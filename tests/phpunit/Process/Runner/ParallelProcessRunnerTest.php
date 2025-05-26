@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Process\MutantProcess;
 use Infection\Process\Runner\ParallelProcessRunner;
-use Infection\Process\Runner\ProcessBearer;
-use Infection\Tests\Fixtures\Event\DummyEvent;
-use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Fixtures\Process\DummyProcessBearer;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -61,42 +59,36 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_starts_the_given_processes(): void
     {
-        $eventDispatcher = new EventDispatcherCollector();
-
         $threadsCount = 4;
 
-        $processes = (function () use ($eventDispatcher, $threadsCount): iterable {
+        $processes = (function () use ($threadsCount): iterable {
             for ($i = 0; $i < 10; ++$i) {
-                yield $this->createProcessBearer($eventDispatcher, ($i % $threadsCount) + 1);
+                yield $this->createMutantProcess(($i % $threadsCount) + 1);
             }
         })();
 
         $runner = new ParallelProcessRunner($threadsCount, 0);
 
-        $this->assertDummyEventCounts(0, $eventDispatcher->getEvents());
+        $executedProcesses = $runner->run($processes);
 
-        $runner->run($processes);
-
-        $this->assertDummyEventCounts(10, $eventDispatcher->getEvents());
+        $this->assertCount(10, iterator_to_array($executedProcesses, true));
     }
 
     public function test_it_checks_if_the_executed_processes_time_out(): void
     {
-        $eventDispatcher = new EventDispatcherCollector();
-
-        $processes = (function () use ($eventDispatcher): iterable {
+        $processes = (function (): iterable {
             for ($i = 0; $i < 10; ++$i) {
-                yield $this->createTimeOutProcessBearer($eventDispatcher);
+                yield $this->createTimeOutMutantProcess();
             }
         })();
 
         $runner = new ParallelProcessRunner(4, 0);
 
-        $this->assertDummyEventCounts(0, $eventDispatcher->getEvents());
-
         $runner->run($processes);
 
-        $this->assertDummyEventCounts(10, $eventDispatcher->getEvents());
+        $executedProcesses = $runner->run($processes);
+
+        $this->assertCount(10, iterator_to_array($executedProcesses, true));
     }
 
     #[DataProvider('threadCountProvider')]
@@ -120,28 +112,24 @@ final class ParallelProcessRunnerTest extends TestCase
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
     {
-        $eventDispatcher = new EventDispatcherCollector();
-
-        $processes = (function () use ($eventDispatcher, $threadCount): iterable {
+        $processes = (function () use ($threadCount): iterable {
             for ($i = 0; $i < 5; ++$i) {
                 $threadIndex = $threadCount === 0 ? 1 : ($i * 2 % $threadCount) + 1;
 
-                yield $this->createProcessBearer($eventDispatcher, $threadIndex);
+                yield $this->createMutantProcess($threadIndex);
 
-                yield $this->createTimeOutProcessBearer($eventDispatcher);
+                yield $this->createTimeOutMutantProcess();
             }
         })();
 
-        $this->assertDummyEventCounts(0, $eventDispatcher->getEvents());
-
         $runner = new ParallelProcessRunner($threadCount, 0);
 
-        $runner->run($processes);
+        $executedProcesses = $runner->run($processes);
 
-        $this->assertDummyEventCounts(10, $eventDispatcher->getEvents());
+        $this->assertCount(10, iterator_to_array($executedProcesses, true));
     }
 
-    private function createProcessBearer(EventDispatcher $eventDispatcher, int $threadIndex): ProcessBearer
+    private function createMutantProcess(int $threadIndex): MutantProcess
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -165,13 +153,10 @@ final class ParallelProcessRunnerTest extends TestCase
         return new DummyProcessBearer(
             $processMock,
             false,
-            static function () use ($eventDispatcher): void {
-                $eventDispatcher->dispatch(new DummyEvent());
-            },
         );
     }
 
-    private function createTimeOutProcessBearer(EventDispatcher $eventDispatcher): ProcessBearer
+    private function createTimeOutMutantProcess(): MutantProcess
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -192,21 +177,6 @@ final class ParallelProcessRunnerTest extends TestCase
         return new DummyProcessBearer(
             $processMock,
             true,
-            static function () use ($eventDispatcher): void {
-                $eventDispatcher->dispatch(new DummyEvent());
-            },
         );
-    }
-
-    /**
-     * @param object[] $events
-     */
-    private function assertDummyEventCounts(int $expectedCount, array $events): void
-    {
-        $this->assertCount($expectedCount, $events);
-
-        foreach ($events as $event) {
-            $this->assertInstanceOf(DummyEvent::class, $event);
-        }
     }
 }

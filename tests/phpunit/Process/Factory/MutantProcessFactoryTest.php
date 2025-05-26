@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Factory;
 
-use function current;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
@@ -128,8 +126,6 @@ final class MutantProcessFactoryTest extends TestCase
         $factory = new MutantProcessFactory(
             $testFrameworkAdapterMock,
             100,
-            $eventDispatcher,
-            $resultFactoryMock,
         );
 
         $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
@@ -150,16 +146,5 @@ final class MutantProcessFactoryTest extends TestCase
         $this->assertFalse($mutantProcess->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
-
-        $mutantProcess->terminateProcess();
-
-        $eventsAfterCallbackCall = $eventDispatcher->getEvents();
-
-        $this->assertCount(1, $eventsAfterCallbackCall);
-
-        $event = current($eventsAfterCallbackCall);
-
-        $this->assertInstanceOf(MutantProcessWasFinished::class, $event);
-        $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }

@@ -38,6 +38,7 @@ namespace Infection\Process\Runner;
 use function array_shift;
 use function count;
 use Generator;
+use Infection\Process\MutantProcess;
 use function max;
 use function microtime;
 use function range;
@@ -57,7 +58,7 @@ final class ParallelProcessRunner implements ProcessRunner
     private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
     /**
-     * @var array<int, IndexedProcessBearer>
+     * @var array<int, IndexedMutantProcess>
      */
     private array $runningProcesses = [];
     /**
@@ -81,7 +82,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->shouldStop = true;
     }
 
-    public function run(iterable $processes): void
+    public function run(iterable $processes): iterable
     {
         /*
          * It takes about 100000 ms for a mutated process to finish, where it takes
@@ -120,7 +121,16 @@ final class ParallelProcessRunner implements ProcessRunner
                     // While we wait, try fetch a good amount of next processes from the queue,
                     // reducing the poll delay with each loaded process
                     usleep(max(0, $this->poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
-                } while (!$this->freeTerminatedProcesses());
+
+                    $terminatedProcess = $this->tryToFreeNotRunningProcess();
+
+                    if ($terminatedProcess !== null) {
+                        // yield back so that we can work on process result
+                        yield $terminatedProcess;
+                    }
+
+                    // Continue if we still have too many running processes and no processes were terminated
+                } while (count($this->runningProcesses) >= $threadCount && $terminatedProcess === null);
             }
 
             // In any case try to load at least one process to the bucket
@@ -129,52 +139,56 @@ final class ParallelProcessRunner implements ProcessRunner
 
         do {
             usleep($this->poll);
-            $this->freeTerminatedProcesses();
+            // Yield any terminated processes
+            $terminatedProcess = $this->tryToFreeNotRunningProcess();
+
+            if ($terminatedProcess !== null) {
+                // yield back so that we can work on process result it afterwords
+                yield $terminatedProcess;
+            }
             // continue loop while there are processes being executed or waiting for execution
         } while ($this->runningProcesses !== []);
     }
 
-    private function freeTerminatedProcesses(): bool
+    private function tryToFreeNotRunningProcess(): ?MutantProcess
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcesses as $index => $indexedProcessBearer) {
-            $processBearer = $indexedProcessBearer->processBearer;
-            $process = $processBearer->getProcess();
+        foreach ($this->runningProcesses as $index => $indexedMutantProcess) {
+            $mutantProcess = $indexedMutantProcess->mutantProcess;
+            $process = $mutantProcess->getProcess();
 
             try {
                 $process->checkTimeout();
             } catch (ProcessTimedOutException) {
-                $processBearer->markAsTimedOut();
+                $mutantProcess->markAsTimedOut();
             }
 
             if (!$process->isRunning()) {
-                $processBearer->terminateProcess();
+                $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
 
-                $this->availableThreadIndexes[] = $indexedProcessBearer->threadIndex;
-
-                unset($this->runningProcesses[$index]->processBearer);
+                unset($this->runningProcesses[$index]->mutantProcess);
                 unset($this->runningProcesses[$index]);
 
-                return true;
+                return $mutantProcess;
             }
         }
 
-        return false;
+        return null;
     }
 
-    private function startProcess(ProcessBearer $processBearer, int $threadIndex): void
+    private function startProcess(MutantProcess $mutantProcess, int $threadIndex): void
     {
-        $processBearer->getProcess()->start(null, [
+        $mutantProcess->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,
         ]);
 
-        $this->runningProcesses[] = new IndexedProcessBearer($threadIndex, $processBearer);
+        $this->runningProcesses[] = new IndexedMutantProcess($threadIndex, $mutantProcess);
     }
 
     /**
-     * @param ProcessBearer[] $bucket
-     * @param Generator<ProcessBearer> $input
+     * @param MutantProcess[] $bucket
+     * @param Generator<MutantProcess> $input
      */
     private static function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
     {
@@ -191,9 +205,9 @@ final class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * @param iterable<ProcessBearer> $input
+     * @param iterable<MutantProcess> $input
      *
-     * @return Generator<ProcessBearer>
+     * @return Generator<MutantProcess>
      */
     private static function toGenerator(iterable &$input): Generator
     {

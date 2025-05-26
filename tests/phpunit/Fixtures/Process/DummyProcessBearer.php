@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\Process;
 
 use Closure;
-use Infection\Process\Runner\ProcessBearer;
+use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
 
 
-final readonly class DummyProcessBearer implements ProcessBearer
+final class DummyProcessBearer extends MutantProcess
 {
-    public function __construct(private Process $process, private bool $expectTimeOut, private Closure $terminateCallback)
+    public function __construct(private Process $process, private bool $expectTimeOut)
     {
     }
 
@@ -29,10 +29,5 @@ final readonly class DummyProcessBearer implements ProcessBearer
                 __FUNCTION__
             ));
         }
-    }
-
-    public function terminateProcess(): void
-    {
-        ($this->terminateCallback)();
     }
 }

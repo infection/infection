@@ -35,14 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\Process\MutantProcess;
+
 /**
  * @internal
  */
-final class IndexedProcessBearer
+final class IndexedMutantProcess
 {
     public function __construct(
         public int $threadIndex,
-        public ProcessBearer $processBearer,
+        public MutantProcess $mutantProcess,
     ) {
     }
 }

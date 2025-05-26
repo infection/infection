@@ -35,26 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Closure;
 use Infection\Mutant\Mutant;
-use Infection\Process\Runner\ProcessBearer;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  * @final
  */
-class MutantProcess implements ProcessBearer
+class MutantProcess
 {
-    private Closure $callback;
-
     private bool $timedOut = false;
 
     public function __construct(
         private readonly Process $process,
         private readonly Mutant $mutant,
     ) {
-        $this->callback = static function (): void {};
     }
 
     public function getProcess(): Process
@@ -75,18 +70,5 @@ class MutantProcess implements ProcessBearer
     public function isTimedOut(): bool
     {
         return $this->timedOut;
-    }
-
-    /**
-     * @param Closure(): void $callback
-     */
-    public function registerTerminateProcessClosure(Closure $callback): void
-    {
-        $this->callback = $callback;
-    }
-
-    public function terminateProcess(): void
-    {
-        ($this->callback)();
     }
 }

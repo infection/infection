@@ -36,10 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Symfony\Component\Process\Process;
 
@@ -49,12 +46,9 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcessFactory
 {
-    // TODO: is it necessary for the timeout to be an int?
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
-        private readonly EventDispatcher $eventDispatcher,
-        private readonly MutantExecutionResultFactory $resultFactory,
     ) {
     }
 
@@ -71,21 +65,6 @@ class MutantProcessFactory
             timeout: $this->timeout,
         );
 
-        $mutantProcess = new MutantProcess($process, $mutant);
-
-        $eventDispatcher = $this->eventDispatcher;
-        $resultFactory = $this->resultFactory;
-
-        $mutantProcess->registerTerminateProcessClosure(static function () use (
-            $mutantProcess,
-            $eventDispatcher,
-            $resultFactory
-        ): void {
-            $eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $resultFactory->createFromProcess($mutantProcess)),
-            );
-        });
-
-        return $mutantProcess;
+        return new MutantProcess($process, $mutant);
     }
 }
