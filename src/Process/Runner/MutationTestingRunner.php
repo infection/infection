@@ -43,9 +43,11 @@ use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessFactory;
+use Infection\Process\MutantProcess;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -61,6 +63,7 @@ class MutationTestingRunner
     public function __construct(
         private readonly MutantProcessFactory $processFactory,
         private readonly MutantFactory $mutantFactory,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly ProcessRunner $processRunner,
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,
@@ -120,14 +123,18 @@ class MutationTestingRunner
 
                 return false;
             })
-            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
+            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcess {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
                 return $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
             })
         ;
 
-        $this->processRunner->run($processes);
+        foreach ($this->processRunner->run($processes) as $mutantProcess) {
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                $this->mutantExecutionResultFactory->createFromProcess($mutantProcess)),
+            );
+        }
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }

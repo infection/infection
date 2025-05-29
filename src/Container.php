@@ -509,8 +509,6 @@ final class Container
             MutantProcessFactory::class => static fn (self $container): MutantProcessFactory => new MutantProcessFactory(
                 $container->getTestFrameworkAdapter(),
                 $container->getConfiguration()->getProcessTimeout(),
-                $container->getEventDispatcher(),
-                $container->getMutantExecutionResultFactory(),
             ),
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();
@@ -529,6 +527,7 @@ final class Container
                 return new MutationTestingRunner(
                     $container->getMutantProcessFactory(),
                     $container->getMutantFactory(),
+                    $container->getMutantExecutionResultFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $configuration->isDryRun()

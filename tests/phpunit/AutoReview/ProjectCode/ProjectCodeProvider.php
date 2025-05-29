@@ -68,7 +68,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\Runner\IndexedProcessBearer;
+use Infection\Process\Runner\IndexedMutantProcess;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
@@ -258,7 +258,7 @@ final class ProjectCodeProvider
                             SourceMethodLineRange::class,
                             NodeLineRangeData::class,
                             TestFileTimeData::class,
-                            IndexedProcessBearer::class,
+                            IndexedMutantProcess::class,
                         ],
                         true,
                     )

@@ -90,23 +90,6 @@ final class MutantProcessTest extends TestCase
         );
     }
 
-    public function test_it_can_have_a_callback_registered_and_executed(): void
-    {
-        $called = false;
-
-        $this->mutantProcess->registerTerminateProcessClosure(
-            static function () use (&$called): void {
-                $called = true;
-            },
-        );
-
-        $this->assertFalse($called);
-
-        $this->mutantProcess->terminateProcess();
-
-        $this->assertTrue($called);
-    }
-
     private function assertMutantProcessStateIs(
         MutantProcess $mutantProcess,
         Process $expectedProcess,

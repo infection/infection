@@ -128,10 +128,6 @@ parameters:
             count: 1
             path: ../tests/phpunit/Process/Runner/DryProcessRunnerTest.php
         -
-            message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with false will always evaluate to false\\.$#"
-            count: 1
-            path: ../tests/phpunit/Process/MutantProcessTest.php
-        -
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php

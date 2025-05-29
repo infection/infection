@@ -45,6 +45,7 @@ use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
@@ -81,6 +82,11 @@ final class MutationTestingRunnerTest extends TestCase
     private $mutantFactoryMock;
 
     /**
+     * @var MutantExecutionResultFactory|MockObject
+     */
+    private $mutationExecutionResultFactory;
+
+    /**
      * @var ProcessRunner|MockObject
      */
     private $processRunnerMock;
@@ -104,6 +110,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $this->processFactoryMock = $this->createMock(MutantProcessFactory::class);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
+        $this->mutationExecutionResultFactory = $this->createMock(MutantExecutionResultFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);
@@ -111,6 +118,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -286,6 +294,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -349,6 +358,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -395,6 +405,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
+            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
