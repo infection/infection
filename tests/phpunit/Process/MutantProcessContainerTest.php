@@ -122,6 +122,8 @@ final class MutantProcessContainerTest extends TestCase
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 
+        $this->assertTrue($container->hasNextProcessToKillMutant());
+
         $container->buildNextProcessToKillMutant();
 
         $this->assertFalse($container->hasNextProcessToKillMutant());

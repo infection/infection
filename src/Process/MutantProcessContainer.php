@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use function count;
+use function array_key_exists;
 use Infection\Process\Factory\LazyMutantProcessCreator;
 
 /**
@@ -68,7 +68,7 @@ class MutantProcessContainer
 
     public function hasNextProcessToKillMutant(): bool
     {
-        return $this->currentProcessIndex < count($this->processes) - 1;
+        return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators);
     }
 
     public function buildNextProcessToKillMutant(): MutantProcess
