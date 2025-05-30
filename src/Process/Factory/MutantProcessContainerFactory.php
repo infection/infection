@@ -53,7 +53,7 @@ class MutantProcessContainerFactory
         private readonly float $timeout,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
         /**
-         * @var list<LazyMutantProcessCreator>
+         * @var list<LazyMutantProcessFactory>
          */
         private readonly array $lazyMutantProcessCreators,
     ) {

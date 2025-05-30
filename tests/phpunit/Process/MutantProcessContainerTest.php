@@ -38,7 +38,7 @@ namespace Infection\Tests\Process;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Process\Factory\LazyMutantProcessCreator;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -65,7 +65,7 @@ final class MutantProcessContainerTest extends TestCase
     private $mutantExecutionResult;
 
     /**
-     * @var LazyMutantProcessCreator|MockObject
+     * @var LazyMutantProcessFactory|MockObject
      */
     private $lazyMutantProcessCreator;
 
@@ -74,7 +74,7 @@ final class MutantProcessContainerTest extends TestCase
         $this->mutant = $this->createMock(Mutant::class);
         $this->mutantExecutionResult = $this->createMock(MutantExecutionResult::class);
         $this->phpUnitMutantProcess = $this->createMock(MutantProcess::class);
-        $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessCreator::class);
+        $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessFactory::class);
     }
 
     public function test_it_returns_current_mutant_process_detection_status(): void
@@ -118,7 +118,7 @@ final class MutantProcessContainerTest extends TestCase
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())
-            ->method('createMutantProcess')
+            ->method('create')
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 
@@ -145,7 +145,7 @@ final class MutantProcessContainerTest extends TestCase
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())
-            ->method('createMutantProcess')
+            ->method('create')
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 
@@ -177,7 +177,7 @@ final class MutantProcessContainerTest extends TestCase
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())
-            ->method('createMutantProcess')
+            ->method('create')
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 

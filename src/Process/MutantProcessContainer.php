@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function array_key_exists;
-use Infection\Process\Factory\LazyMutantProcessCreator;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 
 /**
  * @internal
@@ -54,7 +54,7 @@ class MutantProcessContainer
     public function __construct(
         MutantProcess $phpUnitMutantProcess,
         /**
-         * @var list<LazyMutantProcessCreator>
+         * @var list<LazyMutantProcessFactory>
          */
         private readonly array $lazyMutantProcessCreators,
     ) {
@@ -73,7 +73,7 @@ class MutantProcessContainer
 
     public function buildNextProcessToKillMutant(): MutantProcess
     {
-        $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->createMutantProcess(
+        $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->create(
             $this->processes[0]->getMutant(),
         );
 

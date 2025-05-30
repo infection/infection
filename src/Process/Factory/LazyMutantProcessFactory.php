@@ -41,7 +41,7 @@ use Infection\Process\MutantProcess;
 /**
  * @internal
  */
-interface LazyMutantProcessCreator
+interface LazyMutantProcessFactory
 {
-    public function createMutantProcess(Mutant $mutant): MutantProcess;
+    public function create(Mutant $mutant): MutantProcess;
 }
