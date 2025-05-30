@@ -180,10 +180,8 @@ final class ParallelProcessRunner implements ProcessRunner
                 unset($this->runningProcessContainers[$index]->mutantProcessContainer);
                 unset($this->runningProcessContainers[$index]);
 
-                $isMutantEscaped = $mutantProcessContainer->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
-
-                if ($isMutantEscaped && $mutantProcessContainer->hasNextProcessToKillMutant()) {
-                    $mutantProcessContainer->buildNextProcessToKillMutant();
+                if ($mutantProcessContainer->hasNext()) {
+                    $mutantProcessContainer->createNext();
 
                     // Process needs static analysis run
                     $this->nextMutantProcessKillerContainer[] = $mutantProcessContainer;
