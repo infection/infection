@@ -130,7 +130,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
             [],
         );
 
-        $mutantProcess = $factory->createProcessContainerForMutant($mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);
 
         $process = $mutantProcess->getCurrentMutantProcess()->getProcess();
 

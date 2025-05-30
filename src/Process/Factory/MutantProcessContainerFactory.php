@@ -59,7 +59,7 @@ class MutantProcessContainerFactory
     ) {
     }
 
-    public function createProcessContainerForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
+    public function create(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
     {
         $process = new Process(
             command: $this->testFrameworkAdapter->getMutantCommandLine(

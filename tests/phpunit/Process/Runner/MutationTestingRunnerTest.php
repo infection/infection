@@ -194,7 +194,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->processFactoryMock
-            ->method('createProcessContainerForMutant')
+            ->method('create')
             ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
                 [$mutant1, $testFrameworkExtraOptions],
@@ -266,7 +266,7 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->processFactoryMock
-            ->method('createProcessContainerForMutant')
+            ->method('create')
             ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
                 [$mutant1, $testFrameworkExtraOptions],

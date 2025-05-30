@@ -124,7 +124,7 @@ class MutationTestingRunner
             ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcessContainer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
-                return $this->processFactory->createProcessContainerForMutant($mutant, $testFrameworkExtraOptions);
+                return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
             })
         ;
 
