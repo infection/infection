@@ -129,6 +129,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     DIFF,
                 '<?php $a = 1;',
             ),
+            $this->resultFactory,
         );
 
         $this->assertResultStateIs(
@@ -206,6 +207,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     DIFF,
                 '<?php $a = 1;',
             ),
+            $this->resultFactory,
         );
         $mutantProcess->markAsTimedOut();
 
@@ -289,6 +291,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     DIFF,
                 '<?php $a = 1;',
             ),
+            $this->resultFactory,
         );
 
         $this->assertResultStateIs(
@@ -373,6 +376,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     DIFF,
                 '<?php $a = 1;',
             ),
+            $this->resultFactory,
         );
 
         $this->assertResultStateIs(
@@ -457,6 +461,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     DIFF,
                 '<?php $a = 1;',
             ),
+            $this->resultFactory,
         );
 
         $this->assertResultStateIs(
@@ -550,6 +555,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
                     DIFF,
                 '<?php $a = 1;',
             ),
+            $this->resultFactory,
         );
 
         $this->assertResultStateIs(

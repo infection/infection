@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Symfony\Component\Process\Process;
 
 /**
@@ -49,6 +51,7 @@ class MutantProcess
     public function __construct(
         private readonly Process $process,
         private readonly Mutant $mutant,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
     ) {
     }
 
@@ -70,5 +73,11 @@ class MutantProcess
     public function isTimedOut(): bool
     {
         return $this->timedOut;
+    }
+
+    public function getMutantExecutionResult(): MutantExecutionResult
+    {
+        // TODO cache it
+        return $this->mutantExecutionResultFactory->createFromProcess($this);
     }
 }

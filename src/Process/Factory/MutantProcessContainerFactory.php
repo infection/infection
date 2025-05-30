@@ -37,22 +37,29 @@ namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessFactory
+class MutantProcessContainerFactory
 {
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        /**
+         * @var list<LazyMutantProcessFactory>
+         */
+        private readonly array $lazyMutantProcessCreators,
     ) {
     }
 
-    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    public function create(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
     {
         $process = new Process(
             command: $this->testFrameworkAdapter->getMutantCommandLine(
@@ -65,6 +72,13 @@ class MutantProcessFactory
             timeout: $this->timeout,
         );
 
-        return new MutantProcess($process, $mutant);
+        return new MutantProcessContainer(
+            new MutantProcess(
+                $process,
+                $mutant,
+                $this->mutantExecutionResultFactory,
+            ),
+            $this->lazyMutantProcessCreators,
+        );
     }
 }
