@@ -143,13 +143,20 @@ final class ParallelProcessRunner implements ProcessRunner
                 } while (count($this->runningProcessContainers) >= $threadCount && $terminatedProcess === null);
             }
 
+            // this termination is added for the case when there are few processes than threads and we don't fill/free processes above
+            $terminatedProcess = $this->tryToFreeNotRunningProcess();
+
+            if ($terminatedProcess !== null) {
+                // yield back so that we can work on process result
+                yield $terminatedProcess;
+            }
+
             // In any case try to load at least one process to the bucket
             $this->fillBucketOnce($bucket, $generator, 1);
         }
 
         do {
             usleep($this->poll);
-            // Yield any terminated processes
             $terminatedProcess = $this->tryToFreeNotRunningProcess();
 
             if ($terminatedProcess !== null) {
