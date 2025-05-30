@@ -59,9 +59,18 @@ final class ParallelProcessRunner implements ProcessRunner
     private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
     /**
+     * Here we store "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
+     * For example: static analysis process to try to kill a Mutant
+     *
+     * @var array<int, MutantProcessContainer>
+     */
+    private array $nextMutantProcessKillerContainer = [];
+
+    /**
      * @var array<int, IndexedMutantProcessContainer>
      */
-    private array $runningProcesses = [];
+    private array $runningProcessContainers = [];
+
     /**
      * @var array<int, int>
      */
@@ -100,28 +109,32 @@ final class ParallelProcessRunner implements ProcessRunner
         $bucket = [];
 
         // Load the first process from the queue to buy us some time.
-        self::fillBucketOnce($bucket, $generator, 1);
+        $this->fillBucketOnce($bucket, $generator, 1);
 
         $threadCount = max(1, $this->threadCount);
         $this->availableThreadIndexes = range(1, $threadCount);
 
         // start the initial batch of processes
-        while (($process = array_shift($bucket)) !== null) {
+        do {
             if ($this->shouldStop) {
                 break;
             }
 
-            $threadIndex = array_shift($this->availableThreadIndexes);
+            $mutantProcessContainer = array_shift($bucket);
 
-            Assert::integer($threadIndex, 'Thread index can not be null.');
+            if ($mutantProcessContainer !== null) {
+                $threadIndex = array_shift($this->availableThreadIndexes);
 
-            $this->startProcess($process, $threadIndex);
+                Assert::integer($threadIndex, 'Thread index can not be null.');
 
-            if (count($this->runningProcesses) >= $threadCount) {
+                $this->startProcess($mutantProcessContainer, $threadIndex);
+            }
+
+            if (count($this->runningProcessContainers) >= $threadCount) {
                 do {
                     // While we wait, try fetch a good amount of next processes from the queue,
                     // reducing the poll delay with each loaded process
-                    usleep(max(0, $this->poll - self::fillBucketOnce($bucket, $generator, $threadCount)));
+                    usleep(max(0, $this->poll - $this->fillBucketOnce($bucket, $generator, $threadCount)));
 
                     $terminatedProcess = $this->tryToFreeNotRunningProcess();
 
@@ -131,30 +144,26 @@ final class ParallelProcessRunner implements ProcessRunner
                     }
 
                     // Continue if we still have too many running processes and no processes were terminated
-                } while (count($this->runningProcesses) >= $threadCount && $terminatedProcess === null);
+                } while (count($this->runningProcessContainers) >= $threadCount && $terminatedProcess === null);
             }
 
-            // In any case try to load at least one process to the bucket
-            self::fillBucketOnce($bucket, $generator, 1);
-        }
-
-        do {
-            usleep($this->poll);
-            // Yield any terminated processes
+            // this termination is added for the case when there are few processes than threads and we don't fill/free processes above
             $terminatedProcess = $this->tryToFreeNotRunningProcess();
 
             if ($terminatedProcess !== null) {
-                // yield back so that we can work on process result it afterwords
+                // yield back so that we can work on process result
                 yield $terminatedProcess;
             }
-            // continue loop while there are processes being executed or waiting for execution
-        } while ($this->runningProcesses !== []);
+
+            // In any case try to load at least one process to the bucket
+            $this->fillBucketOnce($bucket, $generator, 1);
+        } while ($bucket !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
     }
 
     private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcesses as $index => $indexedMutantProcess) {
+        foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
             $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
             $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();
@@ -166,16 +175,19 @@ final class ParallelProcessRunner implements ProcessRunner
             }
 
             if (!$process->isRunning()) {
-                if ($mutantProcessContainer->hasNext()) {
-                    $newMutantProcess = $mutantProcessContainer->createNext();
-
-                    // TODO add it to the $bucket and run new process; -> in the next PR
-                }
-
                 $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
 
-                unset($this->runningProcesses[$index]->mutantProcessContainer);
-                unset($this->runningProcesses[$index]);
+                unset($this->runningProcessContainers[$index]->mutantProcessContainer);
+                unset($this->runningProcessContainers[$index]);
+
+                if ($mutantProcessContainer->hasNext()) {
+                    $mutantProcessContainer->createNext();
+
+                    // Process needs static analysis run
+                    $this->nextMutantProcessKillerContainer[] = $mutantProcessContainer;
+
+                    return null;
+                }
 
                 return $mutantProcessContainer;
             }
@@ -191,16 +203,24 @@ final class ParallelProcessRunner implements ProcessRunner
             'TEST_TOKEN' => $threadIndex,
         ]);
 
-        $this->runningProcesses[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
+        $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
     }
 
     /**
+     * This fills the bucket from 2 sources:
+     *  - from the input stream of processes containers (original mutant processes)
+     *  - from the "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
+     *
      * @param MutantProcessContainer[] $bucket
      * @param Generator<MutantProcessContainer> $input
      */
-    private static function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
+    private function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
     {
         if (count($bucket) >= $threadCount || !$input->valid()) {
+            if ($this->nextMutantProcessKillerContainer !== []) {
+                $bucket[] = array_shift($this->nextMutantProcessKillerContainer);
+            }
+
             return 0;
         }
 
