@@ -132,7 +132,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);
 
-        $process = $mutantProcess->getCurrentMutantProcess()->getProcess();
+        $process = $mutantProcess->getCurrent()->getProcess();
 
         $this->assertContains($process->getCommandLine(), [
             "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
@@ -144,8 +144,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
-        $this->assertSame($mutant, $mutantProcess->getCurrentMutantProcess()->getMutant());
-        $this->assertFalse($mutantProcess->getCurrentMutantProcess()->isTimedOut());
+        $this->assertSame($mutant, $mutantProcess->getCurrent()->getMutant());
+        $this->assertFalse($mutantProcess->getCurrent()->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
     }

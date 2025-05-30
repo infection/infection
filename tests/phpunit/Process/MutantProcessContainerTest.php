@@ -77,28 +77,11 @@ final class MutantProcessContainerTest extends TestCase
         $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessFactory::class);
     }
 
-    public function test_it_returns_current_mutant_process_detection_status(): void
-    {
-        $this->phpUnitMutantProcess
-            ->expects($this->once())
-            ->method('getMutantExecutionResult')
-            ->willReturn($this->mutantExecutionResult);
-
-        $this->mutantExecutionResult
-            ->expects($this->once())
-            ->method('getDetectionStatus')
-            ->willReturn(DetectionStatus::KILLED);
-
-        $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
-
-        $this->assertSame(DetectionStatus::KILLED, $container->getCurrentMutantProcessDetectionStatus());
-    }
-
     public function test_it_returns_false_when_there_is_no_next_process_to_kill_mutant(): void
     {
         $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
 
-        $this->assertFalse($container->hasNextProcessToKillMutant());
+        $this->assertFalse($container->hasNext());
     }
 
     public function test_it_returns_true_when_there_is_next_process_to_kill_mutant(): void
@@ -116,17 +99,27 @@ final class MutantProcessContainerTest extends TestCase
             ->method('getMutant')
             ->willReturn($this->mutant);
 
+        $this->phpUnitMutantProcess
+            ->expects($this->once())
+            ->method('getMutantExecutionResult')
+            ->willReturn($this->mutantExecutionResult);
+
+        $this->mutantExecutionResult
+            ->expects($this->once())
+            ->method('getDetectionStatus')
+            ->willReturn(DetectionStatus::ESCAPED);
+
         $this->lazyMutantProcessCreator
             ->expects($this->once())
             ->method('create')
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 
-        $this->assertTrue($container->hasNextProcessToKillMutant());
+        $this->assertTrue($container->hasNext());
 
-        $container->buildNextProcessToKillMutant();
+        $container->createNext();
 
-        $this->assertFalse($container->hasNextProcessToKillMutant());
+        $this->assertFalse($container->hasNext());
     }
 
     public function test_it_builds_next_process_to_kill_mutant(): void
@@ -149,7 +142,7 @@ final class MutantProcessContainerTest extends TestCase
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 
-        $result = $container->buildNextProcessToKillMutant();
+        $result = $container->createNext();
 
         $this->assertSame($newMutantProcess, $result);
     }
@@ -158,7 +151,7 @@ final class MutantProcessContainerTest extends TestCase
     {
         $container = new MutantProcessContainer($this->phpUnitMutantProcess, []);
 
-        $this->assertSame($this->phpUnitMutantProcess, $container->getCurrentMutantProcess());
+        $this->assertSame($this->phpUnitMutantProcess, $container->getCurrent());
     }
 
     public function test_it_returns_next_mutant_process_after_building_it(): void
@@ -181,8 +174,8 @@ final class MutantProcessContainerTest extends TestCase
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
 
-        $container->buildNextProcessToKillMutant();
+        $container->createNext();
 
-        $this->assertSame($newMutantProcess, $container->getCurrentMutantProcess());
+        $this->assertSame($newMutantProcess, $container->getCurrent());
     }
 }

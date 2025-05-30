@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process;
 
 use function array_key_exists;
+use Infection\Mutant\DetectionStatus;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 
 /**
@@ -61,17 +62,16 @@ class MutantProcessContainer
         $this->processes[] = $phpUnitMutantProcess;
     }
 
-    public function getCurrentMutantProcessDetectionStatus(): string
+    /**
+     * Container has a next process only if Mutant is Escaped
+     */
+    public function hasNext(): bool
     {
-        return $this->getCurrentMutantProcess()->getMutantExecutionResult()->getDetectionStatus();
+        return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators)
+            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
     }
 
-    public function hasNextProcessToKillMutant(): bool
-    {
-        return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators);
-    }
-
-    public function buildNextProcessToKillMutant(): MutantProcess
+    public function createNext(): MutantProcess
     {
         $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->create(
             $this->processes[0]->getMutant(),
@@ -84,8 +84,13 @@ class MutantProcessContainer
         return $newMutantProcess;
     }
 
-    public function getCurrentMutantProcess(): MutantProcess
+    public function getCurrent(): MutantProcess
     {
         return $this->processes[$this->currentProcessIndex];
+    }
+
+    private function getCurrentMutantProcessDetectionStatus(): string
+    {
+        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
     }
 }

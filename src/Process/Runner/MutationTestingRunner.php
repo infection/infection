@@ -130,7 +130,7 @@ class MutationTestingRunner
 
         foreach ($this->processRunner->run($processContainers) as $mutantProcessContainer) {
             $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $mutantProcessContainer->getCurrentMutantProcess()->getMutantExecutionResult(),
+                $mutantProcessContainer->getCurrent()->getMutantExecutionResult(),
             ));
         }
 

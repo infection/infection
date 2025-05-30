@@ -39,7 +39,6 @@ use function array_shift;
 use Composer\XdebugHandler\Process;
 use function count;
 use Generator;
-use Infection\Mutant\DetectionStatus;
 use Infection\Process\MutantProcessContainer;
 use function max;
 use function microtime;
@@ -157,7 +156,7 @@ final class ParallelProcessRunner implements ProcessRunner
         // remove any finished process from the stack
         foreach ($this->runningProcesses as $index => $indexedMutantProcess) {
             $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
-            $mutantProcess = $mutantProcessContainer->getCurrentMutantProcess();
+            $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();
 
             try {
@@ -167,10 +166,8 @@ final class ParallelProcessRunner implements ProcessRunner
             }
 
             if (!$process->isRunning()) {
-                $isMutantEscaped = $mutantProcessContainer->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
-
-                if ($isMutantEscaped && $mutantProcessContainer->hasNextProcessToKillMutant()) {
-                    $newMutantProcess = $mutantProcessContainer->buildNextProcessToKillMutant();
+                if ($mutantProcessContainer->hasNext()) {
+                    $newMutantProcess = $mutantProcessContainer->createNext();
 
                     // TODO add it to the $bucket and run new process; -> in the next PR
                 }
@@ -189,7 +186,7 @@ final class ParallelProcessRunner implements ProcessRunner
 
     private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
-        $mutantProcessContainer->getCurrentMutantProcess()->getProcess()->start(null, [
+        $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
             'TEST_TOKEN' => $threadIndex,
         ]);
