@@ -41,7 +41,6 @@ use Infection\Event\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Symfony\Component\Process\Process;
-use function var_dump;
 
 /**
  * @internal
@@ -61,7 +60,7 @@ readonly class InitialStaticAnalysisRunner
 
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $process->run(function (string $type) use ($process): void {
+        $process->run(function (string $type): void {
             $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted());
         });
 

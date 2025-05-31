@@ -38,7 +38,7 @@ namespace Infection\Tests\Process\Runner;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
@@ -176,7 +176,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 $this->createMock(Mutant::class),
-                $this->createMock(MutantExecutionResultFactory::class),
+                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             ),
             [],
@@ -230,7 +230,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('getDetectionStatus')
             ->willReturn(DetectionStatus::ESCAPED);
 
-        $mutantExecutionResultFactoryMock = $this->createMock(MutantExecutionResultFactory::class);
+        $mutantExecutionResultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $mutantExecutionResultFactoryMock
             ->expects($this->once())
@@ -245,9 +245,9 @@ final class ParallelProcessRunnerTest extends TestCase
                 false,
             ),
             [
-                new class($this->createMock(MutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
-                        private MutantExecutionResultFactory $mutantExecutionResultFactory,
+                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
                         private Process $nextProcessMock,
                     ) {
                     }
@@ -287,7 +287,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 $this->createMock(Mutant::class),
-                $this->createMock(MutantExecutionResultFactory::class),
+                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 true,
             ),
             [],

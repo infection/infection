@@ -37,7 +37,9 @@ namespace Infection\StaticAnalysis;
 
 interface StaticAnalysisToolAdapterFactory
 {
-    public static function create(string $staticAnalysisToolExecutable): StaticAnalysisToolAdapter;
+    public static function create(
+        string $staticAnalysisToolExecutable,
+    ): StaticAnalysisToolAdapter;
 
     public static function getAdapterName(): string;
 

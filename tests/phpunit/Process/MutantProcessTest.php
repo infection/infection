@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -53,7 +53,7 @@ final class MutantProcessTest extends TestCase
     private $processMock;
 
     /**
-     * @var MockObject|MutantExecutionResultFactory
+     * @var MockObject|TestFrameworkMutantExecutionResultFactory
      */
     private $mutantExecutionResultFactory;
 
@@ -71,7 +71,7 @@ final class MutantProcessTest extends TestCase
     {
         $this->processMock = $this->createMock(Process::class);
         $this->mutantMock = $this->createMock(Mutant::class);
-        $this->mutantExecutionResultFactory = $this->createMock(MutantExecutionResultFactory::class);
+        $this->mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processMock,

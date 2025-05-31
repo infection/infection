@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+use Infection\Process\Factory\LazyMutantProcessFactory;
+
 interface StaticAnalysisToolAdapter
 {
     public function getName(): string;
 
     public function getInitialRunCommandLine(): array;
 
-    public function getMutantCommandLine(
-        string $mutatedFilePath,
-        string $mutationOriginalFilePath,
-    );
+    public function createMutantProcessFactory(): LazyMutantProcessFactory;
 }

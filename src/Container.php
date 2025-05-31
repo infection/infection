@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
+use Symfony\Component\Process\Process;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -64,6 +64,7 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
+use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
@@ -93,8 +94,9 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
@@ -105,7 +107,9 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcess;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
@@ -159,6 +163,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use function var_dump;
 use Webmozart\Assert\Assert;
 
 /**
@@ -546,17 +551,20 @@ final class Container
                 $container->getInitialStaticAnalysisProcessFactory(),
                 $container->getEventDispatcher(),
             ),
-            MutantProcessFactory::class => function (self $container): MutantProcessFactory {
+            MutantProcessContainerFactory::class => function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
-                return new MutantProcessFactory(
-                MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(    $container->getTestFrameworkAdapter(),
+                $mutantProcessKillerFactories = [];
+
+                if ($config->isStaticAnalysisEnabled()) {
+                    $mutantProcessKillerFactories[] = $container->getStaticAnalysisToolAdapter()->createMutantProcessFactory();
+                }
+
+                return new MutantProcessContainerFactory(
+                    $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getMutantExecutionResultFactory(),
-                    [
-                    // TODO here will be a factory to create Static Analysis MutantProcess to kill Mutant
-                ],
-                    $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
+                    $mutantProcessKillerFactories,
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -570,11 +578,11 @@ final class Container
                     $config->noProgress(),
                 );
             },
-            MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+            MutationTestingRunner::class                     => static function (self $container): MutationTestingRunner {
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getMutantProcessFactory(),
+                    $container->getMutantProcessContainerFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -587,17 +595,17 @@ final class Container
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
                 );
             },
-            LineRangeCalculator::class => static fn (): LineRangeCalculator => new LineRangeCalculator(),
-            StaticAnalysisToolExecutableFinder::class => static fn (): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder(),
-            TestFrameworkFinder::class => static fn (): TestFrameworkFinder => new TestFrameworkFinder(),
-            TestFrameworkExtraOptionsFilter::class => static fn (): TestFrameworkExtraOptionsFilter => new TestFrameworkExtraOptionsFilter(),
-            AdapterInstallationDecider::class => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
-            AdapterInstaller::class => static fn (): AdapterInstaller => new AdapterInstaller(new ComposerExecutableFinder()),
-            MutantExecutionResultFactory::class => static fn (self $container): MutantExecutionResultFactory => new MutantExecutionResultFactory($container->getTestFrameworkAdapter()),
-            FormatterFactory::class => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
-            DiffSourceCodeMatcher::class => static fn (): DiffSourceCodeMatcher => new DiffSourceCodeMatcher(),
-            ShellCommandLineExecutor::class => static fn (): ShellCommandLineExecutor => new ShellCommandLineExecutor(),
-            GitDiffFileProvider::class => static fn (self $container): GitDiffFileProvider => new GitDiffFileProvider($container->getShellCommandLineExecutor()),
+            LineRangeCalculator::class                       => static fn (): LineRangeCalculator => new LineRangeCalculator(),
+            StaticAnalysisToolExecutableFinder::class        => static fn (): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder(),
+            TestFrameworkFinder::class                       => static fn (): TestFrameworkFinder => new TestFrameworkFinder(),
+            TestFrameworkExtraOptionsFilter::class           => static fn (): TestFrameworkExtraOptionsFilter => new TestFrameworkExtraOptionsFilter(),
+            AdapterInstallationDecider::class                => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
+            AdapterInstaller::class                          => static fn (): AdapterInstaller => new AdapterInstaller(new ComposerExecutableFinder()),
+            TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory($container->getTestFrameworkAdapter()),
+            FormatterFactory::class                          => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
+            DiffSourceCodeMatcher::class                     => static fn (): DiffSourceCodeMatcher => new DiffSourceCodeMatcher(),
+            ShellCommandLineExecutor::class                  => static fn (): ShellCommandLineExecutor => new ShellCommandLineExecutor(),
+            GitDiffFileProvider::class                       => static fn (self $container): GitDiffFileProvider => new GitDiffFileProvider($container->getShellCommandLineExecutor()),
         ]);
 
         return $container->withValues(
@@ -1123,7 +1131,7 @@ final class Container
         return $this->get(InitialStaticAnalysisRunner::class);
     }
 
-    public function getMutantProcessFactory(): MutantProcessContainerFactory
+    public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
     {
         return $this->get(MutantProcessContainerFactory::class);
     }
@@ -1188,9 +1196,9 @@ final class Container
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    public function getMutantExecutionResultFactory(): TestFrameworkMutantExecutionResultFactory
     {
-        return $this->get(MutantExecutionResultFactory::class);
+        return $this->get(TestFrameworkMutantExecutionResultFactory::class);
     }
 
     public function getCiDetector(): CiDetector

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
@@ -67,7 +68,7 @@ final readonly class StaticAnalysisToolFactory
             return PHPStanAdapterFactory::create(
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
-                    //  todo                   (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
+                //  todo                   (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
                 ),
             );
         }

@@ -38,6 +38,7 @@ namespace Infection\Process;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Symfony\Component\Process\Process;
 
 /**

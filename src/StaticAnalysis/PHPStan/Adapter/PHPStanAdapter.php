@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 
@@ -44,6 +47,7 @@ use Infection\TestFramework\CommandLineBuilder;
 final class PHPStanAdapter implements StaticAnalysisToolAdapter
 {
     public function __construct(
+        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
     ) {
@@ -72,21 +76,12 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         );
     }
 
-    public function getMutantCommandLine(
-        string $mutatedFilePath,
-        string $mutationOriginalFilePath,
-    ): array {
-        return $this->commandLineBuilder->build(
+    public function createMutantProcessFactory(): LazyMutantProcessFactory
+    {
+        return new PHPStanMutantProcessFactory(
+            $this->mutantExecutionResultFactory,
             $this->staticAnalysisToolExecutable,
-            [],
-            [
-                "--tmp-file=$mutatedFilePath",
-                "--instead-of=$mutationOriginalFilePath",
-                '--error-format=json',
-                '--no-progress',
-                '-vv',
-                // TODO --stop-on-first-error
-            ],
+            $this->commandLineBuilder,
         );
     }
 }

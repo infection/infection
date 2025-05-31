@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
@@ -44,9 +45,12 @@ use Infection\TestFramework\CommandLineBuilder;
  */
 final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
-    public static function create(string $staticAnalysisToolExecutable): StaticAnalysisToolAdapter
+    public static function create(
+        string $staticAnalysisToolExecutable,
+    ): StaticAnalysisToolAdapter
     {
         return new PHPStanAdapter(
+            new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(),
         );

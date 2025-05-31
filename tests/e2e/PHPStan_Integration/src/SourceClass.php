@@ -25,6 +25,8 @@ class SourceClass
 
         $nonEmptyArrayFromMethod = $this->returnNonEmptyArray();
 
+        $inlineNonEmpty = ['1'];
+
         return array_values($values);
     }
 
