@@ -42,7 +42,7 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\Factory\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -50,8 +50,8 @@ use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutantProcessFactory::class)]
-final class MutantProcessFactoryTest extends TestCase
+#[CoversClass(MutantProcessContainerFactory::class)]
+final class MutantProcessContainerFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
@@ -123,14 +123,16 @@ final class MutantProcessFactoryTest extends TestCase
             ->willReturn($executionResultMock)
         ;
 
-        $factory = new MutantProcessFactory(
+        $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
             100,
+            $resultFactoryMock,
+            [],
         );
 
-        $mutantProcess = $factory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+        $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);
 
-        $process = $mutantProcess->getProcess();
+        $process = $mutantProcess->getCurrent()->getProcess();
 
         $this->assertContains($process->getCommandLine(), [
             "'/usr/bin/php' 'bin/phpunit' '--filter' '/path/to/acme/FooTest.php'",
@@ -142,8 +144,8 @@ final class MutantProcessFactoryTest extends TestCase
         $this->assertSame(100., $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
-        $this->assertSame($mutant, $mutantProcess->getMutant());
-        $this->assertFalse($mutantProcess->isTimedOut());
+        $this->assertSame($mutant, $mutantProcess->getCurrent()->getMutant());
+        $this->assertFalse($mutantProcess->getCurrent()->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
     }

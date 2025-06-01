@@ -102,7 +102,7 @@ use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
-use Infection\Process\Factory\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
@@ -506,9 +506,13 @@ final class Container
                 $container->getInitialTestRunProcessFactory(),
                 $container->getEventDispatcher(),
             ),
-            MutantProcessFactory::class => static fn (self $container): MutantProcessFactory => new MutantProcessFactory(
+            MutantProcessContainerFactory::class => static fn (self $container): MutantProcessContainerFactory => new MutantProcessContainerFactory(
                 $container->getTestFrameworkAdapter(),
                 $container->getConfiguration()->getProcessTimeout(),
+                $container->getMutantExecutionResultFactory(),
+                [
+                    // TODO here will be a factory to create Static Analysis MutantProcess to kill Mutant
+                ],
             ),
             MutationGenerator::class => static function (self $container): MutationGenerator {
                 $config = $container->getConfiguration();
@@ -527,7 +531,6 @@ final class Container
                 return new MutationTestingRunner(
                     $container->getMutantProcessFactory(),
                     $container->getMutantFactory(),
-                    $container->getMutantExecutionResultFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $configuration->isDryRun()
@@ -1046,9 +1049,9 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutantProcessFactory(): MutantProcessFactory
+    public function getMutantProcessFactory(): MutantProcessContainerFactory
     {
-        return $this->get(MutantProcessFactory::class);
+        return $this->get(MutantProcessContainerFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator

@@ -46,12 +46,11 @@ use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Process\Factory\MutantProcessFactory;
-use Infection\Process\MutantProcess;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Testing\MutatorName;
@@ -72,7 +71,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MutationTestingRunnerTest extends TestCase
 {
     /**
-     * @var MutantProcessFactory|MockObject
+     * @var MutantProcessContainerFactory|MockObject
      */
     private $processFactoryMock;
 
@@ -80,11 +79,6 @@ final class MutationTestingRunnerTest extends TestCase
      * @var MutantFactory|MockObject
      */
     private $mutantFactoryMock;
-
-    /**
-     * @var TestFrameworkMutantExecutionResultFactory|MockObject
-     */
-    private $mutationExecutionResultFactory;
 
     /**
      * @var ProcessRunner|MockObject
@@ -108,9 +102,8 @@ final class MutationTestingRunnerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->processFactoryMock = $this->createMock(MutantProcessFactory::class);
+        $this->processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
-        $this->mutationExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);
@@ -118,7 +111,6 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
-            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -202,14 +194,14 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->processFactoryMock
-            ->method('createProcessForMutant')
+            ->method('create')
             ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
                 [$mutant1, $testFrameworkExtraOptions],
             ))
             ->willReturnOnConsecutiveCalls(
-                $process0 = $this->buildCoveredMutantProcess(),
-                $process1 = $this->buildCoveredMutantProcess(),
+                $process0 = $this->buildCoveredMutantProcessContainer(),
+                $process1 = $this->buildCoveredMutantProcessContainer(),
             )
         ;
 
@@ -274,14 +266,14 @@ final class MutationTestingRunnerTest extends TestCase
         ;
 
         $this->processFactoryMock
-            ->method('createProcessForMutant')
+            ->method('create')
             ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
                 [$mutant1, $testFrameworkExtraOptions],
             ))
             ->willReturnOnConsecutiveCalls(
-                $process0 = $this->buildCoveredMutantProcess(),
-                $process1 = $this->buildCoveredMutantProcess(),
+                $process0 = $this->buildCoveredMutantProcessContainer(),
+                $process1 = $this->buildCoveredMutantProcessContainer(),
             )
         ;
 
@@ -294,7 +286,6 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
-            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -358,7 +349,6 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
-            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -405,7 +395,6 @@ final class MutationTestingRunnerTest extends TestCase
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
             $this->mutantFactoryMock,
-            $this->mutationExecutionResultFactory,
             $this->processRunnerMock,
             $this->eventDispatcher,
             $this->fileSystemMock,
@@ -538,15 +527,11 @@ final class MutationTestingRunnerTest extends TestCase
         );
     }
 
-    private function buildCoveredMutantProcess(): MutantProcess
+    private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
-        $mutantProcess = $this->createMock(MutantProcess::class);
-        $mutantProcess
-            ->expects($this->never())
-            ->method('getMutant')
-        ;
+        $mutantProcessContainer = $this->createMock(MutantProcessContainer::class);
 
-        return $mutantProcess;
+        return $mutantProcessContainer;
     }
 
     private function someIterable(?callable $callback = null): Callback

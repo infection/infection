@@ -44,10 +44,9 @@ use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Factory\MutantProcessFactory;
-use Infection\Process\MutantProcess;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -61,9 +60,8 @@ class MutationTestingRunner
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        private readonly MutantProcessFactory $processFactory,
+        private readonly MutantProcessContainerFactory $processFactory,
         private readonly MutantFactory $mutantFactory,
-        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly ProcessRunner $processRunner,
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,
@@ -82,7 +80,7 @@ class MutationTestingRunner
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
-        $processes = take($mutations)
+        $processContainers = take($mutations)
             ->cast(fn (Mutation $mutation): Mutant => $this->mutantFactory->create($mutation))
             ->filter(function (Mutant $mutant): bool {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
@@ -123,17 +121,17 @@ class MutationTestingRunner
 
                 return false;
             })
-            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcess {
+            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcessContainer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
-                return $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
+                return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
             })
         ;
 
-        foreach ($this->processRunner->run($processes) as $mutantProcess) {
+        foreach ($this->processRunner->run($processContainers) as $mutantProcessContainer) {
             $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $this->mutantExecutionResultFactory->createFromProcess($mutantProcess)),
-            );
+                $mutantProcessContainer->getCurrent()->getMutantExecutionResult(),
+            ));
         }
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());

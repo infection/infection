@@ -33,38 +33,64 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Factory;
+namespace Infection\Process;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\Mutant;
-use Infection\Process\MutantProcess;
-use Symfony\Component\Process\Process;
+use function array_key_exists;
+use Infection\Mutant\DetectionStatus;
+use Infection\Process\Factory\LazyMutantProcessFactory;
 
 /**
  * @internal
  * @final
  */
-class MutantProcessFactory
+class MutantProcessContainer
 {
+    /**
+     * @var list<MutantProcess>
+     */
+    private array $processes = [];
+
+    private int $currentProcessIndex = 0;
+
     public function __construct(
-        private readonly TestFrameworkAdapter $testFrameworkAdapter,
-        private readonly float $timeout,
+        MutantProcess $phpUnitMutantProcess,
+        /**
+         * @var list<LazyMutantProcessFactory>
+         */
+        private readonly array $lazyMutantProcessCreators,
     ) {
+        $this->processes[] = $phpUnitMutantProcess;
     }
 
-    public function createProcessForMutant(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcess
+    /**
+     * Container has a next process only if Mutant is Escaped
+     */
+    public function hasNext(): bool
     {
-        $process = new Process(
-            command: $this->testFrameworkAdapter->getMutantCommandLine(
-                $mutant->getTests(),
-                $mutant->getFilePath(),
-                $mutant->getMutation()->getHash(),
-                $mutant->getMutation()->getOriginalFilePath(),
-                $testFrameworkExtraOptions,
-            ),
-            timeout: $this->timeout,
+        return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators)
+            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
+    }
+
+    public function createNext(): MutantProcess
+    {
+        $newMutantProcess = $this->lazyMutantProcessCreators[$this->currentProcessIndex]->create(
+            $this->processes[0]->getMutant(),
         );
 
-        return new MutantProcess($process, $mutant);
+        $this->processes[] = $newMutantProcess;
+
+        ++$this->currentProcessIndex;
+
+        return $newMutantProcess;
+    }
+
+    public function getCurrent(): MutantProcess
+    {
+        return $this->processes[$this->currentProcessIndex];
+    }
+
+    private function getCurrentMutantProcessDetectionStatus(): string
+    {
+        return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
     }
 }

@@ -40,10 +40,10 @@ namespace Infection\Process\Runner;
  */
 final class DryProcessRunner implements ProcessRunner
 {
-    public function run(iterable $processes): iterable
+    public function run(iterable $processContainers): iterable
     {
-        foreach ($processes as $process) {
-            yield $process;
+        foreach ($processContainers as $processContainer) {
+            yield $processContainer;
         }
     }
 

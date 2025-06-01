@@ -46,7 +46,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  */
-class TestFrameworkMutantExecutionResultFactory
+class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
     private const PROCESS_MIN_ERROR_CODE = 100;
 

@@ -35,24 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Process\MutantProcess;
-use Infection\Process\Runner\IndexedMutantProcess;
+use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\IndexedMutantProcessContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(IndexedMutantProcess::class)]
-final class IndexedMutantProcessTest extends TestCase
+#[CoversClass(IndexedMutantProcessContainer::class)]
+final class IndexedMutantProcessContainerTest extends TestCase
 {
     public function test_it_creates_object(): void
     {
-        $processBearer = $this->createMock(MutantProcess::class);
+        $processBearer = $this->createMock(MutantProcessContainer::class);
 
-        $indexedProcessBearer = new IndexedMutantProcess(
+        $indexedProcessBearer = new IndexedMutantProcessContainer(
             3,
             $processBearer,
         );
 
         $this->assertSame(3, $indexedProcessBearer->threadIndex);
-        $this->assertSame($processBearer, $indexedProcessBearer->mutantProcess);
+        $this->assertSame($processBearer, $indexedProcessBearer->mutantProcessContainer);
     }
 }

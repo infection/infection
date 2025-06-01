@@ -33,18 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process\Runner;
+namespace Infection\Process\Factory;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Mutant\Mutant;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class IndexedMutantProcess
+class MutantProcessContainerFactory
 {
     public function __construct(
-        public int $threadIndex,
-        public MutantProcess $mutantProcess,
+        private readonly TestFrameworkAdapter $testFrameworkAdapter,
+        private readonly float $timeout,
+        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+        /**
+         * @var list<LazyMutantProcessFactory>
+         */
+        private readonly array $lazyMutantProcessCreators,
     ) {
+    }
+
+    public function create(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
+    {
+        $process = new Process(
+            command: $this->testFrameworkAdapter->getMutantCommandLine(
+                $mutant->getTests(),
+                $mutant->getFilePath(),
+                $mutant->getMutation()->getHash(),
+                $mutant->getMutation()->getOriginalFilePath(),
+                $testFrameworkExtraOptions,
+            ),
+            timeout: $this->timeout,
+        );
+
+        return new MutantProcessContainer(
+            new MutantProcess(
+                $process,
+                $mutant,
+                $this->mutantExecutionResultFactory,
+            ),
+            $this->lazyMutantProcessCreators,
+        );
     }
 }

@@ -36,19 +36,26 @@ declare(strict_types=1);
 namespace Infection\Tests\Process;
 
 use Infection\Mutant\Mutant;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
+use Infection\Process\MutantProcessContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(MutantProcess::class)]
+#[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
     /**
      * @var MockObject|Process
      */
     private $processMock;
+
+    /**
+     * @var MockObject|MutantExecutionResultFactory
+     */
+    private $mutantExecutionResultFactory;
 
     /**
      * @var MockObject|Mutant
@@ -64,8 +71,13 @@ final class MutantProcessTest extends TestCase
     {
         $this->processMock = $this->createMock(Process::class);
         $this->mutantMock = $this->createMock(Mutant::class);
+        $this->mutantExecutionResultFactory = $this->createMock(MutantExecutionResultFactory::class);
 
-        $this->mutantProcess = new MutantProcess($this->processMock, $this->mutantMock);
+        $this->mutantProcess = new MutantProcess(
+            $this->processMock,
+            $this->mutantMock,
+            $this->mutantExecutionResultFactory,
+        );
     }
 
     public function test_it_exposes_its_state(): void
