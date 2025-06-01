@@ -38,7 +38,7 @@ namespace Infection\Tests\Mutant;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
@@ -50,8 +50,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(MutantExecutionResultFactory::class)]
-final class MutantExecutionResultFactoryTest extends TestCase
+#[CoversClass(TestFrameworkMutantExecutionResultFactory::class)]
+final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 {
     use MutantExecutionResultAssertions;
 
@@ -61,7 +61,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
     private $testFrameworkAdapterMock;
 
     /**
-     * @var MutantExecutionResultFactory
+     * @var TestFrameworkMutantExecutionResultFactory
      */
     private $resultFactory;
 
@@ -69,7 +69,7 @@ final class MutantExecutionResultFactoryTest extends TestCase
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
 
-        $this->resultFactory = new MutantExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory($this->testFrameworkAdapterMock);
     }
 
     public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void
