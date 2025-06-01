@@ -43,8 +43,8 @@ use Infection\Event\MutationTestingWasStarted;
 use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessFactory;
 use Infection\Process\MutantProcess;
@@ -63,7 +63,7 @@ class MutationTestingRunner
     public function __construct(
         private readonly MutantProcessFactory $processFactory,
         private readonly MutantFactory $mutantFactory,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly ProcessRunner $processRunner,
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,

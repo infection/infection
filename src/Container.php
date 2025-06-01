@@ -92,8 +92,8 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
@@ -544,7 +544,7 @@ final class Container
             TestFrameworkExtraOptionsFilter::class => static fn (): TestFrameworkExtraOptionsFilter => new TestFrameworkExtraOptionsFilter(),
             AdapterInstallationDecider::class => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
             AdapterInstaller::class => static fn (): AdapterInstaller => new AdapterInstaller(new ComposerExecutableFinder()),
-            MutantExecutionResultFactory::class => static fn (self $container): MutantExecutionResultFactory => new MutantExecutionResultFactory($container->getTestFrameworkAdapter()),
+            TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory($container->getTestFrameworkAdapter()),
             FormatterFactory::class => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
             DiffSourceCodeMatcher::class => static fn (): DiffSourceCodeMatcher => new DiffSourceCodeMatcher(),
             ShellCommandLineExecutor::class => static fn (): ShellCommandLineExecutor => new ShellCommandLineExecutor(),
@@ -1106,9 +1106,9 @@ final class Container
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    public function getMutantExecutionResultFactory(): TestFrameworkMutantExecutionResultFactory
     {
-        return $this->get(MutantExecutionResultFactory::class);
+        return $this->get(TestFrameworkMutantExecutionResultFactory::class);
     }
 
     public function getCiDetector(): CiDetector
