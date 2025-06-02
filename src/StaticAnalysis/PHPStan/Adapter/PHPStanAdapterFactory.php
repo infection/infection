@@ -56,14 +56,4 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             new VersionParser(),
         );
     }
-
-    public static function getAdapterName(): string
-    {
-        return 'phpstan';
-    }
-
-    public static function getExecutableName(): string
-    {
-        return 'phpstan';
-    }
 }

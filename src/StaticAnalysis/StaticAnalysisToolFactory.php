@@ -74,32 +74,6 @@ final readonly class StaticAnalysisToolFactory
 
         $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
 
-        // todo [phpstan-integration]
-        //        foreach ($this->installedExtensions as $installedExtension) {
-        //            $factory = $installedExtension['extra']['class'];
-        //
-        //            Assert::classExists($factory);
-        //
-        //            if (!is_a($factory, TestFrameworkAdapterFactory::class, true)) {
-        //                continue;
-        //            }
-        //
-        //            $availableTestFrameworks[] = $factory::getAdapterName();
-        //
-        //            if ($adapterName === $factory::getAdapterName()) {
-        //                return $factory::create(
-        //                    $this->testFrameworkFinder->find($factory::getExecutableName()),
-        //                    $this->tmpDir,
-        //                    $this->configLocator->locate($factory::getAdapterName()),
-        //                    null,
-        //                    $this->jUnitFilePath,
-        //                    $this->projectDir,
-        //                    $this->infectionConfig->getSourceDirectories(),
-        //                    $skipCoverage,
-        //                );
-        //            }
-        //        }
-
         throw new InvalidArgumentException(sprintf(
             'Invalid name of static analysis tool "%s". Available names are: %s',
             $adapterName,

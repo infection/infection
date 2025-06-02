@@ -35,13 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
+/**
+ * @internal
+ */
 interface StaticAnalysisToolAdapterFactory
 {
     public static function create(
         string $staticAnalysisToolExecutable,
     ): StaticAnalysisToolAdapter;
-
-    public static function getAdapterName(): string;
-
-    public static function getExecutableName(): string;
 }
