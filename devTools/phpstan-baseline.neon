@@ -121,6 +121,12 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
+			message: '#^Parameter &\$bucket by\-ref type of method Infection\\Process\\Runner\\ParallelProcessRunner\:\:fillBucketOnce\(\) expects array\<Infection\\Process\\MutantProcessContainer\>, array\<Infection\\Process\\MutantProcessContainer\|null\> given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: ../src/Process/Runner/ParallelProcessRunner.php
+
+		-
 			message: '#^Parameter \#2 \$paths of method Composer\\Autoload\\ClassLoader\:\:setPsr4\(\) expects list\<string\>\|string, array\<string\> given\.$#'
 			identifier: argument.type
 			count: 1
