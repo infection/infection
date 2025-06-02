@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use function extension_loaded;
 use function getenv;
 use function implode;
@@ -185,7 +186,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Static Analysis tool to use ("%s")',
-                    implode('", "', TestFrameworkTypes::getTypes()),
+                    implode('", "', StaticAnalysisToolTypes::getTypes()),
                 ),
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
             )
