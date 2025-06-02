@@ -100,7 +100,7 @@ final class VersionParserTest extends TestCase
 
         yield 'with spaces' => [' 7.0.2 ', '7.0.2'];
 
-        yield 'nonsense suffix 0' => ['7.0.2foo', '7.0.2'];
+        yield 'nonsense suffix 0' => ['7.0.2foo', '7.0.2foo'];
 
         yield 'nonsense suffix 1' => ['7.0.2-foo', '7.0.2-foo'];
 
@@ -113,6 +113,8 @@ final class VersionParserTest extends TestCase
         yield 'phpspec RC' => ['phpspec version 5.0.0-rc1', '5.0.0-rc1'];
 
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
+
+        yield 'PHPStan' => ['PHPStan - PHP Static Analysis Tool 2.1.x-dev@cfa0299', '2.1.x-dev@cfa0299'];
     }
 
     public static function invalidVersionProvider(): iterable
