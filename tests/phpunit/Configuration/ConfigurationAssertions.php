@@ -89,6 +89,7 @@ trait ConfigurationAssertions
         ?string $expectedGitDiffBase,
         ?string $expectedMapSourceClassToTest,
         ?string $expectedLoggerProjectRootDirectory,
+        ?string $expectedStaticAnalysisTool,
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -145,6 +146,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
         $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy());
         $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->getLoggerProjectRootDirectory());
+        $this->assertSame($expectedStaticAnalysisTool, $configuration->getStaticAnalysisTool());
     }
 
     /**
