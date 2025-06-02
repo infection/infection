@@ -65,6 +65,7 @@ final class PHPStanAdapterTest extends TestCase
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
+            31.0,
             '9.0',
         );
     }
