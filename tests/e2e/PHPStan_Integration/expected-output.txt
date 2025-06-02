@@ -1,9 +1,9 @@
-Total: 1
+Total: 8
 
-Killed: 1
+Killed: 5
 Errored: 0
 Syntax Errors: 0
-Escaped: 0
+Escaped: 3
 Timed Out: 0
 Skipped: 0
 Ignored: 0
