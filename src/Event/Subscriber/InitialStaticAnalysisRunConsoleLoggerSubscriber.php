@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\InitialStaticAnalysisRunWasStarted;
 use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;
 use function sprintf;
@@ -53,8 +53,8 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
     private ProgressBar $progressBar;
 
     public function __construct(
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
-        // todo       private TestFrameworkAdapter $testFrameworkAdapter,
         private bool $debug,
     ) {
         $this->progressBar = new ProgressBar($this->output);
@@ -64,8 +64,7 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
     public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
         try {
-            // todo            $version = $this->testFrameworkAdapter->getVersion();
-            $version = 'hardcoded version';
+            $version = $this->staticAnalysisToolAdapter->getVersion();
         } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
@@ -77,8 +76,7 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
             '',
             sprintf(
                 '%s version: %s',
-                // todo                $this->testFrameworkAdapter->getName(),
-                'PHPStan',
+                $this->staticAnalysisToolAdapter->getName(),
                 $version,
             ),
             '',

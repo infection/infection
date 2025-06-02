@@ -40,6 +40,8 @@ use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\VersionParser;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -50,6 +52,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly VersionParser $versionParser,
+        private ?string $version = null,
     ) {
     }
 
@@ -78,5 +82,24 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             $this->staticAnalysisToolExecutable,
             $this->commandLineBuilder,
         );
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version ??= $this->retrieveVersion();
+    }
+
+    private function retrieveVersion(): string
+    {
+        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
+            $this->staticAnalysisToolExecutable,
+            [],
+            ['--version'],
+        );
+
+        $process = new Process($testFrameworkVersionExecutable);
+        $process->mustRun();
+
+        return $this->versionParser->parse($process->getOutput());
     }
 }

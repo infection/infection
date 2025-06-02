@@ -385,18 +385,25 @@ final class Container
                 $container->getEventDispatcher(),
                 $container->getSubscriberFactoryRegistry(),
             ),
-            ChainSubscriberFactory::class => static fn (self $container): ChainSubscriberFactory => new ChainSubscriberFactory(
-                $container->getInitialTestsConsoleLoggerSubscriberFactory(),
-                $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
-                $container->getMutationTestingResultsCollectorSubscriberFactory(),
-                $container->getMutationTestingConsoleLoggerSubscriberFactory(),
-                $container->getMutationTestingResultsLoggerSubscriberFactory(),
-                $container->getPerformanceLoggerSubscriberFactory(),
-                $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
-                $container->getStopInfectionOnSigintSignalSubscriberFactory(),
-                $container->getDispatchPcntlSignalSubscriberFactory(),
-                $container->getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(),
-            ),
+            ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
+                $subscriberFactories = [
+                    $container->getInitialTestsConsoleLoggerSubscriberFactory(),
+                    $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingResultsCollectorSubscriberFactory(),
+                    $container->getMutationTestingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingResultsLoggerSubscriberFactory(),
+                    $container->getPerformanceLoggerSubscriberFactory(),
+                    $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
+                    $container->getStopInfectionOnSigintSignalSubscriberFactory(),
+                    $container->getDispatchPcntlSignalSubscriberFactory(),
+                ];
+
+                if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
+                    $subscriberFactories[] = $container->getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory();
+                }
+
+                return new ChainSubscriberFactory(...$subscriberFactories);
+            },
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
 
@@ -423,6 +430,7 @@ final class Container
                 return new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
                     $config->noProgress(),
                     $config->isDebugEnabled(),
+                    $container->getStaticAnalysisToolAdapter(),
                 );
             },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(

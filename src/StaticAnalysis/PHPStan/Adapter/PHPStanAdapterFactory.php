@@ -39,6 +39,7 @@ use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
+use Infection\TestFramework\VersionParser;
 
 /**
  * @internal
@@ -52,6 +53,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(),
+            new VersionParser(),
         );
     }
 

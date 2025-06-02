@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,6 +47,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implements EventSubscriber
 {
     public function __construct(
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
     ) {
     }
@@ -54,8 +55,7 @@ final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implement
     public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
         try {
-            // todo            $version = $this->testFrameworkAdapter->getVersion();
-            $version = 'hardcoded version';
+            $version = $this->staticAnalysisToolAdapter->getVersion();
         } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
@@ -66,8 +66,7 @@ final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implement
             '',
             sprintf(
                 '%s version: %s',
-                // todo                $this->testFrameworkAdapter->getName(),
-                'PHPStan',
+                $this->staticAnalysisToolAdapter->getName(),
                 $version,
             ),
         ]);

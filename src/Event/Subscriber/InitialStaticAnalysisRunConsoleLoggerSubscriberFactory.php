@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -45,14 +46,16 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriberFactory impl
     public function __construct(
         private bool $skipProgressBar,
         private bool $debug,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
     {
         return $this->skipProgressBar
-            ? new CiInitialStaticAnalysisRunConsoleLoggerSubscriber($output)
+            ? new CiInitialStaticAnalysisRunConsoleLoggerSubscriber($this->staticAnalysisToolAdapter, $output)
             : new InitialStaticAnalysisRunConsoleLoggerSubscriber(
+                $this->staticAnalysisToolAdapter,
                 $output,
                 $this->debug,
             );

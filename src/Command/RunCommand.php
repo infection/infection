@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use function extension_loaded;
 use function getenv;
 use function implode;
@@ -58,6 +57,7 @@ use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;

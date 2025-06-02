@@ -44,4 +44,6 @@ interface StaticAnalysisToolAdapter
     public function getInitialRunCommandLine(): array;
 
     public function createMutantProcessFactory(): LazyMutantProcessFactory;
+
+    public function getVersion(): string;
 }
