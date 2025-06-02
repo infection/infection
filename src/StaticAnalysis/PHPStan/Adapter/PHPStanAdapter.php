@@ -64,14 +64,13 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
     public function getInitialRunCommandLine(): array
     {
-        // TODO add --stop-on-first-error. Talked to Ondrej - this is the only one way of stop
         // we can't rely on stderr because it's used for other output (non-error)
         // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
-            [],
+            [], // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
         );
     }
 

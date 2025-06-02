@@ -145,10 +145,7 @@ final readonly class Engine
             return;
         }
 
-        // --static-analysis-tool=phpstan|psalm
-        // --skip-initial-static-analysis-run=bool
-        // --static-analysis-cache='/path' - minor
-        // todo see $container->getCoverageChecker()->checkCoverageRequirements(); - make the same for --skip-initial-static-analysis-run and --static-analysis-cache
+        // todo [phpstan-integration] see $container->getCoverageChecker()->checkCoverageRequirements(); - make the same for --skip-initial-static-analysis-run and --static-analysis-cache
 
         //        if ($this->config->shouldSkipInitialTests()) {
         //            $this->consoleOutput->logSkippingInitialTests();
@@ -165,7 +162,7 @@ final readonly class Engine
             );
         }
 
-        // check cache has been generated
+        // todo [phpstan-integration] check cache has been generated
         //        $this->coverageChecker->checkCoverageHasBeenGenerated(
         //            $initialTestSuiteProcess->getCommandLine(),
         //            $initialTestSuiteProcess->getOutput(),

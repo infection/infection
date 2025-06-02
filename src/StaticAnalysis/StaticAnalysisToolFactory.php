@@ -67,13 +67,14 @@ final readonly class StaticAnalysisToolFactory
             return PHPStanAdapterFactory::create(
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
-                    //  todo                   (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
+                    // todo [phpstan-integration] (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
                 ),
             );
         }
 
         $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
 
+        // todo [phpstan-integration]
         //        foreach ($this->installedExtensions as $installedExtension) {
         //            $factory = $installedExtension['extra']['class'];
         //

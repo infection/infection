@@ -58,7 +58,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
             ),
-            timeout: 30, // todo get from config
+            timeout: 30, // todo [phpstan-integration] get from config
         );
 
         return new MutantProcess(
@@ -81,7 +81,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                // TODO --stop-on-first-error
+                // todo [phpstan-integration] --stop-on-first-error
             ],
         );
     }

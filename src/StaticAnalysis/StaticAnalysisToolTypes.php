@@ -65,7 +65,7 @@ final class StaticAnalysisToolTypes
     ): array {
         $types = self::$defaultTypes;
 
-        // TODO
+        // todo [phpstan-integration]
         //        if (count($installedExtensions) > 0) {
         //            foreach ($installedExtensions as $installedExtension) {
         //                $factory = $installedExtension['extra']['class'];
