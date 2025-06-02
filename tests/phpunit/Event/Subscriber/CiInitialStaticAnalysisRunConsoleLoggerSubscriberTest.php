@@ -48,9 +48,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(CiInitialStaticAnalysisRunConsoleLoggerSubscriber::class)]
 final class CiInitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
 {
-    private OutputInterface|MockObject $output;
+    private OutputInterface&MockObject $output;
 
-    private StaticAnalysisToolAdapter|MockObject $staticAnalysisToolAdapter;
+    private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
 
     protected function setUp(): void
     {

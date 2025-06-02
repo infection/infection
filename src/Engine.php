@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Webmozart\Assert\Assert;
 use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -144,6 +145,9 @@ final readonly class Engine
         if (!$this->config->isStaticAnalysisEnabled()) {
             return;
         }
+
+        Assert::notNull($this->initialStaticAnalysisRunner);
+        Assert::notNull($this->staticAnalysisToolAdapter);
 
         // todo [phpstan-integration] see $container->getCoverageChecker()->checkCoverageRequirements(); - make the same for --skip-initial-static-analysis-run and --static-analysis-cache
 

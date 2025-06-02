@@ -72,6 +72,9 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         );
     }
 
+    /**
+     * @return string[]
+     */
     private function getMutantCommandLine(
         string $mutatedFilePath,
         string $mutationOriginalFilePath,

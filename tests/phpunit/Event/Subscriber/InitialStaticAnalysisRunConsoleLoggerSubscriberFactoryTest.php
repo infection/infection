@@ -49,7 +49,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class)]
 final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends TestCase
 {
-    private StaticAnalysisToolAdapter|MockObject $staticAnalysisToolAdapter;
+    private StaticAnalysisToolAdapter&MockObject $staticAnalysisToolAdapter;
 
     protected function setUp(): void
     {

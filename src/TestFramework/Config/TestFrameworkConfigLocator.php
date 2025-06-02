@@ -59,19 +59,19 @@ final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLo
     ) {
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function locate(string $cliTool, ?string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
         $triedFiles = [];
 
         foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+            $conf = sprintf('%s/%s.%s', $dir, $cliTool, $extension);
 
             if (file_exists($conf)) {
                 return realpath($conf);
             }
 
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+            $triedFiles[] = sprintf('%s.%s', $cliTool, $extension);
         }
 
         throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);

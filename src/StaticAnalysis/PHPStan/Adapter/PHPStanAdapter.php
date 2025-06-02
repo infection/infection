@@ -63,6 +63,9 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         return 'PHPStan';
     }
 
+    /**
+     * @return string[]
+     */
     public function getInitialRunCommandLine(): array
     {
         // we can't rely on stderr because it's used for other output (non-error)

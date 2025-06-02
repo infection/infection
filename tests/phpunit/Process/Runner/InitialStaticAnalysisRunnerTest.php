@@ -58,7 +58,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 {
     private static string $phpBin;
 
-    private InitialStaticAnalysisProcessFactory|MockObject $processFactoryMock;
+    private InitialStaticAnalysisProcessFactory&MockObject $processFactoryMock;
 
     private EventDispatcherCollector $eventDispatcher;
 
@@ -66,7 +66,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$phpBin = (new PhpExecutableFinder())->find();
+        self::$phpBin = (string) (new PhpExecutableFinder())->find();
     }
 
     protected function setUp(): void

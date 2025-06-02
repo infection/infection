@@ -57,19 +57,19 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
     ) {
     }
 
-    public function locate(string $staticAnalysisTool, ?string $customDir = null): string
+    public function locate(string $cliTool, ?string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
         $triedFiles = [];
 
         foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $staticAnalysisTool, $extension);
+            $conf = sprintf('%s/%s.%s', $dir, $cliTool, $extension);
 
             if (file_exists($conf)) {
                 return realpath($conf);
             }
 
-            $triedFiles[] = sprintf('%s.%s', $staticAnalysisTool, $extension);
+            $triedFiles[] = sprintf('%s.%s', $cliTool, $extension);
         }
 
         throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);

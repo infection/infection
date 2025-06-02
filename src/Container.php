@@ -536,6 +536,8 @@ final class Container
             StaticAnalysisToolAdapter::class => static function (self $container): StaticAnalysisToolAdapter {
                 $config = $container->getConfiguration();
 
+                Assert::notNull($config->getStaticAnalysisTool());
+
                 return $container->getStaticAnalysisToolFactory()->create(
                     $config->getStaticAnalysisTool(),
                     $config->getProcessTimeout(),

@@ -37,6 +37,7 @@ namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
 use function explode;
+use Generator;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
@@ -193,11 +194,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         );
     }
 
-    public static function providesMockSetup(): array
+    public static function providesMockSetup(): Generator
     {
-        return [
-            'composer-bat' => ['setUpComposerBatchTest'],
-            'project-bat' => ['setUpProjectBatchTest'],
-        ];
+        yield 'composer-bat' => ['setUpComposerBatchTest'];
+
+        yield 'project-bat' => ['setUpProjectBatchTest'];
     }
 }
