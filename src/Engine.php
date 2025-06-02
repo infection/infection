@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Webmozart\Assert\Assert;
 use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -58,6 +57,7 @@ use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
