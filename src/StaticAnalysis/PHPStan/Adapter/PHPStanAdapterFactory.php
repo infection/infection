@@ -48,12 +48,14 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
     public static function create(
         string $staticAnalysisToolExecutable,
+        float $timeout,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
             new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(),
             new VersionParser(),
+            $timeout,
         );
     }
 }

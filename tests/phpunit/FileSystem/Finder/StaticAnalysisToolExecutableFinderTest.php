@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use const DIRECTORY_SEPARATOR;
 use function explode;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;

@@ -538,6 +538,7 @@ final class Container
 
                 return $container->getStaticAnalysisToolFactory()->create(
                     $config->getStaticAnalysisTool(),
+                    $config->getProcessTimeout(),
                 );
             },
             InitialTestsRunProcessFactory::class => static fn (self $container): InitialTestsRunProcessFactory => new InitialTestsRunProcessFactory(

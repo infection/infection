@@ -33,48 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\Event;
 
-use function implode;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use InvalidArgumentException;
-use function sprintf;
+use Infection\Event\InitialStaticAnalysisRunWasFinished;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class StaticAnalysisToolFactory
+#[CoversClass(InitialStaticAnalysisRunWasFinished::class)]
+final class InitialStaticAnalysisRunWasFinishedTest extends TestCase
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
-    public function __construct(
-        private string $tmpDir,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
-    ) {
-    }
-
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function test_it_exposes_its_output(): void
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    // todo [phpstan-integration] (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
+        $text = 'foo-bar-baz';
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
+        $class = new InitialStaticAnalysisRunWasFinished($text);
 
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        $this->assertSame($text, $class->getOutputText());
     }
 }

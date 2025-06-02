@@ -37,6 +37,9 @@ namespace Infection\StaticAnalysis;
 
 use Infection\Process\Factory\LazyMutantProcessFactory;
 
+/**
+ * @internal
+ */
 interface StaticAnalysisToolAdapter
 {
     public function getName(): string;

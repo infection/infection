@@ -48,6 +48,8 @@ final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigL
 {
     private const DEFAULT_EXTENSIONS = [
         'neon',
+        'neon.dist',
+        'dist.neon',
     ];
 
     public function __construct(

@@ -33,48 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\Process\Runner;
 
 use function implode;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use InvalidArgumentException;
-use function sprintf;
+use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
-final readonly class StaticAnalysisToolFactory
+#[CoversClass(InitialStaticAnalysisRunFailed::class)]
+final class InitialStaticAnalysisRunFailedTest extends TestCase
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
-    public function __construct(
-        private string $tmpDir,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
-    ) {
-    }
-
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function test_log_initial_tests_do_not_pass(): void
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    // todo [phpstan-integration] (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())->method('getExitCode')->willReturn(0);
+        $process->expects($this->once())->method('getOutput')->willReturn('output string');
+        $process->expects($this->once())->method('getErrorOutput')->willReturn('error string');
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
+        $error = implode("\n", [
+            'Project static analysis must be in a passing state before running Infection.',
+            'PHPStan reported an exit code of 0.',
+            'Refer to the PHPStan\'s output below:',
+            'STDOUT:',
+            'output string',
+            'STDERR:',
+            'error string',
+        ]);
 
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        $exception = InitialStaticAnalysisRunFailed::fromProcessAndAdapter($process, 'PHPStan');
+
+        $this->assertSame($error, $exception->getMessage());
     }
 }

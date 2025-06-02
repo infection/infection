@@ -42,12 +42,16 @@ use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
     public function __construct(
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
+        private readonly float $timeout,
     ) {
     }
 
@@ -58,7 +62,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
             ),
-            timeout: 30, // todo [phpstan-integration] get from config
+            timeout: $this->timeout,
         );
 
         return new MutantProcess(

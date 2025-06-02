@@ -33,48 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\StaticAnalysis;
 
-use function implode;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use InvalidArgumentException;
-use function sprintf;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class StaticAnalysisToolFactory
+#[CoversClass(StaticAnalysisToolFactory::class)]
+final class StaticAnalysisToolFactoryTest extends TestCase
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
-    public function __construct(
-        private string $tmpDir,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
-    ) {
-    }
-
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    // todo [phpstan-integration] (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
+        $factory = new StaticAnalysisToolFactory(
+            '/tmp',
+            '/project',
+            $this->createMock(StaticAnalysisToolExecutableFinder::class),
+            [],
+        );
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
 
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        $factory->create('Fake SA Tool', 30);
     }
 }

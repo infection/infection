@@ -57,6 +57,7 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
 class StaticAnalysisToolExecutableFinder
 {

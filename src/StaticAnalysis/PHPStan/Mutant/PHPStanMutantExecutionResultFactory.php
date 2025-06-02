@@ -41,9 +41,14 @@ use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use function sprintf;
 use Symfony\Component\Process\Process;
+use function trim;
 use Webmozart\Assert\Assert;
 
-final class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
+/**
+ * @internal
+ * @final
+ */
+class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactory
 {
     private const PROCESS_MIN_ERROR_CODE = 100;
 
@@ -82,7 +87,7 @@ final class PHPStanMutantExecutionResultFactory implements MutantExecutionResult
             ),
         );
 
-        return $process->getOutput() . "\n\n" . $process->getErrorOutput();
+        return trim($process->getOutput() . "\n\n" . $process->getErrorOutput());
     }
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): string

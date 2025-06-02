@@ -33,48 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\Process\Factory;
 
-use function implode;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use InvalidArgumentException;
-use function sprintf;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class StaticAnalysisToolFactory
+#[CoversClass(InitialStaticAnalysisProcessFactory::class)]
+final class InitialStaticAnalysisProcessFactoryTest extends TestCase
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
-    public function __construct(
-        private string $tmpDir,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
-    ) {
-    }
-
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function test_it_creates_initial_process_without_timeout(): void
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    // todo [phpstan-integration] (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
+        $factory = new InitialStaticAnalysisProcessFactory(
+            $this->createMock(StaticAnalysisToolAdapter::class),
+        );
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
+        $process = $factory->createProcess();
 
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        $this->assertNull($process->getTimeout());
     }
 }

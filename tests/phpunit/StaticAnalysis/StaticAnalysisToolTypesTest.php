@@ -33,48 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\StaticAnalysis;
 
-use function implode;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use InvalidArgumentException;
-use function sprintf;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class StaticAnalysisToolFactory
+#[CoversClass(StaticAnalysisToolTypes::class)]
+final class StaticAnalysisToolTypesTest extends TestCase
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
-    public function __construct(
-        private string $tmpDir,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
-    ) {
-    }
-
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function test_it_returns_default_types_when_no_test_framework_adapters_are_installed(): void
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    // todo [phpstan-integration] (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
+        $types = StaticAnalysisToolTypes::getTypes([]);
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
-
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        $this->assertSame(
+            [
+                StaticAnalysisToolTypes::PHPSTAN,
+            ],
+            $types,
+        );
     }
 }

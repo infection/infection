@@ -42,10 +42,10 @@ use Symfony\Component\Process\Process;
  * @internal
  * @final
  */
-class InitialStaticAnalysisProcessFactory
+readonly class InitialStaticAnalysisProcessFactory
 {
     public function __construct(
-        private readonly StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
     ) {
     }
 

@@ -60,7 +60,7 @@ readonly class InitialStaticAnalysisRunner
 
         $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
 
-        $process->run(function (string $type): void {
+        $process->run(function (): void {
             $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted());
         });
 

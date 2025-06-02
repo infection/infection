@@ -33,74 +33,69 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis\PHPStan\Adapter;
+namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
-use Infection\Process\Factory\LazyMutantProcessFactory;
+use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
-use Symfony\Component\Process\Process;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class PHPStanAdapter implements StaticAnalysisToolAdapter
+#[Group('integration')]
+#[CoversClass(PHPStanAdapter::class)]
+final class PHPStanAdapterTest extends TestCase
 {
-    public function __construct(
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
-        private readonly string $staticAnalysisToolExecutable,
-        private readonly CommandLineBuilder $commandLineBuilder,
-        private readonly VersionParser $versionParser,
-        private readonly float $timeout,
-        private ?string $version = null,
-    ) {
-    }
+    private PHPStanAdapter $adapter;
 
-    public function getName(): string
+    private commandLineBuilder|MockObject $commandLineBuilder;
+
+    private PHPStanMutantExecutionResultFactory|MockObject $mutantExecutionResultFactory;
+
+    protected function setUp(): void
     {
-        return 'PHPStan';
-    }
+        $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
+        $this->mutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
 
-    public function getInitialRunCommandLine(): array
-    {
-        // we can't rely on stderr because it's used for other output (non-error)
-        // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
-
-        return $this->commandLineBuilder->build(
-            $this->staticAnalysisToolExecutable,
-            [],
-            [], // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
-        );
-    }
-
-    public function createMutantProcessFactory(): LazyMutantProcessFactory
-    {
-        return new PHPStanMutantProcessFactory(
+        $this->adapter = new PHPStanAdapter(
             $this->mutantExecutionResultFactory,
-            $this->staticAnalysisToolExecutable,
+            '/path/to/phpstan',
             $this->commandLineBuilder,
-            $this->timeout,
+            new VersionParser(),
+            '9.0',
         );
     }
 
-    public function getVersion(): string
+    public function test_it_has_a_name(): void
     {
-        return $this->version ??= $this->retrieveVersion();
+        $this->assertSame('PHPStan', $this->adapter->getName());
     }
 
-    private function retrieveVersion(): string
+    public function test_it_builds_initial_run_command_line(): void
     {
-        $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
-            $this->staticAnalysisToolExecutable,
-            [],
-            ['--version'],
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], [])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+        ;
+
+        $this->assertSame(['/usr/bin/php', '/path/to/phpstan'], $this->adapter->getInitialRunCommandLine());
+    }
+
+    public function test_it_returns_version(): void
+    {
+        $this->assertSame('9.0', $this->adapter->getVersion());
+    }
+
+    public function test_it_creates_mutant_process_creator(): void
+    {
+        $this->assertInstanceOf(
+            PHPStanMutantProcessFactory::class,
+            $this->adapter->createMutantProcessFactory(),
         );
-
-        $process = new Process($testFrameworkVersionExecutable);
-        $process->mustRun();
-
-        return $this->versionParser->parse($process->getOutput());
     }
 }
