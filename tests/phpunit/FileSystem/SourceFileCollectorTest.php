@@ -44,6 +44,7 @@ use function natcasesort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function range;
 use Symfony\Component\Filesystem\Path;
 
@@ -59,7 +60,7 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles);
 
-        $files = [...$files];
+        $files = take($files)->toList();
 
         $this->assertSame(
             $expected,
