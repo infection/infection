@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Fixtures\Process;
 
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResultFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
@@ -15,7 +15,7 @@ final class DummyMutantProcess extends MutantProcess
     public function __construct(
         private Process $process,
         Mutant $mutant,
-        MutantExecutionResultFactory $mutantExecutionResultFactory,
+        TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
         private bool $expectTimeOut
     ) {
         parent::__construct($process, $mutant, $mutantExecutionResultFactory);

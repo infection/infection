@@ -38,6 +38,7 @@ namespace Infection\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use PhpParser\Node;
 use Symfony\Component\Finder\SplFileInfo;
@@ -62,6 +63,7 @@ class Configuration
     /** @var array<string, Mutator<Node>> */
     private readonly array $mutators;
     private readonly string $testFramework;
+    private readonly ?string $staticAnalysisTool;
     private ?float $minMsi = null;
     private readonly int $threadCount;
 
@@ -106,12 +108,14 @@ class Configuration
         private readonly ?string $gitDiffBase,
         private readonly ?string $mapSourceClassToTestStrategy,
         private readonly ?string $loggerProjectRootDirectory,
+        ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
+        Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());
+        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
@@ -120,6 +124,7 @@ class Configuration
         $this->logVerbosity = $logVerbosity;
         $this->mutators = $mutators;
         $this->testFramework = $testFramework;
+        $this->staticAnalysisTool = $staticAnalysisTool;
         $this->minMsi = $minMsi;
         $this->threadCount = $threadCount;
     }
@@ -189,6 +194,16 @@ class Configuration
     public function getTestFramework(): string
     {
         return $this->testFramework;
+    }
+
+    public function getStaticAnalysisTool(): ?string
+    {
+        return $this->staticAnalysisTool;
+    }
+
+    public function isStaticAnalysisEnabled(): bool
+    {
+        return $this->staticAnalysisTool !== null;
     }
 
     public function getBootstrap(): ?string

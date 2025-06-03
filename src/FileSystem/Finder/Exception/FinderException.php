@@ -68,6 +68,16 @@ final class FinderException extends RuntimeException
         );
     }
 
+    public static function staticAnalysisToolNotFound(string $testFrameworkName): self
+    {
+        return new self(
+            sprintf(
+                'Unable to locate a %1$s static analysis executable on local system. Ensure that %1$s is installed and available.',
+                $testFrameworkName,
+            ),
+        );
+    }
+
     public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
     {
         return new self(

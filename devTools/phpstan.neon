@@ -95,7 +95,7 @@ parameters:
                 - ../tests/*
         -
             message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
-            count: 11
+            count: 12
             path:  ../tests/*
         -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'

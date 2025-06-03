@@ -117,6 +117,7 @@ class ConfigurationFactory
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
         ?string $loggerProjectRootDirectory,
+        ?string $staticAnalysisTool,
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -176,6 +177,7 @@ class ConfigurationFactory
             $gitDiffBase,
             $mapSourceClassToTestStrategy,
             $loggerProjectRootDirectory,
+            $staticAnalysisTool,
         );
     }
 

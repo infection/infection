@@ -77,7 +77,7 @@ class MutantProcess
 
     public function getMutantExecutionResult(): MutantExecutionResult
     {
-        // TODO cache it
+        // todo [phpstan-integration] cache it
         return $this->mutantExecutionResultFactory->createFromProcess($this);
     }
 }

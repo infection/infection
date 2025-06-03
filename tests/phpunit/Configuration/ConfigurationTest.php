@@ -42,6 +42,7 @@ use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -96,6 +97,7 @@ final class ConfigurationTest extends TestCase
         ?string $gitDiffBase,
         ?string $mapSourceClassToTest,
         ?string $loggerProjectRootDirectory,
+        ?string $staticAnalysisTool,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -131,6 +133,7 @@ final class ConfigurationTest extends TestCase
             $gitDiffBase,
             $mapSourceClassToTest,
             $loggerProjectRootDirectory,
+            $staticAnalysisTool,
         );
 
         $this->assertConfigurationStateIs(
@@ -168,6 +171,7 @@ final class ConfigurationTest extends TestCase
             $gitDiffBase,
             $mapSourceClassToTest,
             $loggerProjectRootDirectory,
+            $staticAnalysisTool,
         );
     }
 
@@ -207,6 +211,7 @@ final class ConfigurationTest extends TestCase
             'master',
             null,
             null,
+            null, // staticAnalysisTool
         ];
 
         yield 'nominal' => [
@@ -261,6 +266,7 @@ final class ConfigurationTest extends TestCase
             'master',
             MapSourceClassToTestStrategy::SIMPLE,
             null,
+            StaticAnalysisToolTypes::PHPSTAN,
         ];
     }
 }

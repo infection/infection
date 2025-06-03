@@ -57,6 +57,7 @@ use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -79,6 +80,8 @@ final class RunCommand extends BaseCommand
 {
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
+
+    private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
     /** @var string */
     private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
@@ -176,6 +179,16 @@ final class RunCommand extends BaseCommand
                     implode('", "', TestFrameworkTypes::getTypes()),
                 ),
                 Container::DEFAULT_TEST_FRAMEWORK,
+            )
+            ->addOption(
+                self::OPTION_STATIC_ANALYSIS_TOOL,
+                null,
+                InputOption::VALUE_REQUIRED,
+                sprintf(
+                    'Name of the Static Analysis tool to use ("%s")',
+                    implode('", "', StaticAnalysisToolTypes::getTypes()),
+                ),
+                Container::DEFAULT_STATIC_ANALYSIS_TOOL,
             )
             ->addOption(
                 self::OPTION_TEST_FRAMEWORK_OPTIONS,
@@ -385,6 +398,8 @@ final class RunCommand extends BaseCommand
         try {
             $this->startUp($container, $consoleOutput, $logger, $io);
 
+            $config = $container->getConfiguration();
+
             $engine = new Engine(
                 $container->getConfiguration(),
                 $container->getTestFrameworkAdapter(),
@@ -398,6 +413,9 @@ final class RunCommand extends BaseCommand
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
+                // do not create a chain of classes for SA if not enabled
+                $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
+                $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,
             );
 
             $engine->execute();
@@ -429,6 +447,7 @@ final class RunCommand extends BaseCommand
         $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
         $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
+        $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
@@ -523,6 +542,7 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             $this->getMapSourceClassToTest($input),
             $loggerProjectRootDirectory,
+            $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
         );
     }
 

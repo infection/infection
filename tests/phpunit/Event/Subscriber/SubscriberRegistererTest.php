@@ -47,10 +47,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SubscriberRegisterer::class)]
 final class SubscriberRegistererTest extends TestCase
 {
-    /**
-     * @var SubscriberCollectEventDispatcher
-     */
-    private $eventDispatcher;
+    private SubscriberCollectEventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {

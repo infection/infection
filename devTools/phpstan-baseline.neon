@@ -22,6 +22,12 @@ parameters:
 			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-empty\-string\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
+			path: ../src/FileSystem/Finder/StaticAnalysisToolExecutableFinder.php
+
+		-
+			message: '#^Offset 1 might not exist on array\{0\?\: string, 1\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
 			path: ../src/FileSystem/Finder/TestFrameworkFinder.php
 
 		-
@@ -125,6 +131,30 @@ parameters:
 			identifier: parameterByRef.type
 			count: 1
 			path: ../src/Process/Runner/ParallelProcessRunner.php
+
+		-
+			message: '#^Unused Infection\\StaticAnalysis\\StaticAnalysisToolAdapterFactory\:\:create$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
+
+		-
+			message: '#^Property Infection\\StaticAnalysis\\StaticAnalysisToolFactory\:\:\$installedExtensions is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
+
+		-
+			message: '#^Property Infection\\StaticAnalysis\\StaticAnalysisToolFactory\:\:\$projectDir is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
+
+		-
+			message: '#^Property Infection\\StaticAnalysis\\StaticAnalysisToolFactory\:\:\$tmpDir is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
 
 		-
 			message: '#^Parameter \#2 \$paths of method Composer\\Autoload\\ClassLoader\:\:setPsr4\(\) expects list\<string\>\|string, array\<string\> given\.$#'
@@ -745,6 +775,12 @@ parameters:
 			path: ../tests/phpunit/Event/Subscriber/CleanUpAfterMutationTestingFinishedSubscriberFactoryTest.php
 
 		-
+			message: '#^Parameter \#1 \$output of method Infection\\Event\\Subscriber\\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory\:\:create\(\) expects Symfony\\Component\\Console\\Output\\OutputInterface, Infection\\Tests\\Fixtures\\Console\\FakeOutput given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Event/Subscriber/InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest.php
+
+		-
 			message: '#^Parameter \#1 \$output of method Infection\\Event\\Subscriber\\InitialTestsConsoleLoggerSubscriberFactory\:\:create\(\) expects Symfony\\Component\\Console\\Output\\OutputInterface, Infection\\Tests\\Fixtures\\Console\\FakeOutput given\.$#'
 			identifier: argument.type
 			count: 1
@@ -809,6 +845,24 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
+
+		-
+			message: '#^Only booleans are allowed in a ternary operator condition, string\|false given\.$#'
+			identifier: ternary.condNotBoolean
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strlen expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\TestFrameworkFinderTest\:\:providesMockSetup\(\) return type has no value type specified in iterable type array\.$#'
