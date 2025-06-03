@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Mutant;
 
+use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutation\Mutation;
@@ -47,6 +48,7 @@ use Infection\Tests\Mutant\MutantBuilder;
 use Infection\Tests\Mutant\MutantExecutionResultAssertions;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -287,7 +289,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
         );
     }
 
-    public function test_it_can_crate_a_result_from_a_killed_mutant_process(): void
+    #[DataProvider('errorCodes')]
+    public function test_it_can_crate_a_result_from_a_killed_mutant_process(int $errorCode): void
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -307,7 +310,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
         $processMock
             ->expects($this->exactly(2))
             ->method('getExitCode')
-            ->willReturn(1)
+            ->willReturn($errorCode)
         ;
 
         $mutantProcess = new MutantProcess(
@@ -363,5 +366,12 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             $originalFilePath,
             $originalStartingLine,
         );
+    }
+
+    public static function errorCodes(): Generator
+    {
+        yield 'standard error code' => [1];
+
+        yield 'minimum error code' => [100];
     }
 }
