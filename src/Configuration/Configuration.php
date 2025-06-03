@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration;
 
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
@@ -84,6 +85,7 @@ class Configuration
         string $logVerbosity,
         private readonly string $tmpDir,
         private readonly PhpUnit $phpUnit,
+        private readonly PhpStan $phpStan,
         array $mutators,
         string $testFramework,
         private readonly ?string $bootstrap,
@@ -181,6 +183,11 @@ class Configuration
     public function getPhpUnit(): PhpUnit
     {
         return $this->phpUnit;
+    }
+
+    public function getPhpStan(): PhpStan
+    {
+        return $this->phpStan;
     }
 
     /**

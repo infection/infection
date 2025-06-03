@@ -153,6 +153,7 @@ class ConfigurationFactory
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
+            $schema->getPhpStan(),
             $mutators,
             $testFramework,
             $schema->getBootstrap(),

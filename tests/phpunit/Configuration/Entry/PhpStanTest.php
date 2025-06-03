@@ -33,49 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
+namespace Infection\Tests\Configuration\Entry;
 
-use function implode;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use InvalidArgumentException;
-use function sprintf;
+use Infection\Configuration\Entry\PhpStan;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class StaticAnalysisToolFactory
+#[CoversClass(PhpStan::class)]
+final class PhpStanTest extends TestCase
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
-    public function __construct(
-        private Configuration $infectionConfig,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
-    ) {
+    #[DataProvider('valuesProvider')]
+    public function test_it_can_be_instantiated(
+        ?string $executablePath,
+    ): void {
+        $phpUnit = new PhpStan($executablePath);
+
+        $this->assertSame($executablePath, $phpUnit->getCustomPath());
     }
 
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public static function valuesProvider(): iterable
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
+        yield 'minimal' => [
+            null,
+        ];
 
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
-
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        yield 'complete' => [
+            '/path/to/phpunit',
+        ];
     }
 }

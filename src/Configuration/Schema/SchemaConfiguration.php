@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Configuration\Schema;
 
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -59,6 +60,7 @@ final class SchemaConfiguration
         private readonly Logs $logs,
         private readonly ?string $tmpDir,
         private readonly PhpUnit $phpUnit,
+        private readonly PhpStan $phpStan,
         private readonly ?bool $ignoreMsiWithNoMutations,
         private readonly ?float $minMsi,
         private readonly ?float $minCoveredMsi,
@@ -102,6 +104,11 @@ final class SchemaConfiguration
     public function getPhpUnit(): PhpUnit
     {
         return $this->phpUnit;
+    }
+
+    public function getPhpStan(): PhpStan
+    {
+        return $this->phpStan;
     }
 
     public function getIgnoreMsiWithNoMutations(): ?bool
