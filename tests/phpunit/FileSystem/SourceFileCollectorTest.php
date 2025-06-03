@@ -60,7 +60,7 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles);
 
-        $files = take($files)->toArray(); // PHP 7.4 [...$files]
+        $files = [...$files];
 
         $this->assertSame(
             $expected,
