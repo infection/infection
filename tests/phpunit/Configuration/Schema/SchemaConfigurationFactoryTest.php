@@ -43,6 +43,7 @@ use function array_merge;
 use function array_values;
 use function implode;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
@@ -2749,6 +2750,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'logs' => Logs::createEmpty(),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
+            'phpStan' => new PhpStan(null),
             'ignoreMsiWithNoMutations' => null,
             'minMsi' => null,
             'minCoveredMsi' => null,

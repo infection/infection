@@ -39,6 +39,7 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
@@ -59,6 +60,7 @@ class SchemaConfigurationFactory
             self::createLogs($rawConfig->logs ?? new stdClass()),
             self::normalizeString($rawConfig->tmpDir ?? null),
             self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
+            self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
             $rawConfig->ignoreMsiWithNoMutations ?? null,
             $rawConfig->minMsi ?? null,
             $rawConfig->minCoveredMsi ?? null,
@@ -118,6 +120,13 @@ class SchemaConfigurationFactory
         return new PhpUnit(
             self::normalizeString($phpUnit->configDir ?? null),
             self::normalizeString($phpUnit->customPath ?? null),
+        );
+    }
+
+    private static function createPhpStan(stdClass $phpStab): PhpStan
+    {
+        return new PhpStan(
+            self::normalizeString($phpStab->customPath ?? null),
         );
     }
 

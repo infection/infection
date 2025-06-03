@@ -151,12 +151,6 @@ parameters:
 			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
 
 		-
-			message: '#^Property Infection\\StaticAnalysis\\StaticAnalysisToolFactory\:\:\$tmpDir is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
-
-		-
 			message: '#^Parameter \#2 \$paths of method Composer\\Autoload\\ClassLoader\:\:setPsr4\(\) expects list\<string\>\|string, array\<string\> given\.$#'
 			identifier: argument.type
 			count: 1

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Schema;
 
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
@@ -55,6 +56,7 @@ final class SchemaConfigurationTest extends TestCase
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
+        PhpStan $phpStan,
         ?bool $ignoreMsiWithNoMutations,
         $minMsi,
         $minCoveredMsi,
@@ -71,6 +73,7 @@ final class SchemaConfigurationTest extends TestCase
             $logs,
             $tmpDir,
             $phpUnit,
+            $phpStan,
             $ignoreMsiWithNoMutations,
             $minMsi,
             $minCoveredMsi,
@@ -87,6 +90,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($logs, $config->getLogs());
         $this->assertSame($tmpDir, $config->getTmpDir());
         $this->assertSame($phpUnit, $config->getPhpUnit());
+        $this->assertSame($phpStan, $config->getPhpStan());
         $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations());
         $this->assertSame($minMsi, $config->getMinMsi());
         $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi());
@@ -106,6 +110,7 @@ final class SchemaConfigurationTest extends TestCase
             Logs::createEmpty(),
             null,
             new PhpUnit(null, null),
+            new PhpStan(null),
             null,
             null,
             null,
@@ -134,6 +139,7 @@ final class SchemaConfigurationTest extends TestCase
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            new PhpStan('bin/phpstan'),
             true,
             12.0,
             35.0,

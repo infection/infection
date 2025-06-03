@@ -290,7 +290,7 @@ final class Container
                 $config = $container->getConfiguration();
 
                 return new StaticAnalysisToolFactory(
-                    $config->getTmpDir(),
+                    $config,
                     $container->getProjectDir(),
                     $container->getStaticAnalysisToolExecutableFinder(),
                     GeneratedExtensionsConfig::EXTENSIONS,

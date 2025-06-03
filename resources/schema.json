@@ -125,6 +125,17 @@
                 }
             }
         },
+        "phpStan": {
+            "type": "object",
+            "description": "PHPStan additional settings.",
+            "additionalProperties": false,
+            "properties": {
+                "customPath": {
+                    "type": "string",
+                    "description": "Custom path to PHPStan executable."
+                }
+            }
+        },
         "ignoreMsiWithNoMutations": {
             "type": "boolean",
             "description": "Ignore MSI violations with zero mutations."

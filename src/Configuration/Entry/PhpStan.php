@@ -33,49 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\StaticAnalysis;
-
-use function implode;
-use Infection\Configuration\Configuration;
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
-use InvalidArgumentException;
-use function sprintf;
+namespace Infection\Configuration\Entry;
 
 /**
  * @internal
  */
-final readonly class StaticAnalysisToolFactory
+final class PhpStan
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
     public function __construct(
-        private Configuration $infectionConfig,
-        private string $projectDir,
-        private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
-        private array $installedExtensions,
+        private readonly ?string $customPath,
     ) {
     }
 
-    public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
+    public function getCustomPath(): ?string
     {
-        if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
-            return PHPStanAdapterFactory::create(
-                $this->staticAnalysisToolExecutableFiner->find(
-                    StaticAnalysisToolTypes::PHPSTAN,
-                    (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
-                ),
-                $timeout,
-            );
-        }
-
-        $availableTestFrameworks = [StaticAnalysisToolTypes::PHPSTAN];
-
-        throw new InvalidArgumentException(sprintf(
-            'Invalid name of static analysis tool "%s". Available names are: %s',
-            $adapterName,
-            implode(', ', $availableTestFrameworks),
-        ));
+        return $this->customPath;
     }
 }

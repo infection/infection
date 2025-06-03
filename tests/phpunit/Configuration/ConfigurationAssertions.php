@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration;
 use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
@@ -65,6 +66,7 @@ trait ConfigurationAssertions
         string $expectedLogVerbosity,
         string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
+        PhpStan $expectedPhpStan,
         array $expectedMutators,
         string $expectedTestFramework,
         ?string $expectedBootstrap,

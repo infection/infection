@@ -37,6 +37,7 @@ namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
@@ -73,6 +74,7 @@ final class ConfigurationTest extends TestCase
         string $logVerbosity,
         string $tmpDir,
         PhpUnit $phpUnit,
+        PhpStan $phpStan,
         array $mutators,
         string $testFramework,
         ?string $bootstrap,
@@ -109,6 +111,7 @@ final class ConfigurationTest extends TestCase
             $logVerbosity,
             $tmpDir,
             $phpUnit,
+            $phpStan,
             $mutators,
             $testFramework,
             $bootstrap,
@@ -147,6 +150,7 @@ final class ConfigurationTest extends TestCase
             $logVerbosity,
             $tmpDir,
             $phpUnit,
+            $phpStan,
             $mutators,
             $testFramework,
             $bootstrap,
@@ -187,6 +191,7 @@ final class ConfigurationTest extends TestCase
             'none',
             '',
             new PhpUnit(null, null),
+            new PhpStan(null),
             [],
             'phpunit',
             null,
@@ -238,6 +243,7 @@ final class ConfigurationTest extends TestCase
             'default',
             'custom-dir',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            new PhpStan('bin/phpstan'),
             [
                 'Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator()),
             ],
