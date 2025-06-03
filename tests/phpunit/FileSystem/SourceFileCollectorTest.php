@@ -44,7 +44,6 @@ use function natcasesort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function Pipeline\take;
 use function range;
 use Symfony\Component\Filesystem\Path;
 
