@@ -72,8 +72,7 @@ final class FinderException extends RuntimeException
     {
         return new self(
             sprintf(
-                'Unable to locate a %s static analysis executable on local system. Ensure that %s is installed and available.',
-                $testFrameworkName,
+                'Unable to locate a %1$s static analysis executable on local system. Ensure that %1$s is installed and available.',
                 $testFrameworkName,
             ),
         );
