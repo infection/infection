@@ -614,7 +614,7 @@ final class Container
             DiffSourceCodeMatcher::class => static fn (): DiffSourceCodeMatcher => new DiffSourceCodeMatcher(),
             ShellCommandLineExecutor::class => static fn (): ShellCommandLineExecutor => new ShellCommandLineExecutor(),
             GitDiffFileProvider::class => static fn (self $container): GitDiffFileProvider => new GitDiffFileProvider($container->getShellCommandLineExecutor()),
-            ComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            MemoizedComposerExecutableFind::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
         ]);
 
         return $container->withValues(
