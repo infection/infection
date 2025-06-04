@@ -39,7 +39,6 @@ use function array_flip;
 use function array_key_exists;
 use function array_shift;
 use function count;
-use function escapeshellarg;
 use function implode;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -49,8 +48,10 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
-use function Safe\exec;
 use function sprintf;
+use Throwable;
+use function token_get_all;
+use const TOKEN_PARSE;
 use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
@@ -179,19 +180,25 @@ abstract class BaseMutatorTestCase extends TestCase
 
     private function assertSyntaxIsValid(string $realMutatedCode): void
     {
-        exec(
-            sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)),
-            $output,
-            $returnCode,
-        );
+        try {
+            $tokens = token_get_all($realMutatedCode, TOKEN_PARSE);
 
-        $this->assertSame(
-            0,
-            $returnCode,
-            sprintf(
-                'Mutator %s produces invalid code',
-                $this->mutator->getName(),
-            ),
-        );
+            $this->assertTrue(
+                $tokens !== [],
+                sprintf(
+                    'Mutator %s produces invalid code: %s',
+                    $this->mutator->getName(),
+                    $realMutatedCode,
+                ),
+            );
+        } catch (Throwable $e) {
+            $this->fail(
+                sprintf(
+                    'Mutator %s produces invalid code: %s',
+                    $this->mutator->getName(),
+                    $e->getMessage(),
+                ),
+            );
+        }
     }
 }
