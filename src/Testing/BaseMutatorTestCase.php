@@ -37,6 +37,7 @@ namespace Infection\Testing;
 
 use function array_flip;
 use function array_key_exists;
+use function array_map;
 use function array_shift;
 use function count;
 use function escapeshellarg;
@@ -46,20 +47,30 @@ use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
+use LogicException;
 use const PHP_EOL;
+use const PHP_VERSION_ID;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
 use function Safe\exec;
 use function sprintf;
+use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
+    private const SUPPORTS_MULTI_FILE_LINT = 80300;
+
     protected Mutator $mutator;
+    private ?string $tmpDir = null;
 
     protected function setUp(): void
     {
         $this->mutator = $this->createMutator();
+
+        if ($this->tmpDir === null) {
+            $this->tmpDir = sys_get_temp_dir();
+        }
     }
 
     /**
@@ -103,10 +114,10 @@ abstract class BaseMutatorTestCase extends TestCase
                 StringNormalizer::normalizeString($expectedCodeSample),
                 StringNormalizer::normalizeString($realMutatedCode),
             );
+        }
 
-            if (!$allowInvalidCode) {
-                $this->assertSyntaxIsValid($realMutatedCode);
-            }
+        if (!$allowInvalidCode && $mutants !== []) {
+            $this->assertSyntaxIsValid($mutants);
         }
     }
 
@@ -177,21 +188,59 @@ abstract class BaseMutatorTestCase extends TestCase
         return $mutationsCollectorVisitor->getMutations();
     }
 
-    private function assertSyntaxIsValid(string $realMutatedCode): void
+    /**
+     * @param non-empty-array<string> $codes
+     */
+    private function assertSyntaxIsValid(array $codes): void
     {
-        exec(
-            sprintf('echo %s | php -l', escapeshellarg($realMutatedCode)),
-            $output,
-            $returnCode,
-        );
+        if (PHP_VERSION_ID >= self::SUPPORTS_MULTI_FILE_LINT && count($codes) > 1) {
+            // lint multiple files at once, to speedup the process
+            // see https://php.watch/versions/8.3/cli-lint-multiple-files
 
-        $this->assertSame(
-            0,
-            $returnCode,
-            sprintf(
-                'Mutator %s produces invalid code',
-                $this->mutator->getName(),
-            ),
-        );
+            if ($this->tmpDir === null) {
+                throw new LogicException();
+            }
+
+            $filenames = [];
+
+            foreach ($codes as $code) {
+                $filename = \Safe\tempnam($this->tmpDir, 'infection_is_valid');
+                \Safe\file_put_contents($filename, $code);
+
+                $filenames[] = $filename;
+            }
+
+            exec(
+                sprintf('php -l %s', implode(' ', array_map(static fn ($filename) => escapeshellarg($filename), $filenames))),
+                $output,
+                $returnCode,
+            );
+
+            $this->assertSame(
+                0,
+                $returnCode,
+                sprintf(
+                    'Mutator %s produces invalid code',
+                    $this->mutator->getName(),
+                ),
+            );
+        } else {
+            foreach ($codes as $code) {
+                exec(
+                    sprintf('echo %s | php -l', escapeshellarg($code)),
+                    $output,
+                    $returnCode,
+                );
+
+                $this->assertSame(
+                    0,
+                    $returnCode,
+                    sprintf(
+                        'Mutator %s produces invalid code',
+                        $this->mutator->getName(),
+                    ),
+                );
+            }
+        }
     }
 }
