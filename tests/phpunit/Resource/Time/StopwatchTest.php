@@ -69,7 +69,8 @@ final class StopwatchTest extends TestCase
 
         $actualTimeInSeconds = $this->stopwatch->stop();
 
-        $this->assertSame($expectedTime, round($actualTimeInSeconds, 2));
+        // on macOS m4 pro we need a small delta to account for the precision of the timer
+        $this->assertEqualsWithDelta($expectedTime, round($actualTimeInSeconds, 2), 0.02);
     }
 
     public function test_it_cannot_be_started_twice(): void
