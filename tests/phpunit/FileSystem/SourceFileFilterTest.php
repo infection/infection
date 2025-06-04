@@ -208,7 +208,7 @@ final class SourceFileFilterTest extends TestCase
 
         $actual = take($actual)
             ->map(static fn ($traceOrFileInfo) => $traceOrFileInfo->getRealPath())
-            ->toArray();
+            ->toList();
 
         $this->assertSame($expectedFilePaths, $actual);
     }
