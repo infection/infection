@@ -39,6 +39,7 @@ use const DIRECTORY_SEPARATOR;
 use function explode;
 use Generator;
 use function getenv;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -69,6 +70,8 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
     private Filesystem $fileSystem;
 
+    private ComposerExecutableFinder $composerFinder;
+
     /**
      * Saves the current environment
      */
@@ -84,6 +87,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         parent::setUp();
 
         $this->fileSystem = new Filesystem();
+
+        $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
+        $this->composerFinder->method('find')
+            ->willReturn('/usr/bin/composer');
     }
 
     protected function tearDown(): void
@@ -97,7 +104,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder();
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -108,7 +115,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder();
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -120,7 +127,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
     {
         $path = getenv(self::$pathName);
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder();
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             // The main script must be found from the .bat file
@@ -159,7 +166,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder();
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             // This .bat has no code, so main script will not be found
@@ -185,7 +192,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder();
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
         $this->assertSame(
             normalizePath(realpath($mock->getPackageScript())),
