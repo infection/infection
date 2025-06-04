@@ -24,8 +24,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  MIN_MSI: 72.16
-  MIN_COVERED_MSI: 86.48
+  MIN_MSI: 77.0
+  MIN_COVERED_MSI: 87.0
 
 jobs:
   tests:
