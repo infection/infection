@@ -78,6 +78,9 @@ final class MethodCallRemoval implements Mutator
             return false;
         }
 
-        return $node->expr instanceof Node\Expr\MethodCall || $node->expr instanceof Node\Expr\StaticCall;
+        return $node->expr instanceof Node\Expr\MethodCall
+            || $node->expr instanceof Node\Expr\NullsafeMethodCall
+            || $node->expr instanceof Node\Expr\StaticCall
+        ;
     }
 }
