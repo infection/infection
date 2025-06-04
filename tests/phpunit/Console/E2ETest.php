@@ -47,7 +47,7 @@ use function implode;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
 use Infection\Console\E2E;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Testing\SingletonContainer;
 use function is_readable;
@@ -230,7 +230,7 @@ final class E2ETest extends TestCase
 
             try {
                 $process = new Process([
-                    (new ComposerExecutableFinder())->find(),
+                    (new ConcreteComposerExecutableFinder())->find(),
                     'install',
                 ]);
                 $process->setTimeout(300);

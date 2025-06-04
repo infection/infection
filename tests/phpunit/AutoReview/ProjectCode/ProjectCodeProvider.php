@@ -56,7 +56,7 @@ use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Logger\Http\StrykerCurlClient;
@@ -110,7 +110,7 @@ final class ProjectCodeProvider
         ConfigureCommand::class,
         Application::class,
         ProgressFormatter::class,
-        ComposerExecutableFinder::class,
+        ConcreteComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         NodeMutationGenerator::class,

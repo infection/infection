@@ -68,6 +68,11 @@ class TestFrameworkFinder
      */
     private array $cachedPath = [];
 
+    public function __construct(
+        private readonly ComposerExecutableFinder $executableFinder,
+    ) {
+    }
+
     public function find(string $testFrameworkName, string $customPath = ''): string
     {
         if (!array_key_exists($testFrameworkName, $this->cachedPath)) {
@@ -129,7 +134,7 @@ class TestFrameworkFinder
 
     private function findComposer(): string
     {
-        return (new ComposerExecutableFinder())->find();
+        return $this->executableFinder->find();
     }
 
     private function findTestFramework(string $testFrameworkName, string $customPath): string
