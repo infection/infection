@@ -33,12 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Tests\FileSystem\Finder;
 
-/**
- * @internal
- */
-interface ComposerExecutableFinder
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(MemoizedComposerExecutableFinder::class)]
+final class MemoizedComposerExecutableFinderTest extends TestCase
 {
-    public function find(): string;
+    public function test_it(): void
+    {
+        $pathToComposer = '/path/to/composer';
+
+        $mockFinder = $this->createMock(ComposerExecutableFinder::class);
+        $mockFinder->expects($this->once())
+            ->method('find')
+            ->willReturn($pathToComposer);
+
+        $finder = new MemoizedComposerExecutableFinder($mockFinder);
+
+        $this->assertSame($pathToComposer, $finder->find());
+        $this->assertSame($pathToComposer, $finder->find());
+    }
+
+    public function test_it_throws(): void
+    {
+        $exception = FinderException::composerNotFound();
+
+        $mockFinder = $this->createMock(ComposerExecutableFinder::class);
+        $mockFinder->expects($this->once())
+            ->method('find')
+            ->willThrowException($exception);
+
+        $finder = new MemoizedComposerExecutableFinder($mockFinder);
+
+        $this->expectExceptionObject($exception);
+        $finder->find();
+    }
 }

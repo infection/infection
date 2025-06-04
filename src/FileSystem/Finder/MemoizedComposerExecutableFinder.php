@@ -35,10 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use Later\Interfaces\Deferred;
+use function Later\later;
+
 /**
  * @internal
  */
-interface ComposerExecutableFinder
+final readonly class MemoizedComposerExecutableFinder implements ComposerExecutableFinder
 {
-    public function find(): string;
+    /** @var Deferred<string> */
+    private Deferred $result;
+
+    public function __construct(
+        private ComposerExecutableFinder $composerExecutableFinder,
+    ) {
+        $this->result = later(fn () => yield $this->composerExecutableFinder->find());
+    }
+
+    public function find(): string
+    {
+        return $this->result->get();
+    }
 }

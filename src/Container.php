@@ -75,6 +75,8 @@ use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
+use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
@@ -602,16 +604,17 @@ final class Container
                 );
             },
             LineRangeCalculator::class => static fn (): LineRangeCalculator => new LineRangeCalculator(),
-            StaticAnalysisToolExecutableFinder::class => static fn (): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder(),
-            TestFrameworkFinder::class => static fn (): TestFrameworkFinder => new TestFrameworkFinder(),
+            StaticAnalysisToolExecutableFinder::class => static fn (self $container): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder($container->getComposerExecutableFinder()),
+            TestFrameworkFinder::class => static fn (self $container): TestFrameworkFinder => new TestFrameworkFinder($container->getComposerExecutableFinder()),
             TestFrameworkExtraOptionsFilter::class => static fn (): TestFrameworkExtraOptionsFilter => new TestFrameworkExtraOptionsFilter(),
             AdapterInstallationDecider::class => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
-            AdapterInstaller::class => static fn (): AdapterInstaller => new AdapterInstaller(new ComposerExecutableFinder()),
+            AdapterInstaller::class => static fn (self $container): AdapterInstaller => new AdapterInstaller($container->getComposerExecutableFinder()),
             TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory($container->getTestFrameworkAdapter()),
             FormatterFactory::class => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
             DiffSourceCodeMatcher::class => static fn (): DiffSourceCodeMatcher => new DiffSourceCodeMatcher(),
             ShellCommandLineExecutor::class => static fn (): ShellCommandLineExecutor => new ShellCommandLineExecutor(),
             GitDiffFileProvider::class => static fn (self $container): GitDiffFileProvider => new GitDiffFileProvider($container->getShellCommandLineExecutor()),
+            MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
         ]);
 
         return $container->withValues(
@@ -1250,6 +1253,11 @@ final class Container
     public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder
     {
         return $this->get(StrykerHtmlReportBuilder::class);
+    }
+
+    public function getComposerExecutableFinder(): ComposerExecutableFinder
+    {
+        return $this->get(MemoizedComposerExecutableFinder::class);
     }
 
     /**

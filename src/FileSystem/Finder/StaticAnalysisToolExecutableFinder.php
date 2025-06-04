@@ -68,6 +68,11 @@ class StaticAnalysisToolExecutableFinder
      */
     private array $cachedPath = [];
 
+    public function __construct(
+        private readonly ComposerExecutableFinder $executableFinder,
+    ) {
+    }
+
     public function find(string $staticAnalysisTool, string $customPath = ''): string
     {
         if (!array_key_exists($staticAnalysisTool, $this->cachedPath)) {
@@ -129,7 +134,7 @@ class StaticAnalysisToolExecutableFinder
 
     private function findComposer(): string
     {
-        return (new ComposerExecutableFinder())->find();
+        return $this->executableFinder->find();
     }
 
     private function findStaticAnalysisExecutable(string $staticAnalysisTool, string $customPath): string
