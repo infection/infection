@@ -75,4 +75,9 @@ final readonly class CoreClassReflection implements ClassReflection
     {
         return $this->reflectionClass->getName();
     }
+
+    public function isFinal(): bool
+    {
+        return $this->reflectionClass->isFinal();
+    }
 }

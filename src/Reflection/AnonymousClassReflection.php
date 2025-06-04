@@ -79,6 +79,11 @@ final readonly class AnonymousClassReflection implements ClassReflection
         return '';
     }
 
+    public function isFinal(): bool
+    {
+        return $this->reflectionClass->isFinal();
+    }
+
     private static function hasMethodRecursively(
         ReflectionClass $reflectionClass,
         string $methodName,
