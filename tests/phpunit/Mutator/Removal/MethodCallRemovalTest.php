@@ -116,6 +116,22 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It remove a null-safe method call with parameters' => [
+            <<<'PHP'
+                <?php
+
+                $foo?->bar(3, 4);
+                $a = 3;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $a = 3;
+                PHP
+            ,
+        ];
+
         yield 'It does not remove a method call that is assigned to something' => [
             <<<'PHP'
                 <?php
