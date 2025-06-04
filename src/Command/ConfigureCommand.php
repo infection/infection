@@ -157,7 +157,7 @@ final class ConfigureCommand extends BaseCommand
             $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
 
-        $phpUnitExecutableFinder = new TestFrameworkFinder();
+        $phpUnitExecutableFinder = new TestFrameworkFinder($this->getApplication()->getContainer()->getComposerExecutableFinder());
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
