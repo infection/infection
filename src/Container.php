@@ -1316,7 +1316,7 @@ final class Container
 
         // Look for a factory that can create an instance of an interface or abstract class
         foreach ($this->factories as $id => $factory) {
-            if (!is_subclass_of($id, $paramTypeName) && !is_a($id, $paramTypeName, true)) {
+            if (!is_a($id, $paramTypeName, true)) {
                 continue;
             }
 
