@@ -22,7 +22,7 @@ parameters:
         -
             path: '../src/Container.php'
             message: '#^Method Infection\\Container::get.*\(\) should return .* but returns object\.$#'
-            count: 2
+            count: 1
         -
             path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
             message: '#return type has no value type specified in iterable type array#'

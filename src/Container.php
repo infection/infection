@@ -1270,7 +1270,6 @@ final class Container
      * @template T of object
      *
      * @param class-string<T> $id
-     * @param T $value
      * @phpstan-return T
      */
     private function setValueOrThrow(string $id, object $value): object
