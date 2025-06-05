@@ -35,32 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use function array_key_exists;
-use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
-use ReflectionFunction;
-use ReflectionNamedType;
 
 /**
  * @internal
  *
  * @deprecated This mutator is a semantic addition
  *
- * @implements Mutator<Node\Expr\BinaryOp\Identical>
+ * @extends  AbstractIdenticalComparison<Node\Expr\BinaryOp\Identical>
  */
-final class IdenticalEqual implements Mutator
+final class IdenticalEqual extends AbstractIdenticalComparison
 {
     use GetMutatorName;
-
-    /**
-     * @var array<string, string|null>
-     */
-    private array $reflectionCache = [];
 
     public static function getDefinition(): Definition
     {
@@ -120,67 +112,5 @@ final class IdenticalEqual implements Mutator
         }
 
         return true;
-    }
-
-    /**
-     * @param Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr
-     */
-    private function isSameTypeIdenticalComparison(Expr\FuncCall $call, Expr $expr): bool
-    {
-        $returnType = $this->getReturnType($call);
-
-        if ($returnType === null) {
-            return false;
-        }
-
-        if ($expr instanceof Node\Scalar\Int_) {
-            return $returnType === 'int';
-        }
-
-        if ($expr instanceof Node\Scalar\String_) {
-            return $returnType === 'string';
-        }
-
-        if ($expr instanceof Node\Scalar\Float_) {
-            return $returnType === 'float';
-        }
-
-        if ($expr instanceof Expr\ConstFetch) {
-            return in_array($expr->name->toString(), ['true', 'false'], true);
-        }
-
-        if ($expr instanceof Expr\FuncCall) {
-            $exprReturnType = $this->getReturnType($expr);
-
-            if ($exprReturnType === null) {
-                return false;
-            }
-
-            return $returnType === $exprReturnType;
-        }
-
-        return false;
-    }
-
-    private function getReturnType(Expr\FuncCall $call): ?string
-    {
-        if (!$call->name instanceof Node\Name) {
-            return null;
-        }
-
-        $name = $call->name->toString();
-
-        if (array_key_exists($name, $this->reflectionCache)) {
-            return $this->reflectionCache[$name];
-        }
-
-        $reflection = new ReflectionFunction($name);
-        $returnType = $reflection->getReturnType();
-
-        if (!$returnType instanceof ReflectionNamedType) {
-            return $this->reflectionCache[$name] = null;
-        }
-
-        return $this->reflectionCache[$name] = $returnType->getName();
     }
 }
