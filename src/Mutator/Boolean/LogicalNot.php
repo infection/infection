@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -81,7 +82,7 @@ final class LogicalNot implements Mutator
 
         // e.g. "!!someFunc()"
         $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot)
-            || $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
+            || ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot;
 
         return !$isDoubledLogicalNot;
     }
