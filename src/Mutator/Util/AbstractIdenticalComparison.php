@@ -80,7 +80,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
 
         if ($expr instanceof Expr\ConstFetch) {
-            return in_array($expr->name->toString(), ['true', 'false'], true);
+            return $returnType === 'bool' && in_array($expr->name->toString(), ['true', 'false'], true);
         }
 
         if ($expr instanceof Expr\FuncCall) {

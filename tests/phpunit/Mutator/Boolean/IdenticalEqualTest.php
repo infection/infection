@@ -224,5 +224,31 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 trim() === substr();
                 PHP,
         ];
+
+        yield 'It mutates identical operator into equal operator for incompatible types in operation' => [
+            <<<'PHP'
+                <?php
+
+                true === trim();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                true == trim();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for incompatible types in operation (inversed)' => [
+            <<<'PHP'
+                <?php
+
+                trim() === false;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                trim() == false;
+                PHP,
+        ];
     }
 }
