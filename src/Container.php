@@ -1304,6 +1304,7 @@ final class Container
             return;
         }
 
+        /** @var class-string $paramTypeName */
         $paramTypeName = $paramType->getName();
 
         // Found an instantiable class, done
