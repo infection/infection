@@ -38,6 +38,7 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
+use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -143,20 +144,24 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
+use function is_a;
+use function is_subclass_of;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionParameter;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -298,6 +303,7 @@ final class Container
                 $container->getMutantCodeFactory(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
+            SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
@@ -364,10 +370,6 @@ final class Container
                     (float) $config->getMinCoveredMsi(),
                 );
             },
-            SubscriberRegisterer::class => static fn (self $container): SubscriberRegisterer => new SubscriberRegisterer(
-                $container->getEventDispatcher(),
-                $container->getSubscriberFactoryRegistry(),
-            ),
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
@@ -579,8 +581,6 @@ final class Container
                 );
             },
             StaticAnalysisToolExecutableFinder::class => static fn (self $container): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder($container->getComposerExecutableFinder()),
-            TestFrameworkFinder::class => static fn (self $container): TestFrameworkFinder => new TestFrameworkFinder($container->getComposerExecutableFinder()),
-            AdapterInstallationDecider::class => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
             AdapterInstaller::class => static fn (self $container): AdapterInstaller => new AdapterInstaller($container->getComposerExecutableFinder()),
             TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory($container->getTestFrameworkAdapter()),
             FormatterFactory::class => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
@@ -1285,6 +1285,47 @@ final class Container
             return $this->setValueOrThrow($id, $value);
         }
 
+        $resolvedArguments = take($constructor->getParameters())
+            ->map($this->resolveParameter(...))
+            ->toList();
+
+        // Check if we identified all parameters for the service
+        if (count($resolvedArguments) === $constructor->getNumberOfParameters()) {
+            $value = $reflectionClass->newInstanceArgs($resolvedArguments);
+
+            return $this->setValueOrThrow($id, $value);
+        }
+
         throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+    }
+
+    private function resolveParameter(ReflectionParameter $parameter): iterable
+    {
+        $paramType = $parameter->getType();
+
+        // Only attempt to resolve a non-built-in named type (a class/interface)
+        if (!$paramType instanceof ReflectionNamedType || $paramType->isBuiltin()) {
+            return;
+        }
+
+        $paramTypeName = $paramType->getName();
+
+        // Found an instantiable class, done
+        if ((new ReflectionClass($paramTypeName))->isInstantiable()) {
+            yield $this->get($paramTypeName);
+
+            return;
+        }
+
+        // Look for a factory that can create an instance of an interface or abstract class
+        foreach ($this->factories as $id => $factory) {
+            if (!is_subclass_of($id, $paramTypeName) && !is_a($id, $paramTypeName, true)) {
+                continue;
+            }
+
+            yield $this->get($id);
+
+            return;
+        }
     }
 }

@@ -68,6 +68,25 @@ final class ContainerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function test_it_can_resolve_some_dependencies_without_configuration(): void
+    {
+        $container = new Container([]);
+
+        $container->getAdapterInstallationDecider();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_it_can_resolve_all_dependencies_with_configuration(): void
+    {
+        $container = SingletonContainer::getContainer();
+
+        $container->getSubscriberRegisterer();
+        $container->getTestFrameworkFinder();
+
+        $this->addToAssertionCount(1);
+    }
+
     public function test_it_can_be_instantiated_with_the_project_services(): void
     {
         $container = SingletonContainer::getContainer();
