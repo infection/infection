@@ -807,10 +807,13 @@ final class XmlConfigurationManipulatorTest extends TestCase
         $this->assertTrue($this->configManipulator->validate('/path/to/phpunit.xml', $xPath));
     }
 
+    /**
+     * @param list<string> $errorMessages
+     */
     #[DataProvider('invalidSchemaProvider')]
     public function test_it_cannot_validates_xml_if_schema_file_is_invalid(
         string $xsdSchema,
-        string $errorMessage,
+        array $errorMessages,
     ): void {
         $xPath = $this->createXPath(<<<XML
             <?xml version="1.0" encoding="UTF-8"?>
@@ -836,9 +839,9 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
             $this->fail('Expected exception to be thrown');
         } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
-            $this->assertSame(
-                $errorMessage,
+            $this->assertContains(
                 normalizeLineReturn($exception->getMessage()),
+                $errorMessages,
             );
         } finally {
             restore_error_handler();
@@ -990,25 +993,35 @@ final class XmlConfigurationManipulatorTest extends TestCase
     {
         yield 'empty' => [
             '',
-            'Invalid schema path found ""',
+            ['Invalid schema path found ""'],
         ];
 
         yield 'invalid path' => [
             '/unknown/path/to/phpunit.xsd',
-            'Invalid schema path found "/unknown/path/to/phpunit.xsd"',
+            ['Invalid schema path found "/unknown/path/to/phpunit.xsd"'],
         ];
 
         yield 'invalid URL' => [
             'https://unknown.example.com',
-            <<<'EOF'
-                The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-                [Warning] failed to load external entity "https://unknown.example.com"
+            // different libxml2 versions has slightly different error messages
+            [
+                <<<'EOF'
+                    The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+                    [Warning] failed to load external entity "https://unknown.example.com"
 
-                [Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
+                    [Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
 
 
-                EOF
-            ,
+                    EOF,
+                <<<'EOF'
+                    The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+                    [Warning] failed to load "https://unknown.example.com": No such file or directory
+
+                    [Error] Failed to locate the main schema resource at 'https://unknown.example.com'.
+
+
+                    EOF,
+            ],
         ];
     }
 
