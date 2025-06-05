@@ -114,7 +114,7 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It mutates identical operator into equal operator for same type operations (string)' => [
+        yield 'It mutates identical operator into equal operator for maybe same type operations (string)' => [
             <<<'PHP'
                 <?php
 
@@ -127,7 +127,7 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It mutates identical operator into equal operator for same type operations with inverse operands (string)' => [
+        yield 'It mutates identical operator into equal operator for maybe same type operations with inverse operands (string)' => [
             <<<'PHP'
                 <?php
 
@@ -177,6 +177,27 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 <?php
 
                 3.0 === round();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for different type operations with function operands (string)' => [
+            <<<'PHP'
+                <?php
+
+                strchr() === substr();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                strchr() == substr();
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for same type operations with function operands (string)' => [
+            <<<'PHP'
+                <?php
+
+                trim() === substr();
                 PHP,
         ];
     }

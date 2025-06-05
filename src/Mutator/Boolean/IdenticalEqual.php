@@ -97,6 +97,14 @@ final class IdenticalEqual implements Mutator
 
         if (
             $node->left instanceof Expr\FuncCall
+            && $node->right instanceof Expr\FuncCall
+            && $this->isSameTypeIdenticalComparison($node->left, $node->right)
+        ) {
+            return false;
+        }
+
+        if (
+            $node->left instanceof Expr\FuncCall
             && ($node->right instanceof Node\Scalar || $node->right instanceof Expr\ConstFetch)
             && $this->isSameTypeIdenticalComparison($node->left, $node->right)
         ) {
@@ -115,9 +123,9 @@ final class IdenticalEqual implements Mutator
     }
 
     /**
-     * @param Node\Scalar|Expr\ConstFetch $scalarOrConstFetch
+     * @param Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr
      */
-    private function isSameTypeIdenticalComparison(Expr\FuncCall $call, Expr $scalarOrConstFetch): bool
+    private function isSameTypeIdenticalComparison(Expr\FuncCall $call, Expr $expr): bool
     {
         $returnType = $this->getReturnType($call);
 
@@ -125,20 +133,30 @@ final class IdenticalEqual implements Mutator
             return false;
         }
 
-        if ($scalarOrConstFetch instanceof Node\Scalar\Int_) {
+        if ($expr instanceof Node\Scalar\Int_) {
             return $returnType === 'int';
         }
 
-        if ($scalarOrConstFetch instanceof Node\Scalar\String_) {
+        if ($expr instanceof Node\Scalar\String_) {
             return $returnType === 'string';
         }
 
-        if ($scalarOrConstFetch instanceof Node\Scalar\Float_) {
+        if ($expr instanceof Node\Scalar\Float_) {
             return $returnType === 'float';
         }
 
-        if ($scalarOrConstFetch instanceof Expr\ConstFetch) {
-            return in_array($scalarOrConstFetch->name->toString(), ['true', 'false'], true);
+        if ($expr instanceof Expr\ConstFetch) {
+            return in_array($expr->name->toString(), ['true', 'false'], true);
+        }
+
+        if ($expr instanceof Expr\FuncCall) {
+            $exprReturnType = $this->getReturnType($expr);
+
+            if ($exprReturnType === null) {
+                return false;
+            }
+
+            return $returnType === $exprReturnType;
         }
 
         return false;
