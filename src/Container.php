@@ -203,11 +203,6 @@ final class Container
     public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
     /**
-     * @var array<class-string<object>, true>
-     */
-    private array $keys = [];
-
-    /**
      * @var array<class-string<object>, object>
      */
     private array $values = [];
@@ -1267,7 +1262,6 @@ final class Container
      */
     private function offsetSet(string $id, Closure $value): void
     {
-        $this->keys[$id] = true;
         $this->factories[$id] = $value;
         unset($this->values[$id]);
     }
@@ -1277,11 +1271,14 @@ final class Container
      *
      * @param class-string<T> $id
      * @param T $value
+     * @phpstan-return T
      */
-    private function setValueOrThrow(string $id, object $value): void
+    private function setValueOrThrow(string $id, object $value): object
     {
         Assert::isInstanceOf($value, $id);
         $this->values[$id] = $value;
+
+        return $value;
     }
 
     /**
@@ -1301,19 +1298,17 @@ final class Container
 
         if (array_key_exists($id, $this->factories)) {
             $value = $this->factories[$id]($this);
-            $this->setValueOrThrow($id, $value);
 
-            return $value;
+            return $this->setValueOrThrow($id, $value);
         }
 
         $reflectionClass = new ReflectionClass($id);
         $constructor = $reflectionClass->getConstructor();
 
         if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
-            $instance = $reflectionClass->newInstance();
-            $this->setValueOrThrow($id, $instance);
+            $value = $reflectionClass->newInstance();
 
-            return $instance;
+            return $this->setValueOrThrow($id, $value);
         }
 
         throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
