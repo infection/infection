@@ -35,11 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_key_exists;
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use PhpParser\Node\Expr;
+use ReflectionFunction;
+use ReflectionNamedType;
 
 /**
  * @internal
@@ -51,6 +56,11 @@ use PhpParser\Node;
 final class IdenticalEqual implements Mutator
 {
     use GetMutatorName;
+
+    /**
+     * @var array<string, string|null>
+     */
+    private array $reflectionCache = [];
 
     public static function getDefinition(): Definition
     {
@@ -72,15 +82,87 @@ final class IdenticalEqual implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\BinaryOp\Equal>
+     * @return iterable<Expr\BinaryOp\Equal>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
+        yield new Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Identical;
+        if (!$node instanceof Expr\BinaryOp\Identical) {
+            return false;
+        }
+
+        if (
+            $node->left instanceof Expr\FuncCall
+            && ($node->right instanceof Node\Scalar || $node->right instanceof Expr\ConstFetch)
+            && $this->isSameTypeIdenticalComparison($node->left, $node->right)
+        ) {
+            return false;
+        }
+
+        if (
+            $node->right instanceof Expr\FuncCall
+            && ($node->left instanceof Node\Scalar || $node->left instanceof Expr\ConstFetch)
+            && $this->isSameTypeIdenticalComparison($node->right, $node->left)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Node\Scalar|Expr\ConstFetch $scalarOrConstFetch
+     */
+    private function isSameTypeIdenticalComparison(Expr\FuncCall $call, Expr $scalarOrConstFetch): bool
+    {
+        $returnType = $this->getReturnType($call);
+
+        if ($returnType === null) {
+            return false;
+        }
+
+        if ($scalarOrConstFetch instanceof Node\Scalar\Int_) {
+            return $returnType === 'int';
+        }
+
+        if ($scalarOrConstFetch instanceof Node\Scalar\String_) {
+            return $returnType === 'string';
+        }
+
+        if ($scalarOrConstFetch instanceof Node\Scalar\Float_) {
+            return $returnType === 'float';
+        }
+
+        if ($scalarOrConstFetch instanceof Expr\ConstFetch) {
+            return in_array($scalarOrConstFetch->name->toString(), ['true', 'false'], true);
+        }
+
+        return false;
+    }
+
+    private function getReturnType(Expr\FuncCall $call): ?string
+    {
+        if (!$call->name instanceof Node\Name) {
+            return null;
+        }
+
+        $name = $call->name->toString();
+
+        if (array_key_exists($name, $this->reflectionCache)) {
+            return $this->reflectionCache[$name];
+        }
+
+        $reflection = new ReflectionFunction($name);
+        $returnType = $reflection->getReturnType();
+
+        if (!$returnType instanceof ReflectionNamedType) {
+            return $this->reflectionCache[$name] = null;
+        }
+
+        return $this->reflectionCache[$name] = $returnType->getName();
     }
 }
