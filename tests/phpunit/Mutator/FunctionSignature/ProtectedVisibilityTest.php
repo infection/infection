@@ -76,8 +76,16 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It does not mutate final flag' => [
+        yield 'It does not mutate final method' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final.php'),
+        ];
+
+        yield 'It does not mutate method in final class' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final-class.php'),
+        ];
+
+        yield 'It does not mutate method in enum (implicit final)' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-final-enum.php'),
         ];
 
         yield 'It does not mutate abstract protected to private' => [
