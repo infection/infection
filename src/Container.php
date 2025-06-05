@@ -986,11 +986,6 @@ final class Container
         return $this->get(SubscriberRegisterer::class);
     }
 
-    public function getSubscriberFactoryRegistry(): ChainSubscriberFactory
-    {
-        return $this->get(ChainSubscriberFactory::class);
-    }
-
     public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory
     {
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
