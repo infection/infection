@@ -152,6 +152,7 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -1275,22 +1276,46 @@ final class Container
      * @template T of object
      *
      * @param class-string<T> $id
+     * @param T $value
+     */
+    private function setValueOrThrow(string $id, object $value): void
+    {
+        Assert::isInstanceOf($value, $id);
+        $this->values[$id] = $value;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
      * @phpstan-return T
      */
     private function get(string $id): object
     {
-        if (!isset($this->keys[$id])) {
-            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
-        }
-
         if (array_key_exists($id, $this->values)) {
             $value = $this->values[$id];
-        } else {
-            $value = $this->values[$id] = $this->factories[$id]($this);
+            Assert::isInstanceOf($value, $id);
+
+            return $value;
         }
 
-        Assert::isInstanceOf($value, $id);
+        if (array_key_exists($id, $this->factories)) {
+            $value = $this->factories[$id]($this);
+            $this->setValueOrThrow($id, $value);
 
-        return $value;
+            return $value;
+        }
+
+        $reflectionClass = new ReflectionClass($id);
+        $constructor = $reflectionClass->getConstructor();
+
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            $instance = $reflectionClass->newInstance();
+            $this->setValueOrThrow($id, $instance);
+
+            return $instance;
+        }
+
+        throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
     }
 }
