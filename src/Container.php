@@ -124,7 +124,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -152,6 +151,7 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -202,11 +202,6 @@ final class Container
     public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
     /**
-     * @var array<class-string<object>, true>
-     */
-    private array $keys = [];
-
-    /**
      * @var array<class-string<object>, object>
      */
     private array $values = [];
@@ -231,12 +226,9 @@ final class Container
     public static function create(): self
     {
         $container = new self([
-            Filesystem::class => static fn (): Filesystem => new Filesystem(),
-            TmpDirProvider::class => static fn (): TmpDirProvider => new TmpDirProvider(),
             IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
                 $container->getConfiguration()->isForGitDiffLines(),
             ),
-            XmlCoverageParser::class => static fn (): XmlCoverageParser => new XmlCoverageParser(),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
                 $container->getJUnitTestExecutionInfoAdder(),
@@ -306,13 +298,10 @@ final class Container
                 $container->getMutantCodeFactory(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
-            SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
-            DryProcessRunner::class => static fn (): DryProcessRunner => new DryProcessRunner(),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
-            DiffColorizer::class => static fn (): DiffColorizer => new DiffColorizer(),
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
             ),
@@ -321,9 +310,6 @@ final class Container
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
             ResultsCollector::class => static fn (self $container): ResultsCollector => new ResultsCollector(),
-            Stopwatch::class => static fn (): Stopwatch => new Stopwatch(),
-            TimeFormatter::class => static fn (): TimeFormatter => new TimeFormatter(),
-            MemoryFormatter::class => static fn (): MemoryFormatter => new MemoryFormatter(),
             MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
                 $container->getFileSystem(),
                 (string) php_ini_loaded_file(),
@@ -341,8 +327,6 @@ final class Container
                 $container->getSchemaValidator(),
                 $container->getSchemaConfigurationFactory(),
             ),
-            SchemaValidator::class => static fn (): SchemaValidator => new SchemaValidator(),
-            SchemaConfigurationFactory::class => static fn (): SchemaConfigurationFactory => new SchemaConfigurationFactory(),
             ConfigurationFactory::class => static fn (self $container): ConfigurationFactory => new ConfigurationFactory(
                 $container->getTmpDirProvider(),
                 $container->getMutatorResolver(),
@@ -352,9 +336,6 @@ final class Container
                 $container->getCiDetector(),
                 $container->getGitDiffFileProvider(),
             ),
-            MutatorResolver::class => static fn (): MutatorResolver => new MutatorResolver(),
-            MutatorFactory::class => static fn (): MutatorFactory => new MutatorFactory(),
-            MutatorParser::class => static fn (): MutatorParser => new MutatorParser(),
             CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
                 $testFrameworkAdapter = $container->getTestFrameworkAdapter();
@@ -415,8 +396,6 @@ final class Container
                     $config->getTmpDir(),
                 );
             },
-            StopInfectionOnSigintSignalSubscriberFactory::class => static fn (self $container): StopInfectionOnSigintSignalSubscriberFactory => new StopInfectionOnSigintSignalSubscriberFactory(),
-            DispatchPcntlSignalSubscriberFactory::class => static fn (self $container): DispatchPcntlSignalSubscriberFactory => new DispatchPcntlSignalSubscriberFactory(),
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
 
@@ -469,9 +448,6 @@ final class Container
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->getThreadCount(),
             ),
-            CommandLineBuilder::class => static fn (): CommandLineBuilder => new CommandLineBuilder(),
-            SourceFileCollector::class => static fn (): SourceFileCollector => new SourceFileCollector(),
-            NodeTraverserFactory::class => static fn (): NodeTraverserFactory => new NodeTraverserFactory(),
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
                 $configuration = $container->getConfiguration();
 
@@ -484,7 +460,6 @@ final class Container
                     $configuration->getGitDiffBase(),
                 );
             },
-            DiffChangedLinesParser::class => static fn (self $container): DiffChangedLinesParser => new DiffChangedLinesParser(),
             FilesDiffChangedLines::class => static fn (self $container): FilesDiffChangedLines => new FilesDiffChangedLines($container->getDiffChangedLinesParser(), $container->getGitDiffFileProvider()),
             StrykerLoggerFactory::class => static fn (self $container): StrykerLoggerFactory => new StrykerLoggerFactory(
                 $container->getMetricsCalculator(),
@@ -603,16 +578,12 @@ final class Container
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
                 );
             },
-            LineRangeCalculator::class => static fn (): LineRangeCalculator => new LineRangeCalculator(),
             StaticAnalysisToolExecutableFinder::class => static fn (self $container): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder($container->getComposerExecutableFinder()),
             TestFrameworkFinder::class => static fn (self $container): TestFrameworkFinder => new TestFrameworkFinder($container->getComposerExecutableFinder()),
-            TestFrameworkExtraOptionsFilter::class => static fn (): TestFrameworkExtraOptionsFilter => new TestFrameworkExtraOptionsFilter(),
             AdapterInstallationDecider::class => static fn (): AdapterInstallationDecider => new AdapterInstallationDecider(new QuestionHelper()),
             AdapterInstaller::class => static fn (self $container): AdapterInstaller => new AdapterInstaller($container->getComposerExecutableFinder()),
             TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory($container->getTestFrameworkAdapter()),
             FormatterFactory::class => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
-            DiffSourceCodeMatcher::class => static fn (): DiffSourceCodeMatcher => new DiffSourceCodeMatcher(),
-            ShellCommandLineExecutor::class => static fn (): ShellCommandLineExecutor => new ShellCommandLineExecutor(),
             GitDiffFileProvider::class => static fn (self $container): GitDiffFileProvider => new GitDiffFileProvider($container->getShellCommandLineExecutor()),
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
         ]);
@@ -1266,7 +1237,6 @@ final class Container
      */
     private function offsetSet(string $id, Closure $value): void
     {
-        $this->keys[$id] = true;
         $this->factories[$id] = $value;
         unset($this->values[$id]);
     }
@@ -1277,20 +1247,44 @@ final class Container
      * @param class-string<T> $id
      * @phpstan-return T
      */
-    private function get(string $id): object
+    private function setValueOrThrow(string $id, object $value): object
     {
-        if (!isset($this->keys[$id])) {
-            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
-        }
-
-        if (array_key_exists($id, $this->values)) {
-            $value = $this->values[$id];
-        } else {
-            $value = $this->values[$id] = $this->factories[$id]($this);
-        }
-
         Assert::isInstanceOf($value, $id);
+        $this->values[$id] = $value;
 
         return $value;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return T
+     */
+    private function get(string $id): object
+    {
+        if (array_key_exists($id, $this->values)) {
+            $value = $this->values[$id];
+            Assert::isInstanceOf($value, $id);
+
+            return $value;
+        }
+
+        if (array_key_exists($id, $this->factories)) {
+            $value = $this->factories[$id]($this);
+
+            return $this->setValueOrThrow($id, $value);
+        }
+
+        $reflectionClass = new ReflectionClass($id);
+        $constructor = $reflectionClass->getConstructor();
+
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            $value = $reflectionClass->newInstance();
+
+            return $this->setValueOrThrow($id, $value);
+        }
+
+        throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
     }
 }

@@ -52,11 +52,20 @@ final class ContainerTest extends TestCase
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown service "Symfony\Component\Filesystem\Filesystem"');
+        $this->expectExceptionMessage('Unknown service "Infection\FileSystem\SourceFileFilter"');
 
         $container = new Container([]);
 
+        $container->getSourceFileFilter();
+    }
+
+    public function test_it_can_build_simple_services_without_configuration(): void
+    {
+        $container = new Container([]);
+
         $container->getFileSystem();
+
+        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
