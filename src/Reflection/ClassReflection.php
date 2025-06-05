@@ -43,4 +43,6 @@ interface ClassReflection
     public function hasParentMethodWithVisibility(string $methodName, Visibility $visibility): bool;
 
     public function getName(): string;
+
+    public function isFinal(): bool;
 }
