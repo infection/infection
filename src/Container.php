@@ -124,7 +124,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
