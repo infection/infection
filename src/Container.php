@@ -1293,7 +1293,12 @@ final class Container
         throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
     }
 
-    /** @return iterable<object> */
+    /**
+     * Builds a potentially incomplete list of arguments for a constructor; as list of arguments may
+     * contain null values, we use a generator that can yield none or one value as an option type.
+     *
+     * @return iterable<object>
+     */
     private function resolveParameter(ReflectionParameter $parameter): iterable
     {
         $paramType = $parameter->getType();
