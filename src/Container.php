@@ -1294,6 +1294,7 @@ final class Container
         throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
     }
 
+    /** @return iterable<object> */
     private function resolveParameter(ReflectionParameter $parameter): iterable
     {
         $paramType = $parameter->getType();
