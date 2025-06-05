@@ -1298,8 +1298,10 @@ final class Container
     {
         $paramType = $parameter->getType();
 
+        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
+
         // Only attempt to resolve a non-built-in named type (a class/interface)
-        if (!$paramType instanceof ReflectionNamedType || $paramType->isBuiltin()) {
+        if ($paramType->isBuiltin()) {
             return;
         }
 
