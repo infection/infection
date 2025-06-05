@@ -37,16 +37,17 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Expr\BinaryOp\Equal>
+ * @extends  AbstractIdenticalComparison<Node\Expr\BinaryOp\Equal>
  */
-final class EqualIdentical implements Mutator
+final class EqualIdentical extends AbstractIdenticalComparison
 {
     use GetMutatorName;
 
@@ -70,15 +71,43 @@ final class EqualIdentical implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\BinaryOp\Identical>
+     * @return iterable<Expr\BinaryOp\Identical>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
+        yield new Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Equal;
+        if (!$node instanceof Expr\BinaryOp\Equal) {
+            return false;
+        }
+
+        if (
+            $node->left instanceof Expr\FuncCall
+            && $node->right instanceof Expr\FuncCall
+            && $this->isSameTypeIdenticalComparison($node->left, $node->right)
+        ) {
+            return false;
+        }
+
+        if (
+            $node->left instanceof Expr\FuncCall
+            && ($node->right instanceof Node\Scalar || $node->right instanceof Expr\ConstFetch)
+            && $this->isSameTypeIdenticalComparison($node->left, $node->right)
+        ) {
+            return false;
+        }
+
+        if (
+            $node->right instanceof Expr\FuncCall
+            && ($node->left instanceof Node\Scalar || $node->left instanceof Expr\ConstFetch)
+            && $this->isSameTypeIdenticalComparison($node->right, $node->left)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

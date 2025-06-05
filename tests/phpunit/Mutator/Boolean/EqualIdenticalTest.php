@@ -113,5 +113,116 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It mutates equal operator into identical operator for maybe same type operations (string)' => [
+            <<<'PHP'
+                <?php
+
+                $var == trim();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                $var === trim();
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for maybe same type operations with inverse operands (string)' => [
+            <<<'PHP'
+                <?php
+
+                trim() == $var;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                trim() === $var;
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for same type operations (string)' => [
+            <<<'PHP'
+                <?php
+
+                '' == trim();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for inverse same type operations (string)' => [
+            <<<'PHP'
+                <?php
+
+                trim() == '';
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for same type operations (bool)' => [
+            <<<'PHP'
+                <?php
+
+                false == is_array();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for inverse same type operations (bool)' => [
+            <<<'PHP'
+                <?php
+
+                is_array() == false;
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for same type operations (int)' => [
+            <<<'PHP'
+                <?php
+
+                5 == random_int();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for inverse same type operations (int)' => [
+            <<<'PHP'
+                <?php
+
+                random_int() == 5;
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for same type operations (float)' => [
+            <<<'PHP'
+                <?php
+
+                3.0 == round();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for inverse same type operations (float)' => [
+            <<<'PHP'
+                <?php
+
+                round() == 3.0;
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for different type operations with function operands (string)' => [
+            <<<'PHP'
+                <?php
+
+                strchr() == substr();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                strchr() === substr();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for same type operations with function operands (string)' => [
+            <<<'PHP'
+                <?php
+
+                trim() == substr();
+                PHP,
+        ];
     }
 }
