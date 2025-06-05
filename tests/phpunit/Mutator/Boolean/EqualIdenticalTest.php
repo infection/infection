@@ -250,5 +250,73 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 trim() === false;
                 PHP,
         ];
+
+        yield 'It mutates equal operator into identical operator for union type operations with falsy operand' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() == 0;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                preg_match() === 0;
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for union type operations with falsy operand (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                0 == preg_match();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                0 === preg_match();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for union type operations with non-falsy operand' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() == 1;
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for union type operations with non-falsy operand (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                1 == preg_match();
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for union type operations which values cannot be narrowed to a single type' => [
+            <<<'PHP'
+                <?php
+
+                array_key_last() == null;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                array_key_last() === null;
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for comparison of union type operands' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() == array_key_last();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                preg_match() === array_key_last();
+                PHP,
+        ];
     }
 }

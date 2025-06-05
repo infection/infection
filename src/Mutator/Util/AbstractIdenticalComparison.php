@@ -36,12 +36,15 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use function array_key_exists;
+use function count;
 use function in_array;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use ReflectionFunction;
 use ReflectionNamedType;
+use ReflectionType;
+use ReflectionUnionType;
 
 /**
  * @internal
@@ -52,7 +55,7 @@ use ReflectionNamedType;
 abstract class AbstractIdenticalComparison implements Mutator
 {
     /**
-     * @var array<string, string|null>
+     * @var array<string, ReflectionType|null>
      */
     private array $reflectionCache = [];
 
@@ -67,20 +70,22 @@ abstract class AbstractIdenticalComparison implements Mutator
             return false;
         }
 
+        $narrowed = $this->narrowReturnType($returnType, $expr);
+
         if ($expr instanceof Node\Scalar\Int_) {
-            return $returnType === 'int';
+            return $narrowed === 'int';
         }
 
         if ($expr instanceof Node\Scalar\String_) {
-            return $returnType === 'string';
+            return $narrowed === 'string';
         }
 
         if ($expr instanceof Node\Scalar\Float_) {
-            return $returnType === 'float';
+            return $narrowed === 'float';
         }
 
         if ($expr instanceof Expr\ConstFetch) {
-            return $returnType === 'bool' && in_array($expr->name->toString(), ['true', 'false'], true);
+            return $narrowed === 'bool' && in_array($expr->name->toString(), ['true', 'false'], true);
         }
 
         if ($expr instanceof Expr\FuncCall) {
@@ -90,13 +95,20 @@ abstract class AbstractIdenticalComparison implements Mutator
                 return false;
             }
 
-            return $returnType === $exprReturnType;
+            if (
+                !$returnType instanceof ReflectionNamedType
+                || !$exprReturnType instanceof ReflectionNamedType
+            ) {
+                return false;
+            }
+
+            return $returnType->getName() === $exprReturnType->getName();
         }
 
         return false;
     }
 
-    private function getReturnType(Expr\FuncCall $call): ?string
+    private function getReturnType(Expr\FuncCall $call): ?ReflectionType
     {
         if (!$call->name instanceof Node\Name) {
             return null;
@@ -109,12 +121,58 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
 
         $reflection = new ReflectionFunction($name);
-        $returnType = $reflection->getReturnType();
 
-        if (!$returnType instanceof ReflectionNamedType) {
-            return $this->reflectionCache[$name] = null;
+        return $this->reflectionCache[$name] = $reflection->getReturnType();
+    }
+
+    /**
+     * @param Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr
+     */
+    private function narrowReturnType(ReflectionType $returnType, Expr $expr): ?string
+    {
+        if ($returnType instanceof ReflectionNamedType) {
+            return $returnType->getName();
         }
 
-        return $this->reflectionCache[$name] = $returnType->getName();
+        $remainingType = [];
+
+        if ($returnType instanceof ReflectionUnionType) {
+            if (
+                $expr instanceof Node\Scalar\Int_
+                || $expr instanceof Node\Scalar\String_
+                || $expr instanceof Node\Scalar\Float_
+            ) {
+                $exprValue = $expr->value;
+            } elseif ($expr instanceof Expr\ConstFetch && $expr->name->toString() === 'true') {
+                $exprValue = true;
+            } elseif ($expr instanceof Expr\ConstFetch && $expr->name->toString() === 'false') {
+                $exprValue = false;
+            } else {
+                return null; // cannot narrow down the type
+            }
+
+            foreach ($returnType->getTypes() as $type) {
+                if ($type instanceof ReflectionNamedType) {
+                    if ($type->getName() === 'false') {
+                        // non-falsy value eliminates bool-false
+                        if ($exprValue) { // @phpstan-ignore if.condNotBoolean
+                            continue;
+                        }
+                    }
+
+                    $remainingType[] = $type->getName();
+
+                    continue;
+                }
+
+                return null;
+            }
+        }
+
+        if (count($remainingType) === 1) {
+            return $remainingType[0];
+        }
+
+        return null;
     }
 }
