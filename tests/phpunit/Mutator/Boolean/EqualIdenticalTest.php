@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator\Boolean;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -462,5 +463,28 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 round() === RegexIterator::USE_KEY;
                 PHP,
         ];
+
+        if (PHP_VERSION_ID >= 80400) {
+            yield 'It not mutates equal operator into identical operator for known global constants' => [
+                <<<'PHPCODE'
+                    <?php
+
+                    PHP_SAPI == 'phpdbg';
+                    PHPCODE,
+            ];
+        } else {
+            yield 'It mutates equal operator into identical for known global constants in PHP 8.3' => [
+                <<<'PHPCODE'
+                    <?php
+
+                    PHP_SAPI == 'phpdbg';
+                    PHPCODE,
+                <<<'PHPCODE'
+                    <?php
+
+                    PHP_SAPI === 'phpdbg';
+                    PHPCODE,
+            ];
+        }
     }
 }
