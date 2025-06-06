@@ -94,7 +94,7 @@ psalm-baseline: vendor
 
 .PHONY: detect-collisions
 detect-collisions: vendor $(PHPSTAN)
-	$(COLLISION_DETECTOR) --configuration build/collision-detector.json
+	$(COLLISION_DETECTOR) --configuration devTools/collision-detector.json
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
