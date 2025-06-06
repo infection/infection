@@ -157,6 +157,7 @@ use Psr\Log\NullLogger;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
+use function reset;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -1321,14 +1322,16 @@ final class Container
         }
 
         // Look for a factory that can create an instance of an interface or abstract class
-        foreach ($this->factories as $id => $factory) {
-            if (!is_a($id, $paramTypeName, true)) {
-                continue;
-            }
+        $matchingTypes = take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $paramTypeName, true))
+            ->toList();
 
-            yield $this->get($id);
-
+        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
+        if (count($matchingTypes) !== 1) {
             return;
         }
+
+        yield $this->get(reset($matchingTypes));
     }
 }
