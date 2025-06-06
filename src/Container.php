@@ -155,8 +155,8 @@ use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionParameter;
+use function reset;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -247,21 +247,9 @@ final class Container
                 $container->getSourceFileFilter(),
                 $container->getConfiguration()->getSourceFiles(),
             ),
-            UncoveredTraceProvider::class => static fn (self $container): UncoveredTraceProvider => new UncoveredTraceProvider(
-                $container->getBufferedSourceFileFilter(),
-            ),
             SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
                 $container->getConfiguration()->getSourceFilesFilter(),
                 $container->getConfiguration()->getSourceFilesExcludes(),
-            ),
-            JUnitTestExecutionInfoAdder::class => static fn (self $container): JUnitTestExecutionInfoAdder => new JUnitTestExecutionInfoAdder(
-                $container->getTestFrameworkAdapter(),
-                $container->getMemoizedTestFileDataProvider(),
-            ),
-            PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
-                $container->getIndexXmlCoverageLocator(),
-                $container->getIndexXmlCoverageParser(),
-                $container->getXmlCoverageParser(),
             ),
             IndexXmlCoverageLocator::class => static fn (self $container): IndexXmlCoverageLocator => new IndexXmlCoverageLocator(
                 $container->getConfiguration()->getCoveragePath(),
@@ -294,7 +282,6 @@ final class Container
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
-            MutantCodeFactory::class => static fn (self $container): MutantCodeFactory => new MutantCodeFactory($container->getPrinter()),
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->getTmpDir(),
                 $container->getDiffer(),
@@ -311,10 +298,8 @@ final class Container
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
             ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
-            FileParser::class => static fn (self $container): FileParser => new FileParser($container->getParser()),
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
-            ResultsCollector::class => static fn (self $container): ResultsCollector => new ResultsCollector(),
             MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
                 $container->getFileSystem(),
                 (string) php_ini_loaded_file(),
@@ -327,19 +312,6 @@ final class Container
             RootsFileLocator::class => static fn (self $container): RootsFileLocator => new RootsFileLocator(
                 [$container->getProjectDir()],
                 $container->getFileSystem(),
-            ),
-            SchemaConfigurationFileLoader::class => static fn (self $container): SchemaConfigurationFileLoader => new SchemaConfigurationFileLoader(
-                $container->getSchemaValidator(),
-                $container->getSchemaConfigurationFactory(),
-            ),
-            ConfigurationFactory::class => static fn (self $container): ConfigurationFactory => new ConfigurationFactory(
-                $container->getTmpDirProvider(),
-                $container->getMutatorResolver(),
-                $container->getMutatorFactory(),
-                $container->getMutatorParser(),
-                $container->getSourceFileCollector(),
-                $container->getCiDetector(),
-                $container->getGitDiffFileProvider(),
             ),
             CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
@@ -440,9 +412,6 @@ final class Container
                     $container->getOutputFormatter(),
                 );
             },
-            MutationTestingResultsLoggerSubscriberFactory::class => static fn (self $container): MutationTestingResultsLoggerSubscriberFactory => new MutationTestingResultsLoggerSubscriberFactory(
-                $container->getMutationTestingResultsLogger(),
-            ),
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
@@ -461,13 +430,6 @@ final class Container
                     $configuration->getGitDiffBase(),
                 );
             },
-            FilesDiffChangedLines::class => static fn (self $container): FilesDiffChangedLines => new FilesDiffChangedLines($container->getDiffChangedLinesParser(), $container->getGitDiffFileProvider()),
-            StrykerLoggerFactory::class => static fn (self $container): StrykerLoggerFactory => new StrykerLoggerFactory(
-                $container->getMetricsCalculator(),
-                $container->getStrykerHtmlReportBuilder(),
-                $container->getCiDetector(),
-                $container->getLogger(),
-            ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
@@ -491,7 +453,6 @@ final class Container
                     $container->getConfiguration()->getLogs(),
                 ),
             ])),
-            StrykerHtmlReportBuilder::class => static fn (self $container): StrykerHtmlReportBuilder => new StrykerHtmlReportBuilder($container->getMetricsCalculator(), $container->getResultsCollector()),
             TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
                 $config = $container->getConfiguration();
 
@@ -502,7 +463,6 @@ final class Container
                     $config->showMutations(),
                 );
             },
-            FilteringResultsCollectorFactory::class => static fn (self $container): FilteringResultsCollectorFactory => new FilteringResultsCollectorFactory($container->getTargetDetectionStatusesProvider()),
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
                 $config = $container->getConfiguration();
 
@@ -521,13 +481,6 @@ final class Container
                     $config->getProcessTimeout(),
                 );
             },
-            InitialTestsRunProcessFactory::class => static fn (self $container): InitialTestsRunProcessFactory => new InitialTestsRunProcessFactory(
-                $container->getTestFrameworkAdapter(),
-            ),
-            InitialTestsRunner::class => static fn (self $container): InitialTestsRunner => new InitialTestsRunner(
-                $container->getInitialTestRunProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
             InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
                 $container->getStaticAnalysisToolAdapter(),
             ),
@@ -579,11 +532,6 @@ final class Container
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
                 );
             },
-            StaticAnalysisToolExecutableFinder::class => static fn (self $container): StaticAnalysisToolExecutableFinder => new StaticAnalysisToolExecutableFinder($container->getComposerExecutableFinder()),
-            AdapterInstaller::class => static fn (self $container): AdapterInstaller => new AdapterInstaller($container->getComposerExecutableFinder()),
-            TestFrameworkMutantExecutionResultFactory::class => static fn (self $container): TestFrameworkMutantExecutionResultFactory => new TestFrameworkMutantExecutionResultFactory($container->getTestFrameworkAdapter()),
-            FormatterFactory::class => static fn (self $container): FormatterFactory => new FormatterFactory($container->getOutput()),
-            GitDiffFileProvider::class => static fn (self $container): GitDiffFileProvider => new GitDiffFileProvider($container->getShellCommandLineExecutor()),
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
         ]);
 
@@ -1238,13 +1186,26 @@ final class Container
             return $this->setValueOrThrow($id, $value);
         }
 
+        $value = $this->createService($id);
+
+        if ($value === null) {
+            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        }
+
+        return $this->setValueOrThrow($id, $value);
+    }
+
+    private function createService(string $id): ?object
+    {
         $reflectionClass = new ReflectionClass($id);
         $constructor = $reflectionClass->getConstructor();
 
-        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
-            $value = $reflectionClass->newInstance();
+        if (!$reflectionClass->isInstantiable()) {
+            return null;
+        }
 
-            return $this->setValueOrThrow($id, $value);
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            return $reflectionClass->newInstance();
         }
 
         $resolvedArguments = take($constructor->getParameters())
@@ -1252,13 +1213,11 @@ final class Container
             ->toList();
 
         // Check if we identified all parameters for the service
-        if (count($resolvedArguments) === $constructor->getNumberOfParameters()) {
-            $value = $reflectionClass->newInstanceArgs($resolvedArguments);
-
-            return $this->setValueOrThrow($id, $value);
+        if (count($resolvedArguments) !== $constructor->getNumberOfParameters()) {
+            return null;
         }
 
-        throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        return $reflectionClass->newInstanceArgs($resolvedArguments);
     }
 
     /**
@@ -1269,9 +1228,12 @@ final class Container
      */
     private function resolveParameter(ReflectionParameter $parameter): iterable
     {
-        $paramType = $parameter->getType();
+        // Variadic parameters are not supported
+        if ($parameter->isVariadic()) {
+            return;
+        }
 
-        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
+        $paramType = $parameter->getType();
 
         // Only attempt to resolve a non-built-in named type (a class/interface)
         if ($paramType->isBuiltin()) {
@@ -1289,14 +1251,16 @@ final class Container
         }
 
         // Look for a factory that can create an instance of an interface or abstract class
-        foreach ($this->factories as $id => $factory) {
-            if (!is_a($id, $paramTypeName, true)) {
-                continue;
-            }
+        $matchingTypes = take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $paramTypeName, true))
+            ->toList();
 
-            yield $this->get($id);
-
+        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
+        if (count($matchingTypes) !== 1) {
             return;
         }
+
+        yield $this->get(reset($matchingTypes));
     }
 }
