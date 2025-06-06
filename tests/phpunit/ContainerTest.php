@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use function array_search;
 use function class_exists;
 use Error;
 use function get_class;
-use function in_array;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Testing\SingletonContainer;
@@ -53,10 +51,8 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use function sprintf;
-use function sscanf;
 use function str_starts_with;
 use Symfony\Component\Console\Output\NullOutput;
-use function var_export;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 #[Group('integration')]
@@ -146,10 +142,6 @@ final class ContainerTest extends TestCase
     public static function provideServicesWithReflection(): iterable
     {
         foreach (self::getFactories(Container::create()) as $id => $factory) {
-            if (!class_exists($id)) {
-                continue;
-            }
-
             yield $id => [$id];
         }
     }
@@ -170,7 +162,7 @@ final class ContainerTest extends TestCase
             return;
         }
 
-        // Another good case: the service cannot be created without a factory
+        // Another happy path: the service cannot be created without a factory
         if ($service === null) {
             $this->addToAssertionCount(1);
 
@@ -202,36 +194,20 @@ final class ContainerTest extends TestCase
     {
         $container = Container::create();
 
-        $services = [];
-
-        foreach ($services as $id) {
-            $this->unsetFactory($container, $id);
-        }
-
         foreach (self::iterateExpectedServices() as $methodName => $expectedService) {
             try {
                 $service = $container->{$methodName}();
             } catch (Error|AssertException $e) {
                 // Ignore services that require extra configuration
                 continue;
-            } catch (InvalidArgumentException $e) {
-                sscanf($e->getMessage(), 'Unknown service "%s"', $serviceName);
-
-                if (in_array($serviceName, $services, true)) {
-                    throw $e;
-                    // unset($services[array_search($serviceName, $services, true)]);
-
-                    continue;
-                }
             }
 
-            $this->assertNotNull(
+            $this->assertInstanceOf(
+                $expectedService,
                 $service,
                 sprintf('Service should be an instance of "%s"', $expectedService),
             );
         }
-
-        // var_export($services);
     }
 
     private static function getFactories(Container $container): array
