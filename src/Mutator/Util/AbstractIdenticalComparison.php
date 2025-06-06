@@ -58,12 +58,38 @@ abstract class AbstractIdenticalComparison implements Mutator
     /**
      * @var array<string, ReflectionType|null>
      */
-    private array $reflectionCache = [];
+    private static array $reflectionCache = [];
 
-    /**
-     * @param Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr
-     */
-    protected function isSameTypeIdenticalComparison(Expr\FuncCall $call, Expr $expr): bool
+    protected function isSameTypeIdenticalComparison(Expr\BinaryOp\Equal|Expr\BinaryOp\Identical $comparison): bool
+    {
+        if (
+            $comparison->left instanceof Expr\FuncCall
+            && $comparison->right instanceof Expr\FuncCall
+            && $this->isSameTypeFuncCall($comparison->left, $comparison->right)
+        ) {
+            return true;
+        }
+
+        if (
+            $comparison->left instanceof Expr\FuncCall
+            && ($comparison->right instanceof Node\Scalar || $comparison->right instanceof Expr\ConstFetch || $comparison->right instanceof Expr\Array_)
+            && $this->isSameTypeFuncCall($comparison->left, $comparison->right)
+        ) {
+            return true;
+        }
+
+        if (
+            $comparison->right instanceof Expr\FuncCall
+            && ($comparison->left instanceof Node\Scalar || $comparison->left instanceof Expr\ConstFetch || $comparison->left instanceof Expr\Array_)
+            && $this->isSameTypeFuncCall($comparison->right, $comparison->left)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isSameTypeFuncCall(Expr\FuncCall $call, Node\Scalar|Expr\ConstFetch|Expr\FuncCall|Expr\Array_ $expr): bool
     {
         $returnType = $this->getReturnType($call);
 
@@ -87,6 +113,10 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         if ($expr instanceof Expr\ConstFetch) {
             return $narrowed === 'bool' && in_array($expr->name->toString(), ['true', 'false'], true);
+        }
+
+        if ($expr instanceof Expr\Array_ && count($expr->items) === 0) {
+            return $narrowed === 'array';
         }
 
         if ($expr instanceof Expr\FuncCall) {
@@ -117,24 +147,21 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         $name = $call->name->toString();
 
-        if (array_key_exists($name, $this->reflectionCache)) {
-            return $this->reflectionCache[$name];
+        if (array_key_exists($name, self::$reflectionCache)) {
+            return self::$reflectionCache[$name];
         }
 
         try {
             $reflection = new ReflectionFunction($name);
 
-            return $this->reflectionCache[$name] = $reflection->getReturnType();
+            return self::$reflectionCache[$name] = $reflection->getReturnType();
         } catch (ReflectionException) {
             // If the function does not exist, we cannot determine the return type
-            return $this->reflectionCache[$name] = null;
+            return self::$reflectionCache[$name] = null;
         }
     }
 
-    /**
-     * @param Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr
-     */
-    private function narrowReturnType(ReflectionType $returnType, Expr $expr): ?string
+    private function narrowReturnType(ReflectionType $returnType, Node\Scalar|Expr\ConstFetch|Expr\FuncCall|Expr\Array_ $expr): ?string
     {
         if ($returnType instanceof ReflectionNamedType) {
             return $returnType->getName();

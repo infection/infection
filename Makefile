@@ -23,6 +23,7 @@ PHP_CS_FIXER_CACHE=.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
 RECTOR=./vendor/bin/rector
+COLLISION_DETECTOR=./vendor/bin/detect-collisions
 
 PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
@@ -91,6 +92,10 @@ phpstan-baseline: vendor $(PHPSTAN)
 psalm-baseline: vendor
 	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
 
+.PHONY: detect-collisions
+detect-collisions: vendor $(PHPSTAN)
+	$(COLLISION_DETECTOR) --configuration devTools/collision-detector.json
+
 .PHONY: psalm
 psalm: vendor $(PSALM)
 	$(PSALM) --threads=max
@@ -126,7 +131,7 @@ profile: vendor $(BENCHMARK_SOURCES)
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check phpstan psalm validate test-autoreview rector-check
+autoreview: cs-check detect-collisions phpstan psalm validate test-autoreview rector-check
 
 .PHONY: test
 test:		 	## Runs all the tests

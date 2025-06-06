@@ -386,5 +386,26 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 doFoo() === doFoo();
                 PHP,
         ];
+
+        yield 'It not mutates equal operator into identical operator for empty array type' => [
+            <<<'PHP'
+                <?php
+
+                [] == explode();
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for non-empty-array type' => [
+            <<<'PHP'
+                <?php
+
+                ['abc'] == explode();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                ['abc'] === explode();
+                PHP,
+        ];
     }
 }
