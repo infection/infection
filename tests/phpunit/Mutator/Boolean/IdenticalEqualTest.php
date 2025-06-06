@@ -437,7 +437,7 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It mutates identical operator into equal operator for class constant fetches' => [
+        yield 'It mutates identical operator into equal operator for class constant fetches of different type' => [
             <<<'PHP'
                 <?php
 
