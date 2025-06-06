@@ -472,6 +472,19 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                     PHP_SAPI == 'phpdbg';
                     PHPCODE,
             ];
+
+            yield 'It mutates identical operator into equal operator for unknown global constants' => [
+                <<<'PHPCODE'
+                    <?php
+
+                    NOONE_KNOWS_THIS_CONSTANT == 'phpdbg';
+                    PHPCODE,
+                <<<'PHPCODE'
+                    <?php
+
+                    NOONE_KNOWS_THIS_CONSTANT === 'phpdbg';
+                    PHPCODE,
+            ];
         } else {
             yield 'It mutates equal operator into identical for known global constants in PHP 8.3' => [
                 <<<'PHPCODE'
