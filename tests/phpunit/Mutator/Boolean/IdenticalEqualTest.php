@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -172,6 +173,22 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It not mutates identical operator into equal operator for same type operations (true)' => [
+            <<<'PHP'
+                <?php
+
+                true === is_array();
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for inverse same type operations (true)' => [
+            <<<'PHP'
+                <?php
+
+                is_array() === true;
+                PHP,
+        ];
+
         yield 'It not mutates identical operator into equal operator for same type operations (int)' => [
             <<<'PHP'
                 <?php
@@ -248,6 +265,112 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 <?php
 
                 trim() == false;
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for union type operations with falsy operand' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() === 0;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                preg_match() == 0;
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for union type operations with falsy operand (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                0 === preg_match();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                0 == preg_match();
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for union type operations with non-falsy operand' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() === 1;
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for union type operations with non-falsy operand (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                1 === preg_match();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for union type operations which values cannot be narrowed to a single type' => [
+            <<<'PHP'
+                <?php
+
+                array_key_last() === null;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                array_key_last() == null;
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison of union type operands' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() === array_key_last();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                preg_match() == array_key_last();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator of non-reflectable functions' => [
+            <<<'PHP'
+                <?php
+
+                nooneKnowsThisFunction() === nooneKnowsThisFunction();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                nooneKnowsThisFunction() == nooneKnowsThisFunction();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison of intersection types' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'identical-intersection-type.php'),
+            <<<'PHP'
+                <?php
+
+                namespace IdenticalEqualIntersectionType;
+
+                interface A
+                {
+                }
+                interface B
+                {
+                }
+                class C implements A, B
+                {
+                }
+                function doFoo(): A&B
+                {
+                    return new C();
+                }
+                doFoo() == doFoo();
+                doFoo() == doFoo();
                 PHP,
         ];
     }
