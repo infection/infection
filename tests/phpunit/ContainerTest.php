@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_search;
+use function class_exists;
+use Error;
 use function get_class;
+use function in_array;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Testing\SingletonContainer;
@@ -46,9 +50,14 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionClass;
+use ReflectionMethod;
+use ReflectionNamedType;
 use function sprintf;
+use function sscanf;
+use function str_starts_with;
 use Symfony\Component\Console\Output\NullOutput;
-use Throwable;
+use function var_export;
+use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 #[Group('integration')]
 #[CoversClass(Container::class)]
@@ -136,12 +145,11 @@ final class ContainerTest extends TestCase
 
     public static function provideServicesWithReflection(): iterable
     {
-        $container = Container::create();
-        $reflection = new ReflectionClass($container);
+        foreach (self::getFactories(Container::create()) as $id => $factory) {
+            if (!class_exists($id)) {
+                continue;
+            }
 
-        $property = $reflection->getProperty('factories');
-
-        foreach ($property->getValue($container) as $id => $factory) {
             yield $id => [$id];
         }
     }
@@ -153,18 +161,87 @@ final class ContainerTest extends TestCase
 
         $this->unsetFactory($container, $id);
 
-        $this->expectException(Throwable::class);
+        try {
+            $service = $this->createService($container, $id);
+        } catch (InvalidArgumentException $e) {
+            // All good: the service needs a factory
+            $this->assertStringContainsString('Unknown service ', $e->getMessage());
 
-        $service = $this->getService($container, $id);
+            return;
+        }
 
-        $this->markTestIncomplete(sprintf(
+        // Another good case: the service cannot be created without a factory
+        if ($service === null) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        // All other services should be createable without a factory for this service
+        foreach (self::iterateExpectedServices() as $expectedService) {
+            try {
+                $this->getService($container, $expectedService);
+            } catch (InvalidArgumentException $e) {
+                $this->assertStringContainsString('Unknown service ', $e->getMessage());
+
+                // All good: this other service requires a factory for the original service
+                return;
+            }
+        }
+
+        echo "\n\$services[] = '$id';\n";
+
+        $this->fail(sprintf(
             'Service "%s" may not require a factory (found "%s").',
             $id,
-            get_class($service),
+            $service ? get_class($service) : 'null',
         ));
     }
 
-    private function unsetFactory(Container $container, string $id): void
+    public function test_it_can_provide_all_services(): void
+    {
+        $container = Container::create();
+
+        $services = [];
+
+        foreach ($services as $id) {
+            $this->unsetFactory($container, $id);
+        }
+
+        foreach (self::iterateExpectedServices() as $methodName => $expectedService) {
+            try {
+                $service = $container->{$methodName}();
+            } catch (Error|AssertException $e) {
+                // Ignore services that require extra configuration
+                continue;
+            } catch (InvalidArgumentException $e) {
+                sscanf($e->getMessage(), 'Unknown service "%s"', $serviceName);
+
+                if (in_array($serviceName, $services, true)) {
+                    throw $e;
+                    // unset($services[array_search($serviceName, $services, true)]);
+
+                    continue;
+                }
+            }
+
+            $this->assertNotNull(
+                $service,
+                sprintf('Service should be an instance of "%s"', $expectedService),
+            );
+        }
+
+        // var_export($services);
+    }
+
+    private static function getFactories(Container $container): array
+    {
+        $reflection = new ReflectionClass($container);
+
+        return $reflection->getProperty('factories')->getValue($container);
+    }
+
+    private static function unsetFactory(Container $container, string $id): void
     {
         $reflection = new ReflectionClass($container);
 
@@ -177,10 +254,52 @@ final class ContainerTest extends TestCase
         }
     }
 
-    private function getService(Container $container, string $id): object
+    private static function createService(Container $container, string $id): ?object
     {
         $reflection = new ReflectionClass($container);
 
-        return $reflection->getMethod('get')->invoke($container, $id);
+        try {
+            return $reflection->getMethod('createService')->invoke($container, $id);
+        } catch (Error|AssertException $e) {
+            // Ignore services that require extra configuration
+            return null;
+        }
+    }
+
+    private static function getService(Container $container, string $id): ?object
+    {
+        $reflection = new ReflectionClass($container);
+
+        try {
+            return $reflection->getMethod('get')->invoke($container, $id);
+        } catch (Error|AssertException $e) {
+            // Ignore services that require extra configuration
+            return null;
+        }
+    }
+
+    private static function iterateExpectedServices(): iterable
+    {
+        $reflection = new ReflectionClass(Container::class);
+
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if (!str_starts_with($method->getName(), 'get')) {
+                continue;
+            }
+
+            $returnType = $method->getReturnType();
+
+            if (!$returnType instanceof ReflectionNamedType || $returnType->isBuiltin()) {
+                continue;
+            }
+
+            $typeReflection = new ReflectionClass($returnType->getName());
+
+            if ($typeReflection->isInterface()) {
+                continue;
+            }
+
+            yield $method->getName() => $returnType->getName();
+        }
     }
 }
