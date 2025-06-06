@@ -84,30 +84,6 @@ final class EqualIdentical extends AbstractIdenticalComparison
             return false;
         }
 
-        if (
-            $node->left instanceof Expr\FuncCall
-            && $node->right instanceof Expr\FuncCall
-            && $this->isSameTypeIdenticalComparison($node->left, $node->right)
-        ) {
-            return false;
-        }
-
-        if (
-            $node->left instanceof Expr\FuncCall
-            && ($node->right instanceof Node\Scalar || $node->right instanceof Expr\ConstFetch)
-            && $this->isSameTypeIdenticalComparison($node->left, $node->right)
-        ) {
-            return false;
-        }
-
-        if (
-            $node->right instanceof Expr\FuncCall
-            && ($node->left instanceof Node\Scalar || $node->left instanceof Expr\ConstFetch)
-            && $this->isSameTypeIdenticalComparison($node->right, $node->left)
-        ) {
-            return false;
-        }
-
-        return true;
+        return !$this->isSameTypeIdenticalComparison($node);
     }
 }
