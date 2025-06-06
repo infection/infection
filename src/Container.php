@@ -155,8 +155,8 @@ use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionParameter;
+use function reset;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -1238,13 +1238,26 @@ final class Container
             return $this->setValueOrThrow($id, $value);
         }
 
+        $value = $this->createService($id);
+
+        if ($value === null) {
+            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        }
+
+        return $this->setValueOrThrow($id, $value);
+    }
+
+    private function createService(string $id): ?object
+    {
         $reflectionClass = new ReflectionClass($id);
         $constructor = $reflectionClass->getConstructor();
 
-        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
-            $value = $reflectionClass->newInstance();
+        if (!$reflectionClass->isInstantiable()) {
+            return null;
+        }
 
-            return $this->setValueOrThrow($id, $value);
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            return $reflectionClass->newInstance();
         }
 
         $resolvedArguments = take($constructor->getParameters())
@@ -1252,13 +1265,11 @@ final class Container
             ->toList();
 
         // Check if we identified all parameters for the service
-        if (count($resolvedArguments) === $constructor->getNumberOfParameters()) {
-            $value = $reflectionClass->newInstanceArgs($resolvedArguments);
-
-            return $this->setValueOrThrow($id, $value);
+        if (count($resolvedArguments) !== $constructor->getNumberOfParameters()) {
+            return null;
         }
 
-        throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        return $reflectionClass->newInstanceArgs($resolvedArguments);
     }
 
     /**
@@ -1269,9 +1280,11 @@ final class Container
      */
     private function resolveParameter(ReflectionParameter $parameter): iterable
     {
-        $paramType = $parameter->getType();
+        if ($parameter->isVariadic()) {
+            return;
+        }
 
-        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
+        $paramType = $parameter->getType();
 
         // Only attempt to resolve a non-built-in named type (a class/interface)
         if ($paramType->isBuiltin()) {
@@ -1289,14 +1302,16 @@ final class Container
         }
 
         // Look for a factory that can create an instance of an interface or abstract class
-        foreach ($this->factories as $id => $factory) {
-            if (!is_a($id, $paramTypeName, true)) {
-                continue;
-            }
+        $matchingTypes = take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $paramTypeName, true))
+            ->toList();
 
-            yield $this->get($id);
-
+        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
+        if (count($matchingTypes) !== 1) {
             return;
         }
+
+        yield $this->get(reset($matchingTypes));
     }
 }
