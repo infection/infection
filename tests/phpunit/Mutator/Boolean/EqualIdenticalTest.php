@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -169,6 +170,22 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 is_array() == false;
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for same type operations (true)' => [
+            <<<'PHP'
+                <?php
+
+                true == is_array();
+                PHP,
+        ];
+
+        yield 'It not mutates equal operator into identical operator for inverse same type operations (true)' => [
+            <<<'PHP'
+                <?php
+
+                is_array() == true;
                 PHP,
         ];
 
@@ -316,6 +333,44 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match() === array_key_last();
+                PHP,
+        ];
+
+        yield 'It mutates equal operator of non-reflectable functions' => [
+            <<<'PHP'
+                <?php
+
+                nooneKnowsThisFunction() == nooneKnowsThisFunction();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                nooneKnowsThisFunction() === nooneKnowsThisFunction();
+                PHP,
+        ];
+
+        yield 'It mutates equal operator into identical operator for comparison of intersection types' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'identical-intersection-type.php'),
+            <<<'PHP'
+                <?php
+
+                namespace EqualIdenticalIntersectionType;
+
+                interface A
+                {
+                }
+                interface B
+                {
+                }
+                class C implements A, B
+                {
+                }
+                function doFoo(): A&B
+                {
+                    return new C();
+                }
+                doFoo() === doFoo();
+                doFoo() === doFoo();
                 PHP,
         ];
     }

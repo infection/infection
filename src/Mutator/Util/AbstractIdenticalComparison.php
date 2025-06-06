@@ -41,6 +41,7 @@ use function in_array;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
+use ReflectionException;
 use ReflectionFunction;
 use ReflectionNamedType;
 use ReflectionType;
@@ -120,9 +121,14 @@ abstract class AbstractIdenticalComparison implements Mutator
             return $this->reflectionCache[$name];
         }
 
-        $reflection = new ReflectionFunction($name);
+        try {
+            $reflection = new ReflectionFunction($name);
 
-        return $this->reflectionCache[$name] = $reflection->getReturnType();
+            return $this->reflectionCache[$name] = $reflection->getReturnType();
+        } catch (ReflectionException) {
+            // If the function does not exist, we cannot determine the return type
+            return $this->reflectionCache[$name] = null;
+        }
     }
 
     /**

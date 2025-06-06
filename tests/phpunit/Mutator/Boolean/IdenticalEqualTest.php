@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -332,6 +333,44 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match() == array_key_last();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator of non-reflectable functions' => [
+            <<<'PHP'
+                <?php
+
+                nooneKnowsThisFunction() === nooneKnowsThisFunction();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                nooneKnowsThisFunction() == nooneKnowsThisFunction();
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison of intersection types' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'identical-intersection-type.php'),
+            <<<'PHP'
+                <?php
+
+                namespace IdenticalEqualIntersectionType;
+
+                interface A
+                {
+                }
+                interface B
+                {
+                }
+                class C implements A, B
+                {
+                }
+                function doFoo(): A&B
+                {
+                    return new C();
+                }
+                doFoo() == doFoo();
+                doFoo() == doFoo();
                 PHP,
         ];
     }
