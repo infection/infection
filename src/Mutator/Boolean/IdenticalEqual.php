@@ -37,7 +37,6 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
