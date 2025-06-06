@@ -35,14 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use function array_key_exists;
 use function count;
+use function gettype;
 use function in_array;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\CallLike;
+use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
@@ -71,16 +74,31 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
 
         if (
-            $comparison->left instanceof Expr\FuncCall
-            && ($comparison->right instanceof Node\Scalar || $comparison->right instanceof Expr\ConstFetch || $comparison->right instanceof Expr\Array_)
+            (
+                $comparison->left instanceof Expr\FuncCall
+                || $comparison->left instanceof Expr\StaticCall
+            )
+            && (
+                $comparison->right instanceof Node\Scalar
+                || $comparison->right instanceof Expr\ConstFetch
+                || $comparison->right instanceof Expr\ClassConstFetch
+                || $comparison->right instanceof Expr\Array_
+            )
             && $this->isSameTypeFuncCall($comparison->left, $comparison->right)
         ) {
             return true;
         }
 
         if (
-            $comparison->right instanceof Expr\FuncCall
-            && ($comparison->left instanceof Node\Scalar || $comparison->left instanceof Expr\ConstFetch || $comparison->left instanceof Expr\Array_)
+            (
+                $comparison->right instanceof Expr\FuncCall
+                || $comparison->right instanceof Expr\StaticCall
+            )
+            && ($comparison->left instanceof Node\Scalar
+                || $comparison->left instanceof Expr\ConstFetch
+                || $comparison->left instanceof Expr\ClassConstFetch
+                || $comparison->left instanceof Expr\Array_
+            )
             && $this->isSameTypeFuncCall($comparison->right, $comparison->left)
         ) {
             return true;
@@ -89,7 +107,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         return false;
     }
 
-    private function isSameTypeFuncCall(Expr\FuncCall $call, Node\Scalar|Expr\ConstFetch|Expr\FuncCall|Expr\Array_ $expr): bool
+    private function isSameTypeFuncCall(Expr\FuncCall|Expr\StaticCall $call, Node\Scalar|Expr\ConstFetch|Expr\ClassConstFetch|Expr\FuncCall|Expr\Array_ $expr): bool
     {
         $returnType = $this->getReturnType($call);
 
@@ -113,6 +131,27 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         if ($expr instanceof Expr\ConstFetch) {
             return $narrowed === 'bool' && in_array($expr->name->toString(), ['true', 'false'], true);
+        }
+
+        if (
+            $expr instanceof Expr\ClassConstFetch
+            && $expr->class instanceof Node\Name
+            && $expr->name instanceof Node\Identifier
+        ) {
+            $constValue = $this->getClassConstantValue($expr->class, $expr->name);
+
+            if ($constValue === null) {
+                return false; // unable to reflect the constant value
+            }
+            $constType = gettype($constValue);
+
+            return
+                ($constType === 'integer' && $narrowed === 'int')
+                || ($constType === 'string' && $narrowed === 'string')
+                || ($constType === 'double' && $narrowed === 'float')
+                || ($constType === 'boolean' && $narrowed === 'bool')
+                || ($constType === 'array' && $narrowed === 'array')
+            ;
         }
 
         if ($expr instanceof Expr\Array_ && count($expr->items) === 0) {
@@ -139,29 +178,67 @@ abstract class AbstractIdenticalComparison implements Mutator
         return false;
     }
 
-    private function getReturnType(Expr\FuncCall $call): ?ReflectionType
+    private function getReturnType(CallLike $call): ?ReflectionType
     {
-        if (!$call->name instanceof Node\Name) {
-            return null;
+        if ($call instanceof Expr\FuncCall) {
+            if (!$call->name instanceof Node\Name) {
+                return null;
+            }
+            $name = $call->name->toString();
+
+            return self::$reflectionCache[$name] ?? $this->getFunctionReturnType($call->name);
         }
 
-        $name = $call->name->toString();
+        if (
+            $call instanceof Expr\StaticCall
+            && $call->class instanceof Node\Name
+            && $call->name instanceof Node\Identifier
+        ) {
+            $name = $call->class->toString() . '::' . $call->name->toString();
 
-        if (array_key_exists($name, self::$reflectionCache)) {
-            return self::$reflectionCache[$name];
+            return self::$reflectionCache[$name] ?? $this->getStaticMethodReturnType($call->class, $call->name);
         }
 
+        return null;
+    }
+
+    private function getFunctionReturnType(Node\Name $name): ?ReflectionType
+    {
         try {
-            $reflection = new ReflectionFunction($name);
+            $reflection = new ReflectionFunction($name->toString());
 
-            return self::$reflectionCache[$name] = $reflection->getReturnType();
+            return $reflection->getReturnType();
         } catch (ReflectionException) {
             // If the function does not exist, we cannot determine the return type
-            return self::$reflectionCache[$name] = null;
+            return null;
         }
     }
 
-    private function narrowReturnType(ReflectionType $returnType, Node\Scalar|Expr\ConstFetch|Expr\FuncCall|Expr\Array_ $expr): ?string
+    private function getStaticMethodReturnType(Node\Name $class, Node\Identifier $method): ?ReflectionType
+    {
+        try {
+            $reflection = new ReflectionMethod($class->toString(), $method->toString());
+
+            return $reflection->getReturnType();
+        } catch (ReflectionException) {
+            // If the method does not exist, we cannot determine the return type
+            return null;
+        }
+    }
+
+    private function getClassConstantValue(Node\Name $class, Node\Identifier $name): mixed
+    {
+        try {
+            $reflection = new ReflectionClassConstant($class->toString(), $name->toString());
+
+            return $reflection->getValue();
+        } catch (ReflectionException) {
+            // If the no reflection info exist, we cannot determine the return type
+            return null;
+        }
+    }
+
+    private function narrowReturnType(ReflectionType $returnType, Node\Scalar|Expr\ConstFetch|Expr\ClassConstFetch|Expr\FuncCall|Expr\Array_ $expr): ?string
     {
         if ($returnType instanceof ReflectionNamedType) {
             return $returnType->getName();
