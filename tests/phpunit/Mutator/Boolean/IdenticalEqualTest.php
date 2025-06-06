@@ -394,5 +394,13 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 ['abc'] == explode();
                 PHP,
         ];
+
+        yield 'It not mutates identical operator into equal operator for static method call' => [
+            <<<'PHP'
+                <?php
+
+                [] === PhpToken::tokenize();
+                PHP,
+        ];
     }
 }
