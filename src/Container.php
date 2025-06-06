@@ -1248,6 +1248,12 @@ final class Container
         return $this->setValueOrThrow($id, $value);
     }
 
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
     private function createService(string $id): ?object
     {
         $reflectionClass = new ReflectionClass($id);
