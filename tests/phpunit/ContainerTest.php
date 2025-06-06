@@ -35,15 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function get_class;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use ReflectionClass;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
+use Throwable;
 
 #[Group('integration')]
 #[CoversClass(Container::class)]
@@ -79,7 +84,7 @@ final class ContainerTest extends TestCase
 
     public function test_it_can_resolve_all_dependencies_with_configuration(): void
     {
-        $container = SingletonContainer::getContainer();
+        $container = Container::create();
 
         $container->getSubscriberRegisterer();
         $container->getTestFrameworkFinder();
@@ -127,5 +132,55 @@ final class ContainerTest extends TestCase
             noProgress: true,
             forceProgress: true,
         );
+    }
+
+    public static function provideServicesWithReflection(): iterable
+    {
+        $container = Container::create();
+        $reflection = new ReflectionClass($container);
+
+        $property = $reflection->getProperty('factories');
+
+        foreach ($property->getValue($container) as $id => $factory) {
+            yield $id => [$id];
+        }
+    }
+
+    #[DataProvider('provideServicesWithReflection')]
+    public function test_factory_is_essential(string $id): void
+    {
+        $container = Container::create();
+
+        $this->unsetFactory($container, $id);
+
+        $this->expectException(Throwable::class);
+
+        $service = $this->getService($container, $id);
+
+        $this->markTestIncomplete(sprintf(
+            'Service "%s" may not require a factory (found "%s").',
+            $id,
+            get_class($service),
+        ));
+    }
+
+    private function unsetFactory(Container $container, string $id): void
+    {
+        $reflection = new ReflectionClass($container);
+
+        foreach (['factories', 'values'] as $propName) {
+            $property = $reflection->getProperty($propName);
+            $value = $property->getValue($container);
+
+            unset($value[$id]);
+            $property->setValue($container, $value);
+        }
+    }
+
+    private function getService(Container $container, string $id): object
+    {
+        $reflection = new ReflectionClass($container);
+
+        return $reflection->getMethod('get')->invoke($container, $id);
     }
 }
