@@ -336,6 +336,19 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It mutates equal operator into identical operator for comparison of different return-typed operands (union vs. named-type)' => [
+            <<<'PHP'
+                <?php
+
+                preg_match() == count();
+                PHP,
+            <<<'PHP'
+                <?php
+
+                preg_match() === count();
+                PHP,
+        ];
+
         yield 'It mutates equal operator of non-reflectable functions' => [
             <<<'PHP'
                 <?php
