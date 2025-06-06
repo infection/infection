@@ -436,5 +436,18 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 random_int() === RegexIterator::USE_KEY;
                 PHP,
         ];
+
+        yield 'It mutates identical operator into equal operator for class constant fetches' => [
+            <<<'PHP'
+                <?php
+
+                round() === RegexIterator::USE_KEY;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                round() == RegexIterator::USE_KEY;
+                PHP,
+        ];
     }
 }
