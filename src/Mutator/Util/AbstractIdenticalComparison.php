@@ -58,7 +58,7 @@ abstract class AbstractIdenticalComparison implements Mutator
     /**
      * @var array<string, ReflectionType|null>
      */
-    private array $reflectionCache = [];
+    private static array $reflectionCache = [];
 
     protected function isSameTypeIdenticalComparison(Expr\BinaryOp\Equal|Expr\BinaryOp\Identical $comparison): bool
     {
@@ -147,17 +147,17 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         $name = $call->name->toString();
 
-        if (array_key_exists($name, $this->reflectionCache)) {
-            return $this->reflectionCache[$name];
+        if (array_key_exists($name, self::$reflectionCache)) {
+            return self::$reflectionCache[$name];
         }
 
         try {
             $reflection = new ReflectionFunction($name);
 
-            return $this->reflectionCache[$name] = $reflection->getReturnType();
+            return self::$reflectionCache[$name] = $reflection->getReturnType();
         } catch (ReflectionException) {
             // If the function does not exist, we cannot determine the return type
-            return $this->reflectionCache[$name] = null;
+            return self::$reflectionCache[$name] = null;
         }
     }
 
