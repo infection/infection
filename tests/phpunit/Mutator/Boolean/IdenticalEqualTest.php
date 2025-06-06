@@ -172,6 +172,22 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It not mutates identical operator into equal operator for same type operations (true)' => [
+            <<<'PHP'
+                <?php
+
+                true === is_array();
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for inverse same type operations (true)' => [
+            <<<'PHP'
+                <?php
+
+                is_array() === true;
+                PHP,
+        ];
+
         yield 'It not mutates identical operator into equal operator for same type operations (int)' => [
             <<<'PHP'
                 <?php
