@@ -35,15 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function get_class;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use ReflectionClass;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
+use Throwable;
 
 #[Group('integration')]
 #[CoversClass(Container::class)]
@@ -79,7 +84,7 @@ final class ContainerTest extends TestCase
 
     public function test_it_can_resolve_all_dependencies_with_configuration(): void
     {
-        $container = SingletonContainer::getContainer();
+        $container = Container::create();
 
         $container->getSubscriberRegisterer();
         $container->getTestFrameworkFinder();
@@ -101,38 +106,7 @@ final class ContainerTest extends TestCase
         $newContainer = SingletonContainer::getContainer()->withValues(
             new NullLogger(),
             new NullOutput(),
-            Container::DEFAULT_CONFIG_FILE,
-            Container::DEFAULT_MUTATORS_INPUT,
-            Container::DEFAULT_SHOW_MUTATIONS,
-            Container::DEFAULT_LOG_VERBOSITY,
-            Container::DEFAULT_DEBUG,
-            Container::DEFAULT_ONLY_COVERED,
-            Container::DEFAULT_FORMATTER_NAME,
-            Container::DEFAULT_NO_PROGRESS,
-            Container::DEFAULT_FORCE_PROGRESS,
-            '/path/to/coverage',
-            Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            Container::DEFAULT_SKIP_INITIAL_TESTS,
-            Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-            Container::DEFAULT_MIN_MSI,
-            Container::DEFAULT_MIN_COVERED_MSI,
-            Container::DEFAULT_MSI_PRECISION,
-            Container::DEFAULT_TEST_FRAMEWORK,
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            Container::DEFAULT_FILTER,
-            Container::DEFAULT_THREAD_COUNT,
-            Container::DEFAULT_DRY_RUN,
-            Container::DEFAULT_GIT_DIFF_FILTER,
-            Container::DEFAULT_GIT_DIFF_LINES,
-            Container::DEFAULT_GIT_DIFF_BASE,
-            Container::DEFAULT_USE_GITHUB_LOGGER,
-            Container::DEFAULT_GITLAB_LOGGER_PATH,
-            Container::DEFAULT_HTML_LOGGER_PATH,
-            Container::DEFAULT_USE_NOOP_MUTATORS,
-            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
-            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-            Container::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
-            Container::DEFAULT_STATIC_ANALYSIS_TOOL,
+            existingCoveragePath: '/path/to/coverage',
         );
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
@@ -155,38 +129,58 @@ final class ContainerTest extends TestCase
         $container->withValues(
             new NullLogger(),
             new NullOutput(),
-            Container::DEFAULT_CONFIG_FILE,
-            Container::DEFAULT_MUTATORS_INPUT,
-            Container::DEFAULT_SHOW_MUTATIONS,
-            Container::DEFAULT_LOG_VERBOSITY,
-            Container::DEFAULT_DEBUG,
-            Container::DEFAULT_ONLY_COVERED,
-            Container::DEFAULT_FORMATTER_NAME,
-            true,
-            true,
-            Container::DEFAULT_EXISTING_COVERAGE_PATH,
-            Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            Container::DEFAULT_SKIP_INITIAL_TESTS,
-            Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-            Container::DEFAULT_MIN_MSI,
-            Container::DEFAULT_MIN_COVERED_MSI,
-            Container::DEFAULT_MSI_PRECISION,
-            Container::DEFAULT_TEST_FRAMEWORK,
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            Container::DEFAULT_FILTER,
-            Container::DEFAULT_THREAD_COUNT,
-            Container::DEFAULT_DRY_RUN,
-            Container::DEFAULT_GIT_DIFF_FILTER,
-            Container::DEFAULT_GIT_DIFF_LINES,
-            Container::DEFAULT_GIT_DIFF_BASE,
-            Container::DEFAULT_USE_GITHUB_LOGGER,
-            Container::DEFAULT_GITLAB_LOGGER_PATH,
-            Container::DEFAULT_HTML_LOGGER_PATH,
-            Container::DEFAULT_USE_NOOP_MUTATORS,
-            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
-            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-            Container::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
-            Container::DEFAULT_STATIC_ANALYSIS_TOOL,
+            noProgress: true,
+            forceProgress: true,
         );
+    }
+
+    public static function provideServicesWithReflection(): iterable
+    {
+        $container = Container::create();
+        $reflection = new ReflectionClass($container);
+
+        $property = $reflection->getProperty('factories');
+
+        foreach ($property->getValue($container) as $id => $factory) {
+            yield $id => [$id];
+        }
+    }
+
+    #[DataProvider('provideServicesWithReflection')]
+    public function test_factory_is_essential(string $id): void
+    {
+        $container = Container::create();
+
+        $this->unsetFactory($container, $id);
+
+        $this->expectException(Throwable::class);
+
+        $service = $this->getService($container, $id);
+
+        $this->markTestIncomplete(sprintf(
+            'Service "%s" may not require a factory (found "%s").',
+            $id,
+            get_class($service),
+        ));
+    }
+
+    private function unsetFactory(Container $container, string $id): void
+    {
+        $reflection = new ReflectionClass($container);
+
+        foreach (['factories', 'values'] as $propName) {
+            $property = $reflection->getProperty($propName);
+            $value = $property->getValue($container);
+
+            unset($value[$id]);
+            $property->setValue($container, $value);
+        }
+    }
+
+    private function getService(Container $container, string $id): object
+    {
+        $reflection = new ReflectionClass($container);
+
+        return $reflection->getMethod('get')->invoke($container, $id);
     }
 }
