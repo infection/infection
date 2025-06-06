@@ -72,7 +72,7 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         if (
             $comparison->left instanceof Expr\FuncCall
-            && ($comparison->right instanceof Node\Scalar || $comparison->right instanceof Expr\ConstFetch)
+            && ($comparison->right instanceof Node\Scalar || $comparison->right instanceof Expr\ConstFetch || $comparison->right instanceof Expr\Array_)
             && $this->isSameTypeFuncCall($comparison->left, $comparison->right)
         ) {
             return true;
@@ -80,7 +80,7 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         if (
             $comparison->right instanceof Expr\FuncCall
-            && ($comparison->left instanceof Node\Scalar || $comparison->left instanceof Expr\ConstFetch)
+            && ($comparison->left instanceof Node\Scalar || $comparison->left instanceof Expr\ConstFetch || $comparison->left instanceof Expr\Array_)
             && $this->isSameTypeFuncCall($comparison->right, $comparison->left)
         ) {
             return true;
@@ -89,7 +89,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         return false;
     }
 
-    private function isSameTypeFuncCall(Expr\FuncCall $call, Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr): bool
+    private function isSameTypeFuncCall(Expr\FuncCall $call, Node\Scalar|Expr\ConstFetch|Expr\FuncCall|Expr\Array_ $expr): bool
     {
         $returnType = $this->getReturnType($call);
 
@@ -113,6 +113,10 @@ abstract class AbstractIdenticalComparison implements Mutator
 
         if ($expr instanceof Expr\ConstFetch) {
             return $narrowed === 'bool' && in_array($expr->name->toString(), ['true', 'false'], true);
+        }
+
+        if ($expr instanceof Expr\Array_ && count($expr->items) === 0) {
+            return $narrowed === 'array';
         }
 
         if ($expr instanceof Expr\FuncCall) {
@@ -157,7 +161,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
     }
 
-    private function narrowReturnType(ReflectionType $returnType, Node\Scalar|Expr\ConstFetch|Expr\FuncCall $expr): ?string
+    private function narrowReturnType(ReflectionType $returnType, Node\Scalar|Expr\ConstFetch|Expr\FuncCall|Expr\Array_ $expr): ?string
     {
         if ($returnType instanceof ReflectionNamedType) {
             return $returnType->getName();
