@@ -155,6 +155,7 @@ use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ReflectionClass;
+use ReflectionNamedType;
 use ReflectionParameter;
 use function reset;
 use function Safe\getcwd;
@@ -1285,6 +1286,10 @@ final class Container
         }
 
         $paramType = $parameter->getType();
+
+        if (!$paramType instanceof ReflectionNamedType) {
+            return;
+        }
 
         // Only attempt to resolve a non-built-in named type (a class/interface)
         if ($paramType->isBuiltin()) {
