@@ -84,6 +84,7 @@
         "phpunit/phpunit": "^11.5",
         "rector/rector": "^2.0",
         "shipmonk/dead-code-detector": "^0.12.0",
+        "shipmonk/name-collision-detector": "^2.1",
         "sidz/phpstan-rules": "^0.5.1",
         "symfony/yaml": "^6.4 || ^7.0",
         "thecodingmachine/phpstan-safe-rule": "^1.4"

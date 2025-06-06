@@ -1,6 +1,6 @@
 <?php
 
-namespace InfectionReflectionPartOfSignature;
+namespace InfectionReflectionPartOfSignatureWithAttributes;
 
 class Test
 {
