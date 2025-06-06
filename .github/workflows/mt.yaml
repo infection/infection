@@ -25,7 +25,7 @@ concurrency:
 
 env:
   MIN_MSI: 77.0
-  MIN_COVERED_MSI: 86.0
+  MIN_COVERED_MSI: 86.48
 
 jobs:
   tests:
