@@ -1322,6 +1322,7 @@ final class Container
         }
 
         // Look for a factory that can create an instance of an interface or abstract class
+        /** @var class-string[] $matchingTypes */
         $matchingTypes = take($this->factories)
             ->keys()
             ->filter(static fn (string $id) => is_a($id, $paramTypeName, true))
