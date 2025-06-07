@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -80,6 +81,12 @@ final class NotIdentical implements Mutator
 
     public function canMutate(Node $node): bool
     {
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
         return $node instanceof Node\Expr\BinaryOp\NotIdentical;
     }
 }
