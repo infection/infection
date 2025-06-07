@@ -161,12 +161,10 @@ final class ContainerReflection
     private static function handleCommonErrors(callable $callable, string $id): ?object
     {
         try {
-            $result = $callable($id);
-        } catch (Error|AssertException $e) {
+            return $callable($id);
+        } catch (Error|AssertException) {
             // Ignore services that require extra configuration (cause errors or assertions without it)
             return null;
         }
-
-        return $result;
     }
 }
