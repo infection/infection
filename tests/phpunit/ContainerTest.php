@@ -50,7 +50,6 @@ use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
-#[Group('integration')]
 #[CoversClass(Container::class)]
 final class ContainerTest extends TestCase
 {
@@ -101,6 +100,7 @@ final class ContainerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    #[Group('integration')]
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
         $newContainer = SingletonContainer::getContainer()->withValues(
