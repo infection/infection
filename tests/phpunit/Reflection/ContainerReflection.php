@@ -82,7 +82,10 @@ class ContainerReflection
         /* @phpstan-var Closure(string):T $callable */
         $callable = $this->createServiceClosure;
 
-        return self::handleCommonErrors($callable, $id);
+        $service = self::handleCommonErrors($callable, $id);
+
+        /* @var ?T $service */
+        return $service;
     }
 
     /**
@@ -96,7 +99,10 @@ class ContainerReflection
         /* @phpstan-var Closure(string):T $callable */
         $callable = $this->getServiceClosure;
 
-        return self::handleCommonErrors($callable, $id);
+        $service = self::handleCommonErrors($callable, $id);
+
+        /* @phpstan-var ?T $service */
+        return $service;
     }
 
     /**
@@ -152,13 +158,14 @@ class ContainerReflection
     /**
      * @template T of object
      *
-     * @param callable(mixed ...$args): T $callable
+     * @param class-string<T> $id
+     * @param Closure(string): T $callable
      * @phpstan-return ?T
      */
-    private static function handleCommonErrors(callable $callable, mixed ...$args): ?object
+    private static function handleCommonErrors(Closure $callable, string $id): ?object
     {
         try {
-            return $callable(...$args);
+            return $callable($id);
         } catch (Error|AssertException $e) {
             // Ignore services that require extra configuration (cause errors or assertions without it)
             return null;
