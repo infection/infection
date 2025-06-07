@@ -473,7 +473,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                     PHPCODE,
             ];
         } else {
-            yield 'It mutates equal operator into identical operator for known int global constants (PHP 8.3)' => [
+            yield 'It mutates equal operator into identical operator for global int constants without reflection info (PHP 8.3)' => [
                 <<<'PHPCODE'
                     <?php
 
