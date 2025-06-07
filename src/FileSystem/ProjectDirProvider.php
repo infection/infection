@@ -46,7 +46,7 @@ use function Safe\getcwd;
 final class ProjectDirProvider
 {
     /**
-     * @var Deferred<string>
+     * @var Deferred<non-empty-string>
      */
     private readonly Deferred $projectDir;
 
