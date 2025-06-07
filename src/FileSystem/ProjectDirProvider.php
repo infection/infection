@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use function getcwd;
 use Later\Interfaces\Deferred;
 use function Later\later;
+use function Safe\getcwd;
 
 /**
  * Caches the project directory path.
