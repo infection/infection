@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Mutator\Cast\CastBool;
 use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -82,6 +83,20 @@ final class CastBoolTest extends BaseMutatorTestCase
                 1;
                 PHP
             ,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-function' => [
+            <<<'PHP'
+                <?php
+
+                function returnsBool(): bool {
+                    return (bool) preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-method' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'bool-method.php'),
         ];
     }
 }

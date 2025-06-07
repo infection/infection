@@ -37,6 +37,7 @@ namespace Infection\Mutator\Cast;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -59,6 +60,27 @@ final class CastBool extends AbstractCastMutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Bool_;
+        if (!$node instanceof Node\Expr\Cast\Bool_) {
+            return false;
+        }
+
+        $parent = ParentConnector::getParent($node);
+
+        if ($parent instanceof Node\Stmt\Return_) {
+            $functionScope = ParentConnector::getParent($parent);
+
+            if (
+                $functionScope instanceof Node\Stmt\ClassMethod
+                || $functionScope instanceof Node\Stmt\Function_
+            ) {
+                $returnType = $functionScope->getReturnType();
+
+                if ($returnType instanceof Node\Identifier && $returnType->name === 'bool') {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
