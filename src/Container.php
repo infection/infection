@@ -1313,10 +1313,7 @@ final class Container
         }
 
         // Look for a factory that can create an instance of an interface or abstract class
-        $matchingTypes = take($this->factories)
-            ->keys()
-            ->filter(static fn (string $id) => is_a($id, $paramTypeName, true))
-            ->toList();
+        $matchingTypes = $this->factoriesForType($paramTypeName);
 
         // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
         if (count($matchingTypes) !== 1) {
@@ -1324,5 +1321,21 @@ final class Container
         }
 
         yield $this->get(reset($matchingTypes));
+    }
+
+    /**
+     * Retrieves the class or interface names of all registered factories that can produce instances of the given type.
+     * This includes direct implementations, subclasses, or the type itself.
+     *
+     * @template T of object
+     * @param class-string<T> $type the class or interface name to find factories for
+     * @return class-string<T>[] a list of factory IDs (class-strings) that are compatible with the given type
+     */
+    private function factoriesForType(string $type): array
+    {
+        return take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $type, true))
+            ->toList();
     }
 }
