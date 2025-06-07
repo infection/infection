@@ -114,6 +114,15 @@ final class TrueValueTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It does not mutate in ternary condition to prevent overlap with TernaryMutator' => [
+            <<<'PHP'
+                <?php
+
+                $x == true ? 'yes' : 'no';
+                PHP
+            ,
+        ];
+
         yield 'It mutates all caps true to false' => [
             <<<'PHP'
                 <?php

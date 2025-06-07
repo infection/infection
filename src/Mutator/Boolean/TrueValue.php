@@ -105,6 +105,10 @@ final class TrueValue implements ConfigurableMutator
             return false;
         }
 
+        if ($grandParentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;
         }
