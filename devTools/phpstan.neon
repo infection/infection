@@ -20,8 +20,8 @@ parameters:
             message: '#^Method Infection\\Mutator\\MutatorResolver::resolveSettings\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
             count: 1
         -
-            path: '../src/ContainerHelper.php'
-            message: '#^Method Infection\\ContainerHelper::(get|set).*\(\) should return T of .* but returns object\.$#'
+            path: '../src/Container.php'
+            message: '#^Method Infection\\Container::(get|set).*\(\) should return T of .* but returns object\.$#'
             count: 2
         -
             path: '../tests/phpunit/Reflection/ContainerReflection.php'

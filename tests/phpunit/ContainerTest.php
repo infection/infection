@@ -136,8 +136,9 @@ final class ContainerTest extends TestCase
 
     public static function provideServicesWithReflection(): iterable
     {
-        $container = SingletonContainer::getContainer();
-        $reflection = new ContainerReflection($container);
+        $reflection = new ContainerReflection(
+            SingletonContainer::getContainer(),
+        );
 
         foreach ($reflection->getFactories() as $id => $factory) {
             yield $id => [$id];

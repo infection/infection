@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection;
 
 use function array_filter;
+use function array_key_exists;
 use Closure;
+use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -141,14 +143,21 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use InvalidArgumentException;
+use function is_a;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionParameter;
+use function reset;
 use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -197,7 +206,15 @@ final class Container
     public const DEFAULT_DRY_RUN = false;
     public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
-    private readonly ContainerHelper $containerHelper;
+    /**
+     * @var array<class-string<object>, object>
+     */
+    private array $values = [];
+
+    /**
+     * @var array<class-string<object>, Closure(self): object>
+     */
+    private array $factories = [];
 
     private ?string $defaultJUnitPath = null;
 
@@ -206,7 +223,9 @@ final class Container
      */
     public function __construct(array $values)
     {
-        $this->containerHelper = new ContainerHelper($values, $this);
+        foreach ($values as $id => $value) {
+            $this->offsetSet($id, $value);
+        }
     }
 
     public static function create(): self
@@ -1181,7 +1200,22 @@ final class Container
      */
     private function offsetSet(string $id, Closure $value): void
     {
-        $this->containerHelper->offsetSet($id, $value);
+        $this->factories[$id] = $value;
+        unset($this->values[$id]);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return T
+     */
+    private function setValueOrThrow(string $id, object $value): object
+    {
+        Assert::isInstanceOf($value, $id);
+        $this->values[$id] = $value;
+
+        return $value;
     }
 
     /**
@@ -1192,6 +1226,116 @@ final class Container
      */
     private function get(string $id): object
     {
-        return $this->containerHelper->get($id);
+        if (array_key_exists($id, $this->values)) {
+            $value = $this->values[$id];
+            Assert::isInstanceOf($value, $id);
+
+            return $value;
+        }
+
+        if (array_key_exists($id, $this->factories)) {
+            $value = $this->factories[$id]($this);
+
+            return $this->setValueOrThrow($id, $value);
+        }
+
+        $value = $this->createService($id);
+
+        if ($value === null) {
+            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        }
+
+        return $this->setValueOrThrow($id, $value);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
+    private function createService(string $id): ?object
+    {
+        $reflectionClass = new ReflectionClass($id);
+        $constructor = $reflectionClass->getConstructor();
+
+        if (!$reflectionClass->isInstantiable()) {
+            return null;
+        }
+
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            return $reflectionClass->newInstance();
+        }
+
+        $resolvedArguments = take($constructor->getParameters())
+            ->map($this->resolveParameter(...))
+            ->toList();
+
+        // Check if we identified all parameters for the service
+        if (count($resolvedArguments) !== $constructor->getNumberOfParameters()) {
+            return null;
+        }
+
+        return $reflectionClass->newInstanceArgs($resolvedArguments);
+    }
+
+    /**
+     * Builds a potentially incomplete list of arguments for a constructor; as list of arguments may
+     * contain null values, we use a generator that can yield none or one value as an option type.
+     *
+     * @return iterable<object>
+     */
+    private function resolveParameter(ReflectionParameter $parameter): iterable
+    {
+        // Variadic parameters need hand-weaving
+        if ($parameter->isVariadic()) {
+            return;
+        }
+
+        $paramType = $parameter->getType();
+
+        // Not considering composite types, such as unions or intersections, for now
+        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
+
+        // Only attempt to resolve a non-built-in named type (a class/interface)
+        if ($paramType->isBuiltin()) {
+            return;
+        }
+
+        /** @var class-string $paramTypeName */
+        $paramTypeName = $paramType->getName();
+
+        // Found an instantiable class, done
+        if ((new ReflectionClass($paramTypeName))->isInstantiable()) {
+            yield $this->get($paramTypeName);
+
+            return;
+        }
+
+        // Look for a factory that can create an instance of an interface or abstract class
+        $matchingTypes = $this->factoriesForType($paramTypeName);
+
+        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
+        if (count($matchingTypes) !== 1) {
+            return;
+        }
+
+        yield $this->get(reset($matchingTypes));
+    }
+
+    /**
+     * Retrieves the class or interface names of all registered factories that can produce instances of the given type.
+     * This includes direct implementations, subclasses, or the type itself.
+     *
+     * @template T of object
+     * @param class-string<T> $type the class or interface name to find factories for
+     * @return class-string<T>[] a list of factory IDs (class-strings) that are compatible with the given type
+     */
+    private function factoriesForType(string $type): array
+    {
+        return take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $type, true))
+            ->toList();
     }
 }
