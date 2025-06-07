@@ -145,6 +145,9 @@ final class ContainerTest extends TestCase
         }
     }
 
+    /**
+     * @param class-string $id
+     */
     #[DataProvider('provideServicesWithReflection')]
     public function test_factory_is_essential(string $id): void
     {
@@ -169,9 +172,9 @@ final class ContainerTest extends TestCase
         }
 
         // All other services should be createable without a factory for this service
-        foreach ($reflection->iterateExpectedConcreteServices() as $id) {
+        foreach ($reflection->iterateExpectedConcreteServices() as $serviceId) {
             try {
-                $reflection->getService($id);
+                $reflection->getService($serviceId);
             } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString('Unknown service ', $e->getMessage());
 

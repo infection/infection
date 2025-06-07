@@ -43,6 +43,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 use function str_starts_with;
+use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 class ContainerReflection
@@ -50,10 +51,14 @@ class ContainerReflection
     /** @var ReflectionClass<Container> */
     private readonly ReflectionClass $reflection;
 
-    /** @var Closure(string): object */
+    /**
+     * @psalm-var Closure(class-string<object>): object
+     */
     private readonly Closure $createServiceClosure;
 
-    /** @var Closure(string): object */
+    /**
+     * @psalm-var Closure(class-string<object>): object
+     */
     private readonly Closure $getServiceClosure;
 
     private readonly ReflectionProperty $factories;
@@ -79,12 +84,11 @@ class ContainerReflection
      */
     public function createService(string $id): ?object
     {
-        /* @phpstan-var Closure(string):T $callable */
-        $callable = $this->createServiceClosure;
+        $service = self::handleCommonErrors($this->createServiceClosure, $id);
 
-        $service = self::handleCommonErrors($callable, $id);
+        Assert::nullOrIsInstanceOf($service, $id);
+        /* @phpstan-var ?T $service */
 
-        /* @var ?T $service */
         return $service;
     }
 
@@ -96,12 +100,11 @@ class ContainerReflection
      */
     public function getService(string $id): ?object
     {
-        /* @phpstan-var Closure(string):T $callable */
-        $callable = $this->getServiceClosure;
+        $service = self::handleCommonErrors($this->getServiceClosure, $id);
 
-        $service = self::handleCommonErrors($callable, $id);
-
+        Assert::nullOrIsInstanceOf($service, $id);
         /* @phpstan-var ?T $service */
+
         return $service;
     }
 
@@ -155,20 +158,15 @@ class ContainerReflection
         }
     }
 
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @param Closure(string): T $callable
-     * @phpstan-return ?T
-     */
-    private static function handleCommonErrors(Closure $callable, string $id): ?object
+    private static function handleCommonErrors(callable $callable, string $id): ?object
     {
         try {
-            return $callable($id);
+            $result = $callable($id);
         } catch (Error|AssertException $e) {
             // Ignore services that require extra configuration (cause errors or assertions without it)
             return null;
         }
+
+        return $result;
     }
 }
