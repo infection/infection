@@ -187,12 +187,15 @@ final class ContainerTest extends TestCase
         $reflection = new ContainerReflection($container);
 
         foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
-            yield $methodName => [$id, $methodName, $container];
+            yield $methodName => [$id, $methodName, $container, $reflection];
         }
     }
 
+    /**
+     * @param class-string $id
+     */
     #[DataProvider('provideExpectedConcreteServicesWithReflection')]
-    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container): void
+    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container, ContainerReflection $reflection): void
     {
         try {
             $service = $container->{$methodName}();
@@ -208,5 +211,7 @@ final class ContainerTest extends TestCase
             $service,
             sprintf('Service should be an instance of "%s"', $id),
         );
+
+        $this->assertSame($service, $reflection->getService($id));
     }
 }
