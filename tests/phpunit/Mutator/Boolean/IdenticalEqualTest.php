@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator\Boolean;
 use Infection\Mutator\Boolean\IdenticalEqual;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -448,6 +449,117 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
 
                 round() == RegexIterator::USE_KEY;
                 PHP,
+        ];
+
+        if (PHP_VERSION_ID >= 80400) {
+            yield 'It not mutates identical operator into equal operator for known global int constants' => [
+                <<<'PHPCODE'
+                    <?php
+
+                    PHP_MAJOR_VERSION === 5;
+                    PHPCODE,
+            ];
+        } else {
+            yield 'It mutates identical operator into equal operator for global int constants without reflection info (PHP 8.3)' => [
+                <<<'PHPCODE'
+                    <?php
+
+                    PHP_MAJOR_VERSION === 5;
+                    PHPCODE,
+                <<<'PHPCODE'
+                    <?php
+
+                    PHP_MAJOR_VERSION == 5;
+                    PHPCODE,
+            ];
+        }
+
+        yield 'It not mutates identical operator into equal operator for known global constants' => [
+            <<<'PHPCODE'
+                <?php
+
+                PHP_SAPI === 'phpdbg';
+                PHPCODE,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for unknown global constants' => [
+            <<<'PHPCODE'
+                <?php
+
+                NOONE_KNOWS_THIS_CONSTANT === 'phpdbg';
+                PHPCODE,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison against empty literal string' => [
+            <<<'PHP'
+                <?php
+
+                $x === '';
+                PHP,
+            <<<'PHP'
+                <?php
+
+                $x == '';
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison against empty literal string (inversed)' => [
+            <<<'PHP'
+                <?php
+
+                '' === $x;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                '' == $x;
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison against numeric literal string' => [
+            <<<'PHP'
+                <?php
+
+                $x === '123';
+                PHP,
+            <<<'PHP'
+                <?php
+
+                $x == '123';
+                PHP,
+        ];
+
+        yield 'It mutates identical operator into equal operator for comparison against numeric literal string (inversed)' => [
+            <<<'PHP'
+                <?php
+
+                '123' === $x;
+                PHP,
+            <<<'PHP'
+                <?php
+
+                '123' == $x;
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for comparison against non-numeric&non-empty literal string' => [
+            <<<'PHP'
+                <?php
+
+                $x === 'hello';
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for comparison against non-numeric&non-empty literal string (inversed)' => [
+            <<<'PHP'
+                <?php
+
+                'hello' === $x;
+                PHP,
+        ];
+
+        yield 'It not mutates identical operator into equal operator for comparison against non-numeric&non-empty literal string (class constant)' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'non-numeric-non-empty-class-const.php'),
         ];
     }
 }
