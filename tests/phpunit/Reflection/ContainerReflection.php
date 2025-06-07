@@ -75,30 +75,28 @@ class ContainerReflection
      * @template T of object
      *
      * @param class-string<T> $id
-     * @return ?T
+     * @phpstan-return ?T
      */
     public function createService(string $id): ?object
     {
-        return self::handleCommonErrors(
-            /* @phpstan-var Closure(string):T $callable */
-            $this->createServiceClosure,
-            $id,
-        );
+        /* @phpstan-var Closure(string):T $callable */
+        $callable = $this->createServiceClosure;
+
+        return self::handleCommonErrors($callable, $id);
     }
 
     /**
      * @template T of object
      *
      * @param class-string<T> $id
-     * @return ?T
+     * @phpstan-return ?T
      */
     public function getService(string $id): ?object
     {
-        return self::handleCommonErrors(
-            /* @phpstan-var Closure(string):T $callable */
-            $this->getServiceClosure,
-            $id,
-        );
+        /* @phpstan-var Closure(string):T $callable */
+        $callable = $this->getServiceClosure;
+
+        return self::handleCommonErrors($callable, $id);
     }
 
     /**
@@ -155,7 +153,7 @@ class ContainerReflection
      * @template T of object
      *
      * @param callable(mixed ...$args): T $callable
-     * @return ?T
+     * @phpstan-return ?T
      */
     private static function handleCommonErrors(callable $callable, mixed ...$args): ?object
     {
