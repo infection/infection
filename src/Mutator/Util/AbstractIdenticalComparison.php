@@ -39,7 +39,10 @@ use function count;
 use function gettype;
 use function in_array;
 use Infection\Mutator\Mutator;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Reflection\ClassReflection;
 use function is_numeric;
+use function is_string;
 use const PHP_VERSION_ID;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
@@ -70,20 +73,8 @@ abstract class AbstractIdenticalComparison implements Mutator
 
     protected function isSameTypeIdenticalComparison(Expr\BinaryOp\Equal|Expr\BinaryOp\Identical $comparison): bool
     {
-        if ($comparison->left instanceof Node\Scalar\String_) {
-            if ($comparison->left->value !== '' && !is_numeric($comparison->left->value)) {
-                // you can't type juggle any expression type into a non-numeric&non-empty string
-                // see https://github.com/phpstan/phpstan/issues/13120
-                return true;
-            }
-        }
-
-        if ($comparison->right instanceof Node\Scalar\String_) {
-            if ($comparison->right->value !== '' && !is_numeric($comparison->right->value)) {
-                // you can't type juggle any expression type into a non-numeric&non-empty string
-                // see https://github.com/phpstan/phpstan/issues/13120
-                return true;
-            }
+        if ($this->isComparisonAgainstNonEmptyNonNumericString($comparison)) {
+            return true;
         }
 
         if (
@@ -155,7 +146,13 @@ abstract class AbstractIdenticalComparison implements Mutator
                 return $narrowed === 'bool';
             }
 
-            $constType = $this->getGlobalConstantType($expr->name);
+            $constValue = $this->getGlobalConstantValue($expr->name);
+
+            if ($constValue === null) {
+                return false; // unable to reflect the constant value
+            }
+
+            $constType = $this->getValueAsType($constValue);
 
             return $constType !== null && $constType === $narrowed;
         }
@@ -165,7 +162,23 @@ abstract class AbstractIdenticalComparison implements Mutator
             && $expr->class instanceof Node\Name
             && $expr->name instanceof Node\Identifier
         ) {
-            return $this->getClassConstantType($expr->class, $expr->name) === $narrowed;
+            $className = $expr->class;
+
+            if ($className->toString() === 'self') {
+                /** @var ClassReflection $reflectionClass */
+                $reflectionClass = $expr->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+                $className = new Node\Name($reflectionClass->getName());
+            }
+
+            $constValue = $this->getClassConstantValue($className, $expr->name);
+
+            if ($constValue === null) {
+                return false; // unable to reflect the constant value
+            }
+
+            $constType = $this->getValueAsType($constValue);
+
+            return $constType !== null && $constType === $narrowed;
         }
 
         if ($expr instanceof Expr\Array_ && count($expr->items) === 0) {
@@ -192,7 +205,13 @@ abstract class AbstractIdenticalComparison implements Mutator
         if (
             $call instanceof Expr\ConstFetch
         ) {
-            return $this->getGlobalConstantType($call->name);
+            $value = $this->getGlobalConstantValue($call->name);
+
+            if ($value === null) {
+                return null; // unable to reflect the constant value
+            }
+
+            return $this->getValueAsType($value);
         }
 
         $returnType = $this->getReturnType($call);
@@ -252,7 +271,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
     }
 
-    private function getGlobalConstantType(Node\Name $name): ?string
+    private function getGlobalConstantValue(Node\Name $name): mixed
     {
         if (PHP_VERSION_ID < self::REFLECTION_CONSTANT_MIN_VERSION) {
             return null;
@@ -263,19 +282,19 @@ abstract class AbstractIdenticalComparison implements Mutator
             $reflection = new ReflectionConstant($name->toString());
 
             // @phpstan-ignore class.notFound
-            return $this->getValueAsType($reflection->getValue());
+            return $reflection->getValue();
         } catch (ReflectionException) {
             // If the no reflection info exist, we cannot determine the return type
             return null;
         }
     }
 
-    private function getClassConstantType(Node\Name $class, Node\Identifier $name): ?string
+    private function getClassConstantValue(Node\Name $class, Node\Identifier $name): mixed
     {
         try {
             $reflection = new ReflectionClassConstant($class->toString(), $name->toString());
 
-            return $this->getValueAsType($reflection->getValue());
+            return $reflection->getValue();
         } catch (ReflectionException) {
             // If the no reflection info exist, we cannot determine the return type
             return null;
@@ -358,5 +377,47 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
 
         return null;
+    }
+
+    private function isComparisonAgainstNonEmptyNonNumericString(Expr\BinaryOp\Equal|Expr\BinaryOp\Identical $comparison): bool
+    {
+        return $this->isNonEmptyNonNumericStringExpr($comparison->left)
+            || $this->isNonEmptyNonNumericStringExpr($comparison->right);
+    }
+
+    private function isNonEmptyNonNumericStringExpr(Expr $expr): bool
+    {
+        // you can't type juggle any expression type into a non-numeric&non-empty string
+        // see https://github.com/phpstan/phpstan/issues/13120
+
+        if ($expr instanceof Node\Scalar\String_) {
+            return $expr->value !== '' && !is_numeric($expr->value);
+        }
+
+        if ($expr instanceof Expr\ConstFetch) {
+            $constValue = $this->getGlobalConstantValue($expr->name);
+
+            return is_string($constValue) && $constValue !== '' && !is_numeric($constValue);
+        }
+
+        if (
+            $expr instanceof Expr\ClassConstFetch
+            && $expr->class instanceof Node\Name
+            && $expr->name instanceof Node\Identifier
+        ) {
+            $className = $expr->class;
+
+            if ($className->toString() === 'self') {
+                /** @var ClassReflection $reflectionClass */
+                $reflectionClass = $expr->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+                $className = new Node\Name($reflectionClass->getName());
+            }
+
+            $constValue = $this->getClassConstantValue($className, $expr->name);
+
+            return is_string($constValue) && $constValue !== '' && !is_numeric($constValue);
+        }
+
+        return false;
     }
 }
