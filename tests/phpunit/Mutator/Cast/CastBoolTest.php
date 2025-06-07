@@ -95,6 +95,19 @@ final class CastBoolTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It not removes casting to bool in nested return of bool-function' => [
+            <<<'PHP'
+                <?php
+
+                function returnsBool(): bool {
+                    if (true) {
+                        return (bool) preg_match();
+                    }
+                    return false;
+                }
+                PHP,
+        ];
+
         yield 'It not removes casting to bool in return of bool-method' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'bool-method.php'),
         ];
