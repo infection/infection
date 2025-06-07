@@ -198,7 +198,7 @@ final class ContainerTest extends TestCase
         foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
             try {
                 $service = $container->{$methodName}();
-            } catch (Error|AssertException $e) {
+            } catch (Error|AssertException) {
                 // Ignore services that require extra configuration
                 continue;
             }
