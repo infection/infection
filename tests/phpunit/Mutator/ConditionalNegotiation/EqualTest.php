@@ -86,5 +86,14 @@ final class EqualTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It does not mutate inside ternary to prevent overlap with TernaryMutator' => [
+            <<<'PHP'
+                <?php
+
+                $x == false ? 'yes' : 'no';
+                PHP
+            ,
+        ];
     }
 }
