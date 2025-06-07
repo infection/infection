@@ -260,6 +260,11 @@ final class ParallelProcessRunnerTest extends TestCase
                             $this->mutantExecutionResultFactory,
                         );
                     }
+
+                    public function supports(Mutant $mutant): bool
+                    {
+                        return true;
+                    }
                 },
             ],
         );

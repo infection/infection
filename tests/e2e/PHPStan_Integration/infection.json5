@@ -7,8 +7,7 @@
         ]
     },
     "logs": {
-        "summary": "infection.log",
-        "text": "infection.text.log",
+        "summary": "infection.log"
     },
     "tmpDir": "."
 }

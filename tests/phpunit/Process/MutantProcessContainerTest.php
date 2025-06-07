@@ -41,6 +41,9 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
+use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
+use Infection\TestFramework\CommandLineBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -84,6 +87,52 @@ final class MutantProcessContainerTest extends TestCase
         $this->assertFalse($container->hasNext());
     }
 
+    public function test_it_returns_false_when_next_process_does_not_support_mutant(): void
+    {
+        $container = new MutantProcessContainer($this->phpUnitMutantProcess, [
+            new PHPStanMutantProcessFactory(
+                $this->createMock(PHPStanMutantExecutionResultFactory::class),
+                '/path/to/phpstan',
+                $this->createMock(CommandLineBuilder::class),
+                100.0,
+            ),
+        ]);
+
+        $this->assertFalse($container->hasNext());
+    }
+
+    public function test_it_returns_true_when_next_process_supports_mutant(): void
+    {
+        $this->phpUnitMutantProcess
+            ->expects($this->once())
+            ->method('getMutant')
+            ->willReturn($this->mutant);
+
+        $this->phpUnitMutantProcess
+            ->expects($this->once())
+            ->method('getMutantExecutionResult')
+            ->willReturn($this->mutantExecutionResult);
+
+        $this->mutantExecutionResult
+            ->expects($this->once())
+            ->method('getDetectionStatus')
+            ->willReturn(DetectionStatus::ESCAPED);
+
+        $mutantProcessFactoryMock = $this->createMock(LazyMutantProcessFactory::class);
+
+        $mutantProcessFactoryMock
+            ->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
+
+        $container = new MutantProcessContainer(
+            $this->phpUnitMutantProcess,
+            [$mutantProcessFactoryMock],
+        );
+
+        $this->assertTrue($container->hasNext());
+    }
+
     public function test_it_returns_true_when_there_is_next_process_to_kill_mutant(): void
     {
         $container = new MutantProcessContainer(
@@ -95,7 +144,7 @@ final class MutantProcessContainerTest extends TestCase
         $newMutantProcess = $this->createMock(MutantProcess::class);
 
         $this->phpUnitMutantProcess
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getMutant')
             ->willReturn($this->mutant);
 
@@ -114,6 +163,12 @@ final class MutantProcessContainerTest extends TestCase
             ->method('create')
             ->with($this->mutant)
             ->willReturn($newMutantProcess);
+
+        $this->lazyMutantProcessCreator
+            ->expects($this->once())
+            ->method('supports')
+            ->with($this->mutant)
+            ->willReturn(true);
 
         $this->assertTrue($container->hasNext());
 

@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\StaticAnalysis\PHPStan\Process;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use Infection\Mutator\Boolean\InstanceOf_;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
@@ -47,52 +49,16 @@ use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 #[CoversClass(PHPStanMutantProcessFactory::class)]
 final class PHPStanMutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
     {
-        $mutant = MutantBuilder::build(
-            $mutantFilePath = '/path/to/mutant',
-            new Mutation(
-                $originalFilePath = 'path/to/Foo.php',
-                [],
-                For_::class,
-                MutatorName::getName(For_::class),
-                [
-                    'startLine' => $originalStartingLine = 10,
-                    'endLine' => 15,
-                    'startTokenPos' => 0,
-                    'endTokenPos' => 8,
-                    'startFilePos' => 2,
-                    'endFilePos' => 4,
-                ],
-                'Unknown',
-                MutatedNode::wrap(new Nop()),
-                0,
-                $tests = [
-                    new TestLocation(
-                        'FooTest::test_it_can_instantiate',
-                        '/path/to/acme/FooTest.php',
-                        0.01,
-                    ),
-                ],
-            ),
-            'killed#0',
-            $mutantDiff = <<<'DIFF'
-                --- Original
-                +++ New
-                @@ @@
-
-                - echo 'original';
-                + echo 'killed#0';
-
-                DIFF,
-            '<?php $a = 1;',
-        );
-
-        $testFrameworkExtraOptions = '--verbose';
+        $mutant = $this->createMutant();
+        $mutantFilePath = $mutant->getFilePath();
+        $originalFilePath = $mutant->getMutation()->getOriginalFilePath();
 
         $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
@@ -125,5 +91,64 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
 
         $this->assertSame($mutant, $mutantProcess->getMutant());
         $this->assertFalse($mutantProcess->isTimedOut());
+    }
+
+    public function test_it_ignores_particular_mutators(): void
+    {
+        $factory = new PHPStanMutantProcessFactory(
+            $this->createMock(PHPStanMutantExecutionResultFactory::class),
+            '/path/to/phpstan',
+            $this->createMock(CommandLineBuilder::class),
+            100.0,
+        );
+
+        $supports = $factory->supports($this->createMutant(InstanceOf_::class));
+
+        $this->assertFalse(
+            $supports,
+            sprintf('PHPStan must not support %s mutator', InstanceOf_::class),
+        );
+    }
+
+    private function createMutant(string $mutator = For_::class): Mutant
+    {
+        return MutantBuilder::build(
+            '/path/to/mutant',
+            new Mutation(
+                'path/to/Foo.php',
+                [],
+                $mutator,
+                MutatorName::getName($mutator),
+                [
+                    'startLine' => 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                'Unknown',
+                MutatedNode::wrap(new Nop()),
+                0,
+                $tests = [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01,
+                    ),
+                ],
+            ),
+            'killed#0',
+            $mutantDiff = <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed#0';
+
+                DIFF,
+            '<?php $a = 1;',
+        );
     }
 }

@@ -44,4 +44,6 @@ use Infection\Process\MutantProcess;
 interface LazyMutantProcessFactory
 {
     public function create(Mutant $mutant): MutantProcess;
+
+    public function supports(Mutant $mutant): bool;
 }
