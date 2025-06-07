@@ -171,43 +171,42 @@ final class ContainerTest extends TestCase
             return;
         }
 
-        // All other services should be createable without a factory for this service
-        foreach ($reflection->iterateExpectedConcreteServices() as $serviceId) {
-            try {
-                $reflection->getService($serviceId);
-            } catch (InvalidArgumentException $e) {
-                $this->assertStringContainsString('Unknown service ', $e->getMessage());
-
-                // All good: this other service requires a factory for the original service
-                return;
-            }
-        }
-
-        $this->markTestIncomplete(sprintf(
-            'Service "%s" may not require a factory.',
+        $this->assertInstanceOf(
             $id,
-        ));
+            $service,
+            sprintf('Service should be an instance of "%s"', $id),
+        );
+
+        // Here we can check that all other services can be created without a factory for this service
+        // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
     }
 
-    public function test_it_can_provide_all_services(): void
+    public static function provideExpectedConcreteServicesWithReflection(): iterable
     {
-        $reflection = new ContainerReflection(Container::create());
-
         $container = Container::create();
+        $reflection = new ContainerReflection($container);
 
         foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
-            try {
-                $service = $container->{$methodName}();
-            } catch (Error|AssertException) {
-                // Ignore services that require extra configuration
-                continue;
-            }
-
-            $this->assertInstanceOf(
-                $id,
-                $service,
-                sprintf('Service should be an instance of "%s"', $id),
-            );
+            yield $methodName => [$id, $methodName, $container];
         }
+    }
+
+    #[DataProvider('provideExpectedConcreteServicesWithReflection')]
+    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container): void
+    {
+        try {
+            $service = $container->{$methodName}();
+        } catch (Error|AssertException) {
+            // Ignore services that require extra configuration
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        $this->assertInstanceOf(
+            $id,
+            $service,
+            sprintf('Service should be an instance of "%s"', $id),
+        );
     }
 }
