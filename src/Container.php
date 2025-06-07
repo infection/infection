@@ -1287,12 +1287,14 @@ final class Container
      */
     private function resolveParameter(ReflectionParameter $parameter): iterable
     {
+        // Variadic parameters need hand-weaving
         if ($parameter->isVariadic()) {
             return;
         }
 
         $paramType = $parameter->getType();
 
+        // Not considering composite types, such as unions or intersections, for now
         if (!$paramType instanceof ReflectionNamedType) {
             return;
         }

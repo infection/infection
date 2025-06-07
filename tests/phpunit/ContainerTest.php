@@ -35,15 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Error;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
+use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 #[Group('integration')]
 #[CoversClass(Container::class)]
@@ -127,5 +132,79 @@ final class ContainerTest extends TestCase
             noProgress: true,
             forceProgress: true,
         );
+    }
+
+    public static function provideServicesWithReflection(): iterable
+    {
+        $reflection = new ContainerReflection(
+            SingletonContainer::getContainer(),
+        );
+
+        foreach ($reflection->getFactories() as $id => $factory) {
+            yield $id => [$id];
+        }
+    }
+
+    #[DataProvider('provideServicesWithReflection')]
+    public function test_factory_is_essential(string $id): void
+    {
+        $reflection = new ContainerReflection(Container::create());
+
+        $reflection->unsetFactory($id);
+
+        try {
+            $service = $reflection->createService($id);
+        } catch (InvalidArgumentException $e) {
+            // All good: the service needs a factory
+            $this->assertStringContainsString('Unknown service ', $e->getMessage());
+
+            return;
+        }
+
+        // Another happy path: the service cannot be created without a factory
+        if ($service === null) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        // All other services should be createable without a factory for this service
+        foreach ($reflection->iterateExpectedConcreteServices() as $id) {
+            try {
+                $reflection->getService($id);
+            } catch (InvalidArgumentException $e) {
+                $this->assertStringContainsString('Unknown service ', $e->getMessage());
+
+                // All good: this other service requires a factory for the original service
+                return;
+            }
+        }
+
+        $this->markTestIncomplete(sprintf(
+            'Service "%s" may not require a factory.',
+            $id,
+        ));
+    }
+
+    public function test_it_can_provide_all_services(): void
+    {
+        $reflection = new ContainerReflection(Container::create());
+
+        $container = Container::create();
+
+        foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
+            try {
+                $service = $container->{$methodName}();
+            } catch (Error|AssertException $e) {
+                // Ignore services that require extra configuration
+                continue;
+            }
+
+            $this->assertInstanceOf(
+                $id,
+                $service,
+                sprintf('Service should be an instance of "%s"', $id),
+            );
+        }
     }
 }
