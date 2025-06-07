@@ -557,5 +557,9 @@ final class IdenticalEqualTest extends BaseMutatorTestCase
                 'hello' === $x;
                 PHP,
         ];
+
+        yield 'It not mutates identical operator into equal operator for comparison against non-numeric&non-empty literal string (class constant)' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'non-numeric-non-empty-class-const.php'),
+        ];
     }
 }
