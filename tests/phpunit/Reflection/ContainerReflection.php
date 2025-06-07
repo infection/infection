@@ -50,9 +50,11 @@ class ContainerReflection
     /** @var ReflectionClass<Container> */
     private readonly ReflectionClass $reflection;
 
-    private readonly Closure $createService;
+    /** @var Closure(string): object */
+    private readonly Closure $createServiceClosure;
 
-    private readonly Closure $getService;
+    /** @var Closure(string): object */
+    private readonly Closure $getServiceClosure;
 
     private readonly ReflectionProperty $factories;
 
@@ -61,23 +63,25 @@ class ContainerReflection
     public function __construct(private readonly Container $container)
     {
         $this->reflection = new ReflectionClass($container);
-        $this->createService = $this->reflection->getMethod('createService')->getClosure($container);
-        $this->getService = $this->reflection->getMethod('get')->getClosure($container);
 
         $this->factories = $this->reflection->getProperty('factories');
         $this->values = $this->reflection->getProperty('values');
+
+        $this->createServiceClosure = $this->reflection->getMethod('createService')->getClosure($container);
+        $this->getServiceClosure = $this->reflection->getMethod('get')->getClosure($container);
     }
 
     /**
      * @template T of object
      *
      * @param class-string<T> $id
-     * @phpstan-return ?T
+     * @return ?T
      */
     public function createService(string $id): ?object
     {
         return self::handleCommonErrors(
-            $this->createService,
+            /* @phpstan-var Closure(string):T $callable */
+            $this->createServiceClosure,
             $id,
         );
     }
@@ -86,12 +90,13 @@ class ContainerReflection
      * @template T of object
      *
      * @param class-string<T> $id
-     * @phpstan-return ?T
+     * @return ?T
      */
     public function getService(string $id): ?object
     {
         return self::handleCommonErrors(
-            $this->getService,
+            /* @phpstan-var Closure(string):T $callable */
+            $this->getServiceClosure,
             $id,
         );
     }
@@ -133,17 +138,26 @@ class ContainerReflection
                 continue;
             }
 
-            $typeReflection = new ReflectionClass($returnType->getName());
+            /** @var class-string $returnTypeClassName */
+            $returnTypeClassName = $returnType->getName();
+
+            $typeReflection = new ReflectionClass($returnTypeClassName);
 
             if ($typeReflection->isInterface()) {
                 continue;
             }
 
-            yield $method->getName() => $returnType->getName();
+            yield $method->getName() => $returnTypeClassName;
         }
     }
 
-    private static function handleCommonErrors(callable $callable, ...$args): ?object
+    /**
+     * @template T of object
+     *
+     * @param callable(mixed ...$args): T $callable
+     * @return ?T
+     */
+    private static function handleCommonErrors(callable $callable, mixed ...$args): ?object
     {
         try {
             return $callable(...$args);
