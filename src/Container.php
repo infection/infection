@@ -82,6 +82,7 @@ use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
+use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
@@ -158,7 +159,6 @@ use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
 use function reset;
-use function Safe\getcwd;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
@@ -709,8 +709,7 @@ final class Container
 
     public function getProjectDir(): string
     {
-        // TODO: cache that result
-        return getcwd();
+        return $this->get(ProjectDirProvider::class)->getProjectDir();
     }
 
     public function getFileSystem(): Filesystem

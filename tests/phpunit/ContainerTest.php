@@ -51,8 +51,10 @@ use Symfony\Component\Console\Output\NullOutput;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 #[CoversClass(Container::class)]
+#[Group('integration')]
 final class ContainerTest extends TestCase
 {
+    #[Group('default')]
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -63,6 +65,7 @@ final class ContainerTest extends TestCase
         $container->getSourceFileFilter();
     }
 
+    #[Group('default')]
     public function test_it_can_build_simple_services_without_configuration(): void
     {
         $container = new Container([]);
@@ -72,6 +75,7 @@ final class ContainerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    #[Group('default')]
     public function test_it_can_resolve_some_dependencies_without_configuration(): void
     {
         $container = new Container([]);
@@ -81,6 +85,7 @@ final class ContainerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    #[Group('default')]
     public function test_it_can_resolve_all_dependencies_with_configuration(): void
     {
         $container = SingletonContainer::getContainer();
@@ -100,7 +105,6 @@ final class ContainerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    #[Group('integration')]
     public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
     {
         $newContainer = SingletonContainer::getContainer()->withValues(
@@ -149,6 +153,7 @@ final class ContainerTest extends TestCase
      * @param class-string $id
      */
     #[DataProvider('provideServicesWithReflection')]
+    #[Group('default')]
     public function test_factory_is_essential(string $id): void
     {
         $reflection = new ContainerReflection(Container::create());
@@ -195,7 +200,6 @@ final class ContainerTest extends TestCase
      * @param class-string $id
      */
     #[DataProvider('provideExpectedConcreteServicesWithReflection')]
-    #[Group('integration')]
     public function test_it_can_provide_all_services(string $id, string $methodName, Container $container, ContainerReflection $reflection): void
     {
         try {
