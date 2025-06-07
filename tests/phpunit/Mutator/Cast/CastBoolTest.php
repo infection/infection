@@ -85,6 +85,59 @@ final class CastBoolTest extends BaseMutatorTestCase
             ,
         ];
 
+        yield 'It removes casting to bool in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((bool) preg_match()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (preg_match()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (bool) preg_match();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return preg_match();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (bool) preg_match();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return preg_match();
+                }
+                PHP,
+        ];
+
         yield 'It not removes casting to bool in return of bool-function' => [
             <<<'PHP'
                 <?php
