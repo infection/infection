@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
+use function in_array;
 use Infection\Mutant\Mutant;
+use Infection\Mutator\Boolean\InstanceOf_;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
@@ -69,6 +71,21 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             $process,
             $mutant,
             $this->mutantExecutionResultFactory,
+        );
+    }
+
+    public function supports(Mutant $mutant): bool
+    {
+        $mutatorClass = $mutant->getMutation()->getMutatorClass();
+
+        return !in_array(
+            $mutatorClass,
+            [
+                // In PHPStan, it always produces "Left|Right side of && is always true" or "If condition is always true."
+                // https://phpstan.org/r/a9736cca-dc3a-4033-8f2a-80dbc13951b9
+                InstanceOf_::class,
+            ],
+            true,
         );
     }
 
