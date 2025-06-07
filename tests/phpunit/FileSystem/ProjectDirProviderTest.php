@@ -40,6 +40,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProjectDirProvider::class)]
+#[Group('integration')]
 final class ProjectDirProviderTest extends TestCase
 {
     public function test_it_can_provide_project_dir(): void
