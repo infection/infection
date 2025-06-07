@@ -43,7 +43,6 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 use function str_starts_with;
-use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 final class ContainerReflection
@@ -51,14 +50,8 @@ final class ContainerReflection
     /** @var ReflectionClass<Container> */
     private readonly ReflectionClass $reflection;
 
-    /**
-     * @psalm-var Closure(class-string<object>): object
-     */
     private readonly Closure $createServiceClosure;
 
-    /**
-     * @psalm-var Closure(class-string<object>): object
-     */
     private readonly Closure $getServiceClosure;
 
     private readonly ReflectionProperty $factories;
@@ -84,12 +77,7 @@ final class ContainerReflection
      */
     public function createService(string $id): ?object
     {
-        $service = self::handleCommonErrors($this->createServiceClosure, $id);
-
-        Assert::nullOrIsInstanceOf($service, $id);
-        /* @phpstan-var ?T $service */
-
-        return $service;
+        return self::handleCommonErrors($this->createServiceClosure, $id);
     }
 
     /**
@@ -100,12 +88,7 @@ final class ContainerReflection
      */
     public function getService(string $id): ?object
     {
-        $service = self::handleCommonErrors($this->getServiceClosure, $id);
-
-        Assert::nullOrIsInstanceOf($service, $id);
-        /* @phpstan-var ?T $service */
-
-        return $service;
+        return self::handleCommonErrors($this->getServiceClosure, $id);
     }
 
     /**
