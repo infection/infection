@@ -162,15 +162,7 @@ abstract class AbstractIdenticalComparison implements Mutator
             && $expr->class instanceof Node\Name
             && $expr->name instanceof Node\Identifier
         ) {
-            $className = $expr->class;
-
-            if ($className->toString() === 'self') {
-                /** @var ClassReflection $reflectionClass */
-                $reflectionClass = $expr->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
-                $className = new Node\Name($reflectionClass->getName());
-            }
-
-            $constValue = $this->getClassConstantValue($className, $expr->name);
+            $constValue = $this->getClassConstantValue($this->resolveName($expr->class), $expr->name);
 
             if ($constValue === null) {
                 return false; // unable to reflect the constant value
@@ -241,7 +233,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         ) {
             $name = $call->class->toString() . '::' . $call->name->toString();
 
-            return self::$reflectionCache[$name] ?? $this->getStaticMethodReturnType($call->class, $call->name);
+            return self::$reflectionCache[$name] ?? $this->getStaticMethodReturnType($this->resolveName($call->class), $call->name);
         }
 
         return null;
@@ -259,7 +251,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
     }
 
-    private function getStaticMethodReturnType(Node\Name $class, Node\Identifier $method): ?ReflectionType
+    private function getStaticMethodReturnType(Node\Name\FullyQualified $class, Node\Identifier $method): ?ReflectionType
     {
         try {
             $reflection = new ReflectionMethod($class->toString(), $method->toString());
@@ -289,7 +281,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         }
     }
 
-    private function getClassConstantValue(Node\Name $class, Node\Identifier $name): mixed
+    private function getClassConstantValue(Node\Name\FullyQualified $class, Node\Identifier $name): mixed
     {
         try {
             $reflection = new ReflectionClassConstant($class->toString(), $name->toString());
@@ -405,19 +397,23 @@ abstract class AbstractIdenticalComparison implements Mutator
             && $expr->class instanceof Node\Name
             && $expr->name instanceof Node\Identifier
         ) {
-            $className = $expr->class;
-
-            if ($className->toString() === 'self') {
-                /** @var ClassReflection $reflectionClass */
-                $reflectionClass = $expr->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
-                $className = new Node\Name($reflectionClass->getName());
-            }
-
-            $constValue = $this->getClassConstantValue($className, $expr->name);
+            $constValue = $this->getClassConstantValue($this->resolveName($expr->class), $expr->name);
 
             return is_string($constValue) && $constValue !== '' && !is_numeric($constValue);
         }
 
         return false;
+    }
+
+    private function resolveName(Node\Name $name): Node\Name\FullyQualified
+    {
+        if ($name->toString() === 'self') {
+            /** @var ClassReflection $reflectionClass */
+            $reflectionClass = $name->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+            return new Node\Name\FullyQualified($reflectionClass->getName());
+        }
+
+        return $name->getAttribute('resolvedName');
     }
 }
