@@ -195,6 +195,7 @@ final class ContainerTest extends TestCase
      * @param class-string $id
      */
     #[DataProvider('provideExpectedConcreteServicesWithReflection')]
+    #[Group('integration')]
     public function test_it_can_provide_all_services(string $id, string $methodName, Container $container, ContainerReflection $reflection): void
     {
         try {
