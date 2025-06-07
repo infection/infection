@@ -1295,9 +1295,7 @@ final class Container
         $paramType = $parameter->getType();
 
         // Not considering composite types, such as unions or intersections, for now
-        if (!$paramType instanceof ReflectionNamedType) {
-            return;
-        }
+        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
 
         // Only attempt to resolve a non-built-in named type (a class/interface)
         if ($paramType->isBuiltin()) {
