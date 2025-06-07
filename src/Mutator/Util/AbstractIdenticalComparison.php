@@ -39,6 +39,7 @@ use function count;
 use function gettype;
 use function in_array;
 use Infection\Mutator\Mutator;
+use function is_numeric;
 use const PHP_VERSION_ID;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
@@ -69,6 +70,22 @@ abstract class AbstractIdenticalComparison implements Mutator
 
     protected function isSameTypeIdenticalComparison(Expr\BinaryOp\Equal|Expr\BinaryOp\Identical $comparison): bool
     {
+        if ($comparison->left instanceof Node\Scalar\String_) {
+            if ($comparison->left->value !== '' && !is_numeric($comparison->left->value)) {
+                // you can't type juggle any expression type into a non-numeric&non-empty string
+                // see https://github.com/phpstan/phpstan/issues/13120
+                return true;
+            }
+        }
+
+        if ($comparison->right instanceof Node\Scalar\String_) {
+            if ($comparison->right->value !== '' && !is_numeric($comparison->right->value)) {
+                // you can't type juggle any expression type into a non-numeric&non-empty string
+                // see https://github.com/phpstan/phpstan/issues/13120
+                return true;
+            }
+        }
+
         if (
             $comparison->left instanceof Expr\FuncCall
             && $comparison->right instanceof Expr\FuncCall
