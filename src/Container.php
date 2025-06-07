@@ -82,6 +82,7 @@ use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
+use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\FileSystem\TmpDirProvider;
@@ -157,7 +158,7 @@ use Psr\Log\NullLogger;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionParameter;
-use function Safe\getcwd;
+use function reset;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
@@ -708,8 +709,7 @@ final class Container
 
     public function getProjectDir(): string
     {
-        // TODO: cache that result
-        return getcwd();
+        return $this->get(ProjectDirProvider::class)->getProjectDir();
     }
 
     public function getFileSystem(): Filesystem
@@ -1238,13 +1238,32 @@ final class Container
             return $this->setValueOrThrow($id, $value);
         }
 
+        $value = $this->createService($id);
+
+        if ($value === null) {
+            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        }
+
+        return $this->setValueOrThrow($id, $value);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
+    private function createService(string $id): ?object
+    {
         $reflectionClass = new ReflectionClass($id);
         $constructor = $reflectionClass->getConstructor();
 
-        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
-            $value = $reflectionClass->newInstance();
+        if (!$reflectionClass->isInstantiable()) {
+            return null;
+        }
 
-            return $this->setValueOrThrow($id, $value);
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            return $reflectionClass->newInstance();
         }
 
         $resolvedArguments = take($constructor->getParameters())
@@ -1252,13 +1271,11 @@ final class Container
             ->toList();
 
         // Check if we identified all parameters for the service
-        if (count($resolvedArguments) === $constructor->getNumberOfParameters()) {
-            $value = $reflectionClass->newInstanceArgs($resolvedArguments);
-
-            return $this->setValueOrThrow($id, $value);
+        if (count($resolvedArguments) !== $constructor->getNumberOfParameters()) {
+            return null;
         }
 
-        throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
+        return $reflectionClass->newInstanceArgs($resolvedArguments);
     }
 
     /**
@@ -1269,8 +1286,14 @@ final class Container
      */
     private function resolveParameter(ReflectionParameter $parameter): iterable
     {
+        // Variadic parameters need hand-weaving
+        if ($parameter->isVariadic()) {
+            return;
+        }
+
         $paramType = $parameter->getType();
 
+        // Not considering composite types, such as unions or intersections, for now
         Assert::isInstanceOf($paramType, ReflectionNamedType::class);
 
         // Only attempt to resolve a non-built-in named type (a class/interface)
@@ -1289,14 +1312,29 @@ final class Container
         }
 
         // Look for a factory that can create an instance of an interface or abstract class
-        foreach ($this->factories as $id => $factory) {
-            if (!is_a($id, $paramTypeName, true)) {
-                continue;
-            }
+        $matchingTypes = $this->factoriesForType($paramTypeName);
 
-            yield $this->get($id);
-
+        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
+        if (count($matchingTypes) !== 1) {
             return;
         }
+
+        yield $this->get(reset($matchingTypes));
+    }
+
+    /**
+     * Retrieves the class or interface names of all registered factories that can produce instances of the given type.
+     * This includes direct implementations, subclasses, or the type itself.
+     *
+     * @template T of object
+     * @param class-string<T> $type the class or interface name to find factories for
+     * @return class-string<T>[] a list of factory IDs (class-strings) that are compatible with the given type
+     */
+    private function factoriesForType(string $type): array
+    {
+        return take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $type, true))
+            ->toList();
     }
 }

@@ -24,6 +24,10 @@ parameters:
             message: '#^Method Infection\\Container::(get|set).*\(\) should return T of .* but returns object\.$#'
             count: 2
         -
+            path: '../tests/phpunit/Reflection/ContainerReflection.php'
+            message: '#Method .*Service\(\) should return .* but returns .*#'
+            count: 2
+        -
             path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
             message: '#return type has no value type specified in iterable type array#'
         -
