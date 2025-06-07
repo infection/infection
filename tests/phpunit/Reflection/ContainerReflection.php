@@ -46,7 +46,7 @@ use function str_starts_with;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
-class ContainerReflection
+final class ContainerReflection
 {
     /** @var ReflectionClass<Container> */
     private readonly ReflectionClass $reflection;
