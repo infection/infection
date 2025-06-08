@@ -83,5 +83,102 @@ final class CastIntTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It removes casting to integer in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((int) round()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (round()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to integer in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (int) round();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return round();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to integer in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (int) round();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return round();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to integer in return of int-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsInt(): int
+                {
+                    return (int) round();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsInt(): int
+                {
+                    return round();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to integer in return of int-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsInt(): int {
+                    return (int) round();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to integer in nested return of int-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsInt(): int {
+                    if (true) {
+                        return (int) round();
+                    }
+                    return 0;
+                }
+                PHP,
+        ];
     }
 }
