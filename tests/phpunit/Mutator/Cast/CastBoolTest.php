@@ -138,9 +138,30 @@ final class CastBoolTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not removes casting to bool in return of bool-function' => [
+        yield 'It removes casting to bool in return of bool-function when strict-types=0' => [
             <<<'PHP'
                 <?php
+
+                declare (strict_types=0);
+                function returnsBool(): bool
+                {
+                    return (bool) preg_match();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsBool(): bool
+                {
+                    return preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
 
                 function returnsBool(): bool {
                     return (bool) preg_match();
@@ -148,9 +169,9 @@ final class CastBoolTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not removes casting to bool in nested return of bool-function' => [
+        yield 'It not removes casting to bool in nested return of bool-function when strict-types=1' => [
             <<<'PHP'
-                <?php
+                <?php declare(strict_types=1);
 
                 function returnsBool(): bool {
                     if (true) {
@@ -161,7 +182,7 @@ final class CastBoolTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not removes casting to bool in return of bool-method' => [
+        yield 'It not removes casting to bool in return of bool-method when strict-types=1' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'bool-method.php'),
         ];
     }
