@@ -165,5 +165,37 @@ final class CastStringTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It removes casting to string in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    trim((string) 5);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    trim(5);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to string in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    trim((string) 5);
+                }
+                PHP,
+        ];
     }
 }

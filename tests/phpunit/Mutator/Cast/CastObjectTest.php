@@ -165,5 +165,37 @@ final class CastObjectTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It removes casting to object in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    doBar((object) $arr);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    doBar($arr);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to object in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    doBar((object) $arr);
+                }
+                PHP,
+        ];
     }
 }
