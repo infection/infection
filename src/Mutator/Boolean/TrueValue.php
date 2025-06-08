@@ -109,6 +109,15 @@ final class TrueValue implements ConfigurableMutator
             return false;
         }
 
+        if (
+            $parentNode instanceof Node\Expr\BinaryOp\Equal
+            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
+            || $parentNode instanceof Node\Expr\BinaryOp\Identical
+            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
+        ) {
+            return false;
+        }
+
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;
         }
