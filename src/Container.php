@@ -252,6 +252,11 @@ final class Container
                 $container->getConfiguration()->getSourceFilesFilter(),
                 $container->getConfiguration()->getSourceFilesExcludes(),
             ),
+            PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
+                $container->getIndexXmlCoverageLocator(),
+                $container->getIndexXmlCoverageParser(),
+                $container->getXmlCoverageParser(),
+            ),
             IndexXmlCoverageLocator::class => static fn (self $container): IndexXmlCoverageLocator => new IndexXmlCoverageLocator(
                 $container->getConfiguration()->getCoveragePath(),
             ),
