@@ -141,6 +141,13 @@ final class ContainerReflection
         }
     }
 
+    /**
+     * @template T of object
+     *
+     * @param callable(class-string<T>):?T $callable
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
     private static function handleCommonErrors(callable $callable, string $id): ?object
     {
         try {
