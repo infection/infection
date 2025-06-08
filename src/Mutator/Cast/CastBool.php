@@ -68,20 +68,7 @@ final class CastBool extends AbstractCastMutator
         $parent = ParentConnector::getParent($node);
 
         if ($parent instanceof Node\Stmt\Return_) {
-            $functionScope = null;
-
-            do {
-                $parent = ParentConnector::findParent($parent);
-
-                if (
-                    $parent instanceof Node\Stmt\ClassMethod
-                    || $parent instanceof Node\Stmt\Function_
-                ) {
-                    $functionScope = $parent;
-
-                    break;
-                }
-            } while ($parent !== null);
+            $functionScope = $this->findFunctionScope($parent);
 
             if ($functionScope !== null) {
                 if ($functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === false) {
