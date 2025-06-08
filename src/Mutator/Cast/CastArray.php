@@ -37,6 +37,8 @@ namespace Infection\Mutator\Cast;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
@@ -59,6 +61,28 @@ final class CastArray extends AbstractCastMutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Array_;
+        if (!$node instanceof Node\Expr\Cast\Array_) {
+            return false;
+        }
+
+        $parent = ParentConnector::getParent($node);
+
+        if ($parent instanceof Node\Stmt\Return_) {
+            $functionScope = $this->findFunctionScope($parent);
+
+            if ($functionScope !== null) {
+                if ($functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === false) {
+                    return true;
+                }
+
+                $returnType = $functionScope->getReturnType();
+
+                if ($returnType instanceof Node\Identifier && $returnType->name === 'array') {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
