@@ -51,6 +51,7 @@ use Webmozart\Assert\Assert;
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
+    public const STRICT_TYPES_KEY = 'isStrictTypes';
     public const REFLECTION_CLASS_KEY = 'reflectionClass';
     public const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
     public const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
@@ -67,17 +68,30 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private ?string $methodName = null;
 
+    private bool $isDeclareStrictTypes = false;
+
     public function beforeTraverse(array $nodes): ?array
     {
         $this->functionScopeStack = [];
         $this->classScopeStack = [];
         $this->methodName = null;
+        $this->isDeclareStrictTypes = false;
 
         return null;
     }
 
     public function enterNode(Node $node)
     {
+        if ($node instanceof Node\DeclareItem) {
+            if ($node->key->name === 'strict_types') {
+                $this->isDeclareStrictTypes = $node->value instanceof Node\Scalar\Int_ && $node->value->value === 1;
+            }
+        }
+
+        if ($node instanceof Node\Stmt\Function_) {
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
+        }
+
         if ($node instanceof Node\Stmt\ClassLike) {
             $this->classScopeStack[] = $this->getClassReflectionForNode($node);
         }
@@ -105,9 +119,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[count($this->functionScopeStack) - 1]);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);

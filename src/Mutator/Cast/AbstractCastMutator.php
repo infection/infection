@@ -37,6 +37,7 @@ namespace Infection\Mutator\Cast;
 
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -56,5 +57,23 @@ abstract class AbstractCastMutator implements Mutator
     public function mutate(Node $node): iterable
     {
         yield $node->expr;
+    }
+
+    protected function findFunctionScope(Node $node): Node\Stmt\ClassMethod|Node\Stmt\Function_|null
+    {
+        $parent = $node;
+
+        do {
+            $parent = ParentConnector::findParent($parent);
+
+            if (
+                $parent instanceof Node\Stmt\ClassMethod
+                || $parent instanceof Node\Stmt\Function_
+            ) {
+                return $parent;
+            }
+        } while ($parent !== null);
+
+        return null;
     }
 }
