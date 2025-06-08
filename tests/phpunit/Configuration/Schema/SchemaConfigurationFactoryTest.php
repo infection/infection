@@ -2759,6 +2759,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'bootstrap' => null,
             'initialTestsPhpOptions' => null,
             'testFrameworkOptions' => null,
+            'threadCount' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

@@ -529,7 +529,7 @@ final class RunCommand extends BaseCommand
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
             $filter,
-            $this->getThreadCount($input),
+            $this->getThreadCountFromOption($input),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
@@ -677,14 +677,21 @@ final class RunCommand extends BaseCommand
         ));
     }
 
-    private function getThreadCount(InputInterface $input): int
+    private function getThreadCountFromOption(InputInterface $input): ?int
     {
         $threads = $input->getOption(self::OPTION_THREADS);
 
+        // user didn't pass `--threads` option
+        if ($threads === null) {
+            return null;
+        }
+
+        // user passed `--threads=<int>` option
         if (is_numeric($threads)) {
             return (int) $threads;
         }
 
+        // user passed `--threads=max` option
         Assert::same($threads, 'max', sprintf('The value of option `--threads` must be of type integer or string "max". String "%s" provided.', $threads));
 
         // we subtract 1 here to not use all the available cores by Infection

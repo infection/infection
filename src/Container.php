@@ -199,7 +199,7 @@ final class Container
     public const DEFAULT_STATIC_ANALYSIS_TOOL = null;
     public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
     public const DEFAULT_FILTER = '';
-    public const DEFAULT_THREAD_COUNT = 1;
+    public const DEFAULT_THREAD_COUNT = null;
     public const DEFAULT_DRY_RUN = false;
     public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
@@ -566,7 +566,7 @@ final class Container
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         string $filter = self::DEFAULT_FILTER,
-        int $threadCount = self::DEFAULT_THREAD_COUNT,
+        ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
         bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
