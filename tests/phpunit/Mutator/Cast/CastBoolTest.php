@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Mutator\Cast\CastBool;
 use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -82,6 +83,107 @@ final class CastBoolTest extends BaseMutatorTestCase
                 1;
                 PHP
             ,
+        ];
+
+        yield 'It removes casting to bool in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((bool) preg_match()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (preg_match()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (bool) preg_match();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return preg_match();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (bool) preg_match();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to bool in return of bool-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsBool(): bool
+                {
+                    return (bool) preg_match();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsBool(): bool
+                {
+                    return preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsBool(): bool {
+                    return (bool) preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in nested return of bool-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsBool(): bool {
+                    if (true) {
+                        return (bool) preg_match();
+                    }
+                    return false;
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-method when strict-types=1' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'bool-method.php'),
         ];
     }
 }
