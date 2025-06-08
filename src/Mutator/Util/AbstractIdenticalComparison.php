@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
+use function class_exists;
 use function count;
 use function gettype;
 use function in_array;
@@ -43,7 +44,6 @@ use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use function is_numeric;
 use function is_string;
-use const PHP_VERSION_ID;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\CallLike;
@@ -64,8 +64,6 @@ use ReflectionUnionType;
  */
 abstract class AbstractIdenticalComparison implements Mutator
 {
-    private const REFLECTION_CONSTANT_MIN_VERSION = 80400;
-
     /**
      * @var array<string, ReflectionType|null>
      */
@@ -265,15 +263,13 @@ abstract class AbstractIdenticalComparison implements Mutator
 
     private function getGlobalConstantValue(Node\Name $name): mixed
     {
-        if (PHP_VERSION_ID < self::REFLECTION_CONSTANT_MIN_VERSION) {
+        if (!class_exists(ReflectionConstant::class)) {
             return null;
         }
 
         try {
-            // @phpstan-ignore class.notFound
             $reflection = new ReflectionConstant($name->toString());
 
-            // @phpstan-ignore class.notFound
             return $reflection->getValue();
         } catch (ReflectionException) {
             // If the no reflection info exist, we cannot determine the return type
