@@ -165,5 +165,37 @@ final class CastArrayTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It removes casting to array in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    implode((array) 5);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    implode(5);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to array in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    implode((array) 5);
+                }
+                PHP,
+        ];
     }
 }

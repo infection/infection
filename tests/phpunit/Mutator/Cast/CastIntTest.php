@@ -180,5 +180,37 @@ final class CastIntTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It removes casting to int in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    range((int) $s);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    range($s);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to int in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    range((int) $s);
+                }
+                PHP,
+        ];
     }
 }

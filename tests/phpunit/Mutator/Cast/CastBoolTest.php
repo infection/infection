@@ -185,5 +185,37 @@ final class CastBoolTest extends BaseMutatorTestCase
         yield 'It not removes casting to bool in return of bool-method when strict-types=1' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'bool-method.php'),
         ];
+
+        yield 'It removes casting to bool in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    in_array(strict: (bool) $s);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    in_array(strict: $s);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    in_array(strict: (bool) $s);
+                }
+                PHP,
+        ];
     }
 }

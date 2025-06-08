@@ -37,8 +37,6 @@ namespace Infection\Mutator\Cast;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ParentConnector;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
@@ -65,24 +63,6 @@ final class CastFloat extends AbstractCastMutator
             return false;
         }
 
-        $parent = ParentConnector::getParent($node);
-
-        if ($parent instanceof Node\Stmt\Return_) {
-            $functionScope = $this->findFunctionScope($parent);
-
-            if ($functionScope !== null) {
-                if ($functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === false) {
-                    return true;
-                }
-
-                $returnType = $functionScope->getReturnType();
-
-                if ($returnType instanceof Node\Identifier && $returnType->name === 'float') {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return !$this->willRuntimeErrorOnMismatch($node, 'float');
     }
 }
