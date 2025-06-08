@@ -1017,6 +1017,26 @@ final class Container
         return $this->get(MutantCodeFactory::class);
     }
 
+    public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
+    {
+        return $this->get(RootsFileOrDirectoryLocator::class);
+    }
+
+    public function getCoverageChecker(): CoverageChecker
+    {
+        return $this->get(CoverageChecker::class);
+    }
+
+    public function getEventDispatcher(): EventDispatcher
+    {
+        return $this->get(SyncEventDispatcher::class);
+    }
+
+    public function getMinMsiChecker(): MinMsiChecker
+    {
+        return $this->get(MinMsiChecker::class);
+    }
+
     private function getStopwatch(): Stopwatch
     {
         return $this->get(Stopwatch::class);
@@ -1062,16 +1082,6 @@ final class Container
         return $this->get(MutatorParser::class);
     }
 
-    private function getCoverageChecker(): CoverageChecker
-    {
-        return $this->get(CoverageChecker::class);
-    }
-
-    private function getMinMsiChecker(): MinMsiChecker
-    {
-        return $this->get(MinMsiChecker::class);
-    }
-
     private function getPrinter(): PrettyPrinterAbstract
     {
         return $this->get(PrettyPrinterAbstract::class);
@@ -1100,11 +1110,6 @@ final class Container
     private function getDiffer(): Differ
     {
         return $this->get(Differ::class);
-    }
-
-    private function getEventDispatcher(): EventDispatcher
-    {
-        return $this->get(SyncEventDispatcher::class);
     }
 
     private function getMutantFactory(): MutantFactory
@@ -1140,11 +1145,6 @@ final class Container
     private function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
     {
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
-    }
-
-    private function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
-    {
-        return $this->get(RootsFileOrDirectoryLocator::class);
     }
 
     private function getCoveredTraceProvider(): CoveredTraceProvider
