@@ -195,5 +195,37 @@ final class CastFloatTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It removes casting to float in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    round((float) $s);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    round($s);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to float in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    round((float) $s);
+                }
+                PHP,
+        ];
     }
 }

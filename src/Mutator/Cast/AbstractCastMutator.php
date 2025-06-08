@@ -38,6 +38,7 @@ namespace Infection\Mutator\Cast;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
@@ -59,7 +60,41 @@ abstract class AbstractCastMutator implements Mutator
         yield $node->expr;
     }
 
-    protected function findFunctionScope(Node $node): Node\Stmt\ClassMethod|Node\Stmt\Function_|null
+    protected function willRuntimeErrorOnMismatch(Node\Expr\Cast $node, string $returnTypeName): bool
+    {
+        $parent = ParentConnector::getParent($node);
+
+        if ($parent instanceof Node\Arg) {
+            $functionScope = $this->findFunctionScope($parent);
+
+            if (
+                $functionScope !== null
+                && $functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === true
+            ) {
+                return true;
+            }
+        }
+
+        if ($parent instanceof Node\Stmt\Return_) {
+            $functionScope = $this->findFunctionScope($parent);
+
+            if ($functionScope !== null) {
+                if ($functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === false) {
+                    return false;
+                }
+
+                $returnType = $functionScope->getReturnType();
+
+                if ($returnType instanceof Node\Identifier && $returnType->name === $returnTypeName) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function findFunctionScope(Node $node): Node\Stmt\ClassMethod|Node\Stmt\Function_|null
     {
         $parent = $node;
 
