@@ -68,5 +68,102 @@ final class CastStringTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It removes casting to string in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((string) random_int()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (random_int()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to string in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (string) random_int();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return random_int();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to string in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (string) random_int();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to string in return of string-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsString(): string
+                {
+                    return (string) random_int();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsString(): string
+                {
+                    return random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to string in return of string-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsString(): string {
+                    return (string) random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to string in nested return of string-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsString(): string {
+                    if (true) {
+                        return (string) random_int();
+                    }
+                    return "x";
+                }
+                PHP,
+        ];
     }
 }
