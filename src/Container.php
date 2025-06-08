@@ -707,50 +707,9 @@ final class Container
         return $clone;
     }
 
-    public function getProjectDir(): string
-    {
-        return $this->get(ProjectDirProvider::class)->getProjectDir();
-    }
-
     public function getFileSystem(): Filesystem
     {
         return $this->get(Filesystem::class);
-    }
-
-    public function getTmpDirProvider(): TmpDirProvider
-    {
-        return $this->get(TmpDirProvider::class);
-    }
-
-    public function getDefaultJUnitFilePath(): string
-    {
-        return $this->defaultJUnitPath ??= sprintf(
-            '%s/%s',
-            Path::canonicalize(
-                $this->getConfiguration()->getCoveragePath(),
-            ),
-            'junit.xml',
-        );
-    }
-
-    public function getJUnitReportLocator(): JUnitReportLocator
-    {
-        return $this->get(JUnitReportLocator::class);
-    }
-
-    public function getIndexXmlCoverageParser(): IndexXmlCoverageParser
-    {
-        return $this->get(IndexXmlCoverageParser::class);
-    }
-
-    public function getXmlCoverageParser(): XmlCoverageParser
-    {
-        return $this->get(XmlCoverageParser::class);
-    }
-
-    public function getCoveredTraceProvider(): CoveredTraceProvider
-    {
-        return $this->get(CoveredTraceProvider::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider
@@ -763,89 +722,9 @@ final class Container
         return $this->get(SourceFileFilter::class);
     }
 
-    public function getBufferedSourceFileFilter(): BufferedSourceFileFilter
-    {
-        return $this->get(BufferedSourceFileFilter::class);
-    }
-
-    public function getUncoveredTraceProvider(): UncoveredTraceProvider
-    {
-        return $this->get(UncoveredTraceProvider::class);
-    }
-
-    public function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
-    {
-        return $this->get(JUnitTestExecutionInfoAdder::class);
-    }
-
-    public function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
-    {
-        return $this->get(PhpUnitXmlCoverageTraceProvider::class);
-    }
-
-    public function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
-    {
-        return $this->get(IndexXmlCoverageLocator::class);
-    }
-
-    public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
-    {
-        return $this->get(RootsFileOrDirectoryLocator::class);
-    }
-
-    public function getFactory(): Factory
-    {
-        return $this->get(Factory::class);
-    }
-
-    public function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
-    {
-        return $this->get(StaticAnalysisToolFactory::class);
-    }
-
-    public function getMutantCodeFactory(): MutantCodeFactory
-    {
-        return $this->get(MutantCodeFactory::class);
-    }
-
-    public function getMutantFactory(): MutantFactory
-    {
-        return $this->get(MutantFactory::class);
-    }
-
-    public function getDiffer(): Differ
-    {
-        return $this->get(Differ::class);
-    }
-
-    public function getEventDispatcher(): EventDispatcher
-    {
-        return $this->get(SyncEventDispatcher::class);
-    }
-
-    public function getProcessRunner(): ProcessRunner
-    {
-        $config = $this->getConfiguration();
-
-        return $config->isDryRun()
-            ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class)
-        ;
-    }
-
-    public function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
-    {
-        return $this->get(TestFrameworkConfigLocator::class);
-    }
-
     public function getDiffColorizer(): DiffColorizer
     {
         return $this->get(DiffColorizer::class);
-    }
-
-    public function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
-    {
-        return $this->get(MemoizedTestFileDataProvider::class);
     }
 
     public function getParser(): Parser
@@ -858,11 +737,6 @@ final class Container
         return $this->get(FileParser::class);
     }
 
-    public function getPrinter(): PrettyPrinterAbstract
-    {
-        return $this->get(PrettyPrinterAbstract::class);
-    }
-
     public function getMetricsCalculator(): MetricsCalculator
     {
         return $this->get(MetricsCalculator::class);
@@ -873,54 +747,14 @@ final class Container
         return $this->get(ResultsCollector::class);
     }
 
-    public function getStopwatch(): Stopwatch
-    {
-        return $this->get(Stopwatch::class);
-    }
-
-    public function getTimeFormatter(): TimeFormatter
-    {
-        return $this->get(TimeFormatter::class);
-    }
-
-    public function getMemoryFormatter(): MemoryFormatter
-    {
-        return $this->get(MemoryFormatter::class);
-    }
-
     public function getMemoryLimiter(): MemoryLimiter
     {
         return $this->get(MemoryLimiter::class);
     }
 
-    public function getSchemaConfigurationLoader(): SchemaConfigurationLoader
-    {
-        return $this->get(SchemaConfigurationLoader::class);
-    }
-
-    public function getRootsFileLocator(): RootsFileLocator
-    {
-        return $this->get(RootsFileLocator::class);
-    }
-
-    public function getSchemaConfigurationFileLoader(): SchemaConfigurationFileLoader
-    {
-        return $this->get(SchemaConfigurationFileLoader::class);
-    }
-
-    public function getSchemaValidator(): SchemaValidator
-    {
-        return $this->get(SchemaValidator::class);
-    }
-
     public function getSchemaConfigurationFactory(): SchemaConfigurationFactory
     {
         return $this->get(SchemaConfigurationFactory::class);
-    }
-
-    public function getConfigurationFactory(): ConfigurationFactory
-    {
-        return $this->get(ConfigurationFactory::class);
     }
 
     public function getMutatorResolver(): MutatorResolver
@@ -931,21 +765,6 @@ final class Container
     public function getMutatorFactory(): MutatorFactory
     {
         return $this->get(MutatorFactory::class);
-    }
-
-    public function getMutatorParser(): MutatorParser
-    {
-        return $this->get(MutatorParser::class);
-    }
-
-    public function getCoverageChecker(): CoverageChecker
-    {
-        return $this->get(CoverageChecker::class);
-    }
-
-    public function getMinMsiChecker(): MinMsiChecker
-    {
-        return $this->get(MinMsiChecker::class);
     }
 
     public function getSubscriberRegisterer(): SubscriberRegisterer
@@ -1191,6 +1010,187 @@ final class Container
     public function getComposerExecutableFinder(): ComposerExecutableFinder
     {
         return $this->get(MemoizedComposerExecutableFinder::class);
+    }
+
+    public function getMutantCodeFactory(): MutantCodeFactory
+    {
+        return $this->get(MutantCodeFactory::class);
+    }
+
+    public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
+    {
+        return $this->get(RootsFileOrDirectoryLocator::class);
+    }
+
+    public function getCoverageChecker(): CoverageChecker
+    {
+        return $this->get(CoverageChecker::class);
+    }
+
+    public function getEventDispatcher(): EventDispatcher
+    {
+        return $this->get(SyncEventDispatcher::class);
+    }
+
+    public function getMinMsiChecker(): MinMsiChecker
+    {
+        return $this->get(MinMsiChecker::class);
+    }
+
+    private function getStopwatch(): Stopwatch
+    {
+        return $this->get(Stopwatch::class);
+    }
+
+    private function getTimeFormatter(): TimeFormatter
+    {
+        return $this->get(TimeFormatter::class);
+    }
+
+    private function getMemoryFormatter(): MemoryFormatter
+    {
+        return $this->get(MemoryFormatter::class);
+    }
+
+    private function getSchemaConfigurationLoader(): SchemaConfigurationLoader
+    {
+        return $this->get(SchemaConfigurationLoader::class);
+    }
+
+    private function getRootsFileLocator(): RootsFileLocator
+    {
+        return $this->get(RootsFileLocator::class);
+    }
+
+    private function getSchemaConfigurationFileLoader(): SchemaConfigurationFileLoader
+    {
+        return $this->get(SchemaConfigurationFileLoader::class);
+    }
+
+    private function getSchemaValidator(): SchemaValidator
+    {
+        return $this->get(SchemaValidator::class);
+    }
+
+    private function getConfigurationFactory(): ConfigurationFactory
+    {
+        return $this->get(ConfigurationFactory::class);
+    }
+
+    private function getMutatorParser(): MutatorParser
+    {
+        return $this->get(MutatorParser::class);
+    }
+
+    private function getPrinter(): PrettyPrinterAbstract
+    {
+        return $this->get(PrettyPrinterAbstract::class);
+    }
+
+    private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
+    {
+        return $this->get(TestFrameworkConfigLocator::class);
+    }
+
+    private function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
+    {
+        return $this->get(MemoizedTestFileDataProvider::class);
+    }
+
+    private function getProcessRunner(): ProcessRunner
+    {
+        $config = $this->getConfiguration();
+
+        return $config->isDryRun()
+            ? $this->get(DryProcessRunner::class)
+            : $this->get(ParallelProcessRunner::class)
+        ;
+    }
+
+    private function getDiffer(): Differ
+    {
+        return $this->get(Differ::class);
+    }
+
+    private function getMutantFactory(): MutantFactory
+    {
+        return $this->get(MutantFactory::class);
+    }
+
+    private function getFactory(): Factory
+    {
+        return $this->get(Factory::class);
+    }
+
+    private function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
+    {
+        return $this->get(StaticAnalysisToolFactory::class);
+    }
+
+    private function getBufferedSourceFileFilter(): BufferedSourceFileFilter
+    {
+        return $this->get(BufferedSourceFileFilter::class);
+    }
+
+    private function getUncoveredTraceProvider(): UncoveredTraceProvider
+    {
+        return $this->get(UncoveredTraceProvider::class);
+    }
+
+    private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
+    {
+        return $this->get(JUnitTestExecutionInfoAdder::class);
+    }
+
+    private function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
+    {
+        return $this->get(PhpUnitXmlCoverageTraceProvider::class);
+    }
+
+    private function getCoveredTraceProvider(): CoveredTraceProvider
+    {
+        return $this->get(CoveredTraceProvider::class);
+    }
+
+    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
+    {
+        return $this->get(IndexXmlCoverageLocator::class);
+    }
+
+    private function getProjectDir(): string
+    {
+        return $this->get(ProjectDirProvider::class)->getProjectDir();
+    }
+
+    private function getTmpDirProvider(): TmpDirProvider
+    {
+        return $this->get(TmpDirProvider::class);
+    }
+
+    private function getDefaultJUnitFilePath(): string
+    {
+        return $this->defaultJUnitPath ??= sprintf(
+            '%s/%s',
+            Path::canonicalize(
+                $this->getConfiguration()->getCoveragePath(),
+            ),
+            'junit.xml',
+        );
+    }
+
+    private function getJUnitReportLocator(): JUnitReportLocator
+    {
+        return $this->get(JUnitReportLocator::class);
+    }
+
+    private function getIndexXmlCoverageParser(): IndexXmlCoverageParser
+    {
+        return $this->get(IndexXmlCoverageParser::class);
+    }
+
+    private function getXmlCoverageParser(): XmlCoverageParser
+    {
+        return $this->get(XmlCoverageParser::class);
     }
 
     /**
