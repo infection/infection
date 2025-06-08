@@ -117,8 +117,11 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
+
+                Killed by Static Analysis mutants:
+                ==================================
 
                 Errors mutants:
                 ===============
@@ -166,8 +169,11 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
+
+                Killed by Static Analysis mutants:
+                ==================================
 
                 Errors mutants:
                 ===============
@@ -212,8 +218,11 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
+
+                Killed by Static Analysis mutants:
+                ==================================
 
                 Errors mutants:
                 ===============
@@ -255,8 +264,11 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
+
+                Killed by Static Analysis mutants:
+                ==================================
 
                 Errors mutants:
                 ===============
@@ -455,8 +467,8 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
 
                 1) foo/bar:9    [M] PregQuote
 
@@ -478,6 +490,21 @@ final class TextFileLoggerTest extends TestCase
 
                 - echo 'original';
                 + echo 'killed#0';
+
+                  process output
+
+
+                Killed by Static Analysis mutants:
+                ==================================
+
+                1) foo/bar:9    [M] PregQuote
+
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed by SA#0';
 
                   process output
 
@@ -772,8 +799,8 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
 
                 1) foo/bar:9    [M] PregQuote
 
@@ -796,6 +823,22 @@ final class TextFileLoggerTest extends TestCase
 
                 - echo 'original';
                 + echo 'killed#0';
+
+                $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+                  process output
+
+
+                Killed by Static Analysis mutants:
+                ==================================
+
+                1) foo/bar:9    [M] PregQuote
+
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed by SA#0';
 
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
                   process output
@@ -1052,8 +1095,8 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
 
                 1) foo/bar:9    [M] PregQuote
 
@@ -1075,6 +1118,21 @@ final class TextFileLoggerTest extends TestCase
 
                 - echo 'original';
                 + echo 'killed#0';
+
+                  process output
+
+
+                Killed by Static Analysis mutants:
+                ==================================
+
+                1) foo/bar:9    [M] PregQuote
+
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed by SA#0';
 
                   process output
 
@@ -1315,8 +1373,8 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                Killed mutants:
-                ===============
+                Killed by Test Framework mutants:
+                =================================
 
                 1) foo/bar:9    [M] PregQuote
 
@@ -1339,6 +1397,22 @@ final class TextFileLoggerTest extends TestCase
 
                 - echo 'original';
                 + echo 'killed#0';
+
+                $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
+                  process output
+
+
+                Killed by Static Analysis mutants:
+                ==================================
+
+                1) foo/bar:9    [M] PregQuote
+
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed by SA#0';
 
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
                   process output

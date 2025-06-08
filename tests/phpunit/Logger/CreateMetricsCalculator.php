@@ -84,6 +84,12 @@ trait CreateMetricsCalculator
                 'killed#1',
             ),
             self::createMutantExecutionResult(
+                1,
+                PregQuote::class,
+                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
+                'killed by SA#0',
+            ),
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::ERROR,

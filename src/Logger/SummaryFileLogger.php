@@ -56,6 +56,7 @@ final readonly class SummaryFileLogger implements LineMutationTestingResultsLogg
             'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
             '',
             'Killed: ' . $this->metricsCalculator->getKilledCount(),
+            'Killed by Static Analysis: ' . $this->metricsCalculator->getKilledByStaticAnalysisCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
             'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),

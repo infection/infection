@@ -95,6 +95,11 @@ class MetricsCalculator implements Collector
         return $this->countByStatus[DetectionStatus::KILLED];
     }
 
+    public function getKilledByStaticAnalysisCount(): int
+    {
+        return $this->countByStatus[DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+    }
+
     public function getErrorCount(): int
     {
         return $this->countByStatus[DetectionStatus::ERROR];

@@ -61,6 +61,7 @@ final class DotFormatter extends AbstractOutputFormatter
         $this->output->writeln([
             '',
             '<killed>.</killed>: killed, '
+            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
@@ -79,6 +80,10 @@ final class DotFormatter extends AbstractOutputFormatter
         switch ($executionResult->getDetectionStatus()) {
             case DetectionStatus::KILLED:
                 $this->output->write('<killed>.</killed>');
+
+                break;
+            case DetectionStatus::KILLED_BY_STATIC_ANALYSIS:
+                $this->output->write('<killed-by-static-analysis>A</killed-by-static-analysis>');
 
                 break;
             case DetectionStatus::NOT_COVERED:

@@ -65,6 +65,7 @@ final class SummaryFileLoggerTest extends TestCase
                 Total: 0
 
                 Killed: 0
+                Killed by Static Analysis: 0
                 Errored: 0
                 Syntax Errors: 0
                 Escaped: 0
@@ -79,9 +80,10 @@ final class SummaryFileLoggerTest extends TestCase
         yield 'all mutations' => [
             self::createCompleteMetricsCalculator(),
             <<<'TXT'
-                Total: 16
+                Total: 17
 
                 Killed: 2
+                Killed by Static Analysis: 1
                 Errored: 2
                 Syntax Errors: 2
                 Escaped: 2

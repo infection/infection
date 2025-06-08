@@ -1,6 +1,7 @@
 Total: 2
 
 Killed: 2
+Killed by Static Analysis: 0
 Errored: 0
 Syntax Errors: 0
 Escaped: 0

@@ -86,7 +86,13 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
         if ($this->debugVerbosity) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getKilledExecutionResults(),
-                'Killed',
+                'Killed by Test Framework',
+                $separateSections,
+            );
+
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getKilledByStaticAnalysisExecutionResults(),
+                'Killed by Static Analysis',
                 $separateSections,
             );
 

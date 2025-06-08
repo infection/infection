@@ -79,6 +79,7 @@ final class JsonLoggerTest extends TestCase
                 'stats' => [
                     'totalMutantsCount' => 0,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
@@ -93,6 +94,7 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
                 'syntaxErrors' => [],
                 'uncovered' => [],
@@ -106,8 +108,9 @@ final class JsonLoggerTest extends TestCase
             self::createCompleteResultsCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 16,
+                    'totalMutantsCount' => 17,
                     'killedCount' => 2,
+                    'killedByStaticAnalysisCount' => 1,
                     'notCoveredCount' => 2,
                     'escapedCount' => 2,
                     'errorCount' => 2,
@@ -115,9 +118,9 @@ final class JsonLoggerTest extends TestCase
                     'skippedCount' => 2,
                     'ignoredCount' => 2,
                     'timeOutCount' => 2,
-                    'msi' => 66.67,
-                    'mutationCodeCoverage' => 83.33,
-                    'coveredCodeMsi' => 80,
+                    'msi' => 69.23,
+                    'mutationCodeCoverage' => 84.62,
+                    'coveredCodeMsi' => 81.82,
                 ],
                 'escaped' => [
                     [
@@ -188,6 +191,19 @@ final class JsonLoggerTest extends TestCase
                             'originalStartLine' => 10,
                         ],
                         'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
+                'killedByStaticAnalysis' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'PregQuote',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 9,
+                        ],
+                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed by SA#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -275,6 +291,7 @@ final class JsonLoggerTest extends TestCase
                 'stats' => [
                     'totalMutantsCount' => 1,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 1,
                     'escapedCount' => 0,
                     'errorCount' => 0,
@@ -289,6 +306,7 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
                 'syntaxErrors' => [],
                 'uncovered' => [
@@ -316,6 +334,7 @@ final class JsonLoggerTest extends TestCase
                 'stats' => [
                     'totalMutantsCount' => 1,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
@@ -330,6 +349,7 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
                 'syntaxErrors' => [],
                 'uncovered' => [],
@@ -357,6 +377,7 @@ final class JsonLoggerTest extends TestCase
                 'stats' => [
                     'totalMutantsCount' => 0,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
@@ -371,6 +392,7 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
                 'syntaxErrors' => [],
                 'uncovered' => [

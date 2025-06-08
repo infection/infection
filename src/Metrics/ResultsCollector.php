@@ -100,6 +100,14 @@ class ResultsCollector implements Collector
     /**
      * @return MutantExecutionResult[]
      */
+    public function getKilledByStaticAnalysisExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return MutantExecutionResult[]
+     */
     public function getErrorExecutionResults(): array
     {
         return $this->getResultListForStatus(DetectionStatus::ERROR)->getSortedExecutionResults();

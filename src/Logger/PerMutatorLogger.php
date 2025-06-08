@@ -70,7 +70,7 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
         $calculatorPerMutator = $this->createMetricsPerMutators();
 
         $table = [
-            ['Mutator', 'Mutations', 'Killed', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'Ignored', 'MSI (%s)', 'Covered MSI (%s)'],
+            ['Mutator', 'Mutations', 'Killed', 'Killed by Static Analysis', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'Ignored', 'MSI (%s)', 'Covered MSI (%s)'],
         ];
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
@@ -80,6 +80,7 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
                 $mutatorName,
                 (string) $calculator->getTotalMutantsCount(),
                 (string) $calculator->getKilledCount(),
+                (string) $calculator->getKilledByStaticAnalysisCount(),
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),
                 (string) $calculator->getSyntaxErrorCount(),

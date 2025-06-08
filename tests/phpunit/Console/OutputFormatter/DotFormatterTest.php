@@ -57,6 +57,7 @@ final class DotFormatterTest extends TestCase
         $output->expects($this->once())->method('writeln')->with([
             '',
             '<killed>.</killed>: killed, '
+            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
@@ -205,7 +206,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   ( 50 / 127)
                 ..................................................   (100 / 127)
@@ -234,7 +235,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   (   50)
                 ..................................................   (  100)
@@ -270,6 +271,7 @@ final class DotFormatterTest extends TestCase
         $output->expects($this->once())->method('writeln')->with([
             '',
             '<killed>.</killed>: killed, '
+            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '

@@ -131,6 +131,8 @@ class TargetDetectionStatusesProvider
         if ($this->logConfig->getJsonLogFilePath() !== null) {
             yield DetectionStatus::KILLED;
 
+            yield DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
+
             yield DetectionStatus::ESCAPED;
 
             yield DetectionStatus::ERROR;
@@ -158,6 +160,8 @@ class TargetDetectionStatusesProvider
 
             if ($this->logVerbosity === LogVerbosity::DEBUG) {
                 yield DetectionStatus::KILLED;
+
+                yield DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
 
                 yield DetectionStatus::ERROR;
             }

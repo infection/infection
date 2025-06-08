@@ -63,6 +63,7 @@ final readonly class JsonLogger implements LineMutationTestingResultsLogger
             'stats' => [
                 'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
                 'killedCount' => $this->metricsCalculator->getKilledCount(),
+                'killedByStaticAnalysisCount' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
                 'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
                 'escapedCount' => $this->metricsCalculator->getEscapedCount(),
                 'errorCount' => $this->metricsCalculator->getErrorCount(),
@@ -77,6 +78,7 @@ final readonly class JsonLogger implements LineMutationTestingResultsLogger
             'escaped' => $this->getResultsLine($this->resultsCollector->getEscapedExecutionResults()),
             'timeouted' => $this->getResultsLine($this->resultsCollector->getTimedOutExecutionResults()),
             'killed' => $this->getResultsLine($this->resultsCollector->getKilledExecutionResults()),
+            'killedByStaticAnalysis' => $this->getResultsLine($this->resultsCollector->getKilledByStaticAnalysisExecutionResults()),
             'errored' => $this->getResultsLine($this->resultsCollector->getErrorExecutionResults()),
             'syntaxErrors' => $this->getResultsLine($this->resultsCollector->getSyntaxErrorExecutionResults()),
             'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->resultsCollector->getNotCoveredExecutionResults()),

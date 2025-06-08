@@ -64,6 +64,7 @@ final class OutputFormatterStyleConfigurator
         $formatter->setStyle('timeout', new OutputFormatterStyle('yellow'));
         $formatter->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
         $formatter->setStyle('killed', new OutputFormatterStyle('green'));
+        $formatter->setStyle('killed-by-static-analysis', new OutputFormatterStyle('green'));
         $formatter->setStyle('skipped', new OutputFormatterStyle('magenta'));
         $formatter->setStyle('ignored', new OutputFormatterStyle('white'));
         $formatter->setStyle('code', new OutputFormatterStyle('white'));

@@ -72,6 +72,9 @@ final class DebugFileLoggerTest extends TestCase
                 Killed mutants:
                 ===============
 
+                Killed by Static Analysis mutants:
+                ==================================
+
                 Errors mutants:
                 ===============
 
@@ -101,7 +104,7 @@ final class DebugFileLoggerTest extends TestCase
             self::createCompleteResultsCollector(),
             false,
             <<<'TXT'
-                Total: 16
+                Total: 17
 
                 Killed mutants:
                 ===============
@@ -111,6 +114,13 @@ final class DebugFileLoggerTest extends TestCase
 
                 Mutator: For_
                 Line 10
+
+
+                Killed by Static Analysis mutants:
+                ==================================
+
+                Mutator: PregQuote
+                Line 9
 
 
                 Errors mutants:
@@ -190,7 +200,7 @@ final class DebugFileLoggerTest extends TestCase
             self::createCompleteResultsCollector(),
             true,
             <<<'TXT'
-                Total: 16
+                Total: 17
 
                 Killed mutants:
                 ===============
@@ -200,6 +210,13 @@ final class DebugFileLoggerTest extends TestCase
 
                 Mutator: For_
                 Line 10
+
+
+                Killed by Static Analysis mutants:
+                ==================================
+
+                Mutator: PregQuote
+                Line 9
 
 
                 Errors mutants:
