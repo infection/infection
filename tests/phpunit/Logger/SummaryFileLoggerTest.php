@@ -64,7 +64,7 @@ final class SummaryFileLoggerTest extends TestCase
             <<<'TXT'
                 Total: 0
 
-                Killed: 0
+                Killed by Test Framework: 0
                 Killed by Static Analysis: 0
                 Errored: 0
                 Syntax Errors: 0
@@ -82,7 +82,7 @@ final class SummaryFileLoggerTest extends TestCase
             <<<'TXT'
                 Total: 17
 
-                Killed: 2
+                Killed by Test Framework: 2
                 Killed by Static Analysis: 1
                 Errored: 2
                 Syntax Errors: 2
