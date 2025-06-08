@@ -60,7 +60,7 @@ final class DotFormatter extends AbstractOutputFormatter
 
         $this->output->writeln([
             '',
-            '<killed>.</killed>: killed, '
+            '<killed>.</killed>: killed by tests, '
             . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '

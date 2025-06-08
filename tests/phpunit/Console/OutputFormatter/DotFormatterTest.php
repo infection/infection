@@ -56,7 +56,7 @@ final class DotFormatterTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())->method('writeln')->with([
             '',
-            '<killed>.</killed>: killed, '
+            '<killed>.</killed>: killed by tests, '
             . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
@@ -206,7 +206,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   ( 50 / 127)
                 ..................................................   (100 / 127)
@@ -235,7 +235,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   (   50)
                 ..................................................   (  100)
@@ -270,7 +270,7 @@ final class DotFormatterTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())->method('writeln')->with([
             '',
-            '<killed>.</killed>: killed, '
+            '<killed>.</killed>: killed by tests, '
             . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
