@@ -48,7 +48,6 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
@@ -85,7 +84,6 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
-use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHub\GitDiffFileProvider;
@@ -103,7 +101,6 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -1020,19 +1017,9 @@ final class Container
         return $this->get(SchemaConfigurationFileLoader::class);
     }
 
-    private function getSchemaValidator(): SchemaValidator
-    {
-        return $this->get(SchemaValidator::class);
-    }
-
     private function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
-    }
-
-    private function getMutatorParser(): MutatorParser
-    {
-        return $this->get(MutatorParser::class);
     }
 
     private function getPrinter(): PrettyPrinterAbstract
@@ -1043,11 +1030,6 @@ final class Container
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
     {
         return $this->get(TestFrameworkConfigLocator::class);
-    }
-
-    private function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
-    {
-        return $this->get(MemoizedTestFileDataProvider::class);
     }
 
     private function getProcessRunner(): ProcessRunner
@@ -1113,11 +1095,6 @@ final class Container
     private function getProjectDir(): string
     {
         return $this->get(ProjectDirProvider::class)->getProjectDir();
-    }
-
-    private function getTmpDirProvider(): TmpDirProvider
-    {
-        return $this->get(TmpDirProvider::class);
     }
 
     private function getDefaultJUnitFilePath(): string
