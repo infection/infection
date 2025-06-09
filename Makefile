@@ -131,7 +131,7 @@ profile: vendor $(BENCHMARK_SOURCES)
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: cs-check detect-collisions phpstan psalm validate test-autoreview rector-check
+autoreview: cs-check phpstan psalm validate test-autoreview rector-check detect-collisions
 
 .PHONY: test
 test:		 	## Runs all the tests
