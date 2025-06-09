@@ -35,17 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use function array_filter;
-use function array_map;
-use function array_values;
 use function class_exists;
 use Infection\CannotBeInstantiated;
 use Infection\Testing\SourceTestClassNameScheme;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\Console\E2ETest;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use ReflectionClass;
 use function Safe\file_get_contents;
 use Webmozart\Assert\Assert;
@@ -81,20 +78,16 @@ final class IntegrationGroupProvider
             return;
         }
 
-        self::$ioTestCaseClassesTuple = array_values(array_filter(array_map(
-            static fn (string $className): ?array => self::ioTestCaseTuple($className),
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-        )));
+        $itegrationTests = take(self::KNOWN_INTEGRATIONAL_TESTS)
+            ->map(self::classNameFileNameTuple(...))
+            ->tuples()
+            ->toList();
 
-        foreach (self::KNOWN_INTEGRATIONAL_TESTS as $testCaseClass) {
-            $testCaseReflection = new ReflectionClass($testCaseClass);
-            Assert::isInstanceOf($testCaseReflection, ReflectionClass::class);
-
-            self::$ioTestCaseClassesTuple[] = [
-                $testCaseClass,
-                $testCaseReflection->getFileName(),
-            ];
-        }
+        self::$ioTestCaseClassesTuple = take(ProjectCodeProvider::provideSourceClasses())
+            ->cast(self::ioTestCaseTuple(...))
+            ->filter()
+            ->append($itegrationTests)
+            ->toList();
 
         yield from self::$ioTestCaseClassesTuple;
     }
@@ -105,6 +98,15 @@ final class IntegrationGroupProvider
     }
 
     /**
+     * @param class-string $className
+     * @return iterable<class-string, string>
+     */
+    private static function classNameFileNameTuple(string $className): iterable
+    {
+        yield $className => (new ReflectionClass($className))->getFileName();
+    }
+
+    /**
      * @return ?array{0: string, 1: string}
      */
     private static function ioTestCaseTuple(string $className): ?array
@@ -112,7 +114,7 @@ final class IntegrationGroupProvider
         $testCaseClass = SourceTestClassNameScheme::getTestClassName($className);
 
         if (!class_exists($testCaseClass)) {
-            // No test case could be find for this source file
+            // No test case could be found for this source file
             return null;
         }
 

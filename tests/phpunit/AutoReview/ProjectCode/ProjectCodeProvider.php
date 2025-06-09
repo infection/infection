@@ -90,6 +90,7 @@ use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use function ltrim;
+use function Pipeline\take;
 use ReflectionClass;
 use function sort;
 use const SORT_STRING;
@@ -197,19 +198,9 @@ final class ProjectCodeProvider
             ->in(__DIR__ . '/../../../../src')
         ;
 
-        $classes = array_map(
-            static fn (SplFileInfo $file): string => sprintf(
-                '%s\\%s%s%s',
-                'Infection',
-                str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                $file->getRelativePath() !== '' ? '\\' : '',
-                $file->getBasename('.' . $file->getExtension()),
-            ),
-            iterator_to_array($finder, false),
-        );
-        sort($classes, SORT_STRING);
-
-        self::$sourceClasses = $classes;
+        self::$sourceClasses = take($finder)
+            ->cast(self::castSplFileInfoToFQCN(...))
+            ->toList();
 
         yield from self::$sourceClasses;
     }
@@ -341,6 +332,20 @@ final class ProjectCodeProvider
     {
         yield from generator_to_phpunit_data_provider(
             self::NON_FINAL_EXTENSION_CLASSES,
+        );
+    }
+
+    /**
+     * @return class-string
+     */
+    private static function castSplFileInfoToFQCN(SplFileInfo $file): string
+    {
+        return sprintf(
+            '%s\\%s%s%s',
+            'Infection',
+            str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
+            $file->getRelativePath() !== '' ? '\\' : '',
+            $file->getBasename('.' . $file->getExtension()),
         );
     }
 }
