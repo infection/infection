@@ -103,7 +103,7 @@ final class IntegrationGroupProvider
      */
     private static function classNameFileNameTuple(string $className): iterable
     {
-        yield $className => (new ReflectionClass($className))->getFileName();
+        yield $className => (new ReflectionClass($className))->getFileName() ?: '';
     }
 
     /**

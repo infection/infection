@@ -335,9 +335,6 @@ final class ProjectCodeProvider
         );
     }
 
-    /**
-     * @return class-string
-     */
     private static function castSplFileInfoToFQCN(SplFileInfo $file): string
     {
         return sprintf(
