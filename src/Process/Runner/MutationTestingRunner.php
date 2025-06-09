@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use Infection\AstFilter\AstPreFilterRegistry;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -50,6 +51,7 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
+use function var_dump;
 
 /**
  * @internal
@@ -67,6 +69,7 @@ class MutationTestingRunner
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,
         private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
+        private readonly AstPreFilterRegistry $astPreFilterRegistry,
         private readonly bool $runConcurrently,
         private readonly float $timeout,
         private readonly array $ignoreSourceCodeMutatorsMap,
@@ -82,6 +85,7 @@ class MutationTestingRunner
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
+        $counter = 0;
         $processContainers = take($mutations)
             ->stream()
             ->filter($this->ignoredByMutantId(...))
@@ -89,6 +93,15 @@ class MutationTestingRunner
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
+            ->filter(function (Mutant $mutant) use (&$counter): bool {
+                if ($this->astPreFilterRegistry->coversMutation($mutant->getMutation())) {
+                    ++$counter;
+
+                    return false;
+                }
+
+                return true;
+            })
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
@@ -98,6 +111,8 @@ class MutationTestingRunner
         ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+
+        var_dump('killed with AST: ' . $counter);
     }
 
     private function mutationToMutant(Mutation $mutation): Mutant

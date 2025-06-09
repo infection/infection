@@ -163,14 +163,15 @@ abstract class BaseMutatorTestCase extends TestCase
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $container = SingletonContainer::getContainer();
+        $nodes = $container->getParser()->parse($code);
 
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
             $nodes,
         );
 
-        (new NodeTraverserFactory())
+        (new NodeTraverserFactory($container->getAstPreFilterRegistry()))
             ->create($mutationsCollectorVisitor, [])
             ->traverse($nodes)
         ;
