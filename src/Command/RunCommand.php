@@ -605,6 +605,10 @@ final class RunCommand extends BaseCommand
 
         $config = $container->getConfiguration();
 
+        if ($config->isStaticAnalysisEnabled()) {
+            $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
+        }
+
         $container->getFileSystem()->mkdir($config->getTmpDir());
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);

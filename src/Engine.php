@@ -84,6 +84,7 @@ final readonly class Engine
 
     /**
      * @throws InitialTestsFailed
+     * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
      */
     public function execute(): void
@@ -148,8 +149,6 @@ final readonly class Engine
 
         Assert::notNull($this->initialStaticAnalysisRunner);
         Assert::notNull($this->staticAnalysisToolAdapter);
-
-        // todo [phpstan-integration] see $container->getCoverageChecker()->checkCoverageRequirements(); - make the same for --skip-initial-static-analysis-run and --static-analysis-cache
 
         //        if ($this->config->shouldSkipInitialTests()) {
         //            $this->consoleOutput->logSkippingInitialTests();
