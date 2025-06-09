@@ -65,6 +65,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkExtraOptions,
+        string|int|null $threadCount,
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -82,6 +83,7 @@ final class SchemaConfigurationTest extends TestCase
             $bootstrap,
             $initialTestsPhpOptions,
             $testFrameworkExtraOptions,
+            $threadCount,
         );
 
         $this->assertSame($path, $config->getFile());
@@ -119,6 +121,7 @@ final class SchemaConfigurationTest extends TestCase
             null,
             null,
             null,
+            null, // threadCount
         ];
 
         yield 'complete' => [
@@ -151,6 +154,7 @@ final class SchemaConfigurationTest extends TestCase
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
             '--debug',
+            'max', // threadCount
         ];
     }
 }
