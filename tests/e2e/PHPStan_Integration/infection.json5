@@ -1,12 +1,14 @@
 {
     "$schema": "../../../resources/schema.json",
     "timeout": 25,
+    "threads": "max",
     "source": {
         "directories": [
             "src"
         ]
     },
     "logs": {
+        text: "infection.text.log",
         "summary": "infection.log"
     },
     "tmpDir": "."

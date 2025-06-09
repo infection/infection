@@ -43,5 +43,6 @@ interface StaticAnalysisToolAdapterFactory
     public static function create(
         string $staticAnalysisToolExecutable,
         float $timeout,
+        string $tmpDir,
     ): StaticAnalysisToolAdapter;
 }

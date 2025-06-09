@@ -41,6 +41,9 @@ use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Symfony\Component\Process\Process;
+use function file_put_contents;
+use function sprintf;
+use function var_dump;
 
 /**
  * @internal
@@ -52,6 +55,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly float $timeout,
+        private readonly string $tmpDir,
     ) {
     }
 
@@ -61,6 +65,9 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             command: $this->getMutantCommandLine(
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
+                $this->buildMutationConfigFile(
+                    $mutant->getMutation()->getHash()
+                )
             ),
             timeout: $this->timeout,
         );
@@ -78,6 +85,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
     private function getMutantCommandLine(
         string $mutatedFilePath,
         string $mutationOriginalFilePath,
+        string $mutantConfigFile,
     ): array {
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
@@ -85,11 +93,37 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             [
                 "--tmp-file=$mutatedFilePath",
                 "--instead-of=$mutationOriginalFilePath",
+                "--configuration=$mutantConfigFile",
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
                 // todo [phpstan-integration] --stop-on-first-error
             ],
         );
+    }
+
+    private function buildMutationConfigFile(string $mutationHash): string
+    {
+        $mutantConfigPath = sprintf(
+            '%s/phpstan.%s.infection.neon',
+            $this->tmpDir,
+            $mutationHash,
+        );
+
+        var_dump($mutantConfigPath);
+
+        file_put_contents(
+            $mutantConfigPath,
+            <<<NEON
+                parameters:
+                    parallel:
+                        maximumNumberOfProcesses: 1
+                    level: max
+                    paths:
+                        - src
+            NEON
+        );
+
+        return $mutantConfigPath;
     }
 }

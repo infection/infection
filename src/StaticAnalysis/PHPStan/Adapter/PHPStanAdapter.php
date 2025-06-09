@@ -62,6 +62,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
+        private readonly string $tmpDir,
         private ?string $version = null,
     ) {
     }
@@ -93,6 +94,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             $this->staticAnalysisToolExecutable,
             $this->commandLineBuilder,
             $this->timeout,
+            $this->tmpDir,
         );
     }
 

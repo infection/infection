@@ -49,6 +49,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
     public static function create(
         string $staticAnalysisToolExecutable,
         float $timeout,
+        string $tmpDir,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
             new PHPStanMutantExecutionResultFactory(),
@@ -56,6 +57,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             new CommandLineBuilder(),
             new VersionParser(),
             $timeout,
+            $tmpDir,
         );
     }
 }

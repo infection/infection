@@ -67,6 +67,7 @@ final readonly class StaticAnalysisToolFactory
                     (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
                 ),
                 $timeout,
+                $this->infectionConfig->getTmpDir(),
             );
         }
 
