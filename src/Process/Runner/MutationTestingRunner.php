@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\AstKiller\AstKillerManager;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -66,6 +67,7 @@ class MutationTestingRunner
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,
         private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
+        private readonly AstKillerManager $astKillerManager,
         private readonly bool $runConcurrently,
         private readonly float $timeout,
         private readonly array $ignoreSourceCodeMutatorsMap,
@@ -120,6 +122,9 @@ class MutationTestingRunner
                 ));
 
                 return false;
+            })
+            ->filter(function (Mutant $mutant): bool {
+                return !$this->astKillerManager->killsMutation($mutant->getMutation());
             })
             ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcessContainer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());

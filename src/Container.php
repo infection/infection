@@ -40,6 +40,7 @@ use function array_key_exists;
 use Closure;
 use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\AstKiller\AstKillerManager;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
@@ -530,6 +531,7 @@ final class Container
                         ? new DummyFileSystem()
                         : $container->getFileSystem(),
                     $container->getDiffSourceCodeMatcher(),
+                    $container->getAstKillerManager(),
                     $configuration->noProgress(),
                     $configuration->getProcessTimeout(),
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
@@ -985,6 +987,11 @@ final class Container
     public function getMinMsiChecker(): MinMsiChecker
     {
         return $this->get(MinMsiChecker::class);
+    }
+
+    public function getAstKillerManager(): AstKillerManager
+    {
+        return $this->get(AstKillerManager::class);
     }
 
     private function getStopwatch(): Stopwatch

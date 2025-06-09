@@ -40,6 +40,7 @@ use ArrayIterator;
 use function count;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\AstKiller\AstKillerManager;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
@@ -100,6 +101,11 @@ final class MutationTestingRunnerTest extends TestCase
      */
     private $runner;
 
+    /**
+     * @var AstKillerManager
+     */
+    private $astKillerManager;
+
     protected function setUp(): void
     {
         $this->processFactoryMock = $this->createMock(MutantProcessContainerFactory::class);
@@ -107,6 +113,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
         $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->astKillerManager = new AstKillerManager();
 
         $this->runner = new MutationTestingRunner(
             $this->processFactoryMock,
@@ -115,6 +122,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
+            $this->astKillerManager,
             false,
             100.0,
             [],
@@ -290,6 +298,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
+            $this->astKillerManager,
             true,
             100.0,
             [],
@@ -353,6 +362,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
+            $this->astKillerManager,
             true,
             100.0,
             [
@@ -399,6 +409,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
+            $this->astKillerManager,
             true,
             100.0,
             [],
