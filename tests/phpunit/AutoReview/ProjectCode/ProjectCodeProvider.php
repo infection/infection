@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
-use function array_map;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
@@ -202,6 +201,8 @@ final class ProjectCodeProvider
             ->cast(self::castSplFileInfoToFQCN(...))
             ->toList();
 
+        sort(self::$sourceClasses, SORT_STRING);
+
         yield from self::$sourceClasses;
     }
 
@@ -290,24 +291,11 @@ final class ProjectCodeProvider
             ])
         ;
 
-        $classes = array_map(
-            static function (SplFileInfo $file): string {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
-                $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+        self::$testClasses = take($finder)
+            ->cast(self::castTestSplFileInfoToFQCN(...))
+            ->toList();
 
-                return sprintf(
-                    'Infection\\Tests\\%s%s%s',
-                    $fqcnPart,
-                    $file->getRelativePath() === 'phpunit' ? '' : '\\',
-                    $file->getBasename('.' . $file->getExtension()),
-                );
-            },
-            iterator_to_array($finder, false),
-        );
-
-        sort($classes, SORT_STRING);
-
-        self::$testClasses = $classes;
+        sort(self::$testClasses, SORT_STRING);
 
         yield from self::$testClasses;
     }
@@ -342,6 +330,19 @@ final class ProjectCodeProvider
             'Infection',
             str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
             $file->getRelativePath() !== '' ? '\\' : '',
+            $file->getBasename('.' . $file->getExtension()),
+        );
+    }
+
+    private static function castTestSplFileInfoToFQCN(SplFileInfo $file): string
+    {
+        $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
+        $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+
+        return sprintf(
+            'Infection\\Tests\\%s%s%s',
+            $fqcnPart,
+            $file->getRelativePath() === 'phpunit' ? '' : '\\',
             $file->getBasename('.' . $file->getExtension()),
         );
     }
