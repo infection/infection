@@ -33,48 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\ConditionalNegotiation;
+namespace Infection\FileSystem;
 
-use Infection\Mutator\ConditionalNegotiation\GreaterThanNegotiation;
-use Infection\Testing\BaseMutatorTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Later\Interfaces\Deferred;
+use function Later\later;
+use function Safe\getcwd;
 
-#[CoversClass(GreaterThanNegotiation::class)]
-final class GreaterThanNegotiationTest extends BaseMutatorTestCase
+/**
+ * Caches the project directory path.
+ * @internal
+ */
+final class ProjectDirProvider
 {
     /**
-     * @param string|string[] $expected
+     * @var Deferred<non-empty-string>
      */
-    #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    private readonly Deferred $projectDir;
+
+    public function __construct()
     {
-        $this->assertMutatesInput($input, $expected);
+        $this->projectDir = later(static fn () => yield getcwd());
     }
 
-    public static function mutationsProvider(): iterable
+    public function getProjectDir(): string
     {
-        yield 'It mutates greater than' => [
-            <<<'PHP'
-                <?php
-
-                1 > 1;
-                PHP
-            ,
-            <<<'PHP'
-                <?php
-
-                1 <= 1;
-                PHP
-            ,
-        ];
-
-        yield 'It does not mutate inside ternary to prevent overlap with TernaryMutator' => [
-            <<<'PHP'
-                <?php
-                $x > 6 ? 'yes' : 'no';
-                PHP
-            ,
-        ];
+        return $this->projectDir->get();
     }
 }

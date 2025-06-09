@@ -98,5 +98,134 @@ final class CastFloatTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It removes casting to float in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((float) random_int()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (random_int()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to float in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (float) random_int();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return random_int();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to float in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (float) random_int();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to float in return of float-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsFloat(): float
+                {
+                    return (float) random_int();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsFloat(): float
+                {
+                    return random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to float in return of float-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsFloat(): float {
+                    return (float) random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to float in nested return of float-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsFloat(): float {
+                    if (true) {
+                        return (float) random_int();
+                    }
+                    return 1.0;
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to float in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    round((float) $s);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    round($s);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to float in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    round((float) $s);
+                }
+                PHP,
+        ];
     }
 }

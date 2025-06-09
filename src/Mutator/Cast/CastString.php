@@ -59,6 +59,10 @@ final class CastString extends AbstractCastMutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\String_;
+        if (!$node instanceof Node\Expr\Cast\String_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'string');
     }
 }

@@ -59,6 +59,10 @@ final class CastObject extends AbstractCastMutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Object_;
+        if (!$node instanceof Node\Expr\Cast\Object_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'object');
     }
 }

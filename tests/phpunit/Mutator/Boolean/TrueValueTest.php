@@ -114,6 +114,59 @@ final class TrueValueTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It does not mutate in ternary condition to prevent overlap with TernaryMutator' => [
+            <<<'PHP'
+                <?php
+
+                $x == true ? 'yes' : 'no';
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with equal' => [
+            <<<'PHP'
+                <?php
+
+                if ($x == true) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with not-equal' => [
+            <<<'PHP'
+                <?php
+
+                if ($x != true) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with identical' => [
+            <<<'PHP'
+                <?php
+
+                if ($x === true) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with not-identical' => [
+            <<<'PHP'
+                <?php
+
+                if ($x !== true) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
         yield 'It mutates all caps true to false' => [
             <<<'PHP'
                 <?php

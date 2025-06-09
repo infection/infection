@@ -35,28 +35,65 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Error;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
+use Webmozart\Assert\InvalidArgumentException as AssertException;
 
-#[Group('integration')]
 #[CoversClass(Container::class)]
+#[Group('integration')]
 final class ContainerTest extends TestCase
 {
+    #[Group('default')]
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown service "Symfony\Component\Filesystem\Filesystem"');
+        $this->expectExceptionMessage('Unknown service "Infection\FileSystem\SourceFileFilter"');
 
         $container = new Container([]);
 
+        $container->getSourceFileFilter();
+    }
+
+    #[Group('default')]
+    public function test_it_can_build_simple_services_without_configuration(): void
+    {
+        $container = new Container([]);
+
         $container->getFileSystem();
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Group('default')]
+    public function test_it_can_resolve_some_dependencies_without_configuration(): void
+    {
+        $container = new Container([]);
+
+        $container->getAdapterInstallationDecider();
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Group('default')]
+    public function test_it_can_resolve_all_dependencies_with_configuration(): void
+    {
+        $container = SingletonContainer::getContainer();
+
+        $container->getSubscriberRegisterer();
+        $container->getTestFrameworkFinder();
+
+        $this->addToAssertionCount(1);
     }
 
     public function test_it_can_be_instantiated_with_the_project_services(): void
@@ -73,38 +110,7 @@ final class ContainerTest extends TestCase
         $newContainer = SingletonContainer::getContainer()->withValues(
             new NullLogger(),
             new NullOutput(),
-            Container::DEFAULT_CONFIG_FILE,
-            Container::DEFAULT_MUTATORS_INPUT,
-            Container::DEFAULT_SHOW_MUTATIONS,
-            Container::DEFAULT_LOG_VERBOSITY,
-            Container::DEFAULT_DEBUG,
-            Container::DEFAULT_ONLY_COVERED,
-            Container::DEFAULT_FORMATTER_NAME,
-            Container::DEFAULT_NO_PROGRESS,
-            Container::DEFAULT_FORCE_PROGRESS,
-            '/path/to/coverage',
-            Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            Container::DEFAULT_SKIP_INITIAL_TESTS,
-            Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-            Container::DEFAULT_MIN_MSI,
-            Container::DEFAULT_MIN_COVERED_MSI,
-            Container::DEFAULT_MSI_PRECISION,
-            Container::DEFAULT_TEST_FRAMEWORK,
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            Container::DEFAULT_FILTER,
-            Container::DEFAULT_THREAD_COUNT,
-            Container::DEFAULT_DRY_RUN,
-            Container::DEFAULT_GIT_DIFF_FILTER,
-            Container::DEFAULT_GIT_DIFF_LINES,
-            Container::DEFAULT_GIT_DIFF_BASE,
-            Container::DEFAULT_USE_GITHUB_LOGGER,
-            Container::DEFAULT_GITLAB_LOGGER_PATH,
-            Container::DEFAULT_HTML_LOGGER_PATH,
-            Container::DEFAULT_USE_NOOP_MUTATORS,
-            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
-            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-            Container::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
-            Container::DEFAULT_STATIC_ANALYSIS_TOOL,
+            existingCoveragePath: '/path/to/coverage',
         );
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
@@ -127,38 +133,90 @@ final class ContainerTest extends TestCase
         $container->withValues(
             new NullLogger(),
             new NullOutput(),
-            Container::DEFAULT_CONFIG_FILE,
-            Container::DEFAULT_MUTATORS_INPUT,
-            Container::DEFAULT_SHOW_MUTATIONS,
-            Container::DEFAULT_LOG_VERBOSITY,
-            Container::DEFAULT_DEBUG,
-            Container::DEFAULT_ONLY_COVERED,
-            Container::DEFAULT_FORMATTER_NAME,
-            true,
-            true,
-            Container::DEFAULT_EXISTING_COVERAGE_PATH,
-            Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            Container::DEFAULT_SKIP_INITIAL_TESTS,
-            Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-            Container::DEFAULT_MIN_MSI,
-            Container::DEFAULT_MIN_COVERED_MSI,
-            Container::DEFAULT_MSI_PRECISION,
-            Container::DEFAULT_TEST_FRAMEWORK,
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            Container::DEFAULT_FILTER,
-            Container::DEFAULT_THREAD_COUNT,
-            Container::DEFAULT_DRY_RUN,
-            Container::DEFAULT_GIT_DIFF_FILTER,
-            Container::DEFAULT_GIT_DIFF_LINES,
-            Container::DEFAULT_GIT_DIFF_BASE,
-            Container::DEFAULT_USE_GITHUB_LOGGER,
-            Container::DEFAULT_GITLAB_LOGGER_PATH,
-            Container::DEFAULT_HTML_LOGGER_PATH,
-            Container::DEFAULT_USE_NOOP_MUTATORS,
-            Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
-            Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-            Container::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
-            Container::DEFAULT_STATIC_ANALYSIS_TOOL,
+            noProgress: true,
+            forceProgress: true,
         );
+    }
+
+    public static function provideServicesWithReflection(): iterable
+    {
+        $reflection = new ContainerReflection(
+            SingletonContainer::getContainer(),
+        );
+
+        foreach ($reflection->getFactories() as $id => $factory) {
+            yield $id => [$id];
+        }
+    }
+
+    /**
+     * @param class-string $id
+     */
+    #[DataProvider('provideServicesWithReflection')]
+    #[Group('default')]
+    public function test_factory_is_essential(string $id): void
+    {
+        $reflection = new ContainerReflection(Container::create());
+
+        $reflection->unsetFactory($id);
+
+        try {
+            $service = $reflection->createService($id);
+        } catch (InvalidArgumentException $e) {
+            // All good: the service needs a factory
+            $this->assertStringContainsString('Unknown service ', $e->getMessage());
+
+            return;
+        }
+
+        // Another happy path: the service cannot be created without a factory
+        if ($service === null) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        $this->assertInstanceOf(
+            $id,
+            $service,
+            sprintf('Service should be an instance of "%s"', $id),
+        );
+
+        // Here we can check that all other services can be created without a factory for this service
+        // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
+    }
+
+    public static function provideExpectedConcreteServicesWithReflection(): iterable
+    {
+        $container = Container::create();
+        $reflection = new ContainerReflection($container);
+
+        foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $id) {
+            yield $methodName => [$id, $methodName, $container, $reflection];
+        }
+    }
+
+    /**
+     * @param class-string $id
+     */
+    #[DataProvider('provideExpectedConcreteServicesWithReflection')]
+    public function test_it_can_provide_all_services(string $id, string $methodName, Container $container, ContainerReflection $reflection): void
+    {
+        try {
+            $service = $container->{$methodName}();
+        } catch (Error|AssertException) {
+            // Ignore services that require extra configuration
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        $this->assertInstanceOf(
+            $id,
+            $service,
+            sprintf('Service should be an instance of "%s"', $id),
+        );
+
+        $this->assertSame($service, $reflection->getService($id));
     }
 }

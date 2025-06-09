@@ -76,12 +76,34 @@ final class FalseValue implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        $parentNode = ParentConnector::findParent($node);
-
-        if (!$node instanceof Node\Expr\ConstFetch || $parentNode instanceof Node\Stmt\Switch_) {
+        if (!$node instanceof Node\Expr\ConstFetch) {
             return false;
         }
 
-        return $node->name->toLowerString() === 'false';
+        if ($node->name->toLowerString() !== 'false') {
+            return false;
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
+
+        if ($parentNode instanceof Node\Stmt\Switch_) {
+            return false;
+        }
+
+        if ($grandParentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
+        if (
+            $parentNode instanceof Node\Expr\BinaryOp\Equal
+            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
+            || $parentNode instanceof Node\Expr\BinaryOp\Identical
+            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

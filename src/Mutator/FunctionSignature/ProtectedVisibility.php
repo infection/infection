@@ -94,7 +94,10 @@ final class ProtectedVisibility implements Mutator
             return false;
         }
 
-        if ($node->isFinal()) {
+        /** @var ClassReflection $class */
+        $class = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        if ($node->isFinal() || $class !== null && $class->isFinal()) {
             return false;
         }
 

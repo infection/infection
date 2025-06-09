@@ -59,6 +59,10 @@ final class CastArray extends AbstractCastMutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Array_;
+        if (!$node instanceof Node\Expr\Cast\Array_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'array');
     }
 }

@@ -37,18 +37,19 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 
 /**
  * @internal
  *
  * @deprecated This mutator is a semantic addition
  *
- * @implements Mutator<Node\Expr\BinaryOp\Identical>
+ * @extends  AbstractIdenticalComparison<Node\Expr\BinaryOp\Identical>
  */
-final class IdenticalEqual implements Mutator
+final class IdenticalEqual extends AbstractIdenticalComparison
 {
     use GetMutatorName;
 
@@ -72,15 +73,19 @@ final class IdenticalEqual implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\BinaryOp\Equal>
+     * @return iterable<Expr\BinaryOp\Equal>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
+        yield new Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Identical;
+        if (!$node instanceof Expr\BinaryOp\Identical) {
+            return false;
+        }
+
+        return !$this->isSameTypeIdenticalComparison($node);
     }
 }

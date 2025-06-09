@@ -59,6 +59,10 @@ final class CastBool extends AbstractCastMutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Bool_;
+        if (!$node instanceof Node\Expr\Cast\Bool_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'bool');
     }
 }
