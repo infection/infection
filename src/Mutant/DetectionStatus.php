@@ -44,7 +44,7 @@ final class DetectionStatus
 {
     use CannotBeInstantiated;
 
-    public const KILLED = 'killed';
+    public const KILLED_BY_TESTS = 'killed by tests';
     public const KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
     public const ESCAPED = 'escaped';
     public const ERROR = 'error';
@@ -55,7 +55,7 @@ final class DetectionStatus
     public const IGNORED = 'ignored';
 
     public const ALL = [
-        self::KILLED,
+        self::KILLED_BY_TESTS,
         self::KILLED_BY_STATIC_ANALYSIS,
         self::ESCAPED,
         self::ERROR,

@@ -104,7 +104,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
         $this->assertProvidesExcluding(
             [
-                DetectionStatus::KILLED,
+                DetectionStatus::KILLED_BY_TESTS,
                 DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
                 DetectionStatus::ERROR,
             ],
@@ -125,7 +125,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
         $this->assertProvidesExcluding(
             [
-                DetectionStatus::KILLED,
+                DetectionStatus::KILLED_BY_TESTS,
                 DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
                 DetectionStatus::ERROR,
                 DetectionStatus::NOT_COVERED,

@@ -64,7 +64,7 @@ final class ResultsCollectorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $collector,
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_TESTS,
             7,
         );
         $expectedErrorResults = $this->addMutantExecutionResult(
@@ -113,7 +113,7 @@ final class ResultsCollectorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $collector,
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_TESTS,
             1,
         );
 

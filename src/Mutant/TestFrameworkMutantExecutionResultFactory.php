@@ -120,6 +120,6 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
             return DetectionStatus::SYNTAX_ERROR;
         }
 
-        return DetectionStatus::KILLED;
+        return DetectionStatus::KILLED_BY_TESTS;
     }
 }

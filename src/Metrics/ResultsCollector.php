@@ -94,7 +94,7 @@ class ResultsCollector implements Collector
      */
     public function getKilledExecutionResults(): array
     {
-        return $this->getResultListForStatus(DetectionStatus::KILLED)->getSortedExecutionResults();
+        return $this->getResultListForStatus(DetectionStatus::KILLED_BY_TESTS)->getSortedExecutionResults();
     }
 
     /**

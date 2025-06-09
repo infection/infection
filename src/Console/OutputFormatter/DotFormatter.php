@@ -78,7 +78,7 @@ final class DotFormatter extends AbstractOutputFormatter
         parent::advance($executionResult, $mutationCount);
 
         switch ($executionResult->getDetectionStatus()) {
-            case DetectionStatus::KILLED:
+            case DetectionStatus::KILLED_BY_TESTS:
                 $this->output->write('<killed>.</killed>');
 
                 break;

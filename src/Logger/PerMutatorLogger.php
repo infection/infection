@@ -79,7 +79,7 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
             $table[] = [
                 $mutatorName,
                 (string) $calculator->getTotalMutantsCount(),
-                (string) $calculator->getKilledCount(),
+                (string) $calculator->getKilledByTestsCount(),
                 (string) $calculator->getKilledByStaticAnalysisCount(),
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),

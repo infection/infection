@@ -88,7 +88,7 @@ final class FilteringResultsCollectorTest extends TestCase
         ;
 
         $targetDetectionStatuses = array_flip(DetectionStatus::ALL);
-        unset($targetDetectionStatuses[DetectionStatus::KILLED]);
+        unset($targetDetectionStatuses[DetectionStatus::KILLED_BY_TESTS]);
 
         $collector = new FilteringResultsCollector($targetCollector, $targetDetectionStatuses);
 
@@ -99,7 +99,7 @@ final class FilteringResultsCollectorTest extends TestCase
     {
         $this->addMutantExecutionResult(
             $collector,
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_TESTS,
             7,
         );
 

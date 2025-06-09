@@ -84,7 +84,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputKilled);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0],
             10,
         );
     }
@@ -200,7 +200,7 @@ final class DotFormatterTest extends TestCase
         $dot->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0], $totalMutations);
+            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0], $totalMutations);
         }
 
         $this->assertSame(str_replace("\n", PHP_EOL,
@@ -227,7 +227,7 @@ final class DotFormatterTest extends TestCase
 
         for ($i = 0; $i < $totalMutations; ++$i) {
             $dot->advance(
-                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0],
                 0,
             );
         }

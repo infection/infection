@@ -62,7 +62,7 @@ final readonly class JsonLogger implements LineMutationTestingResultsLogger
         $data = [
             'stats' => [
                 'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
-                'killedCount' => $this->metricsCalculator->getKilledCount(),
+                'killedCount' => $this->metricsCalculator->getKilledByTestsCount(),
                 'killedByStaticAnalysisCount' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
                 'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
                 'escapedCount' => $this->metricsCalculator->getEscapedCount(),
