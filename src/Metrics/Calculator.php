@@ -63,7 +63,7 @@ final class Calculator
     {
         return new self(
             $calculator->getRoundingPrecision(),
-            $calculator->getKilledCount(),
+            $calculator->getKilledByTestsCount() + $calculator->getKilledByStaticAnalysisCount(),
             $calculator->getErrorCount() + $calculator->getSyntaxErrorCount(),
             $calculator->getTimedOutCount(),
             $calculator->getNotTestedCount(),

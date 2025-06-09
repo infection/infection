@@ -22,6 +22,9 @@ Mutator: TrueValue
 Line 15
 
 
+Killed by Static Analysis mutants:
+==================================
+
 Errors mutants:
 ===============
 

@@ -56,7 +56,8 @@ final class DotFormatterTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())->method('writeln')->with([
             '',
-            '<killed>.</killed>: killed, '
+            '<killed>.</killed>: killed by tests, '
+            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
@@ -83,7 +84,7 @@ final class DotFormatterTest extends TestCase
         $dot = new DotFormatter($outputKilled);
         $dot->start(10);
         $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0],
             10,
         );
     }
@@ -199,13 +200,13 @@ final class DotFormatterTest extends TestCase
         $dot->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0], $totalMutations);
+            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0], $totalMutations);
         }
 
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   ( 50 / 127)
                 ..................................................   (100 / 127)
@@ -226,7 +227,7 @@ final class DotFormatterTest extends TestCase
 
         for ($i = 0; $i < $totalMutations; ++$i) {
             $dot->advance(
-                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED)[0],
+                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0],
                 0,
             );
         }
@@ -234,7 +235,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   (   50)
                 ..................................................   (  100)
@@ -269,7 +270,8 @@ final class DotFormatterTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
         $output->expects($this->once())->method('writeln')->with([
             '',
-            '<killed>.</killed>: killed, '
+            '<killed>.</killed>: killed by tests, '
+            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '

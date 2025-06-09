@@ -73,6 +73,11 @@ final readonly class DebugFileLogger implements LineMutationTestingResultsLogger
             $separateSections,
         );
         $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getKilledByStaticAnalysisExecutionResults(),
+            'Killed by Static Analysis',
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
             $this->resultsCollector->getErrorExecutionResults(),
             'Errors',
             $separateSections,

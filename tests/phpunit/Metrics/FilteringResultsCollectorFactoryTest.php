@@ -115,7 +115,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
 
         $this->addMutantExecutionResult(
             $filteringCollector,
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_TESTS,
         );
     }
 }
