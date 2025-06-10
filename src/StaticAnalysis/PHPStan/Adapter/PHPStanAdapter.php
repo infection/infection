@@ -35,19 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use function explode;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use RuntimeException;
+use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Process\Process;
+use function version_compare;
 
 /**
  * @internal
  */
 final class PHPStanAdapter implements StaticAnalysisToolAdapter
 {
+    private const VERSION_1 = 1;
+    private const VERSION_2 = 2;
+
     public function __construct(
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisToolExecutable,
@@ -91,6 +99,42 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     public function getVersion(): string
     {
         return $this->version ??= $this->retrieveVersion();
+    }
+
+    public function assertMinimumVersionSatisfied(): void
+    {
+        $version = $this->getVersion();
+        $majorVersion = (int) explode('.', $version)[0];
+
+        // we assume all versions greater than 2.1.17 have needed functionality
+        if ($majorVersion > self::VERSION_2) {
+            return;
+        }
+
+        if (
+            $majorVersion === self::VERSION_2
+            && (
+                version_compare($version, '2.1.17', '>=')
+                || str_starts_with($version, '2.1.x-dev') // allow dev versions for development
+            )
+        ) {
+            return;
+        }
+
+        if (
+            $majorVersion === self::VERSION_1
+            && (
+                version_compare($version, '1.12.27', '>=')
+                || str_starts_with($version, '1.12.x-dev') // allow dev versions for development
+            )
+        ) {
+            return;
+        }
+
+        throw new RuntimeException(sprintf(
+            'Infection requires PHPStan version >=1.12.27 or >=2.1.17, but "%s" is installed.',
+            $version,
+        ));
     }
 
     private function retrieveVersion(): string

@@ -52,4 +52,6 @@ interface StaticAnalysisToolAdapter
     public function createMutantProcessFactory(): LazyMutantProcessFactory;
 
     public function getVersion(): string;
+
+    public function assertMinimumVersionSatisfied(): void;
 }
