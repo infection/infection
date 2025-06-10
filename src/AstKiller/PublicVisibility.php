@@ -36,12 +36,14 @@ declare(strict_types=1);
 namespace Infection\AstKiller;
 
 use function array_key_exists;
+use function array_reverse;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use function is_string;
 use PhpParser\Node;
 use ReflectionException;
+use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 
@@ -66,69 +68,91 @@ class PublicVisibility implements AstKiller
         if (!$node instanceof Node\Expr\MethodCall) {
             return;
         }
-
-        if (!$node->var instanceof Node\Expr\PropertyFetch) {
-            return;
-        }
-
-        if (!$node->var->var instanceof Node\Expr\Variable) {
-            return;
-        }
-
-        if (!is_string($node->var->var->name)) {
-            return;
-        }
-
-        if ($node->var->var->name !== 'this') {
-            return;
-        }
-
-        $propertyName = $node->var->name;
-
-        if (!$propertyName instanceof Node\Identifier) {
-            return;
-        }
-
-        $methodName = $node->name;
-
-        if (!$methodName instanceof Node\Identifier) {
-            return;
-        }
-
         /** @var ClassReflection $class */
         $class = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
-        if (
-            array_key_exists($class->getName(), $this->propertyTypes)
-            && array_key_exists($propertyName->name, $this->propertyTypes[$class->getName()])
-        ) {
-            $propertyTypeName = $this->propertyTypes[$class->getName()][$propertyName->name];
-        } else {
-            $propertyTypeName = null;
+        $astChain = [];
 
-            try {
-                $propertyReflection = new ReflectionProperty(
-                    $class->getName(),
-                    $propertyName->name,
-                );
-
-                $propertyType = $propertyReflection->getType();
-
-                if ($propertyType instanceof ReflectionNamedType && !$propertyType->isBuiltin()) {
-                    $propertyTypeName = $propertyType->getName();
-                }
-            } catch (ReflectionException) {
-                // If the reflection information does not exist, we cannot determine its type
-            }
-
-            $this->propertyTypes[$class->getName()][$propertyName->name] = $propertyTypeName;
+        while ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\PropertyFetch) {
+            $astChain[] = $node;
+            $node = $node->var;
         }
 
-        if ($propertyTypeName === null) {
+        if ($astChain === [] || !$node instanceof Node\Expr\Variable) {
             return;
         }
 
-        $this->seenMethods[$propertyTypeName][$methodName->name] = true;
+        if (!is_string($node->name)) {
+            return;
+        }
+
+        if ($node->name !== 'this') {
+            return;
+        }
+
+        $typeName = null;
+
+        foreach (array_reverse($astChain) as $chainElement) {
+            if ($chainElement instanceof Node\Expr\MethodCall) {
+                if ($typeName === null) {
+                    return;
+                }
+
+                $methodName = $chainElement->name;
+
+                if (!$methodName instanceof Node\Identifier) {
+                    return;
+                }
+
+                $this->seenMethods[$typeName][$methodName->name] = true;
+
+                try {
+                    $reflectionMethod = new ReflectionMethod($typeName, $methodName->name);
+                    $returnType = $reflectionMethod->getReturnType();
+
+                    if (!$returnType instanceof ReflectionNamedType || $returnType->isBuiltin()) {
+                        return;
+                    }
+                    $typeName = $returnType->getName();
+                } catch (ReflectionException) {
+                    // If the reflection information does not exist, we cannot determine its type
+                }
+            }
+
+            if ($chainElement instanceof Node\Expr\PropertyFetch) {
+                $propertyName = $chainElement->name;
+
+                if (!$propertyName instanceof Node\Identifier) {
+                    return;
+                }
+
+                if (
+                    array_key_exists($class->getName(), $this->propertyTypes)
+                    && array_key_exists($propertyName->name, $this->propertyTypes[$class->getName()])
+                ) {
+                    $typeName = $this->propertyTypes[$class->getName()][$propertyName->name];
+                } else {
+                    $typeName = null;
+
+                    try {
+                        $propertyReflection = new ReflectionProperty(
+                            $class->getName(),
+                            $propertyName->name,
+                        );
+
+                        $propertyType = $propertyReflection->getType();
+
+                        if ($propertyType instanceof ReflectionNamedType && !$propertyType->isBuiltin()) {
+                            $typeName = $propertyType->getName();
+                        }
+                    } catch (ReflectionException) {
+                        // If the reflection information does not exist, we cannot determine its type
+                    }
+
+                    $this->propertyTypes[$class->getName()][$propertyName->name] = $typeName;
+                }
+            }
+        }
     }
 
     public function killsMutation(Mutation $mutation): bool
