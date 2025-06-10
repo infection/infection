@@ -142,6 +142,10 @@
             "description": "PHPStan additional settings.",
             "additionalProperties": false,
             "properties": {
+                "configDir": {
+                    "type": "string",
+                    "description": "Path to directory containing PHPStan configuration file."
+                },
                 "customPath": {
                     "type": "string",
                     "description": "Custom path to PHPStan executable."

@@ -103,7 +103,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->with('/path/to/phpstan', [], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
-                "--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
@@ -117,12 +117,12 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->with(
                 '/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
                 <<<NEON
-                    includes:
-                        - /path/to/phpstan-config-folder
-                    parameters:
-                        parallel:
-                            maximumNumberOfProcesses: 1
-                NEON
+                        includes:
+                            - /path/to/phpstan-config-folder
+                        parameters:
+                            parallel:
+                                maximumNumberOfProcesses: 1
+                    NEON,
             );
 
         $factory = new PHPStanMutantProcessFactory(

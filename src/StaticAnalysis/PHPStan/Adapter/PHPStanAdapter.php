@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
-use Symfony\Component\Filesystem\Filesystem;
 use function explode;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
@@ -46,6 +45,7 @@ use Infection\TestFramework\VersionParser;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use function version_compare;
 

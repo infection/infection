@@ -47,8 +47,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Symfony\Component\Filesystem\Filesystem;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(PHPStanAdapter::class)]

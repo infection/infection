@@ -301,7 +301,7 @@ final class Container
             ),
             StaticAnalysisConfigLocator::class => static function (self $container): StaticAnalysisConfigLocator {
                 return new StaticAnalysisConfigLocator(
-                    '/opt/infection/tests/e2e/PHPStan_Integration',// (string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
+                    (string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
                 );
             },
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(

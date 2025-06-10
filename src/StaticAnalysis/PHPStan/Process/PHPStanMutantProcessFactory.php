@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
-use Symfony\Component\Filesystem\Filesystem;
-use function file_put_contents;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
