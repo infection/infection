@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use Symfony\Component\Filesystem\Filesystem;
 use function explode;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
@@ -57,7 +58,8 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     private const VERSION_2 = 2;
 
     public function __construct(
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly Filesystem $fileSystem,
+        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
@@ -91,6 +93,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     public function createMutantProcessFactory(): LazyMutantProcessFactory
     {
         return new PHPStanMutantProcessFactory(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
             $this->staticAnalysisConfigPath,
             $this->staticAnalysisToolExecutable,

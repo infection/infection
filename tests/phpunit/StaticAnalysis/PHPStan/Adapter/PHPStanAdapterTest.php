@@ -47,6 +47,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 use function sprintf;
 
 #[Group('integration')]
@@ -58,13 +59,16 @@ final class PHPStanAdapterTest extends TestCase
     private commandLineBuilder&MockObject $commandLineBuilder;
 
     private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
+    private Filesystem&MockObject $fileSystem;
 
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->mutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $this->fileSystem = $this->createMock(Filesystem::class);
 
         $this->adapter = new PHPStanAdapter(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -110,6 +114,7 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_accepts_valid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',
@@ -130,6 +135,7 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
             '/path/to/phpstan-config-path',
             '/path/to/phpstan',

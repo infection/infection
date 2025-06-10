@@ -40,6 +40,7 @@ use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -53,6 +54,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         string $tmpDir,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
+            new Filesystem(),
             new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,

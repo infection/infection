@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
+use Symfony\Component\Filesystem\Filesystem;
 use function file_put_contents;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
@@ -50,6 +51,7 @@ use Symfony\Component\Process\Process;
 final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
     public function __construct(
+        private readonly Filesystem $fileSystem,
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
@@ -110,7 +112,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             $mutationHash,
         );
 
-        file_put_contents(
+        $this->fileSystem->dumpFile(
             $mutantConfigPath,
             <<<NEON
                     includes:

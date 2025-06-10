@@ -48,9 +48,10 @@ use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
-#[CoversClass(PHPStanMutantProcessFactory::class)]
 #[Group('integration')]
+#[CoversClass(PHPStanMutantProcessFactory::class)]
 final class PHPStanMutantProcessFactoryTest extends TestCase
 {
     public function test_it_creates_a_process_with_timeout(): void
@@ -110,7 +111,22 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                '/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                <<<NEON
+                    includes:
+                        - /path/to/phpstan-config-folder
+                    parameters:
+                        parallel:
+                            maximumNumberOfProcesses: 1
+                NEON
+            );
+
         $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
             $phpStanMutantExecutionResultFactory,
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
