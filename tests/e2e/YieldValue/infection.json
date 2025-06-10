@@ -1,4 +1,5 @@
 {
+    "$schema": "../../../resources/schema.json",
     "timeout": 25,
     "source": {
         "directories": [
@@ -10,7 +11,7 @@
         "YieldValue": true
     },
     "logs": {
-        "perMutator": "infection.log"
+        "debug": "infection.log"
     },
     "tmpDir": "."
 }
