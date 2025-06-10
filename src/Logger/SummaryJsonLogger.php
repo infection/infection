@@ -57,7 +57,7 @@ final readonly class SummaryJsonLogger implements LineMutationTestingResultsLogg
         $data = [
             'stats' => [
                 'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
-                'killedCount' => $this->metricsCalculator->getKilledCount(),
+                'killedCount' => $this->metricsCalculator->getKilledByTestsCount(),
                 'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
                 'escapedCount' => $this->metricsCalculator->getEscapedCount(),
                 'errorCount' => $this->metricsCalculator->getErrorCount(),

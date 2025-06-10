@@ -360,7 +360,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
             $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
             'failed',
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
             $mutantDiff,
             $mutatorName,
             $originalFilePath,

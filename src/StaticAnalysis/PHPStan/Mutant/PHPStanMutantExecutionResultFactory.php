@@ -107,6 +107,6 @@ class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactor
             return DetectionStatus::ESCAPED;
         }
 
-        return DetectionStatus::KILLED;
+        return DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
     }
 }

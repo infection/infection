@@ -150,7 +150,8 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledCount()) . '</options=bold> mutants were killed');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByTestsCount()) . '</options=bold> mutants were killed by Test Framework');
+        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByStaticAnalysisCount()) . '</options=bold> mutants were killed by Static Analysis');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getIgnoredCount()) . '</options=bold> mutants were configured to be ignored');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');

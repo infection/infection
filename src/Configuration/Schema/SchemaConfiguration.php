@@ -69,6 +69,7 @@ final class SchemaConfiguration
         private readonly ?string $bootstrap,
         private readonly ?string $initialTestsPhpOptions,
         private readonly ?string $testFrameworkExtraOptions,
+        private readonly string|int|null $threads,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
@@ -152,5 +153,10 @@ final class SchemaConfiguration
     public function getTestFrameworkExtraOptions(): ?string
     {
         return $this->testFrameworkExtraOptions;
+    }
+
+    public function getThreads(): string|int|null
+    {
+        return $this->threads;
     }
 }

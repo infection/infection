@@ -90,9 +90,14 @@ class MetricsCalculator implements Collector
         return $this->roundingPrecision;
     }
 
-    public function getKilledCount(): int
+    public function getKilledByTestsCount(): int
     {
-        return $this->countByStatus[DetectionStatus::KILLED];
+        return $this->countByStatus[DetectionStatus::KILLED_BY_TESTS];
+    }
+
+    public function getKilledByStaticAnalysisCount(): int
+    {
+        return $this->countByStatus[DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
     }
 
     public function getErrorCount(): int

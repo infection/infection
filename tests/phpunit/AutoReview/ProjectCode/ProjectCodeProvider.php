@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
-use function array_map;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
@@ -90,6 +89,7 @@ use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use function ltrim;
+use function Pipeline\take;
 use ReflectionClass;
 use function sort;
 use const SORT_STRING;
@@ -197,19 +197,11 @@ final class ProjectCodeProvider
             ->in(__DIR__ . '/../../../../src')
         ;
 
-        $classes = array_map(
-            static fn (SplFileInfo $file): string => sprintf(
-                '%s\\%s%s%s',
-                'Infection',
-                str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                $file->getRelativePath() !== '' ? '\\' : '',
-                $file->getBasename('.' . $file->getExtension()),
-            ),
-            iterator_to_array($finder, false),
-        );
-        sort($classes, SORT_STRING);
+        self::$sourceClasses = take($finder)
+            ->cast(self::castSplFileInfoToFQCN(...))
+            ->toList();
 
-        self::$sourceClasses = $classes;
+        sort(self::$sourceClasses, SORT_STRING);
 
         yield from self::$sourceClasses;
     }
@@ -299,24 +291,11 @@ final class ProjectCodeProvider
             ])
         ;
 
-        $classes = array_map(
-            static function (SplFileInfo $file): string {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
-                $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+        self::$testClasses = take($finder)
+            ->cast(self::castTestSplFileInfoToFQCN(...))
+            ->toList();
 
-                return sprintf(
-                    'Infection\\Tests\\%s%s%s',
-                    $fqcnPart,
-                    $file->getRelativePath() === 'phpunit' ? '' : '\\',
-                    $file->getBasename('.' . $file->getExtension()),
-                );
-            },
-            iterator_to_array($finder, false),
-        );
-
-        sort($classes, SORT_STRING);
-
-        self::$testClasses = $classes;
+        sort(self::$testClasses, SORT_STRING);
 
         yield from self::$testClasses;
     }
@@ -341,6 +320,30 @@ final class ProjectCodeProvider
     {
         yield from generator_to_phpunit_data_provider(
             self::NON_FINAL_EXTENSION_CLASSES,
+        );
+    }
+
+    private static function castSplFileInfoToFQCN(SplFileInfo $file): string
+    {
+        return sprintf(
+            '%s\\%s%s%s',
+            'Infection',
+            str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
+            $file->getRelativePath() !== '' ? '\\' : '',
+            $file->getBasename('.' . $file->getExtension()),
+        );
+    }
+
+    private static function castTestSplFileInfoToFQCN(SplFileInfo $file): string
+    {
+        $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
+        $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+
+        return sprintf(
+            'Infection\\Tests\\%s%s%s',
+            $fqcnPart,
+            $file->getRelativePath() === 'phpunit' ? '' : '\\',
+            $file->getBasename('.' . $file->getExtension()),
         );
     }
 }

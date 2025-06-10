@@ -49,7 +49,7 @@ final class MetricsCalculatorTest extends TestCase
     {
         $calculator = new MetricsCalculator(2);
 
-        $this->assertSame(0, $calculator->getKilledCount());
+        $this->assertSame(0, $calculator->getKilledByTestsCount());
         $this->assertSame(0, $calculator->getErrorCount());
         $this->assertSame(0, $calculator->getEscapedCount());
         $this->assertSame(0, $calculator->getTimedOutCount());
@@ -67,7 +67,7 @@ final class MetricsCalculatorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_TESTS,
             7,
         );
         $expectedErrorResults = $this->addMutantExecutionResult(
@@ -91,7 +91,7 @@ final class MetricsCalculatorTest extends TestCase
             1,
         );
 
-        $this->assertSame(7, $calculator->getKilledCount());
+        $this->assertSame(7, $calculator->getKilledByTestsCount());
         $this->assertSame(2, $calculator->getErrorCount());
         $this->assertSame(2, $calculator->getEscapedCount());
         $this->assertSame(2, $calculator->getTimedOutCount());
@@ -107,7 +107,7 @@ final class MetricsCalculatorTest extends TestCase
     {
         $calculator = new MetricsCalculator(2);
 
-        $this->assertSame(0, $calculator->getKilledCount());
+        $this->assertSame(0, $calculator->getKilledByTestsCount());
 
         $this->assertSame(0.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(0.0, $calculator->getCoverageRate());
@@ -115,11 +115,11 @@ final class MetricsCalculatorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $calculator,
-            DetectionStatus::KILLED,
+            DetectionStatus::KILLED_BY_TESTS,
             1,
         );
 
-        $this->assertSame(1, $calculator->getKilledCount());
+        $this->assertSame(1, $calculator->getKilledByTestsCount());
 
         $this->assertSame(100.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(100.0, $calculator->getCoverageRate());

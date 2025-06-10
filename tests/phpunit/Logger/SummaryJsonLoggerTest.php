@@ -89,7 +89,7 @@ final class SummaryJsonLoggerTest extends TestCase
             self::createCompleteMetricsCalculator(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 16,
+                    'totalMutantsCount' => 17,
                     'killedCount' => 2,
                     'notCoveredCount' => 2,
                     'escapedCount' => 2,
@@ -98,9 +98,9 @@ final class SummaryJsonLoggerTest extends TestCase
                     'skippedCount' => 2,
                     'ignoredCount' => 2,
                     'timeOutCount' => 2,
-                    'msi' => 66.67,
-                    'mutationCodeCoverage' => 83.33,
-                    'coveredCodeMsi' => 80,
+                    'msi' => 69.23,
+                    'mutationCodeCoverage' => 84.62,
+                    'coveredCodeMsi' => 81.82,
                 ],
             ],
         ];

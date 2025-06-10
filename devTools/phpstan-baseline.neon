@@ -331,12 +331,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
-			message: '#^Static property Infection\\Tests\\AutoReview\\IntegrationGroup\\IntegrationGroupProvider\:\:\$ioTestCaseClassesTuple \(array\<array\<string\>\>\|null\) does not accept array\<array\<bool\|string\>\>\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
-
-		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 1

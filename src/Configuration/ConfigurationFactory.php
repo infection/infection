@@ -55,7 +55,10 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_numeric;
+use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
@@ -105,7 +108,7 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         string $filter,
-        int $threadCount,
+        ?int $threadCount,
         bool $dryRun,
         ?string $gitDiffFilter,
         bool $isForGitDiffLines,
@@ -170,7 +173,7 @@ class ConfigurationFactory
             $showMutations,
             self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
             $msiPrecision,
-            $threadCount,
+            $this->retrieveThreadCount($threadCount, $schema),
             $dryRun,
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
@@ -396,5 +399,30 @@ class ConfigurationFactory
         }
 
         return sprintf('%s/%s', $configDir, $path);
+    }
+
+    private function retrieveThreadCount(?int $threadCount, SchemaConfiguration $schema): int
+    {
+        // user passed `--threads` option, already validated
+        if ($threadCount !== null) {
+            return $threadCount;
+        }
+
+        $threadsFromSchema = $schema->getThreads();
+
+        if ($threadsFromSchema === null) {
+            return 1;
+        }
+
+        // config has numeric string or integer value
+        if (is_numeric($threadsFromSchema)) {
+            return (int) $threadsFromSchema;
+        }
+
+        // config has `max` thread count
+        Assert::same($threadsFromSchema, 'max', sprintf('The value of key `threads` in configuration file must be of type integer or string "max". String "%s" provided.', $threadsFromSchema));
+
+        // we subtract 1 here to not use all the available cores by Infection
+        return max(1, CpuCoresCountProvider::provide() - 1);
     }
 }

@@ -287,7 +287,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $collector->collect(
             // this tests diffs on the method signature line
             self::createMutantExecutionResult(
-                DetectionStatus::KILLED,
+                DetectionStatus::KILLED_BY_TESTS,
                 <<<'DIFF'
                     @@ @@
                      use function array_fill_keys;
@@ -396,7 +396,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             ),
             // add one test for the second file
             self::createMutantExecutionResult(
-                DetectionStatus::KILLED,
+                DetectionStatus::KILLED_BY_TESTS,
                 <<<'DIFF'
                     @@ @@
                      use function array_fill_keys;
@@ -422,7 +422,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             //
             // with non UTF-8 character
             self::createMutantExecutionResult(
-                DetectionStatus::KILLED,
+                DetectionStatus::KILLED_BY_TESTS,
                 <<<'DIFF'
                     @@ @@
                      use function array_fill_keys;

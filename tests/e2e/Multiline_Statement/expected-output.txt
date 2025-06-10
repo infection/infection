@@ -46,6 +46,9 @@ Mutator: Multiplication
 Line 22
 
 
+Killed by Static Analysis mutants:
+==================================
+
 Errors mutants:
 ===============
 
