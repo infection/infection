@@ -47,12 +47,14 @@ use Infection\TestFramework\VersionParser;
 final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
     public static function create(
+        string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,
         string $tmpDir,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
             new PHPStanMutantExecutionResultFactory(),
+            $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,
             new CommandLineBuilder(),
             new VersionParser(),

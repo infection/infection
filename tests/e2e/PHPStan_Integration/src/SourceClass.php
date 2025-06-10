@@ -2,8 +2,6 @@
 
 namespace PHPStan_Integration;
 
-use function is_string;
-
 class SourceClass
 {
     /**

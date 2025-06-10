@@ -52,6 +52,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
     public function __construct(
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly float $timeout,
@@ -110,17 +111,14 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             $mutationHash,
         );
 
-        var_dump($mutantConfigPath);
-
         file_put_contents(
             $mutantConfigPath,
             <<<NEON
+                includes:
+                    - $this->staticAnalysisConfigPath
                 parameters:
                     parallel:
                         maximumNumberOfProcesses: 1
-                    level: max
-                    paths:
-                        - src
             NEON
         );
 

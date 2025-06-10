@@ -58,6 +58,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
     public function __construct(
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
@@ -91,6 +92,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     {
         return new PHPStanMutantProcessFactory(
             $this->mutantExecutionResultFactory,
+            $this->staticAnalysisConfigPath,
             $this->staticAnalysisToolExecutable,
             $this->commandLineBuilder,
             $this->timeout,

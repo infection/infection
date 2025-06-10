@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -282,6 +283,7 @@ final class Container
                     $config,
                     $container->getProjectDir(),
                     $container->getStaticAnalysisToolExecutableFinder(),
+                    $container->getStaticAnalysisConfigLocator(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -297,6 +299,11 @@ final class Container
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
+            StaticAnalysisConfigLocator::class => function(self $container): StaticAnalysisConfigLocator {
+                return new StaticAnalysisConfigLocator(
+                    '/opt/infection/tests/e2e/PHPStan_Integration'//(string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
+                );
+            },
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
             ),
@@ -1031,6 +1038,11 @@ final class Container
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
     {
         return $this->get(TestFrameworkConfigLocator::class);
+    }
+
+    private function getStaticAnalysisConfigLocator(): StaticAnalysisConfigLocator
+    {
+        return $this->get(StaticAnalysisConfigLocator::class);
     }
 
     private function getProcessRunner(): ProcessRunner
