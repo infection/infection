@@ -299,7 +299,7 @@ final class Container
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
-            StaticAnalysisConfigLocator::class => static fn(self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
+            StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
                 (string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
             ),
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(

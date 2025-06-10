@@ -10,13 +10,16 @@
             "FileSystem/DummySymfony5FileSystem.php",
             "FileSystem/DummySymfony6FileSystem.php",
             "CustomMutator/templates/__Name__.php",
-            "CustomMutator/templates/__Name__Test.php",
+            "CustomMutator/templates/__Name__Test.php"
         ]
     },
     "logs": {
         "stryker": {
             "report": "master"
         }
+    },
+    phpStan: {
+        configDir: "devTools"
     },
     "mutators": {
         "global-ignoreSourceCodeByRegex": [
