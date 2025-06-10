@@ -265,7 +265,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            '',
+            '', // mutators input
             null,
             null,
             '',
@@ -772,6 +772,7 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'mutators from config & input' => self::createValueForMutators(
             [
                 '@default' => true,
+                'global-ignoreSourceCodeByRegex' => ['Assert::.*'],
                 'MethodCallRemoval' => (object) [
                     'ignore' => [
                         'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
@@ -780,10 +781,14 @@ final class ConfigurationFactoryTest extends TestCase
             ],
             'AssignmentEqual,EqualIdentical',
             false,
-            (static fn (): array => [
+            [
                 'AssignmentEqual' => new AssignmentEqual(),
                 'EqualIdentical' => new EqualIdentical(),
-            ])(),
+            ],
+            [
+                'AssignmentEqual' => ['Assert::.*'],
+                'EqualIdentical' => ['Assert::.*'],
+            ],
         );
 
         yield 'with source files' => [
@@ -2304,12 +2309,14 @@ final class ConfigurationFactoryTest extends TestCase
 
     /**
      * @param array<string, Mutator> $expectedMutators
+     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     private static function createValueForMutators(
         array $configMutators,
         string $inputMutators,
         bool $useNoopMutatos,
         array $expectedMutators,
+        array $expectedIgnoreSourceCodeMutatorsMap = [],
     ): array {
         return [
             false,
@@ -2382,7 +2389,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             false,
             null,
-            [],
+            $expectedIgnoreSourceCodeMutatorsMap,
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,

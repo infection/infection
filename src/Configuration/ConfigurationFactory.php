@@ -217,6 +217,10 @@ class ConfigurationFactory
             $mutatorsList = $schemaMutators;
         } else {
             $mutatorsList = array_fill_keys($parsedMutatorsInput, true);
+
+            if (array_key_exists('global-ignoreSourceCodeByRegex', $schemaMutators)) {
+                $mutatorsList['global-ignoreSourceCodeByRegex'] = $schemaMutators['global-ignoreSourceCodeByRegex'];
+            }
         }
 
         return $this->mutatorResolver->resolve($mutatorsList);
