@@ -60,7 +60,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $runner->run([]);
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     public function test_it_starts_the_given_processes(): void

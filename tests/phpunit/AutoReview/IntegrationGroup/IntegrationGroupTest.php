@@ -63,7 +63,7 @@ final class IntegrationGroupTest extends TestCase
             $instance = $groupAttribute->newInstance();
 
             if ($instance->name() === 'integration') {
-                $this->addToAssertionCount(1);
+                $this->assertTrue(true);
 
                 return;
             }

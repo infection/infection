@@ -57,7 +57,7 @@ abstract class BaseNodeIgnorerTestCase extends TestCase
         $traverser->addVisitor($spy);
         $traverser->traverse($nodes);
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     protected function createSpy(): IgnoreSpyVisitor

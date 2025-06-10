@@ -172,7 +172,7 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
         $this->provider->getTestFileInfo('ExampleTest');
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     public static function xmlProvider(): iterable

@@ -76,7 +76,7 @@ final class IntegrationGroupProviderTest extends TestCase
     {
         foreach (IntegrationGroupProvider::ioTestCaseTupleProvider() as $tuple) {
             if ($tuple[0] === E2ETest::class) {
-                $this->addToAssertionCount(1);
+                $this->assertTrue(true);
 
                 return;
             }

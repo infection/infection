@@ -170,7 +170,7 @@ final class CoverageCheckerTest extends TestCase
 
         $checker->checkCoverageExists();
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_with_lambda_test_framework_adapter(): void
@@ -274,7 +274,7 @@ final class CoverageCheckerTest extends TestCase
 
         $checker->checkCoverageExists();
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     public function test_it_does_not_pass_existence_check_if_junit_file_is_missing_with_junit_report_with_lambda_test_framework_adapter(): void
@@ -387,7 +387,7 @@ final class CoverageCheckerTest extends TestCase
             'Ok!',
         );
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     public function test_it_passes_existence_check_if_xml_index_and_junit_files_are_found_after_tests_run_without_junit_report(): void
@@ -408,7 +408,7 @@ final class CoverageCheckerTest extends TestCase
             'Ok!',
         );
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     public function test_it_does_not_pass_existence_check_if_xml_index_is_missing_after_tests_run(): void
@@ -499,7 +499,7 @@ final class CoverageCheckerTest extends TestCase
             'Ok!',
         );
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     private function requireNoPhpDbg(): void

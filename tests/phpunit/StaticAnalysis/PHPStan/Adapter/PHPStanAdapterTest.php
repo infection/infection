@@ -119,7 +119,7 @@ final class PHPStanAdapterTest extends TestCase
         // This should not throw an exception
         $adapter->assertMinimumVersionSatisfied();
 
-        $this->addToAssertionCount(1);
+        $this->assertTrue(true);
     }
 
     #[DataProvider('provideInvalidVersions')]

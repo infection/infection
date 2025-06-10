@@ -56,7 +56,7 @@ final class SubscriberTest extends TestCase
         $subscriberMethods = (new ReflectionClass($subscriberClass))->getMethods();
 
         if (count($subscriberMethods) === 0) {
-            $this->addToAssertionCount(1);
+            $this->assertTrue(true);
 
             return;
         }

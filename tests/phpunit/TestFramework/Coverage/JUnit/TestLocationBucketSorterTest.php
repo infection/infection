@@ -166,7 +166,7 @@ final class TestLocationBucketSorterTest extends TestCase
 
         if (self::areConstraintsOrderValid($uniqueTestLocations)) {
             // Ignore silently as to not pollute to the log.
-            $this->addToAssertionCount(1);
+            $this->assertTrue(true);
 
             return;
         }
