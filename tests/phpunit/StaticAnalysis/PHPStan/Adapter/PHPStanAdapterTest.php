@@ -90,11 +90,15 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+            ->with('/path/to/phpstan', [], ['--configuration=/path/to/phpstan-config-path'])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
         ;
 
-        $this->assertSame(['/usr/bin/php', '/path/to/phpstan'], $this->adapter->getInitialRunCommandLine());
+        $this->assertSame([
+            '/usr/bin/php',
+            '/path/to/phpstan',
+            '--configuration=/path/to/phpstan-config-path',
+        ], $this->adapter->getInitialRunCommandLine());
     }
 
     public function test_it_returns_version(): void

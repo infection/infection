@@ -86,7 +86,10 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
-            [], // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
+            [
+                "--configuration=$this->staticAnalysisConfigPath",
+                // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
+            ],
         );
     }
 
