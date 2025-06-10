@@ -81,14 +81,14 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
                 (string) $calculator->getTotalMutantsCount(),
                 (string) $calculator->getKilledByTestsCount(),
                 sprintf(
-                    '%s / %s / %s',
+                    '%s / %s / %s secs',
                     self::formatTiming($calculator->getTestsMinimumRuntime()),
                     self::formatTiming($calculator->getTestsAverageRuntime()),
                     self::formatTiming($calculator->getTestsMaximumRuntime()),
                 ),
                 (string) $calculator->getKilledByStaticAnalysisCount(),
                 sprintf(
-                    '%s / %s / %s',
+                    '%s / %s / %s secs',
                     self::formatTiming($calculator->getStaticAnalysisMinimumRuntime()),
                     self::formatTiming($calculator->getStaticAnalysisAverageRuntime()),
                     self::formatTiming($calculator->getStaticAnalysisMaximumRuntime()),
