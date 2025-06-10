@@ -55,7 +55,7 @@ final class DetectionStatus
     public const IGNORED = 'ignored';
 
     /**
-     * @var array<self::*
+     * @var array<self::*>
      */
     public const ALL = [
         self::KILLED_BY_TESTS,
