@@ -206,6 +206,7 @@ final class SortableMutantExecutionResultsTest extends TestCase
             now('<?php $a = 1;'),
             now('<?php $a = 1;'),
             [],
+            0.0,
         );
     }
 }

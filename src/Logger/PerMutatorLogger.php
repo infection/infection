@@ -70,7 +70,7 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
         $calculatorPerMutator = $this->createMetricsPerMutators();
 
         $table = [
-            ['Mutator', 'Mutations', 'Killed by Test Framework', 'Killed by Static Analysis', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'Ignored', 'MSI (%s)', 'Covered MSI (%s)'],
+            ['Mutator', 'Mutations', 'Killed by Test Framework', 'Test Timings min/avg/max', 'Killed by Static Analysis', 'Static Analysis Timings min/avg/max', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'Ignored', 'MSI (%s)', 'Covered MSI (%s)'],
         ];
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {
@@ -80,7 +80,19 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
                 $mutatorName,
                 (string) $calculator->getTotalMutantsCount(),
                 (string) $calculator->getKilledByTestsCount(),
+                sprintf(
+                    '%s / %s / %s',
+                    self::formatTiming($calculator->getTestsMinimumRuntime()),
+                    self::formatTiming($calculator->getTestsAverageRuntime()),
+                    self::formatTiming($calculator->getTestsMaximumRuntime()),
+                ),
                 (string) $calculator->getKilledByStaticAnalysisCount(),
+                sprintf(
+                    '%s / %s / %s',
+                    self::formatTiming($calculator->getStaticAnalysisMinimumRuntime()),
+                    self::formatTiming($calculator->getStaticAnalysisAverageRuntime()),
+                    self::formatTiming($calculator->getStaticAnalysisMaximumRuntime()),
+                ),
                 (string) $calculator->getEscapedCount(),
                 (string) $calculator->getErrorCount(),
                 (string) $calculator->getSyntaxErrorCount(),
@@ -98,6 +110,14 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
         array_unshift($logs, '# Effects per Mutator', '');
 
         return $logs;
+    }
+
+    private static function formatTiming(float $timing): string
+    {
+        return sprintf(
+            '%0.2f',
+            round($timing, self::ROUND_PRECISION, PHP_ROUND_HALF_UP),
+        );
     }
 
     private static function formatScore(float $score): string

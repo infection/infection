@@ -54,6 +54,9 @@ final class DetectionStatus
     public const NOT_COVERED = 'not covered';
     public const IGNORED = 'ignored';
 
+    /**
+     * @var array<self::*
+     */
     public const ALL = [
         self::KILLED_BY_TESTS,
         self::KILLED_BY_STATIC_ANALYSIS,
