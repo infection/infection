@@ -38,6 +38,7 @@ namespace Infection\Process;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
+use function microtime;
 use Symfony\Component\Process\Process;
 
 /**
@@ -47,6 +48,8 @@ use Symfony\Component\Process\Process;
 class MutantProcess
 {
     private bool $timedOut = false;
+
+    private float $finishedAt = 0.0;
 
     public function __construct(
         private readonly Process $process,
@@ -73,6 +76,16 @@ class MutantProcess
     public function isTimedOut(): bool
     {
         return $this->timedOut;
+    }
+
+    public function markAsFinished(): void
+    {
+        $this->finishedAt = microtime(true);
+    }
+
+    public function getFinishedAt(): float
+    {
+        return $this->finishedAt;
     }
 
     public function getMutantExecutionResult(): MutantExecutionResult
