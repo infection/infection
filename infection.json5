@@ -18,8 +18,8 @@
             "report": "master"
         }
     },
-    phpStan: {
-        configDir: "devTools"
+    "phpStan": {
+        "configDir": "devTools"
     },
     "mutators": {
         "global-ignoreSourceCodeByRegex": [
