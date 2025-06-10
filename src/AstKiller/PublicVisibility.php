@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\AstKiller;
 
-use ReflectionException;
 use function array_key_exists;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use function is_string;
 use PhpParser\Node;
+use ReflectionException;
 use ReflectionNamedType;
 use ReflectionProperty;
 
@@ -53,9 +52,9 @@ class PublicVisibility implements AstKiller
      */
     private array $seenMethods = [];
     /**
-     * @var array<string, array<string, bool>>
+     * @var array<string, array<string, string|null>>
      */
-    private array $seenProperties = [];
+    private array $propertyTypes = [];
 
     public function getMutatorClass(): string
     {
@@ -100,30 +99,36 @@ class PublicVisibility implements AstKiller
         $class = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
         if (
-            array_key_exists($class->getName(), $this->seenProperties)
-            && array_key_exists($propertyName->name, $this->seenProperties[$class->getName()])
+            array_key_exists($class->getName(), $this->propertyTypes)
+            && array_key_exists($propertyName->name, $this->propertyTypes[$class->getName()])
         ) {
+            $propertyTypeName = $this->propertyTypes[$class->getName()][$propertyName->name];
+        } else {
+            $propertyTypeName = null;
+
+            try {
+                $propertyReflection = new ReflectionProperty(
+                    $class->getName(),
+                    $propertyName->name,
+                );
+
+                $propertyType = $propertyReflection->getType();
+
+                if ($propertyType instanceof ReflectionNamedType && !$propertyType->isBuiltin()) {
+                    $propertyTypeName = $propertyType->getName();
+                }
+            } catch (ReflectionException) {
+                // If the reflection information does not exist, we cannot determine its type
+            }
+
+            $this->propertyTypes[$class->getName()][$propertyName->name] = $propertyTypeName;
+        }
+
+        if ($propertyTypeName === null) {
             return;
         }
-        $this->seenProperties[$class->getName()][$propertyName->name] = true;
 
-        try {
-            $propertyReflection = new ReflectionProperty(
-                $class->getName(),
-                $propertyName->name,
-            );
-        } catch (ReflectionException) {
-            // If the reflection information does not exist, we cannot determine its type
-            return;
-        }
-
-        $propertyType = $propertyReflection->getType();
-
-        if (!$propertyType instanceof ReflectionNamedType) {
-            return;
-        }
-
-        $this->seenMethods[$propertyType->getName()][$methodName->name] = true;
+        $this->seenMethods[$propertyTypeName][$methodName->name] = true;
     }
 
     public function killsMutation(Mutation $mutation): bool
