@@ -42,6 +42,7 @@ use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use function is_string;
 use PhpParser\Node;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -53,10 +54,6 @@ class PublicVisibility implements AstKiller
      * @var array<string, array<string, bool>>
      */
     private array $seenMethods = [];
-    /**
-     * @var array<string, array<string, string|null>>
-     */
-    private array $propertyTypes = [];
 
     public function getMutatorClass(): string
     {
@@ -73,12 +70,17 @@ class PublicVisibility implements AstKiller
 
         $astChain = [];
 
-        while ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\PropertyFetch) {
+        while (
+            $node instanceof Node\Expr\MethodCall
+            || $node instanceof Node\Expr\NullsafeMethodCall
+            || $node instanceof Node\Expr\PropertyFetch
+            || $node instanceof Node\Expr\NullsafePropertyFetch
+        ) {
             $astChain[] = $node;
             $node = $node->var;
         }
 
-        if ($astChain === [] || !$node instanceof Node\Expr\Variable) {
+        if ($class === null || $astChain === [] || !$node instanceof Node\Expr\Variable) {
             return;
         }
 
@@ -90,14 +92,10 @@ class PublicVisibility implements AstKiller
             return;
         }
 
-        $typeName = null;
+        $typeName = $class->getName();
 
         foreach (array_reverse($astChain) as $chainElement) {
-            if ($chainElement instanceof Node\Expr\MethodCall) {
-                if ($typeName === null) {
-                    return;
-                }
-
+            if ($chainElement instanceof Node\Expr\MethodCall || $chainElement instanceof Node\Expr\NullsafeMethodCall) {
                 $methodName = $chainElement->name;
 
                 if (!$methodName instanceof Node\Identifier) {
@@ -113,43 +111,33 @@ class PublicVisibility implements AstKiller
                     if (!$returnType instanceof ReflectionNamedType || $returnType->isBuiltin()) {
                         return;
                     }
-                    $typeName = $returnType->getName();
+                    $typeName = $this->resolveName($typeName, $returnType->getName());
                 } catch (ReflectionException) {
-                    // If the reflection information does not exist, we cannot determine its type
+                    return;
                 }
             }
 
-            if ($chainElement instanceof Node\Expr\PropertyFetch) {
+            if ($chainElement instanceof Node\Expr\PropertyFetch || $chainElement instanceof Node\Expr\NullsafePropertyFetch) {
                 $propertyName = $chainElement->name;
 
                 if (!$propertyName instanceof Node\Identifier) {
                     return;
                 }
 
-                if (
-                    array_key_exists($class->getName(), $this->propertyTypes)
-                    && array_key_exists($propertyName->name, $this->propertyTypes[$class->getName()])
-                ) {
-                    $typeName = $this->propertyTypes[$class->getName()][$propertyName->name];
-                } else {
-                    $typeName = null;
+                try {
+                    $propertyReflection = new ReflectionProperty(
+                        $class->getName(),
+                        $propertyName->name,
+                    );
 
-                    try {
-                        $propertyReflection = new ReflectionProperty(
-                            $class->getName(),
-                            $propertyName->name,
-                        );
+                    $propertyType = $propertyReflection->getType();
 
-                        $propertyType = $propertyReflection->getType();
-
-                        if ($propertyType instanceof ReflectionNamedType && !$propertyType->isBuiltin()) {
-                            $typeName = $propertyType->getName();
-                        }
-                    } catch (ReflectionException) {
-                        // If the reflection information does not exist, we cannot determine its type
+                    if ($propertyType instanceof ReflectionNamedType && !$propertyType->isBuiltin()) {
+                        $typeName = $this->resolveName($typeName, $propertyType->getName());
                     }
-
-                    $this->propertyTypes[$class->getName()][$propertyName->name] = $typeName;
+                } catch (ReflectionException) {
+                    return;
+                    // If the reflection information does not exist, we cannot determine its type
                 }
             }
         }
@@ -168,5 +156,28 @@ class PublicVisibility implements AstKiller
 
         return array_key_exists($class->getName(), $this->seenMethods)
             && array_key_exists($node->name->name, $this->seenMethods[$class->getName()]);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function resolveName(string $rootType, string $name): string
+    {
+        if ($name === 'self' || $name === 'static') {
+            return $rootType;
+        }
+
+        if ($name === 'parent') {
+            $reflectionClass = new ReflectionClass($rootType);
+            $parent = $reflectionClass->getParentClass();
+
+            if ($parent === false) {
+                throw new ReflectionException('Parent class not found for ' . $rootType);
+            }
+
+            return $parent->getName();
+        }
+
+        return $name;
     }
 }
