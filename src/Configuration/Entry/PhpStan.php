@@ -41,8 +41,19 @@ namespace Infection\Configuration\Entry;
 final class PhpStan
 {
     public function __construct(
+        private ?string $configDir,
         private readonly ?string $customPath,
     ) {
+    }
+
+    public function setConfigDir(string $dir): void
+    {
+        $this->configDir = $dir;
+    }
+
+    public function getConfigDir(): ?string
+    {
+        return $this->configDir;
     }
 
     public function getCustomPath(): ?string

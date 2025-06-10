@@ -35,15 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
+use function file_put_contents;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
-use Symfony\Component\Process\Process;
-use function file_put_contents;
 use function sprintf;
-use function var_dump;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
@@ -67,8 +66,8 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
                 $this->buildMutationConfigFile(
-                    $mutant->getMutation()->getHash()
-                )
+                    $mutant->getMutation()->getHash(),
+                ),
             ),
             timeout: $this->timeout,
         );
@@ -114,12 +113,12 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         file_put_contents(
             $mutantConfigPath,
             <<<NEON
-                includes:
-                    - $this->staticAnalysisConfigPath
-                parameters:
-                    parallel:
-                        maximumNumberOfProcesses: 1
-            NEON
+                    includes:
+                        - $this->staticAnalysisConfigPath
+                    parameters:
+                        parallel:
+                            maximumNumberOfProcesses: 1
+                NEON,
         );
 
         return $mutantConfigPath;

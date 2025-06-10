@@ -43,6 +43,7 @@ use function dirname;
 use function file_exists;
 use function in_array;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
@@ -156,7 +157,7 @@ class ConfigurationFactory
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
-            $schema->getPhpStan(),
+            $this->retrievePhpStan($schema, $configDir),
             $mutators,
             $testFramework,
             $schema->getBootstrap(),
@@ -252,6 +253,23 @@ class ConfigurationFactory
         }
 
         return $phpUnit;
+    }
+
+    private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
+    {
+        $phpStan = clone $schema->getPhpStan();
+
+        $phpStanConfigDir = $phpStan->getConfigDir();
+
+        if ($phpStanConfigDir === null) {
+            $phpStan->setConfigDir($configDir);
+        } elseif (!Path::isAbsolute($phpStanConfigDir)) {
+            $phpStan->setConfigDir(sprintf(
+                '%s/%s', $configDir, $phpStanConfigDir,
+            ));
+        }
+
+        return $phpStan;
     }
 
     private static function retrieveCoverageBasePath(

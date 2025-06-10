@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use function array_filter;
 use function array_key_exists;
 use Closure;
@@ -120,6 +119,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
@@ -299,9 +299,9 @@ final class Container
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
-            StaticAnalysisConfigLocator::class => function(self $container): StaticAnalysisConfigLocator {
+            StaticAnalysisConfigLocator::class => static function (self $container): StaticAnalysisConfigLocator {
                 return new StaticAnalysisConfigLocator(
-                    '/opt/infection/tests/e2e/PHPStan_Integration'//(string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
+                    '/opt/infection/tests/e2e/PHPStan_Integration',// (string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
                 );
             },
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(

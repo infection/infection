@@ -43,8 +43,9 @@ use function sprintf;
 
 /**
  * @internal
+ * @final
  */
-final readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigLocatorInterface
+readonly class StaticAnalysisConfigLocator implements TestFrameworkConfigLocatorInterface
 {
     private const DEFAULT_EXTENSIONS = [
         'neon',

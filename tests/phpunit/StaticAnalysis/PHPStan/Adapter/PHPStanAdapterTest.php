@@ -66,10 +66,12 @@ final class PHPStanAdapterTest extends TestCase
 
         $this->adapter = new PHPStanAdapter(
             $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
+            '/tmp',
             '9.0',
         );
     }
@@ -109,10 +111,12 @@ final class PHPStanAdapterTest extends TestCase
     {
         $adapter = new PHPStanAdapter(
             $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
+            '/tmp',
             $version,
         );
 
@@ -127,10 +131,12 @@ final class PHPStanAdapterTest extends TestCase
     {
         $adapter = new PHPStanAdapter(
             $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
+            '/tmp',
             $version,
         );
 

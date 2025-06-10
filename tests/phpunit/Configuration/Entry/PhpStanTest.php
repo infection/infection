@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\PhpStan;
+use Infection\Configuration\Entry\PhpUnit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -45,20 +46,37 @@ final class PhpStanTest extends TestCase
 {
     #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
+        ?string $configDir,
         ?string $executablePath,
     ): void {
-        $phpUnit = new PhpStan($executablePath);
+        $phpUnit = new PhpStan($configDir, $executablePath);
 
+        $this->assertSame($configDir, $phpUnit->getConfigDir());
         $this->assertSame($executablePath, $phpUnit->getCustomPath());
+    }
+
+    public function test_it_can_change_its_configuration_dir(): void
+    {
+        $phpUnit = new PhpUnit(
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
+        );
+
+        $phpUnit->setConfigDir('/path/to/another-phpstan-config-folder');
+
+        $this->assertSame('/path/to/another-phpstan-config-folder', $phpUnit->getConfigDir());
+        $this->assertSame('/path/to/phpstan', $phpUnit->getCustomPath());
     }
 
     public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             null,
+            null,
         ];
 
         yield 'complete' => [
+            '/path/to/phpunit-config-folder',
             '/path/to/phpunit',
         ];
     }

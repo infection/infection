@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis;
 
-use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use InvalidArgumentException;
 use function sprintf;
