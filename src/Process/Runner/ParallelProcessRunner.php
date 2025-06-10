@@ -175,6 +175,8 @@ final class ParallelProcessRunner implements ProcessRunner
             }
 
             if (!$process->isRunning()) {
+                $mutantProcess->markAsFinished();
+
                 $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
 
                 unset($this->runningProcessContainers[$index]->mutantProcessContainer);

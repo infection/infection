@@ -77,6 +77,7 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
+            $mutantProcess->getFinishedAt() - $process->getStartTime(),
         );
     }
 

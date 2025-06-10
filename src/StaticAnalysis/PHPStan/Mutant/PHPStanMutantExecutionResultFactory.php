@@ -74,6 +74,7 @@ class PHPStanMutantExecutionResultFactory implements MutantExecutionResultFactor
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
+            $mutantProcess->getFinishedAt() - $process->getStartTime(),
         );
     }
 

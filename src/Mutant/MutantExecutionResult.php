@@ -75,6 +75,7 @@ class MutantExecutionResult
         private readonly Deferred $originalCode,
         private readonly Deferred $mutatedCode,
         private readonly array $tests,
+        private readonly float $processRuntime,
     ) {
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
@@ -176,6 +177,11 @@ class MutantExecutionResult
         return $this->tests;
     }
 
+    public function getProcessRuntime(): float
+    {
+        return $this->processRuntime;
+    }
+
     /**
      * Adopted from https://github.com/nikic/PHP-Parser/blob/4abdcde5f16269959a834e4e58ea0ba0938ab133/lib/PhpParser/Error.php#L155
      */
@@ -214,6 +220,7 @@ class MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
+            0.0,
         );
     }
 }

@@ -208,6 +208,7 @@ trait CreateMetricsCalculator
             now('<?php $a = 1;'),
             now('<?php $a = 2;'),
             [],
+            0.0,
         );
     }
 

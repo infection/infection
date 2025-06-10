@@ -94,6 +94,7 @@ final class MutantExecutionResultTest extends TestCase
             now($originalCode),
             now($mutatedCode),
             [],
+            0.0,
         );
 
         $this->assertResultStateIs(

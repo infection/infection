@@ -36,9 +36,13 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use function array_key_exists;
+use function array_sum;
+use function count;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
+use function max;
+use function min;
 use function sprintf;
 
 /**
@@ -55,6 +59,13 @@ class MetricsCalculator implements Collector
 
     private ?Calculator $calculator = null;
 
+    private float $testsMinimumRuntime = 0.0;
+    private float $testsAverageRuntime = 0.0;
+    private float $testsMaximumRuntime = 0.0;
+    private float $staticAnalysisMinimumRuntime = 0.0;
+    private float $staticAnalysisAverageRuntime = 0.0;
+    private float $staticAnalysisMaximumRuntime = 0.0;
+
     public function __construct(
         private readonly int $roundingPrecision,
     ) {
@@ -70,6 +81,9 @@ class MetricsCalculator implements Collector
             $this->calculator = null;
         }
 
+        $testRuntimes = [];
+        $staticAnalysisRuntimes = [];
+
         foreach ($executionResults as $executionResult) {
             $detectionStatus = $executionResult->getDetectionStatus();
 
@@ -82,6 +96,26 @@ class MetricsCalculator implements Collector
 
             ++$this->totalMutantsCount;
             ++$this->countByStatus[$detectionStatus];
+
+            if ($detectionStatus === DetectionStatus::KILLED_BY_TESTS) {
+                $testRuntimes[] = $executionResult->getProcessRuntime();
+            }
+
+            if ($detectionStatus === DetectionStatus::KILLED_BY_STATIC_ANALYSIS) {
+                $staticAnalysisRuntimes[] = $executionResult->getProcessRuntime();
+            }
+        }
+
+        if ($testRuntimes !== []) {
+            $this->testsMinimumRuntime = min($testRuntimes);
+            $this->testsAverageRuntime = array_sum($testRuntimes) / count($testRuntimes);
+            $this->testsMaximumRuntime = max($testRuntimes);
+        }
+
+        if ($staticAnalysisRuntimes !== []) {
+            $this->staticAnalysisMinimumRuntime = min($staticAnalysisRuntimes);
+            $this->staticAnalysisAverageRuntime = array_sum($staticAnalysisRuntimes) / count($staticAnalysisRuntimes);
+            $this->staticAnalysisMaximumRuntime = max($staticAnalysisRuntimes);
         }
     }
 
@@ -167,6 +201,36 @@ class MetricsCalculator implements Collector
     public function getCoveredCodeMutationScoreIndicator(): float
     {
         return $this->getCalculator()->getCoveredCodeMutationScoreIndicator();
+    }
+
+    public function getTestsMinimumRuntime(): float
+    {
+        return $this->testsMinimumRuntime;
+    }
+
+    public function getTestsAverageRuntime(): float
+    {
+        return $this->testsAverageRuntime;
+    }
+
+    public function getTestsMaximumRuntime(): float
+    {
+        return $this->testsMaximumRuntime;
+    }
+
+    public function getStaticAnalysisMinimumRuntime(): float
+    {
+        return $this->staticAnalysisMinimumRuntime;
+    }
+
+    public function getStaticAnalysisAverageRuntime(): float
+    {
+        return $this->staticAnalysisAverageRuntime;
+    }
+
+    public function getStaticAnalysisMaximumRuntime(): float
+    {
+        return $this->staticAnalysisMaximumRuntime;
     }
 
     private function getCalculator(): Calculator
