@@ -46,7 +46,12 @@ final class PHPStanAdapterFactoryTest extends TestCase
 {
     public function test_it_can_create_an_adapter(): void
     {
-        $adapter = PHPStanAdapterFactory::create('/path/to/phpstan', 32.3);
+        $adapter = PHPStanAdapterFactory::create(
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            32.3,
+            '/tmp',
+        );
 
         $this->assertSame('PHPStan', $adapter->getName());
     }

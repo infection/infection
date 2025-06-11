@@ -46,8 +46,11 @@ use Infection\Testing\MutatorName;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 
+#[Group('integration')]
 #[CoversClass(PHPStanMutantProcessFactory::class)]
 final class PHPStanMutantProcessFactoryTest extends TestCase
 {
@@ -61,7 +64,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 For_::class,
                 MutatorName::getName(For_::class),
                 [
-                    'startLine' => $originalStartingLine = 10,
+                    'startLine' => 10,
                     'endLine' => 15,
                     'startTokenPos' => 0,
                     'endTokenPos' => 8,
@@ -71,7 +74,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 'Unknown',
                 MutatedNode::wrap(new Nop()),
                 0,
-                $tests = [
+                [
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
@@ -80,7 +83,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 ],
             ),
             'killed#0',
-            $mutantDiff = <<<'DIFF'
+            <<<'DIFF'
                 --- Original
                 +++ New
                 @@ @@
@@ -92,8 +95,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             '<?php $a = 1;',
         );
 
-        $testFrameworkExtraOptions = '--verbose';
-
         $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
         $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $commandLineBuilder
@@ -102,6 +103,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->with('/path/to/phpstan', [], [
                 "--tmp-file=$mutantFilePath",
                 "--instead-of=$originalFilePath",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
@@ -109,11 +111,28 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                '/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                <<<NEON
+                        includes:
+                            - /path/to/phpstan-config-folder
+                        parameters:
+                            parallel:
+                                maximumNumberOfProcesses: 1
+                    NEON,
+            );
+
         $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
             $phpStanMutantExecutionResultFactory,
+            '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
             $commandLineBuilder,
             100.0,
+            '/tmp',
         );
 
         $mutantProcess = $factory->create($mutant);

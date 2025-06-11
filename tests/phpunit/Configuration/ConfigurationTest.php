@@ -191,7 +191,7 @@ final class ConfigurationTest extends TestCase
             'none',
             '',
             new PhpUnit(null, null),
-            new PhpStan(null),
+            new PhpStan(null, null),
             [],
             'phpunit',
             null,
@@ -243,7 +243,7 @@ final class ConfigurationTest extends TestCase
             'default',
             'custom-dir',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
-            new PhpStan('bin/phpstan'),
+            new PhpStan('bin/phpstan-config-dir', 'bin/phpstan'),
             [
                 'Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator()),
             ],

@@ -62,7 +62,7 @@ final class PhpUnitTest extends TestCase
             '/path/to/phpunit',
         );
 
-        $phpUnit->setConfigDir('/path/to/another-phpunit-config');
+        $phpUnit->withConfigDir('/path/to/another-phpunit-config');
 
         $this->assertPhpUnitStateIs(
             $phpUnit,

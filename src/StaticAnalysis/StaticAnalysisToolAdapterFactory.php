@@ -41,7 +41,9 @@ namespace Infection\StaticAnalysis;
 interface StaticAnalysisToolAdapterFactory
 {
     public static function create(
+        string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,
+        string $tmpDir,
     ): StaticAnalysisToolAdapter;
 }
