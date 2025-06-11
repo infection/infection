@@ -48,11 +48,13 @@ use PhpParser\Node;
  */
 abstract class AbstractNumberMutator implements Mutator
 {
-    private const SLEEP_FUNCTION_NAMES = [
+    private const UNWANTED_TO_MUTATE_FUNCTIONS = [
         'sleep',
         'usleep',
         'time_nanosleep',
         'set_time_limit',
+        'memory_limit',
+        'ini_set',
     ];
 
     protected function isPartOfSizeComparison(Node $node): bool
@@ -69,12 +71,20 @@ abstract class AbstractNumberMutator implements Mutator
         return $this->isComparison($parent);
     }
 
-    protected function isInsideSleepFunction(Node\Scalar\LNumber $node): bool
+    protected function isInsideUnwantedToMutateFunctions(Node\Scalar\LNumber $node): bool
     {
         $parentNode = ParentConnector::getParent($node);
 
         if (!$parentNode instanceof Node\Arg) {
-            return false;
+            if (!$parentNode instanceof Node\Expr\UnaryMinus) {
+                return false;
+            }
+
+            $parentNode = ParentConnector::getParent($parentNode);
+
+            if (!$parentNode instanceof Node\Arg) {
+                return false;
+            }
         }
 
         $grandParentNode = ParentConnector::getParent($parentNode);
@@ -83,7 +93,7 @@ abstract class AbstractNumberMutator implements Mutator
             && $grandParentNode->name instanceof Node\Name
             && in_array(
                 $grandParentNode->name->toLowerString(),
-                self::SLEEP_FUNCTION_NAMES,
+                self::UNWANTED_TO_MUTATE_FUNCTIONS,
                 true,
             );
     }

@@ -484,6 +484,11 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 sleep(1_000);
                 time_nanosleep(1_000, 0);
                 set_time_limit(1_000);
+
+                memory_limit(123); // in bytes
+                memory_limit(-1);  // no memory limit
+
+                ini_set('memory_limit', -1);
                 PHP,
         ];
 
