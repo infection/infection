@@ -68,7 +68,8 @@ class MutantProcessContainer
     public function hasNext(): bool
     {
         return array_key_exists($this->currentProcessIndex, $this->lazyMutantProcessCreators)
-            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED;
+            && $this->getCurrentMutantProcessDetectionStatus() === DetectionStatus::ESCAPED
+            && $this->lazyMutantProcessCreators[$this->currentProcessIndex]->supports($this->getCurrent()->getMutant());
     }
 
     public function createNext(): MutantProcess
