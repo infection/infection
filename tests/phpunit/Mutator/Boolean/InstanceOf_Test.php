@@ -64,12 +64,7 @@ final class InstanceOf_Test extends BaseMutatorTestCase
                 <<<'PHP'
                     <?php
 
-                    return true;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    return false;
+                    return !$example instanceof Example;
                     PHP,
             ],
         ];
@@ -84,12 +79,22 @@ final class InstanceOf_Test extends BaseMutatorTestCase
                 <<<'PHP'
                     <?php
 
-                    return true;
+                    return !$example instanceof $foo;
                     PHP,
+            ],
+        ];
+
+        yield 'It mutates an instanceof comparison without double negation' => [
+            <<<'PHP'
+                <?php
+
+                return !$example instanceof Example;
+                PHP,
+            [
                 <<<'PHP'
                     <?php
 
-                    return false;
+                    return $example instanceof Example;
                     PHP,
             ],
         ];

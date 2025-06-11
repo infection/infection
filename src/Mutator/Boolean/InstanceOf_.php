@@ -40,7 +40,9 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use LogicException;
 use PhpParser\Node;
+use function sprintf;
 
 /**
  * @internal
@@ -54,15 +56,13 @@ final class InstanceOf_ implements Mutator
     public static function getDefinition(): Definition
     {
         return new Definition(
-            'Replaces an instanceof comparison with `true` and `false`.',
+            'Replaces an `instanceof` comparison with its negated counterpart.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
                 - $a = $b instanceof User;
                 # Mutation 1
-                + $a = true;
-                # Mutation 2
-                + $a = false;
+                + $a = (!($b instanceof User));
                 DIFF,
         );
     }
@@ -70,22 +70,49 @@ final class InstanceOf_ implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\ConstFetch>
+     * @return iterable<Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\ConstFetch(new Node\Name('true'));
+        if ($node instanceof Node\Expr\BooleanNot) {
+            yield $node->expr;
 
-        yield new Node\Expr\ConstFetch(new Node\Name('false'));
+            return;
+        }
+
+        if (!$node instanceof Node\Expr\Instanceof_) {
+            throw new LogicException(sprintf('Node must be InstanceOf_ but "%s" given.', $node::class));
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Arg) {
+            yield new Node\Expr\ConstFetch(new Node\Name('true'));
+
+            yield new Node\Expr\ConstFetch(new Node\Name('false'));
+
+            return;
+        }
+
+        yield new Node\Expr\BooleanNot($node);
     }
 
     public function canMutate(Node $node): bool
     {
+        if ($node instanceof Node\Expr\BooleanNot && $node->expr instanceof Node\Expr\Instanceof_) {
+            return true;
+        }
+
         if (!$node instanceof Node\Expr\Instanceof_) {
             return false;
         }
 
         if ($this->isArgumentOfAssertFunction($node)) {
+            return false;
+        }
+
+        // prevent double negation, e.g. "!! $example instanceof Example"
+        if (ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot) {
             return false;
         }
 
