@@ -97,7 +97,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         string $extraOptions,
     ): array {
         return $this->getCommandLine(
-            [],
+            ['-d xdebug.mode=develop', '-d xdebug.max_nesting_level=1000'],
             $this->argumentsAndOptionsBuilder->buildForMutant(
                 $this->buildMutationConfigFile(
                     $coverageTests,
