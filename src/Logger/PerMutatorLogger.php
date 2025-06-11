@@ -62,6 +62,7 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
     public function __construct(
         private MetricsCalculator $metricsCalculator,
         private ResultsCollector $resultsCollector,
+        private float $processTimeout,
     ) {
     }
 
@@ -70,7 +71,21 @@ final readonly class PerMutatorLogger implements LineMutationTestingResultsLogge
         $calculatorPerMutator = $this->createMetricsPerMutators();
 
         $table = [
-            ['Mutator', 'Mutations', 'Killed by Test Framework', 'Test Timings min/avg/max', 'Killed by Static Analysis', 'Static Analysis Timings min/avg/max', 'Escaped', 'Errors', 'Syntax Errors', 'Timed Out', 'Skipped', 'Ignored', 'MSI (%s)', 'Covered MSI (%s)'],
+            [
+                'Mutator',
+                'Mutations',
+                'Killed by Test Framework',
+                'Test Timings min/avg/max',
+                'Killed by Static Analysis',
+                'Static Analysis Timings min/avg/max',
+                'Escaped',
+                'Errors',
+                'Syntax Errors',
+                sprintf('Timed Out (Limit: %s secs)', $this->processTimeout),
+                'Skipped',
+                'Ignored',
+                'MSI (%s)', 'Covered MSI (%s)',
+            ],
         ];
 
         foreach ($calculatorPerMutator as $mutatorName => $calculator) {

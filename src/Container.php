@@ -446,6 +446,7 @@ final class Container
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
                     $config->getLoggerProjectRootDirectory(),
+                    $config->getProcessTimeout(),
                 );
             },
             MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FederatedLogger(...array_filter([

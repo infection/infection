@@ -326,6 +326,7 @@ final class FileLoggerFactoryTest extends TestCase
             new FakeLogger(),
             new StrykerHtmlReportBuilder($this->metricsCalculator, $this->resultsCollector),
             null,
+            20,
         );
     }
 
