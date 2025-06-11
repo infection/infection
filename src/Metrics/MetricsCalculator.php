@@ -39,6 +39,7 @@ use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
+use function is_nan;
 use Pipeline\Helper\RunningVariance;
 use function sprintf;
 
@@ -187,36 +188,41 @@ class MetricsCalculator implements Collector
 
     public function getTestsMinimumRuntime(): float
     {
-        return $this->testRuntimesVariance->getMin();
+        return self::foldToZero($this->testRuntimesVariance->getMin());
     }
 
     public function getTestsAverageRuntime(): float
     {
-        return $this->testRuntimesVariance->getMean();
+        return self::foldToZero($this->testRuntimesVariance->getMean());
     }
 
     public function getTestsMaximumRuntime(): float
     {
-        return $this->testRuntimesVariance->getMax();
+        return self::foldToZero($this->testRuntimesVariance->getMax());
     }
 
     public function getStaticAnalysisMinimumRuntime(): float
     {
-        return $this->staticAnalysisRuntimesVariance->getMin();
+        return self::foldToZero($this->staticAnalysisRuntimesVariance->getMin());
     }
 
     public function getStaticAnalysisAverageRuntime(): float
     {
-        return $this->staticAnalysisRuntimesVariance->getMean();
+        return self::foldToZero($this->staticAnalysisRuntimesVariance->getMean());
     }
 
     public function getStaticAnalysisMaximumRuntime(): float
     {
-        return $this->staticAnalysisRuntimesVariance->getMax();
+        return self::foldToZero($this->staticAnalysisRuntimesVariance->getMax());
     }
 
     private function getCalculator(): Calculator
     {
         return $this->calculator ??= Calculator::fromMetrics($this);
+    }
+
+    private static function foldToZero(float $value): float
+    {
+        return is_nan($value) ? 0.0 : $value;
     }
 }
