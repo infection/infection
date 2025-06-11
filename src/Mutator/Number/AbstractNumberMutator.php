@@ -53,7 +53,6 @@ abstract class AbstractNumberMutator implements Mutator
         'usleep',
         'time_nanosleep',
         'set_time_limit',
-        'memory_limit',
         'ini_set',
     ];
 
