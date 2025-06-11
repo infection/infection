@@ -81,7 +81,7 @@ final class PerMutatorLoggerTest extends TestCase
 
                 | Mutator   | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
                 | --------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
-                | For_      |         8 |                        1 |  0.00 / 0.00 / 0.00 secs |                         0 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
+                | For_      |         8 |                        1 |  0.00 / 0.00 / 0.00 secs |                         0 |                NaN / NaN / NaN secs |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
                 | PregQuote |         9 |                        1 |  0.00 / 0.00 / 0.00 secs |                         1 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |         1 |       1 |       1 |    71.43 |            83.33 |
 
                 TXT,
