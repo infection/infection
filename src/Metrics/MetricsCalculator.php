@@ -36,13 +36,10 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use function array_key_exists;
-use function array_sum;
-use function count;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
-use function max;
-use function min;
+use Pipeline\Helper\RunningVariance;
 use function sprintf;
 
 /**
@@ -59,12 +56,9 @@ class MetricsCalculator implements Collector
 
     private ?Calculator $calculator = null;
 
-    private float $testsMinimumRuntime = 0.0;
-    private float $testsAverageRuntime = 0.0;
-    private float $testsMaximumRuntime = 0.0;
-    private float $staticAnalysisMinimumRuntime = 0.0;
-    private float $staticAnalysisAverageRuntime = 0.0;
-    private float $staticAnalysisMaximumRuntime = 0.0;
+    private readonly RunningVariance $testRuntimesVariance;
+
+    private readonly RunningVariance $staticAnalysisRuntimesVariance;
 
     public function __construct(
         private readonly int $roundingPrecision,
@@ -72,6 +66,9 @@ class MetricsCalculator implements Collector
         foreach (DetectionStatus::ALL as $status) {
             $this->countByStatus[$status] = 0;
         }
+
+        $this->testRuntimesVariance = new RunningVariance();
+        $this->staticAnalysisRuntimesVariance = new RunningVariance();
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
@@ -80,9 +77,6 @@ class MetricsCalculator implements Collector
             // Reset the calculator if any result is added
             $this->calculator = null;
         }
-
-        $testRuntimes = [];
-        $staticAnalysisRuntimes = [];
 
         foreach ($executionResults as $executionResult) {
             $detectionStatus = $executionResult->getDetectionStatus();
@@ -98,24 +92,12 @@ class MetricsCalculator implements Collector
             ++$this->countByStatus[$detectionStatus];
 
             if ($detectionStatus === DetectionStatus::KILLED_BY_TESTS) {
-                $testRuntimes[] = $executionResult->getProcessRuntime();
+                $this->testRuntimesVariance->observe($executionResult->getProcessRuntime());
             }
 
             if ($detectionStatus === DetectionStatus::KILLED_BY_STATIC_ANALYSIS) {
-                $staticAnalysisRuntimes[] = $executionResult->getProcessRuntime();
+                $this->staticAnalysisRuntimesVariance->observe($executionResult->getProcessRuntime());
             }
-        }
-
-        if ($testRuntimes !== []) {
-            $this->testsMinimumRuntime = min($testRuntimes);
-            $this->testsAverageRuntime = array_sum($testRuntimes) / count($testRuntimes);
-            $this->testsMaximumRuntime = max($testRuntimes);
-        }
-
-        if ($staticAnalysisRuntimes !== []) {
-            $this->staticAnalysisMinimumRuntime = min($staticAnalysisRuntimes);
-            $this->staticAnalysisAverageRuntime = array_sum($staticAnalysisRuntimes) / count($staticAnalysisRuntimes);
-            $this->staticAnalysisMaximumRuntime = max($staticAnalysisRuntimes);
         }
     }
 
@@ -205,32 +187,32 @@ class MetricsCalculator implements Collector
 
     public function getTestsMinimumRuntime(): float
     {
-        return $this->testsMinimumRuntime;
+        return $this->testRuntimesVariance->getMin();
     }
 
     public function getTestsAverageRuntime(): float
     {
-        return $this->testsAverageRuntime;
+        return $this->testRuntimesVariance->getMean();
     }
 
     public function getTestsMaximumRuntime(): float
     {
-        return $this->testsMaximumRuntime;
+        return $this->testRuntimesVariance->getMax();
     }
 
     public function getStaticAnalysisMinimumRuntime(): float
     {
-        return $this->staticAnalysisMinimumRuntime;
+        return $this->staticAnalysisRuntimesVariance->getMin();
     }
 
     public function getStaticAnalysisAverageRuntime(): float
     {
-        return $this->staticAnalysisAverageRuntime;
+        return $this->staticAnalysisRuntimesVariance->getMean();
     }
 
     public function getStaticAnalysisMaximumRuntime(): float
     {
-        return $this->staticAnalysisMaximumRuntime;
+        return $this->staticAnalysisRuntimesVariance->getMax();
     }
 
     private function getCalculator(): Calculator
