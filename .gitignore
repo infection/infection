@@ -13,6 +13,7 @@
 /devTools/Docker*.json
 /infection-cache
 /infection.log
+/per-mutator.md
 /phpunit.xml
 /tests/benchmark/*/coverage/
 /tests/benchmark/*/sources/
