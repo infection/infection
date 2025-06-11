@@ -62,7 +62,7 @@ final class InstanceOf_ implements Mutator
             <<<'DIFF'
                 - $a = $b instanceof User;
                 # Mutation 1
-                + $a = (!($b instanceof User));
+                + $a = !$b instanceof User;
                 DIFF,
         );
     }
