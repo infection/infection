@@ -62,7 +62,7 @@ final class PhpStanTest extends TestCase
             '/path/to/phpstan',
         );
 
-        $phpUnit->setConfigDir('/path/to/another-phpstan-config-folder');
+        $phpUnit->withConfigDir('/path/to/another-phpstan-config-folder');
 
         $this->assertSame('/path/to/another-phpstan-config-folder', $phpUnit->getConfigDir());
         $this->assertSame('/path/to/phpstan', $phpUnit->getCustomPath());

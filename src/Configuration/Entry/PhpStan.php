@@ -46,7 +46,7 @@ final class PhpStan
     ) {
     }
 
-    public function setConfigDir(string $dir): void
+    public function withConfigDir(string $dir): void
     {
         $this->configDir = $dir;
     }

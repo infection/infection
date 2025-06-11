@@ -245,9 +245,9 @@ class ConfigurationFactory
         $phpUnitConfigDir = $phpUnit->getConfigDir();
 
         if ($phpUnitConfigDir === null) {
-            $phpUnit->setConfigDir($configDir);
+            $phpUnit->withConfigDir($configDir);
         } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->setConfigDir(sprintf(
+            $phpUnit->withConfigDir(sprintf(
                 '%s/%s', $configDir, $phpUnitConfigDir,
             ));
         }
@@ -262,9 +262,9 @@ class ConfigurationFactory
         $phpStanConfigDir = $phpStan->getConfigDir();
 
         if ($phpStanConfigDir === null) {
-            $phpStan->setConfigDir($configDir);
+            $phpStan->withConfigDir($configDir);
         } elseif (!Path::isAbsolute($phpStanConfigDir)) {
-            $phpStan->setConfigDir(sprintf(
+            $phpStan->withConfigDir(sprintf(
                 '%s/%s', $configDir, $phpStanConfigDir,
             ));
         }
