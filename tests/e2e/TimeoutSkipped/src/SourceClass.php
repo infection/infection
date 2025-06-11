@@ -6,7 +6,7 @@ class SourceClass
 {
     public function add(int $a, int $b): int
     {
-        sleep(1);
+        sleep(2);
         return $a + $b;
     }
 }
