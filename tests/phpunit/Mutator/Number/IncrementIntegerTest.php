@@ -247,6 +247,17 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        // see https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9524503 "Suppressing Unproductive Mutants"
+        yield 'It does not increment when it is used in sleep functions' => [
+            <<<'PHP'
+                <?php
+                usleep(1_000);
+                sleep(1_000);
+                time_nanosleep(1_000, 0);
+                set_time_limit(1_000);
+                PHP,
+        ];
+
         $maxInt = PHP_INT_MAX;
 
         yield 'It does not increment max int' => [

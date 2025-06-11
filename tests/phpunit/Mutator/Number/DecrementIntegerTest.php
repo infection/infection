@@ -476,6 +476,17 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        // see https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9524503 "Suppressing Unproductive Mutants"
+        yield 'It does not decrement when it is used in sleep functions' => [
+            <<<'PHP'
+                <?php
+                usleep(1_000);
+                sleep(1_000);
+                time_nanosleep(1_000, 0);
+                set_time_limit(1_000);
+                PHP,
+        ];
+
         yield 'It does not decrement limit argument of preg_split function when it equals to 0' => [
             <<<'PHP'
                 <?php

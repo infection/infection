@@ -115,6 +115,10 @@ final class IncrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        if ($this->isInsideSleepFunction($node)) {
+            return false;
+        }
+
         return true;
     }
 

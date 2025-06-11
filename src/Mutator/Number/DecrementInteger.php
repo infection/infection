@@ -132,6 +132,10 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        if ($this->isInsideSleepFunction($node)) {
+            return false;
+        }
+
         return $this->isAllowedComparison($node);
     }
 

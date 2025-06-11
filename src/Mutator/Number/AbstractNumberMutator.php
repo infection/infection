@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use function in_array;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
@@ -47,6 +48,13 @@ use PhpParser\Node;
  */
 abstract class AbstractNumberMutator implements Mutator
 {
+    private const SLEEP_FUNCTION_NAMES = [
+        'sleep',
+        'usleep',
+        'time_nanosleep',
+        'set_time_limit',
+    ];
+
     protected function isPartOfSizeComparison(Node $node): bool
     {
         $parent = ParentConnector::findParent($node);
@@ -59,6 +67,25 @@ abstract class AbstractNumberMutator implements Mutator
         $parent = ParentConnector::getParent($node);
 
         return $this->isComparison($parent);
+    }
+
+    protected function isInsideSleepFunction(Node\Scalar\LNumber $node): bool
+    {
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Arg) {
+            return false;
+        }
+
+        $grandParentNode = ParentConnector::getParent($parentNode);
+
+        return $grandParentNode instanceof Node\Expr\FuncCall
+            && $grandParentNode->name instanceof Node\Name
+            && in_array(
+                $grandParentNode->name->toLowerString(),
+                self::SLEEP_FUNCTION_NAMES,
+                true,
+            );
     }
 
     private function isSizeComparison(?Node $node): bool
