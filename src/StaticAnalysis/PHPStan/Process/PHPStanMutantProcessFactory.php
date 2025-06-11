@@ -98,6 +98,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
+                '--fail-without-result-cache',
                 // todo [phpstan-integration] --stop-on-first-error
             ],
         );

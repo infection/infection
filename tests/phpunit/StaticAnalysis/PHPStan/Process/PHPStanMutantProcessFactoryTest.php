@@ -107,6 +107,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
+                '--fail-without-result-cache',
             ])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
