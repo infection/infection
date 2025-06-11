@@ -60,6 +60,7 @@ class FileLoggerFactory
         private readonly LoggerInterface $logger,
         private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
         private readonly ?string $loggerProjectRootDirectory,
+        private readonly float $processTimeout,
     ) {
     }
 
@@ -185,6 +186,7 @@ class FileLoggerFactory
         return new PerMutatorLogger(
             $this->metricsCalculator,
             $this->resultsCollector,
+            $this->processTimeout,
         );
     }
 
