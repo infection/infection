@@ -241,6 +241,12 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 [
                     '<options=bold>0</options=bold> mutations were generated:',
                 ],
+                [
+                    '<options=bold>       0</options=bold> mutants were killed by Test Framework',
+                ],
+                [
+                    '<options=bold>       0</options=bold> mutants were caught by Static Analysis',
+                ],
             ));
 
         $this->resultsCollector->expects($this->once())
