@@ -43,42 +43,48 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\For_>
  */
 final class For_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces the looping condition of a `for` block statement preventing any statement within the block
-to be executed. For example:
+                Replaces the looping condition of a `for` block statement preventing any statement within the block
+                to be executed. For example:
 
-```php`
-for ($i=0; $i<10; $i++) {
-    // ...
-}
-```
+                ```php`
+                for ($i=0; $i<10; $i++) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-for ($i=0; false; $i++) {
-    // ...
-}
-```
-TXT
+                ```php
+                for ($i=0; false; $i++) {
+                    // ...
+                }
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - for ($i=0; $i<10; $i++) {
+                + for ($i=0; false; $i++) {
+                      // ...
+                }
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\For_ $node
      *
      * @return iterable<Node\Stmt\For_>
      */
@@ -91,7 +97,7 @@ TXT
                 'loop' => $node->loop,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

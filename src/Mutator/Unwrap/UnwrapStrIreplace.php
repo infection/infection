@@ -42,27 +42,31 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapStrIreplace extends AbstractUnwrapMutator
+final class UnwrapStrIreplace extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_ireplace` function call with its third operand. For example:
+                Replaces a `str_ireplace` function call with its third operand. For example:
 
-```php
-$x = str_ireplace('%body%', 'black', '<body text=%BODY%>');
-```
+                ```php
+                $x = str_ireplace('%body%', 'black', '<body text=%BODY%>');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = '<body text=%BODY%>';
-```
-TXT
+                ```php
+                $x = '<body text=%BODY%>';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = str_ireplace('%body%', 'black', '<body text=%BODY%>');
+                + $x = '<body text=%BODY%>';
+                DIFF,
         );
     }
 

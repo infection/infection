@@ -37,16 +37,18 @@ namespace Infection\Tests\TestFramework;
 
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkAdapter;
 use Infection\Tests\Fixtures\TestFramework\DummyTestFrameworkFactory;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(Factory::class)]
 final class FactoryTest extends TestCase
 {
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
@@ -58,7 +60,8 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkFinder::class),
             '',
             $this->createMock(Configuration::class),
-            []
+            $this->createMock(SourceFileFilter::class),
+            [],
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -74,13 +77,14 @@ final class FactoryTest extends TestCase
             $this->createMock(TestFrameworkFinder::class),
             '',
             $this->createMock(Configuration::class),
+            $this->createMock(SourceFileFilter::class),
             [
                 'infection/codeception-adapter' => [
-                        'install_path' => '/path/to/dummy/adapter/factory.php',
-                        'extra' => ['class' => DummyTestFrameworkFactory::class],
-                        'version' => '1.0.0',
-                    ],
-            ]
+                    'install_path' => '/path/to/dummy/adapter/factory.php',
+                    'extra' => ['class' => DummyTestFrameworkFactory::class],
+                    'version' => '1.0.0',
+                ],
+            ],
         );
 
         $adapter = $factory->create('dummy', false);

@@ -38,13 +38,11 @@ namespace Infection\Event;
 /**
  * @internal
  */
-final class InitialTestSuiteWasFinished
+final readonly class InitialTestSuiteWasFinished
 {
-    private string $outputText;
-
-    public function __construct(string $outputText)
-    {
-        $this->outputText = $outputText;
+    public function __construct(
+        private string $outputText,
+    ) {
     }
 
     public function getOutputText(): string

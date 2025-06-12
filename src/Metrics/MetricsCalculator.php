@@ -35,107 +35,69 @@ declare(strict_types=1);
 
 namespace Infection\Metrics;
 
-use function count;
+use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use function is_nan;
+use Pipeline\Helper\RunningVariance;
+use function sprintf;
 
 /**
  * @internal
  */
-class MetricsCalculator
+class MetricsCalculator implements Collector
 {
-    private int $roundingPrecision;
-    private SortableMutantExecutionResults $killedExecutionResults;
-    private SortableMutantExecutionResults $errorExecutionResults;
-    private SortableMutantExecutionResults $escapedExecutionResults;
-    private SortableMutantExecutionResults $timedOutExecutionResults;
-    private SortableMutantExecutionResults $skippedExecutionResults;
-    private SortableMutantExecutionResults $notCoveredExecutionResults;
-    private SortableMutantExecutionResults $allExecutionResults;
-
-    private int $killedCount = 0;
-
-    private int $errorCount = 0;
-
-    private int $skippedCount = 0;
-
-    private int $escapedCount = 0;
-
-    private int $timedOutCount = 0;
-
-    private int $notCoveredByTestsCount = 0;
+    /**
+     * @var array<string, int>
+     */
+    private array $countByStatus = [];
 
     private int $totalMutantsCount = 0;
 
     private ?Calculator $calculator = null;
 
-    public function __construct(int $roundingPrecision)
-    {
-        $this->roundingPrecision = $roundingPrecision;
-        $this->killedExecutionResults = new SortableMutantExecutionResults();
-        $this->errorExecutionResults = new SortableMutantExecutionResults();
-        $this->escapedExecutionResults = new SortableMutantExecutionResults();
-        $this->timedOutExecutionResults = new SortableMutantExecutionResults();
-        $this->skippedExecutionResults = new SortableMutantExecutionResults();
-        $this->notCoveredExecutionResults = new SortableMutantExecutionResults();
-        $this->allExecutionResults = new SortableMutantExecutionResults();
+    private readonly RunningVariance $testRuntimesVariance;
+
+    private readonly RunningVariance $staticAnalysisRuntimesVariance;
+
+    public function __construct(
+        private readonly int $roundingPrecision,
+    ) {
+        foreach (DetectionStatus::ALL as $status) {
+            $this->countByStatus[$status] = 0;
+        }
+
+        $this->testRuntimesVariance = new RunningVariance();
+        $this->staticAnalysisRuntimesVariance = new RunningVariance();
     }
 
     public function collect(MutantExecutionResult ...$executionResults): void
     {
-        if (count($executionResults) > 0) {
+        if ($this->calculator !== null && $executionResults !== []) {
             // Reset the calculator if any result is added
             $this->calculator = null;
         }
 
         foreach ($executionResults as $executionResult) {
+            $detectionStatus = $executionResult->getDetectionStatus();
+
+            if (!array_key_exists($detectionStatus, $this->countByStatus)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Unknown execution result process result code "%s"',
+                    $executionResult->getDetectionStatus(),
+                ));
+            }
+
             ++$this->totalMutantsCount;
-            $this->allExecutionResults->add($executionResult);
+            ++$this->countByStatus[$detectionStatus];
 
-            switch ($executionResult->getDetectionStatus()) {
-                case DetectionStatus::KILLED:
-                    $this->killedCount++;
-                    $this->killedExecutionResults->add($executionResult);
+            if ($detectionStatus === DetectionStatus::KILLED_BY_TESTS) {
+                $this->testRuntimesVariance->observe($executionResult->getProcessRuntime());
+            }
 
-                    break;
-
-                case DetectionStatus::NOT_COVERED:
-                    $this->notCoveredByTestsCount++;
-                    $this->notCoveredExecutionResults->add($executionResult);
-
-                    break;
-
-                case DetectionStatus::ESCAPED:
-                    $this->escapedCount++;
-                    $this->escapedExecutionResults->add($executionResult);
-
-                    break;
-
-                case DetectionStatus::TIMED_OUT:
-                    $this->timedOutCount++;
-                    $this->timedOutExecutionResults->add($executionResult);
-
-                    break;
-
-                case DetectionStatus::SKIPPED:
-                    $this->skippedCount++;
-                    $this->skippedExecutionResults->add($executionResult);
-
-                    break;
-
-                case DetectionStatus::ERROR:
-                    $this->errorCount++;
-                    $this->errorExecutionResults->add($executionResult);
-
-                    break;
-
-                default:
-                    throw new InvalidArgumentException(sprintf(
-                        'Unknown execution result process result code "%s"',
-                        $executionResult->getDetectionStatus()
-                    ));
+            if ($detectionStatus === DetectionStatus::KILLED_BY_STATIC_ANALYSIS) {
+                $this->staticAnalysisRuntimesVariance->observe($executionResult->getProcessRuntime());
             }
         }
     }
@@ -145,90 +107,49 @@ class MetricsCalculator
         return $this->roundingPrecision;
     }
 
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getKilledExecutionResults(): array
+    public function getKilledByTestsCount(): int
     {
-        return $this->killedExecutionResults->getSortedExecutionResults();
+        return $this->countByStatus[DetectionStatus::KILLED_BY_TESTS];
     }
 
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getErrorExecutionResults(): array
+    public function getKilledByStaticAnalysisCount(): int
     {
-        return $this->errorExecutionResults->getSortedExecutionResults();
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getSkippedExecutionResults(): array
-    {
-        return $this->skippedExecutionResults->getSortedExecutionResults();
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getEscapedExecutionResults(): array
-    {
-        return $this->escapedExecutionResults->getSortedExecutionResults();
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getTimedOutExecutionResults(): array
-    {
-        return $this->timedOutExecutionResults->getSortedExecutionResults();
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getNotCoveredExecutionResults(): array
-    {
-        return $this->notCoveredExecutionResults->getSortedExecutionResults();
-    }
-
-    /**
-     * @return MutantExecutionResult[]
-     */
-    public function getAllExecutionResults(): array
-    {
-        return $this->allExecutionResults->getSortedExecutionResults();
-    }
-
-    public function getKilledCount(): int
-    {
-        return $this->killedCount;
+        return $this->countByStatus[DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
     }
 
     public function getErrorCount(): int
     {
-        return $this->errorCount;
+        return $this->countByStatus[DetectionStatus::ERROR];
+    }
+
+    public function getSyntaxErrorCount(): int
+    {
+        return $this->countByStatus[DetectionStatus::SYNTAX_ERROR];
     }
 
     public function getSkippedCount(): int
     {
-        return $this->skippedCount;
+        return $this->countByStatus[DetectionStatus::SKIPPED];
+    }
+
+    public function getIgnoredCount(): int
+    {
+        return $this->countByStatus[DetectionStatus::IGNORED];
     }
 
     public function getEscapedCount(): int
     {
-        return $this->escapedCount;
+        return $this->countByStatus[DetectionStatus::ESCAPED];
     }
 
     public function getTimedOutCount(): int
     {
-        return $this->timedOutCount;
+        return $this->countByStatus[DetectionStatus::TIMED_OUT];
     }
 
     public function getNotTestedCount(): int
     {
-        return $this->notCoveredByTestsCount;
+        return $this->countByStatus[DetectionStatus::NOT_COVERED];
     }
 
     public function getTotalMutantsCount(): int
@@ -238,7 +159,7 @@ class MetricsCalculator
 
     public function getTestedMutantsCount(): int
     {
-        return $this->totalMutantsCount - $this->skippedCount;
+        return $this->getTotalMutantsCount() - $this->getSkippedCount() - $this->getIgnoredCount();
     }
 
     /**
@@ -265,8 +186,43 @@ class MetricsCalculator
         return $this->getCalculator()->getCoveredCodeMutationScoreIndicator();
     }
 
+    public function getTestsMinimumRuntime(): float
+    {
+        return self::foldToZero($this->testRuntimesVariance->getMin());
+    }
+
+    public function getTestsAverageRuntime(): float
+    {
+        return self::foldToZero($this->testRuntimesVariance->getMean());
+    }
+
+    public function getTestsMaximumRuntime(): float
+    {
+        return self::foldToZero($this->testRuntimesVariance->getMax());
+    }
+
+    public function getStaticAnalysisMinimumRuntime(): float
+    {
+        return self::foldToZero($this->staticAnalysisRuntimesVariance->getMin());
+    }
+
+    public function getStaticAnalysisAverageRuntime(): float
+    {
+        return self::foldToZero($this->staticAnalysisRuntimesVariance->getMean());
+    }
+
+    public function getStaticAnalysisMaximumRuntime(): float
+    {
+        return self::foldToZero($this->staticAnalysisRuntimesVariance->getMax());
+    }
+
     private function getCalculator(): Calculator
     {
-        return $this->calculator ?? $this->calculator = Calculator::fromMetrics($this);
+        return $this->calculator ??= Calculator::fromMetrics($this);
+    }
+
+    private static function foldToZero(float $value): float
+    {
+        return is_nan($value) ? 0.0 : $value;
     }
 }

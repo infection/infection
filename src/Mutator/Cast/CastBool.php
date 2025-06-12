@@ -44,17 +44,25 @@ use PhpParser\Node;
  */
 final class CastBool extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes an boolean cast operator (`(bool)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = (bool) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Bool_;
+        if (!$node instanceof Node\Expr\Cast\Bool_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'bool');
     }
 }

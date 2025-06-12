@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -43,6 +44,8 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Expression>
  */
 final class FunctionCallRemoval implements Mutator
 {
@@ -61,12 +64,15 @@ final class FunctionCallRemoval implements Mutator
         'socket_close',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes the function call.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - fooBar();
+                DIFF,
         );
     }
 
@@ -74,8 +80,6 @@ final class FunctionCallRemoval implements Mutator
      * @psalm-mutation-free
      *
      * Replaces "doSmth()" with ""
-     *
-     * @param Node\Stmt\Expression $node
      *
      * @return iterable<Node\Stmt\Nop>
      */
@@ -100,6 +104,6 @@ final class FunctionCallRemoval implements Mutator
             return true;
         }
 
-        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions);
+        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions, true);
     }
 }

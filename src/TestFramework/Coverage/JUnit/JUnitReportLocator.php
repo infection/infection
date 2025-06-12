@@ -42,10 +42,10 @@ use function file_exists;
 use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use function iterator_to_array;
-use function Safe\sprintf;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -53,14 +53,14 @@ use Webmozart\PathUtil\Path;
  */
 class JUnitReportLocator
 {
-    private string $coveragePath;
-    private string $defaultJUnitPath;
+    private readonly string $defaultJUnitPath;
 
     private ?string $jUnitPath = null;
 
-    public function __construct(string $coveragePath, string $defaultJUnitPath)
-    {
-        $this->coveragePath = $coveragePath;
+    public function __construct(
+        private readonly string $coveragePath,
+        string $defaultJUnitPath,
+    ) {
         $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
     }
 
@@ -83,7 +83,7 @@ class JUnitReportLocator
         if (!file_exists($this->coveragePath)) {
             throw new FileNotFound(sprintf(
                 'Could not find any file with the pattern "*.junit.xml" in "%s"',
-                $this->coveragePath
+                $this->coveragePath,
             ));
         }
 
@@ -93,7 +93,7 @@ class JUnitReportLocator
                 ->in($this->coveragePath)
                 ->name('/^(.+\.)?junit\.xml$/i')
                 ->sortByName(),
-            false
+            false,
         );
 
         if (count($files) > 1) {
@@ -103,12 +103,10 @@ class JUnitReportLocator
                 implode(
                     '", "',
                     array_map(
-                        static function (SplFileInfo $fileInfo): string {
-                            return Path::canonicalize($fileInfo->getPathname());
-                        },
-                        $files
-                    )
-                )
+                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
+                        $files,
+                    ),
+                ),
             ));
         }
 
@@ -120,7 +118,7 @@ class JUnitReportLocator
 
         throw new FileNotFound(sprintf(
             'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->coveragePath
+            $this->coveragePath,
         ));
     }
 }

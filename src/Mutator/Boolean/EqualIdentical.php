@@ -37,44 +37,53 @@ namespace Infection\Mutator\Boolean;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 
 /**
  * @internal
+ *
+ * @extends  AbstractIdenticalComparison<Node\Expr\BinaryOp\Equal>
  */
-final class EqualIdentical implements Mutator
+final class EqualIdentical extends AbstractIdenticalComparison
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a loose comparison (using the equal operator (`==`)) with a strict comparison (using the
-identical operator (`===`)).
-TXT
+                Replaces a loose comparison (using the equal operator (`==`)) with a strict comparison (using the
+                identical operator (`===`)).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b == $c;
+                + $a = $b === $c;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
      *
-     * @param Node\Expr\BinaryOp\Equal $node
-     *
-     * @return iterable<Node\Expr\BinaryOp\Identical>
+     * @return iterable<Expr\BinaryOp\Identical>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
+        yield new Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Equal;
+        if (!$node instanceof Expr\BinaryOp\Equal) {
+            return false;
+        }
+
+        return !$this->isSameTypeIdenticalComparison($node);
     }
 }

@@ -35,15 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use ArrayIterator;
 use Infection\IterableCounter;
 use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(IterableCounter::class)]
 final class IterableCounterTest extends TestCase
 {
     public function test_it_does_not_count_when_not_asked(): void
     {
-        $iterator = $this->createMock(Iterator::class);
+        $iterator = new ArrayIterator();
 
         $count = IterableCounter::bufferAndCountIfNeeded($iterator, true);
 
@@ -63,7 +66,7 @@ final class IterableCounterTest extends TestCase
 
     public function test_it_counts_iterator(): void
     {
-        $generator = (static function () {
+        $generator = (static function (): iterable {
             yield from [1 => 1, 2, 3];
         })();
 

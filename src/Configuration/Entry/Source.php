@@ -43,9 +43,9 @@ use Webmozart\Assert\Assert;
 final class Source
 {
     /** @var string[] */
-    private array $directories;
+    private readonly array $directories;
     /** @var string[] */
-    private array $excludes;
+    private readonly array $excludes;
 
     /**
      * @param string[] $directories

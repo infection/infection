@@ -39,31 +39,38 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use function is_string;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Mul>
  */
 final class Multiplication implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
-TXT
+                Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b * $c;
+                + $a = $b / $c;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Mul $node
      *
      * @return iterable<Node\Expr\BinaryOp\Div>
      */
@@ -90,7 +97,25 @@ TXT
             return false;
         }
 
-        return true;
+        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+
+        if (!$functionScope instanceof Node\Stmt\ClassMethod) {
+            return true;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Stmt\Return_) {
+            return true;
+        }
+
+        $returnType = $functionScope->getReturnType();
+
+        if ($returnType instanceof Node\Identifier) {
+            $returnType = $returnType->name;
+        }
+
+        return !(is_string($returnType) && $returnType === 'int');
     }
 
     private function isNumericOne(Node $node): bool

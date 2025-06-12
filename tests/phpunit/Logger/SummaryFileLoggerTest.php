@@ -37,55 +37,62 @@ namespace Infection\Tests\Logger;
 
 use Infection\Logger\SummaryFileLogger;
 use Infection\Metrics\MetricsCalculator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SummaryFileLogger::class)]
 final class SummaryFileLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
     use LineLoggerAssertions;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new SummaryFileLogger($metricsCalculator);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
             <<<'TXT'
-Total: 0
+                Total: 0
 
-Killed: 0
-Errored: 0
-Escaped: 0
-Timed Out: 0
-Skipped: 0
-Not Covered: 0
+                Killed by Test Framework: 0
+                Killed by Static Analysis: 0
+                Errored: 0
+                Syntax Errors: 0
+                Escaped: 0
+                Timed Out: 0
+                Skipped: 0
+                Ignored: 0
+                Not Covered: 0
 
-TXT
+                TXT,
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
+            self::createCompleteMetricsCalculator(),
             <<<'TXT'
-Total: 12
+                Total: 17
 
-Killed: 2
-Errored: 2
-Escaped: 2
-Timed Out: 2
-Skipped: 2
-Not Covered: 2
+                Killed by Test Framework: 2
+                Killed by Static Analysis: 1
+                Errored: 2
+                Syntax Errors: 2
+                Escaped: 2
+                Timed Out: 2
+                Skipped: 2
+                Ignored: 2
+                Not Covered: 2
 
-TXT
+                TXT,
         ];
     }
 }

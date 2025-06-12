@@ -21,6 +21,6 @@ fi
 
 test -x $(which tput) && tput setaf 1 # red
 echo "Infection configuration master did not start."
-rm -f infection.json.dist
+rm -f infection.json5
 exit 1;
 

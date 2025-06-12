@@ -15,25 +15,27 @@ help:
 # Variables
 #---------------------------------------------------------------------------
 BOX=./.tools/box
-BOX_URL="https://github.com/humbug/box/releases/download/3.8.5/box.phar"
+BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
-PHP_CS_FIXER_URL="https://cs.sensiolabs.org/download/php-cs-fixer-v2.phar"
-PHP_CS_FIXER_CACHE=build/cache/.php_cs.cache
+PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.65.0/php-cs-fixer.phar"
+PHP_CS_FIXER_CACHE=.php_cs.cache
 
 PHPSTAN=./vendor/bin/phpstan
+RECTOR=./vendor/bin/rector
+COLLISION_DETECTOR=./vendor/bin/detect-collisions
 
-PSALM=./vendor/bin/psalm
+PSALM=./.tools/psalm
+PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
+PARATEST=vendor/bin/paratest
 
 INFECTION=./build/infection.phar
 
-DOCKER_RUN=docker run --tty --rm --volume "$$PWD":/opt/infection --workdir /opt/infection
-DOCKER_RUN_74=$(FLOCK) devTools/*php74*.json $(DOCKER_RUN) infection_php74
-DOCKER_RUN_74_IMAGE=devTools/Dockerfile-php74-xdebug.json
-DOCKER_RUN_80=$(FLOCK) devTools/*php80*.json $(DOCKER_RUN) infection_php80
-DOCKER_RUN_80_IMAGE=devTools/Dockerfile-php80-xdebug.json
+DOCKER_RUN=docker compose run --rm
+DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
+DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
@@ -51,7 +53,14 @@ PHPUNIT_GROUP=default
 
 .PHONY: compile
 compile:	 	## Bundles Infection into a PHAR
-compile: $(INFECTION)
+compile:
+	rm $(INFECTION) || true
+	make $(INFECTION)
+
+.PHONY: compile-docker
+compile-docker:	 	## Bundles Infection into a PHAR using docker
+compile-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) make compile
 
 .PHONY: check_trailing_whitespaces
 check_trailing_whitespaces:
@@ -60,18 +69,44 @@ check_trailing_whitespaces:
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE)
+	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
+	$(MAKE) check_trailing_whitespaces
+
+.PHONY: cs-check
+cs-check:		## Runs PHP-CS-Fixer in dry-run mode
+cs-check: $(PHP_CS_FIXER)
+	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --dry-run
+	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: phpstan
 phpstan: vendor $(PHPSTAN)
-	$(PHPSTAN) analyse --configuration devTools/phpstan-src.neon --no-interaction --no-progress
-	$(PHPSTAN) analyse --configuration devTools/phpstan-tests.neon --no-interaction --no-progress
+	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress
+
+.PHONY: phpstan-baseline
+phpstan-baseline: vendor $(PHPSTAN)
+	$(PHPSTAN) analyse --configuration devTools/phpstan.neon --no-interaction --no-progress --generate-baseline devTools/phpstan-baseline.neon || true
+
+.PHONY: psalm-baseline
+psalm-baseline: vendor
+	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
+
+.PHONY: detect-collisions
+detect-collisions: vendor $(PHPSTAN)
+	$(COLLISION_DETECTOR) --configuration devTools/collision-detector.json
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
-	$(PSALM)
+	$(PSALM) --threads=max
+
+.PHONY: rector
+rector: vendor $(RECTOR)
+	$(RECTOR) process
+
+.PHONY: rector-check
+rector-check: vendor $(RECTOR)
+	$(RECTOR) process --dry-run
 
 .PHONY: validate
 validate:
@@ -96,7 +131,7 @@ profile: vendor $(BENCHMARK_SOURCES)
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
-autoreview: phpstan psalm validate test-autoreview
+autoreview: cs-check phpstan psalm validate test-autoreview rector-check detect-collisions
 
 .PHONY: test
 test:		 	## Runs all the tests
@@ -107,25 +142,25 @@ test-docker:		## Runs all the tests on the different Docker platforms
 test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
-test-autoreview:
+test-autoreview: $(PHPUNIT) vendor
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
-test-unit: $(PHPUNIT)
-	$(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit: $(PHPUNIT) vendor
+	$(PHPUNIT) --group $(PHPUNIT_GROUP) --exclude-group e2e
+
+.PHONY: test-unit-parallel
+test-unit-parallel:	## Runs the unit tests in parallel
+test-unit-parallel: $(PARATEST) vendor
+	$(PARATEST) --runner=WrapperRunner
 
 .PHONY: test-unit-docker
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
-test-unit-docker: test-unit-74-docker test-unit-80-docker
+test-unit-docker: test-unit-82-docker
 
-.PHONY: test-unit-74-docker
-test-unit-74-docker: $(DOCKER_RUN_74_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_74) $(PHPUNIT) --group $(PHPUNIT_GROUP)
-
-.PHONY: test-unit-80-docker
-test-unit-80-docker: $(DOCKER_RUN_80_IMAGE) $(PHPUNIT)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
+	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -134,99 +169,73 @@ test-e2e: test-e2e-phpunit
 
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
-test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES)
+test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
 	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
-test-e2e-docker: test-e2e-phpdbg-docker test-e2e-xdebug-docker
-
-.PHONY: test-e2e-phpdbg-docker
-test-e2e-phpdbg-docker: test-e2e-phpdbg-74-docker test-e2e-phpdbg-80-docker
-
-.PHONY: test-e2e-phpdbg-74-docker
-test-e2e-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_74) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_74) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
-
-.PHONY: test-e2e-phpdbg-80-docker
-test-e2e-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_80) env PHPDBG=1 ./tests/e2e_tests $(INFECTION)
+test-e2e-docker: test-e2e-xdebug-docker
 
 .PHONY: test-e2e-xdebug-docker
-test-e2e-xdebug-docker: test-e2e-xdebug-74-docker test-e2e-xdebug-80-docker
+test-e2e-xdebug-docker: test-e2e-xdebug-82-docker
 
-.PHONY: test-e2e-xdebug-74-docker
-test-e2e-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_74) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_74) ./tests/e2e_tests $(INFECTION)
-
-.PHONY: test-e2e-xdebug-80-docker
-test-e2e-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE) $(INFECTION)
-	$(DOCKER_RUN_80) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
-	$(DOCKER_RUN_80) ./tests/e2e_tests $(INFECTION)
+.PHONY: test-e2e-xdebug-82-docker
+test-e2e-xdebug-82-docker: $(DOCKER_FILE_IMAGE) $(INFECTION)
+	$(DOCKER_RUN_82) $(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	$(DOCKER_RUN_82) ./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-infection
-test-infection:	## Runs Infection against itself
-test-infection:
-	$(INFECTION) --threads=4
+test-infection:		## Runs Infection against itself
+test-infection: $(INFECTION) vendor
+	$(INFECTION) --threads=max
 
 .PHONY: test-infection-docker
 test-infection-docker:	## Runs Infection against itself on the different Docker platforms
-test-infection-docker: test-infection-phpdbg-docker test-infection-xdebug-docker
-
-.PHONY: test-infection-phpdbg-docker
-test-infection-phpdbg-docker: test-infection-phpdbg-74-docker test-infection-phpdbg-80-docker
-
-.PHONY: test-infection-phpdbg-74-docker
-test-infection-phpdbg-74-docker: $(DOCKER_RUN_74_IMAGE)
-	$(DOCKER_RUN_74) phpdbg -qrr bin/infection --threads=4
-
-.PHONY: test-infection-phpdbg-80-docker
-test-infection-phpdbg-80-docker: $(DOCKER_RUN_80_IMAGE)
-	$(DOCKER_RUN_80) phpdbg -qrr bin/infection --threads=4
+test-infection-docker: test-infection-xdebug-docker
 
 .PHONY: test-infection-xdebug-docker
-test-infection-xdebug-docker: test-infection-xdebug-74-docker test-infection-xdebug-80-docker
+test-infection-xdebug-docker: test-infection-xdebug-82-docker
 
-.PHONY: test-infection-xdebug-74-docker
-test-infection-xdebug-74-docker: $(DOCKER_RUN_74_IMAGE)
-	$(DOCKER_RUN_74) ./bin/infection --threads=4
-
-.PHONY: test-infection-xdebug-80-docker
-test-infection-xdebug-80-docker: $(DOCKER_RUN_80_IMAGE)
-	$(DOCKER_RUN_80) ./bin/infection --threads=4
+.PHONY: test-infection-xdebug-82-docker
+test-infection-xdebug-82-docker: $(DOCKER_FILE_IMAGE)
+	$(DOCKER_RUN_82) ./bin/infection --threads=max
 
 #
 # Rules from files (non-phony targets)
 #---------------------------------------------------------------------------
 
 $(BOX): Makefile
-	wget $(BOX_URL) --output-document=$(BOX)
+	wget -q $(BOX_URL) --output-document=$(BOX)
 	chmod a+x $(BOX)
-	touch $@
+	touch -c $@
 
 $(PHP_CS_FIXER): Makefile
-	wget $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
+	wget -q $(PHP_CS_FIXER_URL) --output-document=$(PHP_CS_FIXER)
 	chmod a+x $(PHP_CS_FIXER)
-	touch $@
+	touch -c $@
 
 $(PHPSTAN): vendor
+	touch -c $@
 
-$(PSALM): vendor
+$(PSALM): Makefile
+	wget -q $(PSALM_URL) --output-document=$(PSALM)
+	chmod a+x $(PSALM)
+	touch -c $@
 
 $(INFECTION): vendor $(shell find bin/ src/ -type f) $(BOX) box.json.dist .git/HEAD
 	composer require infection/codeception-adapter infection/phpspec-adapter
+	# Workaround for https://github.com/box-project/box/issues/580
+	composer install --no-dev
 	$(BOX) --version
 	$(BOX) validate
 	$(BOX) compile
 	composer remove infection/codeception-adapter infection/phpspec-adapter
+	composer install
 	touch -c $@
 
 vendor: composer.lock
 	composer install --prefer-dist
-	touch $@
+	touch -c $@
 
 composer.lock: composer.json
 	composer install --prefer-dist
@@ -238,16 +247,12 @@ $(PHPUNIT): vendor phpunit.xml.dist
 phpunit.xml.dist:
 	# Not updating phpunit.xml with:
 	# phpunit --migrate-configuration || true
+	touch -c $@
 
-$(DOCKER_RUN_74_IMAGE): devTools/Dockerfile-php74-xdebug
-	docker build --tag infection_php74 --file devTools/Dockerfile-php74-xdebug .
-	docker image inspect infection_php74 > $(DOCKER_RUN_74_IMAGE)
-	touch $@
-
-$(DOCKER_RUN_80_IMAGE): devTools/Dockerfile-php80-xdebug
-	docker build --tag infection_php80 --file devTools/Dockerfile-php80-xdebug .
-	docker image inspect infection_php80 >> $(DOCKER_RUN_80_IMAGE)
-	touch $@
+$(DOCKER_FILE_IMAGE): devTools/Dockerfile
+	docker compose build php82
+	docker image inspect infection-php82 >> $(DOCKER_FILE_IMAGE)
+	touch -c $@
 
 tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz

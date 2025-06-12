@@ -42,7 +42,7 @@ trait PhpUnitAssertions
     private function assertPhpUnitStateIs(
         PhpUnit $phpUnit,
         ?string $expectedConfigDir,
-        ?string $expectedExecutablePath
+        ?string $expectedExecutablePath,
     ): void {
         $this->assertSame($expectedConfigDir, $phpUnit->getConfigDir());
         $this->assertSame($expectedExecutablePath, $phpUnit->getCustomPath());

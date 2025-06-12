@@ -17,7 +17,7 @@ final class SubscriberCollectEventDispatcher implements EventDispatcher
 
     public function dispatch(object $event): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function addSubscriber(EventSubscriber $eventSubscriber): void

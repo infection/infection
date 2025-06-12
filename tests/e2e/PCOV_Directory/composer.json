@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.6.20"
+    },
+    "autoload": {
+        "psr-4": {
+            "PCOV_Directory\\": "example/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PCOV_Directory\\Test\\": "tests/"
+        }
+    }
+}

@@ -39,7 +39,8 @@ use function array_merge;
 use function explode;
 use function file_exists;
 use function getenv;
-use function Safe\sprintf;
+use const PATH_SEPARATOR;
+use function sprintf;
 
 /**
  * @internal
@@ -54,13 +55,13 @@ final class NonExecutableFinder
     {
         $path = getenv('PATH') ?: getenv('Path');
 
-        if (!$path) {
+        if ($path === false || $path === '') {
             return null;
         }
 
         $dirs = array_merge(
             explode(PATH_SEPARATOR, $path),
-            $extraDirectories
+            $extraDirectories,
         );
 
         foreach ($dirs as $dir) {

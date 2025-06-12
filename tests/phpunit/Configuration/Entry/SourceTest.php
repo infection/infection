@@ -36,15 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Source;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Source::class)]
 final class SourceTest extends TestCase
 {
     use SourceAssertions;
 
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(array $directories, array $excludes): void
     {
         $source = new Source($directories, $excludes);
@@ -52,11 +53,11 @@ final class SourceTest extends TestCase
         $this->assertSourceStateIs(
             $source,
             $directories,
-            $excludes
+            $excludes,
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             [],

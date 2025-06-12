@@ -11,6 +11,6 @@ final class FakeLogger extends AbstractLogger
 {
     public function log($level, $message, array $context = []): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __METHOD__);
+        throw UnsupportedMethod::method(self::class, __METHOD__);
     }
 }

@@ -40,10 +40,13 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use const PHP_INT_MAX;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractNumberMutator<Node\Scalar\LNumber>
  */
 final class DecrementInteger extends AbstractNumberMutator
 {
@@ -58,19 +61,21 @@ final class DecrementInteger extends AbstractNumberMutator
         'strlen',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = 20;
+                + $a = 19;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Scalar\LNumber $node
      *
      * @return iterable<Node\Scalar\LNumber>
      */
@@ -80,7 +85,15 @@ final class DecrementInteger extends AbstractNumberMutator
 
         $value = $node->value - 1;
 
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to add to it instead of substracting.
+         */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            // PHP Parser reads negative number as a pair of minus sign and a positive int,
+            // but positive part of PHP_INT_MIN leads to an overflow into float. To work
+            // around this we have to cast the result value back to int after adding one.
             $value = $node->value + 1;
         }
 
@@ -93,9 +106,16 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment PHP_INT_MAX as part of a negative number, leads to parser bugs.
+        if ($node->value === PHP_INT_MAX && $parentNode instanceof Node\Expr\UnaryMinus) {
+            return false;
+        }
+
         if (
             $node->value === 1
-            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
         ) {
             return false;
         }
@@ -132,7 +152,7 @@ final class DecrementInteger extends AbstractNumberMutator
             && in_array(
                 $parentNode->left->name->toLowerString(),
                 self::COUNT_NAMES,
-                true
+                true,
             )
         ) {
             return false;
@@ -142,7 +162,7 @@ final class DecrementInteger extends AbstractNumberMutator
             && in_array(
                 $parentNode->right->name->toLowerString(),
                 self::COUNT_NAMES,
-                true
+                true,
             )
         ) {
             return false;

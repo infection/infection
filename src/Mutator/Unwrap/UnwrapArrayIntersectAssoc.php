@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
@@ -42,34 +43,41 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayIntersectAssoc extends AbstractUnwrapMutator
+final class UnwrapArrayIntersectAssoc extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_intersect_assoc` function call with its operands. For example:
+                Replaces an `array_intersect_assoc` function call with its operands. For example:
 
-```php
-$x = array_intersect_assoc($array1, $array2);
-```
+                ```php
+                $x = array_intersect_assoc($array1, $array2);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $array1;
-```
+                ```php
+                $x = $array1;
+                ```
 
-And:
+                And:
 
-```php
-$x = $array2;
-```
+                ```php
+                $x = $array2;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = array_intersect_assoc($array1, $array2);
+                # Mutation 1
+                + $x = $array1;
+                # Mutation 2
+                + $x = $array2;
+                DIFF,
         );
     }
 

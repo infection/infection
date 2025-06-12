@@ -39,7 +39,7 @@ use DomainException;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that
@@ -52,26 +52,29 @@ use function Safe\sprintf;
  * better performance optimization in our case.
  *
  * @internal
+ *
+ * @template TNode of Node
+ * @implements Mutator<TNode>
  */
-final class IgnoreMutator implements Mutator
+final readonly class IgnoreMutator implements Mutator
 {
-    private IgnoreConfig $config;
-    private Mutator $mutator;
-
-    public function __construct(IgnoreConfig $config, Mutator $mutator)
-    {
-        $this->config = $config;
-        $this->mutator = $mutator;
+    /**
+     * @param Mutator<TNode> $mutator
+     */
+    public function __construct(
+        private IgnoreConfig $config,
+        private Mutator $mutator,
+    ) {
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         // Since we do not use `getDefinition()` in our source code yet (only in tests for
         // documentation purposes), we do not worry about this one for now. If needed, this one
         // can also be made non-static to return the definition of the decorated mutator.
         throw new DomainException(sprintf(
             'The class "%s" does not have a definition',
-            self::class
+            self::class,
         ));
     }
 
@@ -91,14 +94,16 @@ final class IgnoreMutator implements Mutator
         return !$this->config->isIgnored(
             $reflectionClass->getName(),
             $node->getAttribute(ReflectionVisitor::FUNCTION_NAME, ''),
-            $node->getLine()
+            $node->getStartLine(),
         );
     }
 
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node|Node[]>
+     * @param TNode $node
+     *
+     * @return iterable<int|Node|Node[]>
      */
     public function mutate(Node $node): iterable
     {

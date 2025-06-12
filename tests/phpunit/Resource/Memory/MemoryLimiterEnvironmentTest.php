@@ -38,25 +38,22 @@ namespace Infection\Tests\Resource\Memory;
 use Composer\XdebugHandler\XdebugHandler;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use const PHP_SAPI;
+use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\ini_get;
 use function Safe\ini_set;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(MemoryLimiterEnvironment::class)]
 final class MemoryLimiterEnvironmentTest extends TestCase
 {
-    /**
-     * @var string|null
-     */
-    private $originalMemoryLimit;
+    private string $originalMemoryLimit;
 
-    /**
-     * @var MemoryLimiterEnvironment
-     */
-    private $environment;
+    private MemoryLimiterEnvironment $environment;
 
     protected function setUp(): void
     {
@@ -70,12 +67,10 @@ final class MemoryLimiterEnvironmentTest extends TestCase
         ini_set('memory_limit', $this->originalMemoryLimit);
     }
 
-    /**
-     * @dataProvider memoryLimitProvider
-     */
+    #[DataProvider('memoryLimitProvider')]
     public function test_it_can_detect_if_a_memory_limit_is_set(string $memoryLimit, bool $expected): void
     {
-        ini_set('memory_limit', $memoryLimit);
+        @ini_set('memory_limit', $memoryLimit);
 
         $this->assertSame($expected, $this->environment->hasMemoryLimitSet());
     }
@@ -117,15 +112,23 @@ final class MemoryLimiterEnvironmentTest extends TestCase
             $this->markTestSkipped('This test requires running without PHPDBG');
         }
 
-        $skipped = (new ReflectionClass(XdebugHandler::class))->getProperty('skipped');
-        $skipped->setAccessible(true);
-        $skipped->setValue('infection-fake');
+        $reflectionClass = new ReflectionClass(XdebugHandler::class);
+
+        if (PHP_VERSION_ID < 80300) {
+            $reflectionClass->getProperty('skipped')->setValue('infection-fake');
+        } else {
+            $reflectionClass->setStaticPropertyValue('skipped', 'infection-fake');
+        }
 
         try {
             $this->assertFalse($this->environment->isUsingSystemIni());
         } finally {
             // Restore original value
-            $skipped->setValue(null);
+            if (PHP_VERSION_ID < 80300) {
+                $reflectionClass->getProperty('skipped')->setValue(null);
+            } else {
+                $reflectionClass->setStaticPropertyValue('skipped', null);
+            }
         }
     }
 

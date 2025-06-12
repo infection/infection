@@ -43,27 +43,31 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Minus>
  */
 final class MinusEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a subtraction assignment operator (`-=`) with an addition assignment operator (`+=`).
-TXT
+                Replaces a subtraction assignment operator (`-=`) with an addition assignment operator (`+=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a -= $b;
+                + $a += $b;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Minus $node
      *
      * @return iterable<Node\Expr\AssignOp\Plus>
      */

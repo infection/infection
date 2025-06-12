@@ -43,38 +43,43 @@ use Symfony\Component\Console\Question\Question;
 /**
  * @internal
  */
-final class TextLogFileProvider
+final readonly class TextLogFileProvider
 {
-    public const TEXT_LOG_FILE_NAME = 'infection.log';
-
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+    ) {
     }
 
     /**
      * @param string[] $dirsInCurrentDir
      */
-    public function get(IO $io, array $dirsInCurrentDir): string
+    public function get(IO $io, array $dirsInCurrentDir): ?string
     {
         $io->writeln(['']);
 
+        $io->writeln([
+            '',
+            'Infection may save execution results in a text log for a future review.',
+            'This can be "infection.log" but we recommend leaving it out for performance reasons.',
+            'Press <comment><return></comment> to skip additional logging.',
+            '',
+        ]);
+
         $questionText = $this->consoleHelper->getQuestion(
             'Where do you want to store the text log file?',
-            self::TEXT_LOG_FILE_NAME
+            '',
         );
 
-        $question = new Question($questionText, self::TEXT_LOG_FILE_NAME);
+        $question = new Question($questionText, '');
         $question->setAutocompleterValues($dirsInCurrentDir);
 
-        return $this->questionHelper->ask(
+        $answer = $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
-            $question
+            $question,
         );
+
+        return $answer === '' ? null : $answer;
     }
 }

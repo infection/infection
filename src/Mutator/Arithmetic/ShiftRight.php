@@ -43,27 +43,31 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\ShiftRight>
  */
 final class ShiftRight implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a bitwise shift left operator (`>>`) with a bitwise shift right operator (`<<`).
-TXT
+                Replaces a bitwise shift left operator (`>>`) with a bitwise shift right operator (`<<`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b >> 1;
+                + $a = $b << 1;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\ShiftRight $node
      *
      * @return iterable<Node\Expr\BinaryOp\ShiftLeft>
      */

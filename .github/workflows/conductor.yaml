@@ -1,0 +1,29 @@
+# See the Conductor setup guide at https://packagist.com/docs/conductor/getting-started
+
+on:
+  repository_dispatch:
+    types:
+      - dependency_update
+
+name: Private Packagist Conductor
+
+permissions:
+  contents: write
+
+jobs:
+  conductor:
+    name: Private Packagist Conductor
+    runs-on: "ubuntu-latest"
+    env:
+      COMPOSER_AUTH: ${{ secrets.CONDUCTOR_COMPOSER_AUTH }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PHP
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.2"
+
+      - name: "Running Conductor"
+        uses: packagist/conductor-github-action@v1

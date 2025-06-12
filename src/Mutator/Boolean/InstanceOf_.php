@@ -39,21 +39,31 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node>
  */
 final class InstanceOf_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces an instanceof comparison with `true` and `false`.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b instanceof User;
+                # Mutation 1
+                + $a = true;
+                # Mutation 2
+                + $a = false;
+                DIFF,
         );
     }
 
@@ -71,6 +81,26 @@ final class InstanceOf_ implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Instanceof_;
+        if (!$node instanceof Node\Expr\Instanceof_) {
+            return false;
+        }
+
+        if ($this->isArgumentOfAssertFunction($node)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isArgumentOfAssertFunction(Node\Expr\Instanceof_ $node): bool
+    {
+        $parentNode = ParentConnector::findParent($node);
+        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
+
+        if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
+            return false;
+        }
+
+        return $grandParentNode->name->toLowerString() === 'assert';
     }
 }

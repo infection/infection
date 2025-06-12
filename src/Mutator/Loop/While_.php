@@ -43,46 +43,52 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\While_>
  */
 final class While_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `while` expression with false, preventing
-any iteration within the block to be executed. For example:
+                Replaces the iterable being iterated over with a `while` expression with false, preventing
+                any iteration within the block to be executed. For example:
 
-```php`
+                ```php`
 
-$condition = true;
-while ($condition) {
-    // ...
-}
-```
+                $condition = true;
+                while ($condition) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
+                ```php
 
-$condition = true;
-while (false) {
-    // ...
-}
-```
-TXT
+                $condition = true;
+                while (false) {
+                    // ...
+                }
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - while ($condition) {
+                + while (false) {
+                      // ...
+                }
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\While_ $node
      *
      * @return iterable<Node\Stmt\While_>
      */
@@ -91,7 +97,7 @@ TXT
         yield new Node\Stmt\While_(
             new Node\Expr\ConstFetch(new Node\Name('false')),
             $node->stmts,
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 

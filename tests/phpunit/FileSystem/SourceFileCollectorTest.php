@@ -35,44 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use function array_keys;
 use function array_map;
 use function array_values;
+use function count;
 use Infection\FileSystem\SourceFileCollector;
+use function natcasesort;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use function Safe\natcasesort;
-use Webmozart\PathUtil\Path;
+use function range;
+use Symfony\Component\Filesystem\Path;
 
+#[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
 
-    /**
-     * @dataProvider sourceFilesProvider
-     */
+    #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
     {
         $root = self::FIXTURES;
 
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles);
 
-        $files = take($files)->toArray(); // PHP 7.4 [...$files]
+        $files = take($files)->toList();
 
         $this->assertSame(
             $expected,
-            self::normalizePaths($files, $root)
+            self::normalizePaths($files, $root),
         );
 
         if ($files !== []) {
             $this->assertSame(
                 range(0, count($files) - 1),
                 array_keys($files),
-                'Expected the collected files to be a list'
+                'Expected the collected files to be a list',
             );
         }
     }
 
-    public function sourceFilesProvider(): iterable
+    public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
             [],
@@ -148,6 +152,17 @@ final class SourceFileCollectorTest extends TestCase
                 'case1/sub-dir/b.php',
             ],
         ];
+
+        yield 'one directory, no filter, one common excludes and one file exclude' => [
+            [self::FIXTURES . '/case0'],
+            [
+                'sub-dir',
+                'a.php',
+            ],
+            [
+                'case0/outside-symlink.php',
+            ],
+        ];
     }
 
     /**
@@ -161,11 +176,9 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = array_values(
             array_map(
-                static function (string $file) use ($root): string {
-                    return Path::makeRelative($file, $root);
-                },
-                $files
-            )
+                static fn (string $file): string => Path::makeRelative($file, $root),
+                $files,
+            ),
         );
 
         natcasesort($files);

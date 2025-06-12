@@ -38,18 +38,20 @@ namespace Infection\Tests\Mutator\Removal;
 use Infection\Mutator\Removal\ArrayItemRemovalConfig;
 use InvalidArgumentException;
 use const PHP_INT_MAX;
+use const PHP_VERSION_ID;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 
+#[CoversClass(ArrayItemRemovalConfig::class)]
 final class ArrayItemRemovalConfigTest extends TestCase
 {
-    /**
-     * @dataProvider settingsProvider
-     */
+    #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(
         array $settings,
         string $expectedRemove,
-        int $expectedLimit
+        int $expectedLimit,
     ): void {
         $config = new ArrayItemRemovalConfig($settings);
 
@@ -66,7 +68,7 @@ final class ArrayItemRemovalConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected one of: "first", "last", "all". Got: "unknown"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -95,12 +97,12 @@ final class ArrayItemRemovalConfigTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected the limit to be greater or equal than 1. Got "0" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function settingsProvider(): iterable
+    public static function settingsProvider(): iterable
     {
         yield 'default' => [
             [],

@@ -36,7 +36,13 @@ declare(strict_types=1);
 namespace Infection;
 
 use function array_values;
+use function count;
+use function explode;
+use function implode;
+use const PHP_EOL;
+use function Safe\mb_convert_encoding;
 use function str_replace;
+use function trim;
 
 /**
  * @internal
@@ -49,7 +55,7 @@ final class Str
     {
         $lines = explode(
             "\n",
-            str_replace("\r\n", "\n", $string)
+            str_replace("\r\n", "\n", $string),
         );
         $linesCount = count($lines);
 
@@ -83,5 +89,13 @@ final class Str
         }
 
         return implode(PHP_EOL, $lines);
+    }
+
+    public static function convertToUtf8(string $string): string
+    {
+        /** @var string $utf8String */
+        $utf8String = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
+
+        return $utf8String;
     }
 }

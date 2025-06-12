@@ -37,8 +37,10 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(JUnitTestCaseTimeAdder::class)]
 final class JUnitTestCaseTimeAdderTest extends TestCase
 {
     public function test_it_returns_time_for_the_only_test(): void
@@ -47,7 +49,7 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
             new TestLocation(
                 'Test::testMethod1',
                 '/path/to/test-file-1',
-                0.000234
+                0.000234,
             ),
         ];
 
@@ -64,12 +66,12 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
             new TestLocation(
                 'rubbish',
                 '/path/to/test-file-1',
-                0.000234
+                0.000234,
             ),
             new TestLocation(
                 'Test::testMethod1',
                 '/path/to/test-file-1',
-                10.0
+                10.0,
             ),
         ];
 
@@ -86,22 +88,22 @@ final class JUnitTestCaseTimeAdderTest extends TestCase
             new TestLocation(
                 'FooTest::testMethod1',
                 '/path/to/test-file-1',
-                0.9
+                0.9,
             ),
             new TestLocation(
                 'FooTest::testMethod2',
                 '/path/to/test-file-2',
-                0.9
+                0.9,
             ),
             new TestLocation(
                 'BarTest::testMethod3_1',
                 '/path/to/test-file-3',
-                0.2
+                0.2,
             ),
             new TestLocation(
                 'BarTest::testMethod3_2',
                 '/path/to/test-file-4',
-                0.2
+                0.2,
             ),
         ];
 

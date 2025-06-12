@@ -46,24 +46,28 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\ClassMethod>
  */
 final class ProtectedVisibility implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces the `protected` method visibility keyword with `private`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - protected function foo() {
+                + private function foo() {
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\ClassMethod $node
      *
      * @return iterable<Node\Stmt\ClassMethod>
      */
@@ -78,8 +82,9 @@ final class ProtectedVisibility implements Mutator
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
                 'stmts' => $node->getStmts(),
+                'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 
@@ -89,7 +94,10 @@ final class ProtectedVisibility implements Mutator
             return false;
         }
 
-        if ($node->isFinal()) {
+        /** @var ClassReflection $class */
+        $class = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+
+        if ($node->isFinal() || $class !== null && $class->isFinal()) {
             return false;
         }
 

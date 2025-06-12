@@ -37,7 +37,7 @@ namespace Infection\Environment;
 
 use function implode;
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -50,8 +50,8 @@ final class CouldNotResolveStrykerApiKey extends RuntimeException
             'The Stryker API key needs to be configured using one of the environment variables "%s", but could not find any of these.',
             implode(
                 '" or "',
-                $names
-            )
+                $names,
+            ),
         ));
     }
 }

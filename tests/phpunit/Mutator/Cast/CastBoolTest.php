@@ -35,50 +35,187 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Cast\CastBool;
+use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastBool::class)]
 final class CastBoolTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to bool with "bool"' => [
             <<<'PHP'
-<?php
+                <?php
 
-(bool) 1;
-PHP
+                (bool) 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1;
-PHP
+                1;
+                PHP
             ,
         ];
 
         yield 'It removes casting to bool with "boolean"' => [
             <<<'PHP'
-<?php
+                <?php
 
-(boolean) 1;
-PHP
+                (boolean) 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1;
-PHP
+                1;
+                PHP
             ,
+        ];
+
+        yield 'It removes casting to bool in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((bool) preg_match()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (preg_match()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (bool) preg_match();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return preg_match();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to bool in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (bool) preg_match();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to bool in return of bool-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsBool(): bool
+                {
+                    return (bool) preg_match();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsBool(): bool
+                {
+                    return preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsBool(): bool {
+                    return (bool) preg_match();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in nested return of bool-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsBool(): bool {
+                    if (true) {
+                        return (bool) preg_match();
+                    }
+                    return false;
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in return of bool-method when strict-types=1' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'bool-method.php'),
+        ];
+
+        yield 'It removes casting to bool in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    in_array(strict: (bool) $s);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    in_array(strict: $s);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to bool in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    in_array(strict: (bool) $s);
+                }
+                PHP,
         ];
     }
 }

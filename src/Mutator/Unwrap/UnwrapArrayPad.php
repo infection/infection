@@ -41,27 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayPad extends AbstractUnwrapMutator
+final class UnwrapArrayPad extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_pad` function call with its first operand. For example:
+                Replaces an `array_pad` function call with its first operand. For example:
 
-```php
-$x = array_pad(['foo'], 2, ' ');
-```
+                ```php
+                $x = array_pad(['foo'], 2, ' ');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo'];
-```
-TXT
+                ```php
+                $x = ['foo'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = array_pad(['foo'], 2, ' ');
+                + $x = ['foo'];
+                DIFF,
         );
     }
 

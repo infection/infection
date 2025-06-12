@@ -38,8 +38,11 @@ namespace Infection\Tests\Mutator;
 use Error;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\InvalidMutator;
+use Infection\Testing\MutatorName;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(InvalidMutator::class)]
 final class InvalidMutatorTest extends TestCase
 {
     public function test_it_can_create_an_exception(): void
@@ -49,16 +52,16 @@ final class InvalidMutatorTest extends TestCase
         $exception = InvalidMutator::create(
             '/path/to/acme/Foo.php',
             MutatorName::getName(Plus::class),
-            $previous
+            $previous,
         );
 
         $this->assertSame(
             <<<'TXT'
-Encountered an error with the "Plus" mutator in the "/path/to/acme/Foo.php" file. This is most likely a bug in Infection.
-Please consider reporting this this in our issue tracker: https://github.com/infection/infection/issues/new?template=Bug_report.md
-TXT
+                Encountered an error with the "Plus" mutator in the "/path/to/acme/Foo.php" file. This is most likely a bug in Infection.
+                Please consider reporting this this in our issue tracker: https://github.com/infection/infection/issues/new?template=Bug_report.md
+                TXT
             ,
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertSame($previous, $exception->getPrevious());

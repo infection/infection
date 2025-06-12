@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Environment;
 
 use Infection\Environment\CouldNotResolveBuildContext;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(CouldNotResolveBuildContext::class)]
 final class CouldNotResolveBuildContextTest extends TestCase
 {
     public function test_it_can_be_instantiated(): void

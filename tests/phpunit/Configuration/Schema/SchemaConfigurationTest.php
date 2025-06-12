@@ -35,18 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SchemaConfiguration::class)]
 final class SchemaConfigurationTest extends TestCase
 {
-    /**
-     * @dataProvider valueProvider
-     */
+    #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(
         string $path,
         ?float $timeout,
@@ -54,6 +56,7 @@ final class SchemaConfigurationTest extends TestCase
         Logs $logs,
         ?string $tmpDir,
         PhpUnit $phpUnit,
+        PhpStan $phpStan,
         ?bool $ignoreMsiWithNoMutations,
         $minMsi,
         $minCoveredMsi,
@@ -61,7 +64,8 @@ final class SchemaConfigurationTest extends TestCase
         ?string $testFramework,
         ?string $bootstrap,
         ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions
+        ?string $testFrameworkExtraOptions,
+        string|int|null $threadCount,
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -70,6 +74,7 @@ final class SchemaConfigurationTest extends TestCase
             $logs,
             $tmpDir,
             $phpUnit,
+            $phpStan,
             $ignoreMsiWithNoMutations,
             $minMsi,
             $minCoveredMsi,
@@ -77,7 +82,8 @@ final class SchemaConfigurationTest extends TestCase
             $testFramework,
             $bootstrap,
             $initialTestsPhpOptions,
-            $testFrameworkExtraOptions
+            $testFrameworkExtraOptions,
+            $threadCount,
         );
 
         $this->assertSame($path, $config->getFile());
@@ -86,6 +92,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($logs, $config->getLogs());
         $this->assertSame($tmpDir, $config->getTmpDir());
         $this->assertSame($phpUnit, $config->getPhpUnit());
+        $this->assertSame($phpStan, $config->getPhpStan());
         $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations());
         $this->assertSame($minMsi, $config->getMinMsi());
         $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi());
@@ -96,7 +103,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'minimal' => [
             '',
@@ -105,6 +112,7 @@ final class SchemaConfigurationTest extends TestCase
             Logs::createEmpty(),
             null,
             new PhpUnit(null, null),
+            new PhpStan(null, null),
             null,
             null,
             null,
@@ -113,6 +121,7 @@ final class SchemaConfigurationTest extends TestCase
             null,
             null,
             null,
+            null, // threadCount
         ];
 
         yield 'complete' => [
@@ -121,15 +130,19 @@ final class SchemaConfigurationTest extends TestCase
             new Source(['src', 'lib'], ['fixtures', 'tests']),
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
+                'gitlab.log',
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master')
+                StrykerConfig::forFullReport('master'),
+                'summary.json',
             ),
             'path/to/tmp',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            new PhpStan('bin/phpstan-config-dir', 'bin/phpstan'),
             true,
             12.0,
             35.0,
@@ -141,6 +154,7 @@ final class SchemaConfigurationTest extends TestCase
             'bin/bootstrap.php',
             '-d zend_extension=xdebug.so',
             '--debug',
+            'max', // threadCount
         ];
     }
 }

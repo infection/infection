@@ -38,19 +38,17 @@ namespace Infection\Tests\EnvVariableManipulation;
 use function array_key_exists;
 use function getenv;
 use function Safe\putenv;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 final class EnvBackup
 {
-    private $environmentVariables;
-
     /**
      * @param array<string, string> $environmentVariables
      */
-    private function __construct(array $environmentVariables)
-    {
-        $this->environmentVariables = $environmentVariables;
+    private function __construct(
+        private array $environmentVariables,
+    ) {
     }
 
     public static function createSnapshot(): self

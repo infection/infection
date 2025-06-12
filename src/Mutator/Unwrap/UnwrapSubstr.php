@@ -41,27 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapSubstr extends AbstractUnwrapMutator
+final class UnwrapSubstr extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `substr` function call with its first operand. For example:
+                Replaces a `substr` function call with its first operand. For example:
 
-```php
-$x = substr('abcde', 0, -1);
-```
+                ```php
+                $x = substr('abcde', 0, -1);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'abcde';
-```
-TXT
+                ```php
+                $x = 'abcde';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = substr('abcde', 0, -1);
+                + $x = 'abcde';
+                DIFF,
         );
     }
 

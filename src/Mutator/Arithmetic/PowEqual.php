@@ -43,20 +43,26 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Pow>
  */
 final class PowEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an exponentiation assignment operator (`**=`) with a division assignment operator (`/=`).
-TXT
+                Replaces an exponentiation assignment operator (`**=`) with a division assignment operator (`/=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a **= $b;
+                + $a /= $b;
+                DIFF,
         );
     }
 
@@ -64,8 +70,6 @@ TXT
      * Replaces "**=" with "/="
      *
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Pow $node
      *
      * @return iterable<Node\Expr\AssignOp\Div>
      */

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\usort;
+use function usort;
 
 /**
  * @internal
@@ -82,7 +82,7 @@ final class SortableMutantExecutionResults
                 }
 
                 return $a->getOriginalFilePath() <=> $b->getOriginalFilePath();
-            }
+            },
         );
     }
 }

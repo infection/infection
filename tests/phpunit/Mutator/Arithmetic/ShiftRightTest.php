@@ -35,46 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\ShiftRight;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(ShiftRight::class)]
 final class ShiftRightTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates shift right' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a >> 2;
-PHP
+                $a = 1;
+                $a >> 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a << 2;
-PHP
+                $a = 1;
+                $a << 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate shift left' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a << 2;
-PHP
+                $a = 1;
+                $a << 2;
+                PHP
             ,
         ];
     }
@@ -85,11 +88,11 @@ PHP
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<'PHP'
-<?php
+            <?php
 
-$a = 1;
-$a << 2;
-PHP;
+            $a = 1;
+            $a << 2;
+            PHP;
 
         $this->assertSame($expectedMutatedCode, $mutations[0]);
     }

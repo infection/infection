@@ -38,16 +38,17 @@ namespace Infection\Tests;
 use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-/**
- * @group integration
- * @coversNothing
- */
+#[Group('integration')]
+#[CoversNothing]
 final class BenchmarkTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
@@ -57,9 +58,7 @@ final class BenchmarkTest extends TestCase
      */
     private $phpExecutable;
 
-    /**
-     * @dataProvider provideBenchmarks
-     */
+    #[DataProvider('provideBenchmarks')]
     public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
     {
         if (PHP_OS_FAMILY === 'Windows') {
@@ -89,7 +88,7 @@ final class BenchmarkTest extends TestCase
         }
     }
 
-    public function provideBenchmarks(): iterable
+    public static function provideBenchmarks(): iterable
     {
         yield 'MutationGenerator' => [
             realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
@@ -104,6 +103,6 @@ final class BenchmarkTest extends TestCase
 
     private function getPhpExecutable(): string
     {
-        return $this->phpExecutable ?? $this->phpExecutable = (new PhpExecutableFinder())->find();
+        return $this->phpExecutable ??= (new PhpExecutableFinder())->find();
     }
 }

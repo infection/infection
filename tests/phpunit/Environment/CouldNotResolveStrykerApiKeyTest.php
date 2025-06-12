@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Environment;
 
+use function implode;
 use Infection\Environment\CouldNotResolveStrykerApiKey;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
+#[CoversClass(CouldNotResolveStrykerApiKey::class)]
 final class CouldNotResolveStrykerApiKeyTest extends TestCase
 {
     public function test_from_returns_exception(): void
@@ -54,8 +57,8 @@ final class CouldNotResolveStrykerApiKeyTest extends TestCase
             'The Stryker API key needs to be configured using one of the environment variables "%s", but could not find any of these.',
             implode(
                 '" or "',
-                $names
-            )
+                $names,
+            ),
         );
 
         $this->assertSame($message, $exception->getMessage());

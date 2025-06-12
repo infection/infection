@@ -35,41 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use Infection\Metrics\MetricsCalculator;
-use function Safe\getcwd;
+use function getenv;
+use Infection\Metrics\ResultsCollector;
+use function Safe\shell_exec;
 use function str_replace;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
+use function trim;
 
 /**
  * @internal
  */
 final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
+    public const DEFAULT_OUTPUT = 'php://stdout';
 
-    public function __construct(MetricsCalculator $metricsCalculator)
-    {
-        $this->metricsCalculator = $metricsCalculator;
+    public function __construct(
+        private readonly ResultsCollector $resultsCollector,
+        private ?string $loggerProjectRootDirectory,
+    ) {
+        if ($loggerProjectRootDirectory === null) {
+            if (($projectRootDirectory = getenv('GITHUB_WORKSPACE')) === false) {
+                $projectRootDirectory = trim((string) shell_exec('git rev-parse --show-toplevel'));
+            }
+            $this->loggerProjectRootDirectory = $projectRootDirectory;
+        }
     }
 
     public function getLogLines(): array
     {
         $lines = [];
-        $currentWorkingDirectory = getcwd();
 
-        foreach ($this->metricsCalculator->getEscapedExecutionResults() as $escapedExecutionResult) {
+        foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
             $error = [
                 'line' => $escapedExecutionResult->getOriginalStartingLine(),
                 'message' => <<<"TEXT"
-Escaped Mutant:
+                    Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
 
-{$escapedExecutionResult->getMutantDiff()}
-TEXT
-            ,
+                    {$escapedExecutionResult->getMutantDiff()}
+                    TEXT
+                ,
             ];
 
             $lines[] = $this->buildAnnotation(
-                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $currentWorkingDirectory),
+                /* @phpstan-ignore-next-line expects string, string|null given */
+                Path::makeRelative($escapedExecutionResult->getOriginalFilePath(), $this->loggerProjectRootDirectory),
                 $error,
             );
         }

@@ -35,25 +35,33 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_intersect;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use LogicException;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\BooleanOr>
  */
 final class LogicalOr implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces an OR operator (`||`) with an AND operator (`&&`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b || $c;
+                + $a = $b && $c;
+                DIFF,
         );
     }
 
@@ -61,8 +69,6 @@ final class LogicalOr implements Mutator
      * @psalm-mutation-free
      *
      * Replaces "||" with "&&"
-     *
-     * @param Node\Expr\BinaryOp\BooleanOr $node
      *
      * @return iterable<Node\Expr\BinaryOp\BooleanAnd>
      */
@@ -73,6 +79,158 @@ final class LogicalOr implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\BooleanOr;
+        if (!$node instanceof Node\Expr\BinaryOp\BooleanOr) {
+            return false;
+        }
+
+        $nodeLeft = $node->left;
+        $nodeRight = $node->right;
+
+        if (
+            !$nodeLeft instanceof Node\Expr\BinaryOp
+            || !$nodeRight instanceof Node\Expr\BinaryOp
+        ) {
+            return true;
+        }
+
+        $nodeLeftLeft = $nodeLeft->left;
+        $nodeLeftRight = $nodeLeft->right;
+
+        $nodeRightLeft = $nodeRight->left;
+        $nodeRightRight = $nodeRight->right;
+
+        if (
+            $nodeLeft instanceof Node\Expr\BinaryOp\Identical
+            && $nodeRight instanceof Node\Expr\BinaryOp\Identical
+        ) {
+            $varNameLeft = [];
+
+            if ($nodeLeftLeft instanceof Node\Expr\Variable) {
+                $varNameLeft[] = $nodeLeftLeft->name;
+            }
+
+            if ($nodeLeftRight instanceof Node\Expr\Variable) {
+                $varNameLeft[] = $nodeLeftRight->name;
+            }
+
+            $varNameRight = [];
+
+            if ($nodeRightLeft instanceof Node\Expr\Variable) {
+                $varNameRight[] = $nodeRightLeft->name;
+            }
+
+            if ($nodeRightRight instanceof Node\Expr\Variable) {
+                $varNameRight[] = $nodeRightRight->name;
+            }
+
+            return array_intersect($varNameLeft, $varNameRight) === [];
+        }
+
+        if (
+            (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
+                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
+                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
+                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
+                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
+            )
+            || (
+                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
+                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
+            )
+        ) {
+            $varNameLeft = null;
+            $valueLeft = null;
+
+            if ($nodeLeftLeft instanceof Node\Expr\Variable) {
+                $varNameLeft = $nodeLeftLeft->name;
+            } elseif (
+                $nodeLeftLeft instanceof Node\Scalar\LNumber
+                || $nodeLeftLeft instanceof Node\Scalar\DNumber
+            ) {
+                $valueLeft = $nodeLeftLeft->value;
+            } else {
+                return true;
+            }
+
+            if ($nodeLeftRight instanceof Node\Expr\Variable && $varNameLeft === null) {
+                $varNameLeft = $nodeLeftRight->name;
+            } elseif (
+                (
+                    $nodeLeftRight instanceof Node\Scalar\LNumber
+                    || $nodeLeftRight instanceof Node\Scalar\DNumber
+                ) && $valueLeft === null
+            ) {
+                $valueLeft = $nodeLeftRight->value;
+            } else {
+                return true;
+            }
+
+            $varNameRight = null;
+            $valueRight = null;
+
+            if ($nodeRightLeft instanceof Node\Expr\Variable) {
+                $varNameRight = $nodeRightLeft->name;
+            } elseif (
+                $nodeRightLeft instanceof Node\Scalar\LNumber
+                || $nodeRightLeft instanceof Node\Scalar\DNumber
+            ) {
+                $valueRight = $nodeRightLeft->value;
+            } else {
+                return true;
+            }
+
+            if ($nodeRightRight instanceof Node\Expr\Variable && $varNameRight === null) {
+                $varNameRight = $nodeRightRight->name;
+            } elseif (
+                (
+                    $nodeRightRight instanceof Node\Scalar\LNumber
+                    || $nodeRightRight instanceof Node\Scalar\DNumber
+                ) && $valueRight === null
+            ) {
+                $valueRight = $nodeRightRight->value;
+            } else {
+                return true;
+            }
+
+            if ($varNameLeft !== $varNameRight) {
+                return true;
+            }
+
+            return (match ("{$nodeLeft->getOperatorSigil()}::{$nodeRight->getOperatorSigil()}") {
+                '<::>' => static fn () => $valueRight < $valueLeft, // a<5 && a>7; 7<a<5; 7<5;
+                '<::>=' => static fn () => $valueRight < $valueLeft, // a<5 && a>=7; 7<=a<5; 7<5;
+                '<=::>=' => static fn () => $valueRight <= $valueLeft, // a<=5 && a>=7; 7<=a<=5; 7<=5;
+                '<=::>' => static fn () => $valueRight < $valueLeft, // a<=5 && a>7; 7<a<=5; 7<5;
+                '>::<' => static fn () => $valueRight > $valueLeft, // a>5 && a<7; 7>a>5; 7>5;
+                '>::<=' => static fn () => $valueRight > $valueLeft, // a>5 && a<=7; 7>=a>5; 7>5;
+                '>=::<=' => static fn () => $valueRight >= $valueLeft, // a>=5 && a<=7; 7>=a>=5; 7>=5;
+                '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
+                default => throw new LogicException('This is an unreachable statement.'),
+            })();
+        }
+
+        return true;
     }
 }

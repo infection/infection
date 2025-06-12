@@ -37,7 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use const PHP_EOL;
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -48,7 +48,7 @@ final class InvalidPhpUnitConfiguration extends RuntimeException
     {
         return new self(sprintf(
             'The file "%s" is not a valid PHPUnit configuration file',
-            $configPath
+            $configPath,
         ));
     }
 
@@ -58,7 +58,7 @@ final class InvalidPhpUnitConfiguration extends RuntimeException
             'The file "%s" does not pass the XSD schema validation.%s%s',
             $configPath,
             PHP_EOL,
-            $libXmlErrorsString
+            $libXmlErrorsString,
         ));
     }
 }

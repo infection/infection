@@ -47,11 +47,9 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
  */
 class Differ
 {
-    private BaseDiffer $differ;
-
-    public function __construct(BaseDiffer $differ)
-    {
-        $this->differ = $differ;
+    public function __construct(
+        private readonly BaseDiffer $differ,
+    ) {
     }
 
     /**

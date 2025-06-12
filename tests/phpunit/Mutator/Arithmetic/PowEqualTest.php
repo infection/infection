@@ -35,45 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\PowEqual;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(PowEqual::class)]
 final class PowEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates pow equal' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a **= 2;
-PHP
+                $a = 1;
+                $a **= 2;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a /= 2;
-PHP
+                $a = 1;
+                $a /= 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate normal pow' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 ** 3;
-PHP
+                $a = 10 ** 3;
+                PHP
             ,
         ];
     }

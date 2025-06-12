@@ -35,43 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Boolean\LogicalAnd;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(LogicalAnd::class)]
 final class LogicalAndTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical and' => [
             <<<'PHP'
-<?php
+                <?php
 
-true && false;
-PHP
+                true && false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-true || false;
-PHP
+                true || false;
+                PHP
             ,
         ];
 
         yield 'It does not mutate logical lower and' => [
             <<<'PHP'
-<?php
+                <?php
 
-true and false;
-PHP
+                true and false;
+                PHP
             ,
         ];
     }

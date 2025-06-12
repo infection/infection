@@ -4,15 +4,12 @@ cd tests/e2e
 
 failure="false"
 
-if [ -f error.log ]
-then
-    :> error.log
-fi
+:> error.log
 
-touch error.log
+run_infection_for_dir() {
+    dir=$1
+    infection_executable=${2:-bin/infection}
 
-for dir in  */
-do
     cd "$dir"
     echo -e "\n$dir\n";
 
@@ -23,9 +20,9 @@ do
 
     if [ -f "run_tests.bash" ]
     then
-        output="$(bash run_tests.bash)"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash run_tests.bash $infection_executable 2>&1)"
     else
-        output="$(bash ../standard_script.bash ${1:-bin/infection})"
+        output="$(INFECTION_E2E_TESTS_ENV=1 bash ../standard_script.bash $infection_executable 2>&1)"
     fi
 
     if [ $? != 0 ]
@@ -36,14 +33,33 @@ do
         echo "" >> ../error.log
     fi
     cd ..
-done
 
-if [ $failure = "true" ]
-then
-    echo "One of the e2e tests failed, check the logs";
-    cat error.log
-    exit 1
-fi
+    if [ "$failure" = "true" ]
+    then
+        exit 255
+    fi
+}
+
+exitOnError() {
+    exit_code=$1
+    msg=$2
+    if [ "$exit_code" -ne 0 ]; then
+        echo -e "\033[31mEXIT $exit_code $msg\033[0m" >&2
+        # If any invocation of the command exits with a status of 255, xargs will stop immediately without reading any further input.
+        # An error message is issued on stderr when this happens.
+        exit 255
+    fi
+}
+
+e2e_tests_dirs=$(find . -maxdepth 1 -mindepth 1 -type d | grep "${2:-}")
+
+# Export the function so xargs can use it
+export -f run_infection_for_dir
+
+# Use xargs to run the run_infection_for_dir function in parallel
+echo "$e2e_tests_dirs" | xargs -I {} -P 4 bash -c "run_infection_for_dir {} ${1:-bin/infection}"
+
+exitOnError $? "One of the e2e tests failed, check the logs \n\n$(cat error.log)"
 
 echo -e "\nSuccess"
 exit 0

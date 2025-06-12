@@ -39,28 +39,33 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BooleanNot>
  */
 final class LogicalNot implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes a negation operator (`!`), e.g. transforms `!$foo` with `$foo`.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = !$b;
+                + $a = $b;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BooleanNot $node
      *
      * @return iterable<Node\Expr>
      */
@@ -76,8 +81,8 @@ final class LogicalNot implements Mutator
         }
 
         // e.g. "!!someFunc()"
-        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot) ||
-            $node->getAttribute('parent') instanceof Node\Expr\BooleanNot;
+        $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot)
+            || ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot;
 
         return !$isDoubledLogicalNot;
     }

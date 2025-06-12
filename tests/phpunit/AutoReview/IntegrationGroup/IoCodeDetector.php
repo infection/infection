@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function array_keys;
+use function file_exists;
 use Infection\CannotBeInstantiated;
+use const PHP_MAJOR_VERSION;
+use const PHP_MINOR_VERSION;
 use function Safe\file_get_contents;
 use function Safe\preg_match_all;
-use function Safe\sprintf;
-use function strpos;
+use function sprintf;
+use function str_contains;
 
 final class IoCodeDetector
 {
@@ -135,11 +138,6 @@ final class IoCodeDetector
         'use Symfony\Component\Filesystem\Filesystem;',
     ];
 
-    private const SAFE_FILESYSTEM_FILES = [
-        __DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/filesystem.php',
-        __DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/dir.php',
-    ];
-
     /**
      * @var string[]|null
      */
@@ -148,7 +146,7 @@ final class IoCodeDetector
     public static function codeContainsIoOperations(string $code): bool
     {
         foreach (self::getStatements() as $statement) {
-            if (strpos($code, $statement) !== false) {
+            if (str_contains($code, $statement)) {
                 return true;
             }
         }
@@ -189,11 +187,20 @@ final class IoCodeDetector
     {
         $functionNames = [];
 
-        foreach (self::SAFE_FILESYSTEM_FILES as $filePath) {
+        $safeFilesystemFiles = [
+            sprintf(__DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/%s.%s/filesystem.php', PHP_MAJOR_VERSION, PHP_MINOR_VERSION),
+            sprintf(__DIR__ . '/../../../../vendor/thecodingmachine/safe/generated/%s.%s/dir.php', PHP_MAJOR_VERSION, PHP_MINOR_VERSION),
+        ];
+
+        foreach ($safeFilesystemFiles as $filePath) {
+            if (!file_exists($filePath)) {
+                continue;
+            }
+
             preg_match_all(
                 '/function (?<function_name>[_\p{L}]+)\(/u',
                 file_get_contents($filePath),
-                $matches
+                $matches,
             );
 
             foreach ($matches['function_name'] as $functionName) {

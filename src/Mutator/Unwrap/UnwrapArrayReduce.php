@@ -42,33 +42,43 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayReduce extends AbstractUnwrapMutator
+final class UnwrapArrayReduce extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_reduce` function call with its first operand. For example:
+                Replaces an `array_reduce` function call with its first operand. For example:
 
-```php
-$x = array_reduce(
-    ['foo', 'bar', 'baz'],
-    static function ($carry, $item) {
-       return $item;
-    },
-    ['oof']
-);
-```
+                ```php
+                $x = array_reduce(
+                    ['foo', 'bar', 'baz'],
+                    static function ($carry, $item) {
+                       return $item;
+                    },
+                    ['oof']
+                );
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = array_reduce(
+                -     ['foo', 'bar', 'baz'],
+                -     static function ($carry, $item) {
+                -        return $item;
+                -     },
+                -     ['oof']
+                - );
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 

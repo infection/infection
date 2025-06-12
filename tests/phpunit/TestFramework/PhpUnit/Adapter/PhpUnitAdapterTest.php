@@ -35,16 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use function array_map;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
+use const DIRECTORY_SEPARATOR;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\VersionParser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
     /**
@@ -52,6 +56,7 @@ final class PhpUnitAdapterTest extends TestCase
      */
     private $adapter;
 
+    private $pcovDirectoryProvider;
     private $initialConfigBuilder;
     private $mutationConfigBuilder;
     private $cliArgumentsBuilder;
@@ -59,6 +64,7 @@ final class PhpUnitAdapterTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
         $this->initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
         $this->mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
@@ -68,12 +74,13 @@ final class PhpUnitAdapterTest extends TestCase
             '/path/to/phpunit',
             '/tmp',
             '/tmp/infection/junit.xml',
+            $this->pcovDirectoryProvider,
             $this->initialConfigBuilder,
             $this->mutationConfigBuilder,
             $this->cliArgumentsBuilder,
             new VersionParser(),
             $this->commandLineBuilder,
-            '9.0'
+            '9.0',
         );
     }
 
@@ -87,21 +94,27 @@ final class PhpUnitAdapterTest extends TestCase
         $this->assertTrue($this->adapter->hasJUnitReport());
     }
 
-    /**
-     * @dataProvider outputProvider
-     */
-    public function test_it_can_tell_the_outcome_of_the_tests_from_the_output(
+    #[DataProvider('passOutputProvider')]
+    public function test_it_can_tell_if_tests_pass_from_the_output(
         string $output,
-        bool $expected
+        bool $expected,
     ): void {
         $actual = $this->adapter->testsPass($output);
 
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider memoryReportProvider
-     */
+    #[DataProvider('syntaxErrorOutputProvider')]
+    public function test_it_can_tell_if_there_is_a_syntax_error_from_the_output(
+        string $output,
+        bool $expected,
+    ): void {
+        $actual = $this->adapter->isSyntaxError($output);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    #[DataProvider('memoryReportProvider')]
     public function test_it_can_tell_the_memory_usage_from_the_output(string $output, float $expectedResult): void
     {
         $result = $this->adapter->getMemoryUsed($output);
@@ -115,28 +128,16 @@ final class PhpUnitAdapterTest extends TestCase
 
         $this->assertSame(
             ['--configuration', '--filter', '--testsuite'],
-            $options
+            $options,
         );
     }
 
-    public function test_it_provides_node_ignorers(): void
-    {
-        $nodeIgnorers = array_map('get_class', $this->adapter->getNodeIgnorers());
-
-        $this->assertSame(
-            [PhpUnitCodeCoverageAnnotationIgnorer::class],
-            $nodeIgnorers
-        );
-    }
-
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_no_coverage_is_expected(): void
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default')
         ;
 
@@ -147,6 +148,11 @@ final class PhpUnitAdapterTest extends TestCase
             ->willReturn(['/path/to/phpunit', '--dummy-argument'])
         ;
 
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
         $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], true);
 
         $this->assertSame(
@@ -154,18 +160,16 @@ final class PhpUnitAdapterTest extends TestCase
                 '/path/to/phpunit',
                 '--dummy-argument',
             ],
-            $initialTestRunCommandLine
+            $initialTestRunCommandLine,
         );
     }
 
-    /**
-     * @group integration
-     */
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested(): void
     {
         $this->cliArgumentsBuilder
             ->expects($this->once())
-            ->method('build')
+            ->method('buildForInitialTestsRun')
             ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
             ->willReturn([
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
@@ -186,6 +190,17 @@ final class PhpUnitAdapterTest extends TestCase
             ])
         ;
 
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('shallProvide')
+            ->willReturn(false)
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method('getDirectory')
+        ;
+
         $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
 
         $this->assertSame(
@@ -195,11 +210,67 @@ final class PhpUnitAdapterTest extends TestCase
                 '--coverage-xml=/tmp/coverage-xml',
                 '--log-junit=/tmp/infection/junit.xml',
             ],
-            $initialTestRunCommandLine
+            $initialTestRunCommandLine,
         );
     }
 
-    public function outputProvider(): iterable
+    #[Group('integration')]
+    public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested_and_pcov_is_in_use(): void
+    {
+        $this->cliArgumentsBuilder
+            ->expects($this->once())
+            ->method('buildForInitialTestsRun')
+            ->with('', '--group=default --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
+            ->willReturn([
+                '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpunit', [
+                '-d',
+                'memory_limit=-1',
+                '-d',
+                '\\' === DIRECTORY_SEPARATOR ? 'pcov.directory="."' : "pcov.directory='.'",
+            ], [
+                '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+            ->willReturn([
+                '/path/to/phpunit',
+                '--group=default',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('shallProvide')
+            ->willReturn(true)
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('getDirectory')
+            ->willReturn('.')
+        ;
+
+        $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
+
+        $this->assertSame(
+            [
+                '/path/to/phpunit',
+                '--group=default',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ],
+            $initialTestRunCommandLine,
+        );
+    }
+
+    public static function passOutputProvider(): iterable
     {
         yield ['OK, but incomplete, skipped, or risky tests!', true];
 
@@ -208,9 +279,18 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['FAILURES!', false];
 
         yield ['ERRORS!', false];
+
+        yield ['No tests executed!', true];
     }
 
-    public function memoryReportProvider(): iterable
+    public static function syntaxErrorOutputProvider(): iterable
+    {
+        yield ['OK, but incomplete, skipped, or risky tests!', false];
+
+        yield ['ParseError: syntax error, unexpected ">"', true];
+    }
+
+    public static function memoryReportProvider(): iterable
     {
         yield ['Memory: 8.00MB', 8.0];
 

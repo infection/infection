@@ -43,24 +43,28 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\LogicalOr>
  */
 final class LogicalAnd implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces an AND operator (`&&`) with an OR operator (`||`).',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b && User;
+                + $a = $b || $c;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\LogicalOr $node
      *
      * @return iterable<Node\Expr\BinaryOp\BooleanOr>
      */

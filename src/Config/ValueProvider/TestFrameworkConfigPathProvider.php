@@ -37,6 +37,7 @@ namespace Infection\Config\ValueProvider;
 
 use Closure;
 use Exception;
+use function file_exists;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\PhpUnitPathGuesser;
 use Infection\Console\IO;
@@ -46,24 +47,21 @@ use function is_dir;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\json_decode;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
+use function trim;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigPathProvider
+final readonly class TestFrameworkConfigPathProvider
 {
-    private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator;
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->testFrameworkConfigLocator = $testFrameworkConfigLocator;
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        private TestFrameworkConfigLocatorInterface $testFrameworkConfigLocator,
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+    ) {
     }
 
     /**
@@ -75,7 +73,7 @@ final class TestFrameworkConfigPathProvider
             $this->testFrameworkConfigLocator->locate($testFramework);
 
             return null;
-        } catch (Exception $e) {
+        } catch (Exception) {
             if ($testFramework !== TestFrameworkTypes::PHPUNIT) {
                 return $this->askTestFrameworkConfigLocation($io, $dirsInCurrentDir, $testFramework, '');
             }
@@ -89,12 +87,12 @@ final class TestFrameworkConfigPathProvider
             $phpUnitPathGuesser = new PhpUnitPathGuesser(json_decode($composerJsonText));
             $defaultValue = $phpUnitPathGuesser->guess();
 
-            if ($defaultValue) {
+            if ($defaultValue !== '') {
                 try {
                     $this->testFrameworkConfigLocator->locate($testFramework, $defaultValue);
 
                     return $defaultValue;
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // just continue to ask question
                 }
             }
@@ -108,7 +106,7 @@ final class TestFrameworkConfigPathProvider
         return function (string $answerDir) use ($testFramework): string {
             $answerDir = trim($answerDir);
 
-            if (!$answerDir) {
+            if ($answerDir === '') {
                 return $answerDir;
             }
 
@@ -129,11 +127,11 @@ final class TestFrameworkConfigPathProvider
         IO $io,
         array $dirsInCurrentDir,
         string $testFramework,
-        string $defaultValue
+        string $defaultValue,
     ): string {
         $question = sprintf(
             'Where is your <comment>%s.(xml|yml)(.dist)</comment> configuration located?',
-            $testFramework
+            $testFramework,
         );
         $questionText = $this->consoleHelper->getQuestion($question, $defaultValue);
 
@@ -144,7 +142,7 @@ final class TestFrameworkConfigPathProvider
         $testFrameworkConfigLocation = $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
-            $question
+            $question,
         );
 
         return $testFrameworkConfigLocation;

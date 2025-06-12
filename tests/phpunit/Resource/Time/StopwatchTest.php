@@ -37,14 +37,17 @@ namespace Infection\Tests\Resource\Time;
 
 use Infection\Resource\Time\Stopwatch;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function round;
+use function usleep;
 
 // Cannot import this one as it would remove the ability to mock it
 // use function usleep()
-
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
+#[CoversClass(Stopwatch::class)]
 final class StopwatchTest extends TestCase
 {
     /**
@@ -57,9 +60,7 @@ final class StopwatchTest extends TestCase
         $this->stopwatch = new Stopwatch();
     }
 
-    /**
-     * @dataProvider timeProvider
-     */
+    #[DataProvider('timeProvider')]
     public function test_it_returns_the_time_took_on_stop(int $sleepTime, float $expectedTime): void
     {
         $this->stopwatch->start();
@@ -68,7 +69,8 @@ final class StopwatchTest extends TestCase
 
         $actualTimeInSeconds = $this->stopwatch->stop();
 
-        $this->assertSame($expectedTime, $actualTimeInSeconds);
+        // on macOS m4 pro we need a small delta to account for the precision of the timer
+        $this->assertEqualsWithDelta($expectedTime, round($actualTimeInSeconds, 2), 0.02);
     }
 
     public function test_it_cannot_be_started_twice(): void
@@ -82,7 +84,7 @@ final class StopwatchTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Timer can not be started again without stopping.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -96,15 +98,15 @@ final class StopwatchTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Timer must be started before stopping.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function timeProvider(): iterable
+    public static function timeProvider(): iterable
     {
         yield 'no time' => [0, 0.];
 
-        yield 'nominal' => [10000000, 10.0];
+        yield 'nominal' => [1000000, 1.0];
     }
 }

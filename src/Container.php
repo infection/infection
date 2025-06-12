@@ -38,6 +38,7 @@ namespace Infection;
 use function array_filter;
 use function array_key_exists;
 use Closure;
+use function count;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -47,64 +48,82 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
+use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
+use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
 use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
+use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
+use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
+use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
-use Infection\FileSystem\TmpDirProvider;
+use Infection\Logger\FederatedLogger;
+use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\GitHub\GitDiffFileProvider;
-use Infection\Logger\LoggerFactory;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
+use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Logger\StrykerLoggerFactory;
+use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
+use Infection\Metrics\ResultsCollector;
+use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Mutant\MutantFactory;
+use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
-use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
-use Infection\Process\Factory\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
+use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
-use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -124,24 +143,28 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use InvalidArgumentException;
+use function is_a;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
-use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use function Safe\getcwd;
-use function Safe\sprintf;
+use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionParameter;
+use function reset;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
-use Symfony\Component\Console\Helper\QuestionHelper;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -156,8 +179,14 @@ final class Container
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
     public const DEFAULT_GIT_DIFF_FILTER = null;
+    public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
-    public const DEFAULT_USE_GITHUB_LOGGER = false;
+    public const DEFAULT_USE_GITHUB_LOGGER = null;
+    public const DEFAULT_GITLAB_LOGGER_PATH = null;
+    public const DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY = null;
+    public const DEFAULT_HTML_LOGGER_PATH = null;
+    public const DEFAULT_USE_NOOP_MUTATORS = false;
+    public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
     public const DEFAULT_NO_PROGRESS = false;
     public const DEFAULT_FORCE_PROGRESS = false;
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
@@ -168,15 +197,12 @@ final class Container
     public const DEFAULT_MIN_COVERED_MSI = null;
     public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
     public const DEFAULT_TEST_FRAMEWORK = null;
+    public const DEFAULT_STATIC_ANALYSIS_TOOL = null;
     public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
     public const DEFAULT_FILTER = '';
-    public const DEFAULT_THREAD_COUNT = 1;
+    public const DEFAULT_THREAD_COUNT = null;
     public const DEFAULT_DRY_RUN = false;
-
-    /**
-     * @var array<class-string<object>, true>
-     */
-    private array $keys = [];
+    public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
     /**
      * @var array<class-string<object>, object>
@@ -203,74 +229,39 @@ final class Container
     public static function create(): self
     {
         $container = new self([
-            Filesystem::class => static function (): Filesystem {
-                return new Filesystem();
-            },
-            TmpDirProvider::class => static function (): TmpDirProvider {
-                return new TmpDirProvider();
-            },
-            IndexXmlCoverageParser::class => static function (): IndexXmlCoverageParser {
-                return new IndexXmlCoverageParser();
-            },
-            XmlCoverageParser::class => static function (): XmlCoverageParser {
-                // TODO XmlCoverageParser might want to notify ProcessRunner if it can't parse another file due to lack of RAM
-                return new XmlCoverageParser();
-            },
-            CoveredTraceProvider::class => static function (self $container): CoveredTraceProvider {
-                return new CoveredTraceProvider(
-                    $container->getPhpUnitXmlCoverageTraceProvider(),
-                    $container->getJUnitTestExecutionInfoAdder(),
-                    $container->getBufferedSourceFileFilter(),
-                );
-            },
-            UnionTraceProvider::class => static function (self $container): UnionTraceProvider {
-                return new UnionTraceProvider(
-                    $container->getCoveredTraceProvider(),
-                    $container->getUncoveredTraceProvider(),
-                    $container->getConfiguration()->mutateOnlyCoveredCode()
-                );
-            },
-            BufferedSourceFileFilter::class => static function (self $container): BufferedSourceFileFilter {
-                return new BufferedSourceFileFilter(
-                    $container->getSourceFileFilter(),
-                    $container->getConfiguration()->getSourceFiles(),
-                );
-            },
-            UncoveredTraceProvider::class => static function (self $container): UncoveredTraceProvider {
-                return new UncoveredTraceProvider(
-                    $container->getBufferedSourceFileFilter()
-                );
-            },
-            SourceFileFilter::class => static function (self $container): SourceFileFilter {
-                return new SourceFileFilter(
-                    $container->getConfiguration()->getSourceFilesFilter(),
-                    $container->getConfiguration()->getSourceFilesExcludes()
-                );
-            },
-            JUnitTestExecutionInfoAdder::class => static function (self $container): JUnitTestExecutionInfoAdder {
-                return new JUnitTestExecutionInfoAdder(
-                    $container->getTestFrameworkAdapter(),
-                    $container->getMemoizedTestFileDataProvider()
-                );
-            },
-            PhpUnitXmlCoverageTraceProvider::class => static function (self $container): PhpUnitXmlCoverageTraceProvider {
-                return new PhpUnitXmlCoverageTraceProvider(
-                    $container->getIndexXmlCoverageLocator(),
-                    $container->getIndexXmlCoverageParser(),
-                    $container->getXmlCoverageParser()
-                );
-            },
-            IndexXmlCoverageLocator::class => static function (self $container): IndexXmlCoverageLocator {
-                return new IndexXmlCoverageLocator(
-                    $container->getConfiguration()->getCoveragePath()
-                );
-            },
-            RootsFileOrDirectoryLocator::class => static function (self $container): RootsFileOrDirectoryLocator {
-                return new RootsFileOrDirectoryLocator(
-                    [$container->getProjectDir()],
-                    $container->getFileSystem()
-                );
-            },
+            IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
+                $container->getConfiguration()->isForGitDiffLines(),
+            ),
+            CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
+                $container->getPhpUnitXmlCoverageTraceProvider(),
+                $container->getJUnitTestExecutionInfoAdder(),
+                $container->getBufferedSourceFileFilter(),
+            ),
+            UnionTraceProvider::class => static fn (self $container): UnionTraceProvider => new UnionTraceProvider(
+                $container->getCoveredTraceProvider(),
+                $container->getUncoveredTraceProvider(),
+                $container->getConfiguration()->mutateOnlyCoveredCode(),
+            ),
+            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
+                $container->getSourceFileFilter(),
+                $container->getConfiguration()->getSourceFiles(),
+            ),
+            SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
+                $container->getConfiguration()->getSourceFilesFilter(),
+                $container->getConfiguration()->getSourceFilesExcludes(),
+            ),
+            PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
+                $container->getIndexXmlCoverageLocator(),
+                $container->getIndexXmlCoverageParser(),
+                $container->getXmlCoverageParser(),
+            ),
+            IndexXmlCoverageLocator::class => static fn (self $container): IndexXmlCoverageLocator => new IndexXmlCoverageLocator(
+                $container->getConfiguration()->getCoveragePath(),
+            ),
+            RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
+                [$container->getProjectDir()],
+                $container->getFileSystem(),
+            ),
             Factory::class => static function (self $container): Factory {
                 $config = $container->getConfiguration();
 
@@ -281,125 +272,55 @@ final class Container
                     $container->getTestFrameworkFinder(),
                     $container->getDefaultJUnitFilePath(),
                     $config,
-                    GeneratedExtensionsConfig::EXTENSIONS
+                    $container->getSourceFileFilter(),
+                    GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
-            MutantCodeFactory::class => static function (self $container): MutantCodeFactory {
-                return new MutantCodeFactory($container->getPrinter());
-            },
-            MutantFactory::class => static function (self $container): MutantFactory {
-                return new MutantFactory(
-                    $container->getConfiguration()->getTmpDir(),
-                    $container->getDiffer(),
-                    $container->getPrinter(),
-                    $container->getMutantCodeFactory()
-                );
-            },
-            Differ::class => static function (): Differ {
-                return new Differ(new BaseDiffer());
-            },
-            SyncEventDispatcher::class => static function (): SyncEventDispatcher {
-                return new SyncEventDispatcher();
-            },
-            ParallelProcessRunner::class => static function (self $container): ParallelProcessRunner {
-                return new ParallelProcessRunner($container->getConfiguration()->getThreadCount());
-            },
-            DryProcessRunner::class => static function (): DryProcessRunner {
-                return new DryProcessRunner();
-            },
-            TestFrameworkConfigLocator::class => static function (self $container): TestFrameworkConfigLocator {
-                return new TestFrameworkConfigLocator(
-                    (string) $container->getConfiguration()->getPhpUnit()->getConfigDir()
-                );
-            },
-            DiffColorizer::class => static function (): DiffColorizer {
-                return new DiffColorizer();
-            },
-            MemoizedTestFileDataProvider::class => static function (self $container): TestFileDataProvider {
-                return new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider($container->getJUnitReportLocator())
-                );
-            },
-            Lexer::class => static function (): Lexer {
-                $attributes = MutationAttributeKeys::ALL;
-                $attributes[] = 'comments';
+            StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
+                $config = $container->getConfiguration();
 
-                return new Lexer\Emulative(['usedAttributes' => $attributes]);
-            },
-            Parser::class => static function (self $container): Parser {
-                $lexer = $container->getLexer();
-
-                return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-            },
-            FileParser::class => static function (self $container): FileParser {
-                return new FileParser($container->getParser());
-            },
-            PrettyPrinterAbstract::class => static function (): Standard {
-                return new Standard();
-            },
-            MetricsCalculator::class => static function (self $container): MetricsCalculator {
-                return new MetricsCalculator($container->getConfiguration()->getMsiPrecision());
-            },
-            Stopwatch::class => static function (): Stopwatch {
-                return new Stopwatch();
-            },
-            TimeFormatter::class => static function (): TimeFormatter {
-                return new TimeFormatter();
-            },
-            MemoryFormatter::class => static function (): MemoryFormatter {
-                return new MemoryFormatter();
-            },
-            MemoryLimiter::class => static function (self $container): MemoryLimiter {
-                return new MemoryLimiter(
-                    $container->getFileSystem(),
-                    (string) php_ini_loaded_file(),
-                    new MemoryLimiterEnvironment()
+                return new StaticAnalysisToolFactory(
+                    $config,
+                    $container->getProjectDir(),
+                    $container->getStaticAnalysisToolExecutableFinder(),
+                    $container->getStaticAnalysisConfigLocator(),
+                    GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
-            SchemaConfigurationLoader::class => static function (self $container): SchemaConfigurationLoader {
-                return new SchemaConfigurationLoader(
-                    $container->getRootsFileLocator(),
-                    $container->getSchemaConfigurationFileLoader()
-                );
-            },
-            RootsFileLocator::class => static function (self $container): RootsFileLocator {
-                return new RootsFileLocator(
-                    [$container->getProjectDir()],
-                    $container->getFileSystem()
-                );
-            },
-            SchemaConfigurationFileLoader::class => static function (self $container): SchemaConfigurationFileLoader {
-                return new SchemaConfigurationFileLoader(
-                    $container->getSchemaValidator(),
-                    $container->getSchemaConfigurationFactory()
-                );
-            },
-            SchemaValidator::class => static function (): SchemaValidator {
-                return new SchemaValidator();
-            },
-            SchemaConfigurationFactory::class => static function (): SchemaConfigurationFactory {
-                return new SchemaConfigurationFactory();
-            },
-            ConfigurationFactory::class => static function (self $container): ConfigurationFactory {
-                return new ConfigurationFactory(
-                    $container->getTmpDirProvider(),
-                    $container->getMutatorResolver(),
-                    $container->getMutatorFactory(),
-                    $container->getMutatorParser(),
-                    $container->getSourceFileCollector(),
-                    $container->getCiDetector(),
-                    $container->getGitDiffFileProvider()
-                );
-            },
-            MutatorResolver::class => static function (): MutatorResolver {
-                return new MutatorResolver();
-            },
-            MutatorFactory::class => static function (): MutatorFactory {
-                return new MutatorFactory();
-            },
-            MutatorParser::class => static function (): MutatorParser {
-                return new MutatorParser();
-            },
+            MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
+                $container->getConfiguration()->getTmpDir(),
+                $container->getDiffer(),
+                $container->getPrinter(),
+                $container->getMutantCodeFactory(),
+            ),
+            Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
+            SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
+            ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
+            TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
+                (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
+            ),
+            StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
+                (string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
+            ),
+            MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
+                new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
+            ),
+            Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
+            PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
+            MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
+            MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
+                $container->getFileSystem(),
+                (string) php_ini_loaded_file(),
+                new MemoryLimiterEnvironment(),
+            ),
+            SchemaConfigurationLoader::class => static fn (self $container): SchemaConfigurationLoader => new SchemaConfigurationLoader(
+                $container->getRootsFileLocator(),
+                $container->getSchemaConfigurationFileLoader(),
+            ),
+            RootsFileLocator::class => static fn (self $container): RootsFileLocator => new RootsFileLocator(
+                [$container->getProjectDir()],
+                $container->getFileSystem(),
+            ),
             CoverageChecker::class => static function (self $container): CoverageChecker {
                 $config = $container->getConfiguration();
                 $testFrameworkAdapter = $container->getTestFrameworkAdapter();
@@ -412,39 +333,40 @@ final class Container
                     $testFrameworkAdapter->hasJUnitReport(),
                     $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
-                    $container->getIndexXmlCoverageLocator()
+                    $container->getIndexXmlCoverageLocator(),
                 );
             },
-            JUnitReportLocator::class => static function (self $container): JUnitReportLocator {
-                return new JUnitReportLocator(
-                    $container->getConfiguration()->getCoveragePath(),
-                    $container->getDefaultJUnitFilePath()
-                );
-            },
+            JUnitReportLocator::class => static fn (self $container): JUnitReportLocator => new JUnitReportLocator(
+                $container->getConfiguration()->getCoveragePath(),
+                $container->getDefaultJUnitFilePath(),
+            ),
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
 
                 return new MinMsiChecker(
                     $config->ignoreMsiWithNoMutations(),
                     (float) $config->getMinMsi(),
-                    (float) $config->getMinCoveredMsi()
-                );
-            },
-            SubscriberRegisterer::class => static function (self $container): SubscriberRegisterer {
-                return new SubscriberRegisterer(
-                    $container->getEventDispatcher(),
-                    $container->getSubscriberFactoryRegistry()
+                    (float) $config->getMinCoveredMsi(),
                 );
             },
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
-                return new ChainSubscriberFactory(
+                $subscriberFactories = [
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
                     $container->getMutationGeneratingConsoleLoggerSubscriberFactory(),
+                    $container->getMutationTestingResultsCollectorSubscriberFactory(),
                     $container->getMutationTestingConsoleLoggerSubscriberFactory(),
                     $container->getMutationTestingResultsLoggerSubscriberFactory(),
                     $container->getPerformanceLoggerSubscriberFactory(),
-                    $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory()
-                );
+                    $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
+                    $container->getStopInfectionOnSigintSignalSubscriberFactory(),
+                    $container->getDispatchPcntlSignalSubscriberFactory(),
+                ];
+
+                if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
+                    $subscriberFactories[] = $container->getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory();
+                }
+
+                return new ChainSubscriberFactory(...$subscriberFactories);
             },
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
@@ -452,7 +374,7 @@ final class Container
                 return new CleanUpAfterMutationTestingFinishedSubscriberFactory(
                     $config->isDebugEnabled(),
                     $container->getFileSystem(),
-                    $config->getTmpDir()
+                    $config->getTmpDir(),
                 );
             },
             InitialTestsConsoleLoggerSubscriberFactory::class => static function (self $container): InitialTestsConsoleLoggerSubscriberFactory {
@@ -461,64 +383,93 @@ final class Container
                 return new InitialTestsConsoleLoggerSubscriberFactory(
                     $config->noProgress(),
                     $container->getTestFrameworkAdapter(),
-                    $config->isDebugEnabled()
+                    $config->isDebugEnabled(),
                 );
             },
-            MutationGeneratingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationGeneratingConsoleLoggerSubscriberFactory {
-                return new MutationGeneratingConsoleLoggerSubscriberFactory(
-                    $container->getConfiguration()->noProgress()
+            InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
+                $config = $container->getConfiguration();
+
+                return new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+                    $config->noProgress(),
+                    $config->isDebugEnabled(),
+                    $container->getStaticAnalysisToolAdapter(),
                 );
             },
+            MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
+                $container->getConfiguration()->noProgress(),
+            ),
+            MutationTestingResultsCollectorSubscriberFactory::class => static fn (self $container): MutationTestingResultsCollectorSubscriberFactory => new MutationTestingResultsCollectorSubscriberFactory(
+                ...array_filter([
+                    $container->getMetricsCalculator(),
+                    $container->getFilteringResultsCollectorFactory()->create(
+                        $container->getResultsCollector(),
+                    ),
+                ]),
+            ),
             MutationTestingConsoleLoggerSubscriberFactory::class => static function (self $container): MutationTestingConsoleLoggerSubscriberFactory {
                 $config = $container->getConfiguration();
+                /** @var FederatedLogger $federatedMutationTestingResultsLogger */
+                $federatedMutationTestingResultsLogger = $container->getMutationTestingResultsLogger();
 
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
+                    $container->getResultsCollector(),
                     $container->getDiffColorizer(),
+                    $federatedMutationTestingResultsLogger,
                     $config->showMutations(),
-                    $container->getOutputFormatter()
+                    $container->getOutputFormatter(),
                 );
             },
-            MutationTestingResultsLoggerSubscriberFactory::class => static function (self $container): MutationTestingResultsLoggerSubscriberFactory {
-                return new MutationTestingResultsLoggerSubscriberFactory(
-                    $container->getLoggerFactory(),
-                    $container->getConfiguration()->getLogs()
-                );
-            },
-            PerformanceLoggerSubscriberFactory::class => static function (self $container): PerformanceLoggerSubscriberFactory {
-                return new PerformanceLoggerSubscriberFactory(
-                    $container->getStopwatch(),
-                    $container->getTimeFormatter(),
-                    $container->getMemoryFormatter()
-                );
-            },
-            CommandLineBuilder::class => static function (): CommandLineBuilder {
-                return new CommandLineBuilder();
-            },
-            SourceFileCollector::class => static function (): SourceFileCollector {
-                return new SourceFileCollector();
-            },
-            NodeTraverserFactory::class => static function (): NodeTraverserFactory {
-                return new NodeTraverserFactory();
-            },
+            PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
+                $container->getStopwatch(),
+                $container->getTimeFormatter(),
+                $container->getMemoryFormatter(),
+                $container->getConfiguration()->getThreadCount(),
+            ),
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
+                $configuration = $container->getConfiguration();
+
                 return new FileMutationGenerator(
                     $container->getFileParser(),
                     $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator()
+                    $container->getLineRangeCalculator(),
+                    $container->getFilesDiffChangedLines(),
+                    $configuration->isForGitDiffLines(),
+                    $configuration->getGitDiffBase(),
                 );
             },
-            LoggerFactory::class => static function (self $container): LoggerFactory {
+            FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
-                return new LoggerFactory(
+                return new FileLoggerFactory(
                     $container->getMetricsCalculator(),
+                    $container->getResultsCollector(),
                     $container->getFileSystem(),
                     $config->getLogVerbosity(),
                     $config->isDebugEnabled(),
                     $config->mutateOnlyCoveredCode(),
-                    $container->getCiDetector(),
-                    $container->getLogger()
+                    $container->getLogger(),
+                    $container->getStrykerHtmlReportBuilder(),
+                    $config->getLoggerProjectRootDirectory(),
+                    $config->getProcessTimeout(),
+                );
+            },
+            MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FederatedLogger(...array_filter([
+                $container->getFileLoggerFactory()->createFromLogEntries(
+                    $container->getConfiguration()->getLogs(),
+                ),
+                $container->getStrykerLoggerFactory()->createFromLogEntries(
+                    $container->getConfiguration()->getLogs(),
+                ),
+            ])),
+            TargetDetectionStatusesProvider::class => static function (self $container): TargetDetectionStatusesProvider {
+                $config = $container->getConfiguration();
+
+                return new TargetDetectionStatusesProvider(
+                    $config->getLogs(),
+                    $config->getLogVerbosity(),
+                    $config->mutateOnlyCoveredCode(),
+                    $config->showMutations(),
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -526,26 +477,40 @@ final class Container
 
                 return $container->getFactory()->create(
                     $config->getTestFramework(),
-                    $config->shouldSkipCoverage()
+                    $config->shouldSkipCoverage(),
                 );
             },
-            InitialTestsRunProcessFactory::class => static function (self $container): InitialTestsRunProcessFactory {
-                return new InitialTestsRunProcessFactory(
-                    $container->getTestFrameworkAdapter()
+            StaticAnalysisToolAdapter::class => static function (self $container): StaticAnalysisToolAdapter {
+                $config = $container->getConfiguration();
+
+                Assert::notNull($config->getStaticAnalysisTool());
+
+                return $container->getStaticAnalysisToolFactory()->create(
+                    $config->getStaticAnalysisTool(),
+                    $config->getProcessTimeout(),
                 );
             },
-            InitialTestsRunner::class => static function (self $container): InitialTestsRunner {
-                return new InitialTestsRunner(
-                    $container->getInitialTestRunProcessFactory(),
-                    $container->getEventDispatcher()
-                );
-            },
-            MutantProcessFactory::class => static function (self $container): MutantProcessFactory {
-                return new MutantProcessFactory(
+            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
+                $container->getStaticAnalysisToolAdapter(),
+            ),
+            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
+                $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getEventDispatcher(),
+            ),
+            MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
+                $config = $container->getConfiguration();
+
+                $mutantProcessKillerFactories = [];
+
+                if ($config->isStaticAnalysisEnabled()) {
+                    $mutantProcessKillerFactories[] = $container->getStaticAnalysisToolAdapter()->createMutantProcessFactory();
+                }
+
+                return new MutantProcessContainerFactory(
                     $container->getTestFrameworkAdapter(),
                     $container->getConfiguration()->getProcessTimeout(),
-                    $container->getEventDispatcher(),
-                    $container->getMutantExecutionResultFactory()
+                    $container->getMutantExecutionResultFactory(),
+                    $mutantProcessKillerFactories,
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -556,14 +521,14 @@ final class Container
                     $config->getMutators(),
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $config->noProgress()
+                    $config->noProgress(),
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
                 $configuration = $container->getConfiguration();
 
                 return new MutationTestingRunner(
-                    $container->getMutantProcessFactory(),
+                    $container->getMutantProcessContainerFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
@@ -573,95 +538,53 @@ final class Container
                     $container->getDiffSourceCodeMatcher(),
                     $configuration->noProgress(),
                     $configuration->getProcessTimeout(),
-                    $configuration->getIgnoreSourceCodeMutatorsMap()
+                    $configuration->getIgnoreSourceCodeMutatorsMap(),
                 );
             },
-            LineRangeCalculator::class => static function (): LineRangeCalculator {
-                return new LineRangeCalculator();
-            },
-            TestFrameworkFinder::class => static function (): TestFrameworkFinder {
-                return new TestFrameworkFinder();
-            },
-            TestFrameworkExtraOptionsFilter::class => static function (): TestFrameworkExtraOptionsFilter {
-                return new TestFrameworkExtraOptionsFilter();
-            },
-            AdapterInstallationDecider::class => static function (): AdapterInstallationDecider {
-                return new AdapterInstallationDecider(new QuestionHelper());
-            },
-            AdapterInstaller::class => static function (): AdapterInstaller {
-                return new AdapterInstaller(new ComposerExecutableFinder());
-            },
-            MutantExecutionResultFactory::class => static function (self $container): MutantExecutionResultFactory {
-                return new MutantExecutionResultFactory($container->getTestFrameworkAdapter());
-            },
-            FormatterFactory::class => static function (self $container): FormatterFactory {
-                return new FormatterFactory($container->getOutput());
-            },
-            DiffSourceCodeMatcher::class => static function (): DiffSourceCodeMatcher {
-                return new DiffSourceCodeMatcher();
-            },
-            GitDiffFileProvider::class => static function (): GitDiffFileProvider {
-                return new GitDiffFileProvider();
-            },
+            MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
         ]);
 
         return $container->withValues(
             new NullLogger(),
             new NullOutput(),
-            self::DEFAULT_CONFIG_FILE,
-            self::DEFAULT_MUTATORS_INPUT,
-            self::DEFAULT_SHOW_MUTATIONS,
-            self::DEFAULT_LOG_VERBOSITY,
-            self::DEFAULT_DEBUG,
-            self::DEFAULT_ONLY_COVERED,
-            self::DEFAULT_FORMATTER_NAME,
-            self::DEFAULT_NO_PROGRESS,
-            self::DEFAULT_FORCE_PROGRESS,
-            self::DEFAULT_EXISTING_COVERAGE_PATH,
-            self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            self::DEFAULT_SKIP_INITIAL_TESTS,
-            self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-            self::DEFAULT_MIN_MSI,
-            self::DEFAULT_MIN_COVERED_MSI,
-            self::DEFAULT_MSI_PRECISION,
-            self::DEFAULT_TEST_FRAMEWORK,
-            self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            self::DEFAULT_FILTER,
-            self::DEFAULT_THREAD_COUNT,
-            self::DEFAULT_DRY_RUN,
-            self::DEFAULT_GIT_DIFF_FILTER,
-            self::DEFAULT_GIT_DIFF_BASE,
-            self::DEFAULT_USE_GITHUB_LOGGER
         );
     }
 
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,
-        ?string $configFile,
-        string $mutatorsInput,
-        bool $showMutations,
-        string $logVerbosity,
-        bool $debug,
-        bool $onlyCovered,
-        string $formatterName,
-        bool $noProgress,
-        bool $forceProgress,
-        ?string $existingCoveragePath,
-        ?string $initialTestsPhpOptions,
-        bool $skipInitialTests,
-        bool $ignoreMsiWithNoMutations,
-        ?float $minMsi,
-        ?float $minCoveredMsi,
-        int $msiPrecision,
-        ?string $testFramework,
-        ?string $testFrameworkExtraOptions,
-        string $filter,
-        int $threadCount,
-        bool $dryRun,
-        ?string $gitDiffFilter,
-        ?string $gitDiffBase,
-        bool $useGitHubLogger
+        ?string $configFile = self::DEFAULT_CONFIG_FILE,
+        string $mutatorsInput = self::DEFAULT_MUTATORS_INPUT,
+        bool $showMutations = self::DEFAULT_SHOW_MUTATIONS,
+        string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
+        bool $debug = self::DEFAULT_DEBUG,
+        bool $onlyCovered = self::DEFAULT_ONLY_COVERED,
+        string $formatterName = self::DEFAULT_FORMATTER_NAME,
+        bool $noProgress = self::DEFAULT_NO_PROGRESS,
+        bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
+        ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
+        ?string $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+        bool $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
+        bool $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+        ?float $minMsi = self::DEFAULT_MIN_MSI,
+        ?float $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
+        int $msiPrecision = self::DEFAULT_MSI_PRECISION,
+        ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
+        ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        string $filter = self::DEFAULT_FILTER,
+        ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        bool $dryRun = self::DEFAULT_DRY_RUN,
+        ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
+        bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
+        ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
+        ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
+        ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
+        ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
+        bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
+        bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+        ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
+        ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
+        ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
     ): self {
         $clone = clone $this;
 
@@ -671,50 +594,40 @@ final class Container
 
         $clone->offsetSet(
             CiDetector::class,
-            static function () use ($forceProgress): CiDetector {
-                return $forceProgress ? new NullCiDetector() : new MemoizedCiDetector();
-            }
+            static fn (): CiDetector => $forceProgress ? new NullCiDetector() : new MemoizedCiDetector(),
         );
 
         $clone->offsetSet(
             LoggerInterface::class,
-            static function () use ($logger): LoggerInterface {
-                return $logger;
-            }
+            static fn (): LoggerInterface => $logger,
         );
 
         $clone->offsetSet(
             SchemaConfiguration::class,
-            static function (self $container) use ($configFile): SchemaConfiguration {
-                return $container->getSchemaConfigurationLoader()->loadConfiguration(
-                    array_filter(
-                        [
-                            $configFile,
-                            SchemaConfigurationLoader::DEFAULT_CONFIG_FILE,
-                            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
-                        ]
-                    )
-                );
-            }
+            static fn (self $container): SchemaConfiguration => $container->getSchemaConfigurationLoader()->loadConfiguration(
+                array_filter(
+                    [
+                        $configFile,
+                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                    ],
+                ),
+            ),
         );
 
         $clone->offsetSet(
             OutputInterface::class,
-            static function () use ($output): OutputInterface {
-                return $output;
-            }
+            static fn (): OutputInterface => $output,
         );
 
         $clone->offsetSet(
             OutputFormatter::class,
-            static function (self $container) use ($formatterName): OutputFormatter {
-                return $container->getFormatterFactory()->create($formatterName);
-            }
+            static fn (self $container): OutputFormatter => $container->getFormatterFactory()->create($formatterName),
         );
 
         $clone->offsetSet(
             Configuration::class,
-            static function (self $container) use (
+            static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
+                $container->getSchemaConfiguration(),
                 $existingCoveragePath,
                 $initialTestsPhpOptions,
                 $skipInitialTests,
@@ -734,84 +647,25 @@ final class Container
                 $threadCount,
                 $dryRun,
                 $gitDiffFilter,
+                $isForGitDiffLines,
                 $gitDiffBase,
-                $useGitHubLogger
-            ): Configuration {
-                return $container->getConfigurationFactory()->create(
-                    $container->getSchemaConfiguration(),
-                    $existingCoveragePath,
-                    $initialTestsPhpOptions,
-                    $skipInitialTests,
-                    $logVerbosity,
-                    $debug,
-                    $onlyCovered,
-                    $noProgress,
-                    $ignoreMsiWithNoMutations,
-                    $minMsi,
-                    $showMutations,
-                    $minCoveredMsi,
-                    $msiPrecision,
-                    $mutatorsInput,
-                    $testFramework,
-                    $testFrameworkExtraOptions,
-                    $filter,
-                    $threadCount,
-                    $dryRun,
-                    $gitDiffFilter,
-                    $gitDiffBase,
-                    $useGitHubLogger
-                );
-            }
+                $useGitHubLogger,
+                $gitlabLogFilePath,
+                $htmlLogFilePath,
+                $useNoopMutators,
+                $executeOnlyCoveringTestCases,
+                $mapSourceClassToTestStrategy,
+                $loggerProjectRootDirectory,
+                $staticAnalysisTool,
+            ),
         );
 
         return $clone;
     }
 
-    public function getProjectDir(): string
-    {
-        // TODO: cache that result
-        return getcwd();
-    }
-
     public function getFileSystem(): Filesystem
     {
         return $this->get(Filesystem::class);
-    }
-
-    public function getTmpDirProvider(): TmpDirProvider
-    {
-        return $this->get(TmpDirProvider::class);
-    }
-
-    public function getDefaultJUnitFilePath(): string
-    {
-        return $this->defaultJUnitPath ?? $this->defaultJUnitPath = sprintf(
-            '%s/%s',
-            Path::canonicalize(
-                $this->getConfiguration()->getCoveragePath()
-            ),
-            'junit.xml'
-        );
-    }
-
-    public function getJUnitReportLocator(): JUnitReportLocator
-    {
-        return $this->get(JUnitReportLocator::class);
-    }
-
-    public function getIndexXmlCoverageParser(): IndexXmlCoverageParser
-    {
-        return $this->get(IndexXmlCoverageParser::class);
-    }
-
-    public function getXmlCoverageParser(): XmlCoverageParser
-    {
-        return $this->get(XmlCoverageParser::class);
-    }
-
-    public function getCoveredTraceProvider(): CoveredTraceProvider
-    {
-        return $this->get(CoveredTraceProvider::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider
@@ -824,89 +678,9 @@ final class Container
         return $this->get(SourceFileFilter::class);
     }
 
-    public function getBufferedSourceFileFilter(): BufferedSourceFileFilter
-    {
-        return $this->get(BufferedSourceFileFilter::class);
-    }
-
-    public function getUncoveredTraceProvider(): UncoveredTraceProvider
-    {
-        return $this->get(UncoveredTraceProvider::class);
-    }
-
-    public function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
-    {
-        return $this->get(JUnitTestExecutionInfoAdder::class);
-    }
-
-    public function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
-    {
-        return $this->get(PhpUnitXmlCoverageTraceProvider::class);
-    }
-
-    public function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
-    {
-        return $this->get(IndexXmlCoverageLocator::class);
-    }
-
-    public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
-    {
-        return $this->get(RootsFileOrDirectoryLocator::class);
-    }
-
-    public function getFactory(): Factory
-    {
-        return $this->get(Factory::class);
-    }
-
-    public function getMutantCodeFactory(): MutantCodeFactory
-    {
-        return $this->get(MutantCodeFactory::class);
-    }
-
-    public function getMutantFactory(): MutantFactory
-    {
-        return $this->get(MutantFactory::class);
-    }
-
-    public function getDiffer(): Differ
-    {
-        return $this->get(Differ::class);
-    }
-
-    public function getEventDispatcher(): EventDispatcher
-    {
-        return $this->get(SyncEventDispatcher::class);
-    }
-
-    public function getProcessRunner(): ProcessRunner
-    {
-        $config = $this->getConfiguration();
-
-        return $config->isDryRun()
-            ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class)
-        ;
-    }
-
-    public function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
-    {
-        return $this->get(TestFrameworkConfigLocator::class);
-    }
-
     public function getDiffColorizer(): DiffColorizer
     {
         return $this->get(DiffColorizer::class);
-    }
-
-    public function getMemoizedTestFileDataProvider(): MemoizedTestFileDataProvider
-    {
-        return $this->get(MemoizedTestFileDataProvider::class);
-    }
-
-    public function getLexer(): Lexer
-    {
-        return $this->get(Lexer::class);
     }
 
     public function getParser(): Parser
@@ -919,29 +693,14 @@ final class Container
         return $this->get(FileParser::class);
     }
 
-    public function getPrinter(): PrettyPrinterAbstract
-    {
-        return $this->get(PrettyPrinterAbstract::class);
-    }
-
     public function getMetricsCalculator(): MetricsCalculator
     {
         return $this->get(MetricsCalculator::class);
     }
 
-    public function getStopwatch(): Stopwatch
+    public function getResultsCollector(): ResultsCollector
     {
-        return $this->get(Stopwatch::class);
-    }
-
-    public function getTimeFormatter(): TimeFormatter
-    {
-        return $this->get(TimeFormatter::class);
-    }
-
-    public function getMemoryFormatter(): MemoryFormatter
-    {
-        return $this->get(MemoryFormatter::class);
+        return $this->get(ResultsCollector::class);
     }
 
     public function getMemoryLimiter(): MemoryLimiter
@@ -949,34 +708,9 @@ final class Container
         return $this->get(MemoryLimiter::class);
     }
 
-    public function getSchemaConfigurationLoader(): SchemaConfigurationLoader
-    {
-        return $this->get(SchemaConfigurationLoader::class);
-    }
-
-    public function getRootsFileLocator(): RootsFileLocator
-    {
-        return $this->get(RootsFileLocator::class);
-    }
-
-    public function getSchemaConfigurationFileLoader(): SchemaConfigurationFileLoader
-    {
-        return $this->get(SchemaConfigurationFileLoader::class);
-    }
-
-    public function getSchemaValidator(): SchemaValidator
-    {
-        return $this->get(SchemaValidator::class);
-    }
-
     public function getSchemaConfigurationFactory(): SchemaConfigurationFactory
     {
         return $this->get(SchemaConfigurationFactory::class);
-    }
-
-    public function getConfigurationFactory(): ConfigurationFactory
-    {
-        return $this->get(ConfigurationFactory::class);
     }
 
     public function getMutatorResolver(): MutatorResolver
@@ -989,29 +723,9 @@ final class Container
         return $this->get(MutatorFactory::class);
     }
 
-    public function getMutatorParser(): MutatorParser
-    {
-        return $this->get(MutatorParser::class);
-    }
-
-    public function getCoverageChecker(): CoverageChecker
-    {
-        return $this->get(CoverageChecker::class);
-    }
-
-    public function getMinMsiChecker(): MinMsiChecker
-    {
-        return $this->get(MinMsiChecker::class);
-    }
-
     public function getSubscriberRegisterer(): SubscriberRegisterer
     {
         return $this->get(SubscriberRegisterer::class);
-    }
-
-    public function getSubscriberFactoryRegistry(): ChainSubscriberFactory
-    {
-        return $this->get(ChainSubscriberFactory::class);
     }
 
     public function getCleanUpAfterMutationTestingFinishedSubscriberFactory(): CleanUpAfterMutationTestingFinishedSubscriberFactory
@@ -1019,14 +733,34 @@ final class Container
         return $this->get(CleanUpAfterMutationTestingFinishedSubscriberFactory::class);
     }
 
+    public function getStopInfectionOnSigintSignalSubscriberFactory(): StopInfectionOnSigintSignalSubscriberFactory
+    {
+        return $this->get(StopInfectionOnSigintSignalSubscriberFactory::class);
+    }
+
+    public function getDispatchPcntlSignalSubscriberFactory(): DispatchPcntlSignalSubscriberFactory
+    {
+        return $this->get(DispatchPcntlSignalSubscriberFactory::class);
+    }
+
     public function getInitialTestsConsoleLoggerSubscriberFactory(): InitialTestsConsoleLoggerSubscriberFactory
     {
         return $this->get(InitialTestsConsoleLoggerSubscriberFactory::class);
     }
 
+    public function getInitialStaticAnalysisRunConsoleLoggerSubscriberFactory(): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory
+    {
+        return $this->get(InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class);
+    }
+
     public function getMutationGeneratingConsoleLoggerSubscriberFactory(): MutationGeneratingConsoleLoggerSubscriberFactory
     {
         return $this->get(MutationGeneratingConsoleLoggerSubscriberFactory::class);
+    }
+
+    public function getMutationTestingResultsCollectorSubscriberFactory(): MutationTestingResultsCollectorSubscriberFactory
+    {
+        return $this->get(MutationTestingResultsCollectorSubscriberFactory::class);
     }
 
     public function getMutationTestingConsoleLoggerSubscriberFactory(): MutationTestingConsoleLoggerSubscriberFactory
@@ -1059,9 +793,29 @@ final class Container
         return $this->get(FileMutationGenerator::class);
     }
 
-    public function getLoggerFactory(): LoggerFactory
+    public function getFileLoggerFactory(): FileLoggerFactory
     {
-        return $this->get(LoggerFactory::class);
+        return $this->get(FileLoggerFactory::class);
+    }
+
+    public function getStrykerLoggerFactory(): StrykerLoggerFactory
+    {
+        return $this->get(StrykerLoggerFactory::class);
+    }
+
+    public function getMutationTestingResultsLogger(): MutationTestingResultsLogger
+    {
+        return $this->get(MutationTestingResultsLogger::class);
+    }
+
+    public function getTargetDetectionStatusesProvider(): TargetDetectionStatusesProvider
+    {
+        return $this->get(TargetDetectionStatusesProvider::class);
+    }
+
+    public function getFilteringResultsCollectorFactory(): FilteringResultsCollectorFactory
+    {
+        return $this->get(FilteringResultsCollectorFactory::class);
     }
 
     public function getTestFrameworkAdapter(): TestFrameworkAdapter
@@ -1069,9 +823,19 @@ final class Container
         return $this->get(TestFrameworkAdapter::class);
     }
 
+    public function getStaticAnalysisToolAdapter(): StaticAnalysisToolAdapter
+    {
+        return $this->get(StaticAnalysisToolAdapter::class);
+    }
+
     public function getInitialTestRunProcessFactory(): InitialTestsRunProcessFactory
     {
         return $this->get(InitialTestsRunProcessFactory::class);
+    }
+
+    public function getInitialStaticAnalysisProcessFactory(): InitialStaticAnalysisProcessFactory
+    {
+        return $this->get(InitialStaticAnalysisProcessFactory::class);
     }
 
     public function getInitialTestsRunner(): InitialTestsRunner
@@ -1079,9 +843,14 @@ final class Container
         return $this->get(InitialTestsRunner::class);
     }
 
-    public function getMutantProcessFactory(): MutantProcessFactory
+    public function getInitialStaticAnalysisRunner(): InitialStaticAnalysisRunner
     {
-        return $this->get(MutantProcessFactory::class);
+        return $this->get(InitialStaticAnalysisRunner::class);
+    }
+
+    public function getMutantProcessContainerFactory(): MutantProcessContainerFactory
+    {
+        return $this->get(MutantProcessContainerFactory::class);
     }
 
     public function getMutationGenerator(): MutationGenerator
@@ -1109,9 +878,24 @@ final class Container
         return $this->get(LineRangeCalculator::class);
     }
 
+    public function getFilesDiffChangedLines(): FilesDiffChangedLines
+    {
+        return $this->get(FilesDiffChangedLines::class);
+    }
+
+    public function getDiffChangedLinesParser(): DiffChangedLinesParser
+    {
+        return $this->get(DiffChangedLinesParser::class);
+    }
+
     public function getTestFrameworkFinder(): TestFrameworkFinder
     {
         return $this->get(TestFrameworkFinder::class);
+    }
+
+    public function getStaticAnalysisToolExecutableFinder(): StaticAnalysisToolExecutableFinder
+    {
+        return $this->get(StaticAnalysisToolExecutableFinder::class);
     }
 
     public function getTestFrameworkExtraOptionsFilter(): TestFrameworkExtraOptionsFilter
@@ -1129,9 +913,9 @@ final class Container
         return $this->get(AdapterInstaller::class);
     }
 
-    public function getMutantExecutionResultFactory(): MutantExecutionResultFactory
+    public function getMutantExecutionResultFactory(): TestFrameworkMutantExecutionResultFactory
     {
-        return $this->get(MutantExecutionResultFactory::class);
+        return $this->get(TestFrameworkMutantExecutionResultFactory::class);
     }
 
     public function getCiDetector(): CiDetector
@@ -1164,9 +948,190 @@ final class Container
         return $this->get(DiffSourceCodeMatcher::class);
     }
 
+    public function getShellCommandLineExecutor(): ShellCommandLineExecutor
+    {
+        return $this->get(ShellCommandLineExecutor::class);
+    }
+
     public function getGitDiffFileProvider(): GitDiffFileProvider
     {
         return $this->get(GitDiffFileProvider::class);
+    }
+
+    public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder
+    {
+        return $this->get(StrykerHtmlReportBuilder::class);
+    }
+
+    public function getComposerExecutableFinder(): ComposerExecutableFinder
+    {
+        return $this->get(MemoizedComposerExecutableFinder::class);
+    }
+
+    public function getMutantCodeFactory(): MutantCodeFactory
+    {
+        return $this->get(MutantCodeFactory::class);
+    }
+
+    public function getRootsFileOrDirectoryLocator(): RootsFileOrDirectoryLocator
+    {
+        return $this->get(RootsFileOrDirectoryLocator::class);
+    }
+
+    public function getCoverageChecker(): CoverageChecker
+    {
+        return $this->get(CoverageChecker::class);
+    }
+
+    public function getEventDispatcher(): EventDispatcher
+    {
+        return $this->get(SyncEventDispatcher::class);
+    }
+
+    public function getMinMsiChecker(): MinMsiChecker
+    {
+        return $this->get(MinMsiChecker::class);
+    }
+
+    private function getStopwatch(): Stopwatch
+    {
+        return $this->get(Stopwatch::class);
+    }
+
+    private function getTimeFormatter(): TimeFormatter
+    {
+        return $this->get(TimeFormatter::class);
+    }
+
+    private function getMemoryFormatter(): MemoryFormatter
+    {
+        return $this->get(MemoryFormatter::class);
+    }
+
+    private function getSchemaConfigurationLoader(): SchemaConfigurationLoader
+    {
+        return $this->get(SchemaConfigurationLoader::class);
+    }
+
+    private function getRootsFileLocator(): RootsFileLocator
+    {
+        return $this->get(RootsFileLocator::class);
+    }
+
+    private function getSchemaConfigurationFileLoader(): SchemaConfigurationFileLoader
+    {
+        return $this->get(SchemaConfigurationFileLoader::class);
+    }
+
+    private function getConfigurationFactory(): ConfigurationFactory
+    {
+        return $this->get(ConfigurationFactory::class);
+    }
+
+    private function getPrinter(): PrettyPrinterAbstract
+    {
+        return $this->get(PrettyPrinterAbstract::class);
+    }
+
+    private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
+    {
+        return $this->get(TestFrameworkConfigLocator::class);
+    }
+
+    private function getStaticAnalysisConfigLocator(): StaticAnalysisConfigLocator
+    {
+        return $this->get(StaticAnalysisConfigLocator::class);
+    }
+
+    private function getProcessRunner(): ProcessRunner
+    {
+        $config = $this->getConfiguration();
+
+        return $config->isDryRun()
+            ? $this->get(DryProcessRunner::class)
+            : $this->get(ParallelProcessRunner::class)
+        ;
+    }
+
+    private function getDiffer(): Differ
+    {
+        return $this->get(Differ::class);
+    }
+
+    private function getMutantFactory(): MutantFactory
+    {
+        return $this->get(MutantFactory::class);
+    }
+
+    private function getFactory(): Factory
+    {
+        return $this->get(Factory::class);
+    }
+
+    private function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
+    {
+        return $this->get(StaticAnalysisToolFactory::class);
+    }
+
+    private function getBufferedSourceFileFilter(): BufferedSourceFileFilter
+    {
+        return $this->get(BufferedSourceFileFilter::class);
+    }
+
+    private function getUncoveredTraceProvider(): UncoveredTraceProvider
+    {
+        return $this->get(UncoveredTraceProvider::class);
+    }
+
+    private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
+    {
+        return $this->get(JUnitTestExecutionInfoAdder::class);
+    }
+
+    private function getPhpUnitXmlCoverageTraceProvider(): PhpUnitXmlCoverageTraceProvider
+    {
+        return $this->get(PhpUnitXmlCoverageTraceProvider::class);
+    }
+
+    private function getCoveredTraceProvider(): CoveredTraceProvider
+    {
+        return $this->get(CoveredTraceProvider::class);
+    }
+
+    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
+    {
+        return $this->get(IndexXmlCoverageLocator::class);
+    }
+
+    private function getProjectDir(): string
+    {
+        return $this->get(ProjectDirProvider::class)->getProjectDir();
+    }
+
+    private function getDefaultJUnitFilePath(): string
+    {
+        return $this->defaultJUnitPath ??= sprintf(
+            '%s/%s',
+            Path::canonicalize(
+                $this->getConfiguration()->getCoveragePath(),
+            ),
+            'junit.xml',
+        );
+    }
+
+    private function getJUnitReportLocator(): JUnitReportLocator
+    {
+        return $this->get(JUnitReportLocator::class);
+    }
+
+    private function getIndexXmlCoverageParser(): IndexXmlCoverageParser
+    {
+        return $this->get(IndexXmlCoverageParser::class);
+    }
+
+    private function getXmlCoverageParser(): XmlCoverageParser
+    {
+        return $this->get(XmlCoverageParser::class);
     }
 
     /**
@@ -1175,7 +1140,6 @@ final class Container
      */
     private function offsetSet(string $id, Closure $value): void
     {
-        $this->keys[$id] = true;
         $this->factories[$id] = $value;
         unset($this->values[$id]);
     }
@@ -1186,20 +1150,132 @@ final class Container
      * @param class-string<T> $id
      * @phpstan-return T
      */
+    private function setValueOrThrow(string $id, object $value): object
+    {
+        Assert::isInstanceOf($value, $id);
+        $this->values[$id] = $value;
+
+        return $value;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return T
+     */
     private function get(string $id): object
     {
-        if (!isset($this->keys[$id])) {
+        if (array_key_exists($id, $this->values)) {
+            $value = $this->values[$id];
+            Assert::isInstanceOf($value, $id);
+
+            return $value;
+        }
+
+        if (array_key_exists($id, $this->factories)) {
+            $value = $this->factories[$id]($this);
+
+            return $this->setValueOrThrow($id, $value);
+        }
+
+        $value = $this->createService($id);
+
+        if ($value === null) {
             throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
         }
 
-        if (array_key_exists($id, $this->values)) {
-            $value = $this->values[$id];
-        } else {
-            $value = $this->values[$id] = $this->factories[$id]($this);
+        return $this->setValueOrThrow($id, $value);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $id
+     * @phpstan-return ?T
+     */
+    private function createService(string $id): ?object
+    {
+        $reflectionClass = new ReflectionClass($id);
+        $constructor = $reflectionClass->getConstructor();
+
+        if (!$reflectionClass->isInstantiable()) {
+            return null;
         }
 
-        Assert::isInstanceOf($value, $id);
+        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+            return $reflectionClass->newInstance();
+        }
 
-        return $value;
+        $resolvedArguments = take($constructor->getParameters())
+            ->map($this->resolveParameter(...))
+            ->toList();
+
+        // Check if we identified all parameters for the service
+        if (count($resolvedArguments) !== $constructor->getNumberOfParameters()) {
+            return null;
+        }
+
+        return $reflectionClass->newInstanceArgs($resolvedArguments);
+    }
+
+    /**
+     * Builds a potentially incomplete list of arguments for a constructor; as list of arguments may
+     * contain null values, we use a generator that can yield none or one value as an option type.
+     *
+     * @return iterable<object>
+     */
+    private function resolveParameter(ReflectionParameter $parameter): iterable
+    {
+        // Variadic parameters need hand-weaving
+        if ($parameter->isVariadic()) {
+            return;
+        }
+
+        $paramType = $parameter->getType();
+
+        // Not considering composite types, such as unions or intersections, for now
+        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
+
+        // Only attempt to resolve a non-built-in named type (a class/interface)
+        if ($paramType->isBuiltin()) {
+            return;
+        }
+
+        /** @var class-string $paramTypeName */
+        $paramTypeName = $paramType->getName();
+
+        // Found an instantiable class, done
+        if ((new ReflectionClass($paramTypeName))->isInstantiable()) {
+            yield $this->get($paramTypeName);
+
+            return;
+        }
+
+        // Look for a factory that can create an instance of an interface or abstract class
+        $matchingTypes = $this->factoriesForType($paramTypeName);
+
+        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
+        if (count($matchingTypes) !== 1) {
+            return;
+        }
+
+        yield $this->get(reset($matchingTypes));
+    }
+
+    /**
+     * Retrieves the class or interface names of all registered factories that can produce instances of the given type.
+     * This includes direct implementations, subclasses, or the type itself.
+     *
+     * @template T of object
+     * @param class-string<T> $type the class or interface name to find factories for
+     * @return class-string<T>[] a list of factory IDs (class-strings) that are compatible with the given type
+     */
+    private function factoriesForType(string $type): array
+    {
+        return take($this->factories)
+            ->keys()
+            ->filter(static fn (string $id) => is_a($id, $type, true))
+            ->toList();
     }
 }

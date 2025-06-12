@@ -41,27 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapStrShuffle extends AbstractUnwrapMutator
+final class UnwrapStrShuffle extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `str_shuffle` function call with its first operand. For example:
+                Replaces a `str_shuffle` function call with its first operand. For example:
 
-```php
-$x = str_shuffle('Hello!');
-```
+                ```php
+                $x = str_shuffle('Hello!');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'Hello!';
-```
-TXT
+                ```php
+                $x = 'Hello!';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = str_shuffle('Hello!');
+                + $x = 'Hello!';
+                DIFF,
         );
     }
 

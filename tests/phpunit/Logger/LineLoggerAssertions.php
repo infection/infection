@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use function implode;
 use Infection\Logger\LineMutationTestingResultsLogger;
 use function Infection\Tests\normalizeLineReturn;
 
@@ -42,11 +43,11 @@ trait LineLoggerAssertions
 {
     private function assertLoggedContentIs(
         string $expectedContents,
-        LineMutationTestingResultsLogger $logger
+        LineMutationTestingResultsLogger $logger,
     ): void {
         $this->assertSame(
             $expectedContents,
-            normalizeLineReturn(implode("\n", $logger->getLogLines()))
+            normalizeLineReturn(implode("\n", $logger->getLogLines())),
         );
     }
 }

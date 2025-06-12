@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Locator;
 
+use function array_shift;
 use function current;
 use const DIRECTORY_SEPARATOR;
 use function is_file;
 use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -49,18 +50,18 @@ use Webmozart\PathUtil\Path;
 final class RootsFileLocator implements Locator
 {
     /** @var string[] */
-    private array $roots;
-    private \Symfony\Component\Filesystem\Filesystem $filesystem;
+    private readonly array $roots;
 
     /**
      * @param string[] $roots
      */
-    public function __construct(array $roots, Filesystem $filesystem)
-    {
+    public function __construct(
+        array $roots,
+        private readonly Filesystem $filesystem,
+    ) {
         Assert::allString($roots);
 
         $this->roots = $roots;
-        $this->filesystem = $filesystem;
     }
 
     public function locate(string $fileName): string
@@ -110,7 +111,7 @@ final class RootsFileLocator implements Locator
 
         try {
             return $this->locate(current($fileNames));
-        } catch (FileNotFound $exception) {
+        } catch (FileNotFound) {
             array_shift($fileNames);
 
             return $this->innerLocateOneOf($fileNames);

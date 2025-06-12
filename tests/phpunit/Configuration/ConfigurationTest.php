@@ -36,29 +36,34 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(Configuration::class)]
 final class ConfigurationTest extends TestCase
 {
     use ConfigurationAssertions;
 
     /**
-     * @dataProvider valueProvider
-     *
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param SplFileInfo[] $sourceFiles
      * @param Mutator[] $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
+    #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(
         float $timeout,
         array $sourceDirectories,
@@ -69,6 +74,7 @@ final class ConfigurationTest extends TestCase
         string $logVerbosity,
         string $tmpDir,
         PhpUnit $phpUnit,
+        PhpStan $phpStan,
         array $mutators,
         string $testFramework,
         ?string $bootstrap,
@@ -87,7 +93,13 @@ final class ConfigurationTest extends TestCase
         int $msiPrecision,
         int $threadsCount,
         bool $dryRun,
-        array $ignoreSourceCodeMutatorsMap
+        array $ignoreSourceCodeMutatorsMap,
+        bool $executeOnlyCoveringTestCases,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+        ?string $mapSourceClassToTest,
+        ?string $loggerProjectRootDirectory,
+        ?string $staticAnalysisTool,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -99,6 +111,7 @@ final class ConfigurationTest extends TestCase
             $logVerbosity,
             $tmpDir,
             $phpUnit,
+            $phpStan,
             $mutators,
             $testFramework,
             $bootstrap,
@@ -117,7 +130,13 @@ final class ConfigurationTest extends TestCase
             $msiPrecision,
             $threadsCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase,
+            $mapSourceClassToTest,
+            $loggerProjectRootDirectory,
+            $staticAnalysisTool,
         );
 
         $this->assertConfigurationStateIs(
@@ -131,6 +150,7 @@ final class ConfigurationTest extends TestCase
             $logVerbosity,
             $tmpDir,
             $phpUnit,
+            $phpStan,
             $mutators,
             $testFramework,
             $bootstrap,
@@ -149,11 +169,17 @@ final class ConfigurationTest extends TestCase
             $msiPrecision,
             $threadsCount,
             $dryRun,
-            $ignoreSourceCodeMutatorsMap
+            $ignoreSourceCodeMutatorsMap,
+            $executeOnlyCoveringTestCases,
+            $isForGitDiffLines,
+            $gitDiffBase,
+            $mapSourceClassToTest,
+            $loggerProjectRootDirectory,
+            $staticAnalysisTool,
         );
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [
             10.,
@@ -165,6 +191,7 @@ final class ConfigurationTest extends TestCase
             'none',
             '',
             new PhpUnit(null, null),
+            new PhpStan(null, null),
             [],
             'phpunit',
             null,
@@ -184,6 +211,12 @@ final class ConfigurationTest extends TestCase
             0,
             false,
             [],
+            false,
+            false,
+            'master',
+            null,
+            null,
+            null, // staticAnalysisTool
         ];
 
         yield 'nominal' => [
@@ -197,16 +230,20 @@ final class ConfigurationTest extends TestCase
             ['exclude-dir'],
             new Logs(
                 'text.log',
+                'report.html',
                 'summary.log',
                 'json.log',
+                'gitlab.log',
                 'debug.log',
                 'mutator.log',
                 true,
-                new Badge('master')
+                StrykerConfig::forBadge('master'),
+                'summary.json',
             ),
             'default',
             'custom-dir',
             new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            new PhpStan('bin/phpstan-config-dir', 'bin/phpstan'),
             [
                 'Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator()),
             ],
@@ -230,6 +267,12 @@ final class ConfigurationTest extends TestCase
             [
                 'For_' => ['.*someMethod.*'],
             ],
+            true,
+            false,
+            'master',
+            MapSourceClassToTestStrategy::SIMPLE,
+            null,
+            StaticAnalysisToolTypes::PHPSTAN,
         ];
     }
 }

@@ -55,7 +55,7 @@ trait BacksUpEnvironmentVariables
 
         Assert::notNull(
             $value,
-            'Attempted to restore a backup but no backup has been created'
+            'Attempted to restore a backup but no backup has been created',
         );
 
         $value->restore();

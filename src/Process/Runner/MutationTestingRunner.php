@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function array_key_exists;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -46,7 +45,8 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Factory\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -56,40 +56,20 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MutationTestingRunner
 {
-    private MutantProcessFactory $processFactory;
-    private MutantFactory $mutantFactory;
-    private ProcessRunner $processRunner;
-    private EventDispatcher $eventDispatcher;
-    private Filesystem $fileSystem;
-    private DiffSourceCodeMatcher $diffSourceCodeMatcher;
-    private bool $runConcurrently;
-    private float $timeout;
-    /** @var array<string, array<int, string>> */
-    private array $ignoreSourceCodeMutatorsMap;
-
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        MutantProcessFactory $processFactory,
-        MutantFactory $mutantFactory,
-        ProcessRunner $processRunner,
-        EventDispatcher $eventDispatcher,
-        Filesystem $fileSystem,
-        DiffSourceCodeMatcher $diffSourceCodeMatcher,
-        bool $runConcurrently,
-        float $timeout,
-        array $ignoreSourceCodeMutatorsMap
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly MutantFactory $mutantFactory,
+        private readonly ProcessRunner $processRunner,
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly Filesystem $fileSystem,
+        private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
+        private readonly bool $runConcurrently,
+        private readonly float $timeout,
+        private readonly array $ignoreSourceCodeMutatorsMap,
     ) {
-        $this->processFactory = $processFactory;
-        $this->mutantFactory = $mutantFactory;
-        $this->processRunner = $processRunner;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileSystem = $fileSystem;
-        $this->diffSourceCodeMatcher = $diffSourceCodeMatcher;
-        $this->runConcurrently = $runConcurrently;
-        $this->timeout = $timeout;
-        $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
     }
 
     /**
@@ -98,61 +78,61 @@ class MutationTestingRunner
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
-        $processes = take($mutations)
-            ->cast(function (Mutation $mutation): Mutant {
-                return $this->mutantFactory->create($mutation);
-            })
-            ->filter(function (Mutant $mutant) {
-                // It's a proxy call to Mutation, can be done one stage up
-                if ($mutant->isCoveredByTest()) {
-                    return true;
-                }
-
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
-                ));
-
-                return false;
-            })
-            ->filter(function (Mutant $mutant) {
+        $processContainers = take($mutations)
+            ->cast(fn (Mutation $mutation): Mutant => $this->mutantFactory->create($mutation))
+            ->filter(function (Mutant $mutant): bool {
                 $mutatorName = $mutant->getMutation()->getMutatorName();
 
-                if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
-                    return true;
-                }
-
-                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
+                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] ?? [] as $sourceCodeRegex) {
                     if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
+                        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                            MutantExecutionResult::createFromIgnoredMutant($mutant),
+                        ));
+
                         return false;
                     }
                 }
 
                 return true;
             })
-            ->filter(function (Mutant $mutant) {
+            ->filter(function (Mutant $mutant): bool {
+                // It's a proxy call to Mutation, can be done one stage up
+                if ($mutant->isCoveredByTest()) {
+                    return true;
+                }
+
+                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                    MutantExecutionResult::createFromNonCoveredMutant($mutant),
+                ));
+
+                return false;
+            })
+            ->filter(function (Mutant $mutant): bool {
                 // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
                 if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
                     return true;
                 }
 
                 $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromTimeSkippedMutant($mutant)
+                    MutantExecutionResult::createFromTimeSkippedMutant($mutant),
                 ));
 
                 return false;
             })
-            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
+            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): MutantProcessContainer {
                 $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
-                $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-                return $process;
+                return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
             })
         ;
 
-        $this->processRunner->run($processes);
+        foreach ($this->processRunner->run($processContainers) as $mutantProcessContainer) {
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                $mutantProcessContainer->getCurrent()->getMutantExecutionResult(),
+            ));
+        }
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }

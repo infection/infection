@@ -35,171 +35,174 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapUcWords;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapUcWords::class)]
 final class UnwrapUcWordsTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ucwords('good afternoon!');
-PHP
+                $a = ucwords('good afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'good afternoon!';
-PHP
+                $a = 'good afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ucwords(\Class_With_Const::Const);
-PHP
+                $a = ucwords(\Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of ucwords' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \ucwords('good afternoon!');
-PHP
+                $a = \ucwords('good afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'good afternoon!';
-PHP
+                $a = 'good afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'good afternoon!';
-if (ucwords($a) === $a) {
-    return true;
-}
-PHP
+                $a = 'good afternoon!';
+                if (ucwords($a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'good afternoon!';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = 'good afternoon!';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when ucwords is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = uCwOrDs('good afternoon!');
-PHP
+                $a = uCwOrDs('good afternoon!');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'good afternoon!';
-PHP
+                $a = 'good afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when ucwords uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ucwords($foo->bar());
-PHP
+                $a = ucwords($foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ucwords(array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-}));
-PHP
+                $a = ucwords(array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                }));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry . substr($item, 0, 1);
-});
-PHP
+                $a = array_reduce($words, function (string $carry, string $item) {
+                    return $carry . substr($item, 0, 1);
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strtolower('Good Afternoon!');
-PHP
+                $a = strtolower('Good Afternoon!');
+                PHP,
         ];
 
         yield 'It does not mutate functions named ucwords' => [
             <<<'PHP'
-<?php
+                <?php
 
-function ucwords($string)
-{
-}
-PHP
+                function ucwords($string)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'ucwords';
+                $a = 'ucwords';
 
-$b = $a('FooBar');
-PHP
+                $b = $a('FooBar');
+                PHP
             ,
         ];
 
         yield 'It does not break when ucwords uses a delimiter parameter' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ucwords('good|afternoon|world', '|');
-PHP
+                $a = ucwords('good|afternoon|world', '|');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'good|afternoon|world';
-PHP
+                $a = 'good|afternoon|world';
+                PHP,
         ];
     }
 }

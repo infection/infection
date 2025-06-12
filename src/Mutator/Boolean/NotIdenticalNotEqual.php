@@ -45,28 +45,32 @@ use PhpParser\Node;
  * @internal
  *
  * @deprecated This mutator is a semantic addition
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\NotIdentical>
  */
 final class NotIdenticalNotEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a strict inequality comparison (using a not-identical operator (`!==`)) with a loose
-inequality comparison (using a not-equal operator (`!=`)).
-TXT
+                Replaces a strict inequality comparison (using a not-identical operator (`!==`)) with a loose
+                inequality comparison (using a not-equal operator (`!=`)).
+                TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b !== $c;
+                + $a = $b != $c;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\NotIdentical $node
      *
      * @return iterable<Node\Expr\BinaryOp\NotEqual>
      */

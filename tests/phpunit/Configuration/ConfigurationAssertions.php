@@ -38,6 +38,7 @@ namespace Infection\Tests\Configuration;
 use function array_map;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
@@ -65,6 +66,7 @@ trait ConfigurationAssertions
         string $expectedLogVerbosity,
         string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
+        PhpStan $expectedPhpStan,
         array $expectedMutators,
         string $expectedTestFramework,
         ?string $expectedBootstrap,
@@ -83,32 +85,41 @@ trait ConfigurationAssertions
         int $expectedMsiPrecision,
         int $expectedThreadCount,
         bool $expectedDryRyn,
-        array $expectedIgnoreSourceCodeMutatorsMap
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        bool $expectedExecuteOnlyCoveringTestCases,
+        bool $expectedIsForGitDiffLines,
+        ?string $expectedGitDiffBase,
+        ?string $expectedMapSourceClassToTest,
+        ?string $expectedLoggerProjectRootDirectory,
+        ?string $expectedStaticAnalysisTool,
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
         $this->assertSame(
             self::normalizePaths($expectedSourceFiles),
-            self::normalizePaths($configuration->getSourceFiles())
+            self::normalizePaths($configuration->getSourceFiles()),
         );
         $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter());
         $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes());
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
+            $expectedLogs->getHtmlLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
             $expectedLogs->getJsonLogFilePath(),
+            $expectedLogs->getGitlabLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getUseGitHubAnnotationsLogger(),
-            $expectedLogs->getBadge()
+            $expectedLogs->getStrykerConfig(),
+            $expectedLogs->getSummaryJsonLogFilePath(),
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());
         $this->assertSame($expectedTmpDir, $configuration->getTmpDir());
         $this->assertPhpUnitStateIs(
             $configuration->getPhpUnit(),
             $expectedPhpUnit->getConfigDir(),
-            $expectedPhpUnit->getCustomPath()
+            $expectedPhpUnit->getCustomPath(),
         );
         $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10.);
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
@@ -116,7 +127,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
         $this->assertSame(
             $expectedTestFrameworkExtraOptions,
-            $configuration->getTestFrameworkExtraOptions()
+            $configuration->getTestFrameworkExtraOptions(),
         );
         $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath());
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage());
@@ -132,6 +143,12 @@ trait ConfigurationAssertions
         $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
         $this->assertSame($expectedDryRyn, $configuration->isDryRun());
         $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap());
+        $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases());
+        $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines());
+        $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase());
+        $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy());
+        $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->getLoggerProjectRootDirectory());
+        $this->assertSame($expectedStaticAnalysisTool, $configuration->getStaticAnalysisTool());
     }
 
     /**
@@ -142,10 +159,8 @@ trait ConfigurationAssertions
     private static function normalizePaths(array $fileInfos): array
     {
         return array_map(
-            static function (SplFileInfo $fileInfo): string {
-                return $fileInfo->getPathname();
-            },
-            $fileInfos
+            static fn (SplFileInfo $fileInfo): string => $fileInfo->getPathname(),
+            $fileInfos,
         );
     }
 }

@@ -1,7 +1,7 @@
 !/.tools/.gitkeep
 !/build/.gitkeep
 !/build/cache/.gitkeep
-.phpunit.result.cache
+.phpunit.*
 /*.phar
 /.box_dump/
 /.ci/keys.asc
@@ -12,8 +12,8 @@
 /build/
 /devTools/Docker*.json
 /infection-cache
-/infection.json
 /infection.log
+/per-mutator.md
 /phpunit.xml
 /tests/benchmark/*/coverage/
 /tests/benchmark/*/sources/

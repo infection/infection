@@ -42,48 +42,58 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @extends AbstractValueToNullReturnValue<Node\Stmt\Return_>
  */
 final class FunctionCall extends AbstractValueToNullReturnValue
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
-in order to preserve potential side effects. For example:
+                Replaces a returned evaluated function with `null` instead. The function evaluation statement is kept
+                in order to preserve potential side effects. For example:
 
-```php
-class X {
-    function foo()
-    {
-        return bar();
-    }
-}
-```
+                ```php
+                class X {
+                    function foo()
+                    {
+                        return bar();
+                    }
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-class X {
-    function foo()
-    {
-        bar();
-        return null;
-    }
-}
-```
+                ```php
+                class X {
+                    function foo()
+                    {
+                        bar();
+                        return null;
+                    }
+                }
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                class X {
+                    function foo()
+                    {
+                -        return bar();
+                +        bar();
+                +        return null;
+                    }
+                }
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Return_ $node
      *
      * @return iterable<array<Node\Stmt\Expression|Node\Stmt\Return_>>
      */
@@ -95,7 +105,7 @@ TXT
         yield [
             new Node\Stmt\Expression($expr),
             new Node\Stmt\Return_(
-                new Node\Expr\ConstFetch(new Node\Name('null'))
+                new Node\Expr\ConstFetch(new Node\Name('null')),
             ),
         ];
     }

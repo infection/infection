@@ -35,183 +35,186 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapArrayMap;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArrayMap::class)]
 final class UnwrapArrayMapTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 'B', 'C'];
-PHP
+                $a = ['A', 'B', 'C'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', \Class_With_Const::Const);
-PHP
+                $a = array_map('strtolower', \Class_With_Const::Const);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_map' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = \array_map('strtolower', ['A', 'B', 'C']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 'B', 'C'];
-PHP
+                $a = ['A', 'B', 'C'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_filter([1, 2, 3], 'is_int');
-PHP
+                $a = array_filter([1, 2, 3], 'is_int');
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_map' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_map($text, $other)
-{
-}
-PHP
+                function array_map($text, $other)
+                {
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 'B', 'C'];
-if (array_map('strtolower', $a) === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 'B', 'C'];
+                if (array_map('strtolower', $a) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 'B', 'C'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ['A', 'B', 'C'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_map is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ArRaY_mAp('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = ArRaY_mAp('strtolower', ['A', 'B', 'C']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['A', 'B', 'C'];
-PHP
+                $a = ['A', 'B', 'C'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_map uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', $foo->bar());
-PHP
+                $a = array_map('strtolower', $foo->bar());
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_filter(array_map(function(string $letter): string {
-    return strtolower($letter);
-}, ['A', 'B', 'C']), 'is_int');
-PHP
+                $a = array_filter(array_map(function(string $letter): string {
+                    return strtolower($letter);
+                }, ['A', 'B', 'C']), 'is_int');
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_filter(['A', 'B', 'C'], 'is_int');
-PHP
+                $a = array_filter(['A', 'B', 'C'], 'is_int');
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with more than two parameters' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C'], \Class_With_Const::Const, $foo->bar());
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C'], \Class_With_Const::Const, $foo->bar());
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['A', 'B', 'C'];
-PHP
+                    $a = ['A', 'B', 'C'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                    $a = \Class_With_Const::Const;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->bar();
-PHP
+                    $a = $foo->bar();
+                    PHP
                 ,
             ],
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_map';
+                $a = 'array_map';
 
-$b = $a('strtolower', [3,4,5]);
-PHP
+                $b = $a('strtolower', [3,4,5]);
+                PHP
             ,
         ];
     }

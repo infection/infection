@@ -38,10 +38,11 @@ namespace Infection\Configuration\Schema;
 use function array_filter;
 use function array_map;
 use function array_values;
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Entry\StrykerConfig;
 use stdClass;
 use function trim;
 
@@ -59,6 +60,7 @@ class SchemaConfigurationFactory
             self::createLogs($rawConfig->logs ?? new stdClass()),
             self::normalizeString($rawConfig->tmpDir ?? null),
             self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
+            self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
             $rawConfig->ignoreMsiWithNoMutations ?? null,
             $rawConfig->minMsi ?? null,
             $rawConfig->minCoveredMsi ?? null,
@@ -66,7 +68,8 @@ class SchemaConfigurationFactory
             $rawConfig->testFramework ?? null,
             self::normalizeString($rawConfig->bootstrap ?? null),
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
-            self::normalizeString($rawConfig->testFrameworkOptions ?? null)
+            self::normalizeString($rawConfig->testFrameworkOptions ?? null),
+            $rawConfig->threads ?? null,
         );
     }
 
@@ -74,7 +77,7 @@ class SchemaConfigurationFactory
     {
         return new Source(
             self::normalizeStringArray($source->directories ?? []),
-            self::normalizeStringArray($source->excludes ?? [])
+            self::normalizeStringArray($source->excludes ?? []),
         );
     }
 
@@ -82,30 +85,50 @@ class SchemaConfigurationFactory
     {
         return new Logs(
             self::normalizeString($logs->text ?? null),
+            self::normalizeString($logs->html ?? null),
             self::normalizeString($logs->summary ?? null),
             self::normalizeString($logs->json ?? null),
+            self::normalizeString($logs->gitlab ?? null),
             self::normalizeString($logs->debug ?? null),
             self::normalizeString($logs->perMutator ?? null),
             $logs->github ?? false,
-            self::createBadge($logs->badge ?? null)
+            self::createStrykerConfig($logs->stryker ?? null),
+            self::normalizeString($logs->summaryJson ?? null),
         );
     }
 
-    private static function createBadge(?stdClass $badge): ?Badge
+    private static function createStrykerConfig(?stdClass $stryker): ?StrykerConfig
     {
-        $branch = self::normalizeString($badge->branch ?? null);
+        if ($stryker === null) {
+            return null;
+        }
 
-        return $branch === null
-            ? null
-            : new Badge($branch)
-        ;
+        $branch = self::normalizeString($stryker->badge ?? $stryker->report ?? null);
+
+        if ($branch === null) {
+            return null;
+        }
+
+        if (($stryker->badge ?? null) !== null) {
+            return StrykerConfig::forBadge($branch);
+        }
+
+        return StrykerConfig::forFullReport($branch);
     }
 
     private static function createPhpUnit(stdClass $phpUnit): PhpUnit
     {
         return new PhpUnit(
             self::normalizeString($phpUnit->configDir ?? null),
-            self::normalizeString($phpUnit->customPath ?? null)
+            self::normalizeString($phpUnit->customPath ?? null),
+        );
+    }
+
+    private static function createPhpStan(stdClass $phpStan): PhpStan
+    {
+        return new PhpStan(
+            self::normalizeString($phpStan->configDir ?? null),
+            self::normalizeString($phpStan->customPath ?? null),
         );
     }
 

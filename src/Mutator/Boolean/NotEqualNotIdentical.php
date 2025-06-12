@@ -43,28 +43,32 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\NotEqual>
  */
 final class NotEqualNotIdentical implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a loose inequality comparison (using a not-equal operator (`!=`)) with a strict inequality
-comparison (using a not-identical operator (`!==`)).
-TXT
+                Replaces a loose inequality comparison (using a not-equal operator (`!=`)) with a strict inequality
+                comparison (using a not-identical operator (`!==`)).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b != $c;
+                + $a = $b !== $c;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\NotEqual $node
      *
      * @return iterable<Node\Expr\BinaryOp\NotIdentical>
      */

@@ -35,107 +35,110 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Regex\PregMatchMatches;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(PregMatchMatches::class)]
 final class PregMatchMatchesTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $output
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $output = []): void
     {
-        $this->doTest($input, $output);
+        $this->assertMutatesInput($input, $output);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
-        yield 'It mutates ' => [
+        yield 'It mutates' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('/a/', 'b', $foo);
-PHP
+                preg_match('/a/', 'b', $foo);
+                PHP
             ,
-            <<<'PHP'
-<?php
+            (static fn () => <<<'PHP'
+                <?php
 
-(int) ($foo = array());
-PHP
+                (int) $foo = [];
+                PHP)(),
         ];
 
         yield 'It does not mutate if the function is a variable' => [
             <<<'PHP'
-<?php
+                <?php
 
-$foo = 'preg_match';
-$foo('/a/', 'b', $bar);
-PHP
+                $foo = 'preg_match';
+                $foo('/a/', 'b', $bar);
+                PHP,
         ];
 
         yield 'It mutates if preg_match is incorrectly cased' => [
-          <<<'PHP'
-<?php
-
-PreG_maTch('/a/', 'b', $foo);
-PHP
-            ,
             <<<'PHP'
-<?php
+                <?php
 
-(int) ($foo = array());
-PHP
+                PreG_maTch('/a/', 'b', $foo);
+                PHP
+            ,
+            (static fn () => <<<'PHP'
+                <?php
+
+                (int) $foo = [];
+                PHP)(),
         ];
 
         yield 'It does not mutate if there are less than 3 arguments' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('/asdfa/', 'foo');
-PHP
+                preg_match('/asdfa/', 'foo');
+                PHP,
         ];
 
         yield 'It mutates correctly if the 3rd variable is a property' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('/a/', 'b', $a->b);
-PHP
+                preg_match('/a/', 'b', $a->b);
+                PHP
             ,
-            <<<'PHP'
-<?php
+            (static fn () => <<<'PHP'
+                <?php
 
-(int) ($a->b = array());
-PHP
+                (int) $a->b = [];
+                PHP)(),
         ];
 
         yield 'It mutates correctly even with four arguments' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
-PHP
+                preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
+                PHP
             ,
-            <<<'PHP'
-<?php
+            (static fn () => <<<'PHP'
+                <?php
 
-(int) ($foo = array());
-PHP
+                (int) $foo = [];
+                PHP)(),
         ];
 
         yield 'It mutates correctly even with five arguments' => [
             <<<'PHP'
-<?php
+                <?php
 
-preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
-PHP
+                preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
+                PHP
             ,
-            <<<'PHP'
-<?php
+            (static fn () => <<<'PHP'
+                <?php
 
-(int) ($foo = array());
-PHP
+                (int) $foo = [];
+                PHP)(),
         ];
     }
 }

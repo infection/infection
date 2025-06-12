@@ -37,7 +37,7 @@ namespace Infection\Console\OutputFormatter;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,11 +49,9 @@ final class DotFormatter extends AbstractOutputFormatter
 {
     private const DOTS_PER_ROW = 50;
 
-    private OutputInterface $output;
-
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
+    public function __construct(
+        private readonly OutputInterface $output,
+    ) {
     }
 
     public function start(int $mutationCount): void
@@ -62,12 +60,15 @@ final class DotFormatter extends AbstractOutputFormatter
 
         $this->output->writeln([
             '',
-            '<killed>.</killed>: killed, '
+            '<killed>.</killed>: killed by tests, '
+            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
             . '<uncovered>U</uncovered>: uncovered, '
             . '<with-error>E</with-error>: fatal error, '
+            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped',
+            . '<skipped>S</skipped>: skipped, '
+            . '<ignored>I</ignored>: ignored',
             '',
         ]);
     }
@@ -77,8 +78,12 @@ final class DotFormatter extends AbstractOutputFormatter
         parent::advance($executionResult, $mutationCount);
 
         switch ($executionResult->getDetectionStatus()) {
-            case DetectionStatus::KILLED:
+            case DetectionStatus::KILLED_BY_TESTS:
                 $this->output->write('<killed>.</killed>');
+
+                break;
+            case DetectionStatus::KILLED_BY_STATIC_ANALYSIS:
+                $this->output->write('<killed-by-static-analysis>A</killed-by-static-analysis>');
 
                 break;
             case DetectionStatus::NOT_COVERED:
@@ -99,6 +104,14 @@ final class DotFormatter extends AbstractOutputFormatter
                 break;
             case DetectionStatus::ERROR:
                 $this->output->write('<with-error>E</with-error>');
+
+                break;
+            case DetectionStatus::SYNTAX_ERROR:
+                $this->output->write('<with-syntax-error>X</with-syntax-error>');
+
+                break;
+            case DetectionStatus::IGNORED:
+                $this->output->write('<ignored>I</ignored>');
 
                 break;
         }

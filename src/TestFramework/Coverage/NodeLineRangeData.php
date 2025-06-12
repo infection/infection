@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use function range;
 use Webmozart\Assert\Assert;
 
 /**

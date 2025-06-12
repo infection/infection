@@ -41,11 +41,13 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Later\now;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutantExecutionResult::class)]
 final class MutantExecutionResultTest extends TestCase
 {
     use MutantExecutionResultAssertions;
@@ -56,18 +58,23 @@ final class MutantExecutionResultTest extends TestCase
         $processOutput = 'Passed!';
         $processResultCode = DetectionStatus::ESCAPED;
         $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+            --- Original
+            +++ New
+            @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+            - echo 'original';
+            + echo 'notCovered#0';
 
-DIFF;
+            DIFF;
 
+        $mutantHash = 'a1b2c3';
+        $mutatorClass = For_::class;
         $mutatorName = MutatorName::getName(For_::class);
         $originalFilePath = 'path/to/Foo.php';
         $originalStartingLine = 10;
+        $originalEndingLine = 20;
+        $originalStartFilePosition = 1;
+        $originalEndingFilePosition = 5;
         $originalCode = '<php $a = 1;';
         $mutatedCode = '<php $a = 2;';
 
@@ -76,11 +83,18 @@ DIFF;
             $processOutput,
             $processResultCode,
             now($mutantDiff),
+            $mutantHash,
+            $mutatorClass,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
+            $originalEndingLine,
+            $originalStartFilePosition,
+            $originalEndingFilePosition,
             now($originalCode),
-            now($mutatedCode)
+            now($mutatedCode),
+            [],
+            0.0,
         );
 
         $this->assertResultStateIs(
@@ -89,11 +103,12 @@ DIFF;
             $processOutput,
             $processResultCode,
             $mutantDiff,
+            $mutatorClass,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
             $originalCode,
-            $mutatedCode
+            $mutatedCode,
         );
     }
 
@@ -107,6 +122,7 @@ DIFF;
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
                 [],
+                $mutatorClass = For_::class,
                 $mutatorName = MutatorName::getName(For_::class),
                 [
                     'startLine' => $originalStartingLine = 10,
@@ -123,21 +139,21 @@ DIFF;
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
-                        0.01
+                        0.01,
                     ),
-                ]
+                ],
             ),
             $mutatedCode,
             $mutantDiff = <<<'DIFF'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
-- echo 'original';
-+ echo 'notCovered#0';
+                - echo 'original';
+                + echo 'notCovered#0';
 
-DIFF,
-            $originalCode
+                DIFF,
+            $originalCode,
         );
 
         $this->assertResultStateIs(
@@ -146,11 +162,12 @@ DIFF,
             '',
             DetectionStatus::NOT_COVERED,
             $mutantDiff,
+            $mutatorClass,
             $mutatorName,
             $originalFilePath,
             $originalStartingLine,
             $originalCode,
-            $mutatedCode
+            $mutatedCode,
         );
     }
 
@@ -160,16 +177,18 @@ DIFF,
         string $expectedProcessOutput,
         string $expectedDetectionStatus,
         string $expectedMutantDiff,
+        string $expectedMutatorClass,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
         int $expectedOriginalStartingLine,
         string $originalCode,
-        string $mutatedCode
+        string $mutatedCode,
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
         $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
         $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
+        $this->assertSame($expectedMutatorClass, $result->getMutatorClass());
         $this->assertSame($expectedMutatorName, $result->getMutatorName());
         $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
         $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());

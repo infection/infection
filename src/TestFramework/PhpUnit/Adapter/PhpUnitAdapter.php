@@ -35,47 +35,43 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
+use function escapeshellarg;
 use Infection\AbstractTestFramework\MemoryUsageAware;
-use Infection\PhpParser\Visitor\IgnoreNode\PhpUnitCodeCoverageAnnotationIgnorer;
+use Infection\AbstractTestFramework\SyntaxErrorAware;
+use Infection\Config\ValueProvider\PCOVDirectoryProvider;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\VersionParser;
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
+use function trim;
 use function version_compare;
 
 /**
  * @internal
  * @final
  */
-class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAdditionalNodes, MemoryUsageAware, ProvidesInitialRunOnlyOptions
+class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsageAware, ProvidesInitialRunOnlyOptions, SyntaxErrorAware
 {
-    public const COVERAGE_DIR = 'coverage-xml';
-
-    private string $tmpDir;
-
-    private string $jUnitFilePath;
+    final public const COVERAGE_DIR = 'coverage-xml';
 
     public function __construct(
         string $testFrameworkExecutable,
-        string $tmpDir,
-        string $jUnitFilePath,
+        private readonly string $tmpDir,
+        private readonly string $jUnitFilePath,
+        private readonly PCOVDirectoryProvider $pcovDirectoryProvider,
         InitialConfigBuilder $initialConfigBuilder,
         MutationConfigBuilder $mutationConfigBuilder,
         CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
         VersionParser $versionParser,
         CommandLineBuilder $commandLineBuilder,
-        ?string $version = null
+        ?string $version = null,
     ) {
         parent::__construct($testFrameworkExecutable, $initialConfigBuilder, $mutationConfigBuilder, $argumentsAndOptionsBuilder, $versionParser, $commandLineBuilder, $version);
-
-        $this->tmpDir = $tmpDir;
-        $this->jUnitFilePath = $jUnitFilePath;
     }
 
     public function hasJUnitReport(): bool
@@ -93,15 +89,20 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
     public function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
             $extraOptions = trim(sprintf(
                 '%s --coverage-xml=%s --log-junit=%s',
                 $extraOptions,
                 $this->tmpDir . '/' . self::COVERAGE_DIR,
-                $this->jUnitFilePath // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+                $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
             ));
+
+            if ($this->pcovDirectoryProvider->shallProvide()) {
+                $phpExtraArgs[] = '-d';
+                $phpExtraArgs[] = sprintf('pcov.directory=%s', escapeshellarg($this->pcovDirectoryProvider->getDirectory()));
+            }
         }
 
         return parent::getInitialTestRunCommandLine($extraOptions, $phpExtraArgs, $skipCoverage);
@@ -109,29 +110,37 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
 
     public function testsPass(string $output): bool
     {
-        if (preg_match('/failures!/i', $output)) {
+        if (preg_match('/failures!/i', $output) === 1) {
             return false;
         }
 
-        if (preg_match('/errors!/i', $output)) {
+        if (preg_match('/errors!/i', $output) === 1) {
             return false;
         }
 
         // OK (XX tests, YY assertions)
-        $isOk = preg_match('/OK\s\(/', $output);
+        $isOk = preg_match('/OK\s\(/', $output) === 1;
 
         // "OK, but incomplete, skipped, or risky tests!"
-        $isOkWithInfo = preg_match('/OK\s?,/', $output);
+        $isOkWithInfo = preg_match('/OK\s?,/', $output) === 1;
 
         // "Warnings!" - e.g. when deprecated functions are used, but tests pass
-        $isWarning = preg_match('/warnings!/i', $output);
+        $isWarning = preg_match('/warnings!/i', $output) === 1;
 
-        return $isOk || $isOkWithInfo || $isWarning;
+        // "No tests executed!" - e.g. when --filter option contains too large regular expression
+        $isNoTestsExecuted = preg_match('/No tests executed!/i', $output) === 1;
+
+        return $isOk || $isOkWithInfo || $isWarning || $isNoTestsExecuted;
+    }
+
+    public function isSyntaxError(string $output): bool
+    {
+        return preg_match('/ParseError: syntax error/i', $output) === 1;
     }
 
     public function getMemoryUsed(string $output): float
     {
-        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match)) {
+        if (preg_match('/Memory: (\d+(?:\.\d+))\s*MB/', $output, $match) === 1) {
             return (float) $match[1];
         }
 
@@ -150,19 +159,14 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements IgnoresAddi
         if (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
                 "%s\n\n%s\n\n%s",
-                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n" .
-                'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
+                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine)
+                parent::getInitialTestsFailRecommendations($commandLine),
             );
         }
 
         return $recommendations;
-    }
-
-    public function getNodeIgnorers(): array
-    {
-        return [new PhpUnitCodeCoverageAnnotationIgnorer()];
     }
 
     /**

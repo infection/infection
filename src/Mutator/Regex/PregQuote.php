@@ -43,50 +43,58 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\FuncCall>
  */
 final class PregQuote implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes a `preg_quote` function call with its operand. For example:
+                Removes a `preg_quote` function call with its operand. For example:
 
-```php
-$x = preg_quote($string, $delimiter);
-```
+                ```php
+                $x = preg_quote($string, $delimiter);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $string;
-```
+                ```php
+                $x = $string;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = preg_quote($string, $delimiter);
+                + $x = $string;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
      *
-     * @param Node\Expr\FuncCall $node
-     *
-     * @return iterable<Node\Arg>
+     * @return iterable<Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield $node->args[0];
+        if ($node->args[0] instanceof Node\VariadicPlaceholder) {
+            return [];
+        }
+
+        yield $node->args[0]->value;
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\FuncCall &&
-            $node->name instanceof Node\Name &&
-            $node->name->toLowerString() === 'preg_quote';
+        return $node instanceof Node\Expr\FuncCall
+            && $node->name instanceof Node\Name
+            && $node->name->toLowerString() === 'preg_quote';
     }
 }

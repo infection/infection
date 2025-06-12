@@ -38,22 +38,25 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use function array_diff;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
+use Symfony\Component\Filesystem\Path;
 use Traversable;
-use Webmozart\PathUtil\Path;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(IndexXmlCoverageParser::class)]
 final class IndexXmlCoverageParserTest extends TestCase
 {
     /**
@@ -68,22 +71,20 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parser = new IndexXmlCoverageParser();
+        $this->parser = new IndexXmlCoverageParser(false);
     }
 
-    /**
-     * @dataProvider coverageProvider
-     */
+    #[DataProvider('coverageProvider')]
     public function test_it_collects_data_recursively_for_all_files(string $xml): void
     {
         $sourceFilesData = $this->parser->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
-        $this->assertCount(5, $sourceFilesData);
+        $this->assertCount(5, [...$sourceFilesData]);
     }
 
     public function test_it_has_correct_coverage_data_for_each_file(): void
@@ -93,45 +94,45 @@ final class IndexXmlCoverageParserTest extends TestCase
             preg_replace(
                 '/percent=".*"/',
                 '',
-                self::getXml()
+                self::getXml(),
             ),
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::provideFixtures(),
-            $sourceFilesData
+            $sourceFilesData,
         );
     }
 
     public function test_it_correctly_parses_xml_when_directory_has_absolute_path_for_old_phpunit_versions(): void
     {
         $xml = <<<'XML'
-<?xml version="1.0"?>
-<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-    <driver name="xdebug" version="2.5.1"/>
-  </build>
-  <project source="/path/to/src">
-    <tests>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-    </tests>
-    <directory name="/absolute/path">
-      <totals>
-        <lines total="913" comments="130" code="783" executable="348" executed="7" percent="0"/>
-      </totals>
-    </directory>
-  </project>
-  <!-- The rest of the file has been removed for this test-->
-</phpunit>
-XML;
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                <driver name="xdebug" version="2.5.1"/>
+              </build>
+              <project source="/path/to/src">
+                <tests>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                </tests>
+                <directory name="/absolute/path">
+                  <totals>
+                    <lines total="913" comments="130" code="783" executable="348" executed="7" percent="0"/>
+                  </totals>
+                </directory>
+              </project>
+              <!-- The rest of the file has been removed for this test-->
+            </phpunit>
+            XML;
 
         $sourceFilesData = $this->parser->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
         $this->assertCoverageFixtureSame([], $sourceFilesData);
@@ -144,20 +145,18 @@ XML;
             str_replace(
                 '/path/to/src',
                 realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml')
+                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml'),
             ),
-            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
         );
 
         $this->assertCoverageFixtureSame(
             XmlCoverageFixtures::providePhpUnit6Fixtures(),
-            $sourceFilesData
+            $sourceFilesData,
         );
     }
 
-    /**
-     * @dataProvider noCoveredLineReportProviders
-     */
+    #[DataProvider('noCoveredLineReportProviders')]
     public function test_it_errors_when_no_lines_were_executed(string $xml): void
     {
         $this->expectException(NoLineExecuted::class);
@@ -165,11 +164,23 @@ XML;
         $this->parser->parse(
             '/path/to/index.xml',
             $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
     }
 
-    public function coverageProvider(): iterable
+    #[DataProvider('noCoveredLineReportProviders')]
+    public function test_it_errors_for_git_diff_lines_mode_when_no_lines_were_executed(string $xml): void
+    {
+        $this->expectException(NoLineExecutedInDiffLinesMode::class);
+
+        (new IndexXmlCoverageParser(true))->parse(
+            '/path/to/index.xml',
+            $xml,
+            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+        );
+    }
+
+    public static function coverageProvider(): iterable
     {
         yield 'nominal' => [self::getXml()];
 
@@ -177,56 +188,56 @@ XML;
             preg_replace(
                 '/(source)(=\".*?\")/',
                 'name$2',
-                self::getXml()
+                self::getXml(),
             ),
         ];
     }
 
-    public function noCoveredLineReportProviders(): iterable
+    public static function noCoveredLineReportProviders(): iterable
     {
         yield 'zero lines executed' => [<<<'XML'
-<?xml version="1.0"?>
-<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-    <driver name="xdebug" version="2.5.1"/>
-  </build>
-  <project source="/path/to/src">
-    <tests>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-    </tests>
-    <directory name="/">
-      <totals>
-        <lines total="913" comments="130" code="783" executable="348" executed="0" percent="0"/>
-      </totals>
-    </directory>
-  </project>
-  <!-- The rest of the file has been removed for this test-->
-</phpunit>
-XML
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                <driver name="xdebug" version="2.5.1"/>
+              </build>
+              <project source="/path/to/src">
+                <tests>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                </tests>
+                <directory name="/">
+                  <totals>
+                    <lines total="913" comments="130" code="783" executable="348" executed="0" percent="0"/>
+                  </totals>
+                </directory>
+              </project>
+              <!-- The rest of the file has been removed for this test-->
+            </phpunit>
+            XML
         ];
 
         yield 'lines is not present' => [<<<'XML'
-<?xml version="1.0"?>
-<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-    <driver name="xdebug" version="2.5.1"/>
-  </build>
-  <project source="/path/to/src">
-    <tests>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-    </tests>
-    <directory name="/">
-      <totals>
-      </totals>
-    </directory>
-  </project>
-  <!-- The rest of the file has been removed for this test-->
-</phpunit>
-XML
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                <driver name="xdebug" version="2.5.1"/>
+              </build>
+              <project source="/path/to/src">
+                <tests>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                </tests>
+                <directory name="/">
+                  <totals>
+                  </totals>
+                </directory>
+              </project>
+              <!-- The rest of the file has been removed for this test-->
+            </phpunit>
+            XML
         ];
     }
 
@@ -242,7 +253,7 @@ XML
         self::$xml = preg_replace(
             '/(source=\").*?(\")/',
             sprintf('$1%s$2', realpath(XmlCoverageFixtures::FIXTURES_SRC_DIR)),
-            $xml
+            $xml,
         );
 
         return self::$xml;
@@ -254,7 +265,7 @@ XML
      */
     private function assertCoverageFixtureSame(
         iterable $coverageFixtures,
-        iterable $sourceFilesData
+        iterable $sourceFilesData,
     ): void {
         $this->assertSame([], array_diff(
             // Fixtures are not expected to be in any particular order

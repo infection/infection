@@ -44,24 +44,24 @@ use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorConfig;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use function Safe\class_implements;
-use function Safe\sort;
-use function Safe\sprintf;
+use function sort;
 use const SORT_STRING;
+use function sprintf;
 
 /**
- * @coversNothing
- *
  * This class is responsible for testing that all Mutator classes adhere to certain rules e.g.
  * 'Mutators shouldn't declare any public methods'.
- *
  * The goal is to reduce PR reviews about style issues that can't be automatically fixed. All test
  * failures should have a clear explanation to help contributors unfamiliar with the codebase.
  */
+#[CoversNothing]
 final class MutatorTest extends TestCase
 {
     private const KNOWN_MUTATOR_PUBLIC_METHODS = [
@@ -71,9 +71,7 @@ final class MutatorTest extends TestCase
         'canMutate',
     ];
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::mutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'mutatorClassesProvider')]
     public function test_mutators_do_not_declare_public_methods(string $className): void
     {
         $publicMethods = $this->getPublicMethods(new ReflectionClass($className));
@@ -89,24 +87,22 @@ final class MutatorTest extends TestCase
             $publicMethods,
             sprintf(
                 <<<'TXT'
-The mutator class "%s" has the following non-allowed public method(s) declared: "%s". Either
-reconsider if it is necessary for it to be public and make it protected/private instead or add it
-to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".
-TXT
+                    The mutator class "%s" has the following non-allowed public method(s) declared: "%s". Either
+                    reconsider if it is necessary for it to be public and make it protected/private instead or add it
+                    to "%s::KNOWN_MUTATOR_PUBLIC_METHODS".
+                    TXT
                 ,
                 $className,
                 implode(
                     ', ',
-                    array_diff($publicMethods, $knownMutatorPublicMethodNames)
+                    array_diff($publicMethods, $knownMutatorPublicMethodNames),
                 ),
-                self::class
-            )
+                self::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_mutators_have_a_definition(string $className): void
     {
         /** @var Mutator $mutator */
@@ -120,15 +116,13 @@ TXT
             return;
         }
 
-        $this->addWarning(sprintf(
+        $this->fail(sprintf(
             'The mutator "%s" does not have a definition.',
-            $className
+            $className,
         ));
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::concreteMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'concreteMutatorClassesProvider')]
     public function test_configurable_mutators_declare_a_mutator_config(string $className): void
     {
         $mutatorReflection = new ReflectionClass($className);
@@ -136,7 +130,7 @@ TXT
         $isConfigurable = in_array(
             ConfigurableMutator::class,
             class_implements($className),
-            true
+            true,
         );
         $configClassName = $isConfigurable ? $className::getConfigClassName() : null;
 
@@ -147,53 +141,51 @@ TXT
                 $isConfigurable,
                 sprintf(
                     <<<'TXT'
-The mutator "%s" is a configurable mutator but its constructor does not require a configuration.
-The constructor should either require a "%s" parameter or the mutator should not
-implement "%s".
-TXT
+                        The mutator "%s" is a configurable mutator but its constructor does not require a configuration.
+                        The constructor should either require a "%s" parameter or the mutator should not
+                        implement "%s".
+                        TXT
                     ,
                     $className,
                     $configClassName ?: MutatorConfig::class,
-                    ConfigurableMutator::class
-                )
+                    ConfigurableMutator::class,
+                ),
             );
         } else {
             $constructorParameters = $constructorReflection->getParameters();
 
             $assertionErrorMessage = sprintf(
                 <<<'TXT'
-Expected the mutator "%s" to have the constructor signature "__construct(%s $config)".
-TXT
+                    Expected the mutator "%s" to have the constructor signature "__construct(%s $config)".
+                    TXT
                 ,
                 $className,
-                $configClassName
+                $configClassName,
             );
 
             $this->assertCount(
                 1,
                 $constructorParameters,
-                $assertionErrorMessage . ' The constructor parameter count does not match.'
+                $assertionErrorMessage . ' The constructor parameter count does not match.',
             );
 
             $configParameterType = $constructorParameters[0]->getType();
 
             $this->assertNotNull(
                 $configParameterType,
-                $assertionErrorMessage . ' The constructor parameter type does not match.'
+                $assertionErrorMessage . ' The constructor parameter type does not match.',
             );
             $this->assertInstanceOf(ReflectionNamedType::class, $configParameterType);
 
             $this->assertSame(
                 $configClassName,
                 $configParameterType->getName(),
-                $assertionErrorMessage . ' The constructor parameter type does not match.'
+                $assertionErrorMessage . ' The constructor parameter type does not match.',
             );
         }
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Mutator\MutatorProvider::configurableMutatorClassesProvider
-     */
+    #[DataProviderExternal(MutatorProvider::class, 'configurableMutatorClassesProvider')]
     public function test_only_configurable_mutators_have_a_config(string $className): void
     {
         $configClassName = $className::getConfigClassName();
@@ -203,13 +195,13 @@ TXT
             class_implements($configClassName),
             sprintf(
                 <<<'TXT'
-Expected the mutator configuration class "%s" for the mutator "%s" to be a "%s".
-TXT
+                    Expected the mutator configuration class "%s" for the mutator "%s" to be a "%s".
+                    TXT
                 ,
                 $configClassName,
                 $className,
-                MutatorConfig::class
-            )
+                MutatorConfig::class,
+            ),
         );
     }
 
@@ -219,15 +211,11 @@ TXT
     private function getPublicMethods(ReflectionClass $reflectionClass): array
     {
         $publicMethods = array_map(
-            static function (ReflectionMethod $reflectionMethod): string {
-                return $reflectionMethod->getName();
-            },
+            static fn (ReflectionMethod $reflectionMethod): string => $reflectionMethod->getName(),
             array_filter(
                 $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC),
-                static function (ReflectionMethod $reflectionMethod): bool {
-                    return !$reflectionMethod->isConstructor();
-                }
-            )
+                static fn (ReflectionMethod $reflectionMethod): bool => !$reflectionMethod->isConstructor(),
+            ),
         );
 
         sort($publicMethods, SORT_STRING);

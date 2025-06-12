@@ -36,26 +36,22 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
-use function mb_convert_encoding;
 
 /**
  * @internal
  */
-final class JsonLogger implements LineMutationTestingResultsLogger
+final readonly class JsonLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
-    private bool $onlyCoveredMode;
-
     public function __construct(
-        MetricsCalculator $metricsCalculator,
-        bool $onlyCoveredMode
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+        private bool $onlyCoveredMode,
     ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->onlyCoveredMode = $onlyCoveredMode;
     }
 
     /**
@@ -66,21 +62,27 @@ final class JsonLogger implements LineMutationTestingResultsLogger
         $data = [
             'stats' => [
                 'totalMutantsCount' => $this->metricsCalculator->getTotalMutantsCount(),
-                'killedCount' => $this->metricsCalculator->getKilledCount(),
+                'killedCount' => $this->metricsCalculator->getKilledByTestsCount(),
+                'killedByStaticAnalysisCount' => $this->metricsCalculator->getKilledByStaticAnalysisCount(),
                 'notCoveredCount' => $this->metricsCalculator->getNotTestedCount(),
                 'escapedCount' => $this->metricsCalculator->getEscapedCount(),
                 'errorCount' => $this->metricsCalculator->getErrorCount(),
+                'syntaxErrorCount' => $this->metricsCalculator->getSyntaxErrorCount(),
                 'skippedCount' => $this->metricsCalculator->getSkippedCount(),
+                'ignoredCount' => $this->metricsCalculator->getIgnoredCount(),
                 'timeOutCount' => $this->metricsCalculator->getTimedOutCount(),
                 'msi' => $this->metricsCalculator->getMutationScoreIndicator(),
                 'mutationCodeCoverage' => $this->metricsCalculator->getCoverageRate(),
                 'coveredCodeMsi' => $this->metricsCalculator->getCoveredCodeMutationScoreIndicator(),
             ],
-            'escaped' => $this->getResultsLine($this->metricsCalculator->getEscapedExecutionResults()),
-            'timeouted' => $this->getResultsLine($this->metricsCalculator->getTimedOutExecutionResults()),
-            'killed' => $this->getResultsLine($this->metricsCalculator->getKilledExecutionResults()),
-            'errored' => $this->getResultsLine($this->metricsCalculator->getErrorExecutionResults()),
-            'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->metricsCalculator->getNotCoveredExecutionResults()),
+            'escaped' => $this->getResultsLine($this->resultsCollector->getEscapedExecutionResults()),
+            'timeouted' => $this->getResultsLine($this->resultsCollector->getTimedOutExecutionResults()),
+            'killed' => $this->getResultsLine($this->resultsCollector->getKilledExecutionResults()),
+            'killedByStaticAnalysis' => $this->getResultsLine($this->resultsCollector->getKilledByStaticAnalysisExecutionResults()),
+            'errored' => $this->getResultsLine($this->resultsCollector->getErrorExecutionResults()),
+            'syntaxErrors' => $this->getResultsLine($this->resultsCollector->getSyntaxErrorExecutionResults()),
+            'uncovered' => $this->onlyCoveredMode ? [] : $this->getResultsLine($this->resultsCollector->getNotCoveredExecutionResults()),
+            'ignored' => $this->getResultsLine($this->resultsCollector->getIgnoredExecutionResults()),
         ];
 
         return [json_encode($data, JSON_THROW_ON_ERROR)];
@@ -89,13 +91,13 @@ final class JsonLogger implements LineMutationTestingResultsLogger
     /**
      * @param MutantExecutionResult[] $executionResults
      *
-     * @return array<int, array{mutator: array, diff: string, processOutput: string}>
+     * @return array<int, array{mutator: array<string, int|string>, diff: string, processOutput: string}>
      */
     private function getResultsLine(array $executionResults): array
     {
         $mutatorRows = [];
 
-        foreach ($executionResults as $index => $mutantProcess) {
+        foreach ($executionResults as $mutantProcess) {
             $mutatorRows[] = [
                 'mutator' => [
                     'mutatorName' => $mutantProcess->getMutatorName(),
@@ -104,16 +106,11 @@ final class JsonLogger implements LineMutationTestingResultsLogger
                     'originalFilePath' => $mutantProcess->getOriginalFilePath(),
                     'originalStartLine' => $mutantProcess->getOriginalStartingLine(),
                 ],
-                'diff' => $this->convertToUtf8(Str::trimLineReturns($mutantProcess->getMutantDiff())),
-                'processOutput' => $this->convertToUtf8(Str::trimLineReturns($mutantProcess->getProcessOutput())),
+                'diff' => Str::convertToUtf8(Str::trimLineReturns($mutantProcess->getMutantDiff())),
+                'processOutput' => Str::convertToUtf8(Str::trimLineReturns($mutantProcess->getProcessOutput())),
             ];
         }
 
         return $mutatorRows;
-    }
-
-    private function convertToUtf8(string $string): string
-    {
-        return mb_convert_encoding($string, 'UTF-8', 'UTF-8');
     }
 }

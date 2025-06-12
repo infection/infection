@@ -43,29 +43,33 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Greater>
  */
 final class GreaterThan implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a greater-than operator (`>`) with the greater-than-or-equal-to operator (`>=`).
-TXT
+                Replaces a greater-than operator (`>`) with the greater-than-or-equal-to operator (`>=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
-This mutator shifts the compared values highlighting an untested boundary.
-TXT
+                This mutator shifts the compared values highlighting an untested boundary.
+                TXT,
+            <<<'DIFF'
+                - $a = $b > $c;
+                + $a = $b >= $c;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Greater $node
      *
      * @return iterable<Node\Expr\BinaryOp\GreaterOrEqual>
      */

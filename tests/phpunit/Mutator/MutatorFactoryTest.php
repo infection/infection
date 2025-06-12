@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutator;
 use function array_fill_keys;
 use function array_values;
 use function count;
-use function get_class;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\IgnoreMutator;
@@ -48,15 +47,18 @@ use Infection\Mutator\ProfileList;
 use Infection\Mutator\Sort\Spaceship;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use InvalidArgumentException;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
 
+#[CoversClass(MutatorFactory::class)]
 final class MutatorFactoryTest extends TestCase
 {
     /**
@@ -71,7 +73,7 @@ final class MutatorFactoryTest extends TestCase
 
     public function test_it_creates_no_mutator_if_no_profile_or_mutator_is_passed(): void
     {
-        $mutators = $this->mutatorFactory->create([]);
+        $mutators = $this->mutatorFactory->create([], false);
 
         $this->assertSame([], $mutators);
     }
@@ -80,12 +82,12 @@ final class MutatorFactoryTest extends TestCase
     {
         $mutators = $this->mutatorFactory->create(array_fill_keys(
             ProfileList::ALL_MUTATORS,
-            []
-        ));
+            [],
+        ), false);
 
         $this->assertSameMutatorsByClass(
             array_values(ProfileList::ALL_MUTATORS),
-            $mutators
+            $mutators,
         );
     }
 
@@ -95,7 +97,7 @@ final class MutatorFactoryTest extends TestCase
             TrueValue::class => [
                 'ignore' => ['A::B'],
             ],
-        ]);
+        ], false);
 
         $this->assertContainsOnlyInstancesOf(IgnoreMutator::class, $mutators);
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
@@ -111,24 +113,24 @@ final class MutatorFactoryTest extends TestCase
         $trueNode = $this->createBoolNode(
             'true',
             'B',
-            $reflectionMock
+            $reflectionMock,
         );
 
         $this->assertFalse(
-            $mutators[MutatorName::getName(TrueValue::class)]->canMutate($trueNode)
+            $mutators[MutatorName::getName(TrueValue::class)]->canMutate($trueNode),
         );
     }
 
     public function test_it_cannot_create_a_mutator_with_invalid_settings(): void
     {
         try {
-            $this->mutatorFactory->create([Plus::class => false]);
+            $this->mutatorFactory->create([Plus::class => false], false);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected config of the mutator "Infection\Mutator\Arithmetic\Plus" to be an array. Got "boolean" instead',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -137,7 +139,7 @@ final class MutatorFactoryTest extends TestCase
     {
         $mutators = $this->mutatorFactory->create([
             Plus::class => ['unknown' => 'dunno'],
-        ]);
+        ], false);
 
         $this->assertSameMutatorsByClass([Plus::class], $mutators);
     }
@@ -149,7 +151,7 @@ final class MutatorFactoryTest extends TestCase
 
         $mutators = $this->mutatorFactory->create([
             TrueValue::class => ['settings' => $settings],
-        ]);
+        ], false);
 
         $this->assertSameMutatorsByClass([TrueValue::class], $mutators);
     }
@@ -157,13 +159,13 @@ final class MutatorFactoryTest extends TestCase
     public function test_it_cannot_create_an_unknown_mutator(): void
     {
         try {
-            $this->mutatorFactory->create(['Unknown\Mutator' => []]);
+            $this->mutatorFactory->create(['Unknown\Mutator' => []], false);
 
             $this->fail();
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Unknown mutator "Unknown\Mutator"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -182,7 +184,7 @@ final class MutatorFactoryTest extends TestCase
             [
                 ReflectionVisitor::REFLECTION_CLASS_KEY => $reflectionMock,
                 ReflectionVisitor::FUNCTION_NAME => $functionName,
-            ]
+            ],
         );
     }
 
@@ -192,7 +194,7 @@ final class MutatorFactoryTest extends TestCase
      */
     private function assertSameMutatorsByClass(
         array $expectedMutatorClassNames,
-        array $actualMutators
+        array $actualMutators,
     ): void {
         $this->assertCount(count($expectedMutatorClassNames), $actualMutators);
 
@@ -203,11 +205,9 @@ final class MutatorFactoryTest extends TestCase
             $this->assertInstanceOf(Mutator::class, $mutator);
 
             $expectedMutatorClass = $expectedMutatorClassNames[$index];
-            $actualMutatorClass = get_class(
-                $mutator instanceof IgnoreMutator ?
-                    $decoratedMutatorReflection->getValue($mutator) :
-                    $mutator
-            );
+            $actualMutatorClass = ($mutator instanceof IgnoreMutator
+                ? $decoratedMutatorReflection->getValue($mutator)
+                : $mutator)::class;
 
             $this->assertSame(
                 $expectedMutatorClass,
@@ -216,8 +216,8 @@ final class MutatorFactoryTest extends TestCase
                     'Expected the %d-th mutator to be an instance of "%s". Got "%s"',
                     $index,
                     $expectedMutatorClass,
-                    $actualMutatorClass
-                )
+                    $actualMutatorClass,
+                ),
             );
         }
     }

@@ -37,9 +37,10 @@ namespace Infection\Logger;
 
 use function implode;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 
@@ -49,15 +50,13 @@ use function strlen;
  *
  * @internal
  */
-final class DebugFileLogger implements LineMutationTestingResultsLogger
+final readonly class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
-    private bool $onlyCoveredMode;
-
-    public function __construct(MetricsCalculator $metricsCalculator, bool $onlyCoveredMode)
-    {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->onlyCoveredMode = $onlyCoveredMode;
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+        private bool $onlyCoveredMode,
+    ) {
     }
 
     public function getLogLines(): array
@@ -69,36 +68,51 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
         $logs[] = 'Total: ' . $this->metricsCalculator->getTotalMutantsCount();
         $logs[] = '';
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getKilledExecutionResults(),
+            $this->resultsCollector->getKilledExecutionResults(),
             'Killed',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getErrorExecutionResults(),
+            $this->resultsCollector->getKilledByStaticAnalysisExecutionResults(),
+            'Killed by Static Analysis',
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getErrorExecutionResults(),
             'Errors',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getEscapedExecutionResults(),
+            $this->resultsCollector->getSyntaxErrorExecutionResults(),
+            'Syntax Errors',
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getTimedOutExecutionResults(),
+            $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
-            $this->metricsCalculator->getSkippedExecutionResults(),
+            $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
-            $separateSections
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getIgnoredExecutionResults(),
+            'Ignored',
+            $separateSections,
         );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(
-                $this->metricsCalculator->getNotCoveredExecutionResults(),
+                $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
-                $separateSections
+                $separateSections,
             );
         }
 
@@ -115,7 +129,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     private function getResultsLine(
         array $executionResults,
         string $headlinePrefix,
-        bool &$separateSections
+        bool &$separateSections,
     ): string {
         $lines = [];
 
@@ -152,7 +166,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
                 $headline,
                 str_repeat('=', strlen($headline)),
                 '',
-            ]
+            ],
         );
     }
 }

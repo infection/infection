@@ -41,15 +41,17 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
 use function Safe\realpath;
-use function Safe\sprintf;
 use function Safe\touch;
+use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(IndexXmlCoverageLocator::class)]
 final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
     /**
@@ -101,9 +103,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider indexPathsProvider
-     */
+    #[DataProvider('indexPathsProvider')]
     public function test_it_can_find_more_exotic_index_file_names(string $indexRelativePath): void
     {
         (new Filesystem())->dumpFile($indexRelativePath, '');
@@ -124,7 +124,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectExceptionMessage(sprintf(
             'Could not locate the XML coverage index file. More than one file has been found: "%s", "%s"',
             normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'index.xml')),
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml'))
+            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml')),
         ));
 
         $this->locator->locate();
@@ -135,7 +135,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->tmp
+            $this->tmp,
         ));
 
         $this->locator->locate();
@@ -148,7 +148,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->tmp . '/unknown-dir'
+            $this->tmp . '/unknown-dir',
         ));
 
         $this->locator->locate();

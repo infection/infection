@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(DocBlockParser::class)]
 final class DocBlockParserTest extends TestCase
 {
-    /**
-     * @dataProvider docBlocksProvider
-     */
+    #[DataProvider('docBlocksProvider')]
     public function test_it_can_parse_php_doc_blocks(string $docBlock, string $expected): void
     {
         $actual = DocBlockParser::parse($docBlock);
@@ -49,66 +50,66 @@ final class DocBlockParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function docBlocksProvider(): iterable
+    public static function docBlocksProvider(): iterable
     {
         yield ['', ''];
 
         yield [
             <<<'PHP'
-/**
- * This is a
- * multi-line
- * doc-block
- */
-PHP
+                /**
+                 * This is a
+                 * multi-line
+                 * doc-block
+                 */
+                PHP
             ,
             <<<'TEXT'
-This is a
-multi-line
-doc-block
-TEXT
+                This is a
+                multi-line
+                doc-block
+                TEXT,
         ];
 
         yield [
             <<<'PHP'
-/**
- * Single line doc-block
- */
-PHP
+                /**
+                 * Single line doc-block
+                 */
+                PHP
             ,
             'Single line doc-block',
         ];
 
         yield [
             <<<'PHP'
-   /**
- * This is a
- * multi-line
-   * doc-block
- * with weird indentation
-    */
-PHP
+                   /**
+                 * This is a
+                 * multi-line
+                   * doc-block
+                 * with weird indentation
+                    */
+                PHP
             ,
             <<<'TEXT'
-This is a
-multi-line
-doc-block
-with weird indentation
-TEXT
+                This is a
+                multi-line
+                doc-block
+                with weird indentation
+                TEXT,
         ];
 
         yield [
             <<<'PHP'
-/** Inlined doc-block */
-PHP
+                /** Inlined doc-block */
+                PHP
             ,
             'Inlined doc-block',
         ];
 
         yield [
             <<<'PHP'
-// Comment
-PHP
+                // Comment
+                PHP
             ,
             'Comme', // Weird result: regular comments are not properly supported
         ];

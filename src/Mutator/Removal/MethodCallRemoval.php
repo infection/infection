@@ -43,24 +43,27 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Expression>
  */
 final class MethodCallRemoval implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes the method call.',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $this->fooBar();
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Expression $node
      *
      * @return iterable<Node\Stmt\Nop>
      */
@@ -75,6 +78,9 @@ final class MethodCallRemoval implements Mutator
             return false;
         }
 
-        return $node->expr instanceof Node\Expr\MethodCall || $node->expr instanceof Node\Expr\StaticCall;
+        return $node->expr instanceof Node\Expr\MethodCall
+            || $node->expr instanceof Node\Expr\NullsafeMethodCall
+            || $node->expr instanceof Node\Expr\StaticCall
+        ;
     }
 }

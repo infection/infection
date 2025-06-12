@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PHPUnit\Framework\TestCase;
@@ -46,12 +46,14 @@ abstract class BaseNodeIgnorerTestCase extends TestCase
 {
     abstract protected function getIgnore(): NodeIgnorer;
 
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy): void
+    final protected function parseAndTraverse(string $code, NodeVisitor $spy, ?NodeIgnorer $ignorer = null): void
     {
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
 
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([$this->getIgnore()]));
+        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([
+            $ignorer ?? $this->getIgnore(),
+        ]));
         $traverser->addVisitor($spy);
         $traverser->traverse($nodes);
 

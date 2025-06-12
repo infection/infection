@@ -43,28 +43,35 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Coalesce>
  */
 final class Coalesce implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Swaps the coalesce operator (`??`) operands,
-e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
-TXT
+                Swaps the coalesce operator (`??`) operands,
+                e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $d = $a ?? $b ?? $c;
+                # Mutation 1
+                + $d = $b ?? $a ?? $c;
+                # Mutation 2
+                + $d = $a ?? $c ?? $b;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Coalesce $node
      *
      * @return iterable<Node\Expr>
      */
@@ -85,6 +92,7 @@ TXT
     {
         return $node instanceof Node\Expr\BinaryOp\Coalesce
             && !$node->left instanceof Node\Expr\ConstFetch
-            && !$node->left instanceof Node\Expr\ClassConstFetch;
+            && !$node->left instanceof Node\Expr\ClassConstFetch
+            && !($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toLowerString() === 'null');
     }
 }

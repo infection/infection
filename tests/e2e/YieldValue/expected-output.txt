@@ -1,6 +1,41 @@
-# Effects per Mutator
+Total: 4
 
-| Mutator    | Mutations | Killed | Escaped | Errors | Timed Out | Skipped | MSI (%s) | Covered MSI (%s) |
-| ---------- | --------- | ------ | ------- | ------ | --------- | ------- | -------- | ---------------- |
-| YieldValue |         2 |      1 |       0 |      0 |         0 |       0 |    50.00 |           100.00 |
-| Yield_     |         2 |      1 |       0 |      0 |         0 |       0 |    50.00 |           100.00 |
+Killed mutants:
+===============
+
+Mutator: Yield_
+Line 18
+
+Mutator: YieldValue
+Line 18
+
+
+Killed by Static Analysis mutants:
+==================================
+
+Errors mutants:
+===============
+
+Syntax Errors mutants:
+======================
+
+Escaped mutants:
+================
+
+Timed Out mutants:
+==================
+
+Skipped mutants:
+================
+
+Ignored mutants:
+================
+
+Not Covered mutants:
+====================
+
+Mutator: Yield_
+Line 15
+
+Mutator: YieldValue
+Line 15

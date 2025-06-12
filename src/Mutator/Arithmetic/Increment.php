@@ -43,28 +43,32 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\PostInc|Node\Expr\PreInc>
  */
 final class Increment implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
-(`--`).
-TXT
+                Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
+                (`--`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a++;
+                + $a--;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\PostInc|Node\Expr\PreInc $node
      *
      * @return iterable<Node\Expr\PreDec|Node\Expr\PostDec>
      */

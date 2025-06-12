@@ -41,27 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArraySplice extends AbstractUnwrapMutator
+final class UnwrapArraySplice extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_splice` function call with its first operand. For example:
+                Replaces an `array_splice` function call with its first operand. For example:
 
-```php
-$x = array_splice(['foo', 'bar', 'baz'], 1);
-```
+                ```php
+                $x = array_splice(['foo', 'bar', 'baz'], 1);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = array_splice(['foo', 'bar', 'baz'], 1);
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 

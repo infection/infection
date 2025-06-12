@@ -43,20 +43,19 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class AdapterInstaller
+final readonly class AdapterInstaller
 {
     public const OFFICIAL_ADAPTERS_MAP = [
         TestFrameworkTypes::CODECEPTION => 'infection/codeception-adapter',
         TestFrameworkTypes::PHPSPEC => 'infection/phpspec-adapter',
     ];
 
-    private const TIMEOUT = 120.0; // 2 minutes
+    // 2 minutes
+    private const TIMEOUT = 120.0;
 
-    private ComposerExecutableFinder $composerExecutableFinder;
-
-    public function __construct(ComposerExecutableFinder $composerExecutableFinder)
-    {
-        $this->composerExecutableFinder = $composerExecutableFinder;
+    public function __construct(
+        private ComposerExecutableFinder $composerExecutableFinder,
+    ) {
     }
 
     public function install(string $adapterName): void

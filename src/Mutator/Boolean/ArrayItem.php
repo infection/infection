@@ -43,33 +43,37 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\ArrayItem>
  */
 final class ArrayItem implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
-(`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
-For example `[foo() => $b->bar]`.
-TXT
+                Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
+                (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
+                For example `[foo() => $b->bar]`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
-This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
-- completely disregarding the actual values of the array. The array content should either be
-checked or the impure calls should be made outside of the scope of the array.
-TXT
+                This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
+                - completely disregarding the actual values of the array. The array content should either be
+                checked or the impure calls should be made outside of the scope of the array.
+                TXT,
+            <<<'DIFF'
+                - $a = [$key => $value];
+                + $a = [$key > $value]
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\ArrayItem $node
      *
      * @return iterable<Node\Expr\BinaryOp\Greater>
      */
@@ -85,16 +89,18 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem && $node->key && ($this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key));
+        return $node instanceof Node\Expr\ArrayItem && $node->key !== null && (
+            $this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key)
+        );
     }
 
     private function isNodeWithSideEffects(Node $node): bool
     {
         return
             // __get() can have side-effects
-            $node instanceof Node\Expr\PropertyFetch ||
+            $node instanceof Node\Expr\PropertyFetch
             // these clearly can have side-effects
-            $node instanceof Node\Expr\MethodCall ||
-            $node instanceof Node\Expr\FuncCall;
+            || $node instanceof Node\Expr\MethodCall
+            || $node instanceof Node\Expr\FuncCall;
     }
 }

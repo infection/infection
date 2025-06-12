@@ -10,7 +10,9 @@ class SourceClass
     {
         Assert::numeric('1');
 
+        // @codeCoverageIgnoreStart
         $this->getString();
+        // @codeCoverageIgnoreEnd
 
         return 'hello';
     }

@@ -36,17 +36,19 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
-use function realpath as native_realpath;
+use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
-use function Safe\sprintf;
+use function Safe\realpath;
+use function sprintf;
 use function str_replace;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
 use function trim;
 use Webmozart\Assert\Assert;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -54,23 +56,14 @@ use Webmozart\PathUtil\Path;
  */
 class SourceFileInfoProvider
 {
-    private string $coverageIndexPath;
-    private string $coverageDir;
-    private string $relativeCoverageFilePath;
-    private string $projectSource;
-
     private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
-        string $coverageIndexPath,
-        string $coverageDir,
-        string $relativeCoverageFilePath,
-        string $projectSource
+        private readonly string $coverageIndexPath,
+        private readonly string $coverageDir,
+        private readonly string $relativeCoverageFilePath,
+        private readonly string $projectSource,
     ) {
-        $this->coverageIndexPath = $coverageIndexPath;
-        $this->coverageDir = $coverageDir;
-        $this->relativeCoverageFilePath = $relativeCoverageFilePath;
-        $this->projectSource = $projectSource;
     }
 
     /**
@@ -94,7 +87,7 @@ class SourceFileInfoProvider
                 'Could not find the XML coverage file "%s" listed in "%s". Make sure the '
                 . 'coverage used is up to date',
                 $coverageFile,
-                $this->coverageIndexPath
+                $this->coverageIndexPath,
             ));
         }
 
@@ -116,7 +109,7 @@ class SourceFileInfoProvider
             $relativeFilePath = str_replace(
                 sprintf('%s.xml', $fileName),
                 '',
-                $this->relativeCoverageFilePath
+                $this->relativeCoverageFilePath,
             );
         }
 
@@ -124,23 +117,23 @@ class SourceFileInfoProvider
             '/',
             array_filter([
                 $this->projectSource,
-                trim($relativeFilePath, '/'),
+                trim((string) $relativeFilePath, '/'),
                 $fileName,
-            ])
+            ]),
         );
 
-        $realPath = native_realpath($path);
-
-        if ($realPath === false) {
+        try {
+            $realPath = realpath($path);
+        } catch (FilesystemException) {
             $coverageFilePath = Path::canonicalize(
-                $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath
+                $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath,
             );
 
             throw new InvalidCoverage(sprintf(
                 'Could not find the source file "%s" referred by "%s". Make sure the '
                 . 'coverage used is up to date',
                 $path,
-                $coverageFilePath
+                $coverageFilePath,
             ));
         }
 

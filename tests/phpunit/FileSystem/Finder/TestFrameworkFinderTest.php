@@ -36,24 +36,31 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use const DIRECTORY_SEPARATOR;
+use function explode;
+use function getenv;
+use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function Infection\Tests\normalizePath;
+use const PATH_SEPARATOR;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\putenv;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group integration
- * Requires I/O read & writes via the MockVendor
- *
  * @see MockVendor
+ * Requires I/O read & writes via the MockVendor
  */
+#[Group('integration')]
+#[CoversClass(TestFrameworkFinder::class)]
 final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;
@@ -64,14 +71,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     private static $pathName;
 
     /**
-     * @var array
-     */
-    private static $names;
-
-    /**
      * @var Filesystem
      */
     private $fileSystem;
+
+    private ComposerExecutableFinder $composerFinder;
 
     /**
      * Saves the current environment
@@ -79,7 +83,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     public static function setUpBeforeClass(): void
     {
         self::$pathName = getenv('PATH') ? 'PATH' : 'Path';
-        self::$names = [self::$pathName, 'PATHEXT'];
     }
 
     protected function setUp(): void
@@ -89,6 +92,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         parent::setUp();
 
         $this->fileSystem = new Filesystem();
+
+        $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
+        $this->composerFinder->method('find')
+            ->willReturn('/usr/bin/composer');
     }
 
     protected function tearDown(): void
@@ -102,7 +109,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $filename = $this->fileSystem->tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new TestFrameworkFinder();
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -113,7 +120,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new TestFrameworkFinder();
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -125,7 +132,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     {
         $path = getenv(self::$pathName);
 
-        $frameworkFinder = new TestFrameworkFinder();
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             // The main script must be found from the .bat file
@@ -137,7 +144,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath($expected),
             normalizePath($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
-            'Should return the phpunit path'
+            'Should return the phpunit path',
         );
 
         $pathAfterTest = getenv(self::$pathName);
@@ -151,7 +158,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertGreaterThan(
             strlen($path),
             strlen($pathAfterTest),
-            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.'
+            'PATH with vendor added is shorter than without it added, make sure it isn\'t overwritten.',
         );
     }
 
@@ -164,7 +171,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder();
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             // This .bat has no code, so main script will not be found
@@ -176,13 +183,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->assertSame(
             normalizePath(realpath($expected)),
             normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
-            'should return the vendor bin link or .bat'
+            'should return the vendor bin link or .bat',
         );
     }
 
-    /**
-     * @dataProvider providesMockSetup
-     */
+    #[DataProvider('providesMockSetup')]
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
         $mock = new MockVendor($this->tmp, $this->fileSystem);
@@ -192,16 +197,16 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new TestFrameworkFinder();
+        $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         $this->assertSame(
             normalizePath(realpath($mock->getPackageScript())),
             normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
-            'should return the package script from .bat'
+            'should return the package script from .bat',
         );
     }
 
-    public function providesMockSetup(): array
+    public static function providesMockSetup(): array
     {
         return [
             'composer-bat' => ['setUpComposerBatchTest'],

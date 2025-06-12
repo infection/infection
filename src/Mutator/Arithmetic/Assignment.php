@@ -43,28 +43,32 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp>
  */
 final class Assignment implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
-assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
-TXT
+                Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
+                assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a += $b;
+                + $a = $b;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp $node
      *
      * @return iterable<Node\Expr\Assign>
      */
@@ -75,6 +79,6 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp;
+        return $node instanceof Node\Expr\AssignOp && !$node instanceof Node\Expr\AssignOp\Coalesce;
     }
 }

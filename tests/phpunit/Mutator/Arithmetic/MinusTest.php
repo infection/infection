@@ -35,71 +35,74 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\Minus;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Minus::class)]
 final class MinusTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal minus' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1 - 1;
-PHP
+                $a = 1 - 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1 + 1;
-PHP
+                $a = 1 + 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate minus equals' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a -= 2;
-PHP
+                $a = 1;
+                $a -= 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a--;
-PHP
+                $a = 1;
+                $a--;
+                PHP
             ,
         ];
 
         yield 'It does mutate a fake decrement' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a - -1;
-PHP
+                $a = 1;
+                $a - -1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a + -1;
-PHP
+                $a = 1;
+                $a + -1;
+                PHP
             ,
         ];
     }

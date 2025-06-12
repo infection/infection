@@ -48,11 +48,13 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements ConfigurableMutator<Node\Expr\FuncCall>
  */
 final class BCMath implements ConfigurableMutator
 {
-    use GetMutatorName;
     use GetConfigClassName;
+    use GetMutatorName;
 
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr>>
@@ -64,33 +66,35 @@ final class BCMath implements ConfigurableMutator
         $this->converters = self::createConverters($config->getAllowedFunctions());
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the bcmath extension with its vanilla code equivalent. For example:
+                Replaces a statement making use of the bcmath extension with its vanilla code equivalent. For example:
 
-```php`
-$x = bcadd($a, $b);
-```
+                ```php`
+                $x = bcadd($a, $b);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = (string) ($a + $b);
-```
-TXT
+                ```php
+                $x = (string) ($a + $b);
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = bcadd($a, $b);
+                + $x = (string) ($a + $b);
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
      * @psalm-suppress ImpureMethodCall
-     *
-     * @param Node\Expr\FuncCall $node
      *
      * @return iterable<Node\Expr>
      */
@@ -123,57 +127,57 @@ TXT
                 'bcadd' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Plus::class),
+                    ),
                 ),
                 'bcdiv' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Div::class),
+                    ),
                 ),
                 'bcmod' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mod::class),
+                    ),
                 ),
                 'bcmul' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Mul::class),
+                    ),
                 ),
                 'bcpow' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Pow::class),
+                    ),
                 ),
                 'bcsub' => self::makeCheckingMinArgsMapper(
                     2,
                     self::makeCastToStringMapper(
-                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class)
-                    )
+                        self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Minus::class),
+                    ),
                 ),
                 'bcsqrt' => self::makeCheckingMinArgsMapper(
                     1,
                     self::makeCastToStringMapper(
-                        self::makeSquareRootsMapper()
-                    )
+                        self::makeSquareRootsMapper(),
+                    ),
                 ),
                 'bcpowmod' => self::makeCheckingMinArgsMapper(
                     3,
                     self::makeCastToStringMapper(
-                        self::makePowerModuloMapper()
-                    )
+                        self::makePowerModuloMapper(),
+                    ),
                 ),
                 'bccomp' => self::makeCheckingMinArgsMapper(
                     2,
-                    self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class)
+                    self::makeBinaryOperatorMapper(Node\Expr\BinaryOp\Spaceship::class),
                 ),
             ],
-            array_fill_keys($functionsMap, null)
+            array_fill_keys($functionsMap, null),
         );
     }
 
@@ -213,6 +217,10 @@ TXT
     private static function makeBinaryOperatorMapper(string $operator): Closure
     {
         return static function (Node\Expr\FuncCall $node) use ($operator): iterable {
+            if ($node->args[0] instanceof Node\VariadicPlaceholder || $node->args[1] instanceof Node\VariadicPlaceholder) {
+                return;
+            }
+
             yield new $operator($node->args[0]->value, $node->args[1]->value);
         };
     }
@@ -233,12 +241,16 @@ TXT
     private static function makePowerModuloMapper(): Closure
     {
         return static function (Node\Expr\FuncCall $node): iterable {
+            if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+                return;
+            }
+
             yield new Node\Expr\BinaryOp\Mod(
                 new Node\Expr\FuncCall(
                     new Node\Name('\pow'),
-                    [$node->args[0], $node->args[1]]
+                    [$node->args[0], $node->args[1]],
                 ),
-                $node->args[2]->value
+                $node->args[2]->value,
             );
         };
     }

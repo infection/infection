@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use function array_filter;
 use const DIRECTORY_SEPARATOR;
+use function implode;
+use const PHP_EOL;
 use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -43,16 +46,6 @@ final class MockVendor
 {
     public const VENDOR = 'phptester';
     public const PACKAGE = 'awesome-php-tester';
-
-    /**
-     * @var string
-     */
-    private $tmpDir;
-
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
 
     /**
      * @var string
@@ -79,11 +72,10 @@ final class MockVendor
      */
     private $vendorBinBat;
 
-    public function __construct(string $tmpDir, Filesystem $fileSystem)
-    {
-        $this->tmpDir = $tmpDir;
-        $this->fileSystem = $fileSystem;
-
+    public function __construct(
+        private readonly string $tmpDir,
+        private readonly Filesystem $fileSystem,
+    ) {
         $vendorDir = $this->tmpDir . '/vendor';
         $this->vendorBinDir = $vendorDir . '/bin';
 
@@ -161,7 +153,7 @@ final class MockVendor
     {
         $files = array_filter(
             [$this->vendorBinLink, $this->vendorBinBat],
-            'file_exists'
+            'file_exists',
         );
 
         $this->fileSystem->remove($files);

@@ -41,27 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayColumn extends AbstractUnwrapMutator
+final class UnwrapArrayColumn extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_column` function call with its first operand. For example:
+                Replaces an `array_column` function call with its first operand. For example:
 
-```php
-$x = array_column($array, 'id');
-```
+                ```php
+                $x = array_column($array, 'id');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $array;
-```
-TXT
+                ```php
+                $x = $array;
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = array_column($array, 'id');
+                + $x = $array;
+                DIFF,
         );
     }
 

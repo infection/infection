@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function array_flip;
 use function array_intersect_key;
-use function array_keys;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Mutator\ProfileList;
+use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
-use function Safe\array_flip;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,18 +53,10 @@ use Webmozart\Assert\Assert;
  */
 class Mutation
 {
-    private string $originalFilePath;
-    private string $mutatorName;
-    private string $mutatedNodeClass;
-    private MutatedNode $mutatedNode;
-    private int $mutationByMutatorIndex;
+    private readonly string $mutatorClass;
     /** @var array<string|int|float> */
-    private array $attributes;
-    /** @var Node[] */
-    private array $originalFileAst;
-    /** @var TestLocation[] */
-    private array $tests;
-    private bool $coveredByTests;
+    private readonly array $attributes;
+    private readonly bool $coveredByTests;
     private ?float $nominalTimeToTest = null;
 
     private ?string $hash = null;
@@ -75,29 +67,23 @@ class Mutation
      * @param TestLocation[] $tests
      */
     public function __construct(
-        string $originalFilePath,
-        array $originalFileAst,
-        string $mutatorName,
+        private readonly string $originalFilePath,
+        private readonly array $originalFileAst,
+        string $mutatorClass,
+        private readonly string $mutatorName,
         array $attributes,
-        string $mutatedNodeClass,
-        MutatedNode $mutatedNode,
-        int $mutationByMutatorIndex,
-        array $tests
+        private readonly string $mutatedNodeClass,
+        private readonly MutatedNode $mutatedNode,
+        private readonly int $mutationByMutatorIndex,
+        private readonly array $tests,
     ) {
-        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+        Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
         foreach (MutationAttributeKeys::ALL as $key) {
             Assert::keyExists($attributes, $key);
         }
-
-        $this->originalFilePath = $originalFilePath;
-        $this->originalFileAst = $originalFileAst;
-        $this->mutatorName = $mutatorName;
+        $this->mutatorClass = $mutatorClass;
         $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
-        $this->mutatedNodeClass = $mutatedNodeClass;
-        $this->mutatedNode = $mutatedNode;
-        $this->mutationByMutatorIndex = $mutationByMutatorIndex;
-        $this->tests = $tests;
         $this->coveredByTests = $tests !== [];
     }
 
@@ -119,6 +105,11 @@ class Mutation
         return $this->mutatorName;
     }
 
+    public function getMutatorClass(): string
+    {
+        return $this->mutatorClass;
+    }
+
     /**
      * @return (string|int|float)[]
      */
@@ -130,6 +121,21 @@ class Mutation
     public function getOriginalStartingLine(): int
     {
         return (int) $this->attributes['startLine'];
+    }
+
+    public function getOriginalEndingLine(): int
+    {
+        return (int) $this->attributes['endLine'];
+    }
+
+    public function getOriginalStartFilePosition(): int
+    {
+        return (int) $this->attributes['startFilePos'];
+    }
+
+    public function getOriginalEndFilePosition(): int
+    {
+        return (int) $this->attributes['endFilePos'];
     }
 
     public function getMutatedNodeClass(): string
@@ -162,12 +168,12 @@ class Mutation
     public function getNominalTestExecutionTime(): float
     {
         // TestLocator returns non-unique tests, and JUnitTestCaseSorter works around that; we have to do that too.
-        return $this->nominalTimeToTest ?? $this->nominalTimeToTest = (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
+        return $this->nominalTimeToTest ??= (new JUnitTestCaseTimeAdder($this->tests))->getTotalTestTime();
     }
 
     public function getHash(): string
     {
-        return $this->hash ?? $this->hash = $this->createHash();
+        return $this->hash ??= $this->createHash();
     }
 
     private function createHash(): string

@@ -48,18 +48,11 @@ use function Safe\file_get_contents;
  */
 class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 {
-    private IndexXmlCoverageLocator $indexLocator;
-    private IndexXmlCoverageParser $indexParser;
-    private XmlCoverageParser $parser;
-
     public function __construct(
-        IndexXmlCoverageLocator $indexCoverageLocator,
-        IndexXmlCoverageParser $indexCoverageXmlParser,
-        XmlCoverageParser $coverageXmlParser
+        private readonly IndexXmlCoverageLocator $indexLocator,
+        private readonly IndexXmlCoverageParser $indexParser,
+        private readonly XmlCoverageParser $parser,
     ) {
-        $this->indexLocator = $indexCoverageLocator;
-        $this->indexParser = $indexCoverageXmlParser;
-        $this->parser = $coverageXmlParser;
     }
 
     /**
@@ -76,7 +69,7 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
         foreach ($this->indexParser->parse(
             $indexPath,
             $indexContents,
-            $coverageBasePath
+            $coverageBasePath,
         ) as $infoProvider) {
             // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
             yield $this->parser->parse($infoProvider);

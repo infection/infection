@@ -45,7 +45,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,29 +53,17 @@ use Webmozart\Assert\Assert;
  */
 class MutationConfigBuilder extends ConfigBuilder
 {
-    private string $tmpDir;
-    private string $projectDir;
-    private string $originalXmlConfigContent;
-    private XmlConfigurationManipulator $configManipulator;
-    private JUnitTestCaseSorter $jUnitTestCaseSorter;
-
     private ?string $originalBootstrapFile = null;
 
     private ?DOMDocument $dom = null;
 
     public function __construct(
-        string $tmpDir,
-        string $originalXmlConfigContent,
-        XmlConfigurationManipulator $configManipulator,
-        string $projectDir,
-        JUnitTestCaseSorter $jUnitTestCaseSorter
+        private readonly string $tmpDir,
+        private readonly string $originalXmlConfigContent,
+        private readonly XmlConfigurationManipulator $configManipulator,
+        private readonly string $projectDir,
+        private readonly JUnitTestCaseSorter $jUnitTestCaseSorter,
     ) {
-        $this->tmpDir = $tmpDir;
-        $this->projectDir = $projectDir;
-
-        $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->configManipulator = $configManipulator;
-        $this->jUnitTestCaseSorter = $jUnitTestCaseSorter;
     }
 
     /**
@@ -85,7 +73,8 @@ class MutationConfigBuilder extends ConfigBuilder
         array $tests,
         string $mutantFilePath,
         string $mutationHash,
-        string $mutationOriginalFilePath
+        string $mutationOriginalFilePath,
+        string $version,
     ): string {
         $dom = $this->getDom();
         $xPath = new SafeDOMXPath($dom);
@@ -98,9 +87,11 @@ class MutationConfigBuilder extends ConfigBuilder
             $originalBootstrapFile = $this->originalBootstrapFile = $this->getOriginalBootstrapFilePath($xPath);
         }
 
-        $this->configManipulator->setStopOnFailure($xPath);
+        // activate PHPUnit's result cache and order tests by running defects first, then sorted by fastest first
+        $this->configManipulator->handleResultCacheAndExecutionOrder($version, $xPath, $mutationHash, $this->tmpDir);
+        $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
+        $this->configManipulator->setStopOnFailureOrDefect($version, $xPath);
         $this->configManipulator->deactivateColours($xPath);
-        $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
@@ -109,7 +100,7 @@ class MutationConfigBuilder extends ConfigBuilder
         $customAutoloadFilePath = sprintf(
             '%s/interceptor.autoload.%s.infection.php',
             $this->tmpDir,
-            $mutationHash
+            $mutationHash,
         );
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
@@ -120,8 +111,8 @@ class MutationConfigBuilder extends ConfigBuilder
             $this->createCustomAutoloadWithInterceptor(
                 $mutationOriginalFilePath,
                 $mutantFilePath,
-                $originalBootstrapFile
-            )
+                $originalBootstrapFile,
+            ),
         );
 
         $path = $this->buildPath($mutationHash);
@@ -150,24 +141,24 @@ class MutationConfigBuilder extends ConfigBuilder
     private function createCustomAutoloadWithInterceptor(
         string $originalFilePath,
         string $mutantFilePath,
-        string $originalAutoloadFile
+        string $originalAutoloadFile,
     ): string {
         $interceptorPath = IncludeInterceptor::LOCATION;
 
         return sprintf(
             <<<'PHP'
-<?php
+                <?php
 
-if (function_exists('proc_nice')) {
-    proc_nice(1);
-}
-%s
-require_once '%s';
+                if (function_exists('proc_nice')) {
+                    proc_nice(1);
+                }
+                %s
+                require_once '%s';
 
-PHP
+                PHP
             ,
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
-            $originalAutoloadFile
+            $originalAutoloadFile,
         );
     }
 
@@ -176,7 +167,7 @@ PHP
         return sprintf(
             '%s/phpunitConfiguration.%s.infection.xml',
             $this->tmpDir,
-            $mutationHash
+            $mutationHash,
         );
     }
 
@@ -184,7 +175,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             $bootstrap[0]->nodeValue = $customAutoloadFilePath;
         } else {
             $node = $xPath->query('/phpunit')[0];
@@ -205,12 +196,12 @@ PHP
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuites/testsuite')
+            $xPath->query('/phpunit/testsuites/testsuite'),
         );
 
         // Handle situation when test suite is directly inside root node
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuite')
+            $xPath->query('/phpunit/testsuite'),
         );
     }
 
@@ -234,14 +225,14 @@ PHP
     private function addTestSuiteWithFilteredTestFiles(
         array $tests,
         DOMDocument $dom,
-        SafeDOMXPath $xPath
+        SafeDOMXPath $xPath,
     ): void {
         $testSuites = $xPath->query('/phpunit/testsuites');
 
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // If there is no `testsuites` node, append to root
-        if (!$nodeToAppendTestSuite) {
+        if ($nodeToAppendTestSuite === null) {
             $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
@@ -265,7 +256,7 @@ PHP
     {
         $bootstrap = $xPath->query('/phpunit/@bootstrap');
 
-        if ($bootstrap->length) {
+        if ($bootstrap->length > 0) {
             return $bootstrap[0]->nodeValue;
         }
 

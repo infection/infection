@@ -43,27 +43,31 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Coalesce>
  */
 final class AssignCoalesce implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
-TXT
+                Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $this->request->data['comments']['user_id'] ??= 'value';
+                + $this->request->data['comments']['user_id'] = 'value';
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Coalesce $node
      *
      * @return iterable<Node\Expr\Assign>
      */

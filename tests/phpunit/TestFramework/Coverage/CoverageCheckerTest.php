@@ -43,21 +43,25 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
-use Webmozart\PathUtil\Path;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * All these tests should be ran in separate processes, as otherwise they may rely
  * on the internal state of XdebugHandler.
  *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- *
- * @group integration
  * Requires some I/O operations
  */
+#[PreserveGlobalState(false)]
+#[Group('integration')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
     /**
@@ -86,13 +90,13 @@ final class CoverageCheckerTest extends TestCase
             false,
             $this->createFakeJUnitReportLocatorMock(),
             'unknown',
-            $this->createFakeIndexLocatorMock()
+            $this->createFakeIndexLocatorMock(),
         );
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
             'The initial test suite run is being skipped. The XML reports need to be provided with '
-            . 'the "--coverage" option'
+            . 'the "--coverage" option',
         );
 
         $checker->checkCoverageRequirements();
@@ -108,13 +112,13 @@ final class CoverageCheckerTest extends TestCase
             true,
             $this->createJUnitReportLocatorMock(),
             'unknown',
-            $this->createFakeIndexLocatorMock()
+            $this->createFakeIndexLocatorMock(),
         );
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(
             'The initial test suite run is being skipped. The XML and JUnit coverage reports need '
-            . 'to be provided with the "--coverage" option'
+            . 'to be provided with the "--coverage" option',
         );
 
         $checker->checkCoverageRequirements();
@@ -134,18 +138,18 @@ final class CoverageCheckerTest extends TestCase
             false,
             $this->createFakeJUnitReportLocatorMock(),
             'unknown',
-            $this->createFakeIndexLocatorMock()
+            $this->createFakeIndexLocatorMock(),
         );
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<TXT
-Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
-- Enable pcov and run infection again
-- Use phpdbg, e.g. `phpdbg -qrr infection`
-- Enable Xdebug and run infection again
-- Use the "--coverage" option with path to the existing coverage report
-- Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
-TXT
+            Coverage needs to be generated but no code coverage generator (pcov, phpdbg or xdebug) has been detected. Please either:
+            - Enable pcov and run Infection again
+            - Use phpdbg, e.g. `phpdbg -qrr infection`
+            - Enable Xdebug (in case of using Xdebug 3 check that `xdebug.mode` or environment variable XDEBUG_MODE set to `coverage`) and run Infection again
+            - Use the "--coverage" option with path to the existing coverage report
+            - Enable the code generator tool for the initial test run only, e.g. with `--initial-tests-php-options -d zend_extension=xdebug.so`
+            TXT
         );
 
         $checker->checkCoverageRequirements();
@@ -161,7 +165,7 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageExists();
@@ -179,7 +183,7 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'unknown',
-            $this->createInvalidIndexLocatorMock()
+            $this->createInvalidIndexLocatorMock(),
         );
 
         try {
@@ -190,7 +194,7 @@ TXT
             $this->assertSame(
                 'Could not find the "index.xml" file. Please ensure that the XML coverage '
                 . 'report has been properly generated at the right place.',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
@@ -207,7 +211,7 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'phpunit',
-            $this->createInvalidIndexLocatorMock()
+            $this->createInvalidIndexLocatorMock(),
         );
 
         try {
@@ -219,7 +223,7 @@ TXT
                 'Could not find the "index.xml" file. Please ensure that the XML coverage '
                 . 'report has been properly generated at the right place. The PHPUnit option for the '
                 . 'path given is "--coverage-xml=/nowhere/coverage-xml"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
@@ -236,7 +240,7 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'codeception',
-            $this->createInvalidIndexLocatorMock()
+            $this->createInvalidIndexLocatorMock(),
         );
 
         try {
@@ -248,7 +252,7 @@ TXT
                 'Could not find the "index.xml" file. Please ensure that the XML coverage '
                 . 'report has been properly generated at the right place. The Codeception option for the'
                 . ' path given is "--coverage-phpunit=/nowhere/coverage-xml"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
@@ -265,7 +269,7 @@ TXT
             false,
             $this->createFakeJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageExists();
@@ -283,7 +287,7 @@ TXT
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         try {
@@ -292,12 +296,9 @@ TXT
             $this->fail();
         } catch (CoverageNotFound $exception) {
             $this->assertSame(
-                sprintf(
-                    'Could not find the JUnit file report. Please ensure that the JUnit coverage '
-                    . 'report has been properly generated at the right place.',
-                    self::$coveragePath
-                ),
-                $exception->getMessage()
+                'Could not find the JUnit file report. Please ensure that the JUnit coverage '
+                . 'report has been properly generated at the right place.',
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
@@ -317,7 +318,7 @@ TXT
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'phpunit',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         try {
@@ -330,9 +331,9 @@ TXT
                     'Could not find the JUnit file report. Please ensure that the JUnit coverage '
                     . 'report has been properly generated at the right place. The PHPUnit option for the '
                     . 'path given is "--log-junit=%s/junit.xml"',
-                    self::$coveragePath
+                    self::$coveragePath,
                 ),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
@@ -349,7 +350,7 @@ TXT
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'codeception',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         try {
@@ -358,13 +359,10 @@ TXT
             $this->fail();
         } catch (CoverageNotFound $exception) {
             $this->assertSame(
-                sprintf(
-                    'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
-                    . ' been properly generated at the right place. The Codeception option for the path '
-                    . 'given is "--xml"',
-                    self::$coveragePath
-                ),
-                $exception->getMessage()
+                'Could not find the JUnit file report. Please ensure that the JUnit coverage report has'
+                . ' been properly generated at the right place. The Codeception option for the path '
+                . 'given is "--xml"',
+                $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
             $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
@@ -381,12 +379,12 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
-            'Ok!'
+            'Ok!',
         );
 
         $this->addToAssertionCount(1);
@@ -402,12 +400,12 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
-            'Ok!'
+            'Ok!',
         );
 
         $this->addToAssertionCount(1);
@@ -423,27 +421,27 @@ TXT
             true,
             $this->createJUnitReportLocatorMock(),
             'unknown',
-            $this->createInvalidIndexLocatorMock()
+            $this->createInvalidIndexLocatorMock(),
         );
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<'TXT'
-The code coverage generated by the initial test run is invalid. Please report the issue on the
-infection repository "https://github.com/infection/infection".
+            The code coverage generated by the initial test run is invalid. Please report the issue on the
+            infection repository "https://github.com/infection/infection".
 
-```
-$ bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml
-Ok!
-```
+            ```
+            $ bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml
+            Ok!
+            ```
 
-Issue(s):
-- The file "index.xml" could not be found: No index file found
-TXT
+            Issue(s):
+            - The file "index.xml" could not be found: No index file found
+            TXT
         );
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
-            'Ok!'
+            'Ok!',
         );
     }
 
@@ -459,27 +457,27 @@ TXT
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         $this->expectException(CoverageNotFound::class);
         $this->expectExceptionMessage(<<<'TXT'
-The code coverage generated by the initial test run is invalid. Please report the issue on the
-infection repository "https://github.com/infection/infection".
+            The code coverage generated by the initial test run is invalid. Please report the issue on the
+            infection repository "https://github.com/infection/infection".
 
-```
-$ bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml
-Ok!
-```
+            ```
+            $ bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml
+            Ok!
+            ```
 
-Issue(s):
-- The JUnit file could not be found: No JUnit file found
-TXT
+            Issue(s):
+            - The JUnit file could not be found: No JUnit file found
+            TXT
         );
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
-            'Ok!'
+            'Ok!',
         );
     }
 
@@ -493,12 +491,12 @@ TXT
             false,
             $this->createFakeJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml')
+            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageHasBeenGenerated(
             'bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage=junit.xml',
-            'Ok!'
+            'Ok!',
         );
 
         $this->addToAssertionCount(1);

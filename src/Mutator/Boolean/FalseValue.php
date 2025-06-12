@@ -39,28 +39,33 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\ConstFetch>
  */
 final class FalseValue implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a boolean literal (`false`) with its opposite value (`true`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = false;
+                + $a = true;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\ConstFetch $node
      *
      * @return iterable<Node\Expr\ConstFetch>
      */
@@ -75,6 +80,30 @@ final class FalseValue implements Mutator
             return false;
         }
 
-        return $node->name->toLowerString() === 'false';
+        if ($node->name->toLowerString() !== 'false') {
+            return false;
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+        $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
+
+        if ($parentNode instanceof Node\Stmt\Switch_) {
+            return false;
+        }
+
+        if ($grandParentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
+        if (
+            $parentNode instanceof Node\Expr\BinaryOp\Equal
+            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
+            || $parentNode instanceof Node\Expr\BinaryOp\Identical
+            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

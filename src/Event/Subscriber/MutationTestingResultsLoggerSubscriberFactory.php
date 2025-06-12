@@ -35,28 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Logger\LoggerFactory;
+use Infection\Logger\MutationTestingResultsLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final readonly class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
-    private LoggerFactory $loggerFactory;
-    private Logs $logsConfig;
-
-    public function __construct(LoggerFactory $loggerFactory, Logs $logsConfig)
-    {
-        $this->loggerFactory = $loggerFactory;
-        $this->logsConfig = $logsConfig;
+    public function __construct(
+        private MutationTestingResultsLogger $logger,
+    ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
     {
         return new MutationTestingResultsLoggerSubscriber(
-            $this->loggerFactory->createFromLogEntries($this->logsConfig)
+            $this->logger,
         );
     }
 }

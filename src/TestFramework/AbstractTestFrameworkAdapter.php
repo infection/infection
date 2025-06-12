@@ -39,7 +39,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\TestFramework\Config\InitialConfigBuilder;
 use Infection\TestFramework\Config\MutationConfigBuilder;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 
 /**
@@ -47,30 +47,15 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
 {
-    private string $testFrameworkExecutable;
-    private CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder;
-    private InitialConfigBuilder $initialConfigBuilder;
-    private MutationConfigBuilder $mutationConfigBuilder;
-    private VersionParser $versionParser;
-    private CommandLineBuilder $commandLineBuilder;
-    private ?string $version;
-
     public function __construct(
-        string $testFrameworkExecutable,
-        InitialConfigBuilder $initialConfigBuilder,
-        MutationConfigBuilder $mutationConfigBuilder,
-        CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
-        VersionParser $versionParser,
-        CommandLineBuilder $commandLineBuilder,
-        ?string $version = null
+        private readonly string $testFrameworkExecutable,
+        private readonly InitialConfigBuilder $initialConfigBuilder,
+        private readonly MutationConfigBuilder $mutationConfigBuilder,
+        private readonly CommandLineArgumentsAndOptionsBuilder $argumentsAndOptionsBuilder,
+        private readonly VersionParser $versionParser,
+        private readonly CommandLineBuilder $commandLineBuilder,
+        private ?string $version = null,
     ) {
-        $this->testFrameworkExecutable = $testFrameworkExecutable;
-        $this->initialConfigBuilder = $initialConfigBuilder;
-        $this->mutationConfigBuilder = $mutationConfigBuilder;
-        $this->argumentsAndOptionsBuilder = $argumentsAndOptionsBuilder;
-        $this->versionParser = $versionParser;
-        $this->commandLineBuilder = $commandLineBuilder;
-        $this->version = $version;
     }
 
     abstract public function testsPass(string $output): bool;
@@ -89,40 +74,47 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     public function getInitialTestRunCommandLine(
         string $extraOptions,
         array $phpExtraArgs,
-        bool $skipCoverage
+        bool $skipCoverage,
     ): array {
-        return $this->getCommandLine($this->buildInitialConfigFile(), $extraOptions, $phpExtraArgs);
+        return $this->getCommandLine(
+            $phpExtraArgs,
+            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun($this->buildInitialConfigFile(), $extraOptions),
+        );
     }
 
     /**
      * Returns array of arguments to pass them into the Mutant Process
      *
-     * @param TestLocation[] $tests
+     * @param TestLocation[] $coverageTests
      *
      * @return string[]
      */
     public function getMutantCommandLine(
-        array $tests,
-        string $mutantFilePath,
+        array $coverageTests,
+        string $mutatedFilePath,
         string $mutationHash,
         string $mutationOriginalFilePath,
-        string $extraOptions
+        string $extraOptions,
     ): array {
         return $this->getCommandLine(
-            $this->buildMutationConfigFile(
-                $tests,
-                $mutantFilePath,
-                $mutationHash,
-                $mutationOriginalFilePath
+            [],
+            $this->argumentsAndOptionsBuilder->buildForMutant(
+                $this->buildMutationConfigFile(
+                    $coverageTests,
+                    $mutatedFilePath,
+                    $mutationHash,
+                    $mutationOriginalFilePath,
+                ),
+                $extraOptions,
+                $coverageTests,
+                $this->getVersion(),
             ),
-            $extraOptions,
-            []
         );
     }
 
     public function getVersion(): string
     {
-        return $this->version ?? $this->version = $this->retrieveVersion();
+        return $this->version ??= $this->retrieveVersion();
     }
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
@@ -139,35 +131,34 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
      * @param TestLocation[] $tests
      */
     protected function buildMutationConfigFile(
-       array $tests,
-       string $mutantFilePath,
-       string $mutationHash,
-       string $mutationOriginalFilePath
+        array $tests,
+        string $mutantFilePath,
+        string $mutationHash,
+        string $mutationOriginalFilePath,
     ): string {
         return $this->mutationConfigBuilder->build(
             $tests,
             $mutantFilePath,
             $mutationHash,
-            $mutationOriginalFilePath
+            $mutationOriginalFilePath,
+            $this->getVersion(),
         );
     }
 
     /**
      * @param string[] $phpExtraArgs
+     * @param string[] $testFrameworkArgs
      *
      * @return string[]
      */
     private function getCommandLine(
-        string $configPath,
-        string $extraOptions,
-        array $phpExtraArgs
+        array $phpExtraArgs,
+        array $testFrameworkArgs,
     ): array {
-        $frameworkArgs = $this->argumentsAndOptionsBuilder->build($configPath, $extraOptions);
-
         return $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,
             $phpExtraArgs,
-            $frameworkArgs
+            $testFrameworkArgs,
         );
     }
 
@@ -176,7 +167,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
         $testFrameworkVersionExecutable = $this->commandLineBuilder->build(
             $this->testFrameworkExecutable,
             [],
-            ['--version']
+            ['--version'],
         );
 
         $process = new Process($testFrameworkVersionExecutable);

@@ -35,18 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use ColinODell\Json5\SyntaxError;
 use Exception;
-use function get_class;
 use Infection\Configuration\Schema\InvalidFile;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
-use Seld\JsonLint\ParsingException;
+use function sprintf;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(SchemaConfigurationFile::class)]
 final class SchemaConfigurationFileTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Configuration';
@@ -70,7 +71,7 @@ final class SchemaConfigurationFileTest extends TestCase
             $config->getDecodedContents();
 
             $this->fail('Expected the content to be invalid.');
-        } catch (Exception $exception) {
+        } catch (Exception) {
             $this->addToAssertionCount(1);
         }
 
@@ -99,12 +100,10 @@ final class SchemaConfigurationFileTest extends TestCase
         $this->assertSame($expectedValue, $config->getDecodedContents());
     }
 
-    /**
-     * @dataProvider invalidConfigContentsProvider
-     */
+    #[DataProvider('invalidConfigContentsProvider')]
     public function test_it_cannot_retrieve_or_decode_invalid_contents(
         string $path,
-        Exception $expectedException
+        Exception $expectedException,
     ): void {
         $config = new SchemaConfigurationFile($path);
 
@@ -115,11 +114,11 @@ final class SchemaConfigurationFileTest extends TestCase
         } catch (Exception $exception) {
             $this->assertSame(
                 $expectedException->getMessage(),
-                $exception->getMessage()
+                $exception->getMessage(),
             );
             $this->assertSame(
                 $expectedException->getCode(),
-                $exception->getCode()
+                $exception->getCode(),
             );
 
             if ($expectedException->getPrevious() === null) {
@@ -129,7 +128,7 @@ final class SchemaConfigurationFileTest extends TestCase
                 $previous = $exception->getPrevious();
 
                 $this->assertNotNull($previous);
-                $this->assertInstanceOf(get_class($expectedPrevious), $previous);
+                $this->assertInstanceOf($expectedPrevious::class, $previous);
                 $this->assertSame($expectedPrevious->getMessage(), $previous->getMessage());
                 $this->assertSame($expectedPrevious->getCode(), $previous->getCode());
                 $this->assertSame($expectedPrevious->getPrevious(), $previous->getPrevious());
@@ -137,7 +136,7 @@ final class SchemaConfigurationFileTest extends TestCase
         }
     }
 
-    public function invalidConfigContentsProvider(): iterable
+    public static function invalidConfigContentsProvider(): iterable
     {
         yield 'unknown path' => [
             '/nowhere',
@@ -148,7 +147,7 @@ final class SchemaConfigurationFileTest extends TestCase
             self::FIXTURES_DIR,
             new InvalidFile(sprintf(
                 'The file "%s" could not be found or is not a file.',
-            self::FIXTURES_DIR
+                self::FIXTURES_DIR,
             )),
         ];
 
@@ -156,26 +155,11 @@ final class SchemaConfigurationFileTest extends TestCase
             self::FIXTURES_DIR . '/invalid-json',
             new InvalidFile(
                 sprintf(
-                    <<<'ERROR'
-Could not parse the JSON file "%s": Parse error on line 1:
-
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-ERROR
-                    ,
-                self::FIXTURES_DIR . '/invalid-json'
+                    'Could not parse the JSON file "%s": Unexpected EOF at line 1 column 1 of the JSON5 data',
+                    self::FIXTURES_DIR . '/invalid-json',
                 ),
                 0,
-                new ParsingException(
-                    <<<'ERROR'
-Parse error on line 1:
-
-^
-Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-ERROR
-                    ,
-                    []
-                )
+                new SyntaxError('Unexpected EOF', 1, 1),
             ),
         ];
     }

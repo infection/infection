@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function implode;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
+#[CoversClass(InitialTestsFailed::class)]
 final class InitialTestsFailedTest extends TestCase
 {
     public function test_log_initial_tests_do_not_pass(): void

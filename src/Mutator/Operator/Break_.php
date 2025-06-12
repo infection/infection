@@ -44,27 +44,35 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Stmt\Break_>
  */
 final class Break_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a break statement (`break`) with its counterpart continue statement (`continue`).
-TXT
+                Replaces a break statement (`break`) with its counterpart continue statement (`continue`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                foreach ($collection as $item) {
+                    if ($condition) {
+                -       break;
+                +       continue;
+                    }
+                }
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Stmt\Break_ $node
      *
      * @return iterable<Node\Stmt\Continue_>
      */

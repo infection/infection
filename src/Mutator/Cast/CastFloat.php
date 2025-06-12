@@ -44,17 +44,25 @@ use PhpParser\Node;
  */
 final class CastFloat extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes a float cast operator (`(float)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = (float) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Double;
+        if (!$node instanceof Node\Expr\Cast\Double) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'float');
     }
 }

@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\PhpDoc;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(PHPDocParser::class)]
 final class PHPDocParserTest extends TestCase
 {
-    /**
-     * @dataProvider phpDocProvider
-     */
+    #[DataProvider('phpDocProvider')]
     public function test_it_can_parse_phpdoc(string $phpDoc, array $expected): void
     {
         $actual = (new PHPDocParser())->parse($phpDoc);
@@ -49,7 +50,7 @@ final class PHPDocParserTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function phpDocProvider(): iterable
+    public static function phpDocProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -58,16 +59,16 @@ final class PHPDocParserTest extends TestCase
 
         yield 'summary' => [
             <<<'DOCBLOCK'
-This is a multiline
-description that you commonly
-see with tags.
-    It does have a multiline code sample
-    that should align, no matter what
-All spaces superfluous spaces on the
-second and later lines should be
-removed but the code sample should
-still be indented.
-DOCBLOCK
+                This is a multiline
+                description that you commonly
+                see with tags.
+                    It does have a multiline code sample
+                    that should align, no matter what
+                All spaces superfluous spaces on the
+                second and later lines should be
+                removed but the code sample should
+                still be indented.
+                DOCBLOCK
             ,
             [],
         ];
@@ -89,45 +90,45 @@ DOCBLOCK
 
         yield 'doctrine annotation' => [
             <<<'DOCBLOCK'
-@var \DateTime[]
-@Groups({"a", "b"})
-@ORM\Entity
-DOCBLOCK
+                @var \DateTime[]
+                @Groups({"a", "b"})
+                @ORM\Entity
+                DOCBLOCK
             ,
             ['@var', '@Groups', '@ORM\Entity'],
         ];
 
         yield 'summary with ellipsis' => [
             <<<'DOCBLOCK'
- This is a short (...) description.
+                 This is a short (...) description.
 
- This is a long description.
+                 This is a long description.
 
- @return void
-DOCBLOCK
+                 @return void
+                DOCBLOCK
             ,
             ['@return'],
         ];
 
         yield 'duplicate tags' => [
             <<<'DOCBLOCK'
-@final
-@final
-@internal
-DOCBLOCK
+                @final
+                @final
+                @internal
+                DOCBLOCK
             ,
             ['@final', '@internal'],
         ];
 
         yield 'summary with escaped phpdoc' => [
             <<<'DOCBLOCK'
-You can escape the @-sign by surrounding it with braces, for example: @. And escape a closing brace within an
-inline tag by adding an opening brace in front of it like this: }.
-Here are example texts where you can see how they could be used in a real life situation:
-    This is a text with an {@internal inline tag where a closing brace (}) is shown}.
-    Or an {@internal inline tag with a literal {@link} in it}.
-Do note that an {@internal inline tag that has an opening brace ({) does not break out}.
-DOCBLOCK
+                You can escape the @-sign by surrounding it with braces, for example: @. And escape a closing brace within an
+                inline tag by adding an opening brace in front of it like this: }.
+                Here are example texts where you can see how they could be used in a real life situation:
+                    This is a text with an {@internal inline tag where a closing brace (}) is shown}.
+                    Or an {@internal inline tag with a literal {@link} in it}.
+                Do note that an {@internal inline tag that has an opening brace ({) does not break out}.
+                DOCBLOCK
             ,
             ['@internal', '@link'],
         ];

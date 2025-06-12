@@ -35,12 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use function array_values;
 use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use function iterator_to_array;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(BufferedSourceFileFilter::class)]
 final class BufferedSourceFileFilterTest extends TestCase
 {
     public function test_it_filters_and_collects_unseen(): void
@@ -64,15 +68,11 @@ final class BufferedSourceFileFilterTest extends TestCase
         $filter
             ->expects($this->exactly(2))
             ->method('filter')
-            ->withConsecutive(
-                [$traces],
-                [$uncoveredFiles]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $traces,
-                $uncoveredFiles
-            )
-        ;
+            ->willReturnCallback(static fn (array $constraint) => match ($constraint) {
+                $traces => $traces,
+                $uncoveredFiles => $uncoveredFiles,
+                default => 'noop',
+            });
 
         $bufferedFilter = new BufferedSourceFileFilter($filter, $sourceFiles);
 
@@ -94,14 +94,10 @@ final class BufferedSourceFileFilterTest extends TestCase
         return $traceMock;
     }
 
-    private function createFileInfoMock(string $filename): SplFileInfo
+    private function createFileInfoMock(string $filename): MockSplFileInfo
     {
-        $fileInfoMock = $this->createMock(SplFileInfo::class);
-        $fileInfoMock
-            ->method('getRealPath')
-            ->willReturn($filename)
-        ;
-
-        return $fileInfoMock;
+        return new MockSplFileInfo([
+            'realPath' => $filename,
+        ]);
     }
 }

@@ -11,13 +11,10 @@ use PhpParser\NodeVisitorAbstract;
 final class NullMutationVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var Mutator[]
+     * @param Mutator<Node> $mutator
      */
-    private $mutator;
-
-    public function __construct(Mutator $mutator)
+    public function __construct(private readonly Mutator $mutator)
     {
-        $this->mutator = $mutator;
     }
 
     /**

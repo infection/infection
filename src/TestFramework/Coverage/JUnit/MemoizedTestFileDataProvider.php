@@ -42,16 +42,14 @@ use function array_key_exists;
  */
 final class MemoizedTestFileDataProvider implements TestFileDataProvider
 {
-    private TestFileDataProvider $provider;
-
     /**
      * @var array<string, TestFileTimeData>
      */
     private array $cache = [];
 
-    public function __construct(TestFileDataProvider $decoratedProvider)
-    {
-        $this->provider = $decoratedProvider;
+    public function __construct(
+        private readonly TestFileDataProvider $provider,
+    ) {
     }
 
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData

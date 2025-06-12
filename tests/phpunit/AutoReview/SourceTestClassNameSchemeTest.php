@@ -35,15 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview;
 
+use Infection\Testing\SourceTestClassNameScheme;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SourceTestClassNameScheme::class)]
 final class SourceTestClassNameSchemeTest extends TestCase
 {
     public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
     {
         $this->assertSame(
             'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest')
+            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest'),
         );
     }
 
@@ -51,7 +54,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo')
+            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo'),
         );
     }
 
@@ -59,7 +62,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo')
+            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo'),
         );
     }
 
@@ -67,7 +70,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo')
+            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo'),
         );
     }
 }

@@ -45,28 +45,32 @@ use PhpParser\Node;
  * @internal
  *
  * @see Yield_
+ *
+ * @implements Mutator<Node\Expr\Yield_>
  */
 final class YieldValue implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
-For example `yield $b->bar;`.
-TXT
+                Replaces a key-value pair (`yield $key => $value`) yielded value with the yielded value only;
+                For example `yield $value;`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - yield $key => $value;
+                + yield $value;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\Yield_ $node
      *
      * @return iterable<Node\Expr\Yield_>
      */

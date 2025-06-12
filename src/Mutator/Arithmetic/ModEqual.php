@@ -43,27 +43,31 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\AssignOp\Mod>
  */
 final class ModEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a modulo assignment operator (`%=`) with a multiplication assignment operator (`*=`).
-TXT
+                Replaces a modulo assignment operator (`%=`) with a multiplication assignment operator (`*=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a %= $b;
+                + $a *= $b;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\AssignOp\Mod $node
      *
      * @return iterable<Node\Expr\AssignOp\Mul>
      */

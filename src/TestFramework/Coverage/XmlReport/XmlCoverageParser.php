@@ -60,7 +60,7 @@ class XmlCoverageParser
     {
         return new ProxyTrace(
             $provider->provideFileInfo(),
-            lazy(self::createTestLocationsGenerator($provider->provideXPath()))
+            lazy(self::createTestLocationsGenerator($provider->provideXPath())),
         );
     }
 
@@ -96,7 +96,7 @@ class XmlCoverageParser
 
         return new TestLocations(
             self::collectCoveredLinesData($coveredLineNodes),
-            self::collectMethodsCoverageData($coveredMethodNodes)
+            self::collectMethodsCoverageData($coveredMethodNodes),
         );
     }
 
@@ -111,8 +111,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList|DOMElement[] $coveredLineNodes
-     * @phpstan-param DOMNodeList<DOMElement> $coveredLineNodes
+     * @param DOMNodeList<DOMElement> $coveredLineNodes
      *
      * @return array<int, array<int, TestLocation>>
      */
@@ -136,7 +135,7 @@ class XmlCoverageParser
                 }
 
                 $data[$lineNumber][] = TestLocation::forTestMethod(
-                    $coveredNode->getAttribute('by')
+                    $coveredNode->getAttribute('by'),
                 );
             }
         }
@@ -145,9 +144,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList|DOMElement[] $methodsCoverageNodes
-     *
-     * @phpstan-param DOMNodeList<DOMElement> $methodsCoverageNodes
+     * @param DOMNodeList<DOMElement> $methodsCoverageNodes
      *
      * @return SourceMethodLineRange[]
      */
@@ -156,6 +153,10 @@ class XmlCoverageParser
         $methodsCoverage = [];
 
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
+            if ((int) $methodsCoverageNode->getAttribute('coverage') === 0) {
+                continue;
+            }
+
             $methodName = $methodsCoverageNode->getAttribute('name');
 
             $start = $methodsCoverageNode->getAttribute('start');
@@ -166,7 +167,7 @@ class XmlCoverageParser
 
             $methodsCoverage[$methodName] = new SourceMethodLineRange(
                 (int) $start,
-                (int) $end
+                (int) $end,
             );
         }
 

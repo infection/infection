@@ -46,7 +46,7 @@ final class MutantBuilder
         Mutation $mutation,
         string $mutatedCode,
         string $diff,
-        string $prettyPrintedOriginalCode
+        string $prettyPrintedOriginalCode,
     ): Mutant {
         return new Mutant($mutantFilePath, $mutation, now($mutatedCode), now($diff), now($prettyPrintedOriginalCode));
     }

@@ -40,24 +40,27 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function md5;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Mutation::class)]
 final class MutationTest extends TestCase
 {
     /**
-     * @dataProvider valuesProvider
-     *
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
      * @param array<string|int|float> $expectedAttributes
      * @param TestLocation[] $tests
      */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $originalFilePath,
         array $originalFileAst,
+        string $mutatorClass,
         string $mutatorName,
         array $attributes,
         string $mutatedNodeClass,
@@ -68,21 +71,23 @@ final class MutationTest extends TestCase
         array $expectedAttributes,
         int $expectedOriginalStartingLine,
         bool $expectedCoveredByTests,
-        string $expectedHash
+        string $expectedHash,
     ): void {
         $mutation = new Mutation(
             $originalFilePath,
             $originalFileAst,
+            $mutatorClass,
             $mutatorName,
             $attributes,
             $mutatedNodeClass,
             $mutatedNode,
             $mutationByMutatorIndex,
-            $tests
+            $tests,
         );
 
         $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());
         $this->assertSame($originalFileAst, $mutation->getOriginalFileAst());
+        $this->assertSame($mutatorClass, $mutation->getMutatorClass());
         $this->assertSame($mutatorName, $mutation->getMutatorName());
         $this->assertSame($expectedAttributes, $mutation->getAttributes());
         $this->assertSame($expectedOriginalStartingLine, $mutation->getOriginalStartingLine());
@@ -94,7 +99,7 @@ final class MutationTest extends TestCase
         $this->assertSame($expectedHash, $mutation->getHash());
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         $nominalAttributes = [
             'startLine' => $originalStartingLine = 3,
@@ -108,6 +113,7 @@ final class MutationTest extends TestCase
         yield 'empty' => [
             '',
             [],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -125,8 +131,9 @@ final class MutationTest extends TestCase
             '/path/to/acme/Foo.php',
             [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -136,7 +143,7 @@ final class MutationTest extends TestCase
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    0.01,
                 ),
             ],
             0.01,
@@ -150,8 +157,9 @@ final class MutationTest extends TestCase
             '/path/to/acme/Foo.php',
             [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -161,7 +169,7 @@ final class MutationTest extends TestCase
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    0.01,
                 ),
             ],
             0.01,
@@ -175,8 +183,9 @@ final class MutationTest extends TestCase
             '/path/to/acme/Foo.php',
             [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             array_merge($nominalAttributes, ['foo' => 100, 'bar' => 1000]),
             Node\Scalar\LNumber::class,
@@ -186,12 +195,12 @@ final class MutationTest extends TestCase
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    1.1
+                    1.1,
                 ),
                 new TestLocation(
                     'FooTest::test_it_can_do_something',
                     '/path/to/acme/FooTest.php',
-                    1.1
+                    1.1,
                 ),
             ],
             1.1,
@@ -205,8 +214,9 @@ final class MutationTest extends TestCase
             '/path/to/acme/Foo.php',
             [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -224,8 +234,9 @@ final class MutationTest extends TestCase
             '/path/to/acme/Foo.php',
             [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
+            Plus::class,
             MutatorName::getName(Plus::class),
             $nominalAttributes,
             Node\Scalar\LNumber::class,
@@ -238,12 +249,12 @@ final class MutationTest extends TestCase
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    0.01,
                 ),
                 new TestLocation(
                     'BarTest::test_it_just_works',
                     '/path/to/acme/FooTest.php',
-                    0.02
+                    0.02,
                 ),
             ],
             0.03,

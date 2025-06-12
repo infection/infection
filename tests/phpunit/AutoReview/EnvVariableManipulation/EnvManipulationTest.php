@@ -36,22 +36,23 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
-use function Safe\sprintf;
+use function sprintf;
 
+#[CoversNothing]
 final class EnvManipulationTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\EnvVariableManipulation\EnvTestCasesProvider::envTestCaseTupleProvider
-     */
+    #[DataProviderExternal(EnvTestCasesProvider::class, 'envTestCaseTupleProvider')]
     public function test_the_test_cases_manipulation_environment_variables_uses_the_backup_env_trait(
         string $testCaseClassName,
-        string $fileWithEnvManipulations
+        string $fileWithEnvManipulations,
     ): void {
         $import = sprintf(
             'use %s;',
-            BacksUpEnvironmentVariables::class
+            BacksUpEnvironmentVariables::class,
         );
 
         $this->assertStringContainsString(
@@ -59,14 +60,14 @@ final class EnvManipulationTest extends TestCase
             file_get_contents($fileWithEnvManipulations),
             sprintf(
                 <<<'TXT'
-    Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
-    been found in the file "%s".
-TXT
+                        Expected the test case "%s" to be using the "%s" trait as environment variable manipulations have
+                        been found in the file "%s".
+                    TXT
                 ,
                 $testCaseClassName,
                 BacksUpEnvironmentVariables::class,
-                $fileWithEnvManipulations
-            )
+                $fileWithEnvManipulations,
+            ),
         );
     }
 }

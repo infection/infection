@@ -39,31 +39,37 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
+use function is_numeric;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Spaceship>
  */
 final class Spaceship implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
-TXT
+                Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b <=> $c;
+                + $a = $c <=> $b;
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Spaceship $node
      *
      * @return iterable<Node\Expr\BinaryOp\Spaceship>
      */
@@ -74,6 +80,79 @@ TXT
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\BinaryOp\Spaceship;
+        if (!$node instanceof Node\Expr\BinaryOp\Spaceship) {
+            return false;
+        }
+
+        if ($this->isCompareWithZero($node)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isCompareWithZero(Node\Expr\BinaryOp\Spaceship $node): bool
+    {
+        $parentAttribute = ParentConnector::findParent($node);
+
+        if ($parentAttribute instanceof Node\Expr\BinaryOp\Identical) {
+            return $this->isIntegerScalarEqualToZero($parentAttribute);
+        }
+
+        if ($parentAttribute instanceof Node\Expr\BinaryOp\Equal) {
+            return $this->isEqualToZero($parentAttribute);
+        }
+
+        return false;
+    }
+
+    private function isIntegerScalarEqualToZero(Node\Expr\BinaryOp $node): bool
+    {
+        if (!$node instanceof Node\Expr\BinaryOp\Identical && !$node instanceof Node\Expr\BinaryOp\Equal) {
+            return false;
+        }
+
+        if ($node->right instanceof Node\Scalar\LNumber && $node->right->value === 0) {
+            return true;
+        }
+
+        if ($node->left instanceof Node\Scalar\LNumber && $node->left->value === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function isEqualToZero(Node\Expr\BinaryOp\Equal $node): bool
+    {
+        if ($this->isIntegerScalarEqualToZero($node)) {
+            return true;
+        }
+
+        if ($node->right instanceof Node\Scalar\DNumber && $node->right->value === 0.0) {
+            return true;
+        }
+
+        if ($node->left instanceof Node\Scalar\DNumber && $node->left->value === 0.0) {
+            return true;
+        }
+
+        if (
+            $node->right instanceof Node\Scalar\String_
+            && is_numeric($node->right->value)
+            && ($node->right->value === '0' || $node->right->value === '0.0')
+        ) {
+            return true;
+        }
+
+        if (
+            $node->left instanceof Node\Scalar\String_
+            && is_numeric($node->left->value)
+            && ($node->left->value === '0' || $node->left->value === '0.0')
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }

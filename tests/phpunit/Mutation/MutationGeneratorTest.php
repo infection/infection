@@ -46,23 +46,25 @@ use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\WithConsecutive;
 use function Later\now;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(MutationGenerator::class)]
 final class MutationGeneratorTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfo = $this->createMock(SplFileInfo::class);
+        $fileInfo = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
 
-        // Prophecy compares arguments on equality, therefore these have to be somewhat unique
         $proxyTraceA = new ProxyTrace($fileInfo, now(1));
         $proxyTraceB = new ProxyTrace($fileInfo, now(2));
 
@@ -75,25 +77,18 @@ final class MutationGeneratorTest extends TestCase
         $mutation1 = $this->createMock(Mutation::class);
         $mutation2 = $this->createMock(Mutation::class);
 
-        /** @var FileMutationGenerator|ObjectProphecy $fileMutationGeneratorProphecy */
-        $fileMutationGeneratorProphecy = $this->prophesize(FileMutationGenerator::class);
-        $fileMutationGeneratorProphecy
-            ->generate($proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers)
-            ->shouldBeCalledTimes(1)
-            ->willReturn([
-                $mutation0,
-                $mutation1,
-            ])
-        ;
-
-        $fileMutationGeneratorProphecy
-            ->generate($proxyTraceB, $onlyCovered, $mutators, $nodeIgnorers)
-            ->shouldBeCalledTimes(1)
-            ->willReturn([
-                $mutation1,
-                $mutation2,
-            ])
-        ;
+        /** @var FileMutationGenerator&MockObject $fileMutationGenerator */
+        $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGenerator->expects($this->exactly(2))
+            ->method('generate')
+            ->with(...WithConsecutive::create(
+                [$proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers],
+                [$proxyTraceB, $onlyCovered, $mutators, $nodeIgnorers],
+            ))
+            ->willReturnOnConsecutiveCalls(
+                [$mutation0, $mutation1],
+                [$mutation1, $mutation2],
+            );
 
         $expectedMutations = [
             $mutation0,
@@ -116,8 +111,8 @@ final class MutationGeneratorTest extends TestCase
             $traceProviderMock,
             $mutators,
             $eventDispatcherMock,
-            $fileMutationGeneratorProphecy->reveal(),
-            false
+            $fileMutationGenerator,
+            false,
         );
 
         $mutations = [];
@@ -135,12 +130,12 @@ final class MutationGeneratorTest extends TestCase
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(2)],
                 [new MutableFileWasProcessed()],
                 [new MutableFileWasProcessed()],
-                [new MutationGenerationWasFinished()]
-            )
+                [new MutationGenerationWasFinished()],
+            ))
         ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
@@ -149,7 +144,7 @@ final class MutationGeneratorTest extends TestCase
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [],
-                []
+                [],
             )
         ;
 
@@ -162,15 +157,15 @@ final class MutationGeneratorTest extends TestCase
                     new SplFileInfo(
                         'fileA',
                         'relativePathToFileA',
-                        'relativePathnameToFileA'
-                    )
+                        'relativePathnameToFileA',
+                    ),
                 ),
                 new ProxyTrace(
                     new SplFileInfo(
                         'fileB',
                         'relativePathToFileB',
-                        'relativePathnameToFileB'
-                    )
+                        'relativePathnameToFileB',
+                    ),
                 ),
             ])
         ;
@@ -180,7 +175,7 @@ final class MutationGeneratorTest extends TestCase
             [],
             $eventDispatcherMock,
             $fileMutationGeneratorMock,
-            false
+            false,
         );
 
         foreach ($mutationGenerator->generate(false, []) as $_) {
@@ -194,12 +189,12 @@ final class MutationGeneratorTest extends TestCase
         $eventDispatcherMock
             ->expects($this->exactly(4))
             ->method('dispatch')
-            ->withConsecutive(
+            ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(0)],
                 [new MutableFileWasProcessed()],
                 [new MutableFileWasProcessed()],
-                [new MutationGenerationWasFinished()]
-            )
+                [new MutationGenerationWasFinished()],
+            ))
         ;
 
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
@@ -208,7 +203,7 @@ final class MutationGeneratorTest extends TestCase
             ->method('generate')
             ->willReturnOnConsecutiveCalls(
                 [],
-                []
+                [],
             )
         ;
 
@@ -221,15 +216,15 @@ final class MutationGeneratorTest extends TestCase
                     new SplFileInfo(
                         'fileA',
                         'relativePathToFileA',
-                        'relativePathnameToFileA'
-                    )
+                        'relativePathnameToFileA',
+                    ),
                 ),
                 new ProxyTrace(
                     new SplFileInfo(
                         'fileB',
                         'relativePathToFileB',
-                        'relativePathnameToFileB'
-                    )
+                        'relativePathnameToFileB',
+                    ),
                 ),
             ])
         ;
@@ -239,7 +234,7 @@ final class MutationGeneratorTest extends TestCase
             [],
             $eventDispatcherMock,
             $fileMutationGeneratorMock,
-            true
+            true,
         );
 
         foreach ($mutationGenerator->generate(false, []) as $_) {

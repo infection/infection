@@ -41,27 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapStrToUpper extends AbstractUnwrapMutator
+final class UnwrapStrToUpper extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `strtoupper` function call with its first operand. For example:
+                Replaces a `strtoupper` function call with its first operand. For example:
 
-```php
-$x = strtoupper('Hello!');
-```
+                ```php
+                $x = strtoupper('Hello!');
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = 'Hello!';
-```
-TXT
+                ```php
+                $x = 'Hello!';
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = strtoupper('Hello!');
+                + $x = 'Hello!';
+                DIFF,
         );
     }
 

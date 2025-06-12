@@ -39,24 +39,31 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\NotIdentical>
  */
 final class NotIdentical implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a not identical operator (`!==`) with its counterpart the not identical operator (`===`).
-TXT
+                Replaces a not identical operator (`!==`) with its counterpart the not identical operator (`===`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $a = $b !== $c;
+                + $a = $b === $c;
+                DIFF,
         );
     }
 
@@ -64,8 +71,6 @@ TXT
      * Replaces "!==" with "==="
      *
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\NotIdentical $node
      *
      * @return iterable<Node\Expr\BinaryOp\Identical>
      */
@@ -76,6 +81,12 @@ TXT
 
     public function canMutate(Node $node): bool
     {
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
         return $node instanceof Node\Expr\BinaryOp\NotIdentical;
     }
 }

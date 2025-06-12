@@ -37,6 +37,9 @@ namespace Infection\Mutator;
 
 /**
  * @internal
+ *
+ * @template TNode of \PhpParser\Node
+ * @extends Mutator<TNode>
  */
 interface ConfigurableMutator extends Mutator
 {

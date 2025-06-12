@@ -35,43 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Boolean\LogicalLowerOr;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(LogicalLowerOr::class)]
 final class LogicalLowerOrTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates logical lower or' => [
             <<<'PHP'
-<?php
+                <?php
 
-true or false;
-PHP
+                true or false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-true and false;
-PHP
+                true and false;
+                PHP
             ,
         ];
 
         yield 'It does not mutate logical or' => [
             <<<'PHP'
-<?php
+                <?php
 
-true || false;
-PHP
+                true || false;
+                PHP
             ,
         ];
     }

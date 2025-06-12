@@ -43,31 +43,37 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Throw_>
  */
 final class Throw_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes a throw statement (`throw`). For example:
+                Removes a throw statement (`throw`). For example:
 
-```php
-throw new Exception();
-```
+                ```php
+                throw new Exception();
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-new Exception();
-```
+                ```php
+                new Exception();
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - throw new Exception();
+                + new Exception();
+                DIFF,
         );
     }
 
@@ -76,17 +82,15 @@ TXT
      *
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     * @param Node\Stmt\Throw_ $node
-     *
-     * @return iterable<Node\Stmt\Expression>
+     * @return iterable<Node\Stmt\Expression|Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Expression($node->expr);
+        yield $node->expr;
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Throw_;
+        return $node instanceof Node\Expr\Throw_;
     }
 }

@@ -44,7 +44,7 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
@@ -53,28 +53,24 @@ use function trim;
 /**
  * @internal
  */
-final class PhpUnitCustomExecutablePathProvider
+final readonly class PhpUnitCustomExecutablePathProvider
 {
-    private TestFrameworkFinder $phpUnitExecutableFinder;
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(TestFrameworkFinder $phpUnitExecutableFinder, ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->phpUnitExecutableFinder = $phpUnitExecutableFinder;
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        private TestFrameworkFinder $phpUnitExecutableFinder,
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+    ) {
     }
 
     public function get(IO $io): ?string
     {
         try {
             $this->phpUnitExecutableFinder->find(TestFrameworkTypes::PHPUNIT);
-        } catch (FinderException $e) {
+        } catch (FinderException) {
             $io->writeln(['']);
 
             $questionText = $this->consoleHelper->getQuestion(
-                'We did not find phpunit executable. Please provide custom absolute path'
+                'We did not find phpunit executable. Please provide custom absolute path',
             );
 
             $question = new Question($questionText);
@@ -83,7 +79,7 @@ final class PhpUnitCustomExecutablePathProvider
             return str_replace(
                 DIRECTORY_SEPARATOR,
                 '/',
-                $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)
+                (string) $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question),
             );
         }
 
@@ -92,10 +88,10 @@ final class PhpUnitCustomExecutablePathProvider
 
     private function getValidator(): Closure
     {
-        return static function ($answerPath) {
-            $answerPath = $answerPath ? trim($answerPath) : $answerPath;
+        return static function ($answerPath): string {
+            $answerPath = $answerPath !== '' ? trim($answerPath) : $answerPath;
 
-            if (!$answerPath || !file_exists($answerPath)) {
+            if ($answerPath === '' || !file_exists($answerPath)) {
                 throw new RuntimeException(sprintf('Custom path "%s" is incorrect.', $answerPath));
             }
 

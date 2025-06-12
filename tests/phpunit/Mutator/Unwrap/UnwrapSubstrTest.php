@@ -35,157 +35,174 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapSubstr;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapSubstr::class)]
 final class UnwrapSubstrTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with a string' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = substr('Good Afternoon!', 0, -1);
-PHP
+                $a = substr('Good Afternoon!', 0, -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = substr(\Class_With_Const::Const, 0, -1);
-PHP
+                $a = substr(\Class_With_Const::Const, 0, -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of str_replace' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \substr('Good Afternoon!', 0, -1);
-PHP
+                $a = \substr('Good Afternoon!', 0, -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-if (substr($a, 0, -1) === $a) {
-    return true;
-}
-PHP
+                $a = 'Good Afternoon!';
+                if (substr($a, 0, -1) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = 'Good Afternoon!';
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when sUbStR is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = sUbStR('Good Afternoon!', 0, -1);
-PHP
+                $a = sUbStR('Good Afternoon!', 0, -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'Good Afternoon!';
-PHP
+                $a = 'Good Afternoon!';
+                PHP,
         ];
 
         yield 'It mutates correctly when substr uses another function as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = substr($foo->bar(), 0, -1);
-PHP
+                $a = substr($foo->bar(), 0, -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = substr(array_reduce($words, function (string $carry, string $item) {
-    return $carry;
-}), 0, -1);
-PHP
+                $a = substr(array_reduce($words, function (string $carry, string $item) {
+                    return $carry;
+                }), 0, -1);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_reduce($words, function (string $carry, string $item) {
-    return $carry;
-});
-PHP
+                $a = array_reduce($words, function (string $carry, string $item) {
+                    return $carry;
+                });
+                PHP,
         ];
 
         yield 'It does not mutate other str* calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = strrev('Afternoon');
-PHP
+                $a = strrev('Afternoon');
+                PHP,
         ];
 
         yield 'It does not mutate functions named str_replace' => [
             <<<'PHP'
-<?php
+                <?php
 
-function substr($search , $replace , $subject , int &$count = null)
-{
-}
-PHP
+                function substr($search , $replace , $subject , int &$count = null)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'substr';
+                $a = 'substr';
 
-$b = $a('Bar', 0, -1);
-PHP
+                $b = $a('Bar', 0, -1);
+                PHP
             ,
+        ];
+
+        yield 'It mutates correctly complex code with dynamic method name. Related to https://github.com/infection/infection/issues/1799' => [
+            <<<'PHP'
+                <?php
+
+                $object->{substr($key, 0, -2)}();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $object->{$key}();
+                PHP,
         ];
     }
 }

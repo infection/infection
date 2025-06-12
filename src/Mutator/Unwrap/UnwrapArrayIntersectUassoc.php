@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
+use function array_keys;
 use function array_slice;
 use function count;
 use Infection\Mutator\Definition;
@@ -44,34 +45,41 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayIntersectUassoc extends AbstractUnwrapMutator
+final class UnwrapArrayIntersectUassoc extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_intersect_uassoc` function call with its operands. For example:
+                Replaces an `array_intersect_uassoc` function call with its operands. For example:
 
-```php
-$x = array_intersect_uassoc($array1, $array2, $keyCompareFunc);
-```
+                ```php
+                $x = array_intersect_uassoc($array1, $array2, $keyCompareFunc);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $array1;
-```
+                ```php
+                $x = $array1;
+                ```
 
-And:
+                And:
 
-```php
-$x = $array2;
-```
+                ```php
+                $x = $array2;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $x = array_intersect_uassoc($array1, $array2, $keyCompareFunc);
+                # Mutation 1
+                + $x = $array1;
+                # Mutation 2
+                + $x = $array2;
+                DIFF,
         );
     }
 
@@ -88,7 +96,7 @@ TXT
         yield from array_slice(
             array_keys($node->args),
             0,
-            count($node->args) - 1
+            count($node->args) - 1,
         );
     }
 }

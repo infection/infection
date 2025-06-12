@@ -43,10 +43,13 @@ use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use function iterator_to_array;
 use function Later\now;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
+#[CoversClass(JUnitTestExecutionInfoAdder::class)]
 final class JUnitTestExecutionInfoAdderTest extends TestCase
 {
     public function test_it_does_not_add_if_junit_is_not_provided(): void
@@ -91,7 +94,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ->with('Acme\FooTest')
             ->willReturn(new TestFileTimeData(
                 '/path/to/acme/FooTest.php',
-                0.000234
+                0.000234,
             ))
         ;
 
@@ -103,12 +106,12 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
                     TestLocation::forTestMethod('Acme\FooTest::test_it_can_be_instantiated'),
                 ],
             ],
-            []
+            [],
         );
 
         $proxyTrace = new ProxyTrace(
             new SplFileInfo('/path/to/Foo.php', 'Foo.php', 'Foo.php'),
-            now($tests)
+            now($tests),
         );
 
         $expected = [$proxyTrace];
@@ -133,7 +136,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
                     'byMethod' => [],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$proxyTrace->getTests()])
+            TestLocationsNormalizer::normalize([$proxyTrace->getTests()]),
         );
     }
 }

@@ -42,6 +42,6 @@ final class FakeMutationTestingResultsLogger implements MutationTestingResultsLo
 {
     public function log(): void
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

@@ -41,11 +41,14 @@ use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use function Infection\Tests\normalize_trailing_spaces;
+use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Terminal;
 
+#[CoversClass(MinMsiChecker::class)]
 final class MinMsiCheckerTest extends TestCase
 {
     /**
@@ -68,8 +71,8 @@ final class MinMsiCheckerTest extends TestCase
 
         $this->consoleOutput = new ConsoleOutput(
             new ConsoleLogger(
-                new IO(new StringInput(''), $this->output)
-            )
+                new IO(new StringInput(''), $this->output),
+            ),
         );
     }
 
@@ -84,7 +87,7 @@ final class MinMsiCheckerTest extends TestCase
         } catch (MinMsiCheckFailed $exception) {
             $this->assertSame(
                 'The minimum required MSI percentage should be 10%, but actual is 8%. Improve your tests!',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
 
             $this->assertSame('', $this->output->fetch());
@@ -102,7 +105,7 @@ final class MinMsiCheckerTest extends TestCase
         } catch (MinMsiCheckFailed $exception) {
             $this->assertSame(
                 'The minimum required Covered Code MSI percentage should be 10%, but actual is 8%. Improve your tests!',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
 
             $this->assertSame('', $this->output->fetch());
@@ -118,13 +121,13 @@ final class MinMsiCheckerTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 70% percentage points over the required MSI. Consider increasing the required
- !        MSI percentage the next time you run Infection.
+                 ! [NOTE] The MSI is 70% percentage points over the required MSI. Consider increasing the required
+                 !        MSI percentage the next time you run Infection.
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -137,13 +140,13 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The Covered Code MSI is 70% percentage points over the required Covered Code MSI. Consider
- !        increasing the required Covered Code MSI percentage the next time you run Infection.
+                 ! [NOTE] The Covered Code MSI is 70% percentage points over the required Covered Code MSI. Consider
+                 !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 
@@ -156,16 +159,16 @@ TXT
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] The MSI is 70% percentage points over the required MSI. Consider increasing the required
- !        MSI percentage the next time you run Infection.
+                 ! [NOTE] The MSI is 70% percentage points over the required MSI. Consider increasing the required
+                 !        MSI percentage the next time you run Infection.
 
- ! [NOTE] The Covered Code MSI is 70% percentage points over the required Covered Code MSI. Consider
- !        increasing the required Covered Code MSI percentage the next time you run Infection.
+                 ! [NOTE] The Covered Code MSI is 70% percentage points over the required Covered Code MSI. Consider
+                 !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($this->output->fetch())
+            normalize_trailing_spaces($this->output->fetch()),
         );
     }
 

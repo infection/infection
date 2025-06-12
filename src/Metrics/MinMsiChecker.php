@@ -45,18 +45,11 @@ class MinMsiChecker
 {
     private const VALUE_OVER_REQUIRED_TOLERANCE = 2;
 
-    private bool $ignoreMsiWithNoMutations;
-    private float $minMsi;
-    private float $minCoveredCodeMsi;
-
     public function __construct(
-        bool $ignoreMsiWithNoMutations,
-        float $minMsi,
-        float $minCoveredMsi
+        private readonly bool $ignoreMsiWithNoMutations,
+        private readonly float $minMsi,
+        private readonly float $minCoveredCodeMsi,
     ) {
-        $this->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
-        $this->minMsi = $minMsi;
-        $this->minCoveredCodeMsi = $minCoveredMsi;
     }
 
     /**
@@ -66,7 +59,7 @@ class MinMsiChecker
         int $totalMutantCount,
         float $msi,
         float $coveredCodeMsi,
-        ConsoleOutput $consoleOutput
+        ConsoleOutput $consoleOutput,
     ): void {
         $this->checkMinMsi($totalMutantCount, $msi, $coveredCodeMsi);
         $this->checkIfMinMsiCanBeIncreased($msi, $coveredCodeMsi, $consoleOutput);
@@ -83,14 +76,14 @@ class MinMsiChecker
         if ($this->isMsiInsufficient($msi)) {
             throw MinMsiCheckFailed::createForMsi(
                 $this->minMsi,
-                $msi
+                $msi,
             );
         }
 
         if ($this->isCoveredCodeMsiInsufficient($coveredCodeMsi)) {
             throw MinMsiCheckFailed::createCoveredMsi(
                 $this->minCoveredCodeMsi,
-                $coveredCodeMsi
+                $coveredCodeMsi,
             );
         }
     }
@@ -100,26 +93,26 @@ class MinMsiChecker
         if ($this->canIncreaseMsi($msi)) {
             $output->logMinMsiCanGetIncreasedNotice(
                 $this->minMsi,
-                $msi
+                $msi,
             );
         }
 
         if ($this->canIncreaseCoveredCodeMsi($coveredCodeMsi)) {
             $output->logMinCoveredCodeMsiCanGetIncreasedNotice(
                 $this->minCoveredCodeMsi,
-                $coveredCodeMsi
+                $coveredCodeMsi,
             );
         }
     }
 
     private function isMsiInsufficient(float $msi): bool
     {
-        return $this->minMsi && ($msi < $this->minMsi);
+        return $this->minMsi > 0 && $msi < $this->minMsi;
     }
 
     private function isCoveredCodeMsiInsufficient(float $coveredCodeMsi): bool
     {
-        return $this->minCoveredCodeMsi && ($coveredCodeMsi < $this->minCoveredCodeMsi);
+        return $this->minCoveredCodeMsi > 0 && $coveredCodeMsi < $this->minCoveredCodeMsi;
     }
 
     private function canIncreaseMsi(float $msi): bool

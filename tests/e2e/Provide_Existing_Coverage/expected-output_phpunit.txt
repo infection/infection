@@ -1,4 +1,4 @@
-Total: 8
+Total: 7
 
 Killed mutants:
 ===============
@@ -15,9 +15,6 @@ Line 12
 Mutator: PublicVisibility
 Line 12
 
-Mutator: FalseValue
-Line 14
-
 Mutator: NotIdentical
 Line 14
 
@@ -25,8 +22,14 @@ Mutator: TrueValue
 Line 15
 
 
+Killed by Static Analysis mutants:
+==================================
+
 Errors mutants:
 ===============
+
+Syntax Errors mutants:
+======================
 
 Escaped mutants:
 ================
@@ -35,6 +38,9 @@ Timed Out mutants:
 ==================
 
 Skipped mutants:
+================
+
+Ignored mutants:
 ================
 
 Not Covered mutants:

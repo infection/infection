@@ -37,8 +37,11 @@ namespace Infection\Tests\Resource\Memory;
 
 use Infection\Resource\Memory\MemoryFormatter;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MemoryFormatter::class)]
 final class MemoryFormatterTest extends TestCase
 {
     /**
@@ -51,9 +54,7 @@ final class MemoryFormatterTest extends TestCase
         $this->memoryFormatter = new MemoryFormatter();
     }
 
-    /**
-     * @dataProvider bytesProvider
-     */
+    #[DataProvider('bytesProvider')]
     public function test_it_converts_bytes_to_human_readable_time(float $bytes, string $expectedString): void
     {
         $timeString = $this->memoryFormatter->toHumanReadableString($bytes);
@@ -70,12 +71,12 @@ final class MemoryFormatterTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected a positive or null amount of bytes. Got: -1',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function bytesProvider(): iterable
+    public static function bytesProvider(): iterable
     {
         yield [0., '0.00B'];
 

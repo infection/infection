@@ -35,50 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Http;
 
+use function in_array;
 use Psr\Log\LoggerInterface;
-use function Safe\json_encode;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
  */
 class StrykerDashboardClient
 {
-    private StrykerCurlClient $client;
-    private LoggerInterface $logger;
-
-    public function __construct(StrykerCurlClient $client, LoggerInterface $logger)
-    {
-        $this->client = $client;
-        $this->logger = $logger;
+    public function __construct(
+        private readonly StrykerCurlClient $client,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     public function sendReport(
         string $repositorySlug,
         string $branch,
         string $apiKey,
-        float $mutationScore
+        string $reportJson,
     ): void {
         $response = $this->client->request(
             $repositorySlug,
             $branch,
             $apiKey,
-            json_encode(['mutationScore' => $mutationScore])
+            $reportJson,
         );
 
         $statusCode = $response->getStatusCode();
 
-        if ($statusCode !== Response::CREATED_RESPONSE_CODE) {
+        if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
             $this->logger->warning(sprintf(
                 'Stryker dashboard returned an unexpected response code: %s',
-                $statusCode)
+                $statusCode),
             );
         }
 
         $this->logger->notice(sprintf(
             'Dashboard response:%s%s',
             "\r\n",
-            $response->getBody()
+            $response->getBody(),
         ));
     }
 }

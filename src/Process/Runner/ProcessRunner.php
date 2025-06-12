@@ -35,13 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use Infection\Process\MutantProcessContainer;
+
 /**
  * @internal
  */
 interface ProcessRunner
 {
     /**
-     * @param iterable<ProcessBearer> $processes
+     * @param iterable<MutantProcessContainer> $processContainers
+     *
+     * @return iterable<MutantProcessContainer>
      */
-    public function run(iterable $processes): void;
+    public function run(iterable $processContainers): iterable;
+
+    public function stop(): void;
 }

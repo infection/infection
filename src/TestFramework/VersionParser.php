@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use function Safe\preg_match;
-use function Safe\sprintf;
+use function sprintf;
+use function str_replace;
 use Webmozart\Assert\Assert;
 
 /**
@@ -44,7 +45,7 @@ use Webmozart\Assert\Assert;
  */
 final class VersionParser
 {
-    private const VERSION_REGEX = '/(?<version>\d+\.\d+\.?\d*)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>\+[0-9a-zA-Z.]+)?/';
+    private const VERSION_REGEX = '/(?<version>\d+\.\d+\.?\w*)(?<prerelease>-[0-9a-zA-Z.]+)?(?<build>[\+|@][0-9a-zA-Z.]+)?/';
 
     public function parse(string $content): string
     {
@@ -54,7 +55,7 @@ final class VersionParser
         Assert::notSame(
             $matched,
             0,
-            sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', $content)
+            sprintf('Expected "%s" to be contain a valid SemVer (sub)string value.', str_replace('%', '%%', $content)),
         );
 
         return $matches[0];

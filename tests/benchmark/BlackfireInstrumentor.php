@@ -39,7 +39,7 @@ use BlackfireProbe;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use function extension_loaded;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -73,7 +73,7 @@ final class BlackfireInstrumentor
 
             $io->warning(sprintf(
                 'An error occurred. The profile has been discarded please check the error first: "%s"',
-                $throwable->getMessage()
+                $throwable->getMessage(),
             ));
 
             throw $throwable;
@@ -87,7 +87,7 @@ final class BlackfireInstrumentor
                 'Could not find the blackfire extension. Make sure blackfire is properly '
                 . 'installed. See "%s" or "%s"',
                 'https://blackfire.io/docs/up-and-running/installation',
-                'https://support.blackfire.io/en/collections/145104-troubleshooting'
+                'https://support.blackfire.io/en/collections/145104-troubleshooting',
             ));
 
             exit(1);
@@ -98,7 +98,7 @@ final class BlackfireInstrumentor
                 'The extension pcov is enabled and will result in an unusable Blackfire '
                 . 'profile. Make sure it is disable and for more informations you can check '
                 . '<info>%s</info>',
-                'https://support.blackfire.io/en/articles/3669196-known-incompatibilities-with-the-php-probe'
+                'https://support.blackfire.io/en/articles/3669196-known-incompatibilities-with-the-php-probe',
             ));
 
             exit(1);
@@ -117,7 +117,7 @@ final class BlackfireInstrumentor
             $io->warning(sprintf(
                 'The composer autoloader is not set in classmap authoritative mode which can'
                 . ' result in an unnecessary overhead. Consider running the command %s',
-                'composer dump-autoload --classmap-authoritative'
+                'composer dump-autoload --classmap-authoritative',
             ));
         }
     }

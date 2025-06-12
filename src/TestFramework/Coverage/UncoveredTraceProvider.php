@@ -35,20 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use function Later\now;
-
 /**
  * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
  *
  * @internal
  */
-final class UncoveredTraceProvider implements TraceProvider
+final readonly class UncoveredTraceProvider implements TraceProvider
 {
-    private BufferedSourceFileFilter $bufferedFilter;
-
-    public function __construct(BufferedSourceFileFilter $bufferedFilter)
-    {
-        $this->bufferedFilter = $bufferedFilter;
+    public function __construct(
+        private BufferedSourceFileFilter $bufferedFilter,
+    ) {
     }
 
     /**
@@ -57,7 +53,7 @@ final class UncoveredTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, now(new TestLocations()));
+            yield new ProxyTrace($splFileInfo, null);
         }
     }
 }

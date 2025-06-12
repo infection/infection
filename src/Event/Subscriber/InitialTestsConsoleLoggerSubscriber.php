@@ -40,26 +40,23 @@ use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use const PHP_EOL;
+use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
-    private OutputInterface $output;
     private ProgressBar $progressBar;
-    private TestFrameworkAdapter $testFrameworkAdapter;
-    private bool $debug;
 
-    public function __construct(OutputInterface $output, TestFrameworkAdapter $testFrameworkAdapter, bool $debug)
-    {
-        $this->output = $output;
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-        $this->debug = $debug;
-
+    public function __construct(
+        private OutputInterface $output,
+        private TestFrameworkAdapter $testFrameworkAdapter,
+        private bool $debug,
+    ) {
         $this->progressBar = new ProgressBar($this->output);
         $this->progressBar->setFormat('verbose');
     }
@@ -68,7 +65,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
 
@@ -79,7 +76,7 @@ final class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
             sprintf(
                 '%s version: %s',
                 $this->testFrameworkAdapter->getName(),
-                $version
+                $version,
             ),
             '',
         ]);

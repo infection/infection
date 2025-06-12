@@ -9,5 +9,7 @@
         "KevinGH\\Box\\Compactor\\Php",
         "KevinGH\\Box\\Compactor\\PhpScoper"
     ],
-    "files": ["resources/schema.json"]
+    "files": [
+        "resources/schema.json"
+    ]
 }

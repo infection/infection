@@ -38,7 +38,7 @@ namespace Infection\Process\Runner;
 use Exception;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Process\Process;
 
 /**
@@ -48,7 +48,7 @@ final class InitialTestsFailed extends Exception
 {
     public static function fromProcessAndAdapter(
         Process $initialTestSuiteProcess,
-        TestFrameworkAdapter $testFrameworkAdapter
+        TestFrameworkAdapter $testFrameworkAdapter,
     ): self {
         $testFrameworkKey = $testFrameworkAdapter->getName();
 
@@ -58,20 +58,24 @@ final class InitialTestsFailed extends Exception
             sprintf(
                 '%s reported an exit code of %d.',
                 $testFrameworkKey,
-                $initialTestSuiteProcess->getExitCode()
+                $initialTestSuiteProcess->getExitCode(),
             ),
             sprintf(
                 'Refer to the %s\'s output below:',
-                $testFrameworkKey
+                $testFrameworkKey,
             ),
         ];
 
-        if ($stdOut = $initialTestSuiteProcess->getOutput()) {
+        $stdOut = $initialTestSuiteProcess->getOutput();
+
+        if ($stdOut !== '') {
             $lines[] = 'STDOUT:';
             $lines[] = $stdOut;
         }
 
-        if ($stdError = $initialTestSuiteProcess->getErrorOutput()) {
+        $stdError = $initialTestSuiteProcess->getErrorOutput();
+
+        if ($stdError !== '') {
             $lines[] = 'STDERR:';
             $lines[] = $stdError;
         }

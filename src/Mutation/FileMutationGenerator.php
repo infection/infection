@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -44,6 +45,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
+use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 /**
@@ -52,22 +54,18 @@ use Webmozart\Assert\Assert;
  */
 class FileMutationGenerator
 {
-    private FileParser $parser;
-    private NodeTraverserFactory $traverserFactory;
-    private LineRangeCalculator $lineRangeCalculator;
-
     public function __construct(
-        FileParser $parser,
-        NodeTraverserFactory $traverserFactory,
-        LineRangeCalculator $lineRangeCalculator
+        private readonly FileParser $parser,
+        private readonly NodeTraverserFactory $traverserFactory,
+        private readonly LineRangeCalculator $lineRangeCalculator,
+        private readonly FilesDiffChangedLines $filesDiffChangedLines,
+        private readonly bool $isForGitDiffLines,
+        private readonly ?string $gitDiffBase,
     ) {
-        $this->parser = $parser;
-        $this->traverserFactory = $traverserFactory;
-        $this->lineRangeCalculator = $lineRangeCalculator;
     }
 
     /**
-     * @param Mutator[] $mutators
+     * @param Mutator<Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
@@ -78,7 +76,7 @@ class FileMutationGenerator
         Trace $trace,
         bool $onlyCovered,
         array $mutators,
-        array $nodeIgnorers
+        array $nodeIgnorers,
     ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
@@ -87,19 +85,20 @@ class FileMutationGenerator
             return;
         }
 
-        $fileInfo = $trace->getSourceFileInfo();
-
-        $initialStatements = $this->parser->parse($fileInfo);
+        $initialStatements = $this->parser->parse($trace->getSourceFileInfo());
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 $mutators,
-                $fileInfo->getPathname(),
+                $trace->getRealPath(),
                 $initialStatements,
                 $trace,
                 $onlyCovered,
-                $this->lineRangeCalculator
-            )
+                $this->isForGitDiffLines,
+                $this->gitDiffBase,
+                $this->lineRangeCalculator,
+                $this->filesDiffChangedLines,
+            ),
         );
 
         $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);

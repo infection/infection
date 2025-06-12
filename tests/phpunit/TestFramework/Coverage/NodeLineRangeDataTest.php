@@ -37,8 +37,11 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(NodeLineRangeData::class)]
 final class NodeLineRangeDataTest extends TestCase
 {
     public function test_it_can_not_have_an_incorrect_range(): void
@@ -47,9 +50,7 @@ final class NodeLineRangeDataTest extends TestCase
         new NodeLineRangeData(20, 10);
     }
 
-    /**
-     * @dataProvider providesLineRanges
-     */
+    #[DataProvider('providesLineRanges')]
     public function test_it_generates_the_correct_range(int $start, int $end, array $expected): void
     {
         $range = new NodeLineRangeData($start, $end);
@@ -57,7 +58,7 @@ final class NodeLineRangeDataTest extends TestCase
         $this->assertSame($expected, $range->range);
     }
 
-    public function providesLineRanges(): iterable
+    public static function providesLineRanges(): iterable
     {
         yield 'Single line range' => [10, 10, [10]];
 

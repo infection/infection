@@ -35,67 +35,70 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\ReturnValue\FloatNegation;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(FloatNegation::class)]
 final class FloatNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates negative float return to positive' => [
             <<<'PHP'
-<?php
+                <?php
 
-return -2.0;
-PHP
+                return -2.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return 2.0;
-PHP
+                return 2.0;
+                PHP
             ,
         ];
 
         yield 'It mutates positive float return to negative' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 2.0;
-PHP
+                return 2.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return -2.0;
-PHP
+                return -2.0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate float zero' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 0.0;
-PHP
+                return 0.0;
+                PHP
             ,
         ];
 
         yield 'It does not mutate integers' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 1;
-PHP
+                return 1;
+                PHP
             ,
         ];
     }

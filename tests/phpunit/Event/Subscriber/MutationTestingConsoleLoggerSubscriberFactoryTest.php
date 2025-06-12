@@ -38,18 +38,28 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Logger\FederatedLogger;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Metrics\ResultsCollector;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
 final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     /**
      * @var MetricsCalculator|MockObject
      */
     private $metricsCalculatorMock;
+
+    /**
+     * @var ResultsCollector|MockObject
+     */
+    private $resultsCollectorMock;
 
     /**
      * @var DiffColorizer|MockObject
@@ -64,6 +74,12 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             ->method($this->anything())
         ;
 
+        $this->resultsCollectorMock = $this->createMock(ResultsCollector::class);
+        $this->resultsCollectorMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
         $this->diffColorizerMock = $this->createMock(DiffColorizer::class);
         $this->diffColorizerMock
             ->expects($this->never())
@@ -71,16 +87,16 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         ;
     }
 
-    /**
-     * @dataProvider showMutationsProvider
-     */
+    #[DataProvider('showMutationsProvider')]
     public function test_it_creates_a_subscriber(bool $showMutations): void
     {
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
+            $this->resultsCollectorMock,
             $this->diffColorizerMock,
+            new FederatedLogger(),
             $showMutations,
-            new FakeOutputFormatter()
+            new FakeOutputFormatter(),
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
@@ -94,7 +110,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    public function showMutationsProvider(): iterable
+    public static function showMutationsProvider(): iterable
     {
         foreach ([true, false] as $showMutations) {
             yield [$showMutations];

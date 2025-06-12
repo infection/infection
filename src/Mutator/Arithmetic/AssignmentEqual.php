@@ -43,27 +43,31 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\BinaryOp\Equal>
  */
 final class AssignmentEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
-TXT
+                Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - if ($a === self::VALUE);
+                + if ($a = self::VALUE);
+                DIFF,
         );
     }
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\BinaryOp\Equal $node
      *
      * @return iterable<Node\Expr\Assign>
      */

@@ -43,20 +43,26 @@ use PhpParser\Node;
 
 /**
  * @internal
+ *
+ * @implements Mutator<Node\Expr\Ternary>
  */
 final class Ternary implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
-TXT
+                Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null
+            null,
+            <<<'DIFF'
+                - $x = true ? true : false;
+                + $x = true ? false : true;
+                DIFF,
         );
     }
 
@@ -67,8 +73,6 @@ TXT
 
     /**
      * @psalm-mutation-free
-     *
-     * @param Node\Expr\Ternary $node
      *
      * @return iterable<Node\Expr>
      */

@@ -36,30 +36,31 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\CloneVisitor;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
-final class CloneVisitorTest extends BaseVisitorTest
+#[Group('integration')]
+#[CoversClass(CloneVisitor::class)]
+final class CloneVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
-<?php declare(strict_types=1);
+        <?php declare(strict_types=1);
 
-namespace Acme;
+        namespace Acme;
 
-function hello()
-{
-    return 'hello';
-}
-PHP;
+        function hello()
+        {
+            return 'hello';
+        }
+        PHP;
 
     public function test_mutating_nodes_during_traverse_mutates_the_original_nodes(): void
     {
-        $originalNodes = $this->parseCode(self::CODE);
+        $originalNodes = self::parseCode(self::CODE);
 
         $originalDump = SingletonContainer::getNodeDumper()->dump($originalNodes);
 
@@ -73,7 +74,7 @@ PHP;
 
     public function test_mutating_nodes_during_traverse_with_the_clone_visitor_does_not_mutate_the_original_nodes(): void
     {
-        $originalNodes = $this->parseCode(self::CODE);
+        $originalNodes = self::parseCode(self::CODE);
 
         $originalDump = SingletonContainer::getNodeDumper()->dump($originalNodes);
 
@@ -82,7 +83,7 @@ PHP;
             [
                 new CloneVisitor(),
                 $this->createMutateStringValueVisitor(),
-            ]
+            ],
         );
 
         $newDump = SingletonContainer::getNodeDumper()->dump($traversedNodes);
@@ -93,8 +94,8 @@ PHP;
 
     private function createMutateStringValueVisitor(): NodeVisitor
     {
-        return new class() extends NodeVisitorAbstract {
-            public function enterNode(Node $node)
+        return new class extends NodeVisitorAbstract {
+            public function enterNode(Node $node): ?Node\Scalar\String_
             {
                 if ($node instanceof Node\Scalar\String_) {
                     return new Node\Scalar\String_('foo');

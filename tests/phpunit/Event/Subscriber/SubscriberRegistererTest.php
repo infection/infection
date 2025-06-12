@@ -41,14 +41,13 @@ use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use Infection\Tests\Fixtures\Event\DummySubscriberFactory;
 use Infection\Tests\Fixtures\Event\SubscriberCollectEventDispatcher;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SubscriberRegisterer::class)]
 final class SubscriberRegistererTest extends TestCase
 {
-    /**
-     * @var SubscriberCollectEventDispatcher
-     */
-    private $eventDispatcher;
+    private SubscriberCollectEventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -64,7 +63,7 @@ final class SubscriberRegistererTest extends TestCase
         $factory = new ChainSubscriberFactory(
             new DummySubscriberFactory($subscriber0),
             new DummySubscriberFactory($subscriber1),
-            new DummySubscriberFactory($subscriber2)
+            new DummySubscriberFactory($subscriber2),
         );
 
         $registerer = new SubscriberRegisterer($this->eventDispatcher, $factory);
@@ -80,7 +79,7 @@ final class SubscriberRegistererTest extends TestCase
                 $subscriber1,
                 $subscriber2,
             ],
-            $this->eventDispatcher->getSubscribers()
+            $this->eventDispatcher->getSubscribers(),
         );
     }
 
@@ -88,7 +87,7 @@ final class SubscriberRegistererTest extends TestCase
     {
         $registerer = new SubscriberRegisterer(
             $this->eventDispatcher,
-            new ChainSubscriberFactory()
+            new ChainSubscriberFactory(),
         );
 
         // Sanity check

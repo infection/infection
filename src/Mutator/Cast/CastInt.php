@@ -44,17 +44,25 @@ use PhpParser\Node;
  */
 final class CastInt extends AbstractCastMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes an integer cast operator (`(int)`).',
             MutatorCategory::SEMANTIC_REDUCTION,
-            null
+            null,
+            <<<'DIFF'
+                - $a = (int) $value;
+                + $a = $value;
+                DIFF,
         );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Cast\Int_;
+        if (!$node instanceof Node\Expr\Cast\Int_) {
+            return false;
+        }
+
+        return !$this->willRuntimeErrorOnMismatch($node, 'int');
     }
 }

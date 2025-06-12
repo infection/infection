@@ -37,20 +37,23 @@ namespace Infection\Tests\PhpParser;
 
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
+use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 
+#[CoversClass(NodeTraverserFactory::class)]
 final class NodeTraverserFactoryTest extends TestCase
 {
     /**
@@ -64,19 +67,19 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $visitors = array_map(
             'get_class',
-            self::getVisitorReflection()->getValue($traverser)
+            self::getVisitorReflection()->getValue($traverser),
         );
 
         $this->assertSame(
             [
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
-                ParentConnectorVisitor::class,
-                FullyQualifiedClassNameVisitor::class,
+                ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitors
+            $visitors,
         );
     }
 
@@ -87,7 +90,7 @@ final class NodeTraverserFactoryTest extends TestCase
             [
                 new FakeIgnorer(),
                 new FakeIgnorer(),
-            ]
+            ],
         );
 
         $visitors = self::getVisitorReflection()->getValue($traverser);
@@ -96,14 +99,14 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $this->assertSame(
             [
+                IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
-                ParentConnectorVisitor::class,
-                FullyQualifiedClassNameVisitor::class,
+                ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
-            $visitorClasses
+            $visitorClasses,
         );
 
         $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('nodeIgnorers');
@@ -111,17 +114,18 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $actualNodeIgnorers = array_map(
             'get_class',
-            $nodeIgnorersReflection->getValue($visitors[0])
+            $nodeIgnorersReflection->getValue($visitors[1]),
         );
 
         $this->assertSame(
             [
                 FakeIgnorer::class,
                 FakeIgnorer::class,
+                ChangingIgnorer::class,
                 InterfaceIgnorer::class,
                 AbstractMethodIgnorer::class,
             ],
-            $actualNodeIgnorers
+            $actualNodeIgnorers,
         );
     }
 

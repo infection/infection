@@ -37,14 +37,18 @@ namespace Infection\Tests\AutoReview;
 
 use function array_map;
 use function in_array;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
+use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function Safe\file_get_contents;
-use function Safe\sprintf;
+use function sprintf;
 use function strpos;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
+#[CoversNothing]
 final class ContainerTest extends TestCase
 {
     /**
@@ -53,17 +57,16 @@ final class ContainerTest extends TestCase
     private static $containerFiles;
 
     /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
-     *
      * @param class-string $className
      */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
     public function test_source_class_provider_is_valid(string $className): void
     {
         $classFile = (new ReflectionClass($className))->getFileName();
 
         $this->assertNotFalse(
             $classFile,
-            sprintf('Expected the class "%s" to have a file', $className)
+            sprintf('Expected the class "%s" to have a file', $className),
         );
 
         if (in_array($classFile, $this->getContainerFiles(), true)) {
@@ -76,8 +79,8 @@ final class ContainerTest extends TestCase
                 'Did not expect to find a usage of the Infection container in "%s". Please use'
                 . ' "%s::getContainer() instead',
                 $classFile,
-                SingletonContainer::class
-            )
+                SingletonContainer::class,
+            ),
         );
     }
 
@@ -91,14 +94,14 @@ final class ContainerTest extends TestCase
         }
 
         self::$containerFiles = array_map(
-            static function (string $path): string {
-                return Path::canonicalize($path);
-            },
+            static fn (string $path): string => Path::canonicalize($path),
             [
                 __DIR__ . '/ContainerTest.php',
                 __DIR__ . '/../ContainerTest.php',
+                __DIR__ . '/../Reflection/ContainerReflection.php',
                 __DIR__ . '/../SingletonContainer.php',
-            ]
+                __DIR__ . '/../MockedContainer.php',
+            ],
         );
 
         return self::$containerFiles;

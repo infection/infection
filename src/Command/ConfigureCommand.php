@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Composer\InstalledVersions;
 use function count;
 use function file_exists;
+use const GLOB_ONLYDIR;
 use function implode;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
@@ -46,18 +48,25 @@ use Infection\Config\ValueProvider\SourceDirsProvider;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Config\ValueProvider\TextLogFileProvider;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Console\Application;
 use Infection\Console\IO;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
 use Infection\TestFramework\TestFrameworkTypes;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
+use OutOfBoundsException;
 use RuntimeException;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
 use function Safe\glob;
 use function Safe\json_decode;
 use function Safe\json_encode;
-use function Safe\sprintf;
+use function sprintf;
 use stdClass;
+use function str_starts_with;
+use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -81,9 +90,9 @@ final class ConfigureCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::TYPES)
+                    implode('", "', TestFrameworkTypes::getTypes()),
                 ),
-                TestFrameworkTypes::PHPUNIT
+                TestFrameworkTypes::PHPUNIT,
             );
     }
 
@@ -95,10 +104,13 @@ final class ConfigureCommand extends BaseCommand
             $this->abort();
         }
 
-        $consoleHelper = new ConsoleHelper($this->getHelper('formatter'));
+        /** @var FormatterHelper $formatterHelper */
+        $formatterHelper = $this->getHelper('formatter');
+
+        $consoleHelper = new ConsoleHelper($formatterHelper);
         $consoleHelper->writeSection(
             $io->getOutput(),
-            'Welcome to the Infection config generator'
+            'Welcome to the Infection config generator',
         );
 
         $io->newLine();
@@ -108,6 +120,7 @@ final class ConfigureCommand extends BaseCommand
         $dirsInCurrentDir = glob('*', GLOB_ONLYDIR);
         $testFrameworkConfigLocator = new TestFrameworkConfigLocator('.');
 
+        /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
 
         if (file_exists('composer.json')) {
@@ -132,7 +145,7 @@ final class ConfigureCommand extends BaseCommand
         $excludeDirsProvider = new ExcludeDirsProvider(
             $consoleHelper,
             $questionHelper,
-            $fileSystem
+            $fileSystem,
         );
 
         $excludedDirs = $excludeDirsProvider->get($io, $dirsInCurrentDir, $sourceDirs);
@@ -141,10 +154,10 @@ final class ConfigureCommand extends BaseCommand
         $phpUnitConfigPath = $phpUnitConfigPathProvider->get(
             $io,
             $dirsInCurrentDir,
-            $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)
+            $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK),
         );
 
-        $phpUnitExecutableFinder = new TestFrameworkFinder();
+        $phpUnitExecutableFinder = new TestFrameworkFinder($this->getApplication()->getContainer()->getComposerExecutableFinder());
         $phpUnitCustomExecutablePathProvider = new PhpUnitCustomExecutablePathProvider($phpUnitExecutableFinder, $consoleHelper, $questionHelper);
         $phpUnitCustomExecutablePath = $phpUnitCustomExecutablePathProvider->get($io);
 
@@ -156,7 +169,7 @@ final class ConfigureCommand extends BaseCommand
         $io->newLine();
         $io->writeln(sprintf(
             'Configuration file "<comment>%s</comment>" was created.',
-            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE
+            SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
         ));
         $io->newLine();
 
@@ -172,26 +185,28 @@ final class ConfigureCommand extends BaseCommand
         array $excludedDirs,
         ?string $phpUnitConfigPath = null,
         ?string $phpUnitCustomExecutablePath = null,
-        ?string $textLogFilePath = null
+        ?string $textLogFilePath = null,
     ): void {
         $configObject = new stdClass();
 
+        $configObject->{'$schema'} = $this->getJsonSchemaPathOrUrl();
+
         $configObject->source = new stdClass();
 
-        if ($sourceDirs) {
+        if ($sourceDirs !== []) {
             $configObject->source->directories = $sourceDirs;
         }
 
-        if ($excludedDirs) {
+        if ($excludedDirs !== []) {
             $configObject->source->excludes = $excludedDirs;
         }
 
-        if ($phpUnitConfigPath) {
+        if ($phpUnitConfigPath !== null) {
             $configObject->phpUnit = new stdClass();
             $configObject->phpUnit->configDir = $phpUnitConfigPath;
         }
 
-        if ($phpUnitCustomExecutablePath) {
+        if ($phpUnitCustomExecutablePath !== null) {
             if (!isset($configObject->phpUnit)) {
                 $configObject->phpUnit = new stdClass();
             }
@@ -199,7 +214,7 @@ final class ConfigureCommand extends BaseCommand
             $configObject->phpUnit->customPath = $phpUnitCustomExecutablePath;
         }
 
-        if ($textLogFilePath) {
+        if ($textLogFilePath !== null) {
             $configObject->logs = new stdClass();
             $configObject->logs->text = $textLogFilePath;
         }
@@ -214,13 +229,34 @@ final class ConfigureCommand extends BaseCommand
         ];
 
         file_put_contents(
-            SchemaConfigurationLoader::DEFAULT_DIST_CONFIG_FILE,
-            json_encode($configObject, JSON_PRETTY_PRINT)
+            SchemaConfigurationLoader::DEFAULT_JSON5_CONFIG_FILE,
+            json_encode($configObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
         );
     }
 
-    private function abort(): void
+    private function abort(): never
     {
         throw new RuntimeException('Configuration generation aborted');
+    }
+
+    private function getJsonSchemaPathOrUrl(): string
+    {
+        $fileName = 'vendor/infection/infection/resources/schema.json';
+
+        if (file_exists($fileName)) {
+            return $fileName;
+        }
+
+        try {
+            $version = InstalledVersions::getPrettyVersion(Application::PACKAGE_NAME);
+
+            if ($version === null || str_starts_with($version, 'dev-')) {
+                $version = 'master';
+            }
+        } catch (OutOfBoundsException) {
+            $version = 'master';
+        }
+
+        return sprintf('https://raw.githubusercontent.com/infection/infection/%s/resources/schema.json', $version);
     }
 }
