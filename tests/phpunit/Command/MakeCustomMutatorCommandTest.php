@@ -51,6 +51,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
 {
     public function test_it_create_custom_mutator_when_name_is_provided(): void
     {
+        $workingDirectory = \Safe\getcwd();
         $app = new Application($this->createContainer());
 
         $tester = new CommandTester($app->find('make:mutator'));
@@ -63,8 +64,8 @@ final class MakeCustomMutatorCommandTest extends TestCase
         $display = $tester->getDisplay();
 
         $this->assertStringContainsString('Generated files', $display);
-        $this->assertStringContainsString('CustomMutator.php', $display);
-        $this->assertStringContainsString('CustomMutatorTest.php', $display);
+        $this->assertStringContainsString($workingDirectory . '/src/Mutator/CustomMutator.php', $display);
+        $this->assertStringContainsString($workingDirectory . '/src/Mutator/CustomMutatorTest.php', $display);
     }
 
     public function test_it_create_custom_mutator_when_name_is_not_provided_at_command_call(): void
