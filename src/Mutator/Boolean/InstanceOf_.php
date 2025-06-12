@@ -40,9 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
-use LogicException;
 use PhpParser\Node;
-use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -80,9 +79,7 @@ final class InstanceOf_ implements Mutator
             return;
         }
 
-        if (!$node instanceof Node\Expr\Instanceof_) {
-            throw new LogicException(sprintf('Node must be InstanceOf_ but "%s" given.', $node::class));
-        }
+        Assert::isInstanceOf($node, Node\Expr\Instanceof_::class);
 
         $parentNode = ParentConnector::findParent($node);
 
