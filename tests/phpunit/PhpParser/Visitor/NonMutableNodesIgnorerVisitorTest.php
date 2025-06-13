@@ -38,6 +38,7 @@ namespace Infection\Tests\PhpParser\Visitor;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use PhpParser\Node;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -46,7 +47,10 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(NonMutableNodesIgnorerVisitor::class)]
 final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 {
-    private $spyVisitor;
+    /**
+     * @var NodeVisitor&object{nodesVisitedCount: int}
+     */
+    private NodeVisitor $spyVisitor;
 
     protected function setUp(): void
     {
@@ -66,22 +70,20 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
             }
             PHP
         );
-        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
+        $this->assertSame(0, $this->spyVisitor->nodesVisitedCount);
     }
 
-    private function getSpyVisitor()
+    /**
+     * @return NodeVisitor&object{nodesVisitedCount: int}
+     */
+    private function getSpyVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            private $nodesVisitedCount = 0;
+            public int $nodesVisitedCount = 0;
 
             public function leaveNode(Node $node): void
             {
                 ++$this->nodesVisitedCount;
-            }
-
-            public function getNumberOfNodesVisited(): int
-            {
-                return $this->nodesVisitedCount;
             }
         };
     }

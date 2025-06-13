@@ -42,7 +42,7 @@ use PhpParser\NodeVisitorAbstract;
 
 final class IgnoreSpyVisitor extends NodeVisitorAbstract
 {
-    public $nodeCounter = 0;
+    public int $nodeCounter = 0;
 
     private $failureCallBack;
 
