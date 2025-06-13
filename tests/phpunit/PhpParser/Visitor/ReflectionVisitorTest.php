@@ -56,7 +56,10 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
-    private $spyVisitor;
+    /**
+     * @var NodeVisitor&object{isInsideFunction: bool}
+     */
+    private NodeVisitor $spyVisitor;
 
     protected function setUp(): void
     {

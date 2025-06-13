@@ -1627,12 +1627,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/NonMutableNodesIgnorerVisitorTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\PhpParser\\Visitor\\ReflectionVisitorTest\:\:\$spyVisitor has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/ReflectionVisitorTest.php
-
-		-
 			message: '#^Static property Infection\\Tests\\Process\\Runner\\InitialTestsRunnerTest\:\:\$phpBin \(string\) does not accept string\|false\.$#'
 			identifier: assign.propertyType
 			count: 1
