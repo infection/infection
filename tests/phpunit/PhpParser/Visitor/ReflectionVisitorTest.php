@@ -309,7 +309,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     private function getReflectionClassSpyVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            public ClassReflection|null $reflectionClass = null;
+            public ?ClassReflection $reflectionClass = null;
 
             public function enterNode(Node $node): ?int
             {
@@ -330,8 +330,8 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     private function getReflectionClassesSpyVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            public ClassReflection|null $fooReflectionClass = null;
-            public ClassReflection|null $createAnonymousClassReflectionClass = null;
+            public ?ClassReflection $fooReflectionClass = null;
+            public ?ClassReflection $createAnonymousClassReflectionClass = null;
 
             public function enterNode(Node $node): ?int
             {
