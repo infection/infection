@@ -1597,34 +1597,10 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/IgnoreNode/BaseNodeIgnorerTestCase.php
 
 		-
-			message: '#^Property Infection\\Tests\\PhpParser\\Visitor\\IgnoreNode\\IgnoreSpyVisitor\:\:\$nodeCounter has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/IgnoreNode/IgnoreSpyVisitor.php
-
-		-
 			message: '#^Parameter \#2 \$originalFileAst of class Infection\\Mutation\\Mutation constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\PhpParser\\Visitor\\NonMutableNodesIgnorerVisitorTest\:\:getSpyVisitor\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/NonMutableNodesIgnorerVisitorTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\PhpParser\\Visitor\\NonMutableNodesIgnorerVisitorTest\:\:\$spyVisitor has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/NonMutableNodesIgnorerVisitorTest.php
-
-		-
-			message: '#^Property PhpParser\\NodeVisitorAbstract@anonymous/tests/phpunit/PhpParser/Visitor/NonMutableNodesIgnorerVisitorTest\.php\:74\:\:\$nodesVisitedCount has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/NonMutableNodesIgnorerVisitorTest.php
 
 		-
 			message: '#^Static property Infection\\Tests\\Process\\Runner\\InitialTestsRunnerTest\:\:\$phpBin \(string\) does not accept string\|false\.$#'
