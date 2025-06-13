@@ -103,7 +103,7 @@ final class RootsFileOrDirectoryLocator implements Locator
         foreach ($fileNames as $fileName) {
             try {
                 return $this->locate($fileName);
-            } catch (FileNotFound|FileOrDirectoryNotFound) {
+            } catch (FileOrDirectoryNotFound) {
                 // keep trying
             }
         }
