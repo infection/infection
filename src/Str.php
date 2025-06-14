@@ -53,7 +53,6 @@ final class Str
 
     public static function trimLineReturns(string $string): string
     {
-        // test change to trigger tests-checker GH action
         $lines = explode(
             "\n",
             str_replace("\r\n", "\n", $string),
