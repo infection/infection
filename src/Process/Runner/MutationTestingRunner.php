@@ -90,7 +90,7 @@ class MutationTestingRunner
         ;
 
         take($this->processRunner->run($processContainers))
-            ->cast($this->containerToFinishedEvent(...))
+            ->cast(self::containerToFinishedEvent(...))
             ->each($this->eventDispatcher->dispatch(...))
         ;
 
