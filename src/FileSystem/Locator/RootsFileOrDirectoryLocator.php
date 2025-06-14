@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Locator;
 
-use function array_shift;
-use function current;
 use const DIRECTORY_SEPARATOR;
 use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
@@ -102,16 +100,14 @@ final class RootsFileOrDirectoryLocator implements Locator
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {
-        if ($fileNames === []) {
-            return null;
+        foreach ($fileNames as $fileName) {
+            try {
+                return $this->locate($fileName);
+            } catch (FileOrDirectoryNotFound) {
+                // keep trying
+            }
         }
 
-        try {
-            return $this->locate(current($fileNames));
-        } catch (FileOrDirectoryNotFound) {
-            array_shift($fileNames);
-
-            return $this->innerLocateOneOf($fileNames);
-        }
+        return null;
     }
 }
