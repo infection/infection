@@ -147,8 +147,8 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $mutations = [
             $mutation0 = $this->createMutation(0),
-            $mutation1 = $this->createMutation(1),
-            $mutation2 = $this->createMutation(2, 1000.0),
+            $mutation1 = $this->createMutation(1, 99.0),
+            $mutation2 = $this->createMutation(2, 100.0),
         ];
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
