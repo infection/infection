@@ -72,6 +72,8 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MutationTestingRunner::class)]
 final class MutationTestingRunnerTest extends TestCase
 {
+    private const TIMEOUT = 100.0;
+
     /**
      * @var MutantProcessContainerFactory|MockObject
      */
@@ -124,7 +126,7 @@ final class MutationTestingRunnerTest extends TestCase
             $this->fileSystemMock,
             $this->diffSourceCodeMatcher,
             false,
-            100.0,
+            self::TIMEOUT,
             [],
         );
     }
@@ -155,8 +157,8 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $mutations = [
             $mutation0 = $this->createMutation(0),
-            $mutation1 = $this->createMutation(1, 99.0),
-            $mutation2 = $this->createMutation(2, 100.0),
+            $mutation1 = $this->createMutation(1, self::TIMEOUT - 1.0),
+            $mutation2 = $this->createMutation(2, self::TIMEOUT),
         ];
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
