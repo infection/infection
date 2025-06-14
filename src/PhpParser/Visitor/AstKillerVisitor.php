@@ -33,62 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\PhpParser\Visitor;
 
 use Infection\AstKiller\AstKillerManager;
-use Infection\PhpParser\Visitor\AstKillerVisitor;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use SplObjectStorage;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final class AstKillerVisitor extends NodeVisitorAbstract
 {
     public function __construct(
         private readonly AstKillerManager $astKillerManager,
     ) {
     }
 
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function enterNode(Node $node)
     {
-        $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
+        $this->astKillerManager->visitNode($node);
 
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
-
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ]),
-        );
-        $traverser->addVisitor(new ParentConnectingVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor(new AstKillerVisitor($this->astKillerManager));
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
+        return null;
     }
 }
