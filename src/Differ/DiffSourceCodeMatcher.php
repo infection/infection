@@ -40,8 +40,9 @@ use function str_contains;
 
 /**
  * @internal
+ * @final
  */
-final class DiffSourceCodeMatcher
+class DiffSourceCodeMatcher
 {
     private const POSSIBLE_DELIMITERS = [
         '#', '%', ':', ';', '=', '?', '@', '^', '~',

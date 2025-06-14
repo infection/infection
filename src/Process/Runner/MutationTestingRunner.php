@@ -89,11 +89,10 @@ class MutationTestingRunner
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
-        foreach ($this->processRunner->run($processContainers) as $mutantProcessContainer) {
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                $mutantProcessContainer->getCurrent()->getMutantExecutionResult(),
-            ));
-        }
+        take($this->processRunner->run($processContainers))
+            ->cast(self::containerToFinishedEvent(...))
+            ->each($this->eventDispatcher->dispatch(...))
+        ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
     }
@@ -159,5 +158,10 @@ class MutationTestingRunner
         $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
 
         return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
+    }
+
+    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
+    {
+        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
     }
 }
