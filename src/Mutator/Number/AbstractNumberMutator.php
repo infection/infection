@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use function in_array;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
@@ -47,6 +48,14 @@ use PhpParser\Node;
  */
 abstract class AbstractNumberMutator implements Mutator
 {
+    private const UNWANTED_TO_MUTATE_FUNCTIONS = [
+        'sleep',
+        'usleep',
+        'time_nanosleep',
+        'set_time_limit',
+        'ini_set',
+    ];
+
     protected function isPartOfSizeComparison(Node $node): bool
     {
         $parent = ParentConnector::findParent($node);
@@ -59,6 +68,33 @@ abstract class AbstractNumberMutator implements Mutator
         $parent = ParentConnector::getParent($node);
 
         return $this->isComparison($parent);
+    }
+
+    protected function isInsideUnwantedToMutateFunctions(Node\Scalar\LNumber $node): bool
+    {
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Arg) {
+            if (!$parentNode instanceof Node\Expr\UnaryMinus) {
+                return false;
+            }
+
+            $parentNode = ParentConnector::getParent($parentNode);
+
+            if (!$parentNode instanceof Node\Arg) {
+                return false;
+            }
+        }
+
+        $grandParentNode = ParentConnector::getParent($parentNode);
+
+        return $grandParentNode instanceof Node\Expr\FuncCall
+            && $grandParentNode->name instanceof Node\Name
+            && in_array(
+                $grandParentNode->name->toLowerString(),
+                self::UNWANTED_TO_MUTATE_FUNCTIONS,
+                true,
+            );
     }
 
     private function isSizeComparison(?Node $node): bool
