@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Removal;
 
 use function count;
+use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
@@ -141,8 +142,20 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
             return false;
         }
 
-        if ($parent instanceof Node\Arg && ParentConnector::findParent($parent) instanceof Node\Attribute) {
-            return false;
+        if ($parent instanceof Node\Arg) {
+            $grandParent = ParentConnector::findParent($parent);
+
+            if ($grandParent instanceof Node\Attribute) {
+                return false;
+            }
+
+            if (
+                $grandParent instanceof Node\Expr\FuncCall
+                && $grandParent->name instanceof Node\Name
+                && in_array($grandParent->name->toString(), ['in_array', 'array_key_exists'], true)
+            ) {
+                return false;
+            }
         }
 
         // Don't mutate destructured values in foreach loops
