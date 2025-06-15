@@ -124,10 +124,11 @@ class SchemaConfigurationFactory
         );
     }
 
-    private static function createPhpStan(stdClass $phpStab): PhpStan
+    private static function createPhpStan(stdClass $phpStan): PhpStan
     {
         return new PhpStan(
-            self::normalizeString($phpStab->customPath ?? null),
+            self::normalizeString($phpStan->configDir ?? null),
+            self::normalizeString($phpStan->customPath ?? null),
         );
     }
 

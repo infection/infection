@@ -48,6 +48,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(PHPStanAdapter::class)]
@@ -58,18 +59,23 @@ final class PHPStanAdapterTest extends TestCase
     private commandLineBuilder&MockObject $commandLineBuilder;
 
     private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
+    private Filesystem&MockObject $fileSystem;
 
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->mutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $this->fileSystem = $this->createMock(Filesystem::class);
 
         $this->adapter = new PHPStanAdapter(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
+            '/tmp',
             '9.0',
         );
     }
@@ -84,11 +90,15 @@ final class PHPStanAdapterTest extends TestCase
         $this->commandLineBuilder
             ->expects($this->once())
             ->method('build')
-            ->with('/path/to/phpstan', [], [])
-            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+            ->with('/path/to/phpstan', [], ['--configuration=/path/to/phpstan-config-path'])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path'])
         ;
 
-        $this->assertSame(['/usr/bin/php', '/path/to/phpstan'], $this->adapter->getInitialRunCommandLine());
+        $this->assertSame([
+            '/usr/bin/php',
+            '/path/to/phpstan',
+            '--configuration=/path/to/phpstan-config-path',
+        ], $this->adapter->getInitialRunCommandLine());
     }
 
     public function test_it_returns_version(): void
@@ -108,11 +118,14 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_accepts_valid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
+            '/tmp',
             $version,
         );
 
@@ -126,11 +139,14 @@ final class PHPStanAdapterTest extends TestCase
     public function test_it_rejects_invalid_versions(string $version): void
     {
         $adapter = new PHPStanAdapter(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
             '/path/to/phpstan',
             $this->commandLineBuilder,
             new VersionParser(),
             31.0,
+            '/tmp',
             $version,
         );
 

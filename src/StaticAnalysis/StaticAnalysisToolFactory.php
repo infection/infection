@@ -38,6 +38,7 @@ namespace Infection\StaticAnalysis;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapterFactory;
 use InvalidArgumentException;
 use function sprintf;
@@ -54,6 +55,7 @@ final readonly class StaticAnalysisToolFactory
         private Configuration $infectionConfig,
         private string $projectDir,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
+        private StaticAnalysisConfigLocator $staticAnalysisConfigLocator,
         private array $installedExtensions,
     ) {
     }
@@ -61,12 +63,16 @@ final readonly class StaticAnalysisToolFactory
     public function create(string $adapterName, float $timeout): StaticAnalysisToolAdapter
     {
         if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
+            $phpStanConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::PHPSTAN);
+
             return PHPStanAdapterFactory::create(
+                $phpStanConfigPath,
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
                     (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
                 ),
                 $timeout,
+                $this->infectionConfig->getTmpDir(),
             );
         }
 

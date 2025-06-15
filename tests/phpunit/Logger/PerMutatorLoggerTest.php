@@ -54,7 +54,7 @@ final class PerMutatorLoggerTest extends TestCase
         ResultsCollector $resultsCollector,
         string $expectedContents,
     ): void {
-        $logger = new PerMutatorLogger($metricsCalculator, $resultsCollector);
+        $logger = new PerMutatorLogger($metricsCalculator, $resultsCollector, 20);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
@@ -67,8 +67,8 @@ final class PerMutatorLoggerTest extends TestCase
             <<<'TXT'
                 # Effects per Mutator
 
-                | Mutator | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-                | ------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
+                | Mutator | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out (Limit: 20 secs) | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | ------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | -------------------------- | ------- | ------- | -------- | ---------------- |
 
                 TXT,
         ];
@@ -79,10 +79,10 @@ final class PerMutatorLoggerTest extends TestCase
             <<<'TXT'
                 # Effects per Mutator
 
-                | Mutator   | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
-                | --------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | --------- | ------- | ------- | -------- | ---------------- |
-                | For_      |         8 |                        1 |  0.00 / 0.00 / 0.00 secs |                         0 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |         1 |       1 |       1 |    66.67 |            80.00 |
-                | PregQuote |         9 |                        1 |  0.00 / 0.00 / 0.00 secs |                         1 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |         1 |       1 |       1 |    71.43 |            83.33 |
+                | Mutator   | Mutations | Killed by Test Framework | Test Timings min/avg/max | Killed by Static Analysis | Static Analysis Timings min/avg/max | Escaped | Errors | Syntax Errors | Timed Out (Limit: 20 secs) | Skipped | Ignored | MSI (%s) | Covered MSI (%s) |
+                | --------- | --------- | ------------------------ | ------------------------ | ------------------------- | ----------------------------------- | ------- | ------ | ------------- | -------------------------- | ------- | ------- | -------- | ---------------- |
+                | For_      |         8 |                        1 |  0.00 / 0.00 / 0.00 secs |                         0 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |                          1 |       1 |       1 |    66.67 |            80.00 |
+                | PregQuote |         9 |                        1 |  0.00 / 0.00 / 0.00 secs |                         1 |             0.00 / 0.00 / 0.00 secs |       1 |      1 |             1 |                          1 |       1 |       1 |    71.43 |            83.33 |
 
                 TXT,
         ];

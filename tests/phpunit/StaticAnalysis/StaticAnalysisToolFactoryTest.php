@@ -37,6 +37,7 @@ namespace Infection\Tests\StaticAnalysis;
 
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,6 +52,7 @@ final class StaticAnalysisToolFactoryTest extends TestCase
             $this->createMock(Configuration::class),
             '/project',
             $this->createMock(StaticAnalysisToolExecutableFinder::class),
+            $this->createMock(StaticAnalysisConfigLocator::class),
             [],
         );
 

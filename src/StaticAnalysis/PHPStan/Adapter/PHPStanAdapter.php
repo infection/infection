@@ -45,6 +45,7 @@ use Infection\TestFramework\VersionParser;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use function version_compare;
 
@@ -57,11 +58,14 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     private const VERSION_2 = 2;
 
     public function __construct(
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly Filesystem $fileSystem,
+        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
+        private readonly string $tmpDir,
         private ?string $version = null,
     ) {
     }
@@ -82,17 +86,23 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
-            [], // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
+            [
+                "--configuration=$this->staticAnalysisConfigPath",
+                // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
+            ],
         );
     }
 
     public function createMutantProcessFactory(): LazyMutantProcessFactory
     {
         return new PHPStanMutantProcessFactory(
+            $this->fileSystem,
             $this->mutantExecutionResultFactory,
+            $this->staticAnalysisConfigPath,
             $this->staticAnalysisToolExecutable,
             $this->commandLineBuilder,
             $this->timeout,
+            $this->tmpDir,
         );
     }
 

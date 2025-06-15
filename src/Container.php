@@ -119,6 +119,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
@@ -282,6 +283,7 @@ final class Container
                     $config,
                     $container->getProjectDir(),
                     $container->getStaticAnalysisToolExecutableFinder(),
+                    $container->getStaticAnalysisConfigLocator(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -296,6 +298,9 @@ final class Container
             ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
+            ),
+            StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
+                (string) $container->getConfiguration()->getPhpStan()->getConfigDir(),
             ),
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
@@ -446,6 +451,7 @@ final class Container
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
                     $config->getLoggerProjectRootDirectory(),
+                    $config->getProcessTimeout(),
                 );
             },
             MutationTestingResultsLogger::class => static fn (self $container): MutationTestingResultsLogger => new FederatedLogger(...array_filter([
@@ -1030,6 +1036,11 @@ final class Container
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
     {
         return $this->get(TestFrameworkConfigLocator::class);
+    }
+
+    private function getStaticAnalysisConfigLocator(): StaticAnalysisConfigLocator
+    {
+        return $this->get(StaticAnalysisConfigLocator::class);
     }
 
     private function getProcessRunner(): ProcessRunner

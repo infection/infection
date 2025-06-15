@@ -51,13 +51,15 @@ use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use ReflectionClass;
 
 #[Group('integration')]
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends BaseVisitorTestCase
 {
-    private $spyVisitor;
+    /**
+     * @var NodeVisitor&object{isInsideFunction: bool}
+     */
+    private NodeVisitor $spyVisitor;
 
     protected function setUp(): void
     {
@@ -81,7 +83,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
             ],
         );
 
-        $this->assertSame($expected, $spyVisitor->isPartOfSignature());
+        $this->assertSame($expected, $spyVisitor->isPartOfSignature);
     }
 
     #[DataProvider('isPartOfSignatureFlagWithAttributesProvider')]
@@ -93,7 +95,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
 
         $this->parseAndTraverse($code, $spyVisitor);
 
-        $this->assertSame($expected, $spyVisitor->isPartOfSignature());
+        $this->assertSame($expected, $spyVisitor->isPartOfSignature);
     }
 
     public function test_it_detects_if_it_is_traversing_inside_class_method(): void
@@ -239,10 +241,13 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         yield [Node\Expr\Array_::class, false];             // []
     }
 
-    private function getPartOfSignatureSpyVisitor(string $nodeClass)
+    /**
+     * @return NodeVisitor&object{isPartOfSignature: bool}
+     */
+    private function getPartOfSignatureSpyVisitor(string $nodeClass): NodeVisitor
     {
         return new class($nodeClass) extends NodeVisitorAbstract {
-            private $isPartOfSignature;
+            public bool $isPartOfSignature;
 
             public function __construct(
                 private readonly string $nodeClassUnderTest,
@@ -255,18 +260,16 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
                     $this->isPartOfSignature = $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
                 }
             }
-
-            public function isPartOfSignature(): bool
-            {
-                return $this->isPartOfSignature;
-            }
         };
     }
 
-    private function getSpyVisitor(string $nodeClass)
+    /**
+     * @return NodeVisitor&object{spyCalled: bool}
+     */
+    private function getSpyVisitor(string $nodeClass): NodeVisitor
     {
         return new class($nodeClass) extends NodeVisitorAbstract {
-            public $spyCalled = false;
+            public bool $spyCalled = false;
 
             public function __construct(
                 private readonly string $nodeClassUnderTest,
@@ -282,10 +285,13 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         };
     }
 
-    private function getInsideFunctionSpyVisitor()
+    /**
+     * @return NodeVisitor&object{isInsideFunction: bool}
+     */
+    private function getInsideFunctionSpyVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            public $isInsideFunction = false;
+            public bool $isInsideFunction = false;
 
             public function enterNode(Node $node): ?int
             {
@@ -300,13 +306,13 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         };
     }
 
-    private function getReflectionClassSpyVisitor()
+    /**
+     * @return NodeVisitor&object{reflectionClass: ClassReflection|null}
+     */
+    private function getReflectionClassSpyVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            /**
-             * @var ReflectionClass
-             */
-            public $reflectionClass;
+            public ?ClassReflection $reflectionClass = null;
 
             public function enterNode(Node $node): ?int
             {
@@ -321,11 +327,14 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         };
     }
 
-    private function getReflectionClassesSpyVisitor()
+    /**
+     * @return NodeVisitor&object{fooReflectionClass: ClassReflection|null, createAnonymousClassReflectionClass: ClassReflection|null}
+     */
+    private function getReflectionClassesSpyVisitor(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
-            public $fooReflectionClass;
-            public $createAnonymousClassReflectionClass;
+            public ?ClassReflection $fooReflectionClass = null;
+            public ?ClassReflection $createAnonymousClassReflectionClass = null;
 
             public function enterNode(Node $node): ?int
             {

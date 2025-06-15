@@ -2750,7 +2750,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'logs' => Logs::createEmpty(),
             'tmpDir' => null,
             'phpunit' => new PhpUnit(null, null),
-            'phpStan' => new PhpStan(null),
+            'phpStan' => new PhpStan(null, null),
             'ignoreMsiWithNoMutations' => null,
             'minMsi' => null,
             'minCoveredMsi' => null,

@@ -40,6 +40,8 @@ use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
+use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 /**
@@ -48,10 +50,13 @@ use Symfony\Component\Process\Process;
 final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
     public function __construct(
+        private readonly Filesystem $fileSystem,
         private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly float $timeout,
+        private readonly string $tmpDir,
     ) {
     }
 
@@ -61,6 +66,9 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             command: $this->getMutantCommandLine(
                 $mutant->getFilePath(),
                 $mutant->getMutation()->getOriginalFilePath(),
+                $this->buildMutationConfigFile(
+                    $mutant->getMutation()->getHash(),
+                ),
             ),
             timeout: $this->timeout,
         );
@@ -78,6 +86,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
     private function getMutantCommandLine(
         string $mutatedFilePath,
         string $mutationOriginalFilePath,
+        string $mutantConfigFile,
     ): array {
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
@@ -85,11 +94,35 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             [
                 "--tmp-file=$mutatedFilePath",
                 "--instead-of=$mutationOriginalFilePath",
+                "--configuration=$mutantConfigFile",
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
+                '--fail-without-result-cache',
                 // todo [phpstan-integration] --stop-on-first-error
             ],
         );
+    }
+
+    private function buildMutationConfigFile(string $mutationHash): string
+    {
+        $mutantConfigPath = sprintf(
+            '%s/phpstan.%s.infection.neon',
+            $this->tmpDir,
+            $mutationHash,
+        );
+
+        $this->fileSystem->dumpFile(
+            $mutantConfigPath,
+            <<<NEON
+                    includes:
+                        - $this->staticAnalysisConfigPath
+                    parameters:
+                        parallel:
+                            maximumNumberOfProcesses: 1
+                NEON,
+        );
+
+        return $mutantConfigPath;
     }
 }
