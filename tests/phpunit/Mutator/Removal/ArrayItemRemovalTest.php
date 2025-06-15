@@ -137,6 +137,11 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
             '<?php if (array_key_exists($a, [$b])) {}',
         ];
 
+        yield 'It mutates array_search which does not return bool, therefore not overlaps with IfNegation' => [
+            '<?php if (array_search($a, [$b])) {}',
+            "<?php\n\nif (array_search(\$a, [])) {\n}",
+        ];
+
         yield 'It mutates arg of a userland function' => [
             '<?php if (doFoo($a, [$b])) {}',
             "<?php\n\nif (doFoo(\$a, [])) {\n}",
