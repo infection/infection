@@ -471,16 +471,16 @@
         },
         {
             "name": "infection/mutator",
-            "version": "0.4.0",
+            "version": "0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/mutator.git",
-                "reference": "51d6d01a2357102030aee9d603063c4bad86b144"
+                "reference": "3c976d721b02b32f851ee4e15d553ef1e9186d1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/mutator/zipball/51d6d01a2357102030aee9d603063c4bad86b144",
-                "reference": "51d6d01a2357102030aee9d603063c4bad86b144",
+                "url": "https://api.github.com/repos/infection/mutator/zipball/3c976d721b02b32f851ee4e15d553ef1e9186d1d",
+                "reference": "3c976d721b02b32f851ee4e15d553ef1e9186d1d",
                 "shasum": ""
             },
             "require": {
@@ -508,7 +508,7 @@
             "description": "Mutator interface to implement custom mutators (mutation operators) for Infection",
             "support": {
                 "issues": "https://github.com/infection/mutator/issues",
-                "source": "https://github.com/infection/mutator/tree/0.4.0"
+                "source": "https://github.com/infection/mutator/tree/0.4.1"
             },
             "funding": [
                 {
@@ -520,7 +520,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-05-14T22:39:59+00:00"
+            "time": "2025-04-29T08:19:52+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
