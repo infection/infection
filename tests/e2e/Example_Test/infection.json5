@@ -1,6 +1,6 @@
 {
     "$schema": "../../../resources/schema.json",
-    "timeout": 25,
+    "timeout": 2,
     "source": {
         "directories": [
             "src"
@@ -8,6 +8,9 @@
     },
     "logs": {
         "summary": "infection.log"
+    },
+    "mutators": {
+        "@default": true
     },
     "tmpDir": "."
 }
