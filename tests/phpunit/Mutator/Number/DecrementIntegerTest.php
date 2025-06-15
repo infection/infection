@@ -469,6 +469,56 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It does not decrement zero when it is being compared as identical with result of preg_match()' => [
+            <<<'PHP'
+                <?php
+
+                if (preg_match($a, $b) === 0) {
+                    echo 'bar';
+                }
+                PHP,
+        ];
+
+        yield 'It does not decrement zero when it is being compared as identical with result of preg_match_all()' => [
+            <<<'PHP'
+                <?php
+
+                if (preg_match_all($a, $b) === 0) {
+                    echo 'bar';
+                }
+                PHP,
+        ];
+
+        yield 'It does not decrement zero when it is being compared as identical with result of iterator_count()' => [
+            <<<'PHP'
+                <?php
+
+                if (iterator_count($a) === 0) {
+                    echo 'bar';
+                }
+                PHP,
+        ];
+
+        yield 'It does not decrement zero when it is being compared as identical with result of strpos()' => [
+            <<<'PHP'
+                <?php
+
+                if (strpos($a, $n) === 0) {
+                    echo 'bar';
+                }
+                PHP,
+        ];
+
+        yield 'It does not decrement zero when it is being compared as identical with result of stripos()' => [
+            <<<'PHP'
+                <?php
+
+                if (stripos($a, $n) === 0) {
+                    echo 'bar';
+                }
+                PHP,
+        ];
+
         yield 'It does not decrement when it is accessed zero index of an array' => [
             <<<'PHP'
                 <?php
