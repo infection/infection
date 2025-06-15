@@ -62,6 +62,10 @@ final class DecrementInteger extends AbstractNumberMutator
         'strlen',
         'strpos',
         'stripos',
+        'strrpos',
+        'mb_strpos',
+        'mb_stripos',
+        'mb_strrpos',
         'preg_match',
         'preg_match_all',
     ];
