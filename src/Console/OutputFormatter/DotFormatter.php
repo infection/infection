@@ -63,8 +63,8 @@ final class DotFormatter extends AbstractOutputFormatter
             '<killed>.</killed>: killed by tests, '
             . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>U</uncovered>: uncovered, '
-            . '<with-error>E</with-error>: fatal error, '
+            . '<uncovered>U</uncovered>: uncovered',
+            '<with-error>E</with-error>: fatal error, '
             . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
             . '<skipped>S</skipped>: skipped, '
