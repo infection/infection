@@ -204,8 +204,9 @@ final class RunCommand extends BaseCommand
             ->addOption(
                 self::OPTION_SHOW_MUTATIONS,
                 's',
-                InputOption::VALUE_NONE,
-                'Show escaped (and non-covered in verbose mode) mutations to the console',
+                InputOption::VALUE_OPTIONAL,
+                'Number of maximum escaped (and non-covered in verbose mode) mutations shown to the console. Use "max" to show all.',
+                Container::DEFAULT_SHOW_MUTATIONS,
             )
             ->addOption(
                 self::OPTION_NO_PROGRESS,
@@ -490,8 +491,7 @@ final class RunCommand extends BaseCommand
             $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption(self::OPTION_MUTATORS)),
-            // To keep in sync with Container::DEFAULT_SHOW_MUTATIONS
-            (bool) $input->getOption(self::OPTION_SHOW_MUTATIONS),
+            $this->getNumberOfShownMutationsFromOption($input),
             trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
             (bool) $input->getOption(self::OPTION_DEBUG),
@@ -638,4 +638,25 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
+
+    private function getNumberOfShownMutationsFromOption(InputInterface $input): ?int
+    {
+        $shownMutations = $input->getOption(self::OPTION_SHOW_MUTATIONS);
+
+        // user didn't pass `--shownMutations` option
+        if ($shownMutations === null) {
+            return Container::DEFAULT_SHOW_MUTATIONS;
+        }
+
+        // user passed `--shownMutations=<int>` option
+        if (is_numeric($shownMutations)) {
+            return (int) $shownMutations;
+        }
+
+        // user passed `--shownMutations=max` option
+        Assert::same($shownMutations, 'max', sprintf('The value of option `--show-mutations` must be of type integer or string "max". String "%s" provided.', $shownMutations));
+
+        return null; // unlimited mutations
+    }
+
 }

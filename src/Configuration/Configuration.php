@@ -99,7 +99,7 @@ class Configuration
         private readonly bool $noProgress,
         private readonly bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        private readonly bool $showMutations,
+        private readonly ?int $showMutations,
         private readonly ?float $minCoveredMsi,
         private readonly int $msiPrecision,
         int $threadCount,
@@ -268,7 +268,7 @@ class Configuration
         return $this->minMsi;
     }
 
-    public function showMutations(): bool
+    public function showMutations(): ?int
     {
         return $this->showMutations;
     }

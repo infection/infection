@@ -60,4 +60,17 @@ final class RunCommandTest extends TestCase
         $result = $tester->execute(['--threads' => 'abc']);
         $this->assertSame(1, $result);
     }
+
+    public function test_it_fails_when_show_mutations_value_is_string_but_not_max(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of option `--show-mutations` must be of type integer or string "max". String "abc" provided.');
+
+        $app = new Application(SingletonContainer::getContainer());
+
+        $tester = new CommandTester($app->find('run'));
+
+        $result = $tester->execute(['--show-mutations' => 'abc']);
+        $this->assertSame(1, $result);
+    }
 }

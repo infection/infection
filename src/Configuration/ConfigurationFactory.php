@@ -102,7 +102,7 @@ class ConfigurationFactory
         bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
-        bool $showMutations,
+        ?int $showMutations,
         ?float $minCoveredMsi,
         int $msiPrecision,
         string $mutatorsInput,

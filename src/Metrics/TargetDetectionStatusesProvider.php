@@ -53,7 +53,7 @@ class TargetDetectionStatusesProvider
         private readonly Logs $logConfig,
         private readonly string $logVerbosity,
         private readonly bool $onlyCoveredMode,
-        private readonly bool $showMutations,
+        private readonly ?int $showMutations,
     ) {
     }
 
@@ -79,7 +79,7 @@ class TargetDetectionStatusesProvider
      */
     private function findRequired(): Generator
     {
-        if ($this->showMutations) {
+        if ($this->showMutations !== 0) {
             yield DetectionStatus::ESCAPED;
         }
 

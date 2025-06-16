@@ -80,7 +80,7 @@ trait ConfigurationAssertions
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
-        bool $expectedShowMutations,
+        ?int $expectedShowMutations,
         ?float $expectedMinCoveredMsi,
         int $expectedMsiPrecision,
         int $expectedThreadCount,

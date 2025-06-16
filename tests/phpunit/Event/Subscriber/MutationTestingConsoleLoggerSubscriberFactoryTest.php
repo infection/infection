@@ -88,7 +88,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     }
 
     #[DataProvider('showMutationsProvider')]
-    public function test_it_creates_a_subscriber(bool $showMutations): void
+    public function test_it_creates_a_subscriber(?int $showMutations): void
     {
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
@@ -112,7 +112,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 
     public static function showMutationsProvider(): iterable
     {
-        foreach ([true, false] as $showMutations) {
+        foreach ([20, 0, null] as $showMutations) {
             yield [$showMutations];
         }
     }

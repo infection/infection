@@ -52,7 +52,7 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
         private ResultsCollector $resultsCollector,
         private DiffColorizer $diffColorizer,
         private FederatedLogger $mutationTestingResultsLogger,
-        private bool $showMutations,
+        private ?int $showMutations,
         private OutputFormatter $formatter,
     ) {
     }

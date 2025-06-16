@@ -117,7 +117,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            false,
+            0,
         ));
 
         $processRunner = $this->createMock(ProcessRunner::class);
@@ -143,7 +143,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            false,
+            0,
         ));
 
         $dispatcher->dispatch(
@@ -167,7 +167,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            false,
+            0,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -220,7 +220,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            true,
+            20,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -261,7 +261,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            true,
+            20,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -296,7 +296,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 ),
                 new FakeMutationTestingResultsLogger(),
             ),
-            false,
+            0,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -329,7 +329,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(/* no file loggers */),
-            false,
+            0,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -352,7 +352,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(/* no file loggers */),
-            true,
+            20,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -363,24 +363,76 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         );
     }
 
-    public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
+    public function test_mutations_shortened_renders_count_of_omitted(): void
     {
-        $this->output->expects($this->once())
-            ->method('getVerbosity');
+        $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        $this->outputFormatter
-            ->expects($this->once())
-            ->method('finish');
+        $executionResult = $this->createMock(MutantExecutionResult::class);
+        $executionResult->expects($this->once())
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/filePath');
+
+        $executionResult->expects($this->once())
+            ->method('getOriginalStartingLine')
+            ->willReturn(10);
+
+        $executionResult->expects($this->once())
+            ->method('getMutatorName')
+            ->willReturn('Plus');
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([$executionResult, $executionResult]);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $output,
             $this->outputFormatter,
             $this->metricsCalculator,
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            true,
+            1,
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringContainsString(
+            '... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.',
+            $this->getDisplay($output),
+        );
+    }
+
+    public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $executionResult = $this->createMock(MutantExecutionResult::class);
+        $executionResult->expects($this->once())
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/filePath');
+
+        $executionResult->expects($this->once())
+            ->method('getOriginalStartingLine')
+            ->willReturn(10);
+
+        $executionResult->expects($this->once())
+            ->method('getMutatorName')
+            ->willReturn('Plus');
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([$executionResult]);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            1,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
