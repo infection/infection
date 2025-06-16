@@ -67,7 +67,7 @@ final class TestLocationBucketSorterTest extends TestCase
      *
      * @var float
      */
-    private const EPSILON = 0.001;
+    private const EPSILON = 0.0001;
 
     public function test_it_sorts(): void
     {
