@@ -80,7 +80,7 @@ trait ConfigurationAssertions
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
-        ?int $expectedShowMutations,
+        ?int $expectedNumberOfShownMutations,
         ?float $expectedMinCoveredMsi,
         int $expectedMsiPrecision,
         int $expectedThreadCount,
@@ -137,7 +137,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedNoProgress, $configuration->noProgress());
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations());
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
-        $this->assertSame($expectedShowMutations, $configuration->showMutations());
+        $this->assertSame($expectedNumberOfShownMutations, $configuration->getNumberOfShownMutations());
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
         $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision());
         $this->assertSame($expectedThreadCount, $configuration->getThreadCount());

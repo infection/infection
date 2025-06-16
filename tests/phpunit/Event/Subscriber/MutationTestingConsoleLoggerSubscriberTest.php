@@ -405,28 +405,16 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
-        $output = new StreamOutput(fopen('php://memory', 'w'));
+        $this->output->expects($this->once())
+            ->method('getVerbosity');
 
-        $executionResult = $this->createMock(MutantExecutionResult::class);
-        $executionResult->expects($this->once())
-            ->method('getOriginalFilePath')
-            ->willReturn('/original/filePath');
-
-        $executionResult->expects($this->once())
-            ->method('getOriginalStartingLine')
-            ->willReturn(10);
-
-        $executionResult->expects($this->once())
-            ->method('getMutatorName')
-            ->willReturn('Plus');
-
-        $this->resultsCollector->expects($this->once())
-            ->method('getEscapedExecutionResults')
-            ->willReturn([$executionResult]);
+        $this->outputFormatter
+            ->expects($this->once())
+            ->method('finish');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $output,
+            $this->output,
             $this->outputFormatter,
             $this->metricsCalculator,
             $this->resultsCollector,

@@ -416,7 +416,7 @@ final class Container
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
                     $federatedMutationTestingResultsLogger,
-                    $config->showMutations(),
+                    $config->getNumberOfShownMutations(),
                     $container->getOutputFormatter(),
                 );
             },
@@ -469,7 +469,7 @@ final class Container
                     $config->getLogs(),
                     $config->getLogVerbosity(),
                     $config->mutateOnlyCoveredCode(),
-                    $config->showMutations(),
+                    $config->getNumberOfShownMutations(),
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {

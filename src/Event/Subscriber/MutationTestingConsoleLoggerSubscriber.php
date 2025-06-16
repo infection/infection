@@ -80,9 +80,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
         private readonly FederatedLogger $mutationTestingResultsLogger,
-        private readonly ?int $showMutations,
+        private readonly ?int $numberOfShownMutations,
     ) {
-        $this->numberOfMutationsBudget = $this->showMutations;
+        $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
@@ -233,7 +233,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         }
 
         // for the case when no file loggers are configured and `--show-mutations` is not used
-        if ($this->showMutations === 0) {
+        if ($this->numberOfShownMutations === 0) {
             $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.']);
         }
     }

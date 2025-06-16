@@ -88,14 +88,14 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     }
 
     #[DataProvider('showMutationsProvider')]
-    public function test_it_creates_a_subscriber(?int $showMutations): void
+    public function test_it_creates_a_subscriber(?int $numberOfShownMutations): void
     {
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $this->metricsCalculatorMock,
             $this->resultsCollectorMock,
             $this->diffColorizerMock,
             new FederatedLogger(),
-            $showMutations,
+            $numberOfShownMutations,
             new FakeOutputFormatter(),
         );
 
