@@ -40,12 +40,16 @@ use Infection\Command\RunCommand;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
 #[CoversClass(CommandHelper::class)]
 class CommandHelperTest extends TestCase
 {
+    /**
+     * @var InputInterface&MockObject
+     */
     private InputInterface $inputMock;
 
     protected function setUp(): void
