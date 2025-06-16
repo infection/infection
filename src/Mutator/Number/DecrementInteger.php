@@ -52,7 +52,7 @@ final class DecrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    private const NON_NEGATIVE_INT_RETURNING_FUNCTIONS = [
+    public const NON_NEGATIVE_INT_RETURNING_FUNCTIONS = [
         'count',
         'iterator_count',
         'grapheme_strlen',
