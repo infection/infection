@@ -82,6 +82,7 @@ class MutationTestingRunner
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
         $processContainers = take($mutations)
+            ->stream()
             ->cast($this->mutationToMutant(...))
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
