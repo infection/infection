@@ -45,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
 #[CoversClass(CommandHelper::class)]
-class CommandHelperTest extends TestCase
+final class CommandHelperTest extends TestCase
 {
     /**
      * @var InputInterface&MockObject
