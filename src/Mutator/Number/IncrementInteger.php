@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use function array_key_exists;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
@@ -50,6 +51,10 @@ use PhpParser\Node;
 final class IncrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
+
+    private const FUNCTIONS_RETURNING_MAX_INTEGER = [
+        'preg_match' => 1,
+    ];
 
     public static function getDefinition(): Definition
     {
@@ -78,7 +83,7 @@ final class IncrementInteger extends AbstractNumberMutator
         /*
          * Parser gives us only positive numbers we have to check if parent node
          * isn't a minus sign. If so, then means we have a negated positive number so
-         * we have to substract to it instead of adding.
+         * we have to subtract to it instead of adding.
          */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
             $value = $node->value - 1;
@@ -115,7 +120,7 @@ final class IncrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        return true;
+        return $this->isAllowedComparison($node);
     }
 
     private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
@@ -142,5 +147,42 @@ final class IncrementInteger extends AbstractNumberMutator
             && $parentNode->name instanceof Node\Name
             && $parentNode->name->toLowerString() === 'preg_split'
         ;
+    }
+
+    private function isAllowedComparison(Node\Scalar\LNumber $node): bool
+    {
+        if (!$this->isPartOfComparison($node)) {
+            return true;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Expr\BinaryOp) {
+            return true;
+        }
+
+        if (
+            $parentNode->left instanceof Node\Expr\FuncCall
+            && $parentNode->left->name instanceof Node\Name
+            && array_key_exists(
+                $parentNode->left->name->toLowerString(),
+                self::FUNCTIONS_RETURNING_MAX_INTEGER,
+            )
+        ) {
+            return $node->value !== self::FUNCTIONS_RETURNING_MAX_INTEGER[$parentNode->left->name->toLowerString()];
+        }
+
+        if (
+            $parentNode->right instanceof Node\Expr\FuncCall
+            && $parentNode->right->name instanceof Node\Name
+            && array_key_exists(
+                $parentNode->right->name->toLowerString(),
+                self::FUNCTIONS_RETURNING_MAX_INTEGER,
+            )
+        ) {
+            return $node->value !== self::FUNCTIONS_RETURNING_MAX_INTEGER[$parentNode->right->name->toLowerString()];
+        }
+
+        return true;
     }
 }
