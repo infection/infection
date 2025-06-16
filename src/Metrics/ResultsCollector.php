@@ -82,7 +82,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getAllExecutionResults(): array
     {
@@ -90,7 +90,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getKilledExecutionResults(): array
     {
@@ -98,7 +98,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getKilledByStaticAnalysisExecutionResults(): array
     {
@@ -106,7 +106,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getErrorExecutionResults(): array
     {
@@ -114,7 +114,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getSyntaxErrorExecutionResults(): array
     {
@@ -122,7 +122,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getSkippedExecutionResults(): array
     {
@@ -130,7 +130,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getEscapedExecutionResults(): array
     {
@@ -138,7 +138,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getTimedOutExecutionResults(): array
     {
@@ -146,7 +146,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getNotCoveredExecutionResults(): array
     {
@@ -154,7 +154,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getIgnoredExecutionResults(): array
     {
