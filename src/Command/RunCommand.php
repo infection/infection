@@ -36,9 +36,7 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use function extension_loaded;
-use function getenv;
 use function implode;
-use function in_array;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -56,22 +54,16 @@ use Infection\Logger\ConsoleLogger;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
-use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
-use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use function is_numeric;
-use function max;
 use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -79,15 +71,19 @@ use Webmozart\Assert\Assert;
 final class RunCommand extends BaseCommand
 {
     /** @var string */
+    public const OPTION_THREADS = 'threads';
+
+    public const OPTION_MAP_SOURCE_CLASS_TO_TEST = 'map-source-class-to-test';
+
+    /** @var string */
+    public const OPTION_LOGGER_GITHUB = 'logger-github';
+    /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
     private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
     /** @var string */
     private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
-
-    /** @var string */
-    private const OPTION_THREADS = 'threads';
 
     /** @var string */
     private const OPTION_ONLY_COVERED = 'only-covered';
@@ -124,11 +120,6 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
-
-    private const OPTION_MAP_SOURCE_CLASS_TO_TEST = 'map-source-class-to-test';
-
-    /** @var string */
-    private const OPTION_LOGGER_GITHUB = 'logger-github';
 
     /** @var string */
     private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
@@ -492,6 +483,8 @@ final class RunCommand extends BaseCommand
             );
         }
 
+        $commandHelper = new CommandHelper();
+
         return $this->getApplication()->getContainer()->withValues(
             $logger,
             $io->getOutput(),
@@ -529,18 +522,18 @@ final class RunCommand extends BaseCommand
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
             $filter,
-            $this->getThreadCountFromOption($input),
+            $commandHelper->getThreadCountFromOption($input),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
             $isForGitDiffLines,
             $gitDiffBase,
-            $this->getUseGitHubLogger($input),
+            $commandHelper->getUseGitHubLogger($input),
             $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
-            $this->getMapSourceClassToTest($input),
+            $commandHelper->getMapSourceClassToTest($input),
             $loggerProjectRootDirectory,
             $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
         );
@@ -644,88 +637,5 @@ final class RunCommand extends BaseCommand
         } elseif (extension_loaded('pcov')) {
             $consoleOutput->logRunningWithDebugger('PCOV');
         }
-    }
-
-    private function getUseGitHubLogger(InputInterface $input): ?bool
-    {
-        // on e2e environment, we don't need github logger
-        if (getenv('INFECTION_E2E_TESTS_ENV') !== false) {
-            return false;
-        }
-
-        $useGitHubLogger = $input->getOption(self::OPTION_LOGGER_GITHUB);
-
-        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
-        // `null` means the option was provided without any argument -> user wants to enable it
-        // any string: the argument provided, but only `'true'` and `'false` are supported
-        if ($useGitHubLogger === false) {
-            return null;
-        }
-
-        if ($useGitHubLogger === null) {
-            return true;
-        }
-
-        if ($useGitHubLogger === 'true') {
-            return true;
-        }
-
-        if ($useGitHubLogger === 'false') {
-            return false;
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'Cannot pass "%s" to "--%s": only "true", "false" or no argument is supported',
-            $useGitHubLogger,
-            self::OPTION_LOGGER_GITHUB,
-        ));
-    }
-
-    private function getThreadCountFromOption(InputInterface $input): ?int
-    {
-        $threads = $input->getOption(self::OPTION_THREADS);
-
-        // user didn't pass `--threads` option
-        if ($threads === null) {
-            return null;
-        }
-
-        // user passed `--threads=<int>` option
-        if (is_numeric($threads)) {
-            return (int) $threads;
-        }
-
-        // user passed `--threads=max` option
-        Assert::same($threads, 'max', sprintf('The value of option `--threads` must be of type integer or string "max". String "%s" provided.', $threads));
-
-        // we subtract 1 here to not use all the available cores by Infection
-        return max(1, CpuCoresCountProvider::provide() - 1);
-    }
-
-    private function getMapSourceClassToTest(InputInterface $input): ?string
-    {
-        $inputValue = $input->getOption(self::OPTION_MAP_SOURCE_CLASS_TO_TEST);
-
-        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
-        // `null` means the option was provided without any argument -> user wants to enable it
-        // any string: the argument provided, but only `'simple'` is allowed for now
-        if ($inputValue === false) {
-            return null;
-        }
-
-        if ($inputValue === null) {
-            return MapSourceClassToTestStrategy::SIMPLE;
-        }
-
-        if (!in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
-                $inputValue,
-                self::OPTION_MAP_SOURCE_CLASS_TO_TEST,
-                MapSourceClassToTestStrategy::SIMPLE,
-            ));
-        }
-
-        return $inputValue;
     }
 }
