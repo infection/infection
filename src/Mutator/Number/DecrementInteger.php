@@ -52,13 +52,22 @@ final class DecrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    private const COUNT_NAMES = [
+    public const NON_NEGATIVE_INT_RETURNING_FUNCTIONS = [
         'count',
+        'iterator_count',
         'grapheme_strlen',
         'iconv_strlen',
         'mb_strlen',
         'sizeof',
         'strlen',
+        'strpos',
+        'stripos',
+        'strrpos',
+        'mb_strpos',
+        'mb_stripos',
+        'mb_strrpos',
+        'preg_match',
+        'preg_match_all',
     ];
 
     public static function getDefinition(): Definition
@@ -151,7 +160,7 @@ final class DecrementInteger extends AbstractNumberMutator
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
                 $parentNode->left->name->toLowerString(),
-                self::COUNT_NAMES,
+                self::NON_NEGATIVE_INT_RETURNING_FUNCTIONS,
                 true,
             )
         ) {
@@ -161,7 +170,7 @@ final class DecrementInteger extends AbstractNumberMutator
         if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
             && in_array(
                 $parentNode->right->name->toLowerString(),
-                self::COUNT_NAMES,
+                self::NON_NEGATIVE_INT_RETURNING_FUNCTIONS,
                 true,
             )
         ) {

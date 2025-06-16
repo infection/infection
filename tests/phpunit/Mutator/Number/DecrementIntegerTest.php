@@ -41,6 +41,7 @@ use const PHP_INT_MAX;
 use const PHP_INT_MIN;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use function sprintf;
 
 #[CoversClass(DecrementInteger::class)]
 final class DecrementIntegerTest extends BaseMutatorTestCase
@@ -419,55 +420,9 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement zero when it is being compared as identical with result of grapheme_strlen()' => [
-            <<<'PHP'
-                <?php
-
-                if (grapheme_strlen($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
-        ];
-
-        yield 'It does not decrement zero when it is being compared as identical with result of iconv_strlen()' => [
-            <<<'PHP'
-                <?php
-
-                if (iconv_strlen($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
-        ];
-
-        yield 'It does not decrement zero when it is being compared as identical with result of mb_strlen()' => [
-            <<<'PHP'
-                <?php
-
-                if (mb_strlen($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
-        ];
-
-        yield 'It does not decrement zero when it is being compared as identical with result of sizeof()' => [
-            <<<'PHP'
-                <?php
-
-                if (sizeof($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
-        ];
-
-        yield 'It does not decrement zero when it is being compared as identical with result of strlen()' => [
-            <<<'PHP'
-                <?php
-
-                if (strlen($a) === 0) {
-                    echo 'bar';
-                }
-                PHP,
-        ];
+        foreach (DecrementInteger::NON_NEGATIVE_INT_RETURNING_FUNCTIONS as $name) {
+            yield "It does not decrement zero when it is being compared as identical with result of $name" => [sprintf('<?php if (%s() === 0) {}', $name)];
+        }
 
         yield 'It does not decrement when it is accessed zero index of an array' => [
             <<<'PHP'
