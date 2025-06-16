@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_fill;
 use function array_map;
 use ArrayIterator;
 use function count;
@@ -44,6 +45,7 @@ use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
@@ -159,6 +161,7 @@ final class MutationTestingRunnerTest extends TestCase
             $mutation0 = $this->createMutation(0),
             $mutation1 = $this->createMutation(1, self::TIMEOUT - 1.0),
             $mutation2 = $this->createMutation(2, self::TIMEOUT),
+            $mutation3 = $this->createMutation(3, coveredByTests: false),
         ];
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
@@ -168,6 +171,7 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation0],
                 [$mutation1],
                 [$mutation2],
+                [$mutation3],
             ))
             ->willReturnOnConsecutiveCalls(
                 $mutant0 = MutantBuilder::build(
@@ -181,9 +185,10 @@ final class MutationTestingRunnerTest extends TestCase
                     'mutated code 1',
                 ),
                 MutantBuilder::build(
-                    '/path/to/mutant2',
-                    $mutation2,
-                    'mutated code 2',
+                    mutation: $mutation2,
+                ),
+                MutantBuilder::build(
+                    mutation: $mutation3,
                 ),
             )
         ;
@@ -217,13 +222,28 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->runner->run($mutations, $testFrameworkExtraOptions);
 
+        $ignoredMutantCount = 2;
+
         $this->assertAreSameEvents(
             [
-                new MutationTestingWasStarted(3, $this->processRunnerMock),
-                $this->createMock(MutantProcessWasFinished::class),
+                new MutationTestingWasStarted(4, $this->processRunnerMock),
+                ...array_fill(
+                    0,
+                    $ignoredMutantCount,
+                    $this->createMock(MutantProcessWasFinished::class),
+                ),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
+        );
+
+        /** @var MutantProcessWasFinished $secondSkippedEvent */
+        $secondSkippedEvent = $this->eventDispatcher->getEvents()[2];
+
+        $this->assertSame(
+            DetectionStatus::NOT_COVERED,
+            $secondSkippedEvent->getExecutionResult()->getDetectionStatus(),
+            'Mutations should be processed in the order they are given',
         );
     }
 
