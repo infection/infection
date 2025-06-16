@@ -71,6 +71,6 @@ final class BuildConfigYmlTest extends TestCase
     {
         $rootPath = __DIR__ . '/../../../';
 
-        yield [$rootPath . 'codecov.yml'];
+        yield [$rootPath . 'docker-compose.yml'];
     }
 }
