@@ -113,7 +113,7 @@ final readonly class ExcludeDirsProvider
         $question->setAutocompleterValues($autocompleteValues);
         $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
-        while (($dir = $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)) !== '') {
+        while ($dir = $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)) {
             $excludedDirs[] = $dir;
         }
 
