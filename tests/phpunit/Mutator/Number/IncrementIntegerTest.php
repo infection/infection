@@ -284,5 +284,59 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It does not increment preg_match() return value above 1 on identical comparison' => [
+            <<<"PHP"
+                <?php
+
+                if (preg_match() === 1) {}
+                PHP,
+        ];
+
+        yield 'It does not increment preg_match() return value above 1 on equal comparison' => [
+            <<<"PHP"
+                <?php
+
+                if (preg_match() == 1) {}
+                PHP,
+        ];
+
+        yield 'It does not increment preg_match() return value above 1 on not-equal comparison' => [
+            <<<"PHP"
+                <?php
+
+                if (preg_mAtch() != 1) {}
+                PHP,
+        ];
+
+        yield 'It increments return value above 1 on not-equal comparison for userland function' => [
+            <<<'PHP'
+                <?php
+
+                if (doFoo() != 1) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if (doFoo() != 2) {
+                }
+                PHP,
+        ];
+
+        yield 'It increments return value above 1 on not-equal comparison for dynamic function call' => [
+            <<<'PHP'
+                <?php
+
+                $fn = 'doFoo';
+                if ($fn() != 1) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                $fn = 'doFoo';
+                if ($fn() != 2) {
+                }
+                PHP,
+        ];
     }
 }
