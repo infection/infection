@@ -59,8 +59,8 @@ final class DotFormatterTest extends TestCase
             '<killed>.</killed>: killed by tests, '
             . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>U</uncovered>: uncovered, '
-            . '<with-error>E</with-error>: fatal error, '
+            . '<uncovered>U</uncovered>: uncovered',
+            '<with-error>E</with-error>: fatal error, '
             . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
             . '<skipped>S</skipped>: skipped, '
@@ -206,7 +206,8 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed by tests, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered
+                E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   ( 50 / 127)
                 ..................................................   (100 / 127)
@@ -235,7 +236,8 @@ final class DotFormatterTest extends TestCase
         $this->assertSame(str_replace("\n", PHP_EOL,
             <<<'TXT'
 
-                .: killed by tests, A: killed by SA, M: escaped, U: uncovered, E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
+                .: killed by tests, A: killed by SA, M: escaped, U: uncovered
+                E: fatal error, X: syntax error, T: timed out, S: skipped, I: ignored
 
                 ..................................................   (   50)
                 ..................................................   (  100)
@@ -273,8 +275,8 @@ final class DotFormatterTest extends TestCase
             '<killed>.</killed>: killed by tests, '
             . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
             . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>U</uncovered>: uncovered, '
-            . '<with-error>E</with-error>: fatal error, '
+            . '<uncovered>U</uncovered>: uncovered',
+            '<with-error>E</with-error>: fatal error, '
             . '<with-syntax-error>X</with-syntax-error>: syntax error, '
             . '<timeout>T</timeout>: timed out, '
             . '<skipped>S</skipped>: skipped, '

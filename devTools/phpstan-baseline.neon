@@ -13,12 +13,6 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: '#^Function array_walk_recursive is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\array_walk_recursive;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
-			identifier: theCodingMachineSafe.function
-			count: 1
-			path: ../src/Config/Guesser/SourceDirGuesser.php
-
-		-
 			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
