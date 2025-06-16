@@ -116,5 +116,7 @@ class CommandHelperTest extends TestCase
         yield [null, false];
 
         yield [MapSourceClassToTestStrategy::SIMPLE, null];
+
+        yield [MapSourceClassToTestStrategy::SIMPLE, MapSourceClassToTestStrategy::SIMPLE];
     }
 }
