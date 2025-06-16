@@ -403,6 +403,46 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         );
     }
 
+    public function test_without_mutations_limit(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $executionResult = $this->createMock(MutantExecutionResult::class);
+        $executionResult->expects($this->exactly(3))
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/filePath');
+
+        $executionResult->expects($this->exactly(3))
+            ->method('getOriginalStartingLine')
+            ->willReturn(10);
+
+        $executionResult->expects($this->exactly(3))
+            ->method('getMutatorName')
+            ->willReturn('Plus');
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([$executionResult, $executionResult, $executionResult]);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            null,
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringNotContainsString(
+            'mutants were omitted.',
+            $this->getDisplay($output),
+        );
+    }
+
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
         $this->output->expects($this->once())
