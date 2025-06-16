@@ -46,6 +46,9 @@ use function sprintf;
 use Symfony\Component\Console\Input\InputInterface;
 use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ */
 final class CommandHelper
 {
     public function getUseGitHubLogger(InputInterface $input): ?bool
