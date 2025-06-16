@@ -64,6 +64,7 @@ use Webmozart\Assert\Assert;
  */
 final readonly class Engine
 {
+    // test tests-checker
     public function __construct(
         private Configuration $config,
         private TestFrameworkAdapter $adapter,
