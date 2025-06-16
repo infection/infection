@@ -1,7 +1,7 @@
 name: 'Require tests if source code is changed'
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened]
 
 jobs:
