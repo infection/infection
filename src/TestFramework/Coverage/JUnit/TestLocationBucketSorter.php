@@ -60,6 +60,7 @@ final class TestLocationBucketSorter
 
     private function __construct()
     {
+        // test-checker trigger
     }
 
     /**
