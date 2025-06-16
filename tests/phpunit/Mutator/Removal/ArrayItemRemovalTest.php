@@ -128,5 +128,36 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         yield 'It does not mutate destructured array values in foreach loops' => [
             '<?php foreach ($items as [, $value]) {}',
         ];
+
+        yield 'It does not mutate in_array to prevent overlap with IfNegation' => [
+            '<?php if (in_array($a, [$b])) {}',
+        ];
+
+        yield 'It does not mutate array_key_exists to prevent overlap with IfNegation' => [
+            '<?php if (array_key_exists($a, [$b])) {}',
+        ];
+
+        yield 'It mutates array_search which does not return bool, therefore not overlaps with IfNegation' => [
+            '<?php if (array_search($a, [$b])) {}',
+            "<?php\n\nif (array_search(\$a, [])) {\n}",
+        ];
+
+        yield 'It mutates arg of a userland function' => [
+            '<?php if (doFoo($a, [$b])) {}',
+            "<?php\n\nif (doFoo(\$a, [])) {\n}",
+        ];
+
+        yield 'It mutates arg of a dynamic function call' => [
+            '<?php
+                $fn = "doFoo";
+                if ($fn($a, [$b])) {}',
+            <<<'PHP'
+                <?php
+
+                $fn = "doFoo";
+                if ($fn($a, [])) {
+                }
+                PHP,
+        ];
     }
 }
