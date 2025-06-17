@@ -91,7 +91,7 @@ final class RunCommandHelper
         ));
     }
 
-    public function getThreadCountFromOption(): ?int
+    public function getThreadCount(): ?int
     {
         $threads = $this->input->getOption(RunCommand::OPTION_THREADS);
 

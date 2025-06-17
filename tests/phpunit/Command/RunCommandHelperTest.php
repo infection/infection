@@ -89,7 +89,7 @@ final class RunCommandHelperTest extends TestCase
             ->willReturn($optionValue);
 
         $commandHelper = new RunCommandHelper($this->inputMock);
-        $this->assertSame($expected, $commandHelper->getThreadCountFromOption());
+        $this->assertSame($expected, $commandHelper->getThreadCount());
     }
 
     public static function providesThreadCount(): iterable

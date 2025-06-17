@@ -522,7 +522,7 @@ final class RunCommand extends BaseCommand
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
             $filter,
-            $commandHelper->getThreadCountFromOption(),
+            $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
