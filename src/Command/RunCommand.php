@@ -483,7 +483,7 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $commandHelper = new CommandHelper();
+        $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
             $logger,
@@ -522,18 +522,18 @@ final class RunCommand extends BaseCommand
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
             $filter,
-            $commandHelper->getThreadCountFromOption($input),
+            $commandHelper->getThreadCountFromOption(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
             $gitDiffFilter,
             $isForGitDiffLines,
             $gitDiffBase,
-            $commandHelper->getUseGitHubLogger($input),
+            $commandHelper->getUseGitHubLogger(),
             $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
-            $commandHelper->getMapSourceClassToTest($input),
+            $commandHelper->getMapSourceClassToTest(),
             $loggerProjectRootDirectory,
             $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
         );

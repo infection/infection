@@ -49,16 +49,21 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class CommandHelper
+final class RunCommandHelper
 {
-    public function getUseGitHubLogger(InputInterface $input): ?bool
+    public function __construct(
+        private readonly InputInterface $input,
+    ) {
+    }
+
+    public function getUseGitHubLogger(): ?bool
     {
         // on e2e environment, we don't need github logger
         if (getenv('INFECTION_E2E_TESTS_ENV') !== false) {
             return false;
         }
 
-        $useGitHubLogger = $input->getOption(RunCommand::OPTION_LOGGER_GITHUB);
+        $useGitHubLogger = $this->input->getOption(RunCommand::OPTION_LOGGER_GITHUB);
 
         // `false` means the option was not provided at all -> user does not care and it will be auto-detected
         // `null` means the option was provided without any argument -> user wants to enable it
@@ -86,9 +91,9 @@ final class CommandHelper
         ));
     }
 
-    public function getThreadCountFromOption(InputInterface $input): ?int
+    public function getThreadCountFromOption(): ?int
     {
-        $threads = $input->getOption(RunCommand::OPTION_THREADS);
+        $threads = $this->input->getOption(RunCommand::OPTION_THREADS);
 
         // user didn't pass `--threads` option
         if ($threads === null) {
@@ -107,9 +112,9 @@ final class CommandHelper
         return max(1, CpuCoresCountProvider::provide() - 1);
     }
 
-    public function getMapSourceClassToTest(InputInterface $input): ?string
+    public function getMapSourceClassToTest(): ?string
     {
-        $inputValue = $input->getOption(RunCommand::OPTION_MAP_SOURCE_CLASS_TO_TEST);
+        $inputValue = $this->input->getOption(RunCommand::OPTION_MAP_SOURCE_CLASS_TO_TEST);
 
         // `false` means the option was not provided at all -> user does not care and it will be auto-detected
         // `null` means the option was provided without any argument -> user wants to enable it

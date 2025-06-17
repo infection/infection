@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command;
 
-use Infection\Command\CommandHelper;
 use Infection\Command\RunCommand;
+use Infection\Command\RunCommandHelper;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -44,8 +44,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
-#[CoversClass(CommandHelper::class)]
-final class CommandHelperTest extends TestCase
+#[CoversClass(RunCommandHelper::class)]
+final class RunCommandHelperTest extends TestCase
 {
     /**
      * @var InputInterface&MockObject
@@ -65,8 +65,8 @@ final class CommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_LOGGER_GITHUB)
             ->willReturn($optionValue);
 
-        $commandHelper = new CommandHelper();
-        $this->assertSame($expected, $commandHelper->getUseGitHubLogger($this->inputMock));
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getUseGitHubLogger());
     }
 
     public static function providesUsesGitHubLogger(): iterable
@@ -88,8 +88,8 @@ final class CommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_THREADS)
             ->willReturn($optionValue);
 
-        $commandHelper = new CommandHelper();
-        $this->assertSame($expected, $commandHelper->getThreadCountFromOption($this->inputMock));
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getThreadCountFromOption());
     }
 
     public static function providesThreadCount(): iterable
@@ -107,8 +107,8 @@ final class CommandHelperTest extends TestCase
             ->with(RunCommand::OPTION_MAP_SOURCE_CLASS_TO_TEST)
             ->willReturn($optionValue);
 
-        $commandHelper = new CommandHelper();
-        $this->assertSame($expected, $commandHelper->getMapSourceClassToTest($this->inputMock));
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getMapSourceClassToTest());
     }
 
     public static function providesMapSourceClassToTest(): iterable
