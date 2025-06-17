@@ -491,7 +491,7 @@ final class RunCommand extends BaseCommand
             $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption(self::OPTION_MUTATORS)),
-            $this->getNumberOfShownMutationsFromOption($input),
+            $this->getNumberOfShownMutations($input),
             trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
             (bool) $input->getOption(self::OPTION_DEBUG),
@@ -639,7 +639,7 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function getNumberOfShownMutationsFromOption(InputInterface $input): ?int
+    private function getNumberOfShownMutations(InputInterface $input): ?int
     {
         $shownMutations = $input->getOption(self::OPTION_SHOW_MUTATIONS);
 
