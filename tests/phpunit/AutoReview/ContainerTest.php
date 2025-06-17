@@ -101,6 +101,7 @@ final class ContainerTest extends TestCase
                 __DIR__ . '/../Reflection/ContainerReflection.php',
                 __DIR__ . '/../SingletonContainer.php',
                 __DIR__ . '/../MockedContainer.php',
+                __DIR__ . '/../Command/RunCommandHelperTest.php', // file only uses Container:: constant-references
             ],
         );
 
