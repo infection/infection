@@ -33,61 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\DevTools\PHPStan\Rules;
 
-use function array_map;
-use function in_array;
+use Infection\Container;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProviderExternal;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use function Safe\file_get_contents;
-use function sprintf;
-use function strpos;
+use PhpParser\Node;
+use PhpParser\Node\Expr\New_;
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 use Symfony\Component\Filesystem\Path;
+use function realpath;
+use function sprintf;
 
-#[CoversNothing]
-final class ContainerTest extends TestCase
-{
+/**
+ * @implements Rule<New_>
+ */
+final class InfectionContainerRule implements Rule {
     /**
      * @var string[]|null
      */
     private static $containerFiles;
 
-    /**
-     * @param class-string $className
-     */
-    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
-    public function test_source_class_provider_is_valid(string $className): void
-    {
-        $classFile = (new ReflectionClass($className))->getFileName();
+    public function getNodeType(): string {
+        return New_::class;
+    }
 
-        $this->assertNotFalse(
-            $classFile,
-            sprintf('Expected the class "%s" to have a file', $className),
-        );
-
-        if (in_array($classFile, $this->getContainerFiles(), true)) {
-            return;
+    public function processNode(Node $node, Scope $scope): array {
+        if (
+            $node->class instanceof Node\Name
+            && $node->class->toString() === Container::class
+            && !in_array($scope->getFile(), $this->getContainerFiles(), true)
+        ) {
+            return [RuleErrorBuilder::message(
+                sprintf(
+                    'Did not expect to find a usage of the Infection container. Please use "%s::getContainer() instead.',
+                    SingletonContainer::class,
+                ))->identifier('infection.container')->build()];
         }
 
-        $this->assertFalse(
-            strpos(file_get_contents($classFile), 'use Infection\Container;'),
-            sprintf(
-                'Did not expect to find a usage of the Infection container in "%s". Please use'
-                . ' "%s::getContainer() instead',
-                $classFile,
-                SingletonContainer::class,
-            ),
-        );
+        return [];
     }
 
     /**
      * @return string[]
      */
-    public function getContainerFiles(): array
+    private function getContainerFiles(): array
     {
         if (self::$containerFiles !== null) {
             return self::$containerFiles;
@@ -96,12 +87,8 @@ final class ContainerTest extends TestCase
         self::$containerFiles = array_map(
             static fn (string $path): string => Path::canonicalize($path),
             [
-                __DIR__ . '/ContainerTest.php',
-                __DIR__ . '/../ContainerTest.php',
-                __DIR__ . '/../Reflection/ContainerReflection.php',
-                __DIR__ . '/../SingletonContainer.php',
-                __DIR__ . '/../MockedContainer.php',
-                __DIR__ . '/../Command/RunCommandHelperTest.php', // file only uses Container:: constant-references
+                __DIR__ . '/../../../tests/phpunit/ContainerTest.php',
+                __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
             ],
         );
 
