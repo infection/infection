@@ -77,6 +77,9 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     public const OPTION_LOGGER_GITHUB = 'logger-github';
+
+    /** @var string */
+    public const OPTION_SHOW_MUTATIONS = 'show-mutations';
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
@@ -87,9 +90,6 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_ONLY_COVERED = 'only-covered';
-
-    /** @var string */
-    private const OPTION_SHOW_MUTATIONS = 'show-mutations';
 
     /** @var string */
     private const OPTION_NO_PROGRESS = 'no-progress';
@@ -491,7 +491,7 @@ final class RunCommand extends BaseCommand
             $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption(self::OPTION_MUTATORS)),
-            $this->getNumberOfShownMutations($input),
+            $commandHelper->getNumberOfShownMutations(),
             trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
             (bool) $input->getOption(self::OPTION_DEBUG),
@@ -638,25 +638,4 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logRunningWithDebugger('PCOV');
         }
     }
-
-    private function getNumberOfShownMutations(InputInterface $input): ?int
-    {
-        $shownMutations = $input->getOption(self::OPTION_SHOW_MUTATIONS);
-
-        // user didn't pass `--show-mutations` option
-        if ($shownMutations === null) {
-            return Container::DEFAULT_SHOW_MUTATIONS;
-        }
-
-        // user passed `--show-mutations=<int>` option
-        if (is_numeric($shownMutations)) {
-            return (int) $shownMutations;
-        }
-
-        // user passed `--show-mutations=max` option
-        Assert::same($shownMutations, 'max', sprintf('The value of option `--show-mutations` must be of type integer or string "max". String "%s" provided.', $shownMutations));
-
-        return null; // unlimited mutations
-    }
-
 }
