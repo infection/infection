@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function getenv;
 use function in_array;
+use Infection\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use InvalidArgumentException;
@@ -137,5 +138,25 @@ final class RunCommandHelper
         }
 
         return $inputValue;
+    }
+
+    public function getNumberOfShownMutations(): ?int
+    {
+        $shownMutations = $this->input->getOption(RunCommand::OPTION_SHOW_MUTATIONS);
+
+        // user didn't pass `--show-mutations` option
+        if ($shownMutations === null) {
+            return Container::DEFAULT_SHOW_MUTATIONS;
+        }
+
+        // user passed `--show-mutations=<int>` option
+        if (is_numeric($shownMutations)) {
+            return (int) $shownMutations;
+        }
+
+        // user passed `--show-mutations=max` option
+        Assert::same($shownMutations, 'max', sprintf('The value of option `--show-mutations` must be of type integer or string "max". String "%s" provided.', $shownMutations));
+
+        return null; // unlimited mutations
     }
 }

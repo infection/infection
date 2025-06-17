@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use function count;
 use function floor;
 use Generator;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -49,6 +50,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use function iterator_to_array;
+use LogicException;
 use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
@@ -69,6 +71,8 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     private int $mutationCount = 0;
 
+    private ?int $numberOfMutationsBudget;
+
     public function __construct(
         private readonly OutputInterface $output,
         private readonly OutputFormatter $outputFormatter,
@@ -76,8 +80,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
         private readonly FederatedLogger $mutationTestingResultsLogger,
-        private readonly bool $showMutations,
+        private readonly ?int $numberOfShownMutations,
     ) {
+        $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
@@ -98,7 +103,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $this->outputFormatter->finish();
 
-        if ($this->showMutations) {
+        if ($this->numberOfMutationsBudget !== 0) {
             $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');
 
             if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
@@ -117,7 +122,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
      */
     private function showMutations(array $executionResults, string $headlinePrefix): void
     {
-        if ($executionResults === []) {
+        if ($executionResults === [] || $this->numberOfMutationsBudget === 0) {
             return;
         }
 
@@ -130,7 +135,15 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
             '',
         ]);
 
+        $shortened = false;
+
         foreach ($executionResults as $index => $executionResult) {
+            if ($this->numberOfMutationsBudget === 0) {
+                $shortened = true;
+
+                break;
+            }
+
             $this->output->writeln([
                 '',
                 sprintf(
@@ -143,6 +156,24 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
             ]);
 
             $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
+
+            if ($this->numberOfMutationsBudget !== null) {
+                --$this->numberOfMutationsBudget;
+            }
+        }
+
+        if ($shortened) {
+            if (!isset($index)) {
+                throw new LogicException('$index should be set when $shortened is true');
+            }
+
+            $this->output->writeln([
+                '',
+                sprintf(
+                    '... and %d more mutants were omitted. Use "--show-mutations=max" to see all of them.',
+                    count($executionResults) - $index,
+                ),
+            ]);
         }
     }
 
@@ -202,7 +233,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         }
 
         // for the case when no file loggers are configured and `--show-mutations` is not used
-        if (!$this->showMutations) {
+        if ($this->numberOfShownMutations === 0) {
             $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.']);
         }
     }

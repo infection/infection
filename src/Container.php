@@ -173,7 +173,7 @@ final class Container
 {
     public const DEFAULT_CONFIG_FILE = null;
     public const DEFAULT_MUTATORS_INPUT = '';
-    public const DEFAULT_SHOW_MUTATIONS = false;
+    public const DEFAULT_SHOW_MUTATIONS = 20;
     public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
@@ -416,7 +416,7 @@ final class Container
                     $container->getResultsCollector(),
                     $container->getDiffColorizer(),
                     $federatedMutationTestingResultsLogger,
-                    $config->showMutations(),
+                    $config->getNumberOfShownMutations(),
                     $container->getOutputFormatter(),
                 );
             },
@@ -469,7 +469,7 @@ final class Container
                     $config->getLogs(),
                     $config->getLogVerbosity(),
                     $config->mutateOnlyCoveredCode(),
-                    $config->showMutations(),
+                    $config->getNumberOfShownMutations(),
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -555,7 +555,7 @@ final class Container
         OutputInterface $output,
         ?string $configFile = self::DEFAULT_CONFIG_FILE,
         string $mutatorsInput = self::DEFAULT_MUTATORS_INPUT,
-        bool $showMutations = self::DEFAULT_SHOW_MUTATIONS,
+        ?int $numberOfShownMutations = self::DEFAULT_SHOW_MUTATIONS,
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
         bool $onlyCovered = self::DEFAULT_ONLY_COVERED,
@@ -637,7 +637,7 @@ final class Container
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
-                $showMutations,
+                $numberOfShownMutations,
                 $minCoveredMsi,
                 $msiPrecision,
                 $mutatorsInput,

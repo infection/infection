@@ -77,6 +77,9 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     public const OPTION_LOGGER_GITHUB = 'logger-github';
+
+    /** @var string */
+    public const OPTION_SHOW_MUTATIONS = 'show-mutations';
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
@@ -87,9 +90,6 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_ONLY_COVERED = 'only-covered';
-
-    /** @var string */
-    private const OPTION_SHOW_MUTATIONS = 'show-mutations';
 
     /** @var string */
     private const OPTION_NO_PROGRESS = 'no-progress';
@@ -204,8 +204,9 @@ final class RunCommand extends BaseCommand
             ->addOption(
                 self::OPTION_SHOW_MUTATIONS,
                 's',
-                InputOption::VALUE_NONE,
-                'Show escaped (and non-covered in verbose mode) mutations to the console',
+                InputOption::VALUE_OPTIONAL,
+                'Number of maximum escaped (and non-covered in verbose mode) mutations shown to the console. Use "max" to show all.',
+                Container::DEFAULT_SHOW_MUTATIONS,
             )
             ->addOption(
                 self::OPTION_NO_PROGRESS,
@@ -490,8 +491,7 @@ final class RunCommand extends BaseCommand
             $io->getOutput(),
             $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
             trim((string) $input->getOption(self::OPTION_MUTATORS)),
-            // To keep in sync with Container::DEFAULT_SHOW_MUTATIONS
-            (bool) $input->getOption(self::OPTION_SHOW_MUTATIONS),
+            $commandHelper->getNumberOfShownMutations(),
             trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
             (bool) $input->getOption(self::OPTION_DEBUG),

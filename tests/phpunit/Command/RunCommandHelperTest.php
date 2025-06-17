@@ -37,6 +37,7 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
 use Infection\Command\RunCommandHelper;
+use Infection\Container;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -118,5 +119,26 @@ final class RunCommandHelperTest extends TestCase
         yield [MapSourceClassToTestStrategy::SIMPLE, null];
 
         yield [MapSourceClassToTestStrategy::SIMPLE, MapSourceClassToTestStrategy::SIMPLE];
+    }
+
+    #[DataProvider('providesNumberOfShownMutations')]
+    public function test_it_returns_number_of_shown_mutations(?int $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_SHOW_MUTATIONS)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getNumberOfShownMutations());
+    }
+
+    public static function providesNumberOfShownMutations(): iterable
+    {
+        yield [Container::DEFAULT_SHOW_MUTATIONS, null];
+
+        yield [5, '5'];
+
+        yield [null, 'max'];
     }
 }

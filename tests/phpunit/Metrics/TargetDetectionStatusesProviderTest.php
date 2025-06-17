@@ -58,7 +58,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('debug.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -72,7 +72,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('per_mutator.md')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -86,7 +86,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::DEBUG, false, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -100,7 +100,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding(
             [
@@ -121,7 +121,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.log')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding(
             [
@@ -138,7 +138,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
     {
         $logs = $this->createMock(Logs::class);
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, true);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 20);
 
         $this->assertProvides([
             DetectionStatus::ESCAPED,
@@ -149,7 +149,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
     {
         $logs = $this->createMock(Logs::class);
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 
         $this->assertSame([], $provider->get());
     }
@@ -163,7 +163,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(true)
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvides([
             DetectionStatus::ESCAPED,
@@ -179,7 +179,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('gitlab.json')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvides([
             DetectionStatus::ESCAPED,
@@ -195,7 +195,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.json')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding([
             DetectionStatus::NOT_COVERED,
@@ -212,7 +212,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.json')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, false, 0);
 
         $this->assertProvidesExcluding([
             DetectionStatus::SKIPPED,
@@ -228,7 +228,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn('infection.html')
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -247,7 +247,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(StrykerConfig::forFullReport('master'))
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -266,7 +266,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(StrykerConfig::forFullReport('master'))
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NONE, true, 0);
 
         $this->assertProvidesExcluding([], $provider->get());
     }
@@ -285,7 +285,7 @@ final class TargetDetectionStatusesProviderTest extends TestCase
             ->willReturn(StrykerConfig::forBadge('master'))
         ;
 
-        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, false);
+        $provider = new TargetDetectionStatusesProvider($logs, LogVerbosity::NORMAL, true, 0);
 
         $this->assertSame([], $provider->get());
     }
