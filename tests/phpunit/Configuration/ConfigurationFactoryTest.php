@@ -151,6 +151,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $mapSourceClassToTest,
         ?string $loggerProjectRootDirectory,
         ?string $staticAnalysisTool,
+        ?string $mutantId,
     ): void {
         $config = $this
             ->createConfigurationFactory($ciDetected, $githubActionsDetected, $schema)
@@ -185,6 +186,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $mapSourceClassToTest,
                 $loggerProjectRootDirectory,
                 $staticAnalysisTool,
+                $mutantId,
             )
         ;
 
@@ -309,6 +311,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             null, // $staticAnalysisTool
+            null, // $mutantId
         ];
 
         yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
@@ -870,6 +873,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
 
         yield 'complete' => [
@@ -981,6 +985,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            'h4sh', // $mutantId
         ];
 
         yield 'custom mutator with bootstrap file' => [
@@ -1092,6 +1097,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1175,6 +1181,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1258,6 +1265,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1342,6 +1350,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1425,6 +1434,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1509,6 +1519,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1606,6 +1617,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1714,6 +1726,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1798,6 +1811,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1882,6 +1896,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -1966,6 +1981,7 @@ final class ConfigurationFactoryTest extends TestCase
             null, // MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2051,6 +2067,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2135,6 +2152,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2220,6 +2238,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2304,6 +2323,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2394,6 +2414,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2483,6 +2504,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 
@@ -2588,6 +2610,7 @@ final class ConfigurationFactoryTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            null, // $mutantId
         ];
     }
 

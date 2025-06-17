@@ -111,6 +111,7 @@ class Configuration
         private readonly ?string $mapSourceClassToTestStrategy,
         private readonly ?string $loggerProjectRootDirectory,
         ?string $staticAnalysisTool,
+        private readonly ?string $mutantId,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::allString($sourceDirectories);
@@ -324,5 +325,10 @@ class Configuration
     public function getLoggerProjectRootDirectory(): ?string
     {
         return $this->loggerProjectRootDirectory;
+    }
+
+    public function getMutantId(): ?string
+    {
+        return $this->mutantId;
     }
 }

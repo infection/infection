@@ -190,7 +190,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 [
                     [
                         '',
-                        '1) /original/filePath:10    [M] Plus',
+                        '1) /original/filePath:10    [M] Plus [ID] h4sh',
                     ],
                 ],
             ));
@@ -207,6 +207,10 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $executionResult->expects($this->once())
             ->method('getMutatorName')
             ->willReturn('Plus');
+
+        $executionResult->expects($this->once())
+            ->method('getMutantHash')
+            ->willReturn('h4sh');
 
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')

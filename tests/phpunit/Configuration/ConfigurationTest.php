@@ -100,6 +100,7 @@ final class ConfigurationTest extends TestCase
         ?string $mapSourceClassToTest,
         ?string $loggerProjectRootDirectory,
         ?string $staticAnalysisTool,
+        ?string $mutantId,
     ): void {
         $config = new Configuration(
             $timeout,
@@ -137,6 +138,7 @@ final class ConfigurationTest extends TestCase
             $mapSourceClassToTest,
             $loggerProjectRootDirectory,
             $staticAnalysisTool,
+            $mutantId,
         );
 
         $this->assertConfigurationStateIs(
@@ -217,6 +219,7 @@ final class ConfigurationTest extends TestCase
             null,
             null,
             null, // staticAnalysisTool
+            null, // mutantId
         ];
 
         yield 'nominal' => [
@@ -273,6 +276,7 @@ final class ConfigurationTest extends TestCase
             MapSourceClassToTestStrategy::SIMPLE,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
+            '6e877f74af604aee7232075d495130e8', // mutantId
         ];
     }
 }

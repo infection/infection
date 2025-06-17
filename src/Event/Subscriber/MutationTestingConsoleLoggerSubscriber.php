@@ -147,11 +147,12 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
             $this->output->writeln([
                 '',
                 sprintf(
-                    '%d) %s:%d    [M] %s',
+                    '%d) %s:%d    [M] %s [ID] %s',
                     $index + 1,
                     $executionResult->getOriginalFilePath(),
                     $executionResult->getOriginalStartingLine(),
                     $executionResult->getMutatorName(),
+                    $executionResult->getMutantHash(),
                 ),
             ]);
 

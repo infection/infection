@@ -156,6 +156,8 @@ final class RunCommand extends BaseCommand
     /** @var string */
     private const OPTION_DRY_RUN = 'dry-run';
 
+    private const OPTION_MUTANT_ID = 'id';
+
     protected function configure(): void
     {
         $this
@@ -285,6 +287,13 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_OPTIONAL,
                 'Log escaped Mutants as GitHub Annotations (automatically detected on Github Actions itself, use <comment>true</comment> to force-enable or <comment>false</comment> to force-disable it).',
                 false,
+            )
+            ->addOption(
+                self::OPTION_MUTANT_ID,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
+                Container::DEFAULT_MUTANT_ID,
             )
             ->addOption(
                 self::OPTION_MAP_SOURCE_CLASS_TO_TEST,
@@ -536,6 +545,7 @@ final class RunCommand extends BaseCommand
             $commandHelper->getMapSourceClassToTest(),
             $loggerProjectRootDirectory,
             $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
+            $input->getOption(self::OPTION_MUTANT_ID),
         );
     }
 
