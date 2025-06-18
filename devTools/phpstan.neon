@@ -2,6 +2,9 @@ includes:
     - ../vendor/phpstan/phpstan/conf/bleedingEdge.neon
     - phpstan-baseline.neon
 
+rules:
+    - Infection\DevTools\PHPStan\Rules\InfectionContainerRule
+
 parameters:
     tmpDir: ../build/cache/phpstan-src
     inferPrivatePropertyTypeFromConstructor: true
@@ -137,6 +140,7 @@ parameters:
     paths:
         - ../src
         - ../tests/phpunit
+        - ./PHPStan/
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__.php

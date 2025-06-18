@@ -11,7 +11,6 @@
 /devTools/              export-ignore
 /tests/                 export-ignore
 /box.json.dist          export-ignore
-/codecov.yml            export-ignore
 /composer.lock          export-ignore
 /docker-compose.yml     export-ignore
 /infection.json5        export-ignore
