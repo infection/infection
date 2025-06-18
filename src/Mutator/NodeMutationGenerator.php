@@ -79,7 +79,6 @@ class NodeMutationGenerator
         private readonly ?string $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly ?string $mutantId = null,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -107,14 +106,7 @@ class NodeMutationGenerator
         }
 
         foreach ($this->mutators as $mutator) {
-            foreach ($this->generateForMutator($node, $mutator) as $mutation) {
-                if ($this->mutantId !== null && $mutation->getHash() !== $this->mutantId) {
-                    continue;
-                }
-
-                // todo check that prepending code with same mutator doesn't invalidate ID
-                yield $mutation;
-            }
+            yield from $this->generateForMutator($node, $mutator);
         }
     }
 

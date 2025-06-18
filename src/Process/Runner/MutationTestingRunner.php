@@ -70,6 +70,7 @@ class MutationTestingRunner
         private readonly bool $runConcurrently,
         private readonly float $timeout,
         private readonly array $ignoreSourceCodeMutatorsMap,
+        private readonly ?string $mutantId = null,
     ) {
     }
 
@@ -83,6 +84,7 @@ class MutationTestingRunner
 
         $processContainers = take($mutations)
             ->stream()
+            ->filter($this->ignoredByMutantId(...))
             ->cast($this->mutationToMutant(...))
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
@@ -101,6 +103,15 @@ class MutationTestingRunner
     private function mutationToMutant(Mutation $mutation): Mutant
     {
         return $this->mutantFactory->create($mutation);
+    }
+
+    private function ignoredByMutantId(Mutation $mutation): bool
+    {
+        if ($this->mutantId === null) {
+            return true;
+        }
+
+        return $mutation->getHash() === $this->mutantId;
     }
 
     private function ignoredByRegex(Mutant $mutant): bool

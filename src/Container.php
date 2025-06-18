@@ -437,7 +437,6 @@ final class Container
                     $container->getFilesDiffChangedLines(),
                     $configuration->isForGitDiffLines(),
                     $configuration->getGitDiffBase(),
-                    $configuration->getMutantId(),
                 );
             },
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
@@ -541,6 +540,7 @@ final class Container
                     $configuration->noProgress(),
                     $configuration->getProcessTimeout(),
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
+                    $configuration->getMutantId(),
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),

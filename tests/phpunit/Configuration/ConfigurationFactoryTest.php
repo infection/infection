@@ -227,6 +227,7 @@ final class ConfigurationFactoryTest extends TestCase
             $mapSourceClassToTest,
             $loggerProjectRootDirectory,
             $staticAnalysisTool,
+            $mutantId,
         );
     }
 

@@ -178,6 +178,7 @@ final class ConfigurationTest extends TestCase
             $mapSourceClassToTest,
             $loggerProjectRootDirectory,
             $staticAnalysisTool,
+            $mutantId,
         );
     }
 
