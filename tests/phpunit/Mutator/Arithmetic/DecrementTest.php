@@ -96,5 +96,13 @@ final class DecrementTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It does not decrement in for-loops to prevent endless loops' => [
+            <<<'PHP'
+                <?php
+
+                for ($i = strlen($string) - 1; $i > 10; $i--) {}
+                PHP,
+        ];
     }
 }
