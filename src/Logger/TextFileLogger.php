@@ -189,11 +189,12 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
     private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
     {
         return sprintf(
-            '%d) %s:%d    [M] %s',
+            '%d) %s:%d    [M] %s [ID] %s',
             $index + 1,
             $mutantProcess->getOriginalFilePath(),
             $mutantProcess->getOriginalStartingLine(),
             $mutantProcess->getMutatorName(),
+            $mutantProcess->getMutantHash(),
         );
     }
 

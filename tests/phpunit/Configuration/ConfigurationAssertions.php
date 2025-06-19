@@ -92,6 +92,7 @@ trait ConfigurationAssertions
         ?string $expectedMapSourceClassToTest,
         ?string $expectedLoggerProjectRootDirectory,
         ?string $expectedStaticAnalysisTool,
+        ?string $expectedMutantId,
     ): void {
         $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
         $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
@@ -149,6 +150,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy());
         $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->getLoggerProjectRootDirectory());
         $this->assertSame($expectedStaticAnalysisTool, $configuration->getStaticAnalysisTool());
+        $this->assertSame($expectedMutantId, $configuration->getMutantId());
     }
 
     /**

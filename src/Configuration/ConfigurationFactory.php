@@ -122,6 +122,7 @@ class ConfigurationFactory
         ?string $mapSourceClassToTestStrategy,
         ?string $loggerProjectRootDirectory,
         ?string $staticAnalysisTool,
+        ?string $mutantId,
     ): Configuration {
         $configDir = dirname($schema->getFile());
 
@@ -183,6 +184,7 @@ class ConfigurationFactory
             $mapSourceClassToTestStrategy,
             $loggerProjectRootDirectory,
             $staticAnalysisTool,
+            $mutantId,
         );
     }
 

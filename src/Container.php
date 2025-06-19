@@ -178,6 +178,7 @@ final class Container
     public const DEFAULT_DEBUG = false;
     public const DEFAULT_ONLY_COVERED = false;
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_MUTANT_ID = null;
     public const DEFAULT_GIT_DIFF_FILTER = null;
     public const DEFAULT_GIT_DIFF_LINES = false;
     public const DEFAULT_GIT_DIFF_BASE = null;
@@ -539,6 +540,7 @@ final class Container
                     $configuration->noProgress(),
                     $configuration->getProcessTimeout(),
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
+                    $configuration->getMutantId(),
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
@@ -585,6 +587,7 @@ final class Container
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
+        ?string $mutantId = self::DEFAULT_MUTANT_ID,
     ): self {
         $clone = clone $this;
 
@@ -657,6 +660,7 @@ final class Container
                 $mapSourceClassToTestStrategy,
                 $loggerProjectRootDirectory,
                 $staticAnalysisTool,
+                $mutantId,
             ),
         );
 

@@ -290,7 +290,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -300,7 +300,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'escaped#1';
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -313,7 +313,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -323,7 +323,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'timedOut#1';
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -336,7 +336,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -346,7 +346,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'skipped#0';
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -359,7 +359,7 @@ final class TextFileLoggerTest extends TestCase
                 Not Covered mutants:
                 ====================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -369,7 +369,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'notCovered#1';
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -389,7 +389,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -401,7 +401,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -416,7 +416,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -428,7 +428,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -443,7 +443,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -455,7 +455,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -470,7 +470,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Test Framework mutants:
                 =================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -482,7 +482,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -497,7 +497,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Static Analysis mutants:
                 ==================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -512,7 +512,7 @@ final class TextFileLoggerTest extends TestCase
                 Errors mutants:
                 ===============
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -524,7 +524,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -539,7 +539,7 @@ final class TextFileLoggerTest extends TestCase
                 Syntax Errors mutants:
                 ======================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -551,7 +551,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -566,7 +566,7 @@ final class TextFileLoggerTest extends TestCase
                 Not Covered mutants:
                 ====================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -578,7 +578,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -600,7 +600,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -612,7 +612,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -627,7 +627,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -639,7 +639,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -654,7 +654,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -666,7 +666,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -681,7 +681,7 @@ final class TextFileLoggerTest extends TestCase
                 Not Covered mutants:
                 ====================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -693,7 +693,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -715,7 +715,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -728,7 +728,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -744,7 +744,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -757,7 +757,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -773,7 +773,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -786,7 +786,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -802,7 +802,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Test Framework mutants:
                 =================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -815,7 +815,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -831,7 +831,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Static Analysis mutants:
                 ==================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -847,7 +847,7 @@ final class TextFileLoggerTest extends TestCase
                 Errors mutants:
                 ===============
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -860,7 +860,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -876,7 +876,7 @@ final class TextFileLoggerTest extends TestCase
                 Syntax Errors mutants:
                 ======================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -889,7 +889,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -905,7 +905,7 @@ final class TextFileLoggerTest extends TestCase
                 Not Covered mutants:
                 ====================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -918,7 +918,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -941,7 +941,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -951,7 +951,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'escaped#1';
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -964,7 +964,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -974,7 +974,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'timedOut#1';
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -987,7 +987,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -997,7 +997,7 @@ final class TextFileLoggerTest extends TestCase
                 + echo 'skipped#0';
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1017,7 +1017,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1029,7 +1029,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1044,7 +1044,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1056,7 +1056,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1071,7 +1071,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1083,7 +1083,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1098,7 +1098,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Test Framework mutants:
                 =================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1110,7 +1110,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1125,7 +1125,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Static Analysis mutants:
                 ==================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1140,7 +1140,7 @@ final class TextFileLoggerTest extends TestCase
                 Errors mutants:
                 ===============
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1152,7 +1152,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1167,7 +1167,7 @@ final class TextFileLoggerTest extends TestCase
                 Syntax Errors mutants:
                 ======================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1179,7 +1179,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1201,7 +1201,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1213,7 +1213,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1228,7 +1228,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1240,7 +1240,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1255,7 +1255,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1267,7 +1267,7 @@ final class TextFileLoggerTest extends TestCase
                 $ bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1289,7 +1289,7 @@ final class TextFileLoggerTest extends TestCase
                 Escaped mutants:
                 ================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1302,7 +1302,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1318,7 +1318,7 @@ final class TextFileLoggerTest extends TestCase
                 Timed Out mutants:
                 ==================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1331,7 +1331,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1347,7 +1347,7 @@ final class TextFileLoggerTest extends TestCase
                 Skipped mutants:
                 ================
 
-                1) foo/bar:10    [M] For_
+                1) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1360,7 +1360,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] PregQuote
+                2) foo/bar:10    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1376,7 +1376,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Test Framework mutants:
                 =================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1389,7 +1389,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1405,7 +1405,7 @@ final class TextFileLoggerTest extends TestCase
                 Killed by Static Analysis mutants:
                 ==================================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1421,7 +1421,7 @@ final class TextFileLoggerTest extends TestCase
                 Errors mutants:
                 ===============
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1434,7 +1434,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1450,7 +1450,7 @@ final class TextFileLoggerTest extends TestCase
                 Syntax Errors mutants:
                 ======================
 
-                1) foo/bar:9    [M] PregQuote
+                1) foo/bar:9    [M] PregQuote [ID] a1b2c3
 
                 --- Original
                 +++ New
@@ -1463,7 +1463,7 @@ final class TextFileLoggerTest extends TestCase
                   process output
 
 
-                2) foo/bar:10    [M] For_
+                2) foo/bar:10    [M] For_ [ID] a1b2c3
 
                 --- Original
                 +++ New
