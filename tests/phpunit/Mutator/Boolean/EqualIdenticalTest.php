@@ -142,7 +142,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for same type operations (string)' => [
+        yield 'It does not mutate equal operator into identical operator for same type operations (string)' => [
             <<<'PHP'
                 <?php
 
@@ -150,7 +150,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for inverse same type operations (string)' => [
+        yield 'It does not mutate equal operator into identical operator for inverse same type operations (string)' => [
             <<<'PHP'
                 <?php
 
@@ -158,7 +158,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for same type operations (bool)' => [
+        yield 'It does not mutate equal operator into identical operator for same type operations (bool)' => [
             <<<'PHP'
                 <?php
 
@@ -166,7 +166,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for inverse same type operations (bool)' => [
+        yield 'It does not mutate equal operator into identical operator for inverse same type operations (bool)' => [
             <<<'PHP'
                 <?php
 
@@ -174,7 +174,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for same type operations (true)' => [
+        yield 'It does not mutate equal operator into identical operator for same type operations (true)' => [
             <<<'PHP'
                 <?php
 
@@ -182,7 +182,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for inverse same type operations (true)' => [
+        yield 'It does not mutate equal operator into identical operator for inverse same type operations (true)' => [
             <<<'PHP'
                 <?php
 
@@ -190,7 +190,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for same type operations (int)' => [
+        yield 'It does not mutate equal operator into identical operator for same type operations (int)' => [
             <<<'PHP'
                 <?php
 
@@ -198,7 +198,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for inverse same type operations (int)' => [
+        yield 'It does not mutate equal operator into identical operator for inverse same type operations (int)' => [
             <<<'PHP'
                 <?php
 
@@ -206,7 +206,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for same type operations (float)' => [
+        yield 'It does not mutate equal operator into identical operator for same type operations (float)' => [
             <<<'PHP'
                 <?php
 
@@ -214,7 +214,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for inverse same type operations (float)' => [
+        yield 'It does not mutate equal operator into identical operator for inverse same type operations (float)' => [
             <<<'PHP'
                 <?php
 
@@ -235,7 +235,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for same type operations with function operands (string)' => [
+        yield 'It does not mutate equal operator into identical operator for same type operations with function operands (string)' => [
             <<<'PHP'
                 <?php
 
@@ -295,7 +295,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for union type operations with non-falsy operand' => [
+        yield 'It does not mutate equal operator into identical operator for union type operations with non-falsy operand' => [
             <<<'PHP'
                 <?php
 
@@ -303,7 +303,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for union type operations with non-falsy operand (inverse)' => [
+        yield 'It does not mutate equal operator into identical operator for union type operations with non-falsy operand (inverse)' => [
             <<<'PHP'
                 <?php
 
@@ -388,7 +388,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for empty array type' => [
+        yield 'It does not mutate equal operator into identical operator for empty array type' => [
             <<<'PHP'
                 <?php
 
@@ -409,7 +409,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for static method call' => [
+        yield 'It does not mutate equal operator into identical operator for static method call' => [
             <<<'PHP'
                 <?php
 
@@ -443,7 +443,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for class constant fetches' => [
+        yield 'It does not mutate equal operator into identical operator for class constant fetches' => [
             <<<'PHP'
                 <?php
 
@@ -465,7 +465,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
         ];
 
         if (PHP_VERSION_ID >= 80400) {
-            yield 'It not mutates equal operator into identical operator for known int global constants' => [
+            yield 'It does not mutate equal operator into identical operator for known int global constants' => [
                 <<<'PHPCODE'
                     <?php
 
@@ -487,7 +487,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
             ];
         }
 
-        yield 'It not mutates equal operator into identical operator for known global constants' => [
+        yield 'It does not mutate equal operator into identical operator for known global constants' => [
             <<<'PHPCODE'
                 <?php
 
@@ -495,7 +495,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHPCODE,
         ];
 
-        yield 'It not mutates equal operator into identical operator for unknown global constants' => [
+        yield 'It does not mutate equal operator into identical operator for unknown global constants' => [
             <<<'PHPCODE'
                 <?php
 
@@ -555,7 +555,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for comparison against non-numeric&non-empty literal string' => [
+        yield 'It does not mutate equal operator into identical operator for comparison against non-numeric&non-empty literal string' => [
             <<<'PHP'
                 <?php
 
@@ -563,7 +563,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for comparison against non-numeric&non-empty literal string (inversed)' => [
+        yield 'It does not mutate equal operator into identical operator for comparison against non-numeric&non-empty literal string (inversed)' => [
             <<<'PHP'
                 <?php
 
@@ -571,7 +571,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It not mutates equal operator into identical operator for comparison against non-numeric&non-empty literal string (class constant)' => [
+        yield 'It does not mutate equal operator into identical operator for comparison against non-numeric&non-empty literal string (class constant)' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'non-numeric-non-empty-class-const.php'),
         ];
     }

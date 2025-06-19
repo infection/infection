@@ -97,7 +97,7 @@ final class DecrementTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It not mutates pre increment' => [
+        yield 'It does not mutate pre increment' => [
             <<<'PHP'
                 <?php
 
@@ -107,7 +107,7 @@ final class DecrementTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It not mutates post increment' => [
+        yield 'It does not mutate post increment' => [
             <<<'PHP'
                 <?php
 
