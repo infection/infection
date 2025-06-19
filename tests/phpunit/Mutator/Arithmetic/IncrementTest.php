@@ -96,5 +96,33 @@ final class IncrementTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It does not mutate pre decrement' => [
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                --$a;
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate post decrement' => [
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                $a--;
+                PHP
+            ,
+        ];
+
+        yield 'It does not increment in for-loops to prevent endless loops' => [
+            <<<'PHP'
+                <?php
+
+                for ($i = strlen($string) - 1; $i > 10; $i++) {}
+                PHP,
+        ];
     }
 }

@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -80,15 +81,21 @@ final class Decrement implements Mutator
             return;
         }
 
-        if ($node instanceof Node\Expr\PostDec) {
-            yield new Node\Expr\PostInc($node->var, $node->getAttributes());
-
-            return;
-        }
+        yield new Node\Expr\PostInc($node->var, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\PreDec || $node instanceof Node\Expr\PostDec;
+        if (!$node instanceof Node\Expr\PreDec && !$node instanceof Node\Expr\PostDec) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Stmt\For_) {
+            return false;
+        }
+
+        return true;
     }
 }
