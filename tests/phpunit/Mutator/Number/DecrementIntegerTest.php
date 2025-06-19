@@ -599,7 +599,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with *count* property comparison left' => [
+        yield 'It does not decrement with *count* property assignment left' => [
             <<<'PHP'
                 <?php
 
@@ -607,7 +607,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with *count* property comparison right' => [
+        yield 'It does not decrement with *count* property assignment right' => [
             <<<'PHP'
                 <?php
 
@@ -615,7 +615,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with *length* property comparison left' => [
+        yield 'It does not decrement with *length* property assignment left' => [
             <<<'PHP'
                 <?php
 
@@ -623,7 +623,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with *length* property comparison right' => [
+        yield 'It does not decrement with *length* property assignment right' => [
             <<<'PHP'
                 <?php
 
