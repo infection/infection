@@ -519,6 +519,34 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It decrements method call left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes->someMethod() === 0) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if ($nodes->someMethod() === -1) {
+                }
+                PHP,
+        ];
+
+        yield 'It decrements method call right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes->someMethod()) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if (-1 === $nodes->someMethod()) {
+                }
+                PHP,
+        ];
+
         yield 'It does not decrement with length property comparison left' => [
             <<<'PHP'
                 <?php
