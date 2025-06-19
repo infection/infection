@@ -551,6 +551,22 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It does not decrement with count nullsafe property comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes?->countX === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with count nullsafe property comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes?->countY) {}
+                PHP,
+        ];
+
         yield 'It does not decrement with *count* variable comparison left' => [
             <<<'PHP'
                 <?php

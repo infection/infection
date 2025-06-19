@@ -205,7 +205,8 @@ final class DecrementInteger extends AbstractNumberMutator
             }
 
             if (
-                $expr instanceof Node\Expr\PropertyFetch && $expr->name instanceof Node\Identifier
+                ($expr instanceof Node\Expr\PropertyFetch || $expr instanceof Node\Expr\NullsafePropertyFetch)
+                && $expr->name instanceof Node\Identifier
                 && stripos($expr->name->name, $magicNeedle) !== false
             ) {
                 return true;
