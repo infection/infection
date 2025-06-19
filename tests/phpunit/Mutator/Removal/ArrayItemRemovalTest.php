@@ -117,6 +117,15 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
             '<?php [$a] = [];',
         ];
 
+        yield 'It does not mutate array assignment to prevent runtime warning' => [
+            '<?php [$a, $b] = [$c, $d];',
+        ];
+
+        yield 'It mutates array assignment with more elements on the right side' => [
+            '<?php [$a, $b] = [$c, $d, $e];',
+            "<?php\n\n[\$a, \$b] = [\$d, \$e];",
+        ];
+
         yield 'It does not mutate lists with any number of elements' => [
             '<?php [$a, $b] = [];',
         ];
