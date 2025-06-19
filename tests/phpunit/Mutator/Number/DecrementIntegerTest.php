@@ -551,6 +551,38 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
+        yield 'It does not decrement with numberOf methodCall comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($constructor->getNumberOfParameters() === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with numberOf methodCall comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $constructor->getNumberOfParameters()) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with numberOf nullsafe methodCall comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($constructor?->getNumberOfParameters() === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with numberOf nullsafe methodCall comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $constructor?->getNumberOfParameters()) {}
+                PHP,
+        ];
+
         yield 'It does not decrement with count nullsafe property comparison left' => [
             <<<'PHP'
                 <?php
@@ -599,7 +631,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with *count* property assignment left' => [
+        yield 'It does not decrement with *count* property assignment' => [
             <<<'PHP'
                 <?php
 
@@ -607,23 +639,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with *count* property assignment right' => [
-            <<<'PHP'
-                <?php
-
-                $this->callsCount = 0;
-                PHP,
-        ];
-
-        yield 'It does not decrement with *length* property assignment left' => [
-            <<<'PHP'
-                <?php
-
-                $this->callsLength = 0;
-                PHP,
-        ];
-
-        yield 'It does not decrement with *length* property assignment right' => [
+        yield 'It does not decrement with *length* property assignment' => [
             <<<'PHP'
                 <?php
 

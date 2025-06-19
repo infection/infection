@@ -196,7 +196,7 @@ final class DecrementInteger extends AbstractNumberMutator
 
     private function isCountOrLengthExpression(Node\Expr $expr): bool
     {
-        foreach (['count', 'length'] as $magicNeedle) {
+        foreach (['count', 'length', 'numberof'] as $magicNeedle) {
             if (
                 $expr instanceof Node\Expr\Variable && is_string($expr->name)
                 && stripos($expr->name, $magicNeedle) !== false
@@ -206,6 +206,14 @@ final class DecrementInteger extends AbstractNumberMutator
 
             if (
                 ($expr instanceof Node\Expr\PropertyFetch || $expr instanceof Node\Expr\NullsafePropertyFetch)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\MethodCall || $expr instanceof Node\Expr\NullsafeMethodCall)
                 && $expr->name instanceof Node\Identifier
                 && stripos($expr->name->name, $magicNeedle) !== false
             ) {
