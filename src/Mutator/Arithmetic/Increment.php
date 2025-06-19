@@ -81,11 +81,7 @@ final class Increment implements Mutator
             return;
         }
 
-        if ($node instanceof Node\Expr\PostInc) {
-            yield new Node\Expr\PostDec($node->var, $node->getAttributes());
-
-            return;
-        }
+        yield new Node\Expr\PostDec($node->var, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool

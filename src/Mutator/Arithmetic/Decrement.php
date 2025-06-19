@@ -81,11 +81,7 @@ final class Decrement implements Mutator
             return;
         }
 
-        if ($node instanceof Node\Expr\PostDec) {
-            yield new Node\Expr\PostInc($node->var, $node->getAttributes());
-
-            return;
-        }
+        yield new Node\Expr\PostInc($node->var, $node->getAttributes());
     }
 
     public function canMutate(Node $node): bool

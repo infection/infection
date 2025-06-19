@@ -97,6 +97,26 @@ final class DecrementTest extends BaseMutatorTestCase
             ,
         ];
 
+        yield 'It not mutates pre increment' => [
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                ++$a;
+                PHP
+            ,
+        ];
+
+        yield 'It not mutates post increment' => [
+            <<<'PHP'
+                <?php
+
+                $a = 1;
+                $a++;
+                PHP
+            ,
+        ];
+
         yield 'It does not decrement in for-loops to prevent endless loops' => [
             <<<'PHP'
                 <?php
