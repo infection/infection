@@ -547,7 +547,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with length property comparison left' => [
+        yield 'It does not decrement with *length* property comparison left' => [
             <<<'PHP'
                 <?php
 
@@ -555,7 +555,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with length property comparison right' => [
+        yield 'It does not decrement with *length* property comparison right' => [
             <<<'PHP'
                 <?php
 
@@ -563,7 +563,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with count property comparison left' => [
+        yield 'It does not decrement with *count* property comparison left' => [
             <<<'PHP'
                 <?php
 
@@ -571,7 +571,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with count property comparison right' => [
+        yield 'It does not decrement with *count* property comparison right' => [
             <<<'PHP'
                 <?php
 
@@ -579,7 +579,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with numberOf methodCall comparison left' => [
+        yield 'It does not decrement with *numberOf* methodCall comparison left' => [
             <<<'PHP'
                 <?php
 
@@ -587,7 +587,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with numberOf methodCall comparison right' => [
+        yield 'It does not decrement with *numberOf* methodCall comparison right' => [
             <<<'PHP'
                 <?php
 
@@ -595,7 +595,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with numberOf nullsafe methodCall comparison left' => [
+        yield 'It does not decrement with *numberOf* nullsafe methodCall comparison left' => [
             <<<'PHP'
                 <?php
 
@@ -603,7 +603,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with numberOf nullsafe methodCall comparison right' => [
+        yield 'It does not decrement with *numberOf* nullsafe methodCall comparison right' => [
             <<<'PHP'
                 <?php
 
@@ -611,7 +611,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with count nullsafe property comparison left' => [
+        yield 'It does not decrement with *count* nullsafe property comparison left' => [
             <<<'PHP'
                 <?php
 
@@ -619,7 +619,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It does not decrement with count nullsafe property comparison right' => [
+        yield 'It does not decrement with *count* nullsafe property comparison right' => [
             <<<'PHP'
                 <?php
 
