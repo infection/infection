@@ -40,8 +40,10 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
+use function is_string;
 use const PHP_INT_MAX;
 use PhpParser\Node;
+use function stripos;
 
 /**
  * @internal
@@ -129,6 +131,10 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        if ($parentNode instanceof Node\Expr\Assign && $this->isCountOrLengthExpression($parentNode->var)) {
+            return false;
+        }
+
         if ($this->isArrayZeroIndexAccess($node)) {
             return false;
         }
@@ -177,7 +183,45 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
+        if ($this->isCountOrLengthExpression($parentNode->left)) {
+            return false;
+        }
+
+        if ($this->isCountOrLengthExpression($parentNode->right)) {
+            return false;
+        }
+
         return true;
+    }
+
+    private function isCountOrLengthExpression(Node\Expr $expr): bool
+    {
+        foreach (['count', 'length', 'numberof'] as $magicNeedle) {
+            if (
+                $expr instanceof Node\Expr\Variable && is_string($expr->name)
+                && stripos($expr->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\PropertyFetch || $expr instanceof Node\Expr\NullsafePropertyFetch)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\MethodCall || $expr instanceof Node\Expr\NullsafeMethodCall)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function isArrayZeroIndexAccess(Node\Scalar\LNumber $node): bool

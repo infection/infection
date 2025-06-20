@@ -490,5 +490,189 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It decrements property fetch left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes->someProperty === 0) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if ($nodes->someProperty === -1) {
+                }
+                PHP,
+        ];
+
+        yield 'It decrements property fetch right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes->someProperty) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if (-1 === $nodes->someProperty) {
+                }
+                PHP,
+        ];
+
+        yield 'It decrements method call left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes->someMethod() === 0) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if ($nodes->someMethod() === -1) {
+                }
+                PHP,
+        ];
+
+        yield 'It decrements method call right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes->someMethod()) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                if (-1 === $nodes->someMethod()) {
+                }
+                PHP,
+        ];
+
+        yield 'It does not decrement with *length* property comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes->length === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *length* property comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes->length) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* property comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes->countX === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* property comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes->countY) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *numberOf* methodCall comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($constructor->getNumberOfParameters() === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *numberOf* methodCall comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $constructor->getNumberOfParameters()) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *numberOf* nullsafe methodCall comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($constructor?->getNumberOfParameters() === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *numberOf* nullsafe methodCall comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $constructor?->getNumberOfParameters()) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* nullsafe property comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($nodes?->countX === 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* nullsafe property comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 === $nodes?->countY) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* variable comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($totalCount !== 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* variable comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 !== $totalCounts) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *length* variable comparison left' => [
+            <<<'PHP'
+                <?php
+
+                if ($xyzLength !== 0) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *length* variable comparison right' => [
+            <<<'PHP'
+                <?php
+
+                if (0 !== $xyzLength) {}
+                PHP,
+        ];
+
+        yield 'It does not decrement with *count* property assignment' => [
+            <<<'PHP'
+                <?php
+
+                $this->callsCount = 0;
+                PHP,
+        ];
+
+        yield 'It does not decrement with *length* property assignment' => [
+            <<<'PHP'
+                <?php
+
+                $this->callsLength = 0;
+                PHP,
+        ];
     }
 }
