@@ -38,7 +38,10 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractAllSubExprNegation;
+use Infection\Mutator\Util\NameResolver;
 use PhpParser\Node;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @internal
@@ -66,5 +69,31 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
     protected function getSupportedBinaryOpExprClass(): string
     {
         return Node\Expr\BinaryOp\BooleanAnd::class;
+    }
+
+    protected function isSubConditionMutable(Node\Expr $node): bool
+    {
+        if (!parent::isSubConditionMutable($node)) {
+            return false;
+        }
+
+        if (
+            $node instanceof Node\Expr\BooleanNot
+            && $node->expr instanceof Node\Expr\Instanceof_
+            && $node->expr->class instanceof Node\Name
+        ) {
+            $resolvedName = NameResolver::resolveName($node->expr->class);
+
+            try {
+                $reflectionClass = new ReflectionClass($resolvedName->name);
+
+                if (!$reflectionClass->isInterface() && !$reflectionClass->isTrait()) {
+                    return false;
+                }
+            } catch (ReflectionException) {
+            }
+        }
+
+        return true;
     }
 }
