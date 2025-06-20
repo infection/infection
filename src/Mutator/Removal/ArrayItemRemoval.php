@@ -137,9 +137,13 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
 
         $parent = ParentConnector::findParent($node);
 
-        // Arrays to the left of an assignments are not arrays but lists.
-        if ($parent instanceof Node\Expr\Assign && $parent->var === $node) {
-            return false;
+        if ($parent instanceof Node\Expr\Assign) {
+            if (
+                $parent->var instanceof Node\Expr\List_
+                && count($parent->var->items) >= count($node->items)
+            ) {
+                return false;
+            }
         }
 
         if ($parent instanceof Node\Arg) {
