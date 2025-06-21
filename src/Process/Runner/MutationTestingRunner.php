@@ -84,7 +84,6 @@ class MutationTestingRunner
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
-        $counter = 0;
         $processContainers = take($mutations)
             ->stream()
             ->filter($this->ignoredByMutantId(...))
@@ -92,15 +91,7 @@ class MutationTestingRunner
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
-            ->filter(function (Mutant $mutant) use (&$counter): bool {
-                if ($this->astPreFilterRegistry->coversMutation($mutant->getMutation())) {
-                    ++$counter;
-
-                    return false;
-                }
-
-                return true;
-            })
+            ->filter($this->prefilterAst(...))
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
@@ -161,6 +152,19 @@ class MutationTestingRunner
         ));
 
         return false;
+    }
+
+    private function prefilterAst(Mutant $mutant): bool
+    {
+        if ($this->astPreFilterRegistry->coversMutation($mutant->getMutation())) {
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                MutantExecutionResult::createFromAstPrefilteredMutant($mutant),
+            ));
+
+            return false;
+        }
+
+        return true;
     }
 
     private function takingTooLong(Mutant $mutant): bool
