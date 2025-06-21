@@ -39,6 +39,9 @@ use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 final class NameResolver
 {
     public static function resolveName(Node\Name $name): Node\Name\FullyQualified
