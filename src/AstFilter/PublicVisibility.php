@@ -166,7 +166,7 @@ class PublicVisibility implements AstPreFilter
         }
 
         if ($name === 'parent') {
-            $reflectionClass = new ReflectionClass($rootType);
+            $reflectionClass = new ReflectionClass($rootType); // @phpstan-ignore argument.type
             $parent = $reflectionClass->getParentClass();
 
             if ($parent === false) {
