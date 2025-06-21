@@ -47,7 +47,10 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 
-class PublicVisibility implements AstPreFilter
+/**
+ * @internal
+ */
+final class PublicVisibility implements AstPreFilter
 {
     /**
      * @var array<string, array<string, bool>>

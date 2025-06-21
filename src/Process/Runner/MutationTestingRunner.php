@@ -51,7 +51,6 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
-use function var_dump;
 
 /**
  * @internal
@@ -111,8 +110,6 @@ class MutationTestingRunner
         ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
-
-        var_dump('killed with AST: ' . $counter);
     }
 
     private function mutationToMutant(Mutation $mutation): Mutant
