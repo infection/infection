@@ -37,8 +37,6 @@ namespace Infection\CI;
 
 use OndraM\CiDetector\Ci\CiInterface;
 use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\Env;
-use ReflectionClass;
 
 /**
  * @internal
@@ -52,18 +50,6 @@ final class MemoizedCiDetector extends CiDetector
      * @var CiInterface|false|null
      */
     private $ci = false;
-
-    public static function fromEnvironment(Env $environment): CiDetector
-    {
-        $detector = new self();
-
-        // TODO: this is an ugly hack to due to a design flaw in ondram\ci-detector
-        //  See https://github.com/OndraM/ci-detector/pull/65
-        $environmentReflection = (new ReflectionClass(CiDetector::class))->getProperty('environment');
-        $environmentReflection->setValue($detector, $environment);
-
-        return $detector;
-    }
 
     protected function detectCurrentCiServer(): ?CiInterface
     {
