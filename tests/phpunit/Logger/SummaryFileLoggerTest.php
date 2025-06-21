@@ -70,6 +70,7 @@ final class SummaryFileLoggerTest extends TestCase
                 Syntax Errors: 0
                 Escaped: 0
                 Timed Out: 0
+                Covered by AST prefilter: 0
                 Skipped: 0
                 Ignored: 0
                 Not Covered: 0
@@ -88,6 +89,7 @@ final class SummaryFileLoggerTest extends TestCase
                 Syntax Errors: 2
                 Escaped: 2
                 Timed Out: 2
+                Covered by AST prefilter: 0
                 Skipped: 2
                 Ignored: 2
                 Not Covered: 2

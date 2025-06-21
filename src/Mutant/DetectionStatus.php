@@ -46,6 +46,7 @@ final class DetectionStatus
 
     public const KILLED_BY_TESTS = 'killed by tests';
     public const KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
+    public const COVERED_BY_AST_PREFILTER = 'covered by AST prefilter';
     public const ESCAPED = 'escaped';
     public const ERROR = 'error';
     public const TIMED_OUT = 'timed out';
@@ -60,6 +61,7 @@ final class DetectionStatus
         self::ESCAPED,
         self::ERROR,
         self::TIMED_OUT,
+        self::COVERED_BY_AST_PREFILTER,
         self::SKIPPED,
         self::SYNTAX_ERROR,
         self::NOT_COVERED,
