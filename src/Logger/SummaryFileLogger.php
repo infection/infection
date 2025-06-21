@@ -61,6 +61,7 @@ final readonly class SummaryFileLogger implements LineMutationTestingResultsLogg
             'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
             'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
+            'Covered by AST prefilter: ' . $this->metricsCalculator->getCoveredByAstPrefilter(),
             'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
             'Ignored: ' . $this->metricsCalculator->getIgnoredCount(),
             'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),

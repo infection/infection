@@ -117,6 +117,11 @@ class MetricsCalculator implements Collector
         return $this->countByStatus[DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
     }
 
+    public function getCoveredByAstPrefilter(): int
+    {
+        return $this->countByStatus[DetectionStatus::COVERED_BY_AST_PREFILTER];
+    }
+
     public function getErrorCount(): int
     {
         return $this->countByStatus[DetectionStatus::ERROR];

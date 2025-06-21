@@ -38,6 +38,7 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
+use Infection\AstFilter\AstPreFilter;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Config\ConsoleHelper;
@@ -162,6 +163,7 @@ final class ProjectCodeProvider
         Definition::class,
         MutatorCategory::class,
         BaseMutatorTestCase::class,
+        AstPreFilter::class,
     ];
 
     /**

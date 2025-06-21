@@ -33,38 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\CannotBeInstantiated;
+use Infection\AstFilter\AstPreFilterRegistry;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * @internal
  */
-final class DetectionStatus
+final class AstPreFilterVisitor extends NodeVisitorAbstract
 {
-    use CannotBeInstantiated;
+    public function __construct(
+        private readonly AstPreFilterRegistry $astPreFilterRegistry,
+    ) {
+    }
 
-    public const KILLED_BY_TESTS = 'killed by tests';
-    public const KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
-    public const COVERED_BY_AST_PREFILTER = 'covered by AST prefilter';
-    public const ESCAPED = 'escaped';
-    public const ERROR = 'error';
-    public const TIMED_OUT = 'timed out';
-    public const SKIPPED = 'skipped';
-    public const SYNTAX_ERROR = 'syntax error';
-    public const NOT_COVERED = 'not covered';
-    public const IGNORED = 'ignored';
+    public function enterNode(Node $node)
+    {
+        $this->astPreFilterRegistry->visitNode($node);
 
-    public const ALL = [
-        self::KILLED_BY_TESTS,
-        self::KILLED_BY_STATIC_ANALYSIS,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::COVERED_BY_AST_PREFILTER,
-        self::SKIPPED,
-        self::SYNTAX_ERROR,
-        self::NOT_COVERED,
-        self::IGNORED,
-    ];
+        return null;
+    }
 }

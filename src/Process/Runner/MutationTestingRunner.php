@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use Infection\AstFilter\AstPreFilterRegistry;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -67,6 +68,7 @@ class MutationTestingRunner
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,
         private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
+        private readonly AstPreFilterRegistry $astPreFilterRegistry,
         private readonly bool $runConcurrently,
         private readonly float $timeout,
         private readonly array $ignoreSourceCodeMutatorsMap,
@@ -89,6 +91,7 @@ class MutationTestingRunner
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
+            ->filter($this->prefilterAst(...))
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
@@ -149,6 +152,19 @@ class MutationTestingRunner
         ));
 
         return false;
+    }
+
+    private function prefilterAst(Mutant $mutant): bool
+    {
+        if ($this->astPreFilterRegistry->coversMutation($mutant->getMutation())) {
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                MutantExecutionResult::createFromAstPrefilteredMutant($mutant),
+            ));
+
+            return false;
+        }
+
+        return true;
     }
 
     private function takingTooLong(Mutant $mutant): bool

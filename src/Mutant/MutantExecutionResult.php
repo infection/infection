@@ -99,6 +99,11 @@ class MutantExecutionResult
         return self::createFromMutant($mutant, DetectionStatus::IGNORED);
     }
 
+    public static function createFromAstPrefilteredMutant(Mutant $mutant): self
+    {
+        return self::createFromMutant($mutant, DetectionStatus::COVERED_BY_AST_PREFILTER);
+    }
+
     public function getProcessCommandLine(): string
     {
         return $this->processCommandLine;

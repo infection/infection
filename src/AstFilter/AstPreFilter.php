@@ -33,38 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\AstFilter;
 
-use Infection\CannotBeInstantiated;
+use Infection\Mutation\Mutation;
+use Infection\Mutator\Mutator;
+use PhpParser\Node;
 
-/**
- * @internal
- */
-final class DetectionStatus
+interface AstPreFilter
 {
-    use CannotBeInstantiated;
+    /**
+     * @return class-string<Mutator<Node>>
+     */
+    public function getMutatorClass(): string;
 
-    public const KILLED_BY_TESTS = 'killed by tests';
-    public const KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
-    public const COVERED_BY_AST_PREFILTER = 'covered by AST prefilter';
-    public const ESCAPED = 'escaped';
-    public const ERROR = 'error';
-    public const TIMED_OUT = 'timed out';
-    public const SKIPPED = 'skipped';
-    public const SYNTAX_ERROR = 'syntax error';
-    public const NOT_COVERED = 'not covered';
-    public const IGNORED = 'ignored';
+    public function visitNode(Node $node): void;
 
-    public const ALL = [
-        self::KILLED_BY_TESTS,
-        self::KILLED_BY_STATIC_ANALYSIS,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::COVERED_BY_AST_PREFILTER,
-        self::SKIPPED,
-        self::SYNTAX_ERROR,
-        self::NOT_COVERED,
-        self::IGNORED,
-    ];
+    public function coversMutation(Mutation $mutation): bool;
 }
