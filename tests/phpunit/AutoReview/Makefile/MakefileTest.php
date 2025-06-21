@@ -38,17 +38,14 @@ namespace Infection\Tests\AutoReview\Makefile;
 use function array_filter;
 use function array_map;
 use function array_shift;
-use function array_unshift;
 use function array_values;
 use function count;
 use Fidry\Makefile\Rule;
 use Fidry\Makefile\Test\BaseMakefileTestCase;
-use function implode;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\array_replace;
-use function sprintf;
 use function str_ends_with;
 use function str_starts_with;
 use function substr;
@@ -187,37 +184,6 @@ final class MakefileTest extends BaseMakefileTestCase
         ];
     }
 
-    public function test_all_docker_test_targets_are_properly_declared(): void
-    {
-        $testRules = self::getTestRules(true);
-
-        foreach ($testRules as $rule) {
-            $target = $rule->getTarget();
-            $prerequisites = $rule->getPrerequisites();
-
-            $subTestTargets = self::getDockerSubTestTargets($target, $testRules);
-
-            if ($subTestTargets === []) {
-                continue;
-            }
-
-            if ($target === 'test-docker') {
-                array_unshift($subTestTargets, 'autoreview');
-            }
-
-            $this->assertSame(
-                $subTestTargets,
-                $prerequisites,
-                sprintf(
-                    'Expected the pre-requisite of the "%s" target to be "%s". Found "%s" instead',
-                    $target,
-                    implode(' ', $subTestTargets),
-                    implode(' ', $prerequisites),
-                ),
-            );
-        }
-    }
-
     public function test_the_test_target_runs_all_the_tests(): void
     {
         $testRules = self::getTestRules(false);
@@ -231,19 +197,6 @@ final class MakefileTest extends BaseMakefileTestCase
         $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
     }
 
-    public function test_the_docker_test_target_runs_all_the_tests(): void
-    {
-        $testRules = self::getTestRules(true);
-
-        // Exclude itself
-        $testPrerequisites = array_shift($testRules)->getPrerequisites();
-
-        $rootTestTargets = self::getRootTestTargets($testRules, 2);
-        array_unshift($rootTestTargets, 'autoreview');
-
-        $this->assertEqualsCanonicalizing($rootTestTargets, $testPrerequisites);
-    }
-
     protected static function getMakefilePath(): string
     {
         return self::MAKEFILE_PATH;
@@ -251,6 +204,7 @@ final class MakefileTest extends BaseMakefileTestCase
 
     protected function getExpectedHelpOutput(): string
     {
+        // generate it with `make | tee output.txt`
         return <<<'EOF'
             [33mUsage:[0m
               make TARGET
@@ -262,11 +216,14 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mcompile:[0m	 	 Bundles Infection into a PHAR
             [33mcompile-docker:[0m	 	 Bundles Infection into a PHAR using docker
             [33mcs:[0m	  	 	 Runs PHP-CS-Fixer
+            [33mcs-docker:[0m	  	 	 Runs PHP-CS-Fixer
             [33mcs-check:[0m		 Runs PHP-CS-Fixer in dry-run mode
+            [33mcs-check-docker:[0m	 Runs PHP-CS-Fixer in dry-run mode on Docker
             [33mprofile:[0m 	 	 Runs Blackfire
             [33mautoreview:[0m 	 	 Runs various checks (static analysis & AutoReview test suite)
+            [33mautoreview-docker:[0m	 Runs various checks (static analysis & AutoReview test suite) on Docker
             [33mtest:[0m		 	 Runs all the tests
-            [33mtest-docker:[0m		 Runs all the tests on the different Docker platforms
+            [33mtest-docker:[0m		 Runs all the tests on Docker
             [33mtest-unit:[0m	 	 Runs the unit tests
             [33mtest-unit-parallel:[0m	 Runs the unit tests in parallel
             [33mtest-unit-docker:[0m	 Runs the unit tests on the different Docker platforms
