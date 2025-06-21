@@ -40,7 +40,6 @@ use function array_reverse;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
-use function is_string;
 use PhpParser\Node;
 use ReflectionClass;
 use ReflectionException;
@@ -65,7 +64,7 @@ class PublicVisibility implements AstPreFilter
         if (!$node instanceof Node\Expr\MethodCall) {
             return;
         }
-        /** @var ClassReflection $class */
+        /** @var ClassReflection|null $class */
         $class = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
 
         if ($class === null) {
@@ -84,15 +83,10 @@ class PublicVisibility implements AstPreFilter
             $node = $node->var;
         }
 
-        if ($methodCallChain === [] || !$node instanceof Node\Expr\Variable) {
-            return;
-        }
-
-        if (!is_string($node->name)) {
-            return;
-        }
-
-        if ($node->name !== 'this') {
+        if (
+            !$node instanceof Node\Expr\Variable
+            || $node->name !== 'this'
+        ) {
             return;
         }
 
