@@ -38,7 +38,11 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Definition;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractAllSubExprNegation;
+use Infection\Mutator\Util\NameResolver;
+use function is_string;
 use PhpParser\Node;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @internal
@@ -47,6 +51,8 @@ use PhpParser\Node;
  */
 final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
 {
+    private ?string $seenVariabeName = null;
+
     public static function getDefinition(): Definition
     {
         return new Definition(
@@ -66,5 +72,41 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
     protected function getSupportedBinaryOpExprClass(): string
     {
         return Node\Expr\BinaryOp\BooleanAnd::class;
+    }
+
+    protected function isSubConditionMutable(Node\Expr $node): bool
+    {
+        if (!parent::isSubConditionMutable($node)) {
+            return false;
+        }
+
+        if (
+            $node instanceof Node\Expr\BooleanNot
+            && $node->expr instanceof Node\Expr\Instanceof_
+            && $node->expr->expr instanceof Node\Expr\Variable
+            && is_string($node->expr->expr->name)
+            && $node->expr->class instanceof Node\Name
+        ) {
+            if ($this->seenVariabeName === null) {
+                $this->seenVariabeName = $node->expr->expr->name;
+            } else {
+                if ($this->seenVariabeName !== $node->expr->expr->name) {
+                    return true;
+                }
+            }
+
+            $resolvedName = NameResolver::resolveName($node->expr->class);
+
+            try {
+                $reflectionClass = new ReflectionClass($resolvedName->name); // @phpstan-ignore argument.type
+
+                if (!$reflectionClass->isInterface() && !$reflectionClass->isTrait()) {
+                    return false;
+                }
+            } catch (ReflectionException) {
+            }
+        }
+
+        return true;
     }
 }

@@ -92,6 +92,15 @@ abstract class AbstractAllSubExprNegation implements Mutator
      */
     abstract protected function getSupportedBinaryOpExprClass(): string;
 
+    protected function isSubConditionMutable(Node\Expr $node): bool
+    {
+        if ($this->isIdenticalComparisonWithBoolean($node)) {
+            return false;
+        }
+
+        return true;
+    }
+
     private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node): Node\Expr
     {
         $supportedNodeClass = $this->getSupportedBinaryOpExprClass();
@@ -136,7 +145,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
     {
         $leftIsNotMutable = ($left instanceof Node\Expr\BinaryOp\BooleanOr || $left instanceof Node\Expr\BinaryOp\BooleanAnd)
             ? $this->allSubConditionsAreNotMutable($left->left, $left->right)
-            : $this->isIdenticalComparisonWithBoolean($left);
+            : !$this->isSubConditionMutable($left);
 
         // optimization: if left is mutable - no need to check right
         if (!$leftIsNotMutable) {
@@ -145,6 +154,6 @@ abstract class AbstractAllSubExprNegation implements Mutator
 
         return ($right instanceof Node\Expr\BinaryOp\BooleanOr || $right instanceof Node\Expr\BinaryOp\BooleanAnd)
             ? $this->allSubConditionsAreNotMutable($right->left, $right->right)
-            : $this->isIdenticalComparisonWithBoolean($right);
+            : !$this->isSubConditionMutable($right);
     }
 }

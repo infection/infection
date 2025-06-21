@@ -54,6 +54,69 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
+        yield 'It mutates negated instanceof with 1 concrete class and 1 trait' => [
+            <<<'PHP'
+                <?php
+
+                $var = !$node instanceof Node\Expr\PostDec && !$node instanceof Infection\Tests\Mutant\MutantAssertions;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec && $node instanceof Infection\Tests\Mutant\MutantAssertions;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates negated instanceof with 1 concrete class and 1 interface' => [
+            <<<'PHP'
+                <?php
+
+                $var = !$node instanceof \Countable && !$node instanceof Node\Expr\PostDec;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable && $node instanceof Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates negated instanceof with 2 concrete classes (different variables)' => [
+            <<<'PHP'
+                <?php
+
+                $var = !$node1 instanceof PhpParser\Node\Expr\PreDec && !$node2 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node1 instanceof PhpParser\Node\Expr\PreDec && $node2 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate negated instanceof with 2 concrete classes (same variable)' => [
+            <<<'PHP'
+                <?php
+
+                $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate negated instanceof with 3 concrete classes' => [
+            <<<'PHP'
+                <?php
+
+                $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec && !$node instanceof PhpParser\Node\Expr\BooleanNot;
+                PHP
+            ,
+        ];
+
         yield 'It mutates and with two expressions' => [
             <<<'PHP'
                 <?php
