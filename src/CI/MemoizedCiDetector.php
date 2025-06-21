@@ -60,7 +60,6 @@ final class MemoizedCiDetector extends CiDetector
         // TODO: this is an ugly hack to due to a design flaw in ondram\ci-detector
         //  See https://github.com/OndraM/ci-detector/pull/65
         $environmentReflection = (new ReflectionClass(CiDetector::class))->getProperty('environment');
-        $environmentReflection->setAccessible(true);
         $environmentReflection->setValue($detector, $environment);
 
         return $detector;
