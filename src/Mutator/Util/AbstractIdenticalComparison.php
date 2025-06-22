@@ -40,8 +40,6 @@ use function count;
 use function gettype;
 use function in_array;
 use Infection\Mutator\Mutator;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Reflection\ClassReflection;
 use function is_numeric;
 use function is_string;
 use PhpParser\Node;
@@ -160,7 +158,7 @@ abstract class AbstractIdenticalComparison implements Mutator
             && $expr->class instanceof Node\Name
             && $expr->name instanceof Node\Identifier
         ) {
-            $constValue = $this->getClassConstantValue($this->resolveName($expr->class), $expr->name);
+            $constValue = $this->getClassConstantValue(NameResolver::resolveName($expr->class), $expr->name);
 
             if ($constValue === null) {
                 return false; // unable to reflect the constant value
@@ -231,7 +229,7 @@ abstract class AbstractIdenticalComparison implements Mutator
         ) {
             $name = $call->class->toString() . '::' . $call->name->toString();
 
-            return self::$reflectionCache[$name] ?? $this->getStaticMethodReturnType($this->resolveName($call->class), $call->name);
+            return self::$reflectionCache[$name] ?? $this->getStaticMethodReturnType(NameResolver::resolveName($call->class), $call->name);
         }
 
         return null;
@@ -393,23 +391,11 @@ abstract class AbstractIdenticalComparison implements Mutator
             && $expr->class instanceof Node\Name
             && $expr->name instanceof Node\Identifier
         ) {
-            $constValue = $this->getClassConstantValue($this->resolveName($expr->class), $expr->name);
+            $constValue = $this->getClassConstantValue(NameResolver::resolveName($expr->class), $expr->name);
 
             return is_string($constValue) && $constValue !== '' && !is_numeric($constValue);
         }
 
         return false;
-    }
-
-    private function resolveName(Node\Name $name): Node\Name\FullyQualified
-    {
-        if ($name->toString() === 'self') {
-            /** @var ClassReflection $reflectionClass */
-            $reflectionClass = $name->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
-
-            return new Node\Name\FullyQualified($reflectionClass->getName());
-        }
-
-        return $name->getAttribute('resolvedName');
     }
 }
