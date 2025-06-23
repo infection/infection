@@ -662,6 +662,23 @@ final class LogicalOrTest extends BaseMutatorTestCase
             ,
         ];
 
+        yield 'It mutates variable instanceof' => [
+            <<<'PHP'
+                <?php
+
+                $class = PhpParser\Node\Expr\PreDec::class;
+                $var = $node1 instanceof $class || $node1 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $class = PhpParser\Node\Expr\PreDec::class;
+                $var = $node1 instanceof $class && $node1 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
         yield 'It does not mutate negated instanceof with 2 concrete classes (same variable)' => [
             <<<'PHP'
                 <?php
