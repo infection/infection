@@ -246,11 +246,10 @@ final class LogicalOr implements Mutator
         return true;
     }
 
-    private function isInstanceOfConditionMutable(Node\Expr $node): bool
+    private function isInstanceOfConditionMutable(Node\Expr\Instanceof_ $node): bool
     {
         if (
-            $node instanceof Node\Expr\Instanceof_
-            && $node->expr instanceof Node\Expr\Variable
+            $node->expr instanceof Node\Expr\Variable
             && is_string($node->expr->name)
             && $node->class instanceof Node\Name
         ) {
