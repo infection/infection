@@ -632,6 +632,21 @@ final class LogicalOrTest extends BaseMutatorTestCase
             ,
         ];
 
+        yield 'It mutates negated instanceof with 1 concrete class and 1 interface (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec || $node instanceof \Countable;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec && $node instanceof \Countable;
+                PHP
+            ,
+        ];
+
         yield 'It mutates negated instanceof with 2 concrete classes (different variables)' => [
             <<<'PHP'
                 <?php
