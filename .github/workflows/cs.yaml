@@ -15,6 +15,7 @@ jobs:
   coding-standards:
     name: Coding Standards
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
