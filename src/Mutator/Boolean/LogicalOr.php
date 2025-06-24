@@ -55,6 +55,7 @@ use ReflectionException;
 final class LogicalOr implements Mutator
 {
     use GetMutatorName;
+
     private ?string $seenVariabeName = null;
 
     public static function getDefinition(): Definition
