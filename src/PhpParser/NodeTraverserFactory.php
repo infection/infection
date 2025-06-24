@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\AstFilter\AstPreFilterRegistry;
+use Infection\PhpParser\Visitor\AstPreFilterVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -55,6 +57,11 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
+    public function __construct(
+        private readonly AstPreFilterRegistry $astPreFilterRegistry,
+    ) {
+    }
+
     /**
      * @param NodeIgnorer[] $nodeIgnorers
      */
@@ -79,6 +86,7 @@ class NodeTraverserFactory
         );
         $traverser->addVisitor(new ParentConnectingVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
+        $traverser->addVisitor(new AstPreFilterVisitor($this->astPreFilterRegistry));
         $traverser->addVisitor($mutationVisitor);
 
         return $traverser;

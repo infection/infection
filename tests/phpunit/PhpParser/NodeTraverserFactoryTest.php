@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser;
 
 use function array_map;
+use Infection\AstFilter\AstPreFilterRegistry;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\AstPreFilterVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -63,7 +65,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
+        $traverser = (new NodeTraverserFactory(new AstPreFilterRegistry()))->create(new FakeVisitor(), []);
 
         $visitors = array_map(
             'get_class',
@@ -77,6 +79,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
+                AstPreFilterVisitor::class,
                 FakeVisitor::class,
             ],
             $visitors,
@@ -85,7 +88,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_with_node_ignorers(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(
+        $traverser = (new NodeTraverserFactory(new AstPreFilterRegistry()))->create(
             new FakeVisitor(),
             [
                 new FakeIgnorer(),
@@ -104,6 +107,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
+                AstPreFilterVisitor::class,
                 FakeVisitor::class,
             ],
             $visitorClasses,
