@@ -40,8 +40,12 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\NameResolver;
+use function is_string;
 use LogicException;
 use PhpParser\Node;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @internal
@@ -51,6 +55,8 @@ use PhpParser\Node;
 final class LogicalOr implements Mutator
 {
     use GetMutatorName;
+
+    private ?string $seenVariabeName = null;
 
     public static function getDefinition(): Definition
     {
@@ -85,6 +91,13 @@ final class LogicalOr implements Mutator
 
         $nodeLeft = $node->left;
         $nodeRight = $node->right;
+
+        if (
+            $nodeLeft instanceof Node\Expr\Instanceof_
+            && $nodeRight instanceof Node\Expr\Instanceof_
+        ) {
+            return $this->isInstanceOfConditionMutable($nodeLeft) || $this->isInstanceOfConditionMutable($nodeRight);
+        }
 
         if (
             !$nodeLeft instanceof Node\Expr\BinaryOp
@@ -229,6 +242,36 @@ final class LogicalOr implements Mutator
                 '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
                 default => throw new LogicException('This is an unreachable statement.'),
             })();
+        }
+
+        return true;
+    }
+
+    private function isInstanceOfConditionMutable(Node\Expr\Instanceof_ $node): bool
+    {
+        if (
+            $node->expr instanceof Node\Expr\Variable
+            && is_string($node->expr->name)
+            && $node->class instanceof Node\Name
+        ) {
+            if ($this->seenVariabeName === null) {
+                $this->seenVariabeName = $node->expr->name;
+            } else {
+                if ($this->seenVariabeName !== $node->expr->name) {
+                    return true;
+                }
+            }
+
+            $resolvedName = NameResolver::resolveName($node->class);
+
+            try {
+                $reflectionClass = new ReflectionClass($resolvedName->name); // @phpstan-ignore argument.type
+
+                if (!$reflectionClass->isInterface() && !$reflectionClass->isTrait()) {
+                    return false;
+                }
+            } catch (ReflectionException) {
+            }
         }
 
         return true;
