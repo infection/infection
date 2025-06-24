@@ -59,6 +59,7 @@ final class PHPStanAdapterTest extends TestCase
     private commandLineBuilder&MockObject $commandLineBuilder;
 
     private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
+
     private Filesystem&MockObject $fileSystem;
 
     protected function setUp(): void

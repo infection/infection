@@ -56,6 +56,7 @@ use Webmozart\Assert\Assert;
 final class ConsoleLogger extends AbstractLogger
 {
     private const INFO = 'info';
+
     private const ERROR = 'error';
 
     private const VERBOSITY_LEVEL_MAP = [

@@ -67,6 +67,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     private const PAD_LENGTH = 8;
 
     private const LOW_QUALITY_THRESHOLD = 50;
+
     private const MEDIUM_QUALITY_THRESHOLD = 90;
 
     private int $mutationCount = 0;

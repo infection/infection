@@ -60,9 +60,12 @@ class NodeMutationGenerator
     private readonly array $mutators;
 
     private Node $currentNode;
+
     /** @var TestLocation[]|null */
     private ?array $testsMemoized = null;
+
     private ?bool $isOnFunctionSignatureMemoized = null;
+
     private ?bool $isInsideFunctionMemoized = null;
 
     /**

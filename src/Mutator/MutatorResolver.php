@@ -53,9 +53,11 @@ use stdClass;
 final class MutatorResolver
 {
     private const IGNORE_SETTING = 'ignore';
+
     private const IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'ignoreSourceCodeByRegex';
 
     private const GLOBAL_IGNORE_SETTING = 'global-ignore';
+
     private const GLOBAL_IGNORE_SOURCE_CODE_BY_REGEX_SETTING = 'global-ignoreSourceCodeByRegex';
 
     /**

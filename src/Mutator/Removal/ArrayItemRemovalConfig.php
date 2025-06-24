@@ -51,6 +51,7 @@ final class ArrayItemRemovalConfig implements MutatorConfig
     ];
 
     private readonly string $remove;
+
     private readonly int $limit;
 
     /**

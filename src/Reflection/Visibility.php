@@ -41,6 +41,7 @@ namespace Infection\Reflection;
 final readonly class Visibility
 {
     public const PUBLIC = 'public';
+
     public const PROTECTED = 'protected';
 
     private function __construct(

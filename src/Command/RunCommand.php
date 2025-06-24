@@ -80,6 +80,7 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     public const OPTION_SHOW_MUTATIONS = 'show-mutations';
+
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
