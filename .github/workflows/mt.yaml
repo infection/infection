@@ -30,6 +30,7 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     name: Infection complete run on Infection
 
@@ -91,6 +92,7 @@ jobs:
   tests-status:
       name: Mutation Testing Status
       runs-on: ubuntu-latest
+      timeout-minutes: 30
       needs: tests
       if: always()
       steps:

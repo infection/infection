@@ -13,6 +13,7 @@ concurrency:
 jobs:
     tests:
         runs-on: ubuntu-latest
+        timeout-minutes: 30
 
         strategy:
             matrix:
@@ -63,6 +64,7 @@ jobs:
     tests-status:
         name: Annotations Status
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: tests
         if: always()
         steps:

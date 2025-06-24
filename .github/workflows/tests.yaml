@@ -17,6 +17,7 @@ concurrency:
 jobs:
   tests:
     runs-on: ${{ matrix.operating-system }}
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -107,6 +108,7 @@ jobs:
   tests-status:
     name: Unit & Integration Tests Status
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: tests
     if: always()
     steps:
