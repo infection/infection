@@ -48,7 +48,9 @@ final class LogVerbosity
     use CannotBeInstantiated;
 
     public const DEBUG = 'all';
+
     public const NORMAL = 'default';
+
     public const NONE = 'none';
 
     /**

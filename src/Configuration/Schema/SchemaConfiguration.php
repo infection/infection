@@ -48,6 +48,7 @@ use Webmozart\Assert\Assert;
 final class SchemaConfiguration
 {
     private readonly ?float $timeout;
+
     private readonly ?string $testFramework;
 
     /**

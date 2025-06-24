@@ -45,13 +45,21 @@ final class DetectionStatus
     use CannotBeInstantiated;
 
     public const KILLED_BY_TESTS = 'killed by tests';
+
     public const KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
+
     public const ESCAPED = 'escaped';
+
     public const ERROR = 'error';
+
     public const TIMED_OUT = 'timed out';
+
     public const SKIPPED = 'skipped';
+
     public const SYNTAX_ERROR = 'syntax error';
+
     public const NOT_COVERED = 'not covered';
+
     public const IGNORED = 'ignored';
 
     public const ALL = [

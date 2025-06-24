@@ -52,8 +52,11 @@ use function Safe\unlink;
 final class JUnitTestFileDataProviderTest extends TestCase
 {
     private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
+
     private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit2.xml';
+
     private const JUNIT_FEATURE_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_feature.xml';
+
     private const JUNIT_CODECEPTION_CEST_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_codeception_cest.xml';
 
     /**

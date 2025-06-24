@@ -51,6 +51,7 @@ use Webmozart\Assert\Assert;
 class MutantExecutionResult
 {
     private readonly string $detectionStatus;
+
     private readonly string $mutatorClass;
 
     /**

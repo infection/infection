@@ -58,14 +58,21 @@ class Configuration
     ];
 
     private readonly float $timeout;
+
     /** @var string[] */
     private readonly array $sourceDirectories;
+
     private readonly string $logVerbosity;
+
     /** @var array<string, Mutator<Node>> */
     private readonly array $mutators;
+
     private readonly string $testFramework;
+
     private readonly ?string $staticAnalysisTool;
+
     private ?float $minMsi = null;
+
     private readonly int $threadCount;
 
     /**

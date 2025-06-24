@@ -56,7 +56,9 @@ use function strtolower;
 class CoverageChecker
 {
     private const PHPUNIT = 'phpunit';
+
     private const CODECEPTION = 'codeception';
+
     private readonly string $frameworkAdapterName;
 
     public function __construct(

@@ -47,6 +47,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class IO extends SymfonyStyle
 {
     private readonly InputInterface $input;
+
     private readonly OutputInterface $output;
 
     public function __construct(InputInterface $input, OutputInterface $output)

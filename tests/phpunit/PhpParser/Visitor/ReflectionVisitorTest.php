@@ -334,6 +334,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     {
         return new class extends NodeVisitorAbstract {
             public ?ClassReflection $fooReflectionClass = null;
+
             public ?ClassReflection $createAnonymousClassReflectionClass = null;
 
             public function enterNode(Node $node): ?int
