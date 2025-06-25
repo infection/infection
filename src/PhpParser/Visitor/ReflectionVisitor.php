@@ -166,6 +166,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return $functionScope;
     }
 
+    public static function isStrictTypesEnabled(Node\FunctionLike $node): ?bool
+    {
+        return $node->getAttribute(self::STRICT_TYPES_KEY);
+    }
+
     /**
      * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
      * signature.
