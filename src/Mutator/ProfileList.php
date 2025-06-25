@@ -97,9 +97,7 @@ final class ProfileList
         Boolean\ArrayAll::class,
         Boolean\ArrayAny::class,
         Boolean\ArrayItem::class,
-        // EqualIdentical disabled from the default boolean profile
         Boolean\FalseValue::class,
-        // IdenticalEqual disabled from the default boolean profile
         Boolean\InstanceOf_::class,
         Boolean\LogicalAnd::class,
         Boolean\LogicalAndAllSubExprNegation::class,
@@ -137,7 +135,6 @@ final class ProfileList
     ];
 
     public const EQUAL_PROFILE = [
-        Boolean\IdenticalEqual::class,
         Boolean\NotIdenticalNotEqual::class,
     ];
 
@@ -336,9 +333,7 @@ final class ProfileList
         'ArrayAll' => Boolean\ArrayAll::class,
         'ArrayAny' => Boolean\ArrayAny::class,
         'ArrayItem' => Boolean\ArrayItem::class,
-        'EqualIdentical' => Boolean\EqualIdentical::class,
         'FalseValue' => Boolean\FalseValue::class,
-        'IdenticalEqual' => Boolean\IdenticalEqual::class,
         'InstanceOf_' => Boolean\InstanceOf_::class,
         'LogicalAnd' => Boolean\LogicalAnd::class,
         'LogicalAndAllSubExprNegation' => Boolean\LogicalAndAllSubExprNegation::class,

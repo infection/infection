@@ -46,7 +46,6 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
-use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
 use Infection\Mutator\Boolean\TrueValueConfig;
 use Infection\Mutator\IgnoreConfig;
@@ -783,15 +782,13 @@ final class ConfigurationFactoryTest extends TestCase
                     ],
                 ],
             ],
-            'AssignmentEqual,EqualIdentical',
+            'AssignmentEqual',
             false,
             [
                 'AssignmentEqual' => new AssignmentEqual(),
-                'EqualIdentical' => new EqualIdentical(),
             ],
             [
                 'AssignmentEqual' => ['Assert::.*'],
-                'EqualIdentical' => ['Assert::.*'],
             ],
         );
 
