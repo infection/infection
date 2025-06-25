@@ -144,7 +144,6 @@ final class ProfileList
     ];
 
     public const IDENTICAL_PROFILE = [
-        Boolean\EqualIdentical::class,
         Boolean\NotEqualNotIdentical::class,
     ];
 
