@@ -42,8 +42,6 @@ use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
-use PhpParser\Node\FunctionLike;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -128,8 +126,7 @@ final class ArrayOneItem implements Mutator
 
     private function returnTypeIsArray(Node $node): bool
     {
-        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
-        Assert::nullOrIsInstanceOf($functionScope, FunctionLike::class);
+        $functionScope = ReflectionVisitor::getFunctionScope($node);
 
         if ($functionScope === null) {
             return false;

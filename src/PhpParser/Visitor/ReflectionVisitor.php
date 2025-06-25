@@ -158,6 +158,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return $reflection;
     }
 
+    public static function getFunctionScope(Node $node): ?Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
     /**
      * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
      * signature.
