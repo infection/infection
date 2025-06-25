@@ -40,7 +40,6 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
@@ -95,8 +94,7 @@ final class ProtectedVisibility implements Mutator
             return false;
         }
 
-        $class = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
-        Assert::nullOrIsInstanceOf($class, ClassReflection::class);
+        $class = ReflectionVisitor::getReflectionClass($node);
 
         if ($node->isFinal() || $class !== null && $class->isFinal()) {
             return false;
@@ -115,8 +113,8 @@ final class ProtectedVisibility implements Mutator
 
     private function hasSameProtectedParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
-        Assert::isInstanceOf($reflection, ClassReflection::class);
+        $reflection = ReflectionVisitor::getReflectionClass($node);
+        Assert::notNull($reflection);
 
         return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asProtected());
     }

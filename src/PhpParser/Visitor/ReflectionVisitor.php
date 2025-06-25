@@ -150,6 +150,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    public static function getReflectionClass(Node $node): ?ClassReflection
+    {
+        $reflection = $node->getAttribute(self::REFLECTION_CLASS_KEY);
+        Assert::nullOrIsInstanceOf($reflection, ClassReflection::class);
+
+        return $reflection;
+    }
+
     /**
      * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
      * signature.
