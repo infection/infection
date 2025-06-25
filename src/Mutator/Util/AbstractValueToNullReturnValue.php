@@ -40,6 +40,7 @@ use Infection\Mutator\Mutator;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use function is_string;
 use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,8 +54,8 @@ abstract class AbstractValueToNullReturnValue implements Mutator
 
     protected function isNullReturnValueAllowed(Node $node): bool
     {
-        /** @var Node\Stmt\Function_|null $functionScope */
         $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY, null);
+        Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);
 
         if ($functionScope === null) {
             return true;

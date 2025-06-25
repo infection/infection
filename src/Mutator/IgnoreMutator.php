@@ -40,6 +40,7 @@ use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\ClassReflection;
 use PhpParser\Node;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * The mutators implement the ignore + canMutator pattern. The downside of this pattern is that
@@ -84,8 +85,8 @@ final readonly class IgnoreMutator implements Mutator
             return false;
         }
 
-        /** @var ClassReflection|null $reflectionClass */
         $reflectionClass = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+        Assert::nullOrIsInstanceOf($reflectionClass, ClassReflection::class);
 
         if (!$reflectionClass instanceof ClassReflection) {
             return true;
