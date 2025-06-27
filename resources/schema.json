@@ -240,6 +240,7 @@
                 "ArrayFind": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayFindKey": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
+                "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
                 "InstanceOf_": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalAnd": { "$ref": "#/definitions/default-mutator-config" },

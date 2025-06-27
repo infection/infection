@@ -144,6 +144,7 @@ final class ProfileList
     ];
 
     public const IDENTICAL_PROFILE = [
+        Boolean\EqualIdentical::class,
         Boolean\NotEqualNotIdentical::class,
     ];
 
@@ -332,6 +333,7 @@ final class ProfileList
         'ArrayAll' => Boolean\ArrayAll::class,
         'ArrayAny' => Boolean\ArrayAny::class,
         'ArrayItem' => Boolean\ArrayItem::class,
+        'EqualIdentical' => Boolean\EqualIdentical::class,
         'FalseValue' => Boolean\FalseValue::class,
         'InstanceOf_' => Boolean\InstanceOf_::class,
         'LogicalAnd' => Boolean\LogicalAnd::class,
