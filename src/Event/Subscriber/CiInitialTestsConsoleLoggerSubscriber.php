@@ -78,7 +78,9 @@ final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 
     public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
     {
-        $this->output->writeln(sprintf('Ran %d tests.', $this->numberOfCompletedTests));
+        if (!$event->hasErrored()) {
+            $this->output->writeln(sprintf('Ran %d tests.', $this->numberOfCompletedTests));
+        }
     }
 
     public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void

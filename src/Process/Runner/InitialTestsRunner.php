@@ -79,7 +79,7 @@ class InitialTestsRunner
             $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getExitCode() !== 0, $process->getOutput()));
 
         return $process;
     }

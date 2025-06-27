@@ -41,6 +41,7 @@ namespace Infection\Event;
 final readonly class InitialTestSuiteWasFinished
 {
     public function __construct(
+        private bool $errored,
         private string $outputText,
     ) {
     }
@@ -48,5 +49,10 @@ final readonly class InitialTestSuiteWasFinished
     public function getOutputText(): string
     {
         return $this->outputText;
+    }
+
+    public function hasErrored(): bool
+    {
+        return $this->errored;
     }
 }
