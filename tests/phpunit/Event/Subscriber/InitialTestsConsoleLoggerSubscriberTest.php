@@ -109,6 +109,6 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, true));
 
-        $dispatcher->dispatch(new InitialTestSuiteWasFinished($processText));
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished(true, $processText));
     }
 }

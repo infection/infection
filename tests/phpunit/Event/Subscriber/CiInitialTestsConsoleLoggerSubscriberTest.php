@@ -36,10 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -88,5 +90,46 @@ final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
 
         $dispatcher->dispatch(new InitialTestSuiteWasStarted());
+    }
+
+    #[DataProvider('provideSuiteFinished')]
+    public function test_it_reacts_on_test_suite_finished(bool $expectsRanOutput, bool $errored): void
+    {
+        $this->testFramework->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('6.5.4');
+
+        $this->testFramework->expects($this->once())
+            ->method('getName')
+            ->willReturn('PHPUnit');
+
+        $expectedNumberOfWrites = 1;
+
+        if ($expectsRanOutput) {
+            ++$expectedNumberOfWrites;
+        }
+
+        $this->output->expects($this->exactly($expectedNumberOfWrites))
+            ->method('writeln');
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
+
+        $dispatcher->dispatch(new InitialTestSuiteWasStarted());
+
+        $dispatcher->dispatch(new InitialTestSuiteWasFinished($errored, 'something'));
+    }
+
+    public static function provideSuiteFinished(): iterable
+    {
+        yield [
+            'expectsRanOutput' => false,
+            'errored' => true,
+        ];
+
+        yield [
+            'expectsRanOutput' => true,
+            'errored' => false,
+        ];
     }
 }

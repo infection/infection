@@ -37,17 +37,31 @@ namespace Infection\Tests\Event;
 
 use Infection\Event\InitialTestSuiteWasFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InitialTestSuiteWasFinished::class)]
 final class InitialTestSuiteWasFinishedTest extends TestCase
 {
-    public function test_it_exposes_its_output(): void
+    #[DataProvider('provideEvents')]
+    public function test_it_exposes_its_output_and_error(bool $errored, string $output, InitialTestSuiteWasFinished $event): void
     {
-        $text = 'foo-bar-baz';
+        $this->assertSame($output, $event->getOutputText());
+        $this->assertSame($errored, $event->hasErrored());
+    }
 
-        $class = new InitialTestSuiteWasFinished($text);
+    public static function provideEvents(): iterable
+    {
+        yield [
+            false,
+            'foo-bar-baz',
+            new InitialTestSuiteWasFinished(false, 'foo-bar-baz'),
+        ];
 
-        $this->assertSame($text, $class->getOutputText());
+        yield [
+            true,
+            'foo-bar-baz',
+            new InitialTestSuiteWasFinished(true, 'foo-bar-baz'),
+        ];
     }
 }
