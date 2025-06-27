@@ -103,6 +103,7 @@ final class InitialTestsRunnerTest extends TestCase
         $testFrameworkExtraOptions = '--stop-on-failure';
         $phpExtraOptions = ['-d memory_limit=-1'];
         $skipCoverage = false;
+        $skipProgressBar = true;
 
         $process = $this->createProcessForCode(<<<STR
             echo 'ping';
@@ -112,11 +113,11 @@ final class InitialTestsRunnerTest extends TestCase
 
         $this->processFactoryMock
             ->method('createProcess')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $skipProgressBar)
             ->willReturn($process)
         ;
 
-        $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+        $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $skipProgressBar);
 
         $this->assertSame(
             [
@@ -133,6 +134,7 @@ final class InitialTestsRunnerTest extends TestCase
         $testFrameworkExtraOptions = '--stop-on-failure';
         $phpExtraOptions = ['-d memory_limit=-1'];
         $skipCoverage = false;
+        $skipProgressBar = false;
 
         $input = new InputStream();
 
@@ -147,12 +149,12 @@ final class InitialTestsRunnerTest extends TestCase
 
         $this->processFactoryMock
             ->method('createProcess')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage)
+            ->with($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $skipProgressBar)
             ->willReturn($process)
         ;
 
         try {
-            $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage);
+            $this->runner->run($testFrameworkExtraOptions, $phpExtraOptions, $skipCoverage, $skipProgressBar);
         } catch (RuntimeException $e) {
             // Signal 11, AKA "segmentation fault", is not something we can do anything about
             if (extension_loaded('xdebug') && str_contains($e->getMessage(), 'The process has been signaled with signal "11"')) {

@@ -69,7 +69,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
 
         $this->testFrameworkAdapterMock
             ->method('getInitialTestRunCommandLine')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, true)
+            ->with($testFrameworkExtraOptions. ' --no-progress', $phpExtraOptions, true, true)
             ->willReturn(['/usr/bin/php'])
         ;
 
@@ -77,6 +77,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             true,
+            true
         );
 
         $this->assertContains($process->getCommandLine(), [
@@ -97,7 +98,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
 
         $this->testFrameworkAdapterMock
             ->method('getInitialTestRunCommandLine')
-            ->with($testFrameworkExtraOptions, $phpExtraOptions, false)
+            ->with($testFrameworkExtraOptions, $phpExtraOptions, false, false)
             ->willReturn(['/usr/bin/php'])
         ;
 
@@ -105,6 +106,7 @@ final class InitialTestsRunProcessFactoryTest extends TestCase
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             false,
+            false
         );
 
         $this->assertContains($process->getCommandLine(), [
