@@ -40,6 +40,8 @@ use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
+use function rtrim;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -49,10 +51,12 @@ use Symfony\Component\Process\Process;
  */
 readonly class InitialTestsRunner
 {
+    private const TOOL_INDENT = '   ';
+
     public function __construct(
-        private  InitialTestsRunProcessFactory $processBuilder,
-        private  EventDispatcher $eventDispatcher,
-        private  OutputInterface $output,
+        private InitialTestsRunProcessFactory $processBuilder,
+        private EventDispatcher $eventDispatcher,
+        private OutputInterface $output,
     ) {
     }
 
@@ -69,25 +73,27 @@ readonly class InitialTestsRunner
             $testFrameworkExtraOptions,
             $phpExtraOptions,
             $skipCoverage,
-            $skipProgressBar
+            $skipProgressBar,
         );
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
         $process->run(function (string $type, $data) use ($process): void {
-            if (Process::ERR === $type) {
+            if ($type === Process::ERR) {
                 // Stop on the first error encountered
                 $process->stop();
             }
 
-            if (Process::OUT === $type) {
-                $this->output->write($data);
+            if ($type === Process::OUT) {
+                $reformatted = self::TOOL_INDENT
+                    . str_replace("\n", "\n" . self::TOOL_INDENT, $data);
+                $this->output->write(rtrim($reformatted, ' '));
             }
 
-            //$this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
+            // $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
         });
 
-        //$this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
+        // $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
 
         return $process;
     }
