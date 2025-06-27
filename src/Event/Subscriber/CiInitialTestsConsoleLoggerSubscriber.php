@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\InitialTestCaseWasCompleted;
+use Infection\Event\InitialTestSuiteWasFinished;
 use Infection\Event\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
 use function sprintf;
@@ -44,11 +46,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
 {
+    private int $numberOfCompletedTests = 0;
+
     public function __construct(
-        private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
+        private readonly OutputInterface $output,
+        private readonly TestFrameworkAdapter $testFrameworkAdapter,
     ) {
     }
 
@@ -70,5 +74,15 @@ final readonly class CiInitialTestsConsoleLoggerSubscriber implements EventSubsc
                 $version,
             ),
         ]);
+    }
+
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    {
+        $this->output->writeln(sprintf('Ran %d tests.', $this->numberOfCompletedTests));
+    }
+
+    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
+    {
+        ++$this->numberOfCompletedTests;
     }
 }
