@@ -59,6 +59,7 @@ This data is expected to be provided by the user. In which case it needs to be v
 **TODO**s:
 - currently, Infection does not guard against using outdated data.
 - Infection should offer some commands to be able to validate the artifacts
+- Maybe mention tracing?
 
 
 ## Initial Run
