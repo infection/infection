@@ -106,16 +106,16 @@ final class LogicalOr implements Mutator
             return true;
         }
 
+        $leftSigil = $nodeLeft->getOperatorSigil();
+        $rightSigil = $nodeRight->getOperatorSigil();
+
         $nodeLeftLeft = $nodeLeft->left;
         $nodeLeftRight = $nodeLeft->right;
 
         $nodeRightLeft = $nodeRight->left;
         $nodeRightRight = $nodeRight->right;
 
-        if (
-            $nodeLeft instanceof Node\Expr\BinaryOp\Identical
-            && $nodeRight instanceof Node\Expr\BinaryOp\Identical
-        ) {
+        if ($leftSigil === '===' && $rightSigil === '===') {
             $varNameLeft = [];
 
             if ($nodeLeftLeft instanceof Node\Expr\Variable) {
@@ -140,38 +140,14 @@ final class LogicalOr implements Mutator
         }
 
         if (
-            (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
-                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
-                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
-                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
-                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
-            )
+            ($leftSigil === '>' && $rightSigil === '<')
+            || ($leftSigil === '>' && $rightSigil === '<=')
+            || ($leftSigil === '>=' && $rightSigil === '<=')
+            || ($leftSigil === '>=' && $rightSigil === '<')
+            || ($leftSigil === '<' && $rightSigil === '>')
+            || ($leftSigil === '<' && $rightSigil === '>=')
+            || ($leftSigil === '<=' && $rightSigil === '>=')
+            || ($leftSigil === '<=' && $rightSigil === '>')
         ) {
             $varNameLeft = null;
             $valueLeft = null;
@@ -231,7 +207,7 @@ final class LogicalOr implements Mutator
                 return true;
             }
 
-            return (match ("{$nodeLeft->getOperatorSigil()}::{$nodeRight->getOperatorSigil()}") {
+            return (match ("{$leftSigil}::{$rightSigil}") {
                 '<::>' => static fn () => $valueRight < $valueLeft, // a<5 && a>7; 7<a<5; 7<5;
                 '<::>=' => static fn () => $valueRight < $valueLeft, // a<5 && a>=7; 7<=a<5; 7<5;
                 '<=::>=' => static fn () => $valueRight <= $valueLeft, // a<=5 && a>=7; 7<=a<=5; 7<=5;
