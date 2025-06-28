@@ -21,42 +21,27 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-set -Eeuo pipefail
+set -eu
 
-files_with_trailing_whitespaces=$(
-    find . \
-        -type f \
-        -not -name "*.cache" \
-        -not -name "*.log" \
-        -not -path "./.DS_Store" \
-        -not -path "./.composer/*" \
-        -not -path "./.cache/*" \
-        -not -path "./.box_dump/*" \
-        -not -path "./.tools/*" \
-        -not -path "./build/*" \
-        -not -path "./.idea/*" \
-        -not -path "./.git/*" \
-        -not -path "./vendor/*" \
-        -not -path "./tests/autoloaded/*" \
-        -not -path "./tests/benchmark/*/coverage/*" \
-        -not -path "./tests/benchmark/*/sources/*" \
-        -not -path "./tests/e2e/*" \
-        -not -path "./tests/phpunit/Fixtures/Files/phpunit/format-whitespace/original-phpunit.xml" \
-        -not -path "./tests/phpunit/StringNormalizerTest.php" \
-        -not -path "./tests/phpunit/StrTest.php" \
-        -not -path "./tests/benchmark/Tracing/coverage.tar.gz" \
-        -not -path "./tests/benchmark/MutationGenerator/._sources" \
-        -exec grep -EIHn "\\s$" {} \;
+files_with_trailing_spaces=$(
+    git grep -In "\\s$" \
+        ':!tests/autoloaded/*' \
+        ':!tests/e2e/*' \
+        ':!tests/phpunit/StrTest.php' \
+        ':!tests/phpunit/StringNormalizerTest.php' \
+        ':!tests/phpunit/Fixtures/Files/phpunit/format-whitespace/original-phpunit.xml' \
+        ':!tests/benchmark/Tracing/coverage.tar.gz' \
+        ':!tests/benchmark/MutationGenerator/sources.tar.gz' \
+    | sort -fh
 )
 
-if [[ "$files_with_trailing_whitespaces" ]]
+if [ "$files_with_trailing_spaces" ]
 then
-    printf '\033[97;41mTrailing whitespaces detected:\033[0m\n';
-    e=$(printf '\033');
-    echo "${files_with_trailing_whitespaces}" \
-      | sed -E "s/^\\.\\/([^:]+):([0-9]+):(.*[^\\t ])?([\\t ]+)$/${e}[0;31m - in ${e}[0;33m\\1${e}[0;31m at line ${e}[0;33m\\2\\n   ${e}[0;31m>${e}[0m \\3${e}[41;1m\\4${e}[0m/";
+    printf '\033[97;41mTrailing whitespaces detected:\033[0m\n'
+    e=$(printf '\033')
+    echo "${files_with_trailing_spaces}" | sed -E "s/^([^:]+):([0-9]+):(.*[^\\t ])?([\\t ]+)$/${e}[0;31m - in ${e}[0;33m\\1${e}[0;31m at line ${e}[0;33m\\2\\n   ${e}[0;31m>${e}[0m \\3${e}[41;1m\\4${e}[0m/"
 
-    exit 1;
+    exit 3
 fi
 
-printf '\033[0;32mNo trailing whitespaces detected.\033[0m\n';
+printf '\033[0;32mNo trailing whitespaces detected.\033[0m\n'
