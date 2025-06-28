@@ -747,5 +747,35 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It mutates left-side instanceof or non-instanceof expression' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable || $i > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable && $i > 5;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates right-side instanceof or non-instanceof expression' => [
+            <<<'PHP'
+                <?php
+
+                $var = $i > 5 || $node instanceof \Countable;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $i > 5 && $node instanceof \Countable;
+                PHP
+            ,
+        ];
     }
 }
