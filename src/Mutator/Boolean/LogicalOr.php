@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_intersect;
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
@@ -139,15 +140,11 @@ final class LogicalOr implements Mutator
             return array_intersect($varNameLeft, $varNameRight) === [];
         }
 
+        $compareSigils = ['>', '<', '>=', '<='];
+
         if (
-            ($leftSigil === '>' && $rightSigil === '<')
-            || ($leftSigil === '>' && $rightSigil === '<=')
-            || ($leftSigil === '>=' && $rightSigil === '<=')
-            || ($leftSigil === '>=' && $rightSigil === '<')
-            || ($leftSigil === '<' && $rightSigil === '>')
-            || ($leftSigil === '<' && $rightSigil === '>=')
-            || ($leftSigil === '<=' && $rightSigil === '>=')
-            || ($leftSigil === '<=' && $rightSigil === '>')
+            in_array($leftSigil, $compareSigils, true)
+            && in_array($rightSigil, $compareSigils, true)
         ) {
             $varNameLeft = null;
             $valueLeft = null;
