@@ -17,13 +17,14 @@ flowchart LR
     A["Start"] --> B(["Source Collection"])
     A -.-> C(["Pre-Requisite Collection"])
     B --> D(["Initial Run"])
-    D -.-> C
+    D --> C
     D --> E(["AST Collection"])
+    C -.-> E
     E --> F(["Mutagenesis"])
+    C -.-> F
     F --> G(["Mutation Analysis"])
     G --> H(["Reporting"])
     H --> I["End"]
-
 ```
 
 ## Source Collection
@@ -52,13 +53,13 @@ Additional filtering is available which will narrow down the source:
 
 To operate efficiently, the mutation testing service requires some data. The nature of the data varies depending on the implementation and underlying tool(s) used. 
 
-In Infection, this will be a JUnit + XML PHPUnit code coverage report for PHPUnit. If PHPStan is used, this will include an up-to-date PHPStan cache. From those artifacts, we generate _traces_. A trace is a way to identify what test to execute for a given piece of code.
+In Infection, this will be a JUnit + XML PHPUnit code coverage report for PHPUnit. If PHPStan is used, this will include an up-to-date PHPStan cache. From those artefacts, we generate _traces_. A trace is a way to identify what test to execute for a given piece of code.
 
 This data is expected to be provided by the user. In which case it needs to be validated to ensure up-to-date data is being used. But to provide a better user experience, the mutation testing service can do an "initial run" to generate this data.
 
 **TODO**s:
 - currently, Infection does not guard against using outdated data.
-- Infection should offer some commands to be able to validate the artifacts
+- Infection should offer some commands to be able to validate the artefacts
 - Maybe mention tracing?
 
 
@@ -105,13 +106,13 @@ This works by:
 **TODO**s:
 - There should be a way to see why Infection ignores a piece of code.
 - I believe excluding the code may not be done at the correct place yet.
-- All the labeling could follow a coding system to be able to identify the reason for easier review/debugging. For instance, a node could be labeled as non-eligible because it is not part of the targeted source, or it cannot be traced to a test (both different reasons so different codes).
+- All the labelling could follow a coding system to be able to identify the reason for easier review/debugging. For instance, a node could be labelled as non-eligible because it is not part of the targeted source, or it cannot be traced to a test (both different reasons so different codes).
 - If SA or other testing tools are allowed, or based on the tracing strategy, maybe requiring at least one test/trace is not correct.
 
 
 ## Mutagenesis
 
-The mutagenesis service navigates the AST and provides potential mutants. It has access to a registry of mutation operators (AKA mutators) which are implemented as AST visitors.
+The mutagenesis service navigates the AST and provides potential mutants. It has access to a registry of mutation operators (AKA mutators) which is implemented as AST visitors.
 
 A few additional notes:
 
@@ -264,7 +265,7 @@ The idea is to execute _noop tests_, i.e. execute the tests for the mutation but
 
 **TODO**: clarify with mbj the exact behaviour.
 
-If the noop test is passed but another test results in a graceful failure, the mutation can be considered as covered. Otherwise, it remains labeled as suspicious.
+If the noop test is passed but another test results in a graceful failure, the mutation can be considered as covered. Otherwise, it remains labelled as suspicious.
 
 
 ## Reporting
