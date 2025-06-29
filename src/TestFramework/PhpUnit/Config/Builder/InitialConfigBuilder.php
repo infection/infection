@@ -143,7 +143,7 @@ class InitialConfigBuilder implements ConfigBuilder
             return;
         }
 
-        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+        if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
             $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
         }
     }
