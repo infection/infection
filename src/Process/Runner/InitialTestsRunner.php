@@ -85,9 +85,8 @@ readonly class InitialTestsRunner
             }
 
             if ($type === Process::OUT) {
-                $reformatted = self::TOOL_INDENT
-                    . str_replace("\n", "\n" . self::TOOL_INDENT, $data);
-                $this->output->write(rtrim($reformatted, ' '));
+                $reformatted = str_replace("\n", "\n" . self::TOOL_INDENT, $data);
+                $this->output->write($reformatted);
             }
 
             // $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
