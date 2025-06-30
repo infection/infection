@@ -28,11 +28,20 @@ I'd love to see a mutation that would remove one of the return statements if the
 ```diff
     if (null !== $this->config) {
 -        return $this->config;
-+        
     }
     // ...
     return $this->config;
 ```
 
 The missing test should install a spy on `loadConfig()` to confirm it only called once.
+
+Alternatively, we can remove a whole if-return branch:
+
+```diff
+-   if (null !== $this->config) {
+-        return $this->config;
+-   }
+    // ...
+    return $this->config;
+```
 
