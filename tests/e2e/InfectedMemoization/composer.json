@@ -1,15 +1,10 @@
 {
-    "require-dev": {
-        "phpunit/phpunit": "^9.6.20"
+    "require": {
+        "phpunit/phpunit": "^12.2"
     },
     "autoload": {
         "psr-4": {
-            "InfectedMemoization\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "InfectedMemoization\\Test\\": "tests/"
+            "Infected\\": "src/"
         }
     }
 }

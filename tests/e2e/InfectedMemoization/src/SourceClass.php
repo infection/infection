@@ -1,11 +1,26 @@
 <?php
 
-namespace InfectedMemoization;
+declare(strict_types=1);
+
+namespace Infected;
 
 class SourceClass
 {
-    public function hello(): string
+    private ?object $config = null;
+
+    private function loadConfig(): object
     {
-        return 'hello';
+        return (object) ['key' => 'value'];
+    }
+
+    public function getConfig(): object
+    {
+        if (null !== $this->config) {
+            return $this->config;
+        }
+
+        $this->config = $this->loadConfig();
+
+        return $this->config;
     }
 }
