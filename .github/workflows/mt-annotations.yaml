@@ -64,7 +64,6 @@ jobs:
                     --ignore-msi-with-no-mutations \
                     --min-msi=100 \
                     --min-covered-msi=100 \
-                    --static-analysis-tool=phpstan \
                     --only-covered
 
     # This is a meta job to avoid to have to constantly change the protection rules
