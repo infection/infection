@@ -51,7 +51,6 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
-use Infection\Tests\WithConsecutive;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -175,25 +174,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_outputs_escaped_mutants_when_mutation_testing_is_finished(): void
     {
-        $this->output
-            ->expects($this->atLeastOnce())
-            ->method('writeln')
-            ->with(...WithConsecutive::create(
-                [
-                    [
-                        '',
-                        'Escaped mutants:',
-                        '================',
-                        '',
-                    ],
-                ],
-                [
-                    [
-                        '',
-                        '1) /original/filePath:10    [M] Plus [ID] h4sh',
-                    ],
-                ],
-            ));
+        $output = new StreamOutput(fopen('php://memory', 'w'));
 
         $executionResult = $this->createMock(MutantExecutionResult::class);
         $executionResult->expects($this->once())
@@ -218,7 +199,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $output,
             $this->outputFormatter,
             $this->metricsCalculator,
             $this->resultsCollector,
@@ -228,30 +209,26 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringContainsString(
+            "\nEscaped mutants:\n================\n",
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            "\n\n\n1) /original/filePath:10    [M] Plus [ID] h4sh\n",
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            "\n\n" . 'Please note that some mutants will inevitably be harmless (i.e. false positives).',
+            $this->getDisplay($output),
+        );
     }
 
     public function test_it_does_not_output_escaped_mutants_when_mutation_testing_is_finished_with_no_escaped_mutants(): void
     {
-        $this->output
-            ->expects($this->atLeastOnce())
-            ->method('writeln')
-            ->with(...WithConsecutive::create(
-                [
-                    [
-                        '',
-                        '',
-                    ],
-                ],
-                [
-                    '<options=bold>0</options=bold> mutations were generated:',
-                ],
-                [
-                    '<options=bold>       0</options=bold> mutants were killed by Test Framework',
-                ],
-                [
-                    '<options=bold>       0</options=bold> mutants were caught by Static Analysis',
-                ],
-            ));
+        $output = new StreamOutput(fopen('php://memory', 'w'));
 
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
@@ -259,7 +236,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
-            $this->output,
+            $output,
             $this->outputFormatter,
             $this->metricsCalculator,
             $this->resultsCollector,
@@ -269,6 +246,26 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringContainsString(
+            "\n\nMetrics:\n",
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            "\n\n0 mutations were generated:",
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            '       0 mutants were killed by Test Framework',
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            '       0 mutants were caught by Static Analysis',
+            $this->getDisplay($output),
+        );
     }
 
     public function test_it_outputs_generated_file_log_paths_if_enabled(): void
@@ -307,7 +304,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $output = $this->getDisplay($output);
         $this->assertStringContainsString(
-            <<<TEXT
+            "\n\n" . <<<TEXT
                 Generated Reports:
                          - relative/path.log
                          - /absolute/path.html
@@ -402,7 +399,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $this->assertStringContainsString(
-            '... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.',
+            "\n\n\n" . '... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.',
             $this->getDisplay($output),
         );
     }
