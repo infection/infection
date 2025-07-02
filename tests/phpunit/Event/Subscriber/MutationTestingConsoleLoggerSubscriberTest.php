@@ -316,7 +316,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $output,
         );
         $this->assertStringNotContainsString(
-            'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
+            'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.',
             $output,
         );
     }
@@ -339,7 +339,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $this->assertStringContainsString(
-            'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
+            'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.',
             $this->getDisplay($output),
         );
     }
