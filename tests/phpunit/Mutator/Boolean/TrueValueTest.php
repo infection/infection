@@ -172,7 +172,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                 <?php
 
                 match(true) {
-                    $count > 0 && $count <=10 => 'small',
+                    $count > 0 && $count <= 10 => 'small',
                     $count <= 50 => 'medium',
                     $count > 50 => 'huge',
                 };

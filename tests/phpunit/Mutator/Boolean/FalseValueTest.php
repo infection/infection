@@ -94,9 +94,9 @@ final class FalseValueTest extends BaseMutatorTestCase
                 <?php
 
                 match(false) {
-                    $count > 0 && $count <=10 => 'small',
-                    $count <=50 => 'medium',
-                    $count >50 => 'huge',
+                    $count > 0 && $count <= 10 => 'small',
+                    $count <= 50 => 'medium',
+                    $count > 50 => 'huge',
                 };
                 PHP
             ,
