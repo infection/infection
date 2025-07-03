@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.30.1](https://github.com/infection/infection/tree/0.30.1) (2025-07-04)
+
+**Changed:**
+
+* `TextFileLogger`: add hints about different logfile options by @staabm in https://github.com/infection/infection/pull/2278
+* [performance] Smarter `TrueValue`/`FalseValue` mutator by @staabm in https://github.com/infection/infection/pull/2280
+
+**Fixed:**
+
+* Fix HTML report with `--static-analysis-tool=phpstan` by @maks-rafalko in https://github.com/infection/infection/pull/2284
+
+**Internal:**
+
+* Fix a MethodCallRemoval test by @staabm in https://github.com/infection/infection/pull/2282
+
+[Full Changelog](https://github.com/infection/infection/compare/0.30.0...0.30.1)
+
 ## [0.30.0](https://github.com/infection/infection/tree/0.30.0) (2025-07-03)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.29.14...0.30.0)
