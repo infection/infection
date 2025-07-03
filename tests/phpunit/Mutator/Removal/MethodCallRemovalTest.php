@@ -136,7 +136,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $b = foo();
+                $b = $this->foo();
                 $a = 3;
                 PHP
             ,
