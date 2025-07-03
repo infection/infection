@@ -80,11 +80,24 @@ final class FalseValueTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It does not mutate switch false to true' => [
+        yield 'It does not mutate switch(false) to true' => [
             <<<'PHP'
                 <?php
 
                 switch (false) {}
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate match(false) to true to prevent overlap with MatchArmRemoval' => [
+            <<<'PHP'
+                <?php
+
+                match(false) {
+                    $count > 0 && $count <=10 => 'small',
+                    $count <=50 => 'medium',
+                    $count >50 => 'huge',
+                };
                 PHP
             ,
         ];
