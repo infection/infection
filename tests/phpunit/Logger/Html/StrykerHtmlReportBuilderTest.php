@@ -419,10 +419,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 ],
                 'Output without ability to detect the number of executed tests',
             ),
-            //
             // with non UTF-8 character
             self::createMutantExecutionResult(
-                DetectionStatus::KILLED_BY_TESTS,
+                DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
                 <<<'DIFF'
                     @@ @@
                      use function array_fill_keys;
@@ -445,7 +444,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 ],
                 'Output without ability to detect the number of executed tests' . base64_decode('abc', true), // produces non UTF-8 character
             ),
-        );
+            );
     }
 
     /**
