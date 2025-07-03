@@ -65,6 +65,23 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
 
         $logs = [];
 
+        $notes = [];
+
+        if (!$this->debugVerbosity) {
+            $notes[] = 'Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.';
+        }
+
+        if (!$this->debugMode) {
+            $notes[] = 'Note: Pass `--debug` to log test-framework output.';
+        }
+
+        if ($notes !== []) {
+            foreach ($notes as $note) {
+                $logs[] = $note;
+            }
+            $logs[] = '';
+        }
+
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
