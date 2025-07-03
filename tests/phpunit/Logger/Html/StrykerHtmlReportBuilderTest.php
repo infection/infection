@@ -444,7 +444,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
                 ],
                 'Output without ability to detect the number of executed tests' . base64_decode('abc', true), // produces non UTF-8 character
             ),
-            );
+        );
     }
 
     /**
