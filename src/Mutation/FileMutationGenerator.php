@@ -42,7 +42,7 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\PhpParser\Visitor\MutagenesisVisitor;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use PhpParser\Node;
@@ -87,7 +87,7 @@ class FileMutationGenerator
 
         $initialStatements = $this->parser->parse($trace->getSourceFileInfo());
 
-        $mutationCollectorVisitor = new MutationCollectorVisitor(
+        $mutationCollectorVisitor = new MutagenesisVisitor(
             new NodeMutationGenerator(
                 $mutators,
                 $trace->getRealPath(),
@@ -105,6 +105,6 @@ class FileMutationGenerator
 
         $traverser->traverse($initialStatements);
 
-        yield from $mutationCollectorVisitor->getMutations();
+        yield from $mutationCollectorVisitor->getPotentialMutations();
     }
 }

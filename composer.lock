@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "645d7b167cfe99de8a0edfe03ed8e597",
+    "content-hash": "db9d911c6a275b5fd0fe2b95d3c40af3",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -669,6 +669,58 @@
                 "source": "https://github.com/marc-mabe/php-enum/tree/v4.7.1"
             },
             "time": "2024-11-28T04:54:44+00:00"
+        },
+        {
+            "name": "nikic/iter",
+            "version": "v2.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/iter.git",
+                "reference": "3f031ae08d82c4394410e76b88b441331a6fa15f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/iter/zipball/3f031ae08d82c4394410e76b88b441331a6fa15f",
+                "reference": "3f031ae08d82c4394410e76b88b441331a6fa15f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.4",
+                "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
+                "vimeo/psalm": "^4.18 || ^5.13"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/iter.func.php",
+                    "src/iter.php",
+                    "src/iter.rewindable.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Nikita Popov",
+                    "email": "nikic@php.net"
+                }
+            ],
+            "description": "Iteration primitives using generators",
+            "keywords": [
+                "functional",
+                "generator",
+                "iterator"
+            ],
+            "support": {
+                "issues": "https://github.com/nikic/iter/issues",
+                "source": "https://github.com/nikic/iter/tree/v2.4.1"
+            },
+            "time": "2024-03-19T20:45:05+00:00"
         },
         {
             "name": "nikic/php-parser",
