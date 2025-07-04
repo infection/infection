@@ -43,6 +43,7 @@ use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
+use RuntimeException;
 use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -69,17 +70,21 @@ class GitDiffFileProvider
         }
 
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
-        $gitRefs = $this->shellCommandLineExecutor->execute([
-            'git',
-            'symbolic-ref',
-            'refs/remotes/origin/HEAD',
-        ]);
+        try {
+            $gitRefs = $this->shellCommandLineExecutor->execute([
+                'git',
+                'symbolic-ref',
+                'refs/remotes/origin/HEAD',
+            ]);
 
-        $parts = explode('/', $gitRefs);
+            $parts = explode('/', $gitRefs);
 
-        if (count($parts) > 2) {
-            // extract origin/branch from a string like 'refs/remotes/origin/master'
-            return $this->defaultBase = implode('/', array_slice($parts, -2));
+            if (count($parts) > 2) {
+                // extract origin/branch from a string like 'refs/remotes/origin/master'
+                return $this->defaultBase = implode('/', array_slice($parts, -2));
+            }
+        } catch (RuntimeException $e) {
+            // no symbolic ref might be configured for a remote named "origin"
         }
 
         // unable to figure it out, return the default

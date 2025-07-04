@@ -43,6 +43,7 @@ use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use function str_replace;
 
 #[CoversClass(GitDiffFileProvider::class)]
@@ -169,5 +170,16 @@ final class GitDiffFileProviderTest extends TestCase
         yield ['origin/master', ''];
 
         yield ['origin/master', 'something/unexpected'];
+    }
+
+    public function test_it_provides_the_fallback_when_executor_throws(): void
+    {
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->any())
+            ->method('execute')
+            ->willThrowException(new RuntimeException('ref refs/remotes/origin/HEAD is not a symbolic ref'));
+
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
     }
 }
