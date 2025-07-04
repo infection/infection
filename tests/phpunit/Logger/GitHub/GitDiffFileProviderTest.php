@@ -41,6 +41,7 @@ use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function str_replace;
 
@@ -151,14 +152,22 @@ final class GitDiffFileProviderTest extends TestCase
         $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
     }
 
-    public function test_it_provides_the_fallback_when_no_origin_upstream_defined(): void
+    #[DataProvider('provideGitDefaultBaseExecutions')]
+    public function test_it_provides_the_fallback_when_no_origin_upstream_defined(string $expectedBase, string $executorReturn): void
     {
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
         $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
-            ->willReturn('');
+            ->willReturn($executorReturn);
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+        $this->assertSame($expectedBase, $diffProvider->provideDefaultBase());
+    }
+
+    public static function provideGitDefaultBaseExecutions(): iterable
+    {
+        yield ['origin/master', ''];
+
+        yield ['origin/master', 'something/unexpected'];
     }
 }

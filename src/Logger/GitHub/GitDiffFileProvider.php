@@ -79,7 +79,7 @@ class GitDiffFileProvider
 
         if (count($parts) > 2) {
             // extract origin/branch from a string like 'refs/remotes/origin/master'
-            return $this->defaultBase = implode('/', array_slice($parts, -2, 2));
+            return $this->defaultBase = implode('/', array_slice($parts, -2));
         }
 
         // unable to figure it out, return the default
