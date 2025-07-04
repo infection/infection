@@ -83,7 +83,7 @@ class GitDiffFileProvider
                 // extract origin/branch from a string like 'refs/remotes/origin/master'
                 return $this->defaultBase = implode('/', array_slice($parts, -2));
             }
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             // no symbolic ref might be configured for a remote named "origin"
         }
 
