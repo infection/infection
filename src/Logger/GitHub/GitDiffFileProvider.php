@@ -54,6 +54,8 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 class GitDiffFileProvider
 {
+    private const NUM_ORIGIN_AND_BRANCH_PARTS = 2;
+
     private const DEFAULT_BASE = 'origin/master';
 
     private ?string $defaultBase = null;
@@ -79,9 +81,9 @@ class GitDiffFileProvider
 
             $parts = explode('/', $gitRefs);
 
-            if (count($parts) > 2) {
+            if (count($parts) > self::NUM_ORIGIN_AND_BRANCH_PARTS) {
                 // extract origin/branch from a string like 'refs/remotes/origin/master'
-                return $this->defaultBase = implode('/', array_slice($parts, -2));
+                return $this->defaultBase = implode('/', array_slice($parts, -self::NUM_ORIGIN_AND_BRANCH_PARTS));
             }
         } catch (RuntimeException) {
             // no symbolic ref might be configured for a remote named "origin"
