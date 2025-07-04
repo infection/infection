@@ -144,4 +144,10 @@ final class GitDiffFileProviderTest extends TestCase
 
         $this->assertSame($expectedUnifiedReturn, $filter);
     }
+
+    public function test_it_provides_the_infections_own_git_default_base(): void
+    {
+        $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
+        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+    }
 }
