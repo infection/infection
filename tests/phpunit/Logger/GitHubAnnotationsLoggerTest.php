@@ -85,8 +85,8 @@ final class GitHubAnnotationsLoggerTest extends TestCase
         yield 'all mutations' => [
             self::createCompleteResultsCollector(),
             [
-                "::warning file=foo/bar,line=9::Escaped Mutant for Mutator \"PregQuote\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A\n",
-                "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A\n",
+                "::warning file=foo/bar,line=9::Escaped Mutant for Mutator \"PregQuote\":%0A%0A```diff%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#1';%0A%0A```\n",
+                "::warning file=foo/bar,line=10::Escaped Mutant for Mutator \"For_\":%0A%0A```diff%0A--- Original%0A+++ New%0A@@ @@%0A%0A- echo 'original';%0A+ echo 'escaped#0';%0A%0A```\n",
             ],
         ];
     }
