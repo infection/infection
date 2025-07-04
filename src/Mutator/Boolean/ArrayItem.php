@@ -99,8 +99,10 @@ final class ArrayItem implements Mutator
         return
             // __get() can have side-effects
             $node instanceof Node\Expr\PropertyFetch
+            || $node instanceof Node\Expr\NullsafePropertyFetch
             // these clearly can have side-effects
             || $node instanceof Node\Expr\MethodCall
+            || $node instanceof Node\Expr\NullsafeMethodCall
             || $node instanceof Node\Expr\FuncCall;
     }
 }
