@@ -150,4 +150,15 @@ final class GitDiffFileProviderTest extends TestCase
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
         $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
     }
+
+    public function test_it_provides_the_fallback_when_no_origin_upstream_defined(): void
+    {
+        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutor->expects($this->any())
+            ->method('execute')
+            ->willReturn('');
+
+        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+    }
 }
