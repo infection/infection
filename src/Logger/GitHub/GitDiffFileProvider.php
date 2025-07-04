@@ -86,7 +86,7 @@ class GitDiffFileProvider
                 return $this->defaultBase = implode('/', array_slice($parts, -self::NUM_ORIGIN_AND_BRANCH_PARTS));
             }
         } catch (RuntimeException) {
-            // no symbolic ref might be configured for a remote named "origin"
+            // e.g. no symbolic ref might be configured for a remote named "origin"
         }
 
         // unable to figure it out, return the default
