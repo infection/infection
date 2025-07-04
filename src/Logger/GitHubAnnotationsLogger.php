@@ -63,6 +63,9 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
 
     public function getLogLines(): array
     {
+        if (rand(0,1)) {
+            $x = 1;
+        }
         $lines = [];
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
