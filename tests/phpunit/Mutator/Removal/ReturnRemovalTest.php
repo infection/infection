@@ -61,7 +61,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
                 function foo(): void
                 {
-                    return 'bar';
+                    return;
                 }
                 PHP,
             <<<'PHP'
