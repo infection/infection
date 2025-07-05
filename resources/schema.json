@@ -387,6 +387,7 @@
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "ReturnRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
                 "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "FunctionCall": { "$ref": "#/definitions/default-mutator-config" },
