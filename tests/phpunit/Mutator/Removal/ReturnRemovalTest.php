@@ -55,7 +55,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
-        yield 'It mutates a return statement' => [
+        yield 'It mutates a redundant and unnecessary return statement' => [
             <<<'PHP'
                 <?php
 
