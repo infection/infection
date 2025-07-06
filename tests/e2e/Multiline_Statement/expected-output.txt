@@ -1,4 +1,4 @@
-Total: 14
+Total: 16
 
 Killed mutants:
 ===============
@@ -24,6 +24,9 @@ Line 13
 Mutator: Multiplication
 Line 13
 
+Mutator: ReturnRemoval
+Line 17
+
 Mutator: DecrementInteger
 Line 20
 
@@ -44,6 +47,9 @@ Line 22
 
 Mutator: Multiplication
 Line 22
+
+Mutator: ReturnRemoval
+Line 24
 
 
 Killed by Static Analysis mutants:
