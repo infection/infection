@@ -1,8 +1,8 @@
-Total: 1
+Total: 2
 
-Killed by Test Framework: 0
+Killed by Test Framework: 2
 Killed by Static Analysis: 0
-Errored: 1
+Errored: 0
 Syntax Errors: 0
 Escaped: 0
 Timed Out: 0
