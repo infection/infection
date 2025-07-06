@@ -56,7 +56,7 @@ final class ArrayItem implements Mutator
             <<<'TXT'
                 Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
                 (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
-                For example `[foo() => $b->bar]`.
+                For example `[$this->foo() => $b->bar]`.
                 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
@@ -89,20 +89,38 @@ final class ArrayItem implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem && $node->key !== null && (
-            $this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key)
-        );
+        if (!$node instanceof Node\Expr\ArrayItem) {
+            return false;
+        }
+
+        if ($node->key === null) {
+            return false;
+        }
+
+        return $this->isNodeWithSideEffects($node->key) || $this->isNodeWithSideEffects($node->value);
     }
 
+    /**
+     * Split into branches for coverage purposes.
+     */
     private function isNodeWithSideEffects(Node $node): bool
     {
-        return
-            // __get() can have side-effects
+        // __get() can have side effects
+        if (
             $node instanceof Node\Expr\PropertyFetch
             || $node instanceof Node\Expr\NullsafePropertyFetch
-            // these clearly can have side-effects
-            || $node instanceof Node\Expr\MethodCall
+        ) {
+            return true;
+        }
+
+        // these clearly can have side effects
+        if (
+            $node instanceof Node\Expr\MethodCall
             || $node instanceof Node\Expr\NullsafeMethodCall
-            || $node instanceof Node\Expr\FuncCall;
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
