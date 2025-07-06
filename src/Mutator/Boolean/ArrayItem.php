@@ -56,7 +56,7 @@ final class ArrayItem implements Mutator
             <<<'TXT'
                 Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
                 (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
-                For example `[foo() => $b->bar]`.
+                For example `[$this->foo() => $b->bar]`.
                 TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
@@ -97,10 +97,9 @@ final class ArrayItem implements Mutator
     private function isNodeWithSideEffects(Node $node): bool
     {
         return
-            // __get() can have side-effects
+            // __get() can have side effects
             $node instanceof Node\Expr\PropertyFetch
-            // these clearly can have side-effects
-            || $node instanceof Node\Expr\MethodCall
-            || $node instanceof Node\Expr\FuncCall;
+            // only stuff that can have side effects, and can be tested
+            || $node instanceof Node\Expr\MethodCall;
     }
 }
