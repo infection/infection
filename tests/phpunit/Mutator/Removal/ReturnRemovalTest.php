@@ -73,5 +73,50 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 }
                 PHP,
         ];
+
+        yield 'It mutates all return statements, even if they cause an error' => [
+            <<<'PHP'
+                <?php
+
+                function getConfig(): object
+                {
+                    if (null !== $this->config) {
+                        return $this->config;
+                    }
+                    // ... load and cache
+                    $this->config = $config;
+                    return $this->config;
+                }
+                PHP,
+            [
+                <<<'PHP'
+                <?php
+
+                function getConfig(): object
+                {
+                    if (null !== $this->config) {
+
+                    }
+                    // ... load and cache
+                    $this->config = $config;
+                    return $this->config;
+                }
+                PHP,
+                <<<'PHP'
+                <?php
+
+                function getConfig(): object
+                {
+                    if (null !== $this->config) {
+                        return $this->config;
+                    }
+                    // ... load and cache
+                    $this->config = $config;
+
+                }
+                PHP,
+            ]
+        ];
+
     }
 }
