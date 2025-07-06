@@ -118,7 +118,7 @@ final class ArrayItemTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                [foo() => $b->bar];
+                [foo() => $b];
                 PHP
             ,
         ];
@@ -127,7 +127,7 @@ final class ArrayItemTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                [$b->bar => foo()];
+                [$b => foo()];
                 PHP
             ,
         ];
