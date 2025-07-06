@@ -2,10 +2,10 @@ Total: 1
 
 Killed by Test Framework: 0
 Killed by Static Analysis: 0
-Errored: 1
+Errored: 0
 Syntax Errors: 0
 Escaped: 0
-Timed Out: 0
+Timed Out: 1
 Skipped: 0
 Ignored: 0
 Not Covered: 0
