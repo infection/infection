@@ -90,33 +90,32 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 PHP,
             [
                 <<<'PHP'
-                <?php
+                    <?php
 
-                function getConfig(): object
-                {
-                    if (null !== $this->config) {
+                    function getConfig(): object
+                    {
+                        if (null !== $this->config) {
 
-                    }
-                    // ... load and cache
-                    $this->config = $config;
-                    return $this->config;
-                }
-                PHP,
-                <<<'PHP'
-                <?php
-
-                function getConfig(): object
-                {
-                    if (null !== $this->config) {
+                        }
+                        // ... load and cache
+                        $this->config = $config;
                         return $this->config;
                     }
-                    // ... load and cache
-                    $this->config = $config;
+                    PHP,
+                <<<'PHP'
+                    <?php
 
-                }
-                PHP,
-            ]
+                    function getConfig(): object
+                    {
+                        if (null !== $this->config) {
+                            return $this->config;
+                        }
+                        // ... load and cache
+                        $this->config = $config;
+
+                    }
+                    PHP,
+            ],
         ];
-
     }
 }
