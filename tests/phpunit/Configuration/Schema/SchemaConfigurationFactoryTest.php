@@ -2760,6 +2760,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'initialTestsPhpOptions' => null,
             'testFrameworkOptions' => null,
             'threadCount' => null,
+            'staticAnalysisTool' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

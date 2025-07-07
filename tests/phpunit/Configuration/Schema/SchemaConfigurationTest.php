@@ -66,6 +66,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $initialTestsPhpOptions,
         ?string $testFrameworkExtraOptions,
         string|int|null $threadCount,
+        ?string $staticAnalysisTool,
     ): void {
         $config = new SchemaConfiguration(
             $path,
@@ -84,6 +85,7 @@ final class SchemaConfigurationTest extends TestCase
             $initialTestsPhpOptions,
             $testFrameworkExtraOptions,
             $threadCount,
+            $staticAnalysisTool,
         );
 
         $this->assertSame($path, $config->getFile());
@@ -101,6 +103,8 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($bootstrap, $config->getBootstrap());
         $this->assertSame($initialTestsPhpOptions, $config->getInitialTestsPhpOptions());
         $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
+        $this->assertSame($threadCount, $config->getThreads());
+        $this->assertSame($staticAnalysisTool, $config->getStaticAnalysisTool());
     }
 
     public static function valueProvider(): iterable
@@ -122,6 +126,7 @@ final class SchemaConfigurationTest extends TestCase
             null,
             null,
             null, // threadCount
+            null, // staticAnalysisTool
         ];
 
         yield 'complete' => [
@@ -155,6 +160,7 @@ final class SchemaConfigurationTest extends TestCase
             '-d zend_extension=xdebug.so',
             '--debug',
             'max', // threadCount
+            'phpstan', // staticAnalysisTool
         ];
     }
 }
