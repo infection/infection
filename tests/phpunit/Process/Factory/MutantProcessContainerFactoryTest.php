@@ -48,12 +48,14 @@ use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MutantProcessContainerFactory::class)]
 final class MutantProcessContainerFactoryTest extends TestCase
 {
-    public function test_it_creates_a_process_with_timeout(): void
+    #[DataProvider('timeoutDataProvider')]
+    public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
         $mutant = MutantBuilder::build(
             $mutantFilePath = '/path/to/mutant',
@@ -77,7 +79,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
                     new TestLocation(
                         'FooTest::test_it_can_instantiate',
                         '/path/to/acme/FooTest.php',
-                        0.01,
+                        $testLocationExecutionTime,
                     ),
                 ],
             ),
@@ -125,7 +127,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
-            100,
+            $processFactoryTimeout,
             $resultFactoryMock,
             [],
         );
@@ -141,12 +143,21 @@ final class MutantProcessContainerFactoryTest extends TestCase
             '/usr/bin/php bin/phpunit --filter /path/to/acme/FooTest.php',
         ]);
 
-        $this->assertSame(100., $process->getTimeout());
+        $this->assertSame($expectedProcessTimeout, $process->getTimeout());
         $this->assertFalse($process->isStarted());
 
         $this->assertSame($mutant, $mutantProcess->getCurrent()->getMutant());
         $this->assertFalse($mutantProcess->getCurrent()->isTimedOut());
 
         $this->assertSame([], $eventDispatcher->getEvents());
+    }
+
+    public static function timeoutDataProvider(): array
+    {
+        return [
+            'minimum timeout is 5' => [5.0, 0.01, 90],
+            'allows 10x more time than test-execution' => [50.0, 5.0, 90],
+            'slow tests do not get more time than factory-timeout' => [90.0, 10.0, 90],
+        ];
     }
 }
