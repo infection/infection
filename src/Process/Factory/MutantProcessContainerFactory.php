@@ -49,7 +49,7 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcessContainerFactory
 {
-    private const TIMEOUT_FACTOR = 10;
+    private const TIMEOUT_FACTOR = 5;
 
     private const TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
