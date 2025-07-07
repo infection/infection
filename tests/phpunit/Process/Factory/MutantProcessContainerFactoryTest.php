@@ -152,7 +152,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
         $this->assertSame([], $eventDispatcher->getEvents());
     }
 
-    public static function timeoutDataProvider(): array
+    public static function timeoutDataProvider(): iterable
     {
         return [
             'minimum timeout is 5' => [5.0, 0.01, 90],
