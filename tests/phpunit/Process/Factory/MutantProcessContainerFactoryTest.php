@@ -156,7 +156,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
     {
         return [
             'minimum timeout on a fast test' => [5.05, 0.01, 90],
-            'allows 10x more time than test-execution' => [30.0, 5.0, 90],
+            'allows 5x more time than test-execution' => [30.0, 5.0, 90],
             'slow tests do not get more time than factory-timeout' => [40.0, 10.0, 40],
         ];
     }
