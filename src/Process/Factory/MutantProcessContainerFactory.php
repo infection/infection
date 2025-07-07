@@ -40,7 +40,6 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use function max;
 use function min;
 use Symfony\Component\Process\Process;
 
@@ -52,7 +51,7 @@ class MutantProcessContainerFactory
 {
     private const TIMEOUT_FACTOR = 10;
 
-    private const MIN_TIMEOUT = 5;
+    private const TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
 
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
@@ -67,7 +66,8 @@ class MutantProcessContainerFactory
 
     public function create(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
     {
-        $timeout = max(self::MIN_TIMEOUT, min(self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime(), $this->timeout));
+        // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
+        $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
 
         $process = new Process(
             command: $this->testFrameworkAdapter->getMutantCommandLine(
