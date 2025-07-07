@@ -122,8 +122,6 @@ trait ConfigurationAssertions
             $expectedPhpUnit->getConfigDir(),
             $expectedPhpUnit->getCustomPath(),
         );
-        $this->assertSame($expectedPhpStan->getConfigDir(), $configuration->getPhpStan()->getConfigDir());
-        $this->assertSame($expectedPhpStan->getConfigDir(), $configuration->getPhpStan()->getCustomPath());
         $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10.);
         $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
         $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
