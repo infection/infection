@@ -149,12 +149,12 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
         yield 'It leaves the last return statement alone if the method has a return type' => [
             <<<'PHP'
                 <?php
+
                 namespace Foo;
 
                 class ConfigLoader
                 {
                     private ?object $config = null;
-
                     public function getConfig(): object
                     {
                         if (null !== $this->config) {
@@ -163,17 +163,21 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                         // ... load and cache
                         $this->config = $config;
                         return $this->config;
+                        // Cool comment
+                    }
+                    public function foo(): void
+                    {
                     }
                 }
                 PHP,
             <<<'PHP'
                 <?php
+
                 namespace Foo;
 
                 class ConfigLoader
                 {
                     private ?object $config = null;
-
                     public function getConfig(): object
                     {
                         if (null !== $this->config) {
@@ -182,6 +186,10 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                         // ... load and cache
                         $this->config = $config;
                         return $this->config;
+                        // Cool comment
+                    }
+                    public function foo(): void
+                    {
                     }
                 }
                 PHP,

@@ -51,18 +51,23 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
-    }
-
-    public function leaveNode(Node $node): void
-    {
-        // Reset the previous node if we are leaving a function-like node
         if ($node instanceof Node\FunctionLike) {
             $this->previous = null;
 
             return;
         }
 
+        // We only interested in statements, not their sub-nodes
+        if (!$node instanceof Node\Stmt) {
+            return;
+        }
+
+        // We do not account comment nodes for next connections
+        if ($node instanceof Node\Stmt\Nop) {
+            return;
+        }
+
+        $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
         $this->previous = $node;
     }
 }

@@ -90,7 +90,7 @@ final class ReturnRemoval implements Mutator
         }
 
         // If there's more after this return statement, we can remove it
-        return self::hasNextNode($node);
+        return self::hasNextStmtNode($node);
     }
 
     protected function hasReturnType(Node $node): bool
@@ -113,7 +113,7 @@ final class ReturnRemoval implements Mutator
         return true;
     }
 
-    private static function hasNextNode(Node $node): bool
+    private static function hasNextStmtNode(Node $node): bool
     {
         return $node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE) !== null;
     }
