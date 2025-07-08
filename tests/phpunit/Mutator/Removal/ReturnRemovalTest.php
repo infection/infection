@@ -55,19 +55,17 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
-        yield 'It does not mutate essential return statements' => [
-            <<<'PHP'
-                <?php
+        yield from self::doesNotMutateWithReturnType('array');
 
-                class Bar
-                {
-                    function foo(): array
-                    {
-                        return [];
-                    }
-                }
-                PHP,
-        ];
+        yield from self::doesNotMutateWithReturnType('?array');
+
+        yield from self::doesNotMutateWithReturnType('string|object');
+
+        yield from self::doesNotMutateWithReturnType('array|int|null');
+
+        yield from self::mutatesWithReturnType('');
+
+        yield from self::mutatesWithReturnType('void');
 
         yield 'It mutates duplicate return statements' => [
             <<<'PHP'
@@ -75,7 +73,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
                 class Bar
                 {
-                    function foo(): ?array
+                    function foo(): array
                     {
                         return [1];
                         return [2];
@@ -87,60 +85,10 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
                 class Bar
                 {
-                    function foo(): ?array
+                    function foo(): array
                     {
 
                         return [2];
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'It mutates return statements in methods with void type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo(): void
-                    {
-                        return;
-                    }
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo(): void
-                    {
-
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'It mutates return statements in methods with no return type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        return 1;
-                    }
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-
                     }
                 }
                 PHP,
@@ -155,7 +103,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 class ConfigLoader
                 {
                     private ?object $config = null;
-                    public function getConfig(): object|string
+                    public function getConfig(): object
                     {
                         if (null !== $this->config) {
                             return $this->config;
@@ -178,7 +126,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 class ConfigLoader
                 {
                     private ?object $config = null;
-                    public function getConfig(): object|string
+                    public function getConfig(): object
                     {
                         if (null !== $this->config) {
 
@@ -190,6 +138,54 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                     }
                     public function foo(): void
                     {
+                    }
+                }
+                PHP,
+        ];
+    }
+
+    private static function mutatesWithReturnType(string $type): iterable
+    {
+        $displayType = $type === '' ? 'missing' : $type;
+        $methodReturnType = $type === '' ? '' : ": $type";
+
+        yield "It mutates return statements in methods with return type $displayType" => [
+            <<<"PHP"
+                <?php
+
+                class Bar
+                {
+                    function foo()$methodReturnType
+                    {
+                        return;
+                    }
+                }
+                PHP,
+            <<<"PHP"
+                <?php
+
+                class Bar
+                {
+                    function foo()$methodReturnType
+                    {
+
+                    }
+                }
+                PHP,
+        ];
+    }
+
+    private static function doesNotMutateWithReturnType(string $type): iterable
+    {
+        yield "It does not mutate essential return statements with return type $type" => [
+            <<<"PHP"
+                <?php
+
+                class Bar
+                {
+                    function foo(): $type
+                    {
+                        return ThatClass::get();
                     }
                 }
                 PHP,

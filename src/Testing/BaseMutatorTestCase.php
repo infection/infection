@@ -166,6 +166,8 @@ abstract class BaseMutatorTestCase extends TestCase
     {
         $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
 
+        $this->assertNotNull($nodes);
+
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
             $nodes,

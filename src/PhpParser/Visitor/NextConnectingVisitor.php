@@ -44,30 +44,34 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 
     private ?Node $previous = null;
 
-    public function beforeTraverse(array $nodes): void
+    public function beforeTraverse(array $nodes)
     {
         $this->previous = null;
+
+        return null;
     }
 
-    public function enterNode(Node $node): void
+    public function enterNode(Node $node)
     {
         if ($node instanceof Node\FunctionLike) {
             $this->previous = null;
 
-            return;
+            return null;
         }
 
         // We only interested in statements, not their sub-nodes
         if (!$node instanceof Node\Stmt) {
-            return;
+            return null;
         }
 
         // We do not account comment nodes for next connections
         if ($node instanceof Node\Stmt\Nop) {
-            return;
+            return null;
         }
 
         $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
         $this->previous = $node;
+
+        return null;
     }
 }

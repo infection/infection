@@ -175,19 +175,7 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverserInterface\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
 			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<string, array\{settings\: array\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			message: '#^Parameter \#2 \$fileAst of class Infection\\Testing\\SimpleMutationsCollectorVisitor constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
