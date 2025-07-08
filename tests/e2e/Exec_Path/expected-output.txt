@@ -1,6 +1,6 @@
-Total: 7
+Total: 6
 
-Killed by Test Framework: 6
+Killed by Test Framework: 5
 Killed by Static Analysis: 0
 Errored: 0
 Syntax Errors: 0
