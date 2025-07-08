@@ -79,7 +79,6 @@ final class DefinitionTest extends TestCase
         'ArrayItem',
         'EqualIdentical',
         'FalseValue',
-        'IdenticalEqual',
         'InstanceOf_',
         'LogicalAnd',
         'LogicalAndAllSubExprNegation',
