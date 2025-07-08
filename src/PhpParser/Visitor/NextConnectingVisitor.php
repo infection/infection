@@ -42,7 +42,7 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 {
     public const NEXT_ATTRIBUTE = 'next';
 
-    private ?Node $previous;
+    private ?Node $previous = null;
 
     public function beforeTraverse(array $nodes): void
     {
