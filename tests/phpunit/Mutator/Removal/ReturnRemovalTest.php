@@ -75,7 +75,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
                 class Bar
                 {
-                    function foo(): array
+                    function foo(): ?array
                     {
                         return [1];
                         return [2];
@@ -87,7 +87,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
                 class Bar
                 {
-                    function foo(): array
+                    function foo(): ?array
                     {
 
                         return [2];
@@ -155,7 +155,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 class ConfigLoader
                 {
                     private ?object $config = null;
-                    public function getConfig(): object
+                    public function getConfig(): object|string
                     {
                         if (null !== $this->config) {
                             return $this->config;
@@ -178,7 +178,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 class ConfigLoader
                 {
                     private ?object $config = null;
-                    public function getConfig(): object
+                    public function getConfig(): object|string
                     {
                         if (null !== $this->config) {
 

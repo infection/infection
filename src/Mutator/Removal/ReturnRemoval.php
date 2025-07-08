@@ -42,6 +42,7 @@ use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
+use PhpParser\Node\ComplexType;
 use PhpParser\Node\FunctionLike;
 use Webmozart\Assert\Assert;
 
@@ -101,6 +102,11 @@ final class ReturnRemoval implements Mutator
         Assert::isInstanceOf($functionScope, FunctionLike::class);
 
         $returnType = $functionScope->getReturnType();
+
+        // Complex types are specific return types
+        if ($returnType instanceof ComplexType) {
+            return true;
+        }
 
         // A void return type is the same as no return type for this mutator.
         if (
