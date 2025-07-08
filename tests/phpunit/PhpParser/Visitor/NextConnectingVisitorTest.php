@@ -87,6 +87,8 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
+        $this->assertInstanceOf(Node\Stmt\Function_::class, $nodes[1]);
+
         // $a = 1 has no next because function resets the previous tracking
         $this->assertFalse($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
 
@@ -152,6 +154,8 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
+        $this->assertObjectHasProperty('stmts', $nodes[0]);
+
         // If statement connects to first statement inside the block (due to depth-first traversal)
         $this->assertTrue($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
         $this->assertSame($nodes[0]->stmts[0], $nodes[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
@@ -166,6 +170,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
         $this->assertSame($nodes[1], $ifStmts[1]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
 
         // The condition expression node should not have next attribute
+        $this->assertObjectHasProperty('cond', $nodes[0]);
         $this->assertFalse($nodes[0]->cond->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
     }
 
@@ -191,6 +196,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
+        $this->assertObjectHasProperty('stmts', $nodes[0]);
         $classMethods = $nodes[0]->stmts;
 
         // Methods are FunctionLike nodes, so they don't have next attributes
@@ -238,6 +244,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
         $this->assertFalse($nodes[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
 
         // Inside closure
+        $this->assertObjectHasProperty('expr', $nodes[1]);
         $closureExpr = $nodes[1]->expr->expr; // Get the closure from the assignment
         $closureStmts = $closureExpr->stmts;
         $this->assertTrue($closureStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
@@ -296,6 +303,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
+        $this->assertObjectHasProperty('stmts', $nodes[0]);
         $functionStmts = $nodes[0]->stmts;
         $ifStmts = $functionStmts[0]->stmts;
 
@@ -323,6 +331,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
+        $this->assertObjectHasProperty('stmts', $nodes[0]);
         $functionStmts = $nodes[0]->stmts;
 
         // $a = 1 connects to return
