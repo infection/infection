@@ -150,7 +150,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public static function getReflectionClass(Node $node): ?ClassReflection
+    public static function findReflectionClass(Node $node): ?ClassReflection
     {
         $reflection = $node->getAttribute(self::REFLECTION_CLASS_KEY);
         Assert::nullOrIsInstanceOf($reflection, ClassReflection::class);
@@ -158,7 +158,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return $reflection;
     }
 
-    public static function getFunctionScope(Node $node): ?Node\FunctionLike
+    public static function findFunctionScope(Node $node): ?Node\FunctionLike
     {
         $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
         Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);

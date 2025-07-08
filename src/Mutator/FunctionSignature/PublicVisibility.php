@@ -106,7 +106,7 @@ final class PublicVisibility implements Mutator
 
     private function hasSamePublicParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        $reflection = ReflectionVisitor::getReflectionClass($node);
+        $reflection = ReflectionVisitor::findReflectionClass($node);
         Assert::notNull($reflection);
 
         return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asPublic());
