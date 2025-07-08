@@ -69,6 +69,21 @@ final class ArrayItemTest extends BaseMutatorTestCase
             ,
         ];
 
+        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is null safe property' => [
+            <<<'PHP'
+                <?php
+
+                [$a => $b?->bar];
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                [$a > $b?->bar];
+                PHP
+            ,
+        ];
+
         yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is method call' => [
             <<<'PHP'
                 <?php
@@ -84,17 +99,35 @@ final class ArrayItemTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and left is function call' => [
+        yield 'It mutates double arrow operator to a greater than comparison when operands can have side-effects and right is null safe method call' => [
             <<<'PHP'
                 <?php
 
-                [foo() => $b->bar];
+                [$a => $b?->bar()];
                 PHP
             ,
             <<<'PHP'
                 <?php
 
-                [foo() > $b->bar];
+                [$a > $b?->bar()];
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate double arrow operator to a greater than comparison when key is function call' => [
+            <<<'PHP'
+                <?php
+
+                [foo() => $b];
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate double arrow operator to a greater than comparison when value is function call' => [
+            <<<'PHP'
+                <?php
+
+                [$b => foo()];
                 PHP
             ,
         ];

@@ -1,5 +1,143 @@
 # Change Log
 
+## [0.30.1](https://github.com/infection/infection/tree/0.30.1) (2025-07-04)
+
+**Changed:**
+
+* `TextFileLogger`: add hints about different logfile options by @staabm in https://github.com/infection/infection/pull/2278
+* [performance] Smarter `TrueValue`/`FalseValue` mutator by @staabm in https://github.com/infection/infection/pull/2280
+
+**Fixed:**
+
+* Fix HTML report with `--static-analysis-tool=phpstan` by @maks-rafalko in https://github.com/infection/infection/pull/2284
+
+**Internal:**
+
+* Fix a MethodCallRemoval test by @staabm in https://github.com/infection/infection/pull/2282
+
+[Full Changelog](https://github.com/infection/infection/compare/0.30.0...0.30.1)
+
+## [0.30.0](https://github.com/infection/infection/tree/0.30.0) (2025-07-03)
+
+[Full Changelog](https://github.com/infection/infection/compare/0.29.14...0.30.0)
+
+**Added:**
+
+* Add `--threads` to the config file under `threads` key by @maks-rafalko in https://github.com/infection/infection/pull/2158
+* Support `--show-mutations=int|max` to support non-bool values by @staabm in https://github.com/infection/infection/pull/2216
+* Introduce `--id=<mutant-hash>` to run the only one Mutant for killing it by @maks-rafalko in https://github.com/infection/infection/pull/2226
+* Implement `perMutator` timings by @staabm in https://github.com/infection/infection/pull/2164
+* Render process-limit into `perMutator` logger table header by @staabm in https://github.com/infection/infection/pull/2175
+* Introduce a nomenclature by @theofidry in https://github.com/infection/infection/pull/1428
+* Kill mutants by Static Analysis (PHPStan `--static-analysis-tool=phpstan`) if they are escaped and not killed by PHPUnit tests by @maks-rafalko in https://github.com/infection/infection/pull/2098
+* Detect kills by SA during mutation analysis and differentiate them from kills by Test Framework by @maks-rafalko in https://github.com/infection/infection/pull/2157
+
+**Changed:**
+
+* [performance] Support narrowing a union type containing `false` with a non-falsy value by @staabm in https://github.com/infection/infection/pull/2121
+* [performance] Don't mutate method in final class `ProtectedVisibility`: by @staabm in https://github.com/infection/infection/pull/2112
+* [performance] Don't mutate true/false in conditions by @staabm in https://github.com/infection/infection/pull/2143
+* [performance] Don't mutate cast in return of typed function by @staabm in https://github.com/infection/infection/pull/2145
+* [performance] Don't mutate int-cast in return of int-typed function by @staabm in https://github.com/infection/infection/pull/2148
+* [performance] Don't mutate string-cast in return of string-typed function by @staabm in https://github.com/infection/infection/pull/2149
+* [performance] Don't mutate float-cast in return of float-typed function by @staabm in https://github.com/infection/infection/pull/2150
+* [performance] Don't mutate array-cast in return of array-typed function by @staabm in https://github.com/infection/infection/pull/2151
+* [performance] Don't mutate object-cast in return of object-typed function by @staabm in https://github.com/infection/infection/pull/2152
+* [performance] Don't mutate cast in arguments when strict_types=1 by @staabm in https://github.com/infection/infection/pull/2154
+* [performance] Don't mutate instanceof into pre-existing case by @staabm in https://github.com/infection/infection/pull/2176
+* [performance] Don't produce mutations for identical type comparisons in EqualIdentical by @staabm in https://github.com/infection/infection/pull/2119
+* [performance] Don't produce mutations for equal type comparisons in IdenticalEqual by @staabm in https://github.com/infection/infection/pull/2117
+* [performance] Don't produce mutations for empty-array type comparisons by @staabm in https://github.com/infection/infection/pull/2130
+* [performance] Don't produce mutations for same type comparisons of static method calls by @staabm in https://github.com/infection/infection/pull/2132
+* [performance] Don't produce mutations for same type comparisons of class constants by @staabm in https://github.com/infection/infection/pull/2134
+* [performance] Don't produce mutations for same type comparisons of known global constants by @staabm in https://github.com/infection/infection/pull/2135
+* [performance] Don't mutate equal/not-equal in ternary by @staabm in https://github.com/infection/infection/pull/2139
+* [performance] Don't mutate false/true in ternary by @staabm in https://github.com/infection/infection/pull/2138
+* [performance] Don't mutate identical/not-identical in ternary by @staabm in https://github.com/infection/infection/pull/2140
+* [performance] Don't mutate greater/smaller-than in ternary by @staabm in https://github.com/infection/infection/pull/2141
+* [performance] Update MutationTestingRunner to stream-filter mutations in buffered mode by @sanmai in https://github.com/infection/infection/pull/2207
+* [performance] Smarter `DecrementInteger` mutator by @staabm in https://github.com/infection/infection/pull/2204
+* [performance] Smarter `IncrementInteger` mutator by @staabm in https://github.com/infection/infection/pull/2208
+* [performance] Smarter `DecrementInteger` mutator by @staabm in https://github.com/infection/infection/pull/2238
+* [performance] Smarter `LogicalAndAllSubExprNegation` with `instanceof` by @staabm in https://github.com/infection/infection/pull/2241
+* [performance] Smarter `LogicalOr` Mutator by @staabm in https://github.com/infection/infection/pull/2243
+* [performance] Prevent overlap of ArrayItemRemoval with IfNegation by @staabm in https://github.com/infection/infection/pull/2199
+* [performance] Prevent endless loop in Decrement/Increment-mutator by @staabm in https://github.com/infection/infection/pull/2231
+* [performance] `ArrayItemRemoval`: Do not remove item from array assignment as it produces PHP warning by @staabm in https://github.com/infection/infection/pull/2236
+* DotFormatter: break legend into 2 lines by @staabm in https://github.com/infection/infection/pull/2200
+* Support null-safe method calls in MethodCallRemoval mutator by @staabm in https://github.com/infection/infection/pull/2106
+* Fix missing mutation for bool returning functions by @staabm in https://github.com/infection/infection/pull/2120
+
+**Fixed:**
+
+* Set ignore config when `--mutants` is used and config has `global-ignoreSourceCodeByRegex` by @maks-rafalko in https://github.com/infection/infection/pull/2172
+
+**Internal:**
+
+* Allow to run one e2e test for debugging by @maks-rafalko in https://github.com/infection/infection/pull/2062
+* Remove container after usage by @maks-rafalko in https://github.com/infection/infection/pull/2073
+* Get back `devTools/Dockerfile.json` to pin to it on Makefile by @maks-rafalko in https://github.com/infection/infection/pull/2072
+* chore: Use docker compose by @theofidry in https://github.com/infection/infection/pull/2075
+* Apply multiline promoted properties fixer to improve code readability by @maks-rafalko in https://github.com/infection/infection/pull/2076
+* Use one phpstan config for `src` and `tests` folders by @maks-rafalko in https://github.com/infection/infection/pull/2091
+* Introduce dead code detector by @maks-rafalko in https://github.com/infection/infection/pull/2090
+* Do not check trailing whitespaces on `.DB_Store` on MacOS by @maks-rafalko in https://github.com/infection/infection/pull/2094
+* Simplify mutant execution result handling, get rid of redundant abstraction: ProcessBearer by @maks-rafalko in https://github.com/infection/infection/pull/2095
+* Rename `MutantExecutionResultFactory` to `TestFrameworkMutantExecutionResultFactory` and add interface by @maks-rafalko in https://github.com/infection/infection/pull/2099
+* Introduce MutantProcessContainer to be able to run N processes for each Mutant (like PHPUnit, PHPStan, Psalm, any other "killer") by @maks-rafalko in https://github.com/infection/infection/pull/2096
+* Add new processes to kill mutant to the queue if PHPUnit doesn't kill a Mutant by @maks-rafalko in https://github.com/infection/infection/pull/2097
+* Add support for PHPStan dev versions in `VersionParser` by @maks-rafalko in https://github.com/infection/infection/pull/2100
+* Bump sanmai/pipeline to 6.16 by @sanmai in https://github.com/infection/infection/pull/2101
+* Add a memoized ComposerExecutableFinder injected as a dependency by @sanmai in https://github.com/infection/infection/pull/2105
+* BaseMutatorTestCase: lint source in-process by @staabm in https://github.com/infection/infection/pull/2108
+* More resilient StopwatchTest by @staabm in https://github.com/infection/infection/pull/2110
+* Increase min MSI values by @maks-rafalko in https://github.com/infection/infection/pull/2113
+* Utilize `ParentConnector::findParent` over raw calls to `$node->getAttribute('parent')` by @staabm in https://github.com/infection/infection/pull/2116
+* Reduce the boilerplate with autowiring (stage 0) by @sanmai in https://github.com/infection/infection/pull/2115
+* Fix failing test with different libxml2 versions by @maks-rafalko in https://github.com/infection/infection/pull/2122
+* Reduce more boilerplate with autowiring (stage 1) by @sanmai in https://github.com/infection/infection/pull/2118
+* Reduce the repetition in ContainerTest via named arguments by @sanmai in https://github.com/infection/infection/pull/2124
+* Introduce collision detector by @staabm in https://github.com/infection/infection/pull/2128
+* Refactor AbstractIdenticalComparison by @staabm in https://github.com/infection/infection/pull/2129
+* Share reflection-cache across Mutators by @staabm in https://github.com/infection/infection/pull/2131
+* Container: more explicit handling of abstract types by @sanmai in https://github.com/infection/infection/pull/2133
+* Reduce method visibility in Container by @staabm in https://github.com/infection/infection/pull/2155
+* Remove dependencies that can be resolved automatically by @sanmai in https://github.com/infection/infection/pull/2147
+* Run the collision detection last by @sanmai in https://github.com/infection/infection/pull/2159
+* Update ContainerTest to remove unnecessary test grouping by @sanmai in https://github.com/infection/infection/pull/2160
+* Update test data providers to use more  readable style by @sanmai in https://github.com/infection/infection/pull/2161
+* Check minimum PHPStan version before starting MT logic (fail fast) if `--static-analysis-tool=phpstan` is used by @maks-rafalko in https://github.com/infection/infection/pull/2162
+* Update PHPStan to 2.1.17 by @staabm in https://github.com/infection/infection/pull/2165
+* Use numerically-stable memory-efficient approach for perMutator timings by @sanmai in https://github.com/infection/infection/pull/2173
+* Generate PHPStan custom mutant config file to set parallel processes to 1 by @maks-rafalko in https://github.com/infection/infection/pull/2169
+* Added `per-mutator.md` to `.gitignore` by @staabm in https://github.com/infection/infection/pull/2179
+* kill mutants in MakeCustomMutatorCommandTest by @staabm in https://github.com/infection/infection/pull/2177
+* Mutants aren't killed by SA, only prevented/caught by @sanmai in https://github.com/infection/infection/pull/2187
+* ReflectionVisitorTest is more type safe by @staabm in https://github.com/infection/infection/pull/2190
+* Add `--fail-without-result-cache` to PHPStan process by @maks-rafalko in https://github.com/infection/infection/pull/2182
+* Fix FunctionCallRemoval mutation, save 25 seconds on run time by @sanmai in https://github.com/infection/infection/pull/2193
+* Upgrade `infection/tests-checker-action` by @maks-rafalko in https://github.com/infection/infection/pull/2195
+* Refactor MutationTestingRunner for readability by @sanmai in https://github.com/infection/infection/pull/2194
+* Improve MutationTestingRunnerTest by @sanmai in https://github.com/infection/infection/pull/2197
+* TestLocationBucketSorterTest: Use bigger epsilon delta by @staabm in https://github.com/infection/infection/pull/2214
+* ResultsCollector returns list by @staabm in https://github.com/infection/infection/pull/2215
+* Use `pull_request_target` instead of `pull_request` event by @maks-rafalko in https://github.com/infection/infection/pull/2222
+* Killed timed-out mutant in ExcludeDirsProvider by @staabm in https://github.com/infection/infection/pull/2219
+* Kill timed-out mutants in RunCommand by @staabm in https://github.com/infection/infection/pull/2224
+* Remove the codecov badge and config by @sanmai in https://github.com/infection/infection/pull/2211
+* Re-implement ContainerTest as a PHPStan rule by @staabm in https://github.com/infection/infection/pull/2225
+* Cleanup MemoizedCiDetector, NullCiDetector by @staabm in https://github.com/infection/infection/pull/2242
+* PHP-CS-Fixer: enable class_attributes_separation by @staabm in https://github.com/infection/infection/pull/2245
+* github-actions: declare timeout for job execution by @staabm in https://github.com/infection/infection/pull/2244
+* Fix wrong ReflectionClass in NameResolverTest by @staabm in https://github.com/infection/infection/pull/2250
+* Simplify LogicalOr mutator by @staabm in https://github.com/infection/infection/pull/2260
+* Use fully-qualified-constant-reference instead of a dynamic lookup by @staabm in https://github.com/infection/infection/pull/2258
+* Use assertions instead of @var annotations by @staabm in https://github.com/infection/infection/pull/2249
+* Kill mutations in LogicalOr mutator by @staabm in https://github.com/infection/infection/pull/2262
+* cleanup check_trailing_whitespaces.sh by @staabm in https://github.com/infection/infection/pull/2265
+* Improve LogicalOrTest / drop mutator ignores by @staabm in https://github.com/infection/infection/pull/2266
+* Allow setting PHPStan executable custom path by @maks-rafalko in https://github.com/infection/infection/pull/2104
+
 ## [0.29.5](https://github.com/infection/infection/tree/0.29.5) (2024-06-08)
 
 [Full Changelog](https://github.com/infection/infection/compare/0.29.4...0.29.5)

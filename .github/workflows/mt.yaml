@@ -13,7 +13,6 @@
 name: Mutation Testing
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -74,7 +73,7 @@ jobs:
             --coverage-xml=build/logs/coverage-xml \
             --log-junit=build/logs/junit.xml
 
-      - name: Run Infection
+      - name: Run Infection on the full codebase
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
         run: |

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use RuntimeException;
 use Symfony\Component\Process\Process;
 use function trim;
 
@@ -47,6 +48,8 @@ class ShellCommandLineExecutor
 {
     /**
      * @param string[] $command
+     *
+     * @throws RuntimeException
      */
     public function execute(array $command): string
     {

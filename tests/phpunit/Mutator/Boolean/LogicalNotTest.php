@@ -80,6 +80,18 @@ final class LogicalNotTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It does not remove negation on match() to prevent overlap with MatchArmRemoval' => [
+            <<<'PHP'
+                <?php
+
+                $matched = !match ($potionItem->getTypeId()){
+                    ItemTypeIds::POTION, ItemTypeIds::LINGERING_POTION => true,
+                    default => false,
+                };
+                PHP
+            ,
+        ];
     }
 
     public function test_it_mutates_logical_not(): void
