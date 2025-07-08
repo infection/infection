@@ -361,7 +361,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -949,7 +949,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1061,7 +1061,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/config/phpunit-dir',
                 'config/phpunit',
             ),
-            new PhpStan('config/phpunit-dir', 'bin/phpstan'),
+            new PhpStan('/path/to/config/phpstan-dir', 'bin/phpstan'),
             (static fn (): array => [
                 'TrueValue' => new TrueValue(new TrueValueConfig([])),
             ])(),
@@ -1175,7 +1175,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '/path/to/config/phpunit-dir',
                 'config/phpunit',
             ),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             (static fn (): array => [
                 'CustomMutator' => new CustomMutator(),
             ])(),
@@ -1263,7 +1263,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1349,7 +1349,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             $expectedTmpDir,
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1369,7 +1369,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -1436,7 +1436,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1522,7 +1522,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit($expectedPhpUnitConfigDir, null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1609,7 +1609,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1709,7 +1709,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1820,7 +1820,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1860,7 +1860,7 @@ final class ConfigurationFactoryTest extends TestCase
                 Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
-                new PhpStan(null, null),
+                new PhpStan('/path/to', null),
                 $ignoreMsiWithNoMutationsFromSchemaConfiguration,
                 null,
                 null,
@@ -1907,7 +1907,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -1927,7 +1927,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -1947,7 +1947,7 @@ final class ConfigurationFactoryTest extends TestCase
                 Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
-                new PhpStan(null, null),
+                new PhpStan('/path/to', null),
                 null,
                 $minMsiFromSchemaConfiguration,
                 null,
@@ -1994,7 +1994,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -2014,7 +2014,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2034,7 +2034,7 @@ final class ConfigurationFactoryTest extends TestCase
                 Logs::createEmpty(),
                 '',
                 new PhpUnit('/path/to', null),
-                new PhpStan(null, null),
+                new PhpStan('/path/to', null),
                 null,
                 null,
                 $minCoveredMsiFromSchemaConfiguration,
@@ -2081,7 +2081,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -2101,7 +2101,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             null, // MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2169,7 +2169,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             $expectedTestFramework,
             null,
@@ -2189,7 +2189,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2343,7 +2343,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -2363,7 +2363,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2431,7 +2431,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             $configTestFramework,
             null,
@@ -2451,7 +2451,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2518,7 +2518,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             $configTestFramework,
             null,
@@ -2538,7 +2538,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2611,7 +2611,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             $expectedMutators,
             'phpunit',
             null,
@@ -2631,7 +2631,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2701,7 +2701,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             [
                 'MethodCallRemoval' => new MethodCallRemoval(),
             ],
@@ -2723,7 +2723,7 @@ final class ConfigurationFactoryTest extends TestCase
             false,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
@@ -2811,7 +2811,7 @@ final class ConfigurationFactoryTest extends TestCase
             'none',
             sys_get_temp_dir() . '/infection',
             new PhpUnit('/path/to', null),
-            new PhpStan(null, null),
+            new PhpStan('/path/to', null),
             self::getDefaultMutators(),
             'phpunit',
             null,
@@ -2831,7 +2831,7 @@ final class ConfigurationFactoryTest extends TestCase
             true,
             MapSourceClassToTestStrategy::SIMPLE,
             null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            null, // static analysis tool
             null, // $mutantId
         ];
     }
