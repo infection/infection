@@ -42,8 +42,6 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 {
     public const NEXT_ATTRIBUTE = 'next';
 
-    public const PREVIOUS_ATTRIBUTE = 'previous';
-
     private ?Node $previous;
 
     public function beforeTraverse(array $nodes): void
@@ -53,17 +51,18 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
-        if ($this->previous === null) {
-            return;
-        }
-
-        $node->setAttribute(self::PREVIOUS_ATTRIBUTE, $this->previous);
-        $this->previous->setAttribute(self::NEXT_ATTRIBUTE, $node);
+        $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
     }
 
     public function leaveNode(Node $node): void
     {
-        // TODO limit to function nodes only? i.e. no next nodes outside functions
+        // Reset the previous node if we are leaving a function-like node
+        if ($node instanceof Node\FunctionLike) {
+            $this->previous = null;
+
+            return;
+        }
+
         $this->previous = $node;
     }
 }

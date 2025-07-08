@@ -44,6 +44,7 @@ use Infection\Reflection\NullReflection;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use ReflectionException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -124,14 +125,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
-            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
-            $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
-            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[count($this->functionScopeStack) - 1]);
-            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
+        }
+
+        if ($this->isFunctionLikeNode($node) || $isInsideFunction) {
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
+            $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
         }
 
         return null;
@@ -232,7 +233,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
 
         if ($fqn !== null) {
-            return CoreClassReflection::fromClassName($fqn->toString());
+            try {
+                return CoreClassReflection::fromClassName($fqn->toString());
+            } catch (ReflectionException) {
+                // Fallback to the workaround
+            }
         }
 
         // TODO: check against interfaces

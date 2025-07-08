@@ -45,6 +45,7 @@ use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
@@ -169,6 +170,11 @@ abstract class BaseMutatorTestCase extends TestCase
             $this->createMutator($settings),
             $nodes,
         );
+
+        // Pre-traverse the nodes to connect them
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NextConnectingVisitor());
+        $traverser->traverse($nodes);
 
         (new NodeTraverserFactory())
             ->create($mutationsCollectorVisitor, [])

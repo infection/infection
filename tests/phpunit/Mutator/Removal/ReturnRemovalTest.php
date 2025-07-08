@@ -55,67 +55,136 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
-        yield 'It mutates a redundant and unnecessary return statement' => [
+        yield 'It does not mutate essential return statements' => [
             <<<'PHP'
                 <?php
 
-                function foo(): void
+                class Bar
                 {
-                    return;
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                function foo(): void
-                {
-
+                    function foo(): array
+                    {
+                        return [];
+                    }
                 }
                 PHP,
         ];
 
-        yield 'It mutates all return statements, even if they cause an error' => [
+        yield 'It mutates duplicate return statements' => [
             <<<'PHP'
                 <?php
 
-                function getConfig(): object
+                class Bar
                 {
-                    if (null !== $this->config) {
-                        return $this->config;
+                    function foo(): array
+                    {
+                        return [1];
+                        return [2];
                     }
-                    // ... load and cache
-                    $this->config = $config;
-                    return $this->config;
                 }
                 PHP,
-            [
-                <<<'PHP'
-                    <?php
+            <<<'PHP'
+                <?php
 
-                    function getConfig(): object
+                class Bar
+                {
+                    function foo(): array
                     {
-                        if (null !== $this->config) {
 
-                        }
-                        // ... load and cache
-                        $this->config = $config;
-                        return $this->config;
+                        return [2];
                     }
-                    PHP,
-                <<<'PHP'
-                    <?php
+                }
+                PHP,
+        ];
 
-                    function getConfig(): object
+        yield 'It mutates return statements in methods with void type' => [
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo(): void
+                    {
+                        return;
+                    }
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo(): void
+                    {
+
+                    }
+                }
+                PHP,
+        ];
+
+        yield 'It mutates return statements in methods with no return type' => [
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+                        return 1;
+                    }
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+
+                    }
+                }
+                PHP,
+        ];
+
+        yield 'It leaves the last return statement alone if the method has a return type' => [
+            <<<'PHP'
+                <?php
+                namespace Foo;
+
+                class ConfigLoader
+                {
+                    private ?object $config = null;
+
+                    public function getConfig(): object
                     {
                         if (null !== $this->config) {
                             return $this->config;
                         }
                         // ... load and cache
                         $this->config = $config;
-
+                        return $this->config;
                     }
-                    PHP,
-            ],
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+                namespace Foo;
+
+                class ConfigLoader
+                {
+                    private ?object $config = null;
+
+                    public function getConfig(): object
+                    {
+                        if (null !== $this->config) {
+
+                        }
+                        // ... load and cache
+                        $this->config = $config;
+                        return $this->config;
+                    }
+                }
+                PHP,
         ];
     }
 }
