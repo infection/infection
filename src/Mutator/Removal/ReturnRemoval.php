@@ -39,7 +39,11 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
+use PhpParser\Node\FunctionLike;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -50,10 +54,12 @@ final class ReturnRemoval implements Mutator
 {
     use GetMutatorName;
 
+    private const VOID = 'void';
+
     public static function getDefinition(): Definition
     {
         return new Definition(
-            'Removes the return statement.',
+            'Removes a return statement.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -74,6 +80,41 @@ final class ReturnRemoval implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Return_;
+        if (!$node instanceof Node\Stmt\Return_) {
+            return false;
+        }
+
+        // Any return statement in a function-like node that does not have a return type can be removed.
+        if (!self::hasReturnType($node)) {
+            return true;
+        }
+
+        // If there's more after this return statement, we can remove it
+        return self::hasNextNode($node);
+    }
+
+    protected function hasReturnType(Node $node): bool
+    {
+        $functionScope = ReflectionVisitor::getFunctionScope($node);
+
+        // We do not expect to see a return statement outside a function-like node.
+        Assert::isInstanceOf($functionScope, FunctionLike::class);
+
+        $returnType = $functionScope->getReturnType();
+
+        // A void return type is the same as no return type for this mutator.
+        if (
+            $returnType === null
+            || $returnType->toLowerString() === self::VOID
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static function hasNextNode(Node $node): bool
+    {
+        return $node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE) !== null;
     }
 }
