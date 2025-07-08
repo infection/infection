@@ -85,58 +85,34 @@ final class ReturnRemoval implements Mutator
             return false;
         }
 
+        // Any return statement in a function-like node that does not have a return type can be removed.
+        if (!self::hasReturnType($node)) {
+            return true;
+        }
+
+        // If there's more after this return statement, we can remove it
+        return self::hasNextStmtNode($node);
+    }
+
+    protected function hasReturnType(Node $node): bool
+    {
         $functionScope = ReflectionVisitor::getFunctionScope($node);
+
+        // We do not expect to see a return statement outside a function-like node.
         Assert::isInstanceOf($functionScope, FunctionLike::class);
 
         $returnType = $functionScope->getReturnType();
-
-        // Check if it's a void return type
-        if ($returnType !== null && !($returnType instanceof ComplexType) && $returnType->toLowerString() === self::VOID) {
-            // In void functions, any return statement can be removed
-            return true;
-        }
-
-        // Check if there's a non-void return type defined
-        if (self::hasNonVoidReturnType($returnType)) {
-            // For functions with return types, we can remove it only if there's more after this return
-            return self::hasNextStmtNode($node);
-        }
-
-        // For functions without return types, we can only remove the return if:
-        // 1. There's another statement after it, OR
-        // 2. It returns a non-null value (not return; or return null;)
-        return self::hasNextStmtNode($node) || !self::isNullReturn($node);
-    }
-
-    private static function isNullReturn(Node\Stmt\Return_ $node): bool
-    {
-        // Empty return (return;)
-        if ($node->expr === null) {
-            return true;
-        }
-
-        // Check for return null;
-        if ($node->expr instanceof Node\Expr\ConstFetch) {
-            return $node->expr->name->toLowerString() === 'null';
-        }
-
-        return false;
-    }
-
-    private static function hasNonVoidReturnType($returnType): bool
-    {
-        // No return type
-        if ($returnType === null) {
-            return false;
-        }
 
         // Complex types are specific return types
         if ($returnType instanceof ComplexType) {
             return true;
         }
 
-        // Void is not considered a "real" return type for our purposes
-        if ($returnType->toLowerString() === self::VOID) {
+        // A void return type is the same as no return type for this mutator.
+        if (
+            $returnType === null
+            || $returnType->toLowerString() === self::VOID
+        ) {
             return false;
         }
 
