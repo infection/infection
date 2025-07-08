@@ -63,8 +63,6 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
         yield from self::doesNotMutateWithReturnType('array|int|null');
 
-        yield from self::mutatesWithReturnType('');
-
         yield from self::mutatesWithReturnType('void');
 
         yield 'It mutates duplicate return statements' => [
@@ -141,6 +139,111 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                     }
                 }
                 PHP,
+        ];
+
+        yield 'It does not mutate last return null in function without return type' => [
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+                        $a = 1;
+                        return null;
+                    }
+                }
+                PHP,
+        ];
+
+        yield 'It does not mutate last empty return in function without return type' => [
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+                        $a = 1;
+                        return;
+                    }
+                }
+                PHP,
+        ];
+
+        yield 'It mutates return with value in function without return type' => [
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+                        return "value";
+                    }
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+
+                    }
+                }
+                PHP,
+        ];
+
+        yield 'It mutates return null if not last statement' => [
+            <<<'PHP'
+                <?php
+
+                class Bar
+                {
+                    function foo()
+                    {
+                        if (true) {
+                            return null;
+                            echo "never reached";
+                        }
+                        return "default";
+                    }
+                }
+                PHP,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class Bar
+                    {
+                        function foo()
+                        {
+                            if (true) {
+
+                                echo "never reached";
+                            }
+                            return "default";
+                        }
+                    }
+                    PHP,
+                <<<'PHP'
+                    <?php
+
+                    class Bar
+                    {
+                        function foo()
+                        {
+                            if (true) {
+                                return null;
+                                echo "never reached";
+                            }
+
+                        }
+                    }
+                    PHP,
+            ],
         ];
     }
 
