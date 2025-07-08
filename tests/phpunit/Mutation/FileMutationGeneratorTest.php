@@ -196,7 +196,7 @@ final class FileMutationGeneratorTest extends TestCase
             $nodeIgnorers,
         );
 
-        iterator_to_array($mutations, false);
+        $this->assertCount(0, iterator_to_array($mutations, false));
     }
 
     #[DataProvider('parsedFilesProvider')]
