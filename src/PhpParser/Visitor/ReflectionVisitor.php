@@ -151,7 +151,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    public static function getReflectionClass(Node $node): ?ClassReflection
+    public static function findReflectionClass(Node $node): ?ClassReflection
     {
         $reflection = $node->getAttribute(self::REFLECTION_CLASS_KEY);
         Assert::nullOrIsInstanceOf($reflection, ClassReflection::class);
