@@ -39,12 +39,8 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Mutator\Util\ReturnTypeHelper;
 use PhpParser\Node;
-use PhpParser\Node\ComplexType;
-use PhpParser\Node\FunctionLike;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -54,8 +50,6 @@ use Webmozart\Assert\Assert;
 final class ReturnRemoval implements Mutator
 {
     use GetMutatorName;
-
-    private const VOID = 'void';
 
     public static function getDefinition(): Definition
     {
@@ -85,66 +79,26 @@ final class ReturnRemoval implements Mutator
             return false;
         }
 
-        $functionScope = ReflectionVisitor::getFunctionScope($node);
-        Assert::isInstanceOf($functionScope, FunctionLike::class);
+        $returnHelper = new ReturnTypeHelper($node);
 
-        $returnType = $functionScope->getReturnType();
-
-        // Check if it's a void return type
-        if ($returnType !== null && !($returnType instanceof ComplexType) && $returnType->toLowerString() === self::VOID) {
-            // In void functions, any return statement can be removed
+        // In void functions, any return statement can be removed
+        if ($returnHelper->hasVoidReturnType()) {
             return true;
         }
 
         // Check if there's a non-void return type defined
-        if (self::hasNonVoidReturnType($returnType)) {
+        if ($returnHelper->hasSpecificReturnType()) {
             // For functions with return types, we can remove it only if there's more after this return
-            return self::hasNextStmtNode($node);
+            return $returnHelper->hasNextStmtNode();
         }
 
         // For functions without return types, we can only remove the return if:
         // 1. There's another statement after it, OR
-        // 2. It returns a non-null value (not return; or return null;)
-        return self::hasNextStmtNode($node) || !self::isNullReturn($node);
-    }
-
-    private static function isNullReturn(Node\Stmt\Return_ $node): bool
-    {
-        // Empty return (return;)
-        if ($node->expr === null) {
+        if ($returnHelper->hasNextStmtNode()) {
             return true;
         }
 
-        // Check for return null;
-        if ($node->expr instanceof Node\Expr\ConstFetch) {
-            return $node->expr->name->toLowerString() === 'null';
-        }
-
-        return false;
-    }
-
-    private static function hasNonVoidReturnType($returnType): bool
-    {
-        // No return type
-        if ($returnType === null) {
-            return false;
-        }
-
-        // Complex types are specific return types
-        if ($returnType instanceof ComplexType) {
-            return true;
-        }
-
-        // Void is not considered a "real" return type for our purposes
-        if ($returnType->toLowerString() === self::VOID) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static function hasNextStmtNode(Node $node): bool
-    {
-        return $node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE) !== null;
+        // 2. It returns a non-null value (not `return;` or `return null;`)
+        return !$returnHelper->isNullReturn();
     }
 }

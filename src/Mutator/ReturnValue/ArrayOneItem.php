@@ -126,7 +126,7 @@ final class ArrayOneItem implements Mutator
 
     private function returnTypeIsArray(Node $node): bool
     {
-        $functionScope = ReflectionVisitor::getFunctionScope($node);
+        $functionScope = ReflectionVisitor::findFunctionScope($node);
 
         if ($functionScope === null) {
             return false;

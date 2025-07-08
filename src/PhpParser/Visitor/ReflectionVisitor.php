@@ -159,10 +159,18 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return $reflection;
     }
 
-    public static function getFunctionScope(Node $node): ?Node\FunctionLike
+    public static function findFunctionScope(Node $node): ?Node\FunctionLike
     {
         $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
         Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
+    public static function getFunctionScope(Node $node): Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::isInstanceOf($functionScope, Node\FunctionLike::class);
 
         return $functionScope;
     }

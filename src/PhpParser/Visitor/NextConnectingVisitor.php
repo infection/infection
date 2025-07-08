@@ -51,6 +51,9 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 
     private ?Node $previous = null;
 
+    /**
+     * {@inheritDoc}
+     */
     public function beforeTraverse(array $nodes)
     {
         $this->previous = null;
@@ -58,6 +61,9 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\FunctionLike) {
