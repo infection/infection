@@ -1173,7 +1173,7 @@ parameters:
 		-
 			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects array\<Infection\\Mutator\\Mutator\<PhpParser\\Node\>\>, array\{Infection\\Mutator\\IgnoreMutator\<PhpParser\\Node\\Expr\\BinaryOp\\Plus\>\} given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 4
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
 
 		-
