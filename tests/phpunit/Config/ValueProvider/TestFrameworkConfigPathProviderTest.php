@@ -104,12 +104,10 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->locatorMock
             ->expects($this->exactly(3))
             ->method('locate')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    $this->throwException(new Exception()),
-                    '',
-                ),
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                $this->throwException(new Exception()),
+                '',
             );
 
         $inputPhpUnitPath = realpath(__DIR__ . '/../../Fixtures/Files/phpunit');
@@ -132,11 +130,9 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->locatorMock
             ->expects($this->exactly(2))
             ->method('locate')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    '',
-                ),
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                '',
             );
 
         $this->consoleMock
@@ -161,12 +157,10 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
         $this->locatorMock
             ->expects($this->exactly(3))
             ->method('locate')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    $this->throwException(new Exception()),
-                    '',
-                ),
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                $this->throwException(new Exception()),
+                '',
             );
 
         $path = $this->provider->get(

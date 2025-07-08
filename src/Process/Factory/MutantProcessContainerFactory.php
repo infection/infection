@@ -40,6 +40,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use function min;
 use Symfony\Component\Process\Process;
 
 /**
@@ -48,6 +49,10 @@ use Symfony\Component\Process\Process;
  */
 class MutantProcessContainerFactory
 {
+    private const TIMEOUT_FACTOR = 5;
+
+    private const TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD = 5;
+
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
         private readonly float $timeout,
@@ -61,6 +66,9 @@ class MutantProcessContainerFactory
 
     public function create(Mutant $mutant, string $testFrameworkExtraOptions = ''): MutantProcessContainer
     {
+        // getNominalTestExecutionTime() returns the time the test-suite requires to run the test, excluding process creation and test-framework bootstrapping.
+        $timeout = min(self::TEST_FRAMEWORK_BOOTSTRAP_THRESHOLD + (self::TIMEOUT_FACTOR * $mutant->getMutation()->getNominalTestExecutionTime()), $this->timeout);
+
         $process = new Process(
             command: $this->testFrameworkAdapter->getMutantCommandLine(
                 $mutant->getTests(),
@@ -69,7 +77,7 @@ class MutantProcessContainerFactory
                 $mutant->getMutation()->getOriginalFilePath(),
                 $testFrameworkExtraOptions,
             ),
-            timeout: $this->timeout,
+            timeout: $timeout,
         );
 
         return new MutantProcessContainer(

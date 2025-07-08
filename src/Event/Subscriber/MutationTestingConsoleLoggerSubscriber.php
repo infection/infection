@@ -236,7 +236,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
         // for the case when no file loggers are configured and `--show-mutations` is not used
         if ($this->numberOfShownMutations === 0) {
-            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.']);
+            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.']);
         }
     }
 

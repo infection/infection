@@ -57,7 +57,8 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
 
     public static function mutationsProvider(): iterable
     {
-        yield 'It does not decrement an integer in a comparison' => [
+        // @see https://github.com/infection/infection/pull/639
+        yield 'It does not decrement an integer in a comparison to not overlap with GreaterThan and similar' => [
             <<<'PHP'
                 <?php
 

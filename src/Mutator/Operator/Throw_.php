@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -91,6 +92,24 @@ final class Throw_ implements Mutator
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\Throw_;
+        if (!$node instanceof Node\Expr\Throw_) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\MatchArm && $parentNode->conds === null) {
+            return false;
+        }
+
+        if ($parentNode instanceof Node\Stmt\Expression) {
+            $grandParent = ParentConnector::findParent($parentNode);
+
+            if ($grandParent instanceof Node\Stmt\Case_ && $grandParent->cond === null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

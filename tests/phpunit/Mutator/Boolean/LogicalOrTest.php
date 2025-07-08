@@ -519,6 +519,66 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 $myVar <= 10.1 && $myVar > 5;
                 PHP,
         ];
+
+        yield 'It mutates logical or when used with 2 variables' => [
+            <<<'PHP'
+                <?php
+
+                $myVar <= $other || $myVar > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $myVar <= $other && $myVar > 5;
+                PHP,
+        ];
+
+        yield 'It mutates logical or when used with 2 variables (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                $myVar <= 5 || $myVar > $other;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $myVar <= 5 && $myVar > $other;
+                PHP,
+        ];
+
+        yield 'It mutates logical or when used with variable variables' => [
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= ${$s} || $myVar > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= ${$s} && $myVar > 5;
+                PHP,
+        ];
+
+        yield 'It mutates logical or when used with variable variables (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= 5 || $myVar > ${$s};
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= 5 && $myVar > ${$s};
+                PHP,
+        ];
     }
 
     private static function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable
@@ -684,6 +744,36 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node instanceof PhpParser\Node\Expr\PreDec || $node instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates left-side instanceof or non-instanceof expression' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable || $i > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable && $i > 5;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates right-side instanceof or non-instanceof expression' => [
+            <<<'PHP'
+                <?php
+
+                $var = $i > 5 || $node instanceof \Countable;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $i > 5 && $node instanceof \Countable;
                 PHP
             ,
         ];
