@@ -77,6 +77,7 @@ final class DefinitionTest extends TestCase
         'ShiftLeft',
         'ShiftRight',
         'ArrayItem',
+        'EqualIdentical',
         'FalseValue',
         'InstanceOf_',
         'LogicalAnd',
