@@ -97,6 +97,7 @@ final class ProfileList
         Boolean\ArrayAll::class,
         Boolean\ArrayAny::class,
         Boolean\ArrayItem::class,
+        // EqualIdentical has been removed from the default boolean profile
         Boolean\FalseValue::class,
         Boolean\InstanceOf_::class,
         Boolean\LogicalAnd::class,
