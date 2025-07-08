@@ -65,6 +65,8 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
 
         yield from self::mutatesWithReturnType('void');
 
+        yield from self::mutatesWithReturnType('', '"value"');
+
         yield 'It mutates duplicate return statements' => [
             <<<'PHP'
                 <?php
@@ -171,31 +173,6 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 PHP,
         ];
 
-        yield 'It mutates return with value in function without return type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        return "value";
-                    }
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-
-                    }
-                }
-                PHP,
-        ];
-
         yield 'It mutates return null if not last statement' => [
             <<<'PHP'
                 <?php
@@ -247,12 +224,12 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
         ];
     }
 
-    private static function mutatesWithReturnType(string $type): iterable
+    private static function mutatesWithReturnType(string $type, string $returnValue = ''): iterable
     {
         $displayType = $type === '' ? 'missing' : $type;
         $methodReturnType = $type === '' ? '' : ": $type";
 
-        yield "It mutates return statements in methods with return type $displayType" => [
+        yield "It mutates return statements in methods with return type $displayType, value '$returnValue'" => [
             <<<"PHP"
                 <?php
 
@@ -260,7 +237,7 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                 {
                     function foo()$methodReturnType
                     {
-                        return;
+                        return $returnValue;
                     }
                 }
                 PHP,
