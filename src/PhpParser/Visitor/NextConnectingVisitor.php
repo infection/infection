@@ -38,6 +38,13 @@ namespace Infection\PhpParser\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * Connects sequential statement nodes by adding a "next" attribute pointing to the following statement.
+ * This visitor tracks execution order between statements only (ignoring expressions and other non-statement nodes),
+ * while skipping comment nodes (Nop) and resetting the chain at function boundaries.
+ *
+ * @internal
+ */
 final class NextConnectingVisitor extends NodeVisitorAbstract
 {
     public const NEXT_ATTRIBUTE = 'next';
