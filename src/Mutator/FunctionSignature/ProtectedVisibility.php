@@ -94,7 +94,7 @@ final class ProtectedVisibility implements Mutator
             return false;
         }
 
-        $class = ReflectionVisitor::getReflectionClass($node);
+        $class = ReflectionVisitor::findReflectionClass($node);
 
         if ($node->isFinal() || $class !== null && $class->isFinal()) {
             return false;
@@ -113,7 +113,7 @@ final class ProtectedVisibility implements Mutator
 
     private function hasSameProtectedParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        $reflection = ReflectionVisitor::getReflectionClass($node);
+        $reflection = ReflectionVisitor::findReflectionClass($node);
         Assert::notNull($reflection);
 
         return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asProtected());

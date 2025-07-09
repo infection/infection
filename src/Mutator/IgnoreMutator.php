@@ -84,7 +84,7 @@ final readonly class IgnoreMutator implements Mutator
             return false;
         }
 
-        $reflectionClass = ReflectionVisitor::getReflectionClass($node);
+        $reflectionClass = ReflectionVisitor::findReflectionClass($node);
 
         if (!$reflectionClass instanceof ClassReflection) {
             return true;
