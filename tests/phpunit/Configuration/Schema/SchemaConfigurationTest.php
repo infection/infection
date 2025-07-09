@@ -50,24 +50,25 @@ final class SchemaConfigurationTest extends TestCase
 {
     #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(
-        string $path,
-        ?float $timeout,
-        Source $source,
-        Logs $logs,
-        ?string $tmpDir,
-        PhpUnit $phpUnit,
-        PhpStan $phpStan,
-        ?bool $ignoreMsiWithNoMutations,
-        $minMsi,
-        $minCoveredMsi,
-        array $mutators,
-        ?string $testFramework,
-        ?string $bootstrap,
-        ?string $initialTestsPhpOptions,
-        ?string $testFrameworkExtraOptions,
-        string|int|null $threadCount,
-        ?string $staticAnalysisTool,
+        string $path = '',
+        ?float $timeout = null,
+        Source $source = new Source([], []),
+        ?Logs $logs = null,
+        ?string $tmpDir = null,
+        PhpUnit $phpUnit = new PhpUnit(null, null),
+        PhpStan $phpStan = new PhpStan(null, null),
+        ?bool $ignoreMsiWithNoMutations = null,
+        mixed $minMsi = null,
+        mixed $minCoveredMsi = null,
+        array $mutators = [],
+        ?string $testFramework = null,
+        ?string $bootstrap = null,
+        ?string $initialTestsPhpOptions = null,
+        ?string $testFrameworkExtraOptions = null,
+        string|int|null $threadCount = null,
+        ?string $staticAnalysisTool = null,
     ): void {
+        $logs ??= Logs::createEmpty();
         $config = new SchemaConfiguration(
             $path,
             $timeout,
@@ -88,52 +89,34 @@ final class SchemaConfigurationTest extends TestCase
             $staticAnalysisTool,
         );
 
-        $this->assertSame($path, $config->getFile());
-        $this->assertSame($timeout, $config->getTimeout());
-        $this->assertSame($source, $config->getSource());
-        $this->assertSame($logs, $config->getLogs());
-        $this->assertSame($tmpDir, $config->getTmpDir());
-        $this->assertSame($phpUnit, $config->getPhpUnit());
-        $this->assertSame($phpStan, $config->getPhpStan());
-        $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations());
-        $this->assertSame($minMsi, $config->getMinMsi());
-        $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi());
-        $this->assertSame($mutators, $config->getMutators());
-        $this->assertSame($testFramework, $config->getTestFramework());
-        $this->assertSame($bootstrap, $config->getBootstrap());
-        $this->assertSame($initialTestsPhpOptions, $config->getInitialTestsPhpOptions());
-        $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions());
-        $this->assertSame($threadCount, $config->getThreads());
-        $this->assertSame($staticAnalysisTool, $config->getStaticAnalysisTool());
+        $this->assertSame($path, $config->getFile(), 'Failed path check');
+        $this->assertSame($timeout, $config->getTimeout(), 'Failed timeout check');
+        $this->assertSame($source, $config->getSource(), 'Failed source check');
+        $this->assertSame($logs, $config->getLogs(), 'Failed logs check');
+        $this->assertSame($tmpDir, $config->getTmpDir(), 'Failed tmpDir check');
+        $this->assertSame($phpUnit, $config->getPhpUnit(), 'Failed phpUnit check');
+        $this->assertSame($phpStan, $config->getPhpStan(), 'Failed phpStan check');
+        $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
+        $this->assertSame($minMsi, $config->getMinMsi(), 'Failed minMsi check');
+        $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi(), 'Failed minCoveredMsi check');
+        $this->assertSame($mutators, $config->getMutators(), 'Failed mutators check');
+        $this->assertSame($testFramework, $config->getTestFramework(), 'Failed testFramework check');
+        $this->assertSame($bootstrap, $config->getBootstrap(), 'Failed bootstrap check');
+        $this->assertSame($initialTestsPhpOptions, $config->getInitialTestsPhpOptions(), 'Failed initialTestsPhpOptions check');
+        $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions(), 'Failed testFrameworkExtraOptions check');
+        $this->assertSame($threadCount, $config->getThreads(), 'Failed threadCount check');
+        $this->assertSame($staticAnalysisTool, $config->getStaticAnalysisTool(), 'Failed staticAnalysisTool check');
     }
 
     public static function valueProvider(): iterable
     {
-        yield 'minimal' => [
-            '',
-            null,
-            new Source([], []),
-            Logs::createEmpty(),
-            null,
-            new PhpUnit(null, null),
-            new PhpStan(null, null),
-            null,
-            null,
-            null,
-            [],
-            null,
-            null,
-            null,
-            null,
-            null, // threadCount
-            null, // staticAnalysisTool
-        ];
+        yield 'minimal' => [];
 
         yield 'complete' => [
-            '/path/to/config',
-            10.,
-            new Source(['src', 'lib'], ['fixtures', 'tests']),
-            new Logs(
+            'path' => '/path/to/config',
+            'timeout' => 10.,
+            'source' => new Source(['src', 'lib'], ['fixtures', 'tests']),
+            'logs' => new Logs(
                 'text.log',
                 'report.html',
                 'summary.log',
@@ -145,22 +128,22 @@ final class SchemaConfigurationTest extends TestCase
                 StrykerConfig::forFullReport('master'),
                 'summary.json',
             ),
-            'path/to/tmp',
-            new PhpUnit('dist/phpunit', 'bin/phpunit'),
-            new PhpStan('bin/phpstan-config-dir', 'bin/phpstan'),
-            true,
-            12.0,
-            35.0,
-            [
+            'tmpDir' => 'path/to/tmp',
+            'phpUnit' => new PhpUnit('dist/phpunit', 'bin/phpunit'),
+            'phpStan' => new PhpStan('bin/phpstan-config-dir', 'bin/phpstan'),
+            'ignoreMsiWithNoMutations' => true,
+            'minMsi' => 12.0,
+            'minCoveredMsi' => 35.0,
+            'mutators' => [
                 '@arithmetic' => true,
                 '@cast' => false,
             ],
-            'phpunit',
-            'bin/bootstrap.php',
-            '-d zend_extension=xdebug.so',
-            '--debug',
-            'max', // threadCount
-            'phpstan', // staticAnalysisTool
+            'testFramework' => 'phpunit',
+            'bootstrap' => 'bin/bootstrap.php',
+            'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
+            'testFrameworkExtraOptions' => '--debug',
+            'threadCount' => 'max',
+            'staticAnalysisTool' => 'phpstan',
         ];
     }
 }
