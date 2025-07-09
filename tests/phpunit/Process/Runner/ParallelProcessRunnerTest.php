@@ -35,30 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
-use Infection\Process\Factory\LazyMutantProcessFactory;
-use Infection\Process\MutantProcess;
+use Infection\Mutant\MutantExecutionResultFactory;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\ProcessWrangler;
+use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
-use Iterator;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(ProcessWrangler::class)]
+#[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
-        $runner = new ProcessWrangler(4, 0);
+        $runner = new ParallelProcessRunner(4, 0);
 
         $runner->run([]);
 
@@ -75,7 +69,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ProcessWrangler($threadsCount, 0);
+        $runner = new ParallelProcessRunner($threadsCount, 0);
 
         $executedProcesses = $runner->run($processes);
 
@@ -90,7 +84,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ProcessWrangler(4, 0);
+        $runner = new ParallelProcessRunner(4, 0);
 
         $runner->run($processes);
 
@@ -100,47 +94,9 @@ final class ParallelProcessRunnerTest extends TestCase
     }
 
     #[DataProvider('threadCountProvider')]
-    public function test_it_adds_next_processes_if_mutant_is_escaped(int $threadCount): void
-    {
-        $processes = (function () use ($threadCount): iterable {
-            yield $this->createMutantProcessContainerWithNextMutantProcess($threadCount);
-        })();
-
-        $runner = new ProcessWrangler($threadCount, 0);
-
-        $runner->run($processes);
-
-        $executedProcesses = $runner->run($processes);
-
-        $this->assertCount(1, iterator_to_array($executedProcesses, true));
-    }
-
-    #[DataProvider('threadCountProvider')]
     public function test_it_handles_all_kids_of_processes_with_infinite_threads(int $threadCount): void
     {
         $this->runWithAllKindsOfProcesses($threadCount);
-    }
-
-    public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
-    {
-        $runner = new ProcessWrangler(1, 0);
-
-        $bucket = [];
-
-        $iterator = $this->createMock(Iterator::class);
-        $iterator->expects($this->once())
-            ->method('valid')
-            ->willReturn(false);
-
-        $iterator->expects($this->never())
-            ->method('current');
-
-        $reflection = new ReflectionClass($runner);
-        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $iterator, 1]);
-
-        // Should return 0 immediately when generator is not valid
-        $this->assertSame(0, $result);
     }
 
     public static function threadCountProvider(): iterable
@@ -168,7 +124,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ProcessWrangler($threadCount, 0);
+        $runner = new ParallelProcessRunner($threadCount, 0);
 
         $executedProcesses = $runner->run($processes);
 
@@ -200,92 +156,10 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 $this->createMock(Mutant::class),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createMock(MutantExecutionResultFactory::class),
                 false,
             ),
             [],
-        );
-    }
-
-    private function createMutantProcessContainerWithNextMutantProcess(int $threadCount): MutantProcessContainer
-    {
-        $phpUnitProcessMock = $this->createMock(Process::class);
-        $phpUnitProcessMock
-            ->expects($this->once())
-            ->method('start')
-            ->with(null, [
-                'INFECTION' => '1',
-                'TEST_TOKEN' => 1,
-            ])
-        ;
-        $phpUnitProcessMock
-            ->expects($this->once())
-            ->method('checkTimeout')
-        ;
-        $phpUnitProcessMock
-            ->expects($this->once())
-            ->method('isRunning')
-            ->willReturn(false)
-        ;
-
-        $nextProcessMock = $this->createMock(Process::class);
-        $nextProcessMock
-            ->expects($this->once())
-            ->method('start')
-            ->with(null, [
-                'INFECTION' => '1',
-                'TEST_TOKEN' => $threadCount === 0 ? 1 : (1 % $threadCount) + 1,
-            ])
-        ;
-        $nextProcessMock
-            ->expects($this->once())
-            ->method('checkTimeout')
-        ;
-        $nextProcessMock
-            ->expects($this->once())
-            ->method('isRunning')
-            ->willReturn(false)
-        ;
-
-        $mutantExecutionResultMock = $this->createMock(MutantExecutionResult::class);
-
-        $mutantExecutionResultMock
-            ->expects($this->once())
-            ->method('getDetectionStatus')
-            ->willReturn(DetectionStatus::ESCAPED);
-
-        $mutantExecutionResultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
-
-        $mutantExecutionResultFactoryMock
-            ->expects($this->once())
-            ->method('createFromProcess')
-            ->willReturn($mutantExecutionResultMock);
-
-        return new MutantProcessContainer(
-            new DummyMutantProcess(
-                $phpUnitProcessMock,
-                $this->createMock(Mutant::class),
-                $mutantExecutionResultFactoryMock,
-                false,
-            ),
-            [
-                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
-                    public function __construct(
-                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-                        private Process $nextProcessMock,
-                    ) {
-                    }
-
-                    public function create(Mutant $mutant): MutantProcess
-                    {
-                        return new MutantProcess(
-                            $this->nextProcessMock,
-                            $mutant,
-                            $this->mutantExecutionResultFactory,
-                        );
-                    }
-                },
-            ],
         );
     }
 
@@ -311,7 +185,7 @@ final class ParallelProcessRunnerTest extends TestCase
             new DummyMutantProcess(
                 $processMock,
                 $this->createMock(Mutant::class),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                $this->createMock(MutantExecutionResultFactory::class),
                 true,
             ),
             [],
