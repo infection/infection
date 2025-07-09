@@ -58,7 +58,6 @@ jobs:
               run: |
                   git fetch origin $GITHUB_BASE_REF
                   php bin/infection \
-                    --threads=max \
                     --git-diff-lines \
                     --git-diff-base=origin/$GITHUB_BASE_REF \
                     --ignore-msi-with-no-mutations \
