@@ -46,7 +46,6 @@ use function range;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
 use Webmozart\Assert\Assert;
-use Tumblr\Chorus;
 
 /**
  * @internal
@@ -85,7 +84,6 @@ final class ParallelProcessRunner implements ProcessRunner
     public function __construct(
         private readonly int $threadCount,
         private readonly int $poll = self::POLL_WAIT_IN_MS,
-        private readonly Chorus\TimeKeeper $timeKeeper = new Chorus\TimeKeeper(),
     ) {
     }
 
@@ -94,10 +92,6 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->shouldStop = true;
     }
 
-    /**
-     * @param iterable<MutantProcessContainer> $processContainers
-     * @return iterable<MutantProcessContainer>
-     */
     public function run(iterable $processContainers): iterable
     {
         /*
@@ -140,7 +134,7 @@ final class ParallelProcessRunner implements ProcessRunner
                 do {
                     // While we wait, try fetch a good amount of next processes from the queue,
                     // reducing the poll delay with each loaded process
-                    $this->timeKeeper->usleep(max(0, $this->poll - $this->fillBucketOnce($bucket, $generator, $threadCount)));
+                    usleep(max(0, $this->poll - $this->fillBucketOnce($bucket, $generator, $threadCount)));
 
                     $terminatedProcess = $this->tryToFreeNotRunningProcess();
 
@@ -232,12 +226,12 @@ final class ParallelProcessRunner implements ProcessRunner
             return 0;
         }
 
-        $start = $this->timeKeeper->getCurrentTimeAsFloat();
+        $start = microtime(true);
 
         $bucket[] = $input->current();
         $input->next();
 
-        return (int) ($this->timeKeeper->getCurrentTimeAsFloat() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
+        return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
     /**

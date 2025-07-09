@@ -66,7 +66,6 @@
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/process": "^6.4 || ^7.0",
         "thecodingmachine/safe": "^v3.0",
-        "tumblr/chorus-timekeeper": "^0.1.1",
         "webmozart/assert": "^1.11"
     },
     "conflict": {
