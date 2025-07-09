@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Generator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
