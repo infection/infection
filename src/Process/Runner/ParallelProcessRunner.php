@@ -108,7 +108,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $generator = self::toGenerator($processContainers);
 
         // Bucket for processes to be executed
-        /** @var array<MutantProcessContainer|null> $bucket */
+        /** @var array<MutantProcessContainer> $bucket */
         $bucket = [];
 
         // Load the first process from the queue to buy us some time.
@@ -160,7 +160,7 @@ final class ParallelProcessRunner implements ProcessRunner
 
             // In any case try to load at least one process to the bucket
             $this->fillBucketOnce($bucket, $generator, 1);
-        } while (array_filter($bucket) !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
+        } while ($bucket !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
     }
 
     private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
@@ -231,7 +231,10 @@ final class ParallelProcessRunner implements ProcessRunner
 
         $start = microtime(true);
 
-        $bucket[] = $input->current();
+        $current = $input->current();
+        Assert::notNull($current);
+
+        $bucket[] = $current;
         $input->next();
 
         return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
