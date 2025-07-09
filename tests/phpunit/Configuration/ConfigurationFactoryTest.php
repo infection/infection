@@ -125,6 +125,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             null,
+            null,
         ),
         ?string $inputExistingCoveragePath = null,
         ?string $inputInitialTestsPhpOptions = null,
@@ -138,6 +139,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?int $inputNumberOfShownMutations = 0,
         ?float $inputMinCoveredMsi = null,
         string $inputMutators = '',
+        ?string $inputStaticAnalysisTool = null,
         ?string $inputTestFramework = null,
         ?string $inputTestFrameworkExtraOptions = null,
         string $inputFilter = '',
@@ -180,7 +182,7 @@ final class ConfigurationFactoryTest extends TestCase
         bool $inputExecuteOnlyCoveringTestCases = true,
         ?string $mapSourceClassToTest = MapSourceClassToTestStrategy::SIMPLE,
         ?string $loggerProjectRootDirectory = null,
-        ?string $staticAnalysisTool = null,
+        ?string $expectedStaticAnalysisTool = null,
         ?string $mutantId = null,
     ): void {
         $expectedTmpDir ??= sys_get_temp_dir() . '/infection';
@@ -224,7 +226,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputExecuteOnlyCoveringTestCases,
                 $mapSourceClassToTest,
                 $loggerProjectRootDirectory,
-                $staticAnalysisTool,
+                $inputStaticAnalysisTool,
                 $mutantId,
             )
         ;
@@ -265,9 +267,75 @@ final class ConfigurationFactoryTest extends TestCase
             $inputGitDiffBase,
             $mapSourceClassToTest,
             $loggerProjectRootDirectory,
-            $staticAnalysisTool,
+            $expectedStaticAnalysisTool,
             $mutantId,
         );
+    }
+
+    public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
+    {
+        $schema = new SchemaConfiguration(
+            '/path/to/infection.json',
+            null,
+            new Source([], []),
+            Logs::createEmpty(),
+            '',
+            new PhpUnit(null, null),
+            new PhpStan(null, null),
+            null,
+            null,
+            null,
+            [],
+            TestFrameworkTypes::PHPUNIT,
+            null,
+            null,
+            null,
+            null,
+            StaticAnalysisToolTypes::PHPSTAN,
+        );
+
+        $this->expectExceptionMessage('Expected one of: "phpstan". Got: "non-supported-static-analysis-tool"');
+
+        $this
+            ->createConfigurationFactory(
+                false,
+                false,
+                $schema,
+            )
+            ->create(
+                $schema,
+                null,
+                null,
+                false,
+                'none',
+                false,
+                false,
+                false,
+                false,
+                null,
+                0,
+                null,
+                2,
+                '',
+                TestFrameworkTypes::PHPUNIT,
+                null,
+                '',
+                0,
+                false,
+                null,
+                false,
+                'master',
+                false,
+                null,
+                null,
+                false,
+                false,
+                null,
+                null,
+                'non-supported-static-analysis-tool',
+                null,
+            )
+        ;
     }
 
     public static function valueProvider(): iterable
@@ -556,6 +624,30 @@ final class ConfigurationFactoryTest extends TestCase
             21.2,
         );
 
+        yield 'no static analysis tool' => self::createValueForStaticAnalysisTool(
+            null,
+            null,
+            null,
+        );
+
+        yield 'static analysis tool from config' => self::createValueForStaticAnalysisTool(
+            'phpstan',
+            null,
+            'phpstan',
+        );
+
+        yield 'static analysis tool from input' => self::createValueForStaticAnalysisTool(
+            null,
+            'phpstan',
+            'phpstan',
+        );
+
+        yield 'static analysis tool from config & input' => self::createValueForStaticAnalysisTool(
+            'phpstan',
+            'phpstan',
+            'phpstan',
+        );
+
         yield 'no test framework' => self::createValueForTestFramework(
             null,
             null,
@@ -775,6 +867,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 5,
+                null,
             ),
             'inputFilter' => 'src/Foo.php, src/Bar.php',
             'inputGitDiffFilter' => null,
@@ -823,6 +916,7 @@ final class ConfigurationFactoryTest extends TestCase
                 '-d zend_extension=wrong_xdebug.so',
                 '--debug',
                 'max',
+                'phpstan',
             ),
             'inputExistingCoveragePath' => 'dist/coverage',
             'inputInitialTestsPhpOptions' => '-d zend_extension=xdebug.so',
@@ -836,6 +930,7 @@ final class ConfigurationFactoryTest extends TestCase
             'inputNumberOfShownMutations' => 20,
             'inputMinCoveredMsi' => 81.5,
             'inputMutators' => 'TrueValue',
+            'inputStaticAnalysisTool' => StaticAnalysisToolTypes::PHPSTAN,
             'inputTestFramework' => 'phpspec',
             'inputTestFrameworkExtraOptions' => '--stop-on-failure',
             'inputFilter' => 'src/Foo.php, src/Bar.php',
@@ -897,7 +992,7 @@ final class ConfigurationFactoryTest extends TestCase
             'inputExecuteOnlyCoveringTestCases' => false,
             'mapSourceClassToTest' => MapSourceClassToTestStrategy::SIMPLE,
             'loggerProjectRootDirectory' => null,
-            'staticAnalysisTool' => StaticAnalysisToolTypes::PHPSTAN,
+            'expectedStaticAnalysisTool' => StaticAnalysisToolTypes::PHPSTAN,
             'mutantId' => 'h4sh', // $mutantId
         ];
 
@@ -927,6 +1022,7 @@ final class ConfigurationFactoryTest extends TestCase
                 ['@default' => false, 'CustomMutator' => true],
                 null,
                 __DIR__ . '/../Fixtures/Files/bootstrap/bootstrap.php',
+                null,
                 null,
                 null,
                 null,
@@ -960,6 +1056,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
             'expectedTimeout' => $expectedTimeout,
         ];
@@ -982,6 +1079,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 [],
+                null,
                 null,
                 null,
                 null,
@@ -1022,6 +1120,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 [],
+                null,
                 null,
                 null,
                 null,
@@ -1118,6 +1217,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
         ];
     }
@@ -1142,6 +1242,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 [],
+                null,
                 null,
                 null,
                 null,
@@ -1176,6 +1277,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
         ];
     }
@@ -1200,6 +1302,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 $minCoveredMsiFromSchemaConfiguration,
                 [],
+                null,
                 null,
                 null,
                 null,
@@ -1236,7 +1339,38 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
+        ];
+    }
+
+    private static function createValueForStaticAnalysisTool(
+        ?string $configStaticAnalysisTool,
+        ?string $inputStaticAnalysisTool,
+        ?string $expectedStaticAnalysisTool,
+    ): array {
+        return [
+            'schema' => new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                Logs::createEmpty(),
+                '',
+                new PhpUnit(null, null),
+                new PhpStan(null, null),
+                null,
+                null,
+                null,
+                [],
+                TestFrameworkTypes::PHPUNIT,
+                null,
+                null,
+                null,
+                null,
+                $configStaticAnalysisTool,
+            ),
+            'inputStaticAnalysisTool' => $inputStaticAnalysisTool,
+            'expectedStaticAnalysisTool' => $expectedStaticAnalysisTool,
         ];
     }
 
@@ -1263,6 +1397,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 $configInitialTestsPhpOptions,
+                null,
                 null,
                 null,
             ),
@@ -1296,6 +1431,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 $configTestFrameworkExtraOptions,
                 null,
+                null,
             ),
         ];
     }
@@ -1322,6 +1458,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 [],
                 $configTestFramework,
+                null,
                 null,
                 null,
                 null,
@@ -1363,6 +1500,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 null,
+                null,
             ),
         ];
     }
@@ -1388,6 +1526,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 $configMutators,
+                null,
                 null,
                 null,
                 null,
@@ -1442,6 +1581,7 @@ final class ConfigurationFactoryTest extends TestCase
                 null,
                 null,
                 [],
+                null,
                 null,
                 null,
                 null,

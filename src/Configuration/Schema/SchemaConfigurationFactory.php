@@ -70,6 +70,7 @@ class SchemaConfigurationFactory
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
             self::normalizeString($rawConfig->testFrameworkOptions ?? null),
             $rawConfig->threads ?? null,
+            $rawConfig->staticAnalysisTool ?? null,
         );
     }
 

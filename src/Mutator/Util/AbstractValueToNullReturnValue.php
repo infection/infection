@@ -53,7 +53,7 @@ abstract class AbstractValueToNullReturnValue implements Mutator
 
     protected function isNullReturnValueAllowed(Node $node): bool
     {
-        $functionScope = ReflectionVisitor::getFunctionScope($node);
+        $functionScope = ReflectionVisitor::findFunctionScope($node);
 
         if ($functionScope === null) {
             return true;

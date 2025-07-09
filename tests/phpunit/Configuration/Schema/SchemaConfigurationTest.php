@@ -85,6 +85,7 @@ final class SchemaConfigurationTest extends TestCase
             $initialTestsPhpOptions,
             $testFrameworkExtraOptions,
             $threadCount,
+            $staticAnalysisTool,
         );
 
         $this->assertSame($path, $config->getFile(), 'Failed path check');
@@ -107,7 +108,6 @@ final class SchemaConfigurationTest extends TestCase
     public static function valueProvider(): iterable
     {
         yield 'minimal' => [];
-
         yield 'complete' => [
             'path' => '/path/to/config',
             'timeout' => 10.,
