@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use function array_filter;
 use function array_shift;
 use Composer\XdebugHandler\Process;
 use function count;
