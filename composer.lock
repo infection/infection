@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf5d6cf21054eac5ee177e789c897199",
+    "content-hash": "ced86de511ddebb11533150f6ba55228",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -2081,6 +2081,55 @@
                 }
             ],
             "time": "2025-05-14T06:15:44+00:00"
+        },
+        {
+            "name": "tumblr/chorus-timekeeper",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tumblr/chorus-timekeeper.git",
+                "reference": "f74c2f1ddb24d400049d90a2f86dcdb3bf50faa2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tumblr/chorus-timekeeper/zipball/f74c2f1ddb24d400049d90a2f86dcdb3bf50faa2",
+                "reference": "f74c2f1ddb24d400049d90a2f86dcdb3bf50faa2",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.8",
+                "friendsofphp/php-cs-fixer": "^3.17",
+                "infection/infection": ">=0.10.5",
+                "phan/phan": ">=1.1",
+                "phpstan/phpstan": ">=0.10",
+                "phpunit/phpunit": "^9.4",
+                "symfony/phpunit-bridge": "^6.3",
+                "vimeo/psalm": ">=2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Tumblr\\Chorus\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "A super simple class for DI with timekeeping",
+            "support": {
+                "issues": "https://github.com/tumblr/chorus-timekeeper/issues",
+                "source": "https://github.com/tumblr/chorus-timekeeper/tree/0.1.1"
+            },
+            "time": "2023-06-21T08:20:48+00:00"
         },
         {
             "name": "webmozart/assert",
