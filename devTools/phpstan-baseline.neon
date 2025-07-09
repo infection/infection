@@ -463,6 +463,12 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisTool\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+
+		-
 			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFramework\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
