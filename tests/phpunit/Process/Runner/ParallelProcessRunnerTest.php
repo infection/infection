@@ -44,10 +44,12 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
+use Iterator;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -117,6 +119,28 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_it_handles_all_kids_of_processes_with_infinite_threads(int $threadCount): void
     {
         $this->runWithAllKindsOfProcesses($threadCount);
+    }
+
+    public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
+    {
+        $runner = new ParallelProcessRunner(1, 0);
+
+        $bucket = [];
+
+        $iterator = $this->createMock(Iterator::class);
+        $iterator->expects($this->once())
+            ->method('valid')
+            ->willReturn(false);
+
+        $iterator->expects($this->never())
+            ->method('current');
+
+        $reflection = new ReflectionClass($runner);
+        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $iterator, 1]);
+
+        // Should return 0 immediately when generator is not valid
+        $this->assertSame(0, $result);
     }
 
     public static function threadCountProvider(): iterable
