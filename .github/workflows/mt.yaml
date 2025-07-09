@@ -77,7 +77,7 @@ jobs:
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
         run: |
-          php bin/infection --threads=max \
+          php bin/infection \
             --skip-initial-tests \
             --min-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
