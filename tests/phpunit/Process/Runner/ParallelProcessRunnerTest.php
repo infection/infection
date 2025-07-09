@@ -119,6 +119,52 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->runWithAllKindsOfProcesses($threadCount);
     }
 
+    public function test_fillBucketOnce_handles_exhausted_input_with_next_processes(): void
+    {
+        // This test specifically targets the mutation that removes "return 0;" on line 226
+        // by creating a scenario where the generator is exhausted but next processes exist
+        
+        $runner = new ParallelProcessRunner(2, 0);
+        $reflection = new \ReflectionClass($runner);
+        
+        // Access private properties and methods
+        $nextContainerProperty = $reflection->getProperty('nextMutantProcessKillerContainer');
+        $nextContainerProperty->setAccessible(true);
+        
+        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
+        $fillBucketOnceMethod->setAccessible(true);
+        
+        // Create a mock process that doesn't expect start() to be called
+        $processMock = $this->createMock(Process::class);
+        $mutantMock = $this->createMock(Mutant::class);
+        $factoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
+        
+        $dummyProcess = new DummyMutantProcess($processMock, $mutantMock, $factoryMock, false);
+        $container = new MutantProcessContainer($dummyProcess, []);
+        
+        // Set next mutant processes
+        $nextContainerProperty->setValue($runner, [$container]);
+        
+        // Create exhausted generator (no more items)
+        $exhaustedGenerator = (function () { return; yield; })();
+        
+        // Test with empty bucket and exhausted input
+        $bucket = [];
+        $initialBucketCount = count($bucket);
+        $initialNextCount = count($nextContainerProperty->getValue($runner));
+        
+        // Call fillBucketOnce - should return 0 and add next process to bucket
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $exhaustedGenerator, 2]);
+        
+        // Assertions
+        $this->assertSame(0, $result, 'Should return 0 when input is exhausted');
+        $this->assertCount($initialBucketCount + 1, $bucket, 'Should add one next process to bucket');
+        $this->assertCount($initialNextCount - 1, $nextContainerProperty->getValue($runner), 'Should remove one from next container');
+        
+        // Without the return 0, the code would continue and try to access $input->current()
+        // on an exhausted generator, causing issues
+    }
+
     public static function threadCountProvider(): iterable
     {
         yield 'no threads' => [0];
