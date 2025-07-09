@@ -111,9 +111,10 @@ use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\ProcessWrangler;
 use Infection\Process\Runner\ProcessRunner;
+use Infection\Process\Runner\ProcessWrangler;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Process\TestTokenHandler;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
@@ -544,6 +545,7 @@ final class Container
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getMutantExecutionResultFactory(),
                     $mutantProcessKillerFactories,
+                    $container->getTestTokenHandler(),
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -576,6 +578,9 @@ final class Container
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            TestTokenHandler::class => static fn (self $container): TestTokenHandler => new TestTokenHandler(
+                $container->getConfiguration()->getThreadCount(),
+            ),
         ]);
 
         return $container->withValues(
@@ -892,6 +897,11 @@ final class Container
     public function getMutationGenerator(): MutationGenerator
     {
         return $this->get(MutationGenerator::class);
+    }
+
+    public function getTestTokenHandler(): TestTokenHandler
+    {
+        return $this->get(TestTokenHandler::class);
     }
 
     public function getMutationTestingRunner(): MutationTestingRunner
