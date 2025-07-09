@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function array_filter;
 use function array_shift;
 use Composer\XdebugHandler\Process;
 use function count;
@@ -157,7 +158,7 @@ final class ParallelProcessRunner implements ProcessRunner
 
             // In any case try to load at least one process to the bucket
             $this->fillBucketOnce($bucket, $generator, 1);
-        } while ($bucket !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
+        } while (array_filter($bucket) !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
     }
 
     private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
