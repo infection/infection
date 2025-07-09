@@ -216,14 +216,16 @@ final class ParallelProcessRunner implements ProcessRunner
      *  - from the input stream of processes containers (original mutant processes)
      *  - from the "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
      *
-     * @param array<MutantProcessContainer|null> $bucket
+     * @param array<MutantProcessContainer> $bucket
      * @param Iterator<MutantProcessContainer> $input
      */
     private function fillBucketOnce(array &$bucket, Iterator $input, int $threadCount): int
     {
         if (count($bucket) >= $threadCount || !$input->valid()) {
             if ($this->nextMutantProcessKillerContainer !== []) {
-                $bucket[] = array_shift($this->nextMutantProcessKillerContainer);
+                $nextProcess = array_shift($this->nextMutantProcessKillerContainer);
+                Assert::notNull($nextProcess);
+                $bucket[] = $nextProcess;
             }
 
             return 0;
