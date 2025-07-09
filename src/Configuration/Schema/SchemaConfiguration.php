@@ -39,6 +39,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
@@ -50,6 +51,8 @@ final class SchemaConfiguration
     private readonly ?float $timeout;
 
     private readonly ?string $testFramework;
+
+    private readonly ?string $staticAnalysisTool;
 
     /**
      * @param array<string, mixed> $mutators
@@ -71,11 +74,14 @@ final class SchemaConfiguration
         private readonly ?string $initialTestsPhpOptions,
         private readonly ?string $testFrameworkExtraOptions,
         private readonly string|int|null $threads,
+        ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
+        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
         $this->timeout = $timeout;
         $this->testFramework = $testFramework;
+        $this->staticAnalysisTool = $staticAnalysisTool;
     }
 
     public function getFile(): string
@@ -139,6 +145,11 @@ final class SchemaConfiguration
     public function getTestFramework(): ?string
     {
         return $this->testFramework;
+    }
+
+    public function getStaticAnalysisTool(): ?string
+    {
+        return $this->staticAnalysisTool;
     }
 
     public function getBootstrap(): ?string

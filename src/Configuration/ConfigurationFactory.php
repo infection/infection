@@ -129,6 +129,7 @@ class ConfigurationFactory
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
         $testFramework ??= $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->getStaticAnalysisTool();
 
         $skipCoverage = $existingCoveragePath !== null;
 
@@ -183,7 +184,7 @@ class ConfigurationFactory
             $gitDiffBase,
             $mapSourceClassToTestStrategy,
             $loggerProjectRootDirectory,
-            $staticAnalysisTool,
+            $resultStaticAnalysisTool,
             $mutantId,
         );
     }
