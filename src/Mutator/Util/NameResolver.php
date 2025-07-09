@@ -47,7 +47,7 @@ final class NameResolver
     public static function resolveName(Node\Name $name): Node\Name\FullyQualified
     {
         if ($name->toString() === 'self') {
-            $reflectionClass = ReflectionVisitor::getReflectionClass($name);
+            $reflectionClass = ReflectionVisitor::findReflectionClass($name);
             Assert::notNull($reflectionClass);
 
             return new Node\Name\FullyQualified($reflectionClass->getName());
