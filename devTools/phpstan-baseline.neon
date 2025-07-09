@@ -109,12 +109,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
-			message: '#^Parameter &\$bucket by\-ref type of method Infection\\Process\\Runner\\ParallelProcessRunner\:\:fillBucketOnce\(\) expects array\<Infection\\Process\\MutantProcessContainer\>, array\<Infection\\Process\\MutantProcessContainer\|null\> given\.$#'
-			identifier: parameterByRef.type
-			count: 1
-			path: ../src/Process/Runner/ParallelProcessRunner.php
-
-		-
 			message: '#^Unused Infection\\StaticAnalysis\\StaticAnalysisToolAdapterFactory\:\:create$#'
 			identifier: shipmonk.deadMethod
 			count: 1
