@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function count;
+use Generator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
@@ -131,10 +132,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // Access private properties and methods
         $nextContainerProperty = $reflection->getProperty('nextMutantProcessKillerContainer');
-        $nextContainerProperty->setAccessible(true);
-
         $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $fillBucketOnceMethod->setAccessible(true);
 
         // Create a mock process that doesn't expect start() to be called
         $processMock = $this->createMock(Process::class);
@@ -149,10 +147,9 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // Create exhausted generator (no more items)
         $exhaustedGenerator = (static function () {
-            return;
-
             yield;
         })();
+        $_ = iterator_to_array($exhaustedGenerator); // Exhaust the generator
 
         // Test with empty bucket and exhausted input
         $bucket = [];
