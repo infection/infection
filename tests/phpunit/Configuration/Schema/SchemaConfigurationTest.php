@@ -85,7 +85,6 @@ final class SchemaConfigurationTest extends TestCase
             $initialTestsPhpOptions,
             $testFrameworkExtraOptions,
             $threadCount,
-            $staticAnalysisTool,
         );
 
         $this->assertSame($path, $config->getFile(), 'Failed path check');
