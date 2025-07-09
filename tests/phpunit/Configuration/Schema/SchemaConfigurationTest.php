@@ -111,6 +111,7 @@ final class SchemaConfigurationTest extends TestCase
     public static function valueProvider(): iterable
     {
         yield 'minimal' => [];
+
         yield 'complete' => [
             'path' => '/path/to/config',
             'timeout' => 10.,
