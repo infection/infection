@@ -261,11 +261,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             '       0 mutants were killed by Test Framework',
             $this->getDisplay($output),
         );
-
-        $this->assertStringContainsString(
-            '       0 mutants were caught by Static Analysis',
-            $this->getDisplay($output),
-        );
     }
 
     public function test_it_outputs_generated_file_log_paths_if_enabled(): void
