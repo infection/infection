@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use function count;
 use Generator;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
@@ -46,6 +45,7 @@ use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
+use Iterator;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -122,53 +122,26 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->runWithAllKindsOfProcesses($threadCount);
     }
 
-    public function test_fillBucketOnce_with_exhausted_generator_does_not_continue(): void
+    public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
     {
-        // This test specifically targets the mutation that removes "return 0;" on line 226
-        // Without the return, execution continues and tries to call $input->current() on exhausted generator
-        
         $runner = new ParallelProcessRunner(1, 0);
-        $reflection = new ReflectionClass($runner);
-        
-        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $fillBucketOnceMethod->setAccessible(true);
-        
-        $nextContainerProperty = $reflection->getProperty('nextMutantProcessKillerContainer');
-        $nextContainerProperty->setAccessible(true);
-        
-        // Create a simple container for next processes
-        $processMock = $this->createMock(Process::class);
-        $mutantMock = $this->createMock(Mutant::class);
-        $factoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
-        $dummyProcess = new DummyMutantProcess($processMock, $mutantMock, $factoryMock, false);
-        $container = new MutantProcessContainer($dummyProcess, []);
-        
-        // Set up scenario: exhausted generator with next processes available
-        $exhaustedGenerator = (static function () {
-            return;
-            yield; // This makes it a generator but it's already exhausted
-        })();
-        
+
         $bucket = [];
-        $nextContainerProperty->setValue($runner, [$container]);
-        
-        // Call fillBucketOnce - with the mutation, this would continue past the return
-        // and try to access $input->current() which would be null
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $exhaustedGenerator, 1]);
-        
+
+        $iterator = $this->createMock(Iterator::class);
+        $iterator->expects($this->once())
+            ->method('valid')
+            ->willReturn(false);
+
+        $iterator->expects($this->never())
+            ->method('current');
+
+        $reflection = new ReflectionClass($runner);
+        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $iterator, 1]);
+
         // Should return 0 immediately when generator is not valid
         $this->assertSame(0, $result);
-        $this->assertCount(1, $bucket, 'Should add next process to bucket');
-        
-        // If mutation removes return, the code would continue and try:
-        // $bucket[] = $input->current(); // null for exhausted generator
-        // This would add null to bucket, making count = 2
-        $this->assertNotContains(null, $bucket, 'Bucket should not contain null');
-        
-        // All items in bucket should be MutantProcessContainer instances
-        foreach ($bucket as $item) {
-            $this->assertInstanceOf(MutantProcessContainer::class, $item);
-        }
     }
 
     public static function threadCountProvider(): iterable

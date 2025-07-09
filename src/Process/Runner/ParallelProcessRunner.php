@@ -41,6 +41,7 @@ use Composer\XdebugHandler\Process;
 use function count;
 use Generator;
 use Infection\Process\MutantProcessContainer;
+use Iterator;
 use function max;
 use function microtime;
 use function range;
@@ -107,6 +108,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $generator = self::toGenerator($processContainers);
 
         // Bucket for processes to be executed
+        /** @var array<MutantProcessContainer|null> $bucket */
         $bucket = [];
 
         // Load the first process from the queue to buy us some time.
@@ -214,10 +216,10 @@ final class ParallelProcessRunner implements ProcessRunner
      *  - from the input stream of processes containers (original mutant processes)
      *  - from the "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
      *
-     * @param MutantProcessContainer[] $bucket
-     * @param Generator<MutantProcessContainer> $input
+     * @param array<MutantProcessContainer|null> $bucket
+     * @param Iterator<MutantProcessContainer> $input
      */
-    private function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
+    private function fillBucketOnce(array &$bucket, Iterator $input, int $threadCount): int
     {
         if (count($bucket) >= $threadCount || !$input->valid()) {
             if ($this->nextMutantProcessKillerContainer !== []) {
