@@ -42,7 +42,7 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessWrangler;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
 use function iterator_to_array;
@@ -53,12 +53,12 @@ use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-#[CoversClass(ParallelProcessRunner::class)]
+#[CoversClass(ProcessWrangler::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
-        $runner = new ParallelProcessRunner(4, 0);
+        $runner = new ProcessWrangler(4, 0);
 
         $runner->run([]);
 
@@ -75,7 +75,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadsCount, 0);
+        $runner = new ProcessWrangler($threadsCount, 0);
 
         $executedProcesses = $runner->run($processes);
 
@@ -90,7 +90,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner(4, 0);
+        $runner = new ProcessWrangler(4, 0);
 
         $runner->run($processes);
 
@@ -106,7 +106,7 @@ final class ParallelProcessRunnerTest extends TestCase
             yield $this->createMutantProcessContainerWithNextMutantProcess($threadCount);
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0);
+        $runner = new ProcessWrangler($threadCount, 0);
 
         $runner->run($processes);
 
@@ -123,7 +123,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
     {
-        $runner = new ParallelProcessRunner(1, 0);
+        $runner = new ProcessWrangler(1, 0);
 
         $bucket = [];
 
@@ -168,7 +168,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0);
+        $runner = new ProcessWrangler($threadCount, 0);
 
         $executedProcesses = $runner->run($processes);
 

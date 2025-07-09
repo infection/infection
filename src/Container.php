@@ -111,7 +111,7 @@ use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
-use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessWrangler;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Memory\MemoryFormatter;
@@ -328,7 +328,7 @@ final class Container
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
-            ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
+            ProcessWrangler::class => static fn (self $container): ProcessWrangler => new ProcessWrangler($container->getConfiguration()->getThreadCount()),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
@@ -1085,7 +1085,7 @@ final class Container
 
         return $config->isDryRun()
             ? $this->get(DryProcessRunner::class)
-            : $this->get(ParallelProcessRunner::class)
+            : $this->get(ProcessWrangler::class)
         ;
     }
 

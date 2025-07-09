@@ -53,7 +53,7 @@ use Webmozart\Assert\Assert;
  *
  * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
  */
-final class ParallelProcessRunner implements ProcessRunner
+final class ProcessWrangler implements ProcessRunner
 {
     private const POLL_WAIT_IN_MS = 1000;
 
