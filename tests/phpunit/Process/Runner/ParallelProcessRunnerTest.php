@@ -45,7 +45,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
-use function iterator_to_array;
+use function iterator_count;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +80,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     public function test_it_checks_if_the_executed_processes_time_out(): void
@@ -97,7 +97,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     #[DataProvider('threadCountProvider')]
@@ -113,7 +113,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(1, iterator_to_array($executedProcesses, true));
+        $this->assertSame(1, iterator_count($executedProcesses));
     }
 
     #[DataProvider('threadCountProvider')]
@@ -171,7 +171,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     private function createMutantProcessContainer(int $threadIndex): MutantProcessContainer
