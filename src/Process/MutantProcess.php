@@ -106,6 +106,9 @@ class MutantProcess
         return $this->mutantExecutionResultFactory->createFromProcess($this);
     }
 
+    /**
+     * @return array{'INFECTION': string, 'TEST_TOKEN': int}|array{}
+     */
     private function getEnvironment(): array
     {
         if ($this->testTokenHandler === null) {
