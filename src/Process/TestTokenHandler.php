@@ -39,14 +39,15 @@ use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ * @final
  */
-final class TestTokenHandler
+class TestTokenHandler
 {
     /** @var non-negative-int */
     private int $processCount = 0;
 
     public function __construct(
-        /** @var positive-int */
+        /** @var non-negative-int */
         private readonly int $threadCount,
     ) {
     }
@@ -59,6 +60,10 @@ final class TestTokenHandler
      */
     public function getNextToken(int $base = 0): int
     {
+        if ($this->threadCount === 0) {
+            return $base;
+        }
+
         return $this->processCount++ % $this->threadCount + $base;
     }
 }

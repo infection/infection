@@ -62,6 +62,10 @@ final class TestTokenHandlerTest extends TestCase
         yield [4, 0, [0, 1, 2, 3, 0, 1, 2, 3, 0, 1]];
 
         yield [6, 1, [1, 2, 3, 4, 5, 6, 1, 2, 3, 4]];
+
+        yield [0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
+
+        yield [0, 1, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]];
     }
 
     /**
