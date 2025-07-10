@@ -39,6 +39,7 @@ use Infection\Process\MutantProcessContainer;
 
 /**
  * @internal
+ * @deprecated mutantProcessContainer should be used directly instead of this class
  */
 final class IndexedMutantProcessContainer
 {
