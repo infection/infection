@@ -300,6 +300,7 @@ final class ParallelProcessRunnerTest extends TestCase
                             $this->nextProcessMock,
                             $mutant,
                             $this->mutantExecutionResultFactory,
+                            // Child PHPStan processes do not need or use tokens, but we are testing the new handler would work here too, if needed
                             $this->tokenHandler,
                         );
                     }
