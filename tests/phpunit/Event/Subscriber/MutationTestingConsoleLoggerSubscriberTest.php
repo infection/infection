@@ -46,6 +46,7 @@ use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
@@ -233,6 +234,33 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getKilledByTestsCount')
+            ->willReturn(2);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getKilledByStaticAnalysisCount')
+            ->willReturn(3);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getIgnoredCount')
+            ->willReturn(0);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getNotTestedCount')
+            ->willReturn(0);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getEscapedCount')
+            ->willReturn(0);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getErrorCount')
+            ->willReturn(0);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getSyntaxErrorCount')
+            ->willReturn(0);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getTimedOutCount')
+            ->willReturn(0);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getSkippedCount')
+            ->willReturn(0);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -257,8 +285,44 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->getDisplay($output),
         );
 
+        // contains
         $this->assertStringContainsString(
-            '       0 mutants were killed by Test Framework',
+            '       2 mutants were killed by Test Framework',
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            '       3 mutants were caught by Static Analysis',
+            $this->getDisplay($output),
+        );
+
+        // not contains
+        $this->assertStringNotContainsString(
+            'mutants were configured to be ignored',
+            $this->getDisplay($output),
+        );
+        $this->assertStringNotContainsString(
+            'mutants were not covered by tests',
+            $this->getDisplay($output),
+        );
+        $this->assertStringNotContainsString(
+            'covered mutants were not detected',
+            $this->getDisplay($output),
+        );
+        $this->assertStringNotContainsString(
+            'errors were encountered',
+            $this->getDisplay($output),
+        );
+        $this->assertStringNotContainsString(
+            'syntax errors were encountered',
+            $this->getDisplay($output),
+        );
+        $this->assertStringNotContainsString(
+            'time outs were encountered',
+            $this->getDisplay($output),
+        );
+        $this->assertStringNotContainsString(
+            'mutants required more time than configured',
             $this->getDisplay($output),
         );
     }
