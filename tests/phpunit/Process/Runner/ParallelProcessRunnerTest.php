@@ -50,6 +50,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -125,8 +126,6 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         $runner = new ParallelProcessRunner(1, 0);
 
-        $bucket = [];
-
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -137,7 +136,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $reflection = new ReflectionClass($runner);
         $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $iterator, 1]);
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [new SplQueue(), $iterator, 1]);
 
         // Should return 0 immediately when generator is not valid
         $this->assertSame(0, $result);

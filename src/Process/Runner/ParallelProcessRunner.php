@@ -44,6 +44,7 @@ use Iterator;
 use function max;
 use function microtime;
 use function range;
+use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
 use Webmozart\Assert\Assert;
@@ -107,8 +108,8 @@ final class ParallelProcessRunner implements ProcessRunner
         $generator = self::toGenerator($processContainers);
 
         // Bucket for processes to be executed
-        /** @var array<MutantProcessContainer> $bucket */
-        $bucket = [];
+        /** @var SplQueue<MutantProcessContainer> $bucket */
+        $bucket = new SplQueue();
 
         // Load the first process from the queue to buy us some time.
         $this->fillBucketOnce($bucket, $generator, 1);
@@ -122,9 +123,8 @@ final class ParallelProcessRunner implements ProcessRunner
                 break;
             }
 
-            $mutantProcessContainer = array_shift($bucket);
-
-            if ($mutantProcessContainer !== null) {
+            if (!$bucket->isEmpty()) {
+                $mutantProcessContainer = $bucket->dequeue();
                 $threadIndex = array_shift($this->availableThreadIndexes);
 
                 Assert::integer($threadIndex, 'Thread index can not be null.');
@@ -159,7 +159,7 @@ final class ParallelProcessRunner implements ProcessRunner
 
             // In any case try to load at least one process to the bucket
             $this->fillBucketOnce($bucket, $generator, 1);
-        } while ($bucket !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
+        } while (!$bucket->isEmpty() || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
     }
 
     private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
@@ -215,16 +215,16 @@ final class ParallelProcessRunner implements ProcessRunner
      *  - from the input stream of processes containers (original mutant processes)
      *  - from the "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
      *
-     * @param array<MutantProcessContainer> $bucket
+     * @param SplQueue<MutantProcessContainer> $bucket
      * @param Iterator<MutantProcessContainer> $input
      */
-    private function fillBucketOnce(array &$bucket, Iterator $input, int $threadCount): int
+    private function fillBucketOnce(SplQueue $bucket, Iterator $input, int $threadCount): int
     {
         if (count($bucket) >= $threadCount || !$input->valid()) {
             if ($this->nextMutantProcessKillerContainer !== []) {
                 $nextProcess = array_shift($this->nextMutantProcessKillerContainer);
                 Assert::notNull($nextProcess);
-                $bucket[] = $nextProcess;
+                $bucket->enqueue($nextProcess);
             }
 
             return 0;
@@ -235,7 +235,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $current = $input->current();
         Assert::notNull($current);
 
-        $bucket[] = $current;
+        $bucket->enqueue($current);
         $input->next();
 
         return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
