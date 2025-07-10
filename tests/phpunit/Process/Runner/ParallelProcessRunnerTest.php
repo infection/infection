@@ -60,7 +60,7 @@ final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
-        $runner = new ParallelProcessRunner(4, 0);
+        $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
 
         $runner->run([]);
 
@@ -77,7 +77,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadsCount, 0);
+        $runner = new ParallelProcessRunner($threadsCount, 0, new FakeTimeKeeper());
 
         $executedProcesses = $runner->run($processes);
 
@@ -92,7 +92,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner(4, 0);
+        $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
 
         $runner->run($processes);
 
@@ -108,7 +108,7 @@ final class ParallelProcessRunnerTest extends TestCase
             yield $this->createMutantProcessContainerWithNextMutantProcess($threadCount);
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0);
+        $runner = new ParallelProcessRunner($threadCount, 0, new FakeTimeKeeper());
 
         $runner->run($processes);
 
@@ -125,7 +125,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
     {
-        $runner = new ParallelProcessRunner(1, 0);
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
 
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
@@ -335,7 +335,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0);
+        $runner = new ParallelProcessRunner($threadCount, 0, new FakeTimeKeeper());
 
         $executedProcesses = $runner->run($processes);
 

@@ -237,7 +237,7 @@ final class ParallelProcessRunner implements ProcessRunner
     /**
      * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
      */
-    private function wait(int $timeSpentDoingWork = 0): void
+    private function wait(int $timeSpentDoingWork): void
     {
         $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }
