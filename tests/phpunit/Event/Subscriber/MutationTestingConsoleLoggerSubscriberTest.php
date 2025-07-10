@@ -230,10 +230,10 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
+        // important metrics, always rendered
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
-        // important metrics, always rendered
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByTestsCount')
             ->willReturn(0);
@@ -331,17 +331,17 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
+        // important metrics, always rendered
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
-        // important metrics, always rendered
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByTestsCount')
             ->willReturn(2);
+        // less important metrics, only rendered when > 0
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn(3);
-        // less important metrics, only rendered when > 0
         $this->metricsCalculator->expects($this->any())
             ->method('getIgnoredCount')
             ->willReturn(1);
@@ -387,7 +387,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->getDisplay($output),
         );
 
-        // contains
         $this->assertStringContainsString(
             '       2 mutants were killed by Test Framework',
             $this->getDisplay($output),
