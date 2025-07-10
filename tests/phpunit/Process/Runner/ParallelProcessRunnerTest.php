@@ -53,6 +53,7 @@ use ReflectionClass;
 use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Tumblr\Chorus\FakeTimeKeeper;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
@@ -140,6 +141,173 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // Should return 0 immediately when generator is not valid
         $this->assertSame(0, $result);
+    }
+
+    public function test_fill_bucket_once_returns_time_spent_and_never_calls_time_when_bucket_full(): void
+    {
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+
+        // Should never call getCurrentTimeAsFloat when bucket is already full
+        $timeKeeper->expects($this->never())
+            ->method('getCurrentTimeAsFloat');
+
+        $runner = new ParallelProcessRunner(1, 0, $timeKeeper);
+
+        $iterator = $this->createMock(Iterator::class);
+        $iterator->expects($this->never())
+            ->method('valid');
+
+        $bucket = new SplQueue();
+        // Fill bucket to capacity - use a simpler container that doesn't expect start
+        $processMock = $this->createMock(Process::class);
+        $mutantProcess = new DummyMutantProcess(
+            $processMock,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+        $bucket->enqueue(new MutantProcessContainer($mutantProcess, []));
+
+        $reflection = new ReflectionClass($runner);
+        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $iterator, 1]);
+
+        // Should return 0 when bucket is full
+        $this->assertSame(0, $result);
+    }
+
+    public function test_it_waits_and_tracks_time_when_processes_are_running(): void
+    {
+        $threadsCount = 2;
+
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+
+        // Mock time progression - need enough values for all calls
+        $timeKeeper->expects($this->any())
+            ->method('getCurrentTimeAsFloat')
+            ->willReturn(1000.0);
+
+        // Should wait with reduced time based on work done
+        $timeKeeper->expects($this->atLeastOnce())
+            ->method('usleep')
+            ->with($this->logicalOr(
+                $this->equalTo(9), // 10ms poll - 1ms work = 9ms
+                $this->equalTo(8), // 10ms poll - 2ms work = 8ms
+                $this->equalTo(10), // Full poll time when no work done
+            ));
+
+        $processes = (function () use ($threadsCount): iterable {
+            for ($i = 0; $i < 6; ++$i) {
+                yield $this->createSlowMutantProcessContainer(($i % $threadsCount) + 1);
+            }
+        })();
+
+        $runner = new ParallelProcessRunner($threadsCount, 10, $timeKeeper);
+
+        $executedProcesses = $runner->run($processes);
+
+        $this->assertSame(6, iterator_count($executedProcesses));
+    }
+
+    #[DataProvider('waitTimeProvider')]
+    public function test_wait_method_calls_timekeeper_usleep_with_correct_value(
+        int $pollTime,
+        int $timeSpentDoingWork,
+        int $expectedUsleepTime,
+        string $description,
+    ): void {
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+
+        $timeKeeper->expects($this->once())
+            ->method('usleep')
+            ->with($this->equalTo($expectedUsleepTime));
+
+        $runner = new ParallelProcessRunner(1, $pollTime, $timeKeeper);
+
+        $reflection = new ReflectionClass($runner);
+        $waitMethod = $reflection->getMethod('wait');
+
+        $waitMethod->invokeArgs($runner, [$timeSpentDoingWork]);
+    }
+
+    public static function waitTimeProvider(): iterable
+    {
+        yield 'full poll time when no work done' => [
+            'pollTime' => 100,
+            'timeSpentDoingWork' => 0,
+            'expectedUsleepTime' => 100,
+            'description' => 'wait(0) with poll=100',
+        ];
+
+        yield 'reduced wait time when work was done' => [
+            'pollTime' => 100,
+            'timeSpentDoingWork' => 50,
+            'expectedUsleepTime' => 50,
+            'description' => 'wait(50) with poll=100',
+        ];
+
+        yield 'no wait when work equals poll time' => [
+            'pollTime' => 100,
+            'timeSpentDoingWork' => 100,
+            'expectedUsleepTime' => 0,
+            'description' => 'wait(100) with poll=100',
+        ];
+
+        yield 'no wait when work exceeds poll time' => [
+            'pollTime' => 100,
+            'timeSpentDoingWork' => 150,
+            'expectedUsleepTime' => 0,
+            'description' => 'wait(150) with poll=100 (clamped to 0)',
+        ];
+
+        yield 'increased wait time with negative work time' => [
+            'pollTime' => 100,
+            'timeSpentDoingWork' => -50,
+            'expectedUsleepTime' => 150,
+            'description' => 'wait(-50) with poll=100 (negative work time)',
+        ];
+
+        yield 'zero poll time always results in zero wait' => [
+            'pollTime' => 0,
+            'timeSpentDoingWork' => 0,
+            'expectedUsleepTime' => 0,
+            'description' => 'wait(0) with poll=0',
+        ];
+
+        yield 'large poll time with small work' => [
+            'pollTime' => 1000,
+            'timeSpentDoingWork' => 10,
+            'expectedUsleepTime' => 990,
+            'description' => 'wait(10) with poll=1000',
+        ];
+    }
+
+    public function test_it_never_waits_when_processes_complete_immediately(): void
+    {
+        $threadsCount = 4;
+
+        $processes = (function () use ($threadsCount): iterable {
+            for ($i = 0; $i < 10; ++$i) {
+                yield $this->createMutantProcessContainer(($i % $threadsCount) + 1);
+            }
+        })();
+
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+
+        // getCurrentTimeAsFloat is called for fillBucketOnce timing
+        $timeKeeper->expects($this->atLeast(11))
+            ->method('getCurrentTimeAsFloat')
+            ->willReturn(1000.0);
+
+        // Should never call usleep since processes complete immediately
+        $timeKeeper->expects($this->never())
+            ->method('usleep');
+
+        $runner = new ParallelProcessRunner($threadsCount, 10, $timeKeeper);
+
+        $executedProcesses = $runner->run($processes);
+
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     public static function threadCountProvider(): iterable
@@ -312,6 +480,40 @@ final class ParallelProcessRunnerTest extends TestCase
                 $this->createMock(Mutant::class),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 true,
+            ),
+            [],
+        );
+    }
+
+    private function createSlowMutantProcessContainer(int $threadIndex): MutantProcessContainer
+    {
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->expects($this->once())
+            ->method('start')
+            ->with(null, [
+                'INFECTION' => '1',
+                'TEST_TOKEN' => $threadIndex,
+            ])
+        ;
+
+        // First few calls return true (still running), then false
+        $processMock
+            ->expects($this->atLeast(2))
+            ->method('checkTimeout')
+        ;
+        $processMock
+            ->expects($this->atLeast(2))
+            ->method('isRunning')
+            ->willReturnOnConsecutiveCalls(true, true, false)
+        ;
+
+        return new MutantProcessContainer(
+            new DummyMutantProcess(
+                $processMock,
+                $this->createMock(Mutant::class),
+                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                false,
             ),
             [],
         );
