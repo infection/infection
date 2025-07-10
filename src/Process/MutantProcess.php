@@ -39,13 +39,14 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use function microtime;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  * @final
  */
-class MutantProcess
+class MutantProcess implements RunnableProcess
 {
     private bool $timedOut = false;
 
@@ -100,6 +101,17 @@ class MutantProcess
         return $this->mutantExecutionResultFactory->createFromProcess($this);
     }
 
+    public function isRunning(): bool
+    {
+        try {
+            $this->getProcess()->checkTimeout();
+        } catch (ProcessTimedOutException) {
+            $this->markAsTimedOut();
+        }
+
+        return $this->getProcess()->isRunning();
+    }
+
     private function getEnvironment(): array
     {
         if ($this->testTokenHandler === null) {
@@ -109,6 +121,7 @@ class MutantProcess
         return [
             'INFECTION' => '1',
             'TEST_TOKEN' => $this->testTokenHandler->getNextToken(),
+            'INFECTION_THREAD_COUNT' => '1', // TODO
         ];
     }
 }

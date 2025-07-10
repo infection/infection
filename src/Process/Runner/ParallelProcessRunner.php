@@ -98,7 +98,7 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->fillBucketOnce();
 
         // start the initial batch of processes
-        while ($this->hasMoreWorkQueued() || !$this->finishedAll()) {
+        while ($this->hasMoreWorkQueued() || $this->hasRunningProcesses()) {
             if ($this->shouldStop) {
                 break;
             }
@@ -127,7 +127,7 @@ final class ParallelProcessRunner implements ProcessRunner
 
             // yield back so that we can work on process result it afterwords
             yield from $this->tryToFreeNotRunningProcess();
-        } while (!$this->finishedAll());
+        } while ($this->hasRunningProcesses());
     }
 
     /**
@@ -162,9 +162,9 @@ final class ParallelProcessRunner implements ProcessRunner
         return !$this->bucket->isEmpty();
     }
 
-    private function finishedAll(): bool
+    private function hasRunningProcesses(): bool
     {
-        return $this->runningProcesses === [];
+        return $this->runningProcesses !== [];
     }
 
     private function hasThreadsAvailable(): bool

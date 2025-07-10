@@ -35,17 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
-use Infection\Process\MutantProcessContainer;
+use SplQueue;
 
 /**
  * @internal
  */
-interface ProcessRunner
+final class ParallelProcessRunnerBuilder
 {
-    /**
-     * @return iterable<MutantProcessContainer>
-     */
-    public function run(): iterable;
+    public function __construct(
+        private readonly int $threadCount,
+    ) {
+    }
 
-    public function stop(): void;
+    public function build(SplQueue $input): ParallelProcessRunner
+    {
+        return new ParallelProcessRunner(
+            $this->threadCount,
+            $input,
+        );
+    }
 }
