@@ -42,11 +42,10 @@ use Generator;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
 use function max;
-use function microtime;
 use function range;
 use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use function usleep;
+use Tumblr\Chorus\TimeKeeper;
 use Webmozart\Assert\Assert;
 
 /**
@@ -78,6 +77,7 @@ final class ParallelProcessRunner implements ProcessRunner
     public function __construct(
         private readonly int $threadCount,
         private readonly int $poll = self::POLL_WAIT_IN_MS,
+        private readonly TimeKeeper $timeKeeper = new TimeKeeper(),
     ) {
     }
 
@@ -131,7 +131,7 @@ final class ParallelProcessRunner implements ProcessRunner
             while (count($this->runningProcessContainers) >= $threadCount) {
                 // While we wait, try fetch a good amount of next processes from the queue,
                 // reducing the poll delay with each loaded process
-                usleep(max(0, $this->poll - $this->fillBucketOnce($bucket, $generator, $threadCount)));
+                $this->poll($this->fillBucketOnce($bucket, $generator, $threadCount));
 
                 // yield back so that we can work on process result
                 yield from $this->tryToFreeNotRunningProcess($bucket);
@@ -214,7 +214,7 @@ final class ParallelProcessRunner implements ProcessRunner
             return 0;
         }
 
-        $start = microtime(true);
+        $start = $this->timeKeeper->getCurrentTimeAsFloat();
 
         $current = $input->current();
         Assert::notNull($current);
@@ -222,7 +222,12 @@ final class ParallelProcessRunner implements ProcessRunner
         $bucket->enqueue($current);
         $input->next();
 
-        return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
+        return (int) ($this->timeKeeper->getCurrentTimeAsFloat() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
+    }
+
+    private function poll(int $timeSpentDoingWork = 0): void
+    {
+        $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }
 
     /**
