@@ -233,12 +233,14 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
+        // important metrics, always rendered
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByTestsCount')
-            ->willReturn(2);
+            ->willReturn(0);
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByStaticAnalysisCount')
-            ->willReturn(3);
+            ->willReturn(0);
+        // less important metrics, only rendered when > 0
         $this->metricsCalculator->expects($this->any())
             ->method('getIgnoredCount')
             ->willReturn(0);
@@ -322,6 +324,102 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         );
         $this->assertStringNotContainsString(
             'mutants required more time than configured',
+            $this->getDisplay($output),
+        );
+    }
+
+    public function test_it_outputs_metrics_bigger_zero(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        // important metrics, always rendered
+        $this->metricsCalculator->expects($this->any())
+            ->method('getKilledByTestsCount')
+            ->willReturn(2);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getKilledByStaticAnalysisCount')
+            ->willReturn(3);
+        // less important metrics, only rendered when > 0
+        $this->metricsCalculator->expects($this->any())
+            ->method('getIgnoredCount')
+            ->willReturn(1);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getNotTestedCount')
+            ->willReturn(1);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getEscapedCount')
+            ->willReturn(1);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getErrorCount')
+            ->willReturn(1);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getSyntaxErrorCount')
+            ->willReturn(1);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getTimedOutCount')
+            ->willReturn(1);
+        $this->metricsCalculator->expects($this->any())
+            ->method('getSkippedCount')
+            ->willReturn(1);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            20,
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $this->assertStringContainsString(
+            "\n\nMetrics:\n",
+            $this->getDisplay($output),
+        );
+
+        $this->assertStringContainsString(
+            "\n\n0 mutations were generated:",
+            $this->getDisplay($output),
+        );
+
+        // contains
+        $this->assertStringContainsString(
+            '       2 mutants were killed by Test Framework',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       3 mutants were caught by Static Analysis',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 mutants were configured to be ignored',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 mutants were not covered by tests',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 covered mutants were not detected',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 errors were encountered',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 syntax errors were encountered',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 time outs were encountered',
+            $this->getDisplay($output),
+        );
+        $this->assertStringContainsString(
+            '       1 mutants required more time than configured',
             $this->getDisplay($output),
         );
     }
