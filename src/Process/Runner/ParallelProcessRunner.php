@@ -128,10 +128,10 @@ final class ParallelProcessRunner implements ProcessRunner
                 $this->startProcess($mutantProcessContainer, $threadIndex);
             }
 
-            while (count($this->runningProcessContainers) >= $threadCount) {
+            while ($this->hasProcessesThatCouldBeFreed($threadCount)) {
                 // While we wait, try fetch a good amount of next processes from the queue,
                 // reducing the poll delay with each loaded process
-                $this->poll($this->fillBucketOnce($bucket, $generator, $threadCount));
+                $this->wait($this->fillBucketOnce($bucket, $generator, $threadCount));
 
                 // yield back so that we can work on process result
                 yield from $this->tryToFreeNotRunningProcess($bucket);
@@ -146,6 +146,15 @@ final class ParallelProcessRunner implements ProcessRunner
             // In any case try to load at least one process to the bucket
             $this->fillBucketOnce($bucket, $generator, 1);
         } while (!$bucket->isEmpty() || $this->runningProcessContainers !== []);
+    }
+
+    /**
+     * This method checks if we have enough processes running that could be freed.
+     * Left as protected to allow spying off a mock in tests.
+     */
+    protected function hasProcessesThatCouldBeFreed(int $threadCount): bool
+    {
+        return count($this->runningProcessContainers) >= $threadCount;
     }
 
     /**
@@ -225,7 +234,10 @@ final class ParallelProcessRunner implements ProcessRunner
         return (int) ($this->timeKeeper->getCurrentTimeAsFloat() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
-    private function poll(int $timeSpentDoingWork = 0): void
+    /**
+     * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
+     */
+    private function wait(int $timeSpentDoingWork = 0): void
     {
         $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }
