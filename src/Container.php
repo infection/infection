@@ -545,7 +545,7 @@ final class Container
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getMutantExecutionResultFactory(),
                     $mutantProcessKillerFactories,
-                    $container->getTestTokenHandler(),
+                    $container->get(TestTokenHandler::class),
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {
@@ -897,11 +897,6 @@ final class Container
     public function getMutationGenerator(): MutationGenerator
     {
         return $this->get(MutationGenerator::class);
-    }
-
-    public function getTestTokenHandler(): TestTokenHandler
-    {
-        return $this->get(TestTokenHandler::class);
     }
 
     public function getMutationTestingRunner(): MutationTestingRunner
