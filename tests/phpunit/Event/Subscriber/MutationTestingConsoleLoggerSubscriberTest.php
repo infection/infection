@@ -237,10 +237,10 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByTestsCount')
             ->willReturn(0);
+        // less important metrics, only rendered when > 0
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn(0);
-        // less important metrics, only rendered when > 0
         $this->metricsCalculator->expects($this->any())
             ->method('getIgnoredCount')
             ->willReturn(0);
@@ -288,16 +288,15 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         // contains
         $this->assertStringContainsString(
-            '       2 mutants were killed by Test Framework',
-            $this->getDisplay($output),
-        );
-
-        $this->assertStringContainsString(
-            '       3 mutants were caught by Static Analysis',
+            '       0 mutants were killed by Test Framework',
             $this->getDisplay($output),
         );
 
         // not contains
+        $this->assertStringNotContainsString(
+            'mutants were caught by Static Analysis',
+            $this->getDisplay($output),
+        );
         $this->assertStringNotContainsString(
             'mutants were configured to be ignored',
             $this->getDisplay($output),
@@ -332,6 +331,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([]);
         // important metrics, always rendered
         $this->metricsCalculator->expects($this->any())
             ->method('getKilledByTestsCount')
