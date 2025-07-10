@@ -1,5 +1,29 @@
 # Change Log
 
+## [0.30.2](https://github.com/infection/infection/tree/0.30.2) (2025-07-10)
+
+**Changed:**
+
+* [performance] Smarter `LogicalNot` mutator by @staabm in https://github.com/infection/infection/pull/2283
+* [performance] MutationProcess timeout is based on test-execution time by @staabm in https://github.com/infection/infection/pull/2300
+* DX: Automatically determine git reference branch by @staabm in https://github.com/infection/infection/pull/2289
+* Support NullSafe PropertyFetch/MethodCall in ArrayItem mutator by @staabm in https://github.com/infection/infection/pull/2294
+* Make ArrayItem mutator less evil by @sanmai in https://github.com/infection/infection/pull/2299
+* Remove `IdenticalEqual` by @sanmai in https://github.com/infection/infection/pull/2248
+* Allow setting static analysis tool in config file by @maks-rafalko in https://github.com/infection/infection/pull/2301
+
+**Internal:**
+
+* Cleanup composer.json conflict rules with phpunit/php-code-coverage by @staabm in https://github.com/infection/infection/pull/2288
+* Test forgotten PhpStan value object by @maks-rafalko in https://github.com/infection/infection/pull/2302
+* Finally, fix the worst and the most unmaintainable test ever by @maks-rafalko in https://github.com/infection/infection/pull/2304
+* Rename functions of ReflectionVisitor.php by @maks-rafalko in https://github.com/infection/infection/pull/2308
+* Add threads=max to infection.json5 by @maks-rafalko in https://github.com/infection/infection/pull/2307
+* Improve ParallelProcessRunner to guard against ReturnRemoval mutator by @sanmai in https://github.com/infection/infection/pull/2310
+* Refactor SchemaConfigurationTest by @sanmai in https://github.com/infection/infection/pull/2305
+
+**Full Changelog**: https://github.com/infection/infection/compare/0.30.1...0.30.2
+
 ## [0.30.1](https://github.com/infection/infection/tree/0.30.1) (2025-07-04)
 
 **Changed:**
