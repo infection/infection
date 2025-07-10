@@ -33,32 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
+namespace Infection\Tests\Process;
 
-use Symfony\Component\Process\Process;
+use Infection\Process\TestTokenHandler;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use function Safe\json_encode;
+use function sprintf;
 
-/**
- * @internal
- */
-final class TestTokenHandler
+#[CoversClass(TestTokenHandler::class)]
+final class TestTokenHandlerTest extends TestCase
 {
-    /** @var non-negative-int */
-    private int $processCount = 0;
+    public function test_it_base_default(): void
+    {
+        $handler = new TestTokenHandler(3);
 
-    public function __construct(
-        /** @var positive-int */
-        private readonly int $threadCount,
-    ) {
+        $this->assertSame(0, $handler->getNextToken());
+        $this->assertSame(1, $handler->getNextToken());
+        $this->assertSame(2, $handler->getNextToken());
+        $this->assertSame(0, $handler->getNextToken());
+    }
+
+    public static function provideExamples(): iterable
+    {
+        yield [3, 1, [1, 2, 3, 1, 2, 3, 1, 2, 3, 1]];
+
+        yield [4, 0, [0, 1, 2, 3, 0, 1, 2, 3, 0, 1]];
+
+        yield [6, 1, [1, 2, 3, 4, 5, 6, 1, 2, 3, 4]];
     }
 
     /**
-     * Returns 0- or 1-based token for the next process. This method should be called right between ending the old process and starting a new process, and definitely not ahead of the time.
-     *
+     * @param positive-int $threadCount
      * @phpstan-param 0|1 $base
-     * @return non-negative-int
+     * @param array<non-negative-int> $expected
      */
-    public function getNextToken(int $base = 0): int
+    #[DataProvider('provideExamples')]
+    public function test_it_base_thread_count(int $threadCount, int $base, array $expected): void
     {
-        return $this->processCount++ % $this->threadCount + $base;
+        $handler = new TestTokenHandler($threadCount);
+
+        $actual = [];
+
+        for ($i = 0; $i < 10; ++$i) {
+            $actual[] = $handler->getNextToken($base);
+        }
+
+        $this->assertSame($expected, $actual, sprintf('Expected: %s', json_encode($actual)));
     }
 }
