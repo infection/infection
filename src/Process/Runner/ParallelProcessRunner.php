@@ -67,7 +67,7 @@ final class ParallelProcessRunner implements ProcessRunner
     private array $nextMutantProcessKillerContainer = [];
 
     /**
-     * @var array<int, IndexedMutantProcessContainer>
+     * @var array<int, MutantProcessContainer>
      */
     private array $runningProcessContainers = [];
 
@@ -154,8 +154,7 @@ final class ParallelProcessRunner implements ProcessRunner
     private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
-            $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
+        foreach ($this->runningProcessContainers as $index => $mutantProcessContainer) {
             $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();
 
@@ -168,7 +167,6 @@ final class ParallelProcessRunner implements ProcessRunner
             if (!$process->isRunning()) {
                 $mutantProcess->markAsFinished();
 
-                unset($this->runningProcessContainers[$index]->mutantProcessContainer);
                 unset($this->runningProcessContainers[$index]);
 
                 if ($mutantProcessContainer->hasNext()) {
@@ -189,9 +187,9 @@ final class ParallelProcessRunner implements ProcessRunner
 
     private function startProcess(MutantProcessContainer $mutantProcessContainer): void
     {
-        $threadIndex = $mutantProcessContainer->getCurrent()->startProcess();
+        $mutantProcessContainer->getCurrent()->startProcess();
 
-        $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
+        $this->runningProcessContainers[] = $mutantProcessContainer;
     }
 
     /**

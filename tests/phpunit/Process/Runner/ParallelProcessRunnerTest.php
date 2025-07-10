@@ -53,7 +53,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
@@ -271,8 +270,11 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('createFromProcess')
             ->willReturn($mutantExecutionResultMock);
 
-        // We are testing the new token handler behaves just like the old approach
-        Assert::greaterThanEq($threadCount, 0);
+        /**
+         * We are testing the new token handler behaves just like the old approach.
+         * And we are also using negative thread counts here, so we need to ignore the error.
+         * @phpstan-ignore argument.type
+         */
         $tokenHandler = new TestTokenHandler($threadCount);
 
         return new MutantProcessContainer(

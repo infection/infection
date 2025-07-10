@@ -69,15 +69,9 @@ class MutantProcess
         return $this->mutant;
     }
 
-    /**
-     * @return int a test token for backward compatibility with the old test token handler; should be removed together IndexedMutantProcessContainer
-     */
-    public function startProcess(): int
+    public function startProcess(): void
     {
-        $env = $this->getEnvironment();
-        $this->getProcess()->start(env: $env);
-
-        return $env['TEST_TOKEN'] ?? 0;
+        $this->getProcess()->start(env: $this->getEnvironment());
     }
 
     public function markAsTimedOut(): void
