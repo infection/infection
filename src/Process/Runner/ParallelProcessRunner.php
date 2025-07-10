@@ -166,25 +166,27 @@ final class ParallelProcessRunner implements ProcessRunner
                 $mutantProcess->markAsTimedOut();
             }
 
-            if (!$process->isRunning()) {
-                $mutantProcess->markAsFinished();
-
-                $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
-
-                unset($this->runningProcessContainers[$index]->mutantProcessContainer);
-                unset($this->runningProcessContainers[$index]);
-
-                if ($mutantProcessContainer->hasNext()) {
-                    $mutantProcessContainer->createNext();
-
-                    // Enqueue the needed static analysis run
-                    $bucket->enqueue($mutantProcessContainer);
-
-                    return;
-                }
-
-                yield $mutantProcessContainer;
+            if ($process->isRunning()) {
+                continue;
             }
+
+            $mutantProcess->markAsFinished();
+
+            $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
+
+            unset($this->runningProcessContainers[$index]->mutantProcessContainer);
+            unset($this->runningProcessContainers[$index]);
+
+            if ($mutantProcessContainer->hasNext()) {
+                $mutantProcessContainer->createNext();
+
+                // Enqueue the needed static analysis run
+                $bucket->enqueue($mutantProcessContainer);
+
+                continue;
+            }
+
+            yield $mutantProcessContainer;
         }
     }
 
