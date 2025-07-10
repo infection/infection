@@ -43,6 +43,7 @@ use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\TestTokenHandler;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
 use function iterator_to_array;
@@ -52,6 +53,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
@@ -196,12 +198,20 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
+        $testTokenHandlerMock = $this->createMock(TestTokenHandler::class);
+        $testTokenHandlerMock
+            ->expects($this->once())
+            ->method('getNextToken')
+            ->willReturn($threadIndex)
+        ;
+
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
                 $this->createMock(Mutant::class),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
+                $testTokenHandlerMock,
             ),
             [],
         );
@@ -261,18 +271,24 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('createFromProcess')
             ->willReturn($mutantExecutionResultMock);
 
+        // We are testing the new token handler behaves just like the old approach
+        Assert::greaterThanEq($threadCount, 0);
+        $tokenHandler = new TestTokenHandler($threadCount);
+
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $phpUnitProcessMock,
                 $this->createMock(Mutant::class),
                 $mutantExecutionResultFactoryMock,
                 false,
+                $tokenHandler,
             ),
             [
-                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock, $tokenHandler) implements LazyMutantProcessFactory {
                     public function __construct(
                         private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
                         private Process $nextProcessMock,
+                        private TestTokenHandler $tokenHandler,
                     ) {
                     }
 
@@ -282,6 +298,7 @@ final class ParallelProcessRunnerTest extends TestCase
                             $this->nextProcessMock,
                             $mutant,
                             $this->mutantExecutionResultFactory,
+                            $this->tokenHandler,
                         );
                     }
                 },
@@ -313,6 +330,7 @@ final class ParallelProcessRunnerTest extends TestCase
                 $this->createMock(Mutant::class),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 true,
+                null,
             ),
             [],
         );

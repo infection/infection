@@ -49,10 +49,10 @@ final class TestTokenHandlerTest extends TestCase
     {
         $handler = new TestTokenHandler(3);
 
-        $this->assertSame(0, $handler->getNextToken());
         $this->assertSame(1, $handler->getNextToken());
         $this->assertSame(2, $handler->getNextToken());
-        $this->assertSame(0, $handler->getNextToken());
+        $this->assertSame(3, $handler->getNextToken());
+        $this->assertSame(1, $handler->getNextToken());
     }
 
     public static function provideExamples(): iterable

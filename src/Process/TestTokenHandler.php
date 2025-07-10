@@ -58,7 +58,7 @@ class TestTokenHandler
      * @phpstan-param 0|1 $base
      * @return non-negative-int
      */
-    public function getNextToken(int $base = 0): int
+    public function getNextToken(int $base = 1): int
     {
         if ($this->threadCount === 0) {
             return $base;
