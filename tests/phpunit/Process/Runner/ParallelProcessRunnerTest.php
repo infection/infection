@@ -43,6 +43,7 @@ use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\TestTokenHandler;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
 use function iterator_to_array;
@@ -196,12 +197,20 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
+        $testTokenHandlerMock = $this->createMock(TestTokenHandler::class);
+        $testTokenHandlerMock
+            ->expects($this->once())
+            ->method('getNextToken')
+            ->willReturn($threadIndex)
+        ;
+
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
                 $this->createMock(Mutant::class),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
+                $testTokenHandlerMock,
             ),
             [],
         );
@@ -261,18 +270,27 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('createFromProcess')
             ->willReturn($mutantExecutionResultMock);
 
+        /**
+         * We are testing the new token handler behaves just like the old approach.
+         * And we are also using negative thread counts here, so we need to ignore the error.
+         * @phpstan-ignore argument.type
+         */
+        $tokenHandler = new TestTokenHandler($threadCount);
+
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $phpUnitProcessMock,
                 $this->createMock(Mutant::class),
                 $mutantExecutionResultFactoryMock,
                 false,
+                $tokenHandler,
             ),
             [
-                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
+                new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock, $tokenHandler) implements LazyMutantProcessFactory {
                     public function __construct(
                         private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
                         private Process $nextProcessMock,
+                        private TestTokenHandler $tokenHandler,
                     ) {
                     }
 
@@ -282,6 +300,8 @@ final class ParallelProcessRunnerTest extends TestCase
                             $this->nextProcessMock,
                             $mutant,
                             $this->mutantExecutionResultFactory,
+                            // Child PHPStan processes do not need or use tokens, but we are testing the new handler would work here too, if needed
+                            $this->tokenHandler,
                         );
                     }
                 },
@@ -313,6 +333,7 @@ final class ParallelProcessRunnerTest extends TestCase
                 $this->createMock(Mutant::class),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 true,
+                null,
             ),
             [],
         );

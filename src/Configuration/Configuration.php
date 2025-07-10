@@ -291,6 +291,7 @@ class Configuration
         return $this->msiPrecision;
     }
 
+    /** @return non-negative-int */
     public function getThreadCount(): int
     {
         return $this->threadCount;

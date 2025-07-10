@@ -43,7 +43,6 @@ use Infection\Process\MutantProcessContainer;
 use Iterator;
 use function max;
 use function microtime;
-use function range;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use function usleep;
 use Webmozart\Assert\Assert;
@@ -68,14 +67,9 @@ final class ParallelProcessRunner implements ProcessRunner
     private array $nextMutantProcessKillerContainer = [];
 
     /**
-     * @var array<int, IndexedMutantProcessContainer>
+     * @var array<int, MutantProcessContainer>
      */
     private array $runningProcessContainers = [];
-
-    /**
-     * @var array<int, int>
-     */
-    private array $availableThreadIndexes = [];
 
     private bool $shouldStop = false;
 
@@ -114,7 +108,6 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->fillBucketOnce($bucket, $generator, 1);
 
         $threadCount = max(1, $this->threadCount);
-        $this->availableThreadIndexes = range(1, $threadCount);
 
         // start the initial batch of processes
         do {
@@ -125,11 +118,7 @@ final class ParallelProcessRunner implements ProcessRunner
             $mutantProcessContainer = array_shift($bucket);
 
             if ($mutantProcessContainer !== null) {
-                $threadIndex = array_shift($this->availableThreadIndexes);
-
-                Assert::integer($threadIndex, 'Thread index can not be null.');
-
-                $this->startProcess($mutantProcessContainer, $threadIndex);
+                $this->startProcess($mutantProcessContainer);
             }
 
             if (count($this->runningProcessContainers) >= $threadCount) {
@@ -165,8 +154,7 @@ final class ParallelProcessRunner implements ProcessRunner
     private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
     {
         // remove any finished process from the stack
-        foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
-            $mutantProcessContainer = $indexedMutantProcess->mutantProcessContainer;
+        foreach ($this->runningProcessContainers as $index => $mutantProcessContainer) {
             $mutantProcess = $mutantProcessContainer->getCurrent();
             $process = $mutantProcess->getProcess();
 
@@ -179,9 +167,6 @@ final class ParallelProcessRunner implements ProcessRunner
             if (!$process->isRunning()) {
                 $mutantProcess->markAsFinished();
 
-                $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
-
-                unset($this->runningProcessContainers[$index]->mutantProcessContainer);
                 unset($this->runningProcessContainers[$index]);
 
                 if ($mutantProcessContainer->hasNext()) {
@@ -200,14 +185,11 @@ final class ParallelProcessRunner implements ProcessRunner
         return null;
     }
 
-    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
+    private function startProcess(MutantProcessContainer $mutantProcessContainer): void
     {
-        $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
-            'INFECTION' => '1',
-            'TEST_TOKEN' => $threadIndex,
-        ]);
+        $mutantProcessContainer->getCurrent()->startProcess();
 
-        $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
+        $this->runningProcessContainers[] = $mutantProcessContainer;
     }
 
     /**

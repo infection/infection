@@ -43,6 +43,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\TestTokenHandler;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
@@ -125,11 +126,18 @@ final class MutantProcessContainerFactoryTest extends TestCase
             ->willReturn($executionResultMock)
         ;
 
+        $testTokenHandlerMock = $this->createMock(TestTokenHandler::class);
+        $testTokenHandlerMock
+            ->expects($this->never())
+            ->method($this->anything())
+        ;
+
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
             $processFactoryTimeout,
             $resultFactoryMock,
             [],
+            $testTokenHandlerMock,
         );
 
         $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);

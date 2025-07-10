@@ -33,26 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Process\Runner;
+namespace Infection\Process;
 
-use Infection\Process\MutantProcessContainer;
-use Infection\Process\Runner\IndexedMutantProcessContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
-#[CoversClass(IndexedMutantProcessContainer::class)]
-final class IndexedMutantProcessContainerTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class TestTokenHandler
 {
-    public function test_it_creates_object(): void
+    /** @var non-negative-int */
+    private int $processCount = 0;
+
+    public function __construct(
+        /** @var non-negative-int */
+        private readonly int $threadCount,
+    ) {
+    }
+
+    /**
+     * Returns 0- or 1-based token for the next process. This method should be called right between ending the old process and starting a new process, and definitely not ahead of the time.
+     *
+     * @phpstan-param 0|1 $base
+     * @return non-negative-int
+     */
+    public function getNextToken(int $base = 1): int
     {
-        $processBearer = $this->createMock(MutantProcessContainer::class);
+        if ($this->threadCount === 0) {
+            return $base;
+        }
 
-        $indexedProcessBearer = new IndexedMutantProcessContainer(
-            3,
-            $processBearer,
-        );
-
-        $this->assertSame(3, $indexedProcessBearer->threadIndex);
-        $this->assertSame($processBearer, $indexedProcessBearer->mutantProcessContainer);
+        return $this->processCount++ % $this->threadCount + $base;
     }
 }

@@ -55,6 +55,7 @@ class MutantProcess
         private readonly Process $process,
         private readonly Mutant $mutant,
         private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly ?TestTokenHandler $testTokenHandler = null,
     ) {
     }
 
@@ -66,6 +67,11 @@ class MutantProcess
     public function getMutant(): Mutant
     {
         return $this->mutant;
+    }
+
+    public function startProcess(): void
+    {
+        $this->getProcess()->start(env: $this->getEnvironment());
     }
 
     public function markAsTimedOut(): void
@@ -92,5 +98,20 @@ class MutantProcess
     {
         // todo [phpstan-integration] cache it
         return $this->mutantExecutionResultFactory->createFromProcess($this);
+    }
+
+    /**
+     * @return array{'INFECTION': string, 'TEST_TOKEN': int}|array{}
+     */
+    private function getEnvironment(): array
+    {
+        if ($this->testTokenHandler === null) {
+            return [];
+        }
+
+        return [
+            'INFECTION' => '1',
+            'TEST_TOKEN' => $this->testTokenHandler->getNextToken(),
+        ];
     }
 }

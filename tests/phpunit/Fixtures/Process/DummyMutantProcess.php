@@ -7,6 +7,7 @@ namespace Infection\Tests\Fixtures\Process;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
+use Infection\Process\TestTokenHandler;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
 
@@ -16,9 +17,10 @@ final class DummyMutantProcess extends MutantProcess
         private Process $process,
         Mutant $mutant,
         TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-        private bool $expectTimeOut
+        private bool $expectTimeOut,
+        ?TestTokenHandler $testTokenHandler,
     ) {
-        parent::__construct($process, $mutant, $mutantExecutionResultFactory);
+        parent::__construct($process, $mutant, $mutantExecutionResultFactory, $testTokenHandler);
     }
 
     public function getProcess(): Process
