@@ -40,6 +40,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Process\TestTokenHandler;
 use function min;
 use Symfony\Component\Process\Process;
 
@@ -61,6 +62,7 @@ class MutantProcessContainerFactory
          * @var list<LazyMutantProcessFactory>
          */
         private readonly array $lazyMutantProcessCreators,
+        private readonly TestTokenHandler $testTokenHandler,
     ) {
     }
 
@@ -85,6 +87,7 @@ class MutantProcessContainerFactory
                 $process,
                 $mutant,
                 $this->mutantExecutionResultFactory,
+                $this->testTokenHandler,
             ),
             $this->lazyMutantProcessCreators,
         );

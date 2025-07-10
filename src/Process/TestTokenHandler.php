@@ -35,80 +35,30 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutant\MutantExecutionResultFactory;
-use function microtime;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
- * @final
  */
-class MutantProcess
+final class TestTokenHandler
 {
-    private bool $timedOut = false;
-
-    private float $finishedAt = 0.0;
+    private int $processCount = 0;
 
     public function __construct(
-        private readonly Process $process,
-        private readonly Mutant $mutant,
-        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
-        private readonly ?TestTokenHandler $testTokenHandler = null,
+        private readonly int $threadCount,
     ) {
     }
 
-    public function getProcess(): Process
+    /**
+     * Returns 0- or 1-based token for the next process. This method should be called right between ending the old process and starting a new process, and definitely not ahead of the time.
+     *
+     * @param int<0|1> $base
+     * @return non-negative-int
+     */
+    public function getNextToken(int $base = 0): int
     {
-        return $this->process;
-    }
+        ++$this->processCount;
 
-    public function getMutant(): Mutant
-    {
-        return $this->mutant;
-    }
-
-    public function startProcess(): void
-    {
-        $this->getProcess()->start(null, $this->getEnvironment());
-    }
-
-    public function markAsTimedOut(): void
-    {
-        $this->timedOut = true;
-    }
-
-    public function isTimedOut(): bool
-    {
-        return $this->timedOut;
-    }
-
-    public function markAsFinished(): void
-    {
-        $this->finishedAt = microtime(true);
-    }
-
-    public function getFinishedAt(): float
-    {
-        return $this->finishedAt;
-    }
-
-    public function getMutantExecutionResult(): MutantExecutionResult
-    {
-        // todo [phpstan-integration] cache it
-        return $this->mutantExecutionResultFactory->createFromProcess($this);
-    }
-
-    private function getEnvironment(): array
-    {
-        if ($this->testTokenHandler === null) {
-            return [];
-        }
-
-        return [
-            'INFECTION' => '1',
-            'TEST_TOKEN' => $this->testTokenHandler->getNextToken(),
-        ];
+        return $this->processCount % $this->threadCount + $base;
     }
 }
