@@ -156,7 +156,7 @@ final class ParallelProcessRunner implements ProcessRunner
      * @param SplQueue<MutantProcessContainer> $bucket
      * @return iterable<MutantProcessContainer>
      */
-    private function tryToFreeNotRunningProcess(SplQueue $bucket, bool &$terminated = false): iterable
+    private function tryToFreeNotRunningProcess(SplQueue $bucket, bool &$terminated): iterable
     {
         // remove any finished process from the stack
         foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
