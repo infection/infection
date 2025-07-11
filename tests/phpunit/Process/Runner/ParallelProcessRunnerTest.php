@@ -62,6 +62,7 @@ use Tumblr\Chorus\TimeKeeper;
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {
+    private const SIMULATED_TIME_MICROSECONDS = 1_000;
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
         $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
@@ -239,7 +240,7 @@ final class ParallelProcessRunnerTest extends TestCase
                     $bucket->enqueue($iterator->current());
                     $iterator->next();
 
-                    return 1000; // Some time taken
+                    return self::SIMULATED_TIME_MICROSECONDS; // Some time taken
                 }
 
                 return 0;
@@ -263,6 +264,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->getMock();
 
         // Track the sequence of method calls
+        /** @var array<int, array{method: string, threadCount?: int}> */
         $callSequence = [];
 
         // fillBucketOnce should be called at least twice:
@@ -314,6 +316,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // 1. First fillBucketOnce MUST happen before process.start
         $this->assertNotEmpty($callSequence, 'Call sequence must be tracked');
         $this->assertSame('fillBucketOnce', $callSequence[0]['method'], 'First call must be fillBucketOnce');
+        $this->assertArrayHasKey('threadCount', $callSequence[0], 'First call must have threadCount');
         $this->assertSame(1, $callSequence[0]['threadCount'], 'Initial fillBucketOnce must use threadCount=1');
 
         // Find process.start in the sequence
@@ -732,12 +735,12 @@ final class ParallelProcessRunnerTest extends TestCase
         // fillBucketOnce should be called and return some time value
         $runner->expects($this->atLeastOnce())
             ->method('fillBucketOnce')
-            ->willReturn(1000); // Return 1000 microseconds
+            ->willReturn(self::SIMULATED_TIME_MICROSECONDS); // Return 1000 microseconds
 
         // wait should be called with the return value from fillBucketOnce
         $runner->expects($this->atLeastOnce())
             ->method('wait')
-            ->with($this->identicalTo(1000)); // Must be called with the fillBucketOnce return value
+            ->with($this->identicalTo(self::SIMULATED_TIME_MICROSECONDS)); // Must be called with the fillBucketOnce return value
 
         // Create processes
         $processes = [];
