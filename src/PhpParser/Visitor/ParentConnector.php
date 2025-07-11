@@ -68,6 +68,7 @@ final class ParentConnector
 
             $parent = $weakRef->get();
             Assert::notNull($parent, 'Parent node has been garbage collected');
+            Assert::isInstanceOf($parent, Node::class);
 
             return $parent;
         }
@@ -85,7 +86,11 @@ final class ParentConnector
             $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
 
             if ($weakRef instanceof WeakReference) {
-                return $weakRef->get();
+                $parent = $weakRef->get();
+
+                if ($parent instanceof Node) {
+                    return $parent;
+                }
             }
 
             return null;
