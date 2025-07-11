@@ -63,6 +63,7 @@ use Tumblr\Chorus\TimeKeeper;
 final class ParallelProcessRunnerTest extends TestCase
 {
     private const SIMULATED_TIME_MICROSECONDS = 1_000;
+
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
         $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
