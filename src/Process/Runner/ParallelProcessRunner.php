@@ -190,7 +190,7 @@ class ParallelProcessRunner implements ProcessRunner
      * @param SplQueue<MutantProcessContainer> $bucket
      * @return iterable<MutantProcessContainer>
      */
-    private function tryToFreeNotRunningProcess(SplQueue $bucket): iterable
+    protected function tryToFreeNotRunningProcess(SplQueue $bucket): iterable
     {
         // remove any finished process from the stack
         foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
@@ -228,7 +228,7 @@ class ParallelProcessRunner implements ProcessRunner
         }
     }
 
-    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
+    protected function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
         $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
@@ -241,7 +241,7 @@ class ParallelProcessRunner implements ProcessRunner
     /**
      * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
      */
-    private function wait(int $timeSpentDoingWork): void
+    protected function wait(int $timeSpentDoingWork): void
     {
         $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }
