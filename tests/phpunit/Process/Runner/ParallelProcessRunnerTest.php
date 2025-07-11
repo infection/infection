@@ -53,9 +53,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SplQueue;
+use stdClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Tumblr\Chorus\FakeTimeKeeper;
+use Tumblr\Chorus\TimeKeeper;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
@@ -345,6 +347,418 @@ final class ParallelProcessRunnerTest extends TestCase
         yield 'nominal' => [4];
 
         yield 'thread count more than processes' => [20];
+    }
+
+    public function test_has_processes_that_could_be_freed_greater_than_or_equal_to_behavior(): void
+    {
+        // This test kills the GreaterThanOrEqualTo mutation on line 161
+        // Original: count($this->runningProcessContainers) >= $threadCount
+        // Mutated: count($this->runningProcessContainers) > $threadCount
+
+        $runner = new ParallelProcessRunner(2, 0, new FakeTimeKeeper());
+
+        $reflection = new ReflectionClass($runner);
+
+        // Set up runningProcessContainers with exactly 2 items
+        $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
+        $runningProcessContainers->setValue($runner, [
+            'dummy1' => new stdClass(),
+            'dummy2' => new stdClass(),
+        ]);
+
+        $method = $reflection->getMethod('hasProcessesThatCouldBeFreed');
+
+        // When count == threadCount, >= returns true, > returns false
+        $this->assertTrue($method->invokeArgs($runner, [2]), 'Should return true when count equals threadCount');
+
+        // When count > threadCount, both >= and > return true
+        $runningProcessContainers->setValue($runner, [
+            'dummy1' => new stdClass(),
+            'dummy2' => new stdClass(),
+            'dummy3' => new stdClass(),
+        ]);
+
+        $this->assertTrue($method->invokeArgs($runner, [2]), 'Should return true when count > threadCount');
+
+        // When count < threadCount, both >= and > return false
+        $runningProcessContainers->setValue($runner, [
+            'dummy1' => new stdClass(),
+        ]);
+
+        $this->assertFalse($method->invokeArgs($runner, [2]), 'Should return false when count < threadCount');
+    }
+
+    public function test_fill_bucket_once_greater_than_or_equal_to_behavior(): void
+    {
+        // This test kills the GreaterThanOrEqualTo mutation on line 174
+        // Original: count($bucket) >= $threadCount
+        // Mutated: count($bucket) > $threadCount
+
+        $runner = new ParallelProcessRunner(2, 0, new FakeTimeKeeper());
+
+        $reflection = new ReflectionClass($runner);
+        $method = $reflection->getMethod('fillBucketOnce');
+
+        // Test when bucket count equals threadCount
+        $bucket = new SplQueue();
+        $bucket->enqueue('item1');
+        $bucket->enqueue('item2');
+
+        $iterator = $this->createMock(Iterator::class);
+        $iterator->expects($this->never())->method('valid'); // Should not be called when bucket >= threadCount
+        $iterator->expects($this->never())->method('current'); // Should not be called
+
+        $result = $method->invokeArgs($runner, [$bucket, $iterator, 2]);
+
+        // Should return 0 immediately when bucket count >= threadCount
+        $this->assertSame(0, $result, 'Should return 0 when bucket count equals threadCount');
+
+        // Test when bucket count > threadCount
+        $bucket->enqueue('item3');
+
+        $iterator2 = $this->createMock(Iterator::class);
+        $iterator2->expects($this->never())->method('valid'); // Should not be called when bucket > threadCount
+        $iterator2->expects($this->never())->method('current'); // Should not be called
+
+        $result2 = $method->invokeArgs($runner, [$bucket, $iterator2, 2]);
+
+        // Should return 0 immediately when bucket count > threadCount
+        $this->assertSame(0, $result2, 'Should return 0 when bucket count > threadCount');
+    }
+
+    public function test_fill_bucket_once_time_calculation_with_minus_mutation(): void
+    {
+        // This test kills the Minus mutation on line 186
+        // Original: ($this->timeKeeper->getCurrentTimeAsFloat() - $start)
+        // Mutated: ($this->timeKeeper->getCurrentTimeAsFloat() + $start)
+
+        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $runner = new ParallelProcessRunner(2, 0, $timeKeeperMock);
+
+        $reflection = new ReflectionClass($runner);
+        $method = $reflection->getMethod('fillBucketOnce');
+
+        $bucket = new SplQueue();
+
+        $iterator = $this->createMock(Iterator::class);
+        $iterator->expects($this->once())->method('valid')->willReturn(true);
+        $iterator->expects($this->once())->method('current')->willReturn('item');
+        $iterator->expects($this->once())->method('next');
+
+        // Mock two sequential calls to getCurrentTimeAsFloat()
+        $timeKeeperMock->expects($this->exactly(2))
+            ->method('getCurrentTimeAsFloat')
+            ->willReturnOnConsecutiveCalls(1000.0, 1001.0); // start = 1000.0, end = 1001.0 (1 second difference)
+
+        $result = $method->invokeArgs($runner, [$bucket, $iterator, 2]);
+
+        // With original code: (1001.0 - 1000.0) * 1000000 = 1000000
+        // With mutated code: (1001.0 + 1000.0) * 1000000 = 2001000000
+        $this->assertSame(1000000, $result, 'Time calculation should use subtraction, not addition');
+    }
+
+    public function test_wait_method_with_decrement_integer_mutation(): void
+    {
+        // This test kills the DecrementInteger mutation on line 246
+        // Original: max(0, $this->poll - $timeSpentDoingWork)
+        // Mutated: max(-1, $this->poll - $timeSpentDoingWork)
+
+        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $runner = new ParallelProcessRunner(2, 10000, $timeKeeperMock); // 10ms poll time
+
+        $reflection = new ReflectionClass($runner);
+        $method = $reflection->getMethod('wait');
+
+        // Test scenario where poll - timeSpentDoingWork would be negative
+        $timeSpentDoingWork = 15000; // 15ms, more than poll time
+
+        // With original code: max(0, 10000 - 15000) = max(0, -5000) = 0
+        // With mutated code: max(-1, 10000 - 15000) = max(-1, -5000) = -1
+        $timeKeeperMock->expects($this->once())
+            ->method('usleep')
+            ->with($this->identicalTo(0)); // Should be 0, not -1
+
+        $method->invokeArgs($runner, [$timeSpentDoingWork]);
+    }
+
+    public function test_wait_method_with_increment_integer_mutation(): void
+    {
+        // This test kills the IncrementInteger mutation on line 246
+        // Original: max(0, $this->poll - $timeSpentDoingWork)
+        // Mutated: max(1, $this->poll - $timeSpentDoingWork)
+
+        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $runner = new ParallelProcessRunner(2, 10000, $timeKeeperMock); // 10ms poll time
+
+        $reflection = new ReflectionClass($runner);
+        $method = $reflection->getMethod('wait');
+
+        // Test scenario where poll - timeSpentDoingWork would be exactly 0
+        $timeSpentDoingWork = 10000; // Exactly poll time
+
+        // With original code: max(0, 10000 - 10000) = max(0, 0) = 0
+        // With mutated code: max(1, 10000 - 10000) = max(1, 0) = 1
+        $timeKeeperMock->expects($this->once())
+            ->method('usleep')
+            ->with($this->identicalTo(0)); // Should be 0, not 1
+
+        $method->invokeArgs($runner, [$timeSpentDoingWork]);
+    }
+
+    public function test_wait_method_with_minus_mutation(): void
+    {
+        // This test kills the Minus mutation on line 246
+        // Original: max(0, $this->poll - $timeSpentDoingWork)
+        // Mutated: max(0, $this->poll + $timeSpentDoingWork)
+
+        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $runner = new ParallelProcessRunner(2, 5000, $timeKeeperMock); // 5ms poll time
+
+        $reflection = new ReflectionClass($runner);
+        $method = $reflection->getMethod('wait');
+
+        $timeSpentDoingWork = 2000; // 2ms
+
+        // With original code: max(0, 5000 - 2000) = max(0, 3000) = 3000
+        // With mutated code: max(0, 5000 + 2000) = max(0, 7000) = 7000
+        $timeKeeperMock->expects($this->once())
+            ->method('usleep')
+            ->with($this->identicalTo(3000)); // Should be 3000, not 7000
+
+        $method->invokeArgs($runner, [$timeSpentDoingWork]);
+    }
+
+    public function test_wait_method_call_removal_mutation(): void
+    {
+        // This test kills the MethodCallRemoval mutation on line 246
+        // Original: $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
+        // Mutated: (empty)
+
+        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $runner = new ParallelProcessRunner(2, 5000, $timeKeeperMock); // 5ms poll time
+
+        $reflection = new ReflectionClass($runner);
+        $method = $reflection->getMethod('wait');
+
+        $timeSpentDoingWork = 1000; // 1ms
+
+        // usleep must be called
+        $timeKeeperMock->expects($this->once())
+            ->method('usleep')
+            ->with($this->identicalTo(4000)); // Should be 4000
+
+        $method->invokeArgs($runner, [$timeSpentDoingWork]);
+    }
+
+    public function test_mark_as_timed_out_method_call_removal_mutation(): void
+    {
+        // This test kills the MethodCallRemoval mutation on line 204
+        // Original: $mutantProcess->markAsTimedOut();
+        // Mutated: (empty)
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        $reflection = new ReflectionClass($runner);
+
+        // Create a timeout process that will throw ProcessTimedOutException
+        $processMock = $this->createMock(Process::class);
+        $processMock->expects($this->once())
+            ->method('checkTimeout')
+            ->willThrowException(new ProcessTimedOutException($processMock, 1));
+        $processMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false);
+
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock->expects($this->once())
+            ->method('getProcess')
+            ->willReturn($processMock);
+        $mutantProcessMock->expects($this->once())
+            ->method('markAsTimedOut'); // This call must happen
+
+        $mutantProcessContainerMock = $this->createMock(MutantProcessContainer::class);
+        $mutantProcessContainerMock->expects($this->once())
+            ->method('getCurrent')
+            ->willReturn($mutantProcessMock);
+
+        $container = new stdClass();
+        $container->mutantProcessContainer = $mutantProcessContainerMock;
+        $container->threadIndex = 0;
+
+        // Set up runningProcessContainers
+        $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
+        $runningProcessContainers->setValue($runner, [0 => $container]);
+
+        $availableThreadIndexes = $reflection->getProperty('availableThreadIndexes');
+        $availableThreadIndexes->setValue($runner, []);
+
+        $method = $reflection->getMethod('tryToFreeNotRunningProcess');
+        $bucket = new SplQueue();
+
+        // This should call markAsTimedOut on the mutant process
+        iterator_to_array($method->invokeArgs($runner, [$bucket]));
+    }
+
+    public function test_mark_as_finished_method_call_removal_mutation(): void
+    {
+        // This test kills the MethodCallRemoval mutation on line 211
+        // Original: $mutantProcess->markAsFinished();
+        // Mutated: (empty)
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        $reflection = new ReflectionClass($runner);
+
+        // Create a finished process
+        $processMock = $this->createMock(Process::class);
+        $processMock->expects($this->once())
+            ->method('checkTimeout'); // No exception
+        $processMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false); // Process is not running
+
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock->expects($this->once())
+            ->method('getProcess')
+            ->willReturn($processMock);
+        $mutantProcessMock->expects($this->once())
+            ->method('markAsFinished'); // This call must happen
+
+        $mutantProcessContainerMock = $this->createMock(MutantProcessContainer::class);
+        $mutantProcessContainerMock->expects($this->once())
+            ->method('getCurrent')
+            ->willReturn($mutantProcessMock);
+
+        $container = new stdClass();
+        $container->mutantProcessContainer = $mutantProcessContainerMock;
+        $container->threadIndex = 0;
+
+        // Set up runningProcessContainers
+        $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
+        $runningProcessContainers->setValue($runner, [0 => $container]);
+
+        $availableThreadIndexes = $reflection->getProperty('availableThreadIndexes');
+        $availableThreadIndexes->setValue($runner, []);
+
+        $method = $reflection->getMethod('tryToFreeNotRunningProcess');
+        $bucket = new SplQueue();
+
+        // This should call markAsFinished on the mutant process
+        iterator_to_array($method->invokeArgs($runner, [$bucket]));
+    }
+
+    public function test_while_loop_condition_with_while_mutation(): void
+    {
+        // This test kills the While_ mutation on line 135
+        // Original: while ($this->hasProcessesThatCouldBeFreed($threadCount))
+        // Mutated: while (false)
+
+        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
+            ->setConstructorArgs([2, 0, new FakeTimeKeeper()])
+            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce'])
+            ->getMock();
+
+        $callCount = 0;
+
+        // hasProcessesThatCouldBeFreed should be called and return true at least once
+        $runner->expects($this->atLeastOnce())
+            ->method('hasProcessesThatCouldBeFreed')
+            ->willReturnCallback(static function () use (&$callCount) {
+                ++$callCount;
+
+                return $callCount <= 2; // Return true twice, then false
+            });
+
+        // fillBucketOnce should be called in the while loop
+        $runner->expects($this->atLeastOnce())
+            ->method('fillBucketOnce')
+            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) {
+                // Simulate adding processes to bucket
+                if ($iterator->valid() && count($bucket) < $threadCount) {
+                    $bucket->enqueue($iterator->current());
+                    $iterator->next();
+                }
+
+                return 0;
+            });
+
+        // Create processes
+        $processes = [];
+
+        for ($i = 0; $i < 3; ++$i) {
+            $process = $this->createMock(Process::class);
+            $process->expects($this->once())->method('start');
+            $process->expects($this->any())->method('isRunning')->willReturn(false);
+
+            $mutantProcess = new DummyMutantProcess(
+                $process,
+                $this->createMock(Mutant::class),
+                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                false,
+            );
+
+            $processes[] = new MutantProcessContainer($mutantProcess, []);
+        }
+
+        // Run the processes - the while loop should execute because hasProcessesThatCouldBeFreed returns true
+        iterator_to_array($runner->run($processes));
+
+        // If the while condition was mutated to false, hasProcessesThatCouldBeFreed would never be called
+        $this->assertGreaterThan(0, $callCount, 'hasProcessesThatCouldBeFreed should be called in while loop');
+    }
+
+    public function test_while_loop_wait_call_with_method_call_removal_mutation(): void
+    {
+        // This test kills the MethodCallRemoval mutation on line 138
+        // Original: $this->wait($this->fillBucketOnce($bucket, $generator, $threadCount));
+        // Mutated: (empty)
+
+        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
+            ->setConstructorArgs([2, 0, new FakeTimeKeeper()])
+            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce', 'wait'])
+            ->getMock();
+
+        $callCount = 0;
+
+        // hasProcessesThatCouldBeFreed should return true once to enter the loop
+        $runner->expects($this->atLeastOnce())
+            ->method('hasProcessesThatCouldBeFreed')
+            ->willReturnCallback(static function () use (&$callCount) {
+                ++$callCount;
+
+                return $callCount <= 1; // Return true once, then false
+            });
+
+        // fillBucketOnce should be called and return some time value
+        $runner->expects($this->atLeastOnce())
+            ->method('fillBucketOnce')
+            ->willReturn(1000); // Return 1000 microseconds
+
+        // wait should be called with the return value from fillBucketOnce
+        $runner->expects($this->atLeastOnce())
+            ->method('wait')
+            ->with($this->identicalTo(1000)); // Must be called with the fillBucketOnce return value
+
+        // Create processes
+        $processes = [];
+
+        for ($i = 0; $i < 2; ++$i) {
+            $process = $this->createMock(Process::class);
+            $process->expects($this->any())->method('start'); // May or may not be called depending on mock behavior
+            $process->expects($this->any())->method('isRunning')->willReturn(false);
+
+            $mutantProcess = new DummyMutantProcess(
+                $process,
+                $this->createMock(Mutant::class),
+                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                false,
+            );
+
+            $processes[] = new MutantProcessContainer($mutantProcess, []);
+        }
+
+        // Run the processes - wait should be called with the fillBucketOnce return value
+        iterator_to_array($runner->run($processes));
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
