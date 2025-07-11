@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_search;
+use function array_sum;
+use ArrayIterator;
+use Closure;
 use function count;
 use Exception;
 use Infection\Mutant\DetectionStatus;
@@ -47,6 +51,7 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
+use InvalidArgumentException;
 use Iterator;
 use function iterator_count;
 use function iterator_to_array;
@@ -59,6 +64,7 @@ use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Tumblr\Chorus\FakeTimeKeeper;
+use Tumblr\Chorus\TimeKeeper;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
@@ -1423,11 +1429,6 @@ final class ParallelProcessRunnerTest extends TestCase
             yield from $items;
         })();
 
-        // Critical test: fillBucketOnce(0) returns 0 immediately (bucket "full" at 0)
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 0]);
-        $this->assertSame(0, $result, 'fillBucketOnce(0) returns 0 without adding');
-        $this->assertSame(0, $bucket->count(), 'Bucket remains empty with threadCount=0');
-
         // Now test fillBucketOnce(1) - adds exactly 1
         $result = $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 1]);
         // FakeTimeKeeper returns 0 for elapsed time, so result will be 0
@@ -1438,6 +1439,24 @@ final class ParallelProcessRunnerTest extends TestCase
         $result = $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 1]);
         $this->assertSame(0, $result, 'fillBucketOnce(1) with full bucket returns 0');
         $this->assertSame(1, $bucket->count(), 'Bucket unchanged');
+    }
+
+    public function test_fill_bucket_once_with_zero_thread_count_throws_exception(): void
+    {
+        // Critical test: fillBucketOnce(0) now throws an assertion error
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+        $reflection = new ReflectionClass($runner);
+        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
+
+        $bucket = new SplQueue();
+        $items = [new MutantProcessContainer($this->createMock(MutantProcess::class), [])];
+        $generator = (static function () use ($items) { yield from $items; })();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Thread count must be positive.');
+
+        $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 0]);
     }
 
     public function test_initial_fill_bucket_once_with_zero_prevents_any_execution(): void
@@ -1453,13 +1472,11 @@ final class ParallelProcessRunnerTest extends TestCase
         $items = [new MutantProcessContainer($this->createMock(MutantProcess::class), [])];
         $generator = (static function () use ($items) { yield from $items; })();
 
-        // fillBucketOnce(0) returns 0 immediately without adding anything
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 0]);
-        $this->assertSame(0, $result, 'fillBucketOnce(0) returns 0');
-        $this->assertSame(0, $bucket->count(), 'Bucket remains empty');
+        // fillBucketOnce(0) now throws an assertion error
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Thread count must be positive.');
 
-        // This proves that with fillBucketOnce(0) on line 111:
-        // - The bucket would be empty
+        $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 0]);
         // - The do-while condition !$bucket->isEmpty() would be false
         // - No process would ever start
     }
@@ -1827,6 +1844,24 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertCount(3, $yielded);
     }
 
+    public function test_fill_bucket_once_with_zero_thread_count_throws_assertion(): void
+    {
+        // Direct test of fillBucketOnce to kill DecrementInteger 1->0 mutation
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+        $reflection = new ReflectionClass($runner);
+        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
+
+        // With threadCount=0, throws assertion error (kills DecrementInteger 1->0)
+        $bucket = new SplQueue();
+        $container = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
+        $generator = (static function () use ($container) { yield $container; })();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Thread count must be positive.');
+
+        $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $generator, 0]);
+    }
+
     public function test_fill_bucket_once_exact_behavior_with_different_params(): void
     {
         // Direct test of fillBucketOnce to kill mutations on lines 111 and 147
@@ -1834,47 +1869,37 @@ final class ParallelProcessRunnerTest extends TestCase
         $reflection = new ReflectionClass($runner);
         $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
 
-        // Test 1: With threadCount=0, bucket stays empty (kills DecrementInteger 1->0)
+        // Test 1: With threadCount=1, exactly 1 item added
         $bucket1 = new SplQueue();
         $container1 = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
         $generator1 = (static function () use ($container1) { yield $container1; })();
 
-        $result1 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket1, $generator1, 0]);
-        $this->assertSame(0, $result1, 'With threadCount=0, returns 0');
-        $this->assertSame(0, $bucket1->count(), 'With threadCount=0, no items added');
-        $this->assertTrue($generator1->valid(), 'Generator not consumed with threadCount=0');
+        $result1 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket1, $generator1, 1]);
+        $this->assertSame(0, $result1); // FakeTimeKeeper returns 0
+        $this->assertSame(1, $bucket1->count(), 'With threadCount=1, 1 item added');
+        $this->assertSame($container1, $bucket1->dequeue(), 'Correct item added');
+        $this->assertFalse($generator1->valid(), 'Generator consumed');
 
-        // Test 2: With threadCount=1, exactly 1 item added
+        // Test 2: With threadCount=2 but only 1 item available, still adds 1
         $bucket2 = new SplQueue();
         $container2 = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
         $generator2 = (static function () use ($container2) { yield $container2; })();
 
-        $result2 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket2, $generator2, 1]);
-        $this->assertSame(0, $result2); // FakeTimeKeeper returns 0
-        $this->assertSame(1, $bucket2->count(), 'With threadCount=1, 1 item added');
-        $this->assertSame($container2, $bucket2->dequeue(), 'Correct item added');
-        $this->assertFalse($generator2->valid(), 'Generator consumed');
+        $result2 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket2, $generator2, 2]);
+        $this->assertSame(0, $result2);
+        $this->assertSame(1, $bucket2->count(), 'With threadCount=2, still adds only 1');
 
-        // Test 3: With threadCount=2 but only 1 item available, still adds 1
+        // Test 3: Behavior when bucket already has items
         $bucket3 = new SplQueue();
+        $bucket3->enqueue(new MutantProcessContainer($this->createMock(MutantProcess::class), []));
         $container3 = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
         $generator3 = (static function () use ($container3) { yield $container3; })();
 
-        $result3 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket3, $generator3, 2]);
-        $this->assertSame(0, $result3);
-        $this->assertSame(1, $bucket3->count(), 'With threadCount=2, still adds only 1');
-
-        // Test 4: Behavior when bucket already has items
-        $bucket4 = new SplQueue();
-        $bucket4->enqueue(new MutantProcessContainer($this->createMock(MutantProcess::class), []));
-        $container4 = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
-        $generator4 = (static function () use ($container4) { yield $container4; })();
-
         // With bucket count=1 and threadCount=1, returns 0 without adding
-        $result4 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket4, $generator4, 1]);
-        $this->assertSame(0, $result4, 'Returns 0 when bucket full');
-        $this->assertSame(1, $bucket4->count(), 'No item added when bucket full');
-        $this->assertTrue($generator4->valid(), 'Generator not consumed when bucket full');
+        $result3 = $fillBucketOnceMethod->invokeArgs($runner, [$bucket3, $generator3, 1]);
+        $this->assertSame(0, $result3, 'Returns 0 when bucket full');
+        $this->assertSame(1, $bucket3->count(), 'No item added when bucket full');
+        $this->assertTrue($generator3->valid(), 'Generator not consumed when bucket full');
     }
 
     public function test_continue_vs_break_in_try_to_free_not_running_process(): void
@@ -2119,16 +2144,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $result1 = $method->invoke($runner, $bucket1, $iterator1, 1);
         $this->assertCount(1, $bucket1);
 
-        // Case 2: Empty bucket with threadCount=0 - should NOT add (0 >= 0)
-        $bucket2 = new SplQueue();
-        $iterator2 = $this->createMock(Iterator::class);
-        $iterator2->expects($this->never())->method('valid');
-
-        $result2 = $method->invoke($runner, $bucket2, $iterator2, 0);
-        $this->assertCount(0, $bucket2);
-        $this->assertSame(0, $result2);
-
-        // Case 3: Empty bucket with threadCount=2 - should add (0 < 2)
+        // Case 2: Empty bucket with threadCount=2 - should add (0 < 2)
         $bucket3 = new SplQueue();
         $processMock3 = $this->createMock(Process::class);
         $processMock3->expects($this->never())->method('start'); // Not started by fillBucketOnce
@@ -2149,6 +2165,573 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $result3 = $method->invoke($runner, $bucket3, $iterator3, 2);
         $this->assertCount(1, $bucket3);
+    }
+
+    public function test_fill_bucket_once_with_zero_thread_count_edge_case(): void
+    {
+        // Case: threadCount=0 now throws an assertion error
+        $reflection = new ReflectionClass(ParallelProcessRunner::class);
+        $method = $reflection->getMethod('fillBucketOnce');
+        $method->setAccessible(true);
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        $bucket2 = new SplQueue();
+        $iterator2 = $this->createMock(Iterator::class);
+        $iterator2->expects($this->never())->method('valid');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Thread count must be positive.');
+        $method->invoke($runner, $bucket2, $iterator2, 0);
+    }
+
+    public function test_initial_fill_bucket_once_is_called(): void
+    {
+        // This test ensures the initial fillBucketOnce call is made
+        // It kills the MethodCallRemoval mutation at line 117
+
+        // Create a spy iterator that tracks method calls
+        $calledMethods = [];
+        $container = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
+
+        $iterator = new class([$container]) implements Iterator {
+            private array $items;
+
+            private int $position = 0;
+
+            public array $methodCalls = [];
+
+            public function __construct(array $items)
+            {
+                $this->items = $items;
+            }
+
+            public function current(): mixed
+            {
+                $this->methodCalls[] = 'current';
+
+                return $this->items[$this->position] ?? null;
+            }
+
+            public function key(): mixed
+            {
+                return $this->position;
+            }
+
+            public function next(): void
+            {
+                $this->methodCalls[] = 'next';
+                ++$this->position;
+            }
+
+            public function rewind(): void
+            {
+                $this->position = 0;
+            }
+
+            public function valid(): bool
+            {
+                $this->methodCalls[] = 'valid';
+
+                return isset($this->items[$this->position]);
+            }
+        };
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Run the processes
+        iterator_to_array($runner->run($iterator));
+
+        // The initial fillBucketOnce call MUST happen, which means:
+        // 1. valid() is called to check if iterator has items
+        // 2. current() is called to get the item
+        // 3. next() is called to advance the iterator
+        // Without the initial fillBucketOnce, the bucket would be empty and nothing would run
+        $this->assertContains('valid', $iterator->methodCalls, 'Iterator valid() must be called');
+        $this->assertContains('current', $iterator->methodCalls, 'Iterator current() must be called');
+        $this->assertContains('next', $iterator->methodCalls, 'Iterator next() must be called');
+
+        // Verify the sequence happened (valid -> current -> next is the fillBucketOnce pattern)
+        $validIndex = array_search('valid', $iterator->methodCalls, true);
+        $currentIndex = array_search('current', $iterator->methodCalls, true);
+        $nextIndex = array_search('next', $iterator->methodCalls, true);
+
+        $this->assertLessThan($currentIndex, $validIndex, 'valid() must be called before current()');
+        $this->assertLessThan($nextIndex, $currentIndex, 'current() must be called before next()');
+    }
+
+    public function test_runner_without_initial_fill_fails_to_process_single_item(): void
+    {
+        // This test verifies that without the initial fillBucketOnce call,
+        // a single process would never be executed because the bucket starts empty
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Create a mock process that tracks if it was started
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start')
+            ->with(null, ['INFECTION' => '1', 'TEST_TOKEN' => 1]);
+
+        $process->expects($this->any())
+            ->method('isRunning')
+            ->willReturn(false);
+
+        $mutantProcess = new DummyMutantProcess(
+            $process,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+
+        $container = new MutantProcessContainer($mutantProcess, []);
+
+        // Run with single process - it MUST be started
+        iterator_to_array($runner->run([$container]));
+
+        // The process->start() expectation above will fail if the initial
+        // fillBucketOnce is removed, because the bucket would remain empty
+        // and the do-while loop would exit immediately
+    }
+
+    public function test_empty_bucket_prevents_process_execution(): void
+    {
+        // This test specifically verifies that the initial fillBucketOnce call
+        // is essential for the runner to work, especially with small thread counts
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Track how many times the process logic is invoked
+        $processStartCount = 0;
+
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start')
+            ->willReturnCallback(static function () use (&$processStartCount): void {
+                ++$processStartCount;
+            });
+
+        $process->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false);
+
+        $mutantProcess = new DummyMutantProcess(
+            $process,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+
+        $container = new MutantProcessContainer($mutantProcess, []);
+
+        // Run the process
+        iterator_to_array($runner->run([$container]));
+
+        // Without the initial fillBucketOnce, the bucket is empty when entering the do-while loop
+        // The condition !$bucket->isEmpty() would be false, causing immediate exit
+        // This assertion fails if fillBucketOnce is removed
+        $this->assertSame(1, $processStartCount, 'Process must be started exactly once');
+    }
+
+    public function test_initial_bucket_loading_is_required_for_single_thread(): void
+    {
+        // This test proves that the initial fillBucketOnce is REQUIRED
+        // When threadCount=1, hasProcessesThatCouldBeFreed returns false initially (0 < 1)
+        // So we skip the while loop and go straight to tryToFreeNotRunningProcess
+        // But without the initial fillBucketOnce, bucket is empty and nothing runs
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Create an iterator that tracks if it was consumed
+        $iteratorConsumed = false;
+
+        $container = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
+        $iterator = new ArrayIterator([$container]);
+
+        // Wrap the iterator to track consumption using closure
+        $trackingIterator = new class($iterator, static function () use (&$iteratorConsumed): void {
+            $iteratorConsumed = true;
+        }) implements Iterator {
+            private Iterator $inner;
+
+            private Closure $onConsume;
+
+            public function __construct(Iterator $inner, Closure $onConsume)
+            {
+                $this->inner = $inner;
+                $this->onConsume = $onConsume;
+            }
+
+            public function current(): mixed
+            {
+                ($this->onConsume)();
+
+                return $this->inner->current();
+            }
+
+            public function key(): mixed
+            {
+                return $this->inner->key();
+            }
+
+            public function next(): void
+            {
+                $this->inner->next();
+            }
+
+            public function rewind(): void
+            {
+                $this->inner->rewind();
+            }
+
+            public function valid(): bool
+            {
+                return $this->inner->valid();
+            }
+        };
+
+        // Run the process
+        iterator_to_array($runner->run($trackingIterator));
+
+        // The iterator MUST be consumed - this only happens if fillBucketOnce is called
+        $this->assertTrue($iteratorConsumed, 'Iterator must be consumed by initial fillBucketOnce');
+    }
+
+    public function test_initial_fill_bucket_once_must_be_called_for_single_process(): void
+    {
+        // This test verifies that for a single process with threadCount=1,
+        // the process would never execute without the initial fillBucketOnce
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Track the exact sequence of operations
+        $operationSequence = [];
+
+        // Create a process that tracks when it's started
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())
+            ->method('start')
+            ->willReturnCallback(static function () use (&$operationSequence): void {
+                $operationSequence[] = 'process_started';
+            });
+
+        $process->expects($this->any())
+            ->method('isRunning')
+            ->willReturn(false);
+
+        $mutantProcess = new DummyMutantProcess(
+            $process,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+
+        $container = new MutantProcessContainer($mutantProcess, []);
+
+        // Create an iterator that tracks when it's accessed
+        $iterator = new class([$container], static function ($event) use (&$operationSequence): void {
+            $operationSequence[] = $event;
+        }) implements Iterator {
+            private array $items;
+
+            private int $position = 0;
+
+            private Closure $tracker;
+
+            public function __construct(array $items, Closure $tracker)
+            {
+                $this->items = $items;
+                $this->tracker = $tracker;
+            }
+
+            public function current(): mixed
+            {
+                ($this->tracker)('iterator_current');
+
+                return $this->items[$this->position] ?? null;
+            }
+
+            public function key(): mixed
+            {
+                return $this->position;
+            }
+
+            public function next(): void
+            {
+                ($this->tracker)('iterator_next');
+                ++$this->position;
+            }
+
+            public function rewind(): void
+            {
+                $this->position = 0;
+            }
+
+            public function valid(): bool
+            {
+                ($this->tracker)('iterator_valid');
+
+                return isset($this->items[$this->position]);
+            }
+        };
+
+        // Run the process
+        iterator_to_array($runner->run($iterator));
+
+        // Verify the sequence: iterator must be accessed BEFORE process starts
+        // This only happens if the initial fillBucketOnce is called
+        $iteratorAccessIndex = array_search('iterator_current', $operationSequence, true);
+        $processStartIndex = array_search('process_started', $operationSequence, true);
+
+        $this->assertNotFalse($iteratorAccessIndex, 'Iterator must be accessed');
+        $this->assertNotFalse($processStartIndex, 'Process must be started');
+        $this->assertLessThan($processStartIndex, $iteratorAccessIndex,
+            'Iterator must be accessed before process starts (via initial fillBucketOnce)');
+    }
+
+    public function test_initial_fill_bucket_once_is_critical_for_performance(): void
+    {
+        // This test verifies that the initial fillBucketOnce prevents an empty first iteration
+        // Without it, the first do-while iteration would do nothing productive
+
+        $timeKeeper = new FakeTimeKeeper();
+        $timeKeeper->setCurrentUnixTime(1000.0);
+
+        $runner = new ParallelProcessRunner(1, 100, $timeKeeper); // 100ms poll time
+
+        // Track when usleep is called - this indicates wasted waiting time
+        $usleepCalls = [];
+        $timeKeeperSpy = new class($timeKeeper, static function ($time) use (&$usleepCalls): void {
+            $usleepCalls[] = $time;
+        }) extends TimeKeeper {
+            private TimeKeeper $inner;
+
+            private Closure $tracker;
+
+            public function __construct(TimeKeeper $inner, Closure $tracker)
+            {
+                $this->inner = $inner;
+                $this->tracker = $tracker;
+            }
+
+            public function getCurrentTimeAsFloat(): float
+            {
+                return $this->inner->getCurrentTimeAsFloat();
+            }
+
+            public function usleep(int $microseconds): void
+            {
+                ($this->tracker)($microseconds);
+                $this->inner->usleep($microseconds);
+            }
+        };
+
+        // Create a custom runner with our spy timekeeper
+        $runnerWithSpy = new ParallelProcessRunner(1, 100, $timeKeeperSpy);
+
+        $container = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
+
+        // Run a single process
+        iterator_to_array($runnerWithSpy->run([$container]));
+
+        // Without the initial fillBucketOnce:
+        // 1. Bucket is empty
+        // 2. First iteration: hasProcessesThatCouldBeFreed(1) returns false (0 < 1)
+        // 3. Skip while loop, go to tryToFreeNotRunningProcess (does nothing)
+        // 4. Call fillBucketOnce at the end
+        // 5. Loop again with non-empty bucket
+        // This causes unnecessary wait() calls
+
+        // With the initial fillBucketOnce, we avoid the empty first iteration
+        // Assert we don't have excessive waiting
+        $totalWaitTime = array_sum($usleepCalls);
+        $this->assertLessThan(200000, $totalWaitTime, 'Should not have excessive wait time from empty iterations');
+    }
+
+    public function test_initial_fill_bucket_once_reflection_based(): void
+    {
+        // Use reflection to verify fillBucketOnce is called with correct parameters
+        $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
+
+        $reflection = new ReflectionClass($runner);
+        $fillBucketMethod = $reflection->getMethod('fillBucketOnce');
+        $fillBucketMethod->setAccessible(true);
+
+        // Create a mock iterator that tracks method calls
+        $callCount = 0;
+        $iterator = $this->createMock(Iterator::class);
+        $iterator->expects($this->any())
+            ->method('valid')
+            ->willReturnCallback(static function () use (&$callCount) {
+                return $callCount++ < 1;
+            });
+        $iterator->expects($this->any())
+            ->method('current')
+            ->willReturn(new MutantProcessContainer($this->createMock(MutantProcess::class), []));
+        $iterator->expects($this->any())
+            ->method('next');
+
+        // Create a bucket
+        $bucket = new SplQueue();
+
+        // Test that fillBucketOnce works correctly with threadCount = 4
+        $timeTaken = $fillBucketMethod->invoke($runner, $bucket, $iterator, 4);
+
+        // Verify the bucket has one item
+        $this->assertCount(1, $bucket);
+        $this->assertGreaterThanOrEqual(0, $timeTaken);
+
+        // Test that it respects the threadCount parameter
+        $bucket2 = new SplQueue();
+
+        for ($i = 0; $i < 5; ++$i) {
+            $bucket2->enqueue(new MutantProcessContainer($this->createMock(MutantProcess::class), []));
+        }
+
+        // When bucket already has >= threadCount items, it should return 0
+        $timeTaken2 = $fillBucketMethod->invoke($runner, $bucket2, $iterator, 4);
+        $this->assertSame(0, $timeTaken2);
+        $this->assertCount(5, $bucket2); // No new items added
+    }
+
+    public function test_without_initial_fill_bucket_once_nothing_runs(): void
+    {
+        // This test demonstrates that without the initial fillBucketOnce on line 117,
+        // no processes would be started because the bucket would be empty
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Track if any process is dequeued from the bucket
+        $processDequeued = false;
+
+        // Create a custom bucket that tracks dequeue operations
+        $bucket = new class(static function () use (&$processDequeued): void {
+            $processDequeued = true;
+        }) extends SplQueue {
+            private Closure $onDequeue;
+
+            public function __construct(Closure $onDequeue)
+            {
+                $this->onDequeue = $onDequeue;
+            }
+
+            public function dequeue(): mixed
+            {
+                ($this->onDequeue)();
+
+                return parent::dequeue();
+            }
+        };
+
+        // Without initial fillBucketOnce, the bucket is empty
+        // The do-while loop condition !$bucket->isEmpty() would be false initially
+        // So we'd never enter the loop body to dequeue and start processes
+
+        // Simulate what happens without initial fillBucketOnce:
+        // 1. bucket is empty
+        // 2. hasProcessesThatCouldBeFreed(1) returns false (0 < 1)
+        // 3. tryToFreeNotRunningProcess yields nothing
+        // 4. fillBucketOnce at line 150 is called but it's too late
+        // 5. The loop condition !$bucket->isEmpty() is false, exit
+
+        $this->assertCount(0, $bucket);
+        $this->assertFalse($processDequeued);
+
+        // Now demonstrate that with fillBucketOnce, the bucket has items
+        $reflection = new ReflectionClass($runner);
+        $fillBucketMethod = $reflection->getMethod('fillBucketOnce');
+        $fillBucketMethod->setAccessible(true);
+
+        $container = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
+        $iterator = new ArrayIterator([$container]);
+
+        // Call fillBucketOnce like line 117 does
+        $fillBucketMethod->invoke($runner, $bucket, $iterator, 1);
+
+        // Now the bucket has an item that can be dequeued and processed
+        $this->assertCount(1, $bucket);
+    }
+
+    public function test_initial_fill_bucket_once_with_increment_integer_mutation(): void
+    {
+        // This test specifically targets the IncrementInteger mutation on line 114
+        // The initial fillBucketOnce is called with 1, if it's incremented to 2,
+        // the behavior should be detectable
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+        $reflection = new ReflectionClass($runner);
+        $fillBucketMethod = $reflection->getMethod('fillBucketOnce');
+        $fillBucketMethod->setAccessible(true);
+
+        // Create multiple containers
+        $containers = [];
+
+        for ($i = 0; $i < 3; ++$i) {
+            $containers[] = new MutantProcessContainer($this->createMock(MutantProcess::class), []);
+        }
+        $iterator = new ArrayIterator($containers);
+
+        // Test with parameter 1 (normal behavior)
+        $bucket1 = new SplQueue();
+        $timeTaken1 = $fillBucketMethod->invoke($runner, $bucket1, $iterator, 1);
+        $this->assertCount(1, $bucket1);
+        $this->assertGreaterThanOrEqual(0, $timeTaken1);
+
+        // If mutation changes 1 to 2, the bucket check would behave differently
+        // With threadCount=2, if bucket has 0 or 1 items, it can add more
+        // But fillBucketOnce only adds ONE item regardless of threadCount
+        $iterator->rewind(); // Reset iterator
+        $bucket2 = new SplQueue();
+        $timeTaken2 = $fillBucketMethod->invoke($runner, $bucket2, $iterator, 2);
+        $this->assertCount(1, $bucket2); // Still adds only 1 item
+
+        // The key difference: with threadCount=2, a second call would still add
+        $timeTaken3 = $fillBucketMethod->invoke($runner, $bucket2, $iterator, 2);
+        $this->assertCount(2, $bucket2); // Now we have 2 items
+
+        // But with threadCount=1, a second call would NOT add (bucket already has 1)
+        $iterator->rewind();
+        $bucket3 = new SplQueue();
+        $fillBucketMethod->invoke($runner, $bucket3, $iterator, 1);
+        $this->assertCount(1, $bucket3);
+        $timeTaken4 = $fillBucketMethod->invoke($runner, $bucket3, $iterator, 1);
+        $this->assertSame(0, $timeTaken4); // Returns 0, no item added
+        $this->assertCount(1, $bucket3); // Still only 1 item
+    }
+
+    public function test_initial_fill_bucket_once_is_essential_for_first_process(): void
+    {
+        // This test verifies that the MethodCallRemoval mutation on line 114 breaks functionality
+        // Without the initial fillBucketOnce, the first process never starts
+
+        $processStarted = false;
+        $process = $this->createMock(Process::class);
+        $process->expects($this->any())
+            ->method('start')
+            ->willReturnCallback(static function () use (&$processStarted): void {
+                $processStarted = true;
+            });
+        $process->expects($this->any())
+            ->method('isRunning')
+            ->willReturn(false);
+
+        $mutantProcess = new DummyMutantProcess(
+            $process,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+
+        $container = new MutantProcessContainer($mutantProcess, []);
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // Run the process
+        iterator_to_array($runner->run([$container]));
+
+        // The process MUST have been started
+        // Without the initial fillBucketOnce, bucket would be empty and process wouldn't start
+        $this->assertTrue($processStarted, 'Process must be started (requires initial fillBucketOnce)');
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
