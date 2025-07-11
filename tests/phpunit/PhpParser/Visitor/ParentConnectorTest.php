@@ -77,6 +77,10 @@ final class ParentConnectorTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
+        // We are not interested in a more helpful message here since it would be the result of
+        // a misconfiguration on our part rather than a user one. Plus this would require some
+        // extra processing on a part which is quite a hot path.
+
         ParentConnector::getParent($node);
     }
 
