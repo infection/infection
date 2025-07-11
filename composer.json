@@ -75,7 +75,6 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
-        "dg/bypass-finals": "^1.9",
         "fidry/makefile": "^1.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",

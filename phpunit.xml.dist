@@ -38,8 +38,4 @@
         </exclude>
     </groups>
 
-    <extensions>
-        <bootstrap class="DG\BypassFinals\PHPUnitExtension"/>
-    </extensions>
-
 </phpunit>

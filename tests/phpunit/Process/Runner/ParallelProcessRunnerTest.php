@@ -2942,6 +2942,150 @@ final class ParallelProcessRunnerTest extends TestCase
         // Without step 1, bucket would be empty and loop would exit immediately
     }
 
+    public function test_initial_fill_bucket_once_called_with_one_using_mock(): void
+    {
+        // This test uses a partial mock to verify fillBucketOnce is called with 1
+        // This will kill the IncrementInteger mutation on line 115
+
+        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
+            ->setConstructorArgs([4, 0, new FakeTimeKeeper()])
+            ->onlyMethods(['fillBucketOnce'])
+            ->getMock();
+
+        // Create one process
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())->method('start');
+        $process->expects($this->any())->method('isRunning')->willReturn(false);
+
+        $mutantProcess = new DummyMutantProcess(
+            $process,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+
+        $container = new MutantProcessContainer($mutantProcess, []);
+
+        // Expect fillBucketOnce to be called with exactly 1 as the third parameter
+        $runner->expects($this->atLeastOnce())
+            ->method('fillBucketOnce')
+            ->with(
+                $this->isInstanceOf(SplQueue::class),
+                $this->isInstanceOf(Iterator::class),
+                $this->identicalTo(1), // Must be exactly 1, not 2
+            )
+            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) {
+                if ($iterator->valid() && count($bucket) < $threadCount) {
+                    $bucket->enqueue($iterator->current());
+                    $iterator->next();
+                }
+
+                return 0;
+            });
+
+        // Run the process
+        iterator_to_array($runner->run([$container]));
+    }
+
+    public function test_fill_bucket_once_at_line_151_called_with_one_using_mock(): void
+    {
+        // This test verifies the fillBucketOnce call at line 151 uses hardcoded 1
+        // This will kill the IncrementInteger mutation on line 151
+
+        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
+            ->setConstructorArgs([2, 0, new FakeTimeKeeper()])
+            ->onlyMethods(['fillBucketOnce'])
+            ->getMock();
+
+        // Create multiple processes
+        $processes = [];
+
+        for ($i = 0; $i < 3; ++$i) {
+            $process = $this->createMock(Process::class);
+            $process->expects($this->once())->method('start');
+            $process->expects($this->any())->method('isRunning')->willReturn(false);
+
+            $mutantProcess = new DummyMutantProcess(
+                $process,
+                $this->createMock(Mutant::class),
+                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+                false,
+            );
+
+            $processes[] = new MutantProcessContainer($mutantProcess, []);
+        }
+
+        $callCount = 0;
+
+        // Expect all fillBucketOnce calls to use 1 as the third parameter
+        $runner->expects($this->atLeastOnce())
+            ->method('fillBucketOnce')
+            ->with(
+                $this->isInstanceOf(SplQueue::class),
+                $this->isInstanceOf(Iterator::class),
+                $this->identicalTo(1), // Must be exactly 1, not 2
+            )
+            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) use (&$callCount) {
+                ++$callCount;
+
+                if ($iterator->valid() && count($bucket) < $threadCount) {
+                    $bucket->enqueue($iterator->current());
+                    $iterator->next();
+
+                    return 1000; // Some time taken
+                }
+
+                return 0;
+            });
+
+        // Run the processes
+        iterator_to_array($runner->run($processes));
+
+        // Verify fillBucketOnce was called multiple times with 1
+        $this->assertGreaterThan(1, $callCount, 'fillBucketOnce should be called multiple times');
+    }
+
+    public function test_initial_fill_bucket_once_method_call_is_required(): void
+    {
+        // This test verifies that the initial fillBucketOnce call is essential
+        // This will kill the MethodCallRemoval mutation on line 115
+
+        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
+            ->setConstructorArgs([1, 0, new FakeTimeKeeper()])
+            ->onlyMethods(['fillBucketOnce'])
+            ->getMock();
+
+        $process = $this->createMock(Process::class);
+        $process->expects($this->once())->method('start');
+        $process->expects($this->any())->method('isRunning')->willReturn(false);
+
+        $mutantProcess = new DummyMutantProcess(
+            $process,
+            $this->createMock(Mutant::class),
+            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
+            false,
+        );
+
+        $container = new MutantProcessContainer($mutantProcess, []);
+
+        // We expect fillBucketOnce to be called at least once
+        // If the MethodCallRemoval mutation removes the initial call,
+        // this expectation will fail
+        $runner->expects($this->atLeastOnce())
+            ->method('fillBucketOnce')
+            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) {
+                if ($iterator->valid() && count($bucket) < $threadCount) {
+                    $bucket->enqueue($iterator->current());
+                    $iterator->next();
+                }
+
+                return 0;
+            });
+
+        // Run the process
+        iterator_to_array($runner->run([$container]));
+    }
+
     private function runWithAllKindsOfProcesses(int $threadCount): void
     {
         $processes = (function () use ($threadCount): iterable {
