@@ -60,15 +60,10 @@ final class ParentConnector
     public static function getParent(Node $node): Node
     {
         Assert::true($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE));
-        $parent = self::extractWeakReferenceParent($node);
+        $parent = self::findParent($node);
         Assert::notNull($parent, 'Parent node has been garbage collected');
 
         return $parent;
-    }
-
-    public static function findParent(Node $node): ?Node
-    {
-        return self::extractWeakReferenceParent($node);
     }
 
     /**
@@ -76,7 +71,7 @@ final class ParentConnector
      *
      * @return Node|null Returns the parent node if WeakReference is valid, null if garbage collected or invalid
      */
-    private static function extractWeakReferenceParent(Node $node): ?Node
+    public static function findParent(Node $node): ?Node
     {
         return $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE)?->get();
     }
