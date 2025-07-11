@@ -44,11 +44,11 @@ use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\WeakParentConnectingVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -76,7 +76,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
-                ParentConnectingVisitor::class,
+                WeakParentConnectingVisitor::class,
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],
@@ -103,7 +103,7 @@ final class NodeTraverserFactoryTest extends TestCase
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
-                ParentConnectingVisitor::class,
+                WeakParentConnectingVisitor::class,
                 ReflectionVisitor::class,
                 FakeVisitor::class,
             ],

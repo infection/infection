@@ -35,44 +35,37 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\CannotBeInstantiated;
 use PhpParser\Node;
-use WeakReference;
-use Webmozart\Assert\Assert;
+use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 
 /**
  * @internal
  */
-final class ParentConnector
+final class WeakParentConnectingVisitor implements NodeVisitor
 {
-    use CannotBeInstantiated;
-
-    private const PARENT_ATTRIBUTE = 'weak_parent';
-
-    public static function setParent(Node $node, ?Node $parent): void
-    {
-        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent !== null ? WeakReference::create($parent) : null);
+    public function __construct(
+        private readonly ParentConnectingVisitor $delegate = new ParentConnectingVisitor(true),
+    ) {
     }
 
-    /**
-     * @psalm-mutation-free
-     */
-    public static function getParent(Node $node): Node
+    public function beforeTraverse(array $nodes): ?array
     {
-        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
-        $parent = self::findParent($node);
-        Assert::notNull($parent, 'Parent node has been garbage collected');
-
-        return $parent;
+        return $this->delegate->beforeTraverse($nodes);
     }
 
-    /**
-     * Extract parent node from WeakReference attribute.
-     *
-     * @return Node|null Returns the parent node if WeakReference is valid, null if garbage collected or invalid
-     */
-    public static function findParent(Node $node): ?Node
+    public function enterNode(Node $node): mixed
     {
-        return $node->getAttribute(self::PARENT_ATTRIBUTE, null)?->get();
+        return $this->delegate->enterNode($node);
+    }
+
+    public function leaveNode(Node $node): mixed
+    {
+        return $this->delegate->leaveNode($node);
+    }
+
+    public function afterTraverse(array $nodes): ?array
+    {
+        return $this->delegate->afterTraverse($nodes);
     }
 }
