@@ -63,12 +63,8 @@ final class ParentConnector
     {
         // Check for weak reference first (new behavior)
         if ($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE)) {
-            $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
-            Assert::isInstanceOf($weakRef, WeakReference::class);
-
-            $parent = $weakRef->get();
+            $parent = self::extractWeakReferenceParent($node);
             Assert::notNull($parent, 'Parent node has been garbage collected');
-            Assert::isInstanceOf($parent, Node::class);
 
             return $parent;
         }
@@ -83,20 +79,32 @@ final class ParentConnector
     {
         // Check for weak reference first (new behavior)
         if ($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE)) {
-            $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
-
-            if ($weakRef instanceof WeakReference) {
-                $parent = $weakRef->get();
-
-                if ($parent instanceof Node) {
-                    return $parent;
-                }
-            }
-
-            return null;
+            return self::extractWeakReferenceParent($node);
         }
 
         // Fall back to strong reference (legacy behavior)
         return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
+    }
+
+    /**
+     * Extract parent node from WeakReference attribute.
+     *
+     * @return Node|null Returns the parent node if WeakReference is valid, null if garbage collected or invalid
+     */
+    private static function extractWeakReferenceParent(Node $node): ?Node
+    {
+        $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
+
+        if (!$weakRef instanceof WeakReference) {
+            return null;
+        }
+
+        $parent = $weakRef->get();
+
+        if (!$parent instanceof Node) {
+            return null;
+        }
+
+        return $parent;
     }
 }
