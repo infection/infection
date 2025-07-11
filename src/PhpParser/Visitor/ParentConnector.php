@@ -47,13 +47,11 @@ final class ParentConnector
 {
     use CannotBeInstantiated;
 
-    private const PARENT_ATTRIBUTE = 'parent';
-
     private const WEAK_PARENT_ATTRIBUTE = 'weak_parent';
 
     public static function setParent(Node $node, ?Node $parent): void
     {
-        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent);
+        $node->setAttribute(self::WEAK_PARENT_ATTRIBUTE, $parent !== null ? WeakReference::create($parent) : null);
     }
 
     /**

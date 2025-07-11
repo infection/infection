@@ -91,11 +91,12 @@ final class ParentConnectorTest extends TestCase
 
         ParentConnector::setParent($node, $parent);
 
-        // setParent still uses strong references for backward compatibility
-        // but getParent expects weak references, so this will fail
-        $this->expectException(InvalidArgumentException::class);
+        $this->assertSame($parent, ParentConnector::getParent($node));
+        $this->assertSame($parent, ParentConnector::findParent($node));
 
-        ParentConnector::getParent($node);
+        ParentConnector::setParent($node, null);
+
+        $this->assertNull(ParentConnector::findParent($node));
     }
 
     public function test_it_handles_invalid_weak_reference_values(): void
