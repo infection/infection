@@ -169,19 +169,7 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverserInterface\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
 			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<string, array\{settings\: array\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			message: '#^Parameter \#2 \$fileAst of class Infection\\Testing\\SimpleMutationsCollectorVisitor constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
@@ -1173,7 +1161,7 @@ parameters:
 		-
 			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects array\<Infection\\Mutator\\Mutator\<PhpParser\\Node\>\>, array\{Infection\\Mutator\\IgnoreMutator\<PhpParser\\Node\\Expr\\BinaryOp\\Plus\>\} given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 4
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
 
 		-

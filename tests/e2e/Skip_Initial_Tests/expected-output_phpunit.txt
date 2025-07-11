@@ -1,4 +1,4 @@
-Total: 7
+Total: 10
 
 Killed mutants:
 ===============
@@ -7,6 +7,9 @@ Mutator: PublicVisibility
 Line 7
 
 Mutator: Plus
+Line 9
+
+Mutator: ReturnRemoval
 Line 9
 
 Mutator: TrueValue
@@ -19,6 +22,9 @@ Mutator: NotIdentical
 Line 14
 
 Mutator: TrueValue
+Line 15
+
+Mutator: ReturnRemoval
 Line 15
 
 
@@ -47,4 +53,7 @@ Not Covered mutants:
 ====================
 
 Mutator: FalseValue
+Line 18
+
+Mutator: ReturnRemoval
 Line 18

@@ -45,11 +45,12 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
-use function iterator_to_array;
+use function iterator_count;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -79,7 +80,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     public function test_it_checks_if_the_executed_processes_time_out(): void
@@ -96,7 +97,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     #[DataProvider('threadCountProvider')]
@@ -112,7 +113,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(1, iterator_to_array($executedProcesses, true));
+        $this->assertSame(1, iterator_count($executedProcesses));
     }
 
     #[DataProvider('threadCountProvider')]
@@ -125,8 +126,6 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         $runner = new ParallelProcessRunner(1, 0);
 
-        $bucket = [];
-
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -137,7 +136,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $reflection = new ReflectionClass($runner);
         $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [&$bucket, $iterator, 1]);
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [new SplQueue(), $iterator, 1]);
 
         // Should return 0 immediately when generator is not valid
         $this->assertSame(0, $result);
@@ -172,7 +171,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     private function createMutantProcessContainer(int $threadIndex): MutantProcessContainer
