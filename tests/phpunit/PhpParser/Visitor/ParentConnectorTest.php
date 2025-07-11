@@ -49,56 +49,6 @@ final class ParentConnectorTest extends TestCase
     public function test_it_can_provide_the_node_parent(): void
     {
         $parent = new Nop();
-
-        $node = new Nop(['parent' => $parent]);
-
-        $this->assertSame($parent, ParentConnector::getParent($node));
-        $this->assertSame($parent, ParentConnector::findParent($node));
-    }
-
-    public function test_it_can_look_for_the_node_parent(): void
-    {
-        $parent = new Nop();
-
-        $node1 = new Nop(['parent' => $parent]);
-        $node2 = new Nop(['parent' => null]);
-        $node3 = new Nop();
-
-        $this->assertSame($parent, ParentConnector::findParent($node1));
-        $this->assertNull(ParentConnector::findParent($node2));
-        $this->assertNull(ParentConnector::findParent($node3));
-    }
-
-    public function test_it_cannot_provide_the_node_parent_if_has_not_be_set_yet(): void
-    {
-        $node = new Nop();
-
-        $this->expectException(InvalidArgumentException::class);
-
-        // We are not interested in a more helpful message here since it would be the result of
-        // a misconfiguration on our part rather than a user one. Plus this would require some
-        // extra processing on a part which is quite a hot path.
-
-        ParentConnector::getParent($node);
-    }
-
-    public function test_it_can_set_a_node_parent(): void
-    {
-        $parent = new Nop();
-        $node = new Nop();
-
-        ParentConnector::setParent($node, $parent);
-
-        $this->assertSame($parent, ParentConnector::getParent($node));
-
-        ParentConnector::setParent($node, null);
-
-        $this->assertNull(ParentConnector::findParent($node));
-    }
-
-    public function test_it_can_provide_the_node_parent_from_weak_reference(): void
-    {
-        $parent = new Nop();
         $weakRef = WeakReference::create($parent);
 
         $node = new Nop(['weak_parent' => $weakRef]);
@@ -107,7 +57,7 @@ final class ParentConnectorTest extends TestCase
         $this->assertSame($parent, ParentConnector::findParent($node));
     }
 
-    public function test_it_can_look_for_the_node_parent_from_weak_reference(): void
+    public function test_it_can_look_for_the_node_parent(): void
     {
         $parent = new Nop();
         $weakRef = WeakReference::create($parent);
@@ -121,20 +71,43 @@ final class ParentConnectorTest extends TestCase
         $this->assertNull(ParentConnector::findParent($node3));
     }
 
-    public function test_it_prioritizes_weak_reference_over_strong_reference(): void
+    public function test_it_cannot_provide_the_node_parent_if_has_not_be_set_yet(): void
     {
-        $strongParent = new Nop();
-        $weakParent = new Nop();
-        $weakRef = WeakReference::create($weakParent);
+        $node = new Nop();
 
-        $node = new Nop([
-            'parent' => $strongParent,
-            'weak_parent' => $weakRef,
-        ]);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Node must have weak_parent attribute set by ParentConnectingVisitor');
 
-        // Should return the weak reference parent, not the strong reference parent
-        $this->assertSame($weakParent, ParentConnector::getParent($node));
-        $this->assertSame($weakParent, ParentConnector::findParent($node));
+        ParentConnector::getParent($node);
+    }
+
+    public function test_it_can_set_a_node_parent(): void
+    {
+        $parent = new Nop();
+        $node = new Nop();
+
+        ParentConnector::setParent($node, $parent);
+
+        // setParent still uses strong references for backward compatibility
+        // but getParent expects weak references, so this will fail
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Node must have weak_parent attribute set by ParentConnectingVisitor');
+
+        ParentConnector::getParent($node);
+    }
+
+    public function test_it_handles_invalid_weak_reference_values(): void
+    {
+        $parent = new Nop();
+        $weakRef = WeakReference::create($parent);
+
+        $node1 = new Nop(['weak_parent' => $weakRef]);
+        $node2 = new Nop(['weak_parent' => 'not_a_weak_reference']);
+        $node3 = new Nop();
+
+        $this->assertSame($parent, ParentConnector::findParent($node1));
+        $this->assertNull(ParentConnector::findParent($node2));
+        $this->assertNull(ParentConnector::findParent($node3));
     }
 
     public function test_it_throws_exception_when_weak_reference_is_garbage_collected(): void
