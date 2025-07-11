@@ -77,7 +77,7 @@ class NodeTraverserFactory
                 'replaceNodes' => false,
             ]),
         );
-        $traverser->addVisitor(new ParentConnectingVisitor());
+        $traverser->addVisitor(new ParentConnectingVisitor(true));
         $traverser->addVisitor(new ReflectionVisitor());
         $traverser->addVisitor($mutationVisitor);
 

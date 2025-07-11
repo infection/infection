@@ -38,6 +38,7 @@ namespace Infection\PhpParser\Visitor;
 use Infection\CannotBeInstantiated;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
+use WeakReference;
 
 /**
  * @internal
@@ -47,6 +48,7 @@ final class ParentConnector
     use CannotBeInstantiated;
 
     private const PARENT_ATTRIBUTE = 'parent';
+    private const WEAK_PARENT_ATTRIBUTE = 'weak_parent';
 
     public static function setParent(Node $node, ?Node $parent): void
     {
@@ -58,6 +60,18 @@ final class ParentConnector
      */
     public static function getParent(Node $node): Node
     {
+        // Check for weak reference first (new behavior)
+        if ($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE)) {
+            $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
+            Assert::isInstanceOf($weakRef, WeakReference::class);
+            
+            $parent = $weakRef->get();
+            Assert::notNull($parent, 'Parent node has been garbage collected');
+            
+            return $parent;
+        }
+        
+        // Fall back to strong reference (legacy behavior)
         Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
 
         return $node->getAttribute(self::PARENT_ATTRIBUTE);
@@ -65,6 +79,18 @@ final class ParentConnector
 
     public static function findParent(Node $node): ?Node
     {
+        // Check for weak reference first (new behavior)
+        if ($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE)) {
+            $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
+            
+            if ($weakRef instanceof WeakReference) {
+                return $weakRef->get();
+            }
+            
+            return null;
+        }
+        
+        // Fall back to strong reference (legacy behavior)
         return $node->getAttribute(self::PARENT_ATTRIBUTE, null);
     }
 }
