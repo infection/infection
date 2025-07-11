@@ -2004,7 +2004,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_initial_fill_bucket_once_removal_breaks_execution(): void
+    public function test_initial_fill_bucket_once_removal_breaks_execution_inverse(): void
     {
         // This test proves removing the initial fillBucketOnce call would break execution
         // We test the inverse - that WITH the call, execution works properly
@@ -2030,22 +2030,6 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertCount(1, $results);
     }
 
-    public function test_initial_fill_bucket_once_decrement_mutation(): void
-    {
-        // Test that changing initial fillBucketOnce parameter from 1 to 0 breaks execution
-        // With threadCount=1, using fillBucketOnce(..., 0) won't add anything
-
-        $process = $this->createMutantProcessContainer(1);
-        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
-
-        // This works because fillBucketOnce is called with parameter 1
-        $results = iterator_to_array($runner->run([$process]));
-        $this->assertCount(1, $results);
-
-        // If it were called with parameter 0, nothing would be added to the bucket
-        // We can't test the mutation directly, but we prove parameter 1 is essential
-    }
-
     public function test_initial_fill_bucket_once_method_call_removal_breaks_execution(): void
     {
         // This test proves that removing the initial fillBucketOnce call breaks execution
@@ -2061,6 +2045,22 @@ final class ParallelProcessRunnerTest extends TestCase
         // This only works because fillBucketOnce is called initially
         // Without it, the do-while loop would have an empty bucket and exit immediately
         $this->assertCount(1, $results);
+    }
+
+    public function test_initial_fill_bucket_once_decrement_mutation_one_thread(): void
+    {
+        // Test that changing initial fillBucketOnce parameter from 1 to 0 breaks execution
+        // With threadCount=1, using fillBucketOnce(..., 0) won't add anything
+
+        $process = $this->createMutantProcessContainer(1);
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        // This works because fillBucketOnce is called with parameter 1
+        $results = iterator_to_array($runner->run([$process]));
+        $this->assertCount(1, $results);
+
+        // If it were called with parameter 0, nothing would be added to the bucket
+        // We can't test the mutation directly, but we prove parameter 1 is essential
     }
 
     public function test_initial_fill_bucket_once_mutations_break_single_thread_execution(): void
