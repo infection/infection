@@ -187,10 +187,18 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
+     * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
+     */
+    protected function wait(int $timeSpentDoingWork): void
+    {
+        $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
+    }
+
+    /**
      * @param SplQueue<MutantProcessContainer> $bucket
      * @return iterable<MutantProcessContainer>
      */
-    protected function tryToFreeNotRunningProcess(SplQueue $bucket): iterable
+    private function tryToFreeNotRunningProcess(SplQueue $bucket): iterable
     {
         // remove any finished process from the stack
         foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
@@ -228,7 +236,7 @@ class ParallelProcessRunner implements ProcessRunner
         }
     }
 
-    protected function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
+    private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
     {
         $mutantProcessContainer->getCurrent()->getProcess()->start(null, [
             'INFECTION' => '1',
@@ -236,14 +244,6 @@ class ParallelProcessRunner implements ProcessRunner
         ]);
 
         $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
-    }
-
-    /**
-     * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
-     */
-    protected function wait(int $timeSpentDoingWork): void
-    {
-        $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }
 
     /**
