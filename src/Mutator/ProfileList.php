@@ -195,6 +195,7 @@ final class ProfileList
         Removal\FunctionCallRemoval::class,
         Removal\MatchArmRemoval::class,
         Removal\MethodCallRemoval::class,
+        Removal\ReturnRemoval::class,
         Removal\SharedCaseRemoval::class,
     ];
 
@@ -415,6 +416,7 @@ final class ProfileList
         'FunctionCallRemoval' => Removal\FunctionCallRemoval::class,
         'MatchArmRemoval' => Removal\MatchArmRemoval::class,
         'MethodCallRemoval' => Removal\MethodCallRemoval::class,
+        'ReturnRemoval' => Removal\ReturnRemoval::class,
         'SharedCaseRemoval' => Removal\SharedCaseRemoval::class,
 
         // Return Value
