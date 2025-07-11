@@ -118,6 +118,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                     includes:
                         - $this->staticAnalysisConfigPath
                     parameters:
+                        reportUnmatchedIgnoredErrors: false
                         parallel:
                             maximumNumberOfProcesses: 1
                 NEON,
