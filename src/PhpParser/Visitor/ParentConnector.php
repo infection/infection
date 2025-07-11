@@ -61,9 +61,6 @@ final class ParentConnector
      */
     public static function getParent(Node $node): Node
     {
-        // ParentConnectingVisitor is always configured with weakReferences=true
-        Assert::true($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE), 'Node must have weak_parent attribute set by ParentConnectingVisitor');
-
         $parent = self::extractWeakReferenceParent($node);
         Assert::notNull($parent, 'Parent node has been garbage collected');
 
@@ -72,11 +69,6 @@ final class ParentConnector
 
     public static function findParent(Node $node): ?Node
     {
-        // ParentConnectingVisitor is always configured with weakReferences=true
-        if (!$node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE)) {
-            return null;
-        }
-
         return self::extractWeakReferenceParent($node);
     }
 
@@ -87,18 +79,6 @@ final class ParentConnector
      */
     private static function extractWeakReferenceParent(Node $node): ?Node
     {
-        $weakRef = $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE);
-
-        if (!$weakRef instanceof WeakReference) {
-            return null;
-        }
-
-        $parent = $weakRef->get();
-
-        if (!$parent instanceof Node) {
-            return null;
-        }
-
-        return $parent;
+        return $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE)?->get();
     }
 }

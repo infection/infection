@@ -63,7 +63,7 @@ final class ParentConnectorTest extends TestCase
         $weakRef = WeakReference::create($parent);
 
         $node1 = new Nop(['weak_parent' => $weakRef]);
-        $node2 = new Nop(['weak_parent' => 'not_a_weak_reference']);
+        $node2 = new Nop(['weak_parent' => null]);
         $node3 = new Nop();
 
         $this->assertSame($parent, ParentConnector::findParent($node1));
@@ -102,7 +102,7 @@ final class ParentConnectorTest extends TestCase
         $weakRef = WeakReference::create($parent);
 
         $node1 = new Nop(['weak_parent' => $weakRef]);
-        $node2 = new Nop(['weak_parent' => 'not_a_weak_reference']);
+        $node2 = new Nop(['weak_parent' => null]);
         $node3 = new Nop();
 
         $this->assertSame($parent, ParentConnector::findParent($node1));
