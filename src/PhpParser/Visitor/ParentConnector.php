@@ -61,6 +61,7 @@ final class ParentConnector
      */
     public static function getParent(Node $node): Node
     {
+        Assert::true($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE));
         $parent = self::extractWeakReferenceParent($node);
         Assert::notNull($parent, 'Parent node has been garbage collected');
 
