@@ -44,6 +44,7 @@ use Infection\Reflection\NullReflection;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use ReflectionException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -166,6 +167,14 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return $functionScope;
     }
 
+    public static function getFunctionScope(Node $node): Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::isInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
     public static function isStrictTypesEnabled(Node\FunctionLike $node): ?bool
     {
         return $node->getAttribute(self::STRICT_TYPES_KEY);
@@ -232,7 +241,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
 
         if ($fqn !== null) {
-            return CoreClassReflection::fromClassName($fqn->toString());
+            try {
+                return CoreClassReflection::fromClassName($fqn->toString());
+            } catch (ReflectionException) {
+                // Fallback to the workaround
+            }
         }
 
         // TODO: check against interfaces

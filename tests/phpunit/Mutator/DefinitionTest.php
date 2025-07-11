@@ -141,6 +141,7 @@ final class DefinitionTest extends TestCase
         'MatchArmRemoval',
         'MethodCallRemoval',
         'SharedCaseRemoval',
+        'ReturnRemoval',
         'ArrayOneItem',
         'FloatNegation',
         'FunctionCall',
