@@ -1,5 +1,25 @@
 # Change Log
 
+## [0.30.3](https://github.com/infection/infection/tree/0.30.3) (2025-07-11)
+
+**Added:**
+
+* [new mutator] Add `ReturnRemoval` mutator by @sanmai in https://github.com/infection/infection/pull/2296
+
+**Changed**:
+
+* Don't show `0` metrics in result summary by @staabm in https://github.com/infection/infection/pull/2311
+
+**Fixed:**
+
+* Do not report unmatched ignored errors for PHPStan killer for a mutant by @maks-rafalko in https://github.com/infection/infection/pull/2326
+
+**Internal:**
+
+* Replace array-by-reference with a SplQueue object by @sanmai in https://github.com/infection/infection/pull/2321
+
+**Full Changelog**: https://github.com/infection/infection/compare/0.30.2...0.30.3
+
 ## [0.30.2](https://github.com/infection/infection/tree/0.30.2) (2025-07-10)
 
 **Changed:**
