@@ -161,6 +161,31 @@ final class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
+     * This fills the bucket from the input stream of processes containers (original mutant processes)
+     *
+     * @param SplQueue<MutantProcessContainer> $bucket
+     * @param Iterator<MutantProcessContainer> $input
+     */
+    protected function fillBucketOnce(SplQueue $bucket, Iterator $input, int $threadCount): int
+    {
+        Assert::greaterThan($threadCount, 0, 'Thread count must be positive.');
+
+        if (count($bucket) >= $threadCount || !$input->valid()) {
+            return 0;
+        }
+
+        $start = $this->timeKeeper->getCurrentTimeAsFloat();
+
+        $current = $input->current();
+        Assert::notNull($current);
+
+        $bucket->enqueue($current);
+        $input->next();
+
+        return (int) ($this->timeKeeper->getCurrentTimeAsFloat() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
+    }
+
+    /**
      * @param SplQueue<MutantProcessContainer> $bucket
      * @return iterable<MutantProcessContainer>
      */
@@ -210,31 +235,6 @@ final class ParallelProcessRunner implements ProcessRunner
         ]);
 
         $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
-    }
-
-    /**
-     * This fills the bucket from 2 sources:
-     *  - from the input stream of processes containers (original mutant processes)
-     *  - from the "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
-     *
-     * @param SplQueue<MutantProcessContainer> $bucket
-     * @param Iterator<MutantProcessContainer> $input
-     */
-    private function fillBucketOnce(SplQueue $bucket, Iterator $input, int $threadCount): int
-    {
-        if (count($bucket) >= $threadCount || !$input->valid()) {
-            return 0;
-        }
-
-        $start = $this->timeKeeper->getCurrentTimeAsFloat();
-
-        $current = $input->current();
-        Assert::notNull($current);
-
-        $bucket->enqueue($current);
-        $input->next();
-
-        return (int) ($this->timeKeeper->getCurrentTimeAsFloat() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
     /**
