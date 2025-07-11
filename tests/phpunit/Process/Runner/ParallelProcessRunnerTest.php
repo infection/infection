@@ -310,6 +310,73 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertSame(10, iterator_count($executedProcesses));
     }
 
+    public function test_it_marks_mutant_process_as_finished_when_not_running(): void
+    {
+        $processMock = $this->createMock(Process::class);
+        $processMock->expects($this->once())
+            ->method('start')
+            ->with(null, [
+                'INFECTION' => '1',
+                'TEST_TOKEN' => 1,
+            ]);
+        $processMock->expects($this->once())
+            ->method('checkTimeout');
+        $processMock->expects($this->once())
+            ->method('isRunning')
+            ->willReturn(false);
+
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock->expects($this->atLeastOnce())
+            ->method('getProcess')
+            ->willReturn($processMock);
+        $mutantProcessMock->expects($this->once())
+            ->method('markAsFinished');
+
+        $container = new MutantProcessContainer($mutantProcessMock, []);
+
+        $processes = [$container];
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        $executedProcesses = $runner->run($processes);
+
+        $this->assertSame(1, iterator_count($executedProcesses));
+    }
+
+    public function test_it_does_not_mark_process_as_finished_when_still_running(): void
+    {
+        $processMock = $this->createMock(Process::class);
+        $processMock->expects($this->once())
+            ->method('start')
+            ->with(null, [
+                'INFECTION' => '1',
+                'TEST_TOKEN' => 1,
+            ]);
+        $processMock->expects($this->atLeast(2))
+            ->method('checkTimeout');
+        $processMock->expects($this->atLeast(2))
+            ->method('isRunning')
+            ->willReturnOnConsecutiveCalls(true, false);
+
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock->expects($this->atLeastOnce())
+            ->method('getProcess')
+            ->willReturn($processMock);
+        // Should only be called once when process is no longer running
+        $mutantProcessMock->expects($this->once())
+            ->method('markAsFinished');
+
+        $container = new MutantProcessContainer($mutantProcessMock, []);
+
+        $processes = [$container];
+
+        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+
+        $executedProcesses = $runner->run($processes);
+
+        $this->assertSame(1, iterator_count($executedProcesses));
+    }
+
     public static function threadCountProvider(): iterable
     {
         yield 'no threads' => [0];
@@ -342,7 +409,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertSame(10, iterator_count($executedProcesses));
     }
 
-    private function createMutantProcessContainer(int $threadIndex): MutantProcessContainer
+    private function createMutantProcessContainer(int $threadIndex, bool $withFinishedSpy = false): MutantProcessContainer
     {
         $processMock = $this->createMock(Process::class);
         $processMock
@@ -362,6 +429,17 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('isRunning')
             ->willReturn(false)
         ;
+
+        if ($withFinishedSpy) {
+            $mutantProcessMock = $this->createMock(MutantProcess::class);
+            $mutantProcessMock->expects($this->once())
+                ->method('getProcess')
+                ->willReturn($processMock);
+            $mutantProcessMock->expects($this->once())
+                ->method('markAsFinished');
+
+            return new MutantProcessContainer($mutantProcessMock, []);
+        }
 
         return new MutantProcessContainer(
             new DummyMutantProcess(
