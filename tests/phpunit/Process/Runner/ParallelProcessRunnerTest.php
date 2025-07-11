@@ -43,25 +43,30 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
+use InvalidArgumentException;
 use Iterator;
+use function iterator_count;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use RuntimeException;
 use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Tumblr\Chorus\FakeTimeKeeper;
+use Tumblr\Chorus\TimeKeeper;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
 {
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
-        $runner = new ParallelProcessRunner(4, 0);
+        $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
 
         $runner->run([]);
 
@@ -78,11 +83,11 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadsCount, 0);
+        $runner = new ParallelProcessRunner($threadsCount, 0, new FakeTimeKeeper());
 
         $executedProcesses = $runner->run($processes);
 
-        $this->assertCount(10, iterator_to_array($executedProcesses, true));
+        $this->assertSame(10, iterator_count($executedProcesses));
     }
 
     public function test_it_checks_if_the_executed_processes_time_out(): void
