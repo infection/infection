@@ -47,11 +47,11 @@ final class ParentConnector
 {
     use CannotBeInstantiated;
 
-    private const WEAK_PARENT_ATTRIBUTE = 'weak_parent';
+    private const PARENT_ATTRIBUTE = 'weak_parent';
 
     public static function setParent(Node $node, ?Node $parent): void
     {
-        $node->setAttribute(self::WEAK_PARENT_ATTRIBUTE, $parent !== null ? WeakReference::create($parent) : null);
+        $node->setAttribute(self::PARENT_ATTRIBUTE, $parent !== null ? WeakReference::create($parent) : null);
     }
 
     /**
@@ -59,7 +59,7 @@ final class ParentConnector
      */
     public static function getParent(Node $node): Node
     {
-        Assert::true($node->hasAttribute(self::WEAK_PARENT_ATTRIBUTE));
+        Assert::true($node->hasAttribute(self::PARENT_ATTRIBUTE));
         $parent = self::findParent($node);
         Assert::notNull($parent, 'Parent node has been garbage collected');
 
@@ -73,6 +73,6 @@ final class ParentConnector
      */
     public static function findParent(Node $node): ?Node
     {
-        return $node->getAttribute(self::WEAK_PARENT_ATTRIBUTE)?->get();
+        return $node->getAttribute(self::PARENT_ATTRIBUTE, null)?->get();
     }
 }
