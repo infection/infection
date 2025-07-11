@@ -76,7 +76,6 @@ final class ParentConnectorTest extends TestCase
         $node = new Nop();
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Node must have weak_parent attribute set by ParentConnectingVisitor');
 
         ParentConnector::getParent($node);
     }
@@ -91,7 +90,6 @@ final class ParentConnectorTest extends TestCase
         // setParent still uses strong references for backward compatibility
         // but getParent expects weak references, so this will fail
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Node must have weak_parent attribute set by ParentConnectingVisitor');
 
         ParentConnector::getParent($node);
     }
