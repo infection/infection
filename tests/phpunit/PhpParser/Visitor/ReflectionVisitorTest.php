@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\WeakParentConnectingVisitor;
 use Infection\Reflection\AnonymousClassReflection;
 use Infection\Reflection\ClassReflection;
 use Infection\Reflection\NullReflection;
@@ -46,7 +47,6 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -76,7 +76,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
         $this->traverse(
             $nodes,
             [
-                new ParentConnectingVisitor(),
+                new WeakParentConnectingVisitor(),
                 self::createNameResolver(),
                 new ReflectionVisitor(),
                 $spyVisitor = $this->getPartOfSignatureSpyVisitor($nodeClass),
@@ -369,7 +369,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
             $nodes,
             [
                 self::createNameResolver(),
-                new ParentConnectingVisitor(),
+                new WeakParentConnectingVisitor(),
                 new ReflectionVisitor(),
                 $nodeVisitor ?: $this->spyVisitor,
             ],

@@ -43,11 +43,11 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\PhpParser\Visitor\WeakParentConnectingVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
-use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use SplObjectStorage;
 
 /**
@@ -78,7 +78,7 @@ class NodeTraverserFactory
                 'replaceNodes' => false,
             ]),
         );
-        $traverser->addVisitor(new ParentConnectingVisitor(true));
+        $traverser->addVisitor(new WeakParentConnectingVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
         $traverser->addVisitor($mutationVisitor);
 
