@@ -56,7 +56,7 @@
         "infection/include-interceptor": "^0.2.5",
         "infection/mutator": "^0.4",
         "justinrainbow/json-schema": "^5.3 || ^6.0",
-        "nikic/php-parser": "^5.3",
+        "nikic/php-parser": "^5.5",
         "ondram/ci-detector": "^4.1.0",
         "sanmai/later": "^0.1.7",
         "sanmai/pipeline": "^6.16",
