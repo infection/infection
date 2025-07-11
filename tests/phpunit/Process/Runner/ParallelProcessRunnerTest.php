@@ -66,7 +66,11 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
-        $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+        $timeKeeper->expects($this->never())
+            ->method($this->anything());
+
+        $runner = new ParallelProcessRunner(4, 0, $timeKeeper);
 
         $runner->run([]);
 
