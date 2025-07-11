@@ -35,11 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function gc_collect_cycles;
 use Infection\PhpParser\Visitor\ParentConnector;
 use InvalidArgumentException;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use WeakReference;
 
 #[CoversClass(ParentConnector::class)]
 final class ParentConnectorTest extends TestCase
@@ -90,6 +92,78 @@ final class ParentConnectorTest extends TestCase
         $this->assertSame($parent, ParentConnector::getParent($node));
 
         ParentConnector::setParent($node, null);
+
+        $this->assertNull(ParentConnector::findParent($node));
+    }
+
+    public function test_it_can_provide_the_node_parent_from_weak_reference(): void
+    {
+        $parent = new Nop();
+        $weakRef = WeakReference::create($parent);
+
+        $node = new Nop(['weak_parent' => $weakRef]);
+
+        $this->assertSame($parent, ParentConnector::getParent($node));
+        $this->assertSame($parent, ParentConnector::findParent($node));
+    }
+
+    public function test_it_can_look_for_the_node_parent_from_weak_reference(): void
+    {
+        $parent = new Nop();
+        $weakRef = WeakReference::create($parent);
+
+        $node1 = new Nop(['weak_parent' => $weakRef]);
+        $node2 = new Nop(['weak_parent' => 'not_a_weak_reference']);
+        $node3 = new Nop();
+
+        $this->assertSame($parent, ParentConnector::findParent($node1));
+        $this->assertNull(ParentConnector::findParent($node2));
+        $this->assertNull(ParentConnector::findParent($node3));
+    }
+
+    public function test_it_prioritizes_weak_reference_over_strong_reference(): void
+    {
+        $strongParent = new Nop();
+        $weakParent = new Nop();
+        $weakRef = WeakReference::create($weakParent);
+
+        $node = new Nop([
+            'parent' => $strongParent,
+            'weak_parent' => $weakRef,
+        ]);
+
+        // Should return the weak reference parent, not the strong reference parent
+        $this->assertSame($weakParent, ParentConnector::getParent($node));
+        $this->assertSame($weakParent, ParentConnector::findParent($node));
+    }
+
+    public function test_it_throws_exception_when_weak_reference_is_garbage_collected(): void
+    {
+        $parent = new Nop();
+        $weakRef = WeakReference::create($parent);
+
+        $node = new Nop(['weak_parent' => $weakRef]);
+
+        // Clear the parent reference to trigger garbage collection
+        $parent = null;
+        gc_collect_cycles();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Parent node has been garbage collected');
+
+        ParentConnector::getParent($node);
+    }
+
+    public function test_it_returns_null_when_weak_reference_is_garbage_collected_in_find_parent(): void
+    {
+        $parent = new Nop();
+        $weakRef = WeakReference::create($parent);
+
+        $node = new Nop(['weak_parent' => $weakRef]);
+
+        // Clear the parent reference to trigger garbage collection
+        $parent = null;
+        gc_collect_cycles();
 
         $this->assertNull(ParentConnector::findParent($node));
     }
