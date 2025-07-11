@@ -43,6 +43,7 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
@@ -53,7 +54,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SplQueue;
-use stdClass;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use Tumblr\Chorus\FakeTimeKeeper;
@@ -370,8 +370,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // Set up runningProcessContainers with exactly 2 items
         $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
         $runningProcessContainers->setValue($runner, [
-            'dummy1' => new stdClass(),
-            'dummy2' => new stdClass(),
+            0 => new IndexedMutantProcessContainer(1, $this->createMock(MutantProcessContainer::class)),
+            1 => new IndexedMutantProcessContainer(2, $this->createMock(MutantProcessContainer::class)),
         ]);
 
         $method = $reflection->getMethod('hasProcessesThatCouldBeFreed');
@@ -381,16 +381,16 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // When count > threadCount, both >= and > return true
         $runningProcessContainers->setValue($runner, [
-            'dummy1' => new stdClass(),
-            'dummy2' => new stdClass(),
-            'dummy3' => new stdClass(),
+            0 => new IndexedMutantProcessContainer(1, $this->createMock(MutantProcessContainer::class)),
+            1 => new IndexedMutantProcessContainer(2, $this->createMock(MutantProcessContainer::class)),
+            2 => new IndexedMutantProcessContainer(3, $this->createMock(MutantProcessContainer::class)),
         ]);
 
         $this->assertTrue($method->invokeArgs($runner, [2]), 'Should return true when count > threadCount');
 
         // When count < threadCount, both >= and > return false
         $runningProcessContainers->setValue($runner, [
-            'dummy1' => new stdClass(),
+            0 => new IndexedMutantProcessContainer(1, $this->createMock(MutantProcessContainer::class)),
         ]);
 
         $this->assertFalse($method->invokeArgs($runner, [2]), 'Should return false when count < threadCount');
@@ -589,9 +589,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('getCurrent')
             ->willReturn($mutantProcessMock);
 
-        $container = new stdClass();
-        $container->mutantProcessContainer = $mutantProcessContainerMock;
-        $container->threadIndex = 0;
+        $container = new IndexedMutantProcessContainer(0, $mutantProcessContainerMock);
 
         // Set up runningProcessContainers
         $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
@@ -637,9 +635,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('getCurrent')
             ->willReturn($mutantProcessMock);
 
-        $container = new stdClass();
-        $container->mutantProcessContainer = $mutantProcessContainerMock;
-        $container->threadIndex = 0;
+        $container = new IndexedMutantProcessContainer(0, $mutantProcessContainerMock);
 
         // Set up runningProcessContainers
         $runningProcessContainers = $reflection->getProperty('runningProcessContainers');
