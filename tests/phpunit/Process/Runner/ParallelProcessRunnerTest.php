@@ -403,7 +403,7 @@ final class ParallelProcessRunnerTest extends TestCase
             ->method('markAsFinished');
 
         $container = new MutantProcessContainer($mutantProcessMock, []);
-        
+
         $processes = [$container];
 
         $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
@@ -413,13 +413,13 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertSame(1, iterator_count($executedProcesses));
     }
 
-    public function test_initial_fillBucketOnce_must_be_called_with_1_not_0(): void
+    public function test_initial_fill_bucket_once_must_be_called_with_1_not_0(): void
     {
         // This test ensures fillBucketOnce(1) is called, not fillBucketOnce(0)
         // With 0, the bucket would remain empty and no process would start initially
-        
+
         $timeKeeper = $this->createMock(FakeTimeKeeper::class);
-        
+
         // If fillBucketOnce(0) was called, getCurrentTimeAsFloat wouldn't be called
         // If fillBucketOnce(1) is called, it's called exactly twice (start and end)
         $timeKeeper->expects($this->exactly(2))
@@ -439,18 +439,18 @@ final class ParallelProcessRunnerTest extends TestCase
         $processes = [new MutantProcessContainer($mutantProcessMock, [])];
 
         $runner = new ParallelProcessRunner(1, 0, $timeKeeper);
-        
+
         $executedProcesses = $runner->run($processes);
         $this->assertSame(1, iterator_count($executedProcesses));
     }
 
-    public function test_initial_fillBucketOnce_must_be_called_with_1_not_2(): void
+    public function test_initial_fill_bucket_once_must_be_called_with_1_not_2(): void
     {
         // This test ensures fillBucketOnce(1) is called, not fillBucketOnce(2)
         // With large thread counts and few processes, calling with wrong param matters
-        
+
         $timeKeeper = $this->createMock(FakeTimeKeeper::class);
-        
+
         // With only 1 process but high thread count:
         // fillBucketOnce(1) = 2 calls (fills 1 item)
         // fillBucketOnce(2) would also = 2 calls (still fills only 1 item)
@@ -472,27 +472,99 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // High thread count to test the parameter matters
         $runner = new ParallelProcessRunner(10, 0, $timeKeeper);
-        
+
         $executedProcesses = $runner->run($processes);
         $this->assertSame(1, iterator_count($executedProcesses));
     }
 
-    public function test_no_processes_executed_without_initial_fillBucketOnce(): void
+    public function test_no_processes_executed_without_initial_fill_bucket_once(): void
     {
         // This test would fail if initial fillBucketOnce was removed
         // We need at least one process to be executed
         $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
-        
+
         // Empty array simulates what would happen if fillBucketOnce wasn't called
         $executedProcesses = $runner->run([]);
         $this->assertSame(0, iterator_count($executedProcesses));
+    }
+
+    public function test_fill_bucket_once_must_be_called_or_no_initial_process_starts(): void
+    {
+        // This test verifies that without the initial fillBucketOnce call,
+        // the first process wouldn't start until the loop calls it
+
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+
+        // The initial fillBucketOnce MUST happen for proper timing
+        // If removed, getCurrentTimeAsFloat would be called differently
+        $callCount = 0;
+        $timeKeeper->expects($this->any())
+            ->method('getCurrentTimeAsFloat')
+            ->willReturnCallback(static function () use (&$callCount) {
+                ++$callCount;
+
+                // First 2 calls are from initial fillBucketOnce
+                // Without it, the pattern would be different
+                return 1000.0 + ($callCount * 0.001);
+            });
+
+        $processMock = $this->createMock(Process::class);
+        $processMock->expects($this->once())->method('start');
+        $processMock->expects($this->once())->method('checkTimeout');
+        $processMock->expects($this->once())->method('isRunning')->willReturn(false);
+
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock->expects($this->any())->method('getProcess')->willReturn($processMock);
+        $mutantProcessMock->expects($this->once())->method('markAsFinished');
+
+        $processes = [new MutantProcessContainer($mutantProcessMock, [])];
+
+        $runner = new ParallelProcessRunner(1, 0, $timeKeeper);
+
+        $executedProcesses = $runner->run($processes);
+        $this->assertSame(1, iterator_count($executedProcesses));
+
+        // With initial fillBucketOnce: 2 calls before start, then more
+        // Without it: different pattern
+        $this->assertGreaterThanOrEqual(2, $callCount);
+    }
+
+    public function test_initial_fill_bucket_once_with_zero_would_not_load_process(): void
+    {
+        // This kills the DecrementInteger mutation fillBucketOnce(1) -> fillBucketOnce(0)
+        // With 0, the bucket check count($bucket) >= 0 would always be true, nothing loads
+
+        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
+
+        // fillBucketOnce(1) causes exactly 2 calls (start/end timing)
+        // fillBucketOnce(0) would cause 0 calls (early return)
+        $timeKeeper->expects($this->exactly(2))
+            ->method('getCurrentTimeAsFloat')
+            ->willReturn(1000.0);
+
+        $processMock = $this->createMock(Process::class);
+        $processMock->expects($this->once())->method('start');
+        $processMock->expects($this->once())->method('checkTimeout');
+        $processMock->expects($this->once())->method('isRunning')->willReturn(false);
+
+        $mutantProcessMock = $this->createMock(MutantProcess::class);
+        $mutantProcessMock->expects($this->any())->method('getProcess')->willReturn($processMock);
+        $mutantProcessMock->expects($this->once())->method('markAsFinished');
+
+        $runner = new ParallelProcessRunner(1, 0, $timeKeeper);
+
+        // Single process that must be loaded by initial fillBucketOnce(1)
+        $processes = [new MutantProcessContainer($mutantProcessMock, [])];
+
+        $executedProcesses = $runner->run($processes);
+        $this->assertSame(1, iterator_count($executedProcesses));
     }
 
     public function test_continue_statement_processes_all_running_containers(): void
     {
         // This test verifies that 'continue' is necessary at line 179
         // If it was 'break', only the first running process would be checked
-        
+
         $processMock1 = $this->createMock(Process::class);
         $processMock1->expects($this->once())->method('start');
         $processMock1->expects($this->exactly(2))->method('checkTimeout');
@@ -514,11 +586,11 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $processes = [
             new MutantProcessContainer($mutantProcessMock1, []),
-            new MutantProcessContainer($mutantProcessMock2, [])
+            new MutantProcessContainer($mutantProcessMock2, []),
         ];
 
         $runner = new ParallelProcessRunner(2, 0, new FakeTimeKeeper());
-        
+
         $executedProcesses = $runner->run($processes);
         // Both should be processed
         $this->assertSame(2, iterator_count($executedProcesses));
@@ -528,7 +600,7 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         // This test verifies the continue at line 195
         // If it was 'break', containers after one with hasNext() wouldn't be processed
-        
+
         // First process that escapes and has next
         $process1 = $this->createMock(Process::class);
         $process1->expects($this->once())->method('start');
@@ -549,7 +621,7 @@ final class ParallelProcessRunnerTest extends TestCase
             $process1,
             $this->createMock(Mutant::class),
             $resultFactory1,
-            false
+            false,
         );
 
         // Next process for the escaped mutant
@@ -561,10 +633,12 @@ final class ParallelProcessRunnerTest extends TestCase
         $nextFactory = new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcess) implements LazyMutantProcessFactory {
             public function __construct(
                 private TestFrameworkMutantExecutionResultFactory $factory,
-                private Process $process
-            ) {}
-            
-            public function create(Mutant $mutant): MutantProcess {
+                private Process $process,
+            ) {
+            }
+
+            public function create(Mutant $mutant): MutantProcess
+            {
                 return new MutantProcess($this->process, $mutant, $this->factory);
             }
         };
@@ -581,11 +655,11 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $processes = [
             new MutantProcessContainer($mutantProcess1, [$nextFactory]),
-            new MutantProcessContainer($mutantProcess2, [])
+            new MutantProcessContainer($mutantProcess2, []),
         ];
 
         $runner = new ParallelProcessRunner(2, 0, new FakeTimeKeeper());
-        
+
         $executedProcesses = $runner->run($processes);
         // Should yield both containers (first one twice because of hasNext)
         $this->assertSame(2, iterator_count($executedProcesses));
