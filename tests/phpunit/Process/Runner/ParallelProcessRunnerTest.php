@@ -3047,43 +3047,86 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_initial_fill_bucket_once_method_call_is_required(): void
     {
-        // This test verifies that the initial fillBucketOnce call is essential
-        // This will kill the MethodCallRemoval mutation on line 115
+        // This test uses a partial mock to verify the initial fillBucketOnce is called
+        // before any other operations in the run() method.
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
             ->setConstructorArgs([1, 0, new FakeTimeKeeper()])
-            ->onlyMethods(['fillBucketOnce'])
+            ->onlyMethods(['fillBucketOnce', 'hasProcessesThatCouldBeFreed'])
             ->getMock();
 
+        // Track the sequence of method calls
+        $callSequence = [];
+
+        // fillBucketOnce should be called at least twice:
+        // 1. Initial call before the loop (line 115)
+        // 2. Inside the loop (line 151)
+        $runner->expects($this->atLeast(2))
+            ->method('fillBucketOnce')
+            ->willReturnCallback(static function ($bucket, $generator, $threadCount) use (&$callSequence) {
+                $callSequence[] = ['method' => 'fillBucketOnce', 'threadCount' => $threadCount];
+
+                // Simulate the real behavior
+                if ($generator->valid() && count($bucket) < $threadCount) {
+                    $bucket->enqueue($generator->current());
+                    $generator->next();
+                }
+
+                return 0;
+            });
+
+        // hasProcessesThatCouldBeFreed is called after processes start
+        $runner->expects($this->any())
+            ->method('hasProcessesThatCouldBeFreed')
+            ->willReturnCallback(static function () use (&$callSequence) {
+                $callSequence[] = ['method' => 'hasProcessesThatCouldBeFreed'];
+
+                return false; // Return false to avoid the while loop
+            });
+
+        // Create a single process
         $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('start');
+        $process->expects($this->once())->method('start')
+            ->willReturnCallback(static function () use (&$callSequence): void {
+                $callSequence[] = ['method' => 'process.start'];
+            });
+        $process->expects($this->any())->method('checkTimeout');
         $process->expects($this->any())->method('isRunning')->willReturn(false);
 
-        $mutantProcess = new DummyMutantProcess(
+        $mutant = new DummyMutantProcess(
             $process,
             $this->createMock(Mutant::class),
             $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
             false,
         );
 
-        $container = new MutantProcessContainer($mutantProcess, []);
-
-        // We expect fillBucketOnce to be called at least once
-        // If the MethodCallRemoval mutation removes the initial call,
-        // this expectation will fail
-        $runner->expects($this->atLeastOnce())
-            ->method('fillBucketOnce')
-            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) {
-                if ($iterator->valid() && count($bucket) < $threadCount) {
-                    $bucket->enqueue($iterator->current());
-                    $iterator->next();
-                }
-
-                return 0;
-            });
-
-        // Run the process
+        $container = new MutantProcessContainer($mutant, []);
         iterator_to_array($runner->run([$container]));
+
+        // Verify the sequence:
+        // 1. First fillBucketOnce MUST happen before process.start
+        $this->assertNotEmpty($callSequence, 'Call sequence must be tracked');
+        $this->assertSame('fillBucketOnce', $callSequence[0]['method'], 'First call must be fillBucketOnce');
+        $this->assertSame(1, $callSequence[0]['threadCount'], 'Initial fillBucketOnce must use threadCount=1');
+
+        // Find process.start in the sequence
+        $processStartIndex = null;
+
+        foreach ($callSequence as $index => $call) {
+            if ($call['method'] === 'process.start') {
+                $processStartIndex = $index;
+
+                break;
+            }
+        }
+
+        $this->assertNotNull($processStartIndex, 'Process must start');
+        $this->assertGreaterThan(0, $processStartIndex, 'Process must start AFTER initial fillBucketOnce');
+
+        // This test fails if the initial fillBucketOnce is removed because:
+        // - The bucket would be empty at the start of the loop
+        // - The process wouldn't start until after the loop fills the bucket at line 151
+        // - This would change the call sequence
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
