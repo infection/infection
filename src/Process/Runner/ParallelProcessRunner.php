@@ -100,8 +100,11 @@ final class ParallelProcessRunner implements ProcessRunner
          *
          * For our purposes we need to make sure we only see one process only once. Thus,
          * we use a generator here which is both non-rewindable, and will fail loudly if tried.
+         * That said, we permit iterators for testing purposes, as they can be mocked.
          */
-        $generator = self::toGenerator($processContainers);
+        $generator = $processContainers instanceof Iterator
+            ? $processContainers
+            : self::toGenerator($processContainers);
 
         // Bucket for processes to be executed
         /** @var SplQueue<MutantProcessContainer> $bucket */
@@ -192,7 +195,7 @@ final class ParallelProcessRunner implements ProcessRunner
                 // Enqueue the needed static analysis run
                 $bucket->enqueue($mutantProcessContainer);
 
-                continue;
+                return;
             }
 
             yield $mutantProcessContainer;
