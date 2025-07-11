@@ -48,7 +48,6 @@ use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
 use Iterator;
 use function iterator_count;
-use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -137,8 +136,6 @@ final class ParallelProcessRunnerTest extends TestCase
     {
         $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
 
-        $bucket = new SplQueue();
-
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
             ->method('valid')
@@ -149,7 +146,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $reflection = new ReflectionClass($runner);
         $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [$bucket, $iterator, 1]);
+        $result = $fillBucketOnceMethod->invokeArgs($runner, [new SplQueue(), $iterator, 1]);
 
         // Should return 0 immediately when generator is not valid
         $this->assertSame(0, $result);
@@ -197,7 +194,7 @@ final class ParallelProcessRunnerTest extends TestCase
             });
 
         // Run the process
-        iterator_to_array($runner->run([$container]));
+        iterator_count($runner->run([$container]));
     }
 
     public function test_fill_bucket_once_at_line_151_called_with_one_using_mock(): void
@@ -252,7 +249,7 @@ final class ParallelProcessRunnerTest extends TestCase
             });
 
         // Run the processes
-        iterator_to_array($runner->run($processes));
+        iterator_count($runner->run($processes));
 
         // Verify fillBucketOnce was called multiple times with 1
         $this->assertGreaterThan(1, $callCount, 'fillBucketOnce should be called multiple times');
@@ -315,7 +312,7 @@ final class ParallelProcessRunnerTest extends TestCase
         );
 
         $container = new MutantProcessContainer($mutant, []);
-        iterator_to_array($runner->run([$container]));
+        iterator_count($runner->run([$container]));
 
         // Verify the sequence:
         // 1. First fillBucketOnce MUST happen before process.start
@@ -440,7 +437,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: ($this->timeKeeper->getCurrentTimeAsFloat() - $start)
         // Mutated: ($this->timeKeeper->getCurrentTimeAsFloat() + $start)
 
-        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
         $runner = new ParallelProcessRunner(2, 0, $timeKeeperMock);
 
         $reflection = new ReflectionClass($runner);
@@ -471,7 +468,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(-1, $this->poll - $timeSpentDoingWork)
 
-        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
         $runner = new ParallelProcessRunner(2, 10000, $timeKeeperMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
@@ -495,7 +492,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(1, $this->poll - $timeSpentDoingWork)
 
-        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
         $runner = new ParallelProcessRunner(2, 10000, $timeKeeperMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
@@ -519,7 +516,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(0, $this->poll + $timeSpentDoingWork)
 
-        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
         $runner = new ParallelProcessRunner(2, 5000, $timeKeeperMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
@@ -542,7 +539,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
         // Mutated: (empty)
 
-        $timeKeeperMock = $this->createMock(TimeKeeper::class);
+        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
         $runner = new ParallelProcessRunner(2, 5000, $timeKeeperMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
@@ -602,7 +599,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $bucket = new SplQueue();
 
         // This should call markAsTimedOut on the mutant process
-        iterator_to_array($method->invokeArgs($runner, [$bucket]));
+        iterator_count($method->invokeArgs($runner, [$bucket]));
     }
 
     public function test_mark_as_finished_method_call_removal_mutation(): void
@@ -648,7 +645,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $bucket = new SplQueue();
 
         // This should call markAsFinished on the mutant process
-        iterator_to_array($method->invokeArgs($runner, [$bucket]));
+        iterator_count($method->invokeArgs($runner, [$bucket]));
     }
 
     public function test_while_loop_condition_with_while_mutation(): void
@@ -705,7 +702,7 @@ final class ParallelProcessRunnerTest extends TestCase
         }
 
         // Run the processes - the while loop should execute because hasProcessesThatCouldBeFreed returns true
-        iterator_to_array($runner->run($processes));
+        iterator_count($runner->run($processes));
 
         // If the while condition was mutated to false, hasProcessesThatCouldBeFreed would never be called
         $this->assertGreaterThan(0, $callCount, 'hasProcessesThatCouldBeFreed should be called in while loop');
@@ -762,7 +759,7 @@ final class ParallelProcessRunnerTest extends TestCase
         }
 
         // Run the processes - wait should be called with the fillBucketOnce return value
-        iterator_to_array($runner->run($processes));
+        iterator_count($runner->run($processes));
     }
 
     private function runWithAllKindsOfProcesses(int $threadCount): void
