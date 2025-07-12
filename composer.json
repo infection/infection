@@ -58,6 +58,7 @@
         "justinrainbow/json-schema": "^5.3 || ^6.0",
         "nikic/php-parser": "^5.3",
         "ondram/ci-detector": "^4.1.0",
+        "sanmai/duoclock": "^0.1.0",
         "sanmai/later": "^0.1.7",
         "sanmai/pipeline": "^6.16",
         "sebastian/diff": "^3.0.2 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
@@ -66,7 +67,6 @@
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/process": "^6.4 || ^7.0",
         "thecodingmachine/safe": "^v3.0",
-        "tumblr/chorus-timekeeper": "^0.1.1",
         "webmozart/assert": "^1.11"
     },
     "conflict": {

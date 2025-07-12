@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Process\Runner;
 
 use function count;
+use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
@@ -55,8 +56,6 @@ use ReflectionClass;
 use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
-use Tumblr\Chorus\FakeTimeKeeper;
-use Tumblr\Chorus\TimeKeeper;
 
 #[CoversClass(ParallelProcessRunner::class)]
 final class ParallelProcessRunnerTest extends TestCase
@@ -65,11 +64,11 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_it_does_nothing_when_no_process_is_given(): void
     {
-        $timeKeeper = $this->createMock(FakeTimeKeeper::class);
-        $timeKeeper->expects($this->never())
+        $clock = $this->createMock(TimeSpy::class);
+        $clock->expects($this->never())
             ->method($this->anything());
 
-        $runner = new ParallelProcessRunner(4, 0, $timeKeeper);
+        $runner = new ParallelProcessRunner(4, 0, $clock);
 
         $runner->run([]);
 
@@ -86,7 +85,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadsCount, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner($threadsCount, 0, new TimeSpy());
 
         $executedProcesses = $runner->run($processes);
 
@@ -101,7 +100,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner(4, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner(4, 0, new TimeSpy());
 
         $runner->run($processes);
 
@@ -117,7 +116,7 @@ final class ParallelProcessRunnerTest extends TestCase
             yield $this->createMutantProcessContainerWithNextMutantProcess($threadCount);
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner($threadCount, 0, new TimeSpy());
 
         $runner->run($processes);
 
@@ -134,7 +133,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
     {
-        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
 
         $iterator = $this->createMock(Iterator::class);
         $iterator->expects($this->once())
@@ -158,7 +157,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // This will kill the IncrementInteger mutation on line 115
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([4, 0, new FakeTimeKeeper()])
+            ->setConstructorArgs([4, 0, new TimeSpy()])
             ->onlyMethods(['fillBucketOnce'])
             ->getMock();
 
@@ -203,7 +202,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // This will kill the IncrementInteger mutation on line 151
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new FakeTimeKeeper()])
+            ->setConstructorArgs([2, 0, new TimeSpy()])
             ->onlyMethods(['fillBucketOnce'])
             ->getMock();
 
@@ -261,7 +260,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // before any other operations in the run() method.
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([1, 0, new FakeTimeKeeper()])
+            ->setConstructorArgs([1, 0, new TimeSpy()])
             ->onlyMethods(['fillBucketOnce', 'hasProcessesThatCouldBeFreed'])
             ->getMock();
 
@@ -360,7 +359,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: count($this->runningProcessContainers) >= $threadCount
         // Mutated: count($this->runningProcessContainers) > $threadCount
 
-        $runner = new ParallelProcessRunner(2, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner(2, 0, new TimeSpy());
 
         $reflection = new ReflectionClass($runner);
 
@@ -399,7 +398,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: count($bucket) >= $threadCount
         // Mutated: count($bucket) > $threadCount
 
-        $runner = new ParallelProcessRunner(2, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner(2, 0, new TimeSpy());
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('fillBucketOnce');
@@ -433,12 +432,8 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_fill_bucket_once_time_calculation_with_minus_mutation(): void
     {
-        // This test kills the Minus mutation on line 186
-        // Original: ($this->timeKeeper->getCurrentTimeAsFloat() - $start)
-        // Mutated: ($this->timeKeeper->getCurrentTimeAsFloat() + $start)
-
-        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
-        $runner = new ParallelProcessRunner(2, 0, $timeKeeperMock);
+        $clockMock = $this->createMock(TimeSpy::class);
+        $runner = new ParallelProcessRunner(2, 0, $clockMock);
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('fillBucketOnce');
@@ -450,9 +445,9 @@ final class ParallelProcessRunnerTest extends TestCase
         $iterator->expects($this->once())->method('current')->willReturn('item');
         $iterator->expects($this->once())->method('next');
 
-        // Mock two sequential calls to getCurrentTimeAsFloat()
-        $timeKeeperMock->expects($this->exactly(2))
-            ->method('getCurrentTimeAsFloat')
+        // Mock two sequential calls to microtime()
+        $clockMock->expects($this->exactly(2))
+            ->method('microtime')
             ->willReturnOnConsecutiveCalls(1000.0, 1001.0); // start = 1000.0, end = 1001.0 (1 second difference)
 
         $result = $method->invokeArgs($runner, [$bucket, $iterator, 2]);
@@ -468,8 +463,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(-1, $this->poll - $timeSpentDoingWork)
 
-        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
-        $runner = new ParallelProcessRunner(2, 10000, $timeKeeperMock); // 10ms poll time
+        $clockMock = $this->createMock(TimeSpy::class);
+        $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('wait');
@@ -479,7 +474,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // With original code: max(0, 10000 - 15000) = max(0, -5000) = 0
         // With mutated code: max(-1, 10000 - 15000) = max(-1, -5000) = -1
-        $timeKeeperMock->expects($this->once())
+        $clockMock->expects($this->once())
             ->method('usleep')
             ->with($this->identicalTo(0)); // Should be 0, not -1
 
@@ -492,8 +487,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(1, $this->poll - $timeSpentDoingWork)
 
-        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
-        $runner = new ParallelProcessRunner(2, 10000, $timeKeeperMock); // 10ms poll time
+        $clockMock = $this->createMock(TimeSpy::class);
+        $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('wait');
@@ -503,7 +498,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // With original code: max(0, 10000 - 10000) = max(0, 0) = 0
         // With mutated code: max(1, 10000 - 10000) = max(1, 0) = 1
-        $timeKeeperMock->expects($this->once())
+        $clockMock->expects($this->once())
             ->method('usleep')
             ->with($this->identicalTo(0)); // Should be 0, not 1
 
@@ -516,8 +511,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(0, $this->poll + $timeSpentDoingWork)
 
-        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
-        $runner = new ParallelProcessRunner(2, 5000, $timeKeeperMock); // 5ms poll time
+        $clockMock = $this->createMock(TimeSpy::class);
+        $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('wait');
@@ -526,7 +521,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // With original code: max(0, 5000 - 2000) = max(0, 3000) = 3000
         // With mutated code: max(0, 5000 + 2000) = max(0, 7000) = 7000
-        $timeKeeperMock->expects($this->once())
+        $clockMock->expects($this->once())
             ->method('usleep')
             ->with($this->identicalTo(3000)); // Should be 3000, not 7000
 
@@ -536,11 +531,11 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_wait_method_call_removal_mutation(): void
     {
         // This test kills the MethodCallRemoval mutation on line 246
-        // Original: $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
+        // Original: $this->clock->usleep(max(0, $this->poll - $timeSpentDoingWork));
         // Mutated: (empty)
 
-        $timeKeeperMock = $this->createMock(FakeTimeKeeper::class);
-        $runner = new ParallelProcessRunner(2, 5000, $timeKeeperMock); // 5ms poll time
+        $clockMock = $this->createMock(TimeSpy::class);
+        $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
         $method = $reflection->getMethod('wait');
@@ -548,7 +543,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $timeSpentDoingWork = 1000; // 1ms
 
         // usleep must be called
-        $timeKeeperMock->expects($this->once())
+        $clockMock->expects($this->once())
             ->method('usleep')
             ->with($this->identicalTo(4000)); // Should be 4000
 
@@ -561,7 +556,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: $mutantProcess->markAsTimedOut();
         // Mutated: (empty)
 
-        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
 
         $reflection = new ReflectionClass($runner);
 
@@ -608,7 +603,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Original: $mutantProcess->markAsFinished();
         // Mutated: (empty)
 
-        $runner = new ParallelProcessRunner(1, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
 
         $reflection = new ReflectionClass($runner);
 
@@ -655,7 +650,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: while (false)
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new FakeTimeKeeper()])
+            ->setConstructorArgs([2, 0, new TimeSpy()])
             ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce'])
             ->getMock();
 
@@ -715,7 +710,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: (empty)
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new FakeTimeKeeper()])
+            ->setConstructorArgs([2, 0, new TimeSpy()])
             ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce', 'wait'])
             ->getMock();
 
@@ -774,7 +769,7 @@ final class ParallelProcessRunnerTest extends TestCase
             }
         })();
 
-        $runner = new ParallelProcessRunner($threadCount, 0, new FakeTimeKeeper());
+        $runner = new ParallelProcessRunner($threadCount, 0, new TimeSpy());
 
         $executedProcesses = $runner->run($processes);
 

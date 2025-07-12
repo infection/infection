@@ -38,6 +38,7 @@ namespace Infection\Process\Runner;
 use function array_shift;
 use Composer\XdebugHandler\Process;
 use function count;
+use DuoClock\DuoClock;
 use Generator;
 use Infection\Process\MutantProcessContainer;
 use Iterator;
@@ -45,7 +46,6 @@ use function max;
 use function range;
 use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use Tumblr\Chorus\TimeKeeper;
 use Webmozart\Assert\Assert;
 
 /**
@@ -78,7 +78,7 @@ class ParallelProcessRunner implements ProcessRunner
     public function __construct(
         private readonly int $threadCount,
         private readonly int $poll = self::POLL_WAIT_IN_MS,
-        private readonly TimeKeeper $timeKeeper = new TimeKeeper(),
+        private readonly DuoClock $clock = new DuoClock(),
     ) {
     }
 
@@ -175,7 +175,7 @@ class ParallelProcessRunner implements ProcessRunner
             return 0;
         }
 
-        $start = $this->timeKeeper->getCurrentTimeAsFloat();
+        $start = $this->clock->microtime();
 
         $current = $input->current();
         Assert::notNull($current);
@@ -183,7 +183,7 @@ class ParallelProcessRunner implements ProcessRunner
         $bucket->enqueue($current);
         $input->next();
 
-        return (int) ($this->timeKeeper->getCurrentTimeAsFloat() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
+        return (int) ($this->clock->microtime() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
     /**
@@ -191,7 +191,7 @@ class ParallelProcessRunner implements ProcessRunner
      */
     protected function wait(int $timeSpentDoingWork): void
     {
-        $this->timeKeeper->usleep(max(0, $this->poll - $timeSpentDoingWork));
+        $this->clock->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }
 
     /**
