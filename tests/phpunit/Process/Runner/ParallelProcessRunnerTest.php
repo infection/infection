@@ -154,7 +154,7 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_initial_fill_bucket_once_called_with_one_using_mock(): void
     {
         // This test uses a partial mock to verify fillBucketOnce is called with 1
-        // This will kill the IncrementInteger mutation on line 115
+        // This will kill the IncrementInteger mutation
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
             ->setConstructorArgs([4, 0, new TimeSpy()])
@@ -196,10 +196,10 @@ final class ParallelProcessRunnerTest extends TestCase
         iterator_count($runner->run([$container]));
     }
 
-    public function test_fill_bucket_once_at_line_151_called_with_one_using_mock(): void
+    public function test_fill_bucket_once_called_with_one_using_mock(): void
     {
-        // This test verifies the fillBucketOnce call at line 151 uses hardcoded 1
-        // This will kill the IncrementInteger mutation on line 151
+        // This test verifies the fillBucketOnce call uses hardcoded 1
+        // This will kill the IncrementInteger mutation
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
             ->setConstructorArgs([2, 0, new TimeSpy()])
@@ -269,8 +269,8 @@ final class ParallelProcessRunnerTest extends TestCase
         $callSequence = [];
 
         // fillBucketOnce should be called at least twice:
-        // 1. Initial call before the loop (line 115)
-        // 2. Inside the loop (line 151)
+        // 1. Initial call before the loop
+        // 2. Inside the loop
         $runner->expects($this->atLeast(2))
             ->method('fillBucketOnce')
             ->willReturnCallback(static function ($bucket, $generator, $threadCount) use (&$callSequence) {
@@ -336,7 +336,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // This test fails if the initial fillBucketOnce is removed because:
         // - The bucket would be empty at the start of the loop
-        // - The process wouldn't start until after the loop fills the bucket at line 151
+        // - The process wouldn't start until after the loop fills the bucket
         // - This would change the call sequence
     }
 
@@ -355,7 +355,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_has_processes_that_could_be_freed_greater_than_or_equal_to_behavior(): void
     {
-        // This test kills the GreaterThanOrEqualTo mutation on line 161
+        // This test kills the GreaterThanOrEqualTo mutation
         // Original: count($this->runningProcessContainers) >= $threadCount
         // Mutated: count($this->runningProcessContainers) > $threadCount
 
@@ -394,7 +394,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_fill_bucket_once_greater_than_or_equal_to_behavior(): void
     {
-        // This test kills the GreaterThanOrEqualTo mutation on line 174
+        // This test kills the GreaterThanOrEqualTo mutation
         // Original: count($bucket) >= $threadCount
         // Mutated: count($bucket) > $threadCount
 
@@ -459,7 +459,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_wait_method_with_decrement_integer_mutation(): void
     {
-        // This test kills the DecrementInteger mutation on line 246
+        // This test kills the DecrementInteger mutation
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(-1, $this->poll - $timeSpentDoingWork)
 
@@ -483,7 +483,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_wait_method_with_increment_integer_mutation(): void
     {
-        // This test kills the IncrementInteger mutation on line 246
+        // This test kills the IncrementInteger mutation
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(1, $this->poll - $timeSpentDoingWork)
 
@@ -507,7 +507,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_wait_method_with_minus_mutation(): void
     {
-        // This test kills the Minus mutation on line 246
+        // This test kills the Minus mutation
         // Original: max(0, $this->poll - $timeSpentDoingWork)
         // Mutated: max(0, $this->poll + $timeSpentDoingWork)
 
@@ -530,7 +530,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_wait_method_call_removal_mutation(): void
     {
-        // This test kills the MethodCallRemoval mutation on line 246
+        // This test kills the MethodCallRemoval mutation
         // Original: $this->clock->usleep(max(0, $this->poll - $timeSpentDoingWork));
         // Mutated: (empty)
 
@@ -552,7 +552,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_mark_as_timed_out_method_call_removal_mutation(): void
     {
-        // This test kills the MethodCallRemoval mutation on line 204
+        // This test kills the MethodCallRemoval mutation
         // Original: $mutantProcess->markAsTimedOut();
         // Mutated: (empty)
 
@@ -599,7 +599,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_mark_as_finished_method_call_removal_mutation(): void
     {
-        // This test kills the MethodCallRemoval mutation on line 211
+        // This test kills the MethodCallRemoval mutation
         // Original: $mutantProcess->markAsFinished();
         // Mutated: (empty)
 
@@ -645,7 +645,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_while_loop_condition_with_while_mutation(): void
     {
-        // This test kills the While_ mutation on line 135
+        // This test kills the While_ mutation
         // Original: while ($this->hasProcessesThatCouldBeFreed($threadCount))
         // Mutated: while (false)
 
@@ -705,7 +705,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
     public function test_while_loop_wait_call_with_method_call_removal_mutation(): void
     {
-        // This test kills the MethodCallRemoval mutation on line 138
+        // This test kills the MethodCallRemoval mutation
         // Original: $this->wait($this->fillBucketOnce($bucket, $generator, $threadCount));
         // Mutated: (empty)
 
