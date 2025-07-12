@@ -121,6 +121,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         includes:
                             - /path/to/phpstan-config-folder
                         parameters:
+                            reportUnmatchedIgnoredErrors: false
                             parallel:
                                 maximumNumberOfProcesses: 1
                     NEON,
