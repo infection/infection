@@ -136,6 +136,9 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
+        -
+            message: '#Call to function iterator_.* on a separate line has no effect#'
+            path: ../tests/*
     level: 8
     paths:
         - ../src
