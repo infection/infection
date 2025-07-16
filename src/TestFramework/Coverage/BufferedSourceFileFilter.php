@@ -52,7 +52,6 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  * @final
- * @implements FileFilter<Trace>
  */
 class BufferedSourceFileFilter implements FileFilter
 {
