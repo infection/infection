@@ -47,6 +47,7 @@ use Symfony\Component\Finder\Iterator\PathFilterIterator;
 /**
  * @internal
  * @final
+ * @implements FileFilter<SplFileInfo>
  */
 class SourceFileFilter implements FileFilter
 {
