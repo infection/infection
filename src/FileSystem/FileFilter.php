@@ -46,7 +46,7 @@ interface FileFilter
     /**
      * @param iterable<SplFileInfo|Trace> $input
      *
-     * @return iterable<SplFileInfo|Trace>
+     * @return iterable<Trace>
      */
     public function filter(iterable $input): iterable;
 }
