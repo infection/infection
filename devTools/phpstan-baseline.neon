@@ -13,6 +13,12 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
+			message: '#^Method Infection\\Container\:\:factoriesForType\(\) should return array\<class\-string\<T of object\>\> but returns list\<\(int\|string\)\>\.$#'
+			identifier: return.type
+			count: 1
+			path: ../src/Container.php
+
+		-
 			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -137,6 +143,12 @@ parameters:
 			identifier: theCodingMachineSafe.function
 			count: 1
 			path: ../src/TestFramework/CommandLineBuilder.php
+
+		-
+			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:filter\(\) expects \(callable\(Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\)\: bool\)\|null, Closure\(Infection\\TestFramework\\Coverage\\Trace\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
 
 		-
 			message: '#^Function ini_get is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ini_get;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
@@ -271,9 +283,27 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
+			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<string\>\:\:map\(\) expects \(callable\(\)\: \(Generator\<int\|string, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|\(callable\(string\)\: \(Generator\<int\|string, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|null, Closure\(class\-string\)\: iterable\<class\-string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 2
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#^Parameter \#1 \$values of method Pipeline\\Standard\<list\<string\>\|null\>\:\:append\(\) expects iterable\<array\{string, string\}\|null\>\|null, list\<array\{\(int\|string\), iterable\<class\-string, string\>\}\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#^Static property Infection\\Tests\\AutoReview\\IntegrationGroup\\IntegrationGroupProvider\:\:\$ioTestCaseClassesTuple \(array\<array\<string\>\>\|null\) does not accept list\<list\<string\>\|null\>\.$#'
+			identifier: assign.propertyType
+			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
@@ -867,6 +897,12 @@ parameters:
 		-
 			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$sourceDirectories with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
+
+		-
+			message: '#^Parameter \#1 \$files of static method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:normalizePaths\(\) expects array\<string\>, list\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
 
@@ -1864,4 +1900,10 @@ parameters:
 			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:mainlineConfigurationsProvider\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+
+		-
+			message: '#^Unable to resolve the template type TTake in call to function Pipeline\\take$#'
+			identifier: argument.templateType
+			count: 2
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
