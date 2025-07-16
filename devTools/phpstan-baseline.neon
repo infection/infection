@@ -145,13 +145,7 @@ parameters:
 			path: ../src/TestFramework/CommandLineBuilder.php
 
 		-
-			message: '#^PHPDoc tag @implements contains generic type Infection\\FileSystem\\FileFilter\<Infection\\TestFramework\\Coverage\\Trace\> but interface Infection\\FileSystem\\FileFilter is not generic\.$#'
-			identifier: generics.notGeneric
-			count: 1
-			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
-
-		-
-			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:filter\(\) expects \(callable\(Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\)\: bool\)\|null, Closure\(Infection\\TestFramework\\Coverage\\Trace\)\: bool given\.$#'
+			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:filter\(\) expects \(callable\(Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\)\: bool\)\|null, Closure\(Infection\\TestFramework\\Coverage\\Trace\|Symfony\\Component\\Finder\\SplFileInfo\)\: bool given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
