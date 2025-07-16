@@ -2,7 +2,7 @@
 
 set -e pipefail
 
-readonly INFECTION="../../../bin/infection --coverage=infection-coverage"
+readonly INFECTION="../../../bin/infection --coverage=infection-coverage --allow-uncovered"
 readonly PHPUNIT="vendor/bin/phpunit  --coverage-xml=infection-coverage/coverage-xml --log-junit=infection-coverage/junit.xml"
 
 if [ "$DRIVER" = "phpdbg" ]
