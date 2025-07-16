@@ -76,7 +76,7 @@ trait ConfigurationAssertions
         bool $expectedSkipCoverage,
         bool $expectedSkipInitialTests,
         bool $expectedDebug,
-        bool $expectedOnlyCovered,
+        bool $expectedAllowUncovered,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
@@ -138,7 +138,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage(), 'Failed skipCoverage check');
         $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests(), 'Failed skipInitialTests check');
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled(), 'Failed isDebugEnabled check');
-        $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode(), 'Failed onlyCoveredCode check');
+        $this->assertSame($expectedAllowUncovered, !$configuration->mutateOnlyCoveredCode(), 'Failed onlyCoveredCode check');
         $this->assertSame($expectedNoProgress, $configuration->noProgress(), 'Failed noProgress check');
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
         $this->assertSame($expectedMinMsi, $configuration->getMinMsi(), 'Failed minMsi check');

@@ -181,7 +181,7 @@ final class Container
 
     public const DEFAULT_DEBUG = false;
 
-    public const DEFAULT_ONLY_COVERED = false;
+    public const DEFAULT_ALLOW_UNCOVERED = false;
 
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
 
@@ -592,7 +592,7 @@ final class Container
         ?int $numberOfShownMutations = self::DEFAULT_SHOW_MUTATIONS,
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
-        bool $onlyCovered = self::DEFAULT_ONLY_COVERED,
+        bool $allowUncovered = self::DEFAULT_ALLOW_UNCOVERED,
         string $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
@@ -668,7 +668,7 @@ final class Container
                 $skipInitialTests,
                 $logVerbosity,
                 $debug,
-                $onlyCovered,
+                $allowUncovered,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,

@@ -51,7 +51,7 @@ $container = Container::create()->withValues(
     Container::DEFAULT_SHOW_MUTATIONS,
     Container::DEFAULT_LOG_VERBOSITY,
     Container::DEFAULT_DEBUG,
-    Container::DEFAULT_ONLY_COVERED,
+    Container::DEFAULT_ALLOW_UNCOVERED,
     Container::DEFAULT_FORMATTER_NAME,
     Container::DEFAULT_NO_PROGRESS,
     Container::DEFAULT_FORCE_PROGRESS,
