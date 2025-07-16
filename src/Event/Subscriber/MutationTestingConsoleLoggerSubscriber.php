@@ -55,7 +55,6 @@ use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
-use function str_replace;
 use function str_starts_with;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
