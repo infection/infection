@@ -188,5 +188,19 @@ final class DiffColorizerTest extends TestCase
                          return $response;</code>
                 CODE,
         ];
+
+        yield 'code-containing-style-tags' => [
+            <<<'CODE'
+
+                - $output->writeln('<options=bold>' . $x . '</options=bold> mutants were caught by Static Analysis');
+                + $output->writeln('<options=bold>' . $x . '</options=bold> mutants were caught by Static Analysis.');
+                CODE,
+            <<<'CODE'
+                <code>
+
+                <diff-del>- $output->writeln('\<options=bold>' . $x . '\</options=bold> mutants were caught by Static Analysis');</diff-del>
+                <diff-add>+ $output->writeln('\<options=bold>' . $x . '\</options=bold> mutants were caught by Static Analysis<diff-add-inline>.</diff-add-inline>');</diff-add></code>
+                CODE,
+        ];
     }
 }

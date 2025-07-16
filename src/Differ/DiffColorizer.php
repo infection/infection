@@ -46,6 +46,7 @@ use function mb_strrpos;
 use function mb_substr;
 use function Safe\preg_match_all;
 use function sprintf;
+use function str_replace;
 use function str_starts_with;
 use function substr;
 use function substr_replace;
@@ -59,6 +60,10 @@ class DiffColorizer
 {
     public function colorize(string $diff): string
     {
+        // escape symfony console style like tags, so they don't mix up infections own output styles
+        // see https://symfony.com/doc/current/console/coloring.html
+        $diff = str_replace('<', '\<', $diff);
+
         // fallback for cases when diff has multiple added new lines
         if ($this->isMultiLineDiff($diff)) {
             return $this->simpleMultilineColorize($diff);

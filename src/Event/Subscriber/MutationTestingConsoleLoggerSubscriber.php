@@ -158,7 +158,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                 ),
             ]);
 
-            $this->output->writeln($this->colorizeMutantDiff($executionResult));
+            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
 
             if ($this->numberOfMutationsBudget !== null) {
                 --$this->numberOfMutationsBudget;
@@ -178,17 +178,6 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                 ),
             ]);
         }
-    }
-
-    private function colorizeMutantDiff(MutantExecutionResult $executionResult): string
-    {
-        $diff = $executionResult->getMutantDiff();
-
-        // escape symfony console style like tags, so they don't mix up infections own output styles
-        // see https://symfony.com/doc/current/console/coloring.html
-        $diff = str_replace('<', '\<', $diff);
-
-        return $this->diffColorizer->colorize($diff);
     }
 
     private function showMetrics(): void
