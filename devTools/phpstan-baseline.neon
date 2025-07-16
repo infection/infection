@@ -13,8 +13,14 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: '#^Method Infection\\Container\:\:factoriesForType\(\) should return array\<class\-string\<T of object\>\> but returns list\<\(int\|string\)\>\.$#'
+			message: '#^Method Infection\\Container\:\:factoriesForType\(\) should return array\<class\-string\<T of object\>\> but returns list\<class\-string\<object\>\>\.$#'
 			identifier: return.type
+			count: 1
+			path: ../src/Container.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<int\<0, max\>,ReflectionParameter\>\:\:map\(\)$#'
+			identifier: argument.templateType
 			count: 1
 			path: ../src/Container.php
 
@@ -277,7 +283,7 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
-			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<string\>\:\:map\(\) expects \(callable\(\)\: \(Generator\<int\|string, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|\(callable\(string\)\: \(Generator\<int\|string, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|null, Closure\(class\-string\)\: iterable\<class\-string, string\> given\.$#'
+			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<int,string\>\:\:map\(\) expects \(callable\(\)\: \(Generator\<mixed, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|\(callable\(string\)\: \(Generator\<mixed, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|null, Closure\(class\-string\)\: iterable\<class\-string, string\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
@@ -289,7 +295,7 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
-			message: '#^Parameter \#1 \$values of method Pipeline\\Standard\<list\<string\>\|null\>\:\:append\(\) expects iterable\<array\{string, string\}\|null\>\|null, list\<array\{\(int\|string\), iterable\<class\-string, string\>\}\> given\.$#'
+			message: '#^Parameter \#1 \$values of method Pipeline\\Standard\<mixed,list\<string\>\|null\>\:\:append\(\) expects iterable\<array\{string, string\}\|null\>\|null, list\<array\{mixed, iterable\<class\-string, string\>\}\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
@@ -297,6 +303,12 @@ parameters:
 		-
 			message: '#^Static property Infection\\Tests\\AutoReview\\IntegrationGroup\\IntegrationGroupProvider\:\:\$ioTestCaseClassesTuple \(array\<array\<string\>\>\|null\) does not accept list\<list\<string\>\|null\>\.$#'
 			identifier: assign.propertyType
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<int,string\>\:\:map\(\)$#'
+			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
@@ -909,6 +921,18 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\> given\.$#'
 			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<\(int\|string\),string\>\:\:map\(\)$#'
+			identifier: argument.templateType
+			count: 2
+			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<mixed,Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:map\(\)$#'
+			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
@@ -1894,6 +1918,12 @@ parameters:
 			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:mainlineConfigurationsProvider\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function Pipeline\\take$#'
+			identifier: argument.templateType
+			count: 2
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
 
 		-
