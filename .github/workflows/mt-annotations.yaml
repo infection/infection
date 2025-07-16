@@ -62,8 +62,7 @@ jobs:
                     --git-diff-base=origin/$GITHUB_BASE_REF \
                     --ignore-msi-with-no-mutations \
                     --min-msi=100 \
-                    --min-covered-msi=100 \
-                    --only-covered
+                    --min-covered-msi=100
 
     # This is a meta job to avoid to have to constantly change the protection rules
     # whenever we touch the matrix.
