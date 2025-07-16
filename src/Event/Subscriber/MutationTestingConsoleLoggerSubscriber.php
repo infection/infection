@@ -55,6 +55,7 @@ use function sprintf;
 use function str_pad;
 use const STR_PAD_LEFT;
 use function str_repeat;
+use function str_replace;
 use function str_starts_with;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -157,7 +158,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                 ),
             ]);
 
-            $this->output->writeln($this->diffColorizer->colorize($executionResult->getMutantDiff()));
+            $this->output->writeln($this->colorizeMutantDiff($executionResult));
 
             if ($this->numberOfMutationsBudget !== null) {
                 --$this->numberOfMutationsBudget;
@@ -177,6 +178,17 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
                 ),
             ]);
         }
+    }
+
+    private function colorizeMutantDiff(MutantExecutionResult $executionResult): string
+    {
+        $diff = $executionResult->getMutantDiff();
+
+        // escape symfony console style like tags, so they don't mix up infections own output styles
+        // see https://symfony.com/doc/current/console/coloring.html
+        $diff = str_replace('<', '\<', $diff);
+
+        return $this->diffColorizer->colorize($diff);
     }
 
     private function showMetrics(): void
