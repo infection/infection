@@ -44,9 +44,9 @@ use SplFileInfo;
 interface FileFilter
 {
     /**
-     * @param iterable<SplFileInfo&Trace> $input
+     * @param iterable<SplFileInfo|Trace> $input
      *
-     * @return iterable<SplFileInfo&Trace>
+     * @return iterable<SplFileInfo|Trace>
      */
     public function filter(iterable $input): iterable;
 }

@@ -19,12 +19,6 @@ parameters:
 			path: ../src/Container.php
 
 		-
-			message: '#^Method Infection\\FileSystem\\SourceFileFilter\:\:filter\(\) should return iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\> but returns Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\.$#'
-			identifier: return.type
-			count: 1
-			path: ../src/FileSystem/SourceFileFilter.php
-
-		-
 			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -151,13 +145,7 @@ parameters:
 			path: ../src/TestFramework/CommandLineBuilder.php
 
 		-
-			message: '#^PHPDoc tag @var with type iterable\<Symfony\\Component\\Finder\\SplFileInfo\> is not subtype of type iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>\.$#'
-			identifier: varTag.type
-			count: 1
-			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
-
-		-
-			message: '#^Parameter \#1 \$input of method Infection\\FileSystem\\FileFilter\:\:filter\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>, array\<string, Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:filter\(\) expects \(callable\(Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\)\: bool\)\|null, Closure\(Infection\\TestFramework\\Coverage\\Trace\)\: bool given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
@@ -167,30 +155,6 @@ parameters:
 			identifier: theCodingMachineSafe.function
 			count: 1
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
-
-		-
-			message: '#^PHPDoc tag @var with type iterable\<Infection\\TestFramework\\Coverage\\Trace\> is not subtype of type iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>\.$#'
-			identifier: varTag.type
-			count: 1
-			path: ../src/TestFramework/Coverage/CoveredTraceProvider.php
-
-		-
-			message: '#^Parameter \#1 \$input of method Infection\\FileSystem\\FileFilter\:\:filter\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>, iterable\<Infection\\TestFramework\\Coverage\\Trace\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/TestFramework/Coverage/CoveredTraceProvider.php
-
-		-
-			message: '#^PHPDoc tag @var with type list\<SplFileInfo\> is not subtype of type array\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>\.$#'
-			identifier: varTag.type
-			count: 1
-			path: ../src/TestFramework/Factory.php
-
-		-
-			message: '#^Parameter \#1 \$input of method Infection\\FileSystem\\SourceFileFilter\:\:filter\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/TestFramework/Factory.php
 
 		-
 			message: '#^Method Infection\\Testing\\BaseMutatorTestCase\:\:createMutator\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
@@ -941,12 +905,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
-
-		-
-			message: '#^Parameter \#1 \$input of method Infection\\FileSystem\\SourceFileFilter\:\:filter\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>, iterable\<Infection\\TestFramework\\Coverage\\Trace\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
 		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
@@ -1730,12 +1688,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$array of function array_values expects array\<T\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
-
-		-
-			message: '#^Parameter \#1 \$input of method Infection\\TestFramework\\Coverage\\BufferedSourceFileFilter\:\:filter\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace&SplFileInfo\>, array\<int, Infection\\TestFramework\\Coverage\\Trace\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
