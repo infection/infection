@@ -19,12 +19,6 @@ parameters:
 			path: ../src/Container.php
 
 		-
-			message: '#^Method Infection\\FileSystem\\SourceFileFilter\:\:filter\(\) should return iterable\<SplFileInfo\> but returns Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\.$#'
-			identifier: return.type
-			count: 1
-			path: ../src/FileSystem/SourceFileFilter.php
-
-		-
 			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -151,14 +145,8 @@ parameters:
 			path: ../src/TestFramework/CommandLineBuilder.php
 
 		-
-			message: '#^Method Infection\\TestFramework\\Coverage\\BufferedSourceFileFilter\:\:__construct\(\) has parameter \$filter with generic interface Infection\\FileSystem\\FileFilter but does not specify its types\: T$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
-
-		-
-			message: '#^Method Infection\\TestFramework\\Coverage\\BufferedSourceFileFilter\:\:filter\(\) should return iterable\<Infection\\TestFramework\\Coverage\\Trace\> but returns Pipeline\\Standard\<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\.$#'
-			identifier: return.type
+			message: '#^PHPDoc tag @implements contains generic type Infection\\FileSystem\\FileFilter\<Infection\\TestFramework\\Coverage\\Trace\> but interface Infection\\FileSystem\\FileFilter is not generic\.$#'
+			identifier: generics.notGeneric
 			count: 1
 			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
 
@@ -923,12 +911,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
-
-		-
-			message: '#^Parameter \#1 \$input of method Infection\\FileSystem\\SourceFileFilter\:\:filter\(\) expects iterable\<SplFileInfo\>, iterable\<Infection\\TestFramework\\Coverage\\Trace\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
 		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
