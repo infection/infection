@@ -145,12 +145,6 @@ parameters:
 			path: ../src/TestFramework/CommandLineBuilder.php
 
 		-
-			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:filter\(\) expects \(callable\(Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\)\: bool\)\|null, Closure\(Infection\\TestFramework\\Coverage\\Trace\|Symfony\\Component\\Finder\\SplFileInfo\)\: bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/TestFramework/Coverage/BufferedSourceFileFilter.php
-
-		-
 			message: '#^Function ini_get is unsafe to use\. It can return FALSE instead of throwing an exception\. Please add ''use function Safe\\ini_get;'' at the beginning of the file to use the variant provided by the ''thecodingmachine/safe'' library\.$#'
 			identifier: theCodingMachineSafe.function
 			count: 1
