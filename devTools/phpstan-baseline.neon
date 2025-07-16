@@ -175,12 +175,6 @@ parameters:
 			path: ../src/TestFramework/Coverage/CoverageChecker.php
 
 		-
-			message: '#^Method Infection\\TestFramework\\Coverage\\CoveredTraceProvider\:\:__construct\(\) has parameter \$bufferedFilter with generic interface Infection\\FileSystem\\FileFilter but does not specify its types\: T$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/TestFramework/Coverage/CoveredTraceProvider.php
-
-		-
 			message: '#^Method Infection\\Testing\\BaseMutatorTestCase\:\:createMutator\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

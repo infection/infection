@@ -45,6 +45,9 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
  */
 final readonly class CoveredTraceProvider implements TraceProvider
 {
+    /**
+     * @param FileFilter<Trace> $bufferedFilter
+     */
     public function __construct(
         private TraceProvider $primaryTraceProvider,
         private JUnitTestExecutionInfoAdder $testFileDataAdder,
