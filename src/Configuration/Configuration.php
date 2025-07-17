@@ -102,7 +102,7 @@ class Configuration
         private readonly bool $skipCoverage,
         private readonly bool $skipInitialTests,
         private readonly bool $debug,
-        private readonly bool $allowUncovered,
+        private readonly bool $withUncovered,
         private readonly bool $noProgress,
         private readonly bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
@@ -258,7 +258,7 @@ class Configuration
 
     public function mutateOnlyCoveredCode(): bool
     {
-        return !$this->allowUncovered;
+        return !$this->withUncovered;
     }
 
     public function noProgress(): bool

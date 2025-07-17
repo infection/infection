@@ -90,7 +90,7 @@ final class RunCommand extends BaseCommand
     private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
 
     /** @var string */
-    private const OPTION_ALLOW_UNCOVERED = 'allow-uncovered';
+    private const OPTION_WITH_UNCOVERED = 'with-uncovered';
 
     /** @var string */
     private const OPTION_NO_PROGRESS = 'no-progress';
@@ -199,7 +199,7 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_THREAD_COUNT,
             )
             ->addOption(
-                self::OPTION_ALLOW_UNCOVERED,
+                self::OPTION_WITH_UNCOVERED,
                 null,
                 InputOption::VALUE_NONE,
                 'Allow mutation of code not covered by tests.',
@@ -505,8 +505,8 @@ final class RunCommand extends BaseCommand
             trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
             (bool) $input->getOption(self::OPTION_DEBUG),
-            // To keep in sync with Container::DEFAULT_ALLOW_UNCOVERED
-            (bool) $input->getOption(self::OPTION_ALLOW_UNCOVERED),
+            // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
+            (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
             // TODO: add more type check like we do for the test frameworks
             trim((string) $input->getOption(self::OPTION_FORMATTER)),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS

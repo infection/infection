@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly INFECTION="../../../${1} --allow-uncovered"
+readonly INFECTION="../../../${1} --with-uncovered"
 
 set -e pipefail
 
