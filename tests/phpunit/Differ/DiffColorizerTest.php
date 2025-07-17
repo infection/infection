@@ -188,5 +188,35 @@ final class DiffColorizerTest extends TestCase
                          return $response;</code>
                 CODE,
         ];
+
+        yield 'code string containing symfony style-tags' => [
+            <<<'CODE'
+
+                - $output->writeln('<options=bold>' . $x . '</options=bold> mutants were caught by Static Analysis');
+                + $output->writeln('<options=bold>' . $x . '</options=bold> mutants were caught by Static Analysis.');
+                CODE,
+            <<<'CODE'
+                <code>
+
+                <diff-del>- $output->writeln('\<options=bold>' . $x . '\</options=bold> mutants were caught by Static Analysis');</diff-del>
+                <diff-add>+ $output->writeln('\<options=bold>' . $x . '\</options=bold> mutants were caught by Static Analysis<diff-add-inline>.</diff-add-inline>');</diff-add></code>
+                CODE,
+        ];
+
+        yield 'surrounding comment containing symfony style-tags' => [
+            <<<'CODE'
+
+                // symfony docs suggest to use <error>foo</error>
+                -        $changedLinesRangeXX = 1;
+                +        $changedLinesRangeXX = 2;
+                CODE,
+            <<<'CODE'
+                <code>
+
+                // symfony docs suggest to use \<error>foo\</error>
+                <diff-del>-        $changedLinesRangeXX = <diff-del-inline>1</diff-del-inline>;</diff-del>
+                <diff-add>+        $changedLinesRangeXX = <diff-add-inline>2</diff-add-inline>;</diff-add></code>
+                CODE,
+        ];
     }
 }
