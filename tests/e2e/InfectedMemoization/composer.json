@@ -1,0 +1,10 @@
+{
+    "require": {
+        "phpunit/phpunit": "^9.6.20"
+    },
+    "autoload": {
+        "psr-4": {
+            "Infected\\": "src/"
+        }
+    }
+}
