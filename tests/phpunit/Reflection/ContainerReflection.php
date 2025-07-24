@@ -64,7 +64,7 @@ final class ContainerReflection
         $this->reflection = new ReflectionClass($container);
 
         $parentReflection = $this->reflection->getParentClass();
-        Assert::notNull($parentReflection);
+        Assert::notFalse($parentReflection);
 
         $this->factories = $parentReflection->getProperty('factories');
         $this->values = $parentReflection->getProperty('values');

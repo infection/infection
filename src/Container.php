@@ -1144,9 +1144,9 @@ final class Container extends DIContainer
 
     /**
      * @param class-string<object> $id
-     * @param Closure(self): object $value
+     * @param callable(static): object $value
      */
-    private function offsetSet(string $id, Closure $value): void
+    private function offsetSet(string $id, callable $value): void
     {
         $this->set($id, $value);
     }
