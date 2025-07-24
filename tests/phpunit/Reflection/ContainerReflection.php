@@ -43,6 +43,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
 use function str_starts_with;
+use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException as AssertException;
 
 final class ContainerReflection
@@ -63,6 +64,7 @@ final class ContainerReflection
         $this->reflection = new ReflectionClass($container);
 
         $parentReflection = $this->reflection->getParentClass();
+        Assert::notNull($parentReflection);
 
         $this->factories = $parentReflection->getProperty('factories');
         $this->values = $parentReflection->getProperty('values');
