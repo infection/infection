@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "25859a1e505c938119c237611345c864",
+    "content-hash": "a63a0cd0dff4edce5424cf9d74d82b34",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -959,16 +959,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.1.3",
+            "version": "0.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "dc1488c9559f27048e9879751f4d7ec8d20f73ef"
+                "reference": "7141a28f33d72dd7a9e3148e32a8b54b93050453"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/dc1488c9559f27048e9879751f4d7ec8d20f73ef",
-                "reference": "dc1488c9559f27048e9879751f4d7ec8d20f73ef",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/7141a28f33d72dd7a9e3148e32a8b54b93050453",
+                "reference": "7141a28f33d72dd7a9e3148e32a8b54b93050453",
                 "shasum": ""
             },
             "require": {
@@ -1001,13 +1001,22 @@
             "authors": [
                 {
                     "name": "Alexey Kopytko",
-                    "email": "alexey@kopytko.com"
+                    "email": "alexey@kopytko.com",
+                    "homepage": "https://github.com/sanmai"
+                },
+                {
+                    "name": "Maks Rafalko",
+                    "homepage": "https://twitter.com/maks_rafalko"
+                },
+                {
+                    "name": "Théo FIDRY",
+                    "homepage": "https://twitter.com/tfidry"
                 }
             ],
             "description": "Straightforward DI container with autowiring",
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.1.3"
+                "source": "https://github.com/sanmai/di-container/tree/0.1.4"
             },
             "funding": [
                 {
@@ -1015,7 +1024,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-24T02:09:35+00:00"
+            "time": "2025-07-24T03:40:49+00:00"
         },
         {
             "name": "sanmai/duoclock",
