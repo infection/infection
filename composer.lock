@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04f0a2a03159475bd1290bb4daa7aeb4",
+    "content-hash": "25859a1e505c938119c237611345c864",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -959,16 +959,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.1.2",
+            "version": "0.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "721c106d59bb703370f228953c57921a39f58f9b"
+                "reference": "dc1488c9559f27048e9879751f4d7ec8d20f73ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/721c106d59bb703370f228953c57921a39f58f9b",
-                "reference": "721c106d59bb703370f228953c57921a39f58f9b",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/dc1488c9559f27048e9879751f4d7ec8d20f73ef",
+                "reference": "dc1488c9559f27048e9879751f4d7ec8d20f73ef",
                 "shasum": ""
             },
             "require": {
@@ -1007,7 +1007,7 @@
             "description": "Straightforward DI container with autowiring",
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.1.2"
+                "source": "https://github.com/sanmai/di-container/tree/0.1.3"
             },
             "funding": [
                 {
@@ -1015,7 +1015,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-24T01:46:56+00:00"
+            "time": "2025-07-24T02:09:35+00:00"
         },
         {
             "name": "sanmai/duoclock",
