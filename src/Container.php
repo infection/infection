@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection;
 
 use function array_filter;
-use Closure;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
