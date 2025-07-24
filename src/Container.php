@@ -36,9 +36,8 @@ declare(strict_types=1);
 namespace Infection;
 
 use function array_filter;
-use function array_key_exists;
 use Closure;
-use function count;
+use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -142,21 +141,14 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use InvalidArgumentException;
-use function is_a;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ReflectionClass;
-use ReflectionNamedType;
-use ReflectionParameter;
-use function reset;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
@@ -165,7 +157,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use DIContainer\Container as DIContainer;
 
 /**
  * @internal
