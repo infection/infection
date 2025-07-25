@@ -7,7 +7,7 @@ tputx () {
 }
 
 run () {
-    local INFECTION=${1}
+    local INFECTION="${1} --with-uncovered"
     local PHPARGS=${2}
 
     if [ "$DRIVER" = "phpdbg" ]

@@ -172,7 +172,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_DEBUG = false;
 
-    public const DEFAULT_ONLY_COVERED = false;
+    public const DEFAULT_WITH_UNCOVERED = false;
 
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
 
@@ -563,7 +563,7 @@ final class Container extends DIContainer
         ?int $numberOfShownMutations = self::DEFAULT_SHOW_MUTATIONS,
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
-        bool $onlyCovered = self::DEFAULT_ONLY_COVERED,
+        bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
         string $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
@@ -639,7 +639,7 @@ final class Container extends DIContainer
                 $skipInitialTests,
                 $logVerbosity,
                 $debug,
-                $onlyCovered,
+                $withUncovered,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
