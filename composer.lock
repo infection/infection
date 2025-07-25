@@ -1153,16 +1153,16 @@
         },
         {
             "name": "sanmai/pipeline",
-            "version": "6.21",
+            "version": "7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/pipeline.git",
-                "reference": "6d729c0b0c662010d84cdea9b99f90a65ae4cf5e"
+                "reference": "b760e0f670555507fbdd0659f739f2ccf625a052"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/6d729c0b0c662010d84cdea9b99f90a65ae4cf5e",
-                "reference": "6d729c0b0c662010d84cdea9b99f90a65ae4cf5e",
+                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/b760e0f670555507fbdd0659f739f2ccf625a052",
+                "reference": "b760e0f670555507fbdd0659f739f2ccf625a052",
                 "shasum": ""
             },
             "require": {
@@ -1170,6 +1170,7 @@
             },
             "require-dev": {
                 "ergebnis/composer-normalize": "^2.8",
+                "esi/phpunit-coverage-check": ">2",
                 "friendsofphp/php-cs-fixer": "^3.17",
                 "infection/infection": ">=0.30.3",
                 "league/pipeline": "^0.3 || ^1.0",
@@ -1178,6 +1179,7 @@
                 "phpstan/phpstan": "^2",
                 "phpunit/phpunit": ">=9.4 <12",
                 "sanmai/phpstan-rules": "^0.3.0",
+                "sanmai/phpunit-double-colon-syntax": "^0.1.1",
                 "vimeo/psalm": ">=2"
             },
             "type": "library",
@@ -1207,7 +1209,7 @@
             "description": "General-purpose collections pipeline",
             "support": {
                 "issues": "https://github.com/sanmai/pipeline/issues",
-                "source": "https://github.com/sanmai/pipeline/tree/6.21"
+                "source": "https://github.com/sanmai/pipeline/tree/7.0"
             },
             "funding": [
                 {
@@ -1215,7 +1217,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-16T04:06:56+00:00"
+            "time": "2025-07-23T10:09:26+00:00"
         },
         {
             "name": "sebastian/diff",
