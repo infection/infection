@@ -13,14 +13,8 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: '#^Method Infection\\Container\:\:factoriesForType\(\) should return array\<class\-string\<T of object\>\> but returns list\<class\-string\<object\>\>\.$#'
-			identifier: return.type
-			count: 1
-			path: ../src/Container.php
-
-		-
-			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<int\<0, max\>,ReflectionParameter\>\:\:map\(\)$#'
-			identifier: argument.templateType
+			message: '#^Parameter \#2 \$value of method DIContainer\\Container\:\:set\(\) expects \(callable\(DIContainer\\Container\)\: object\)\|class\-string\<DIContainer\\Builder\<object\>\>, callable\(Infection\\Container\)\: object given\.$#'
+			identifier: argument.type
 			count: 1
 			path: ../src/Container.php
 
