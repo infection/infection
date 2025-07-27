@@ -146,7 +146,7 @@ final class MinMsiCheckerTest extends TestCase
 
         $msiChecker->checkMetrics(2, 12., 10., $this->consoleOutput);
 
-        $this->assertSame('', normalize_trailing_spaces($this->output->fetch()),);
+        $this->assertSame('', normalize_trailing_spaces($this->output->fetch()));
     }
 
     public function test_does_not_suggest_to_increase_the_min_msi_if_limit_is_zero(): void
