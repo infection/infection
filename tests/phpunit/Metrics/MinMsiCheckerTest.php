@@ -94,6 +94,15 @@ final class MinMsiCheckerTest extends TestCase
         }
     }
 
+    public function test_it_does_not_fails_the_check_if_min_msis_are_zero(): void
+    {
+        $msiChecker = new MinMsiChecker(false, 0., 0.);
+
+        $msiChecker->checkMetrics(2, 0., 0., $this->consoleOutput);
+
+        $this->assertSame('', $this->output->fetch());
+    }
+
     public function test_it_fails_the_check_if_the_covered_code_msi_is_lower_than_the_min_covered_code_msi(): void
     {
         $msiChecker = new MinMsiChecker(false, 5., 10.);
@@ -129,6 +138,15 @@ final class MinMsiCheckerTest extends TestCase
             ,
             normalize_trailing_spaces($this->output->fetch()),
         );
+    }
+
+    public function test_does_not_suggest_to_increase_the_min_msi_if_limit_is_zero(): void
+    {
+        $msiChecker = new MinMsiChecker(false, 0., 0.);
+
+        $msiChecker->checkMetrics(2, 80., 10., $this->consoleOutput);
+
+        $this->assertSame('', normalize_trailing_spaces($this->output->fetch()));
     }
 
     public function test_it_suggests_to_increase_the_min_covered_code_msi_if_above_the_limit(): void
