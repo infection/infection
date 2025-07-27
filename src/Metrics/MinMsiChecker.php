@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Metrics;
 
 use Infection\Console\ConsoleOutput;
+use function var_dump;
 
 /**
  * @internal

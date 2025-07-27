@@ -121,7 +121,7 @@ final class MinMsiCheckerTest extends TestCase
         }
     }
 
-    public function test_it_suggests_to_increase_the_min_msi_if_above_the_limit(): void
+    public function test_it_suggests_to_increase_the_min_uncovered_msi_if_above_the_limit(): void
     {
         $msiChecker = new MinMsiChecker(false, 10., 10.);
 
@@ -138,6 +138,15 @@ final class MinMsiCheckerTest extends TestCase
             ,
             normalize_trailing_spaces($this->output->fetch()),
         );
+    }
+
+    public function test_it_does_not_suggest_to_increase_the_min_uncovered_msi_for_exact_same_value(): void
+    {
+        $msiChecker = new MinMsiChecker(false, 10., 10.);
+
+        $msiChecker->checkMetrics(2, 12., 10., $this->consoleOutput);
+
+        $this->assertSame('', normalize_trailing_spaces($this->output->fetch()),);
     }
 
     public function test_does_not_suggest_to_increase_the_min_msi_if_limit_is_zero(): void
