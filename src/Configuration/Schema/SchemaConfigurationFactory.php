@@ -62,7 +62,7 @@ class SchemaConfigurationFactory
             self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
             self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
             $rawConfig->ignoreMsiWithNoMutations ?? null,
-            $rawConfig->minMsi ?? null,
+            $rawConfig->minUncoveredMsi ?? null,
             $rawConfig->minCoveredMsi ?? null,
             (array) ($rawConfig->mutators ?? []),
             $rawConfig->testFramework ?? null,

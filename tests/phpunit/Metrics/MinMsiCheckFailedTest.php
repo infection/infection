@@ -44,10 +44,10 @@ final class MinMsiCheckFailedTest extends TestCase
 {
     public function test_it_can_be_created_for_min_msi(): void
     {
-        $exception = MinMsiCheckFailed::createForMsi(73.26, 52.1);
+        $exception = MinMsiCheckFailed::createUncoveredMsi(73.26, 52.1);
 
         $this->assertSame(
-            'The minimum required MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
+            'The minimum required Uncovered MSI percentage should be 73.26%, but actual is 52.1%. Improve your tests!',
             $exception->getMessage(),
         );
     }

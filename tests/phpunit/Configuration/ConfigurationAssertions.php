@@ -141,7 +141,7 @@ trait ConfigurationAssertions
         $this->assertSame($expectedWithUncovered, !$configuration->mutateOnlyCoveredCode(), 'Failed onlyCoveredCode check');
         $this->assertSame($expectedNoProgress, $configuration->noProgress(), 'Failed noProgress check');
         $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
-        $this->assertSame($expectedMinMsi, $configuration->getMinMsi(), 'Failed minMsi check');
+        $this->assertSame($expectedMinMsi, $configuration->getMinUncoveredMsi(), 'Failed minMsi check');
         $this->assertSame($expectedNumberOfShownMutations, $configuration->getNumberOfShownMutations(), 'Failed numberOfShownMutations check');
         $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi(), 'Failed minCoveredMsi check');
         $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision(), 'Failed msiPrecision check');

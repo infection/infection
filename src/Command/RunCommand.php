@@ -134,7 +134,7 @@ final class RunCommand extends BaseCommand
     private const OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
 
     /** @var string */
-    private const OPTION_MIN_MSI = 'min-msi';
+    private const OPTION_MIN_UNCOVERED_MSI = 'min-uncovered-msi';
 
     /** @var string */
     private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
@@ -334,17 +334,17 @@ final class RunCommand extends BaseCommand
                 'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit / Pest it uses <comment>"--filter"</comment> option',
             )
             ->addOption(
-                self::OPTION_MIN_MSI,
+                self::OPTION_MIN_UNCOVERED_MSI,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum Mutation Score Indicator (MSI) percentage value',
+                'Minimum Mutation Score Indicator (MSI) percentage value, for all mutants including uncovered',
                 Container::DEFAULT_MIN_MSI,
             )
             ->addOption(
                 self::OPTION_MIN_COVERED_MSI,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value',
+                'Minimum Covered Code Mutation Score Indicator (MSI) percentage value.',
                 Container::DEFAULT_MIN_COVERED_MSI,
             )
             ->addOption(
@@ -455,12 +455,12 @@ final class RunCommand extends BaseCommand
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
         $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
 
-        /** @var string|null $minMsi */
-        $minMsi = $input->getOption(self::OPTION_MIN_MSI);
+        /** @var string|null $minUncoveredMsi */
+        $minUncoveredMsi = $input->getOption(self::OPTION_MIN_UNCOVERED_MSI);
         /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption(self::OPTION_MIN_COVERED_MSI);
 
-        $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
+        $msiPrecision = MsiParser::detectPrecision($minUncoveredMsi, $minCoveredMsi);
 
         $noProgress = (bool) $input->getOption(self::OPTION_NO_PROGRESS);
         $forceProgress = (bool) $input->getOption(self::OPTION_FORCE_PROGRESS);
@@ -522,7 +522,7 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
             (bool) $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS),
-            MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
+            MsiParser::parse($minUncoveredMsi, $msiPrecision, self::OPTION_MIN_UNCOVERED_MSI),
             MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
             $msiPrecision,
             $testFramework === ''

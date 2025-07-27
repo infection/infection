@@ -71,10 +71,10 @@ class ConsoleOutput
         );
     }
 
-    public function logMinMsiCanGetIncreasedNotice(float $minMsi, float $msi): void
+    public function logMinUncoveredMsiCanGetIncreasedNotice(float $minUncoveredMsi, float $actualUncoveredMsi): void
     {
-        $typeString = 'MSI';
-        $msiDifference = $msi - $minMsi;
+        $typeString = 'Uncovered MSI';
+        $msiDifference = $actualUncoveredMsi - $minUncoveredMsi;
 
         $this->logger->notice(
             sprintf(
@@ -88,10 +88,10 @@ class ConsoleOutput
         );
     }
 
-    public function logMinCoveredCodeMsiCanGetIncreasedNotice(float $minMsi, float $coveredCodeMsi): void
+    public function logMinCoveredCodeMsiCanGetIncreasedNotice(float $minCoveredMsi, float $actualCoveredCodeMsi): void
     {
         $typeString = 'Covered Code MSI';
-        $msiDifference = $coveredCodeMsi - $minMsi;
+        $msiDifference = $actualCoveredCodeMsi - $minCoveredMsi;
 
         $this->logger->notice(
             sprintf(

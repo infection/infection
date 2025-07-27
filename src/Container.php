@@ -349,7 +349,7 @@ final class Container extends DIContainer
 
                 return new MinMsiChecker(
                     $config->ignoreMsiWithNoMutations(),
-                    (float) $config->getMinMsi(),
+                    (float) $config->getMinUncoveredMsi(),
                     (float) $config->getMinCoveredMsi(),
                 );
             },
@@ -571,7 +571,7 @@ final class Container extends DIContainer
         ?string $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
         bool $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
         bool $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-        ?float $minMsi = self::DEFAULT_MIN_MSI,
+        ?float $minUncoveredMsi = self::DEFAULT_MIN_MSI,
         ?float $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
@@ -642,7 +642,7 @@ final class Container extends DIContainer
                 $withUncovered,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
-                $minMsi,
+                $minUncoveredMsi,
                 $numberOfShownMutations,
                 $minCoveredMsi,
                 $msiPrecision,

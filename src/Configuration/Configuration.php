@@ -71,7 +71,7 @@ class Configuration
 
     private readonly ?string $staticAnalysisTool;
 
-    private ?float $minMsi = null;
+    private ?float $minUncoveredMsi = null;
 
     private readonly int $threadCount;
 
@@ -105,7 +105,7 @@ class Configuration
         private readonly bool $withUncovered,
         private readonly bool $noProgress,
         private readonly bool $ignoreMsiWithNoMutations,
-        ?float $minMsi,
+        ?float $minUncoveredMsi,
         private readonly ?int $numberOfShownMutations,
         private readonly ?float $minCoveredMsi,
         private readonly int $msiPrecision,
@@ -126,7 +126,7 @@ class Configuration
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
-        Assert::nullOrGreaterThanEq($minMsi, 0.);
+        Assert::nullOrGreaterThanEq($minUncoveredMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
 
         $this->timeout = $timeout;
@@ -135,7 +135,7 @@ class Configuration
         $this->mutators = $mutators;
         $this->testFramework = $testFramework;
         $this->staticAnalysisTool = $staticAnalysisTool;
-        $this->minMsi = $minMsi;
+        $this->minUncoveredMsi = $minUncoveredMsi;
         $this->threadCount = $threadCount;
     }
 
@@ -271,9 +271,9 @@ class Configuration
         return $this->ignoreMsiWithNoMutations;
     }
 
-    public function getMinMsi(): ?float
+    public function getMinUncoveredMsi(): ?float
     {
-        return $this->minMsi;
+        return $this->minUncoveredMsi;
     }
 
     public function getNumberOfShownMutations(): ?int

@@ -2,7 +2,7 @@
 
 set -e pipefail
 
-readonly INFECTION="../../../bin/infection --ignore-msi-with-no-mutations --filter=notExistentFile.php --min-msi=100"
+readonly INFECTION="../../../bin/infection --ignore-msi-with-no-mutations --filter=notExistentFile.php --min-uncovered-msi=100"
 
 if [ "$DRIVER" = "phpdbg" ]
 then

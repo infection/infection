@@ -97,7 +97,7 @@ final class SchemaConfigurationTest extends TestCase
         $this->assertSame($phpUnit, $config->getPhpUnit(), 'Failed phpUnit check');
         $this->assertSame($phpStan, $config->getPhpStan(), 'Failed phpStan check');
         $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
-        $this->assertSame($minMsi, $config->getMinMsi(), 'Failed minMsi check');
+        $this->assertSame($minMsi, $config->getMinUncoveredMsi(), 'Failed minMsi check');
         $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi(), 'Failed minCoveredMsi check');
         $this->assertSame($mutators, $config->getMutators(), 'Failed mutators check');
         $this->assertSame($testFramework, $config->getTestFramework(), 'Failed testFramework check');

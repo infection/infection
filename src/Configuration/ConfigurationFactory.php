@@ -101,7 +101,7 @@ class ConfigurationFactory
         bool $withUncovered,
         bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
-        ?float $minMsi,
+        ?float $minUncoveredMsi,
         ?int $numberOfShownMutations,
         ?float $minCoveredMsi,
         int $msiPrecision,
@@ -172,7 +172,7 @@ class ConfigurationFactory
             $withUncovered,
             $this->retrieveNoProgress($noProgress),
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
-            self::retrieveMinMsi($minMsi, $schema),
+            self::retrieveMinUncoveredMsi($minUncoveredMsi, $schema),
             $numberOfShownMutations,
             self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
             $msiPrecision,
@@ -314,9 +314,9 @@ class ConfigurationFactory
         return $ignoreMsiWithNoMutations ?? $schema->getIgnoreMsiWithNoMutations() ?? false;
     }
 
-    private static function retrieveMinMsi(?float $minMsi, SchemaConfiguration $schema): ?float
+    private static function retrieveMinUncoveredMsi(?float $minUncoveredMsi, SchemaConfiguration $schema): ?float
     {
-        return $minMsi ?? $schema->getMinMsi();
+        return $minUncoveredMsi ?? $schema->getMinUncoveredMsi();
     }
 
     private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float

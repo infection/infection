@@ -156,11 +156,11 @@
             "type": "boolean",
             "description": "Ignore MSI violations with zero mutations."
         },
-        "minMsi": {
+        "minUncoveredMsi": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Minimum Mutation Score Indicator (MSI) percentage value. Should be used in CI server."
+            "description": "Minimum Mutation Score Indicator (MSI) percentage value for all the code, including uncovered. Should be used in CI server."
         },
         "minCoveredMsi": {
             "type": "number",

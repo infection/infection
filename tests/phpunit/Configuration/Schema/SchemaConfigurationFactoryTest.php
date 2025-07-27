@@ -875,35 +875,35 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ]),
         ];
 
-        yield '[minMsi] is float' => [
+        yield '[minUncoveredMsi] is float' => [
             <<<'JSON'
                 {
                     "source": {
                         "directories": ["src"]
                     },
-                    "minMsi": 3.14
+                    "minUncoveredMsi": 3.14
                 }
                 JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'minMsi' => 3.14,
+                'minUncoveredMsi' => 3.14,
             ]),
         ];
 
-        yield '[minMsi] is int' => [
+        yield '[minUncoveredMsi] is int' => [
             <<<'JSON'
                 {
                     "source": {
                         "directories": ["src"]
                     },
-                    "minMsi": 32
+                    "minUncoveredMsi": 32
                 }
                 JSON
             ,
             self::createConfig([
                 'source' => new Source(['src'], []),
-                'minMsi' => 32.0,
+                'minUncoveredMsi' => 32.0,
             ]),
         ];
 
@@ -2750,7 +2750,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'phpunit' => new PhpUnit(null, null),
             'phpStan' => new PhpStan(null, null),
             'ignoreMsiWithNoMutations' => null,
-            'minMsi' => null,
+            'minUncoveredMsi' => null,
             'minCoveredMsi' => null,
             'mutators' => [],
             'testFramework' => null,

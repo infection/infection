@@ -43,23 +43,23 @@ use UnexpectedValueException;
  */
 final class MinMsiCheckFailed extends UnexpectedValueException
 {
-    public static function createForMsi(float $minMsi, float $msi): self
+    public static function createUncoveredMsi(float $minUncoveredMsi, float $actualUncoveredMsi): self
     {
         return new self(sprintf(
-            'The minimum required MSI percentage should be %s%%, but actual is %s%%. '
+            'The minimum required Uncovered MSI percentage should be %s%%, but actual is %s%%. '
             . 'Improve your tests!',
-            $minMsi,
-            $msi,
+            $minUncoveredMsi,
+            $actualUncoveredMsi,
         ));
     }
 
-    public static function createCoveredMsi(float $minMsi, float $coveredCodeMsi): self
+    public static function createCoveredMsi(float $minCoveredCodeMsi, float $actualCoveredCodeMsi): self
     {
         return new self(sprintf(
             'The minimum required Covered Code MSI percentage should be %s%%, but actual is '
             . '%s%%. Improve your tests!',
-            $minMsi,
-            $coveredCodeMsi,
+            $minCoveredCodeMsi,
+            $actualCoveredCodeMsi,
         ));
     }
 }

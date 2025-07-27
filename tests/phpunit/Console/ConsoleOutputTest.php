@@ -140,7 +140,7 @@ final class ConsoleOutputTest extends TestCase
 
     public function test_log_min_msi_can_get_increased_notice_for_msi(): void
     {
-        $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
+        $this->consoleOutput->logMinUncoveredMsiCanGetIncreasedNotice(
             5.0,
             10.0,
         );
@@ -148,8 +148,8 @@ final class ConsoleOutputTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
-                 ! [NOTE] The MSI is 5% percentage points over the required MSI. Consider increasing the required
-                 !        MSI percentage the next time you run Infection.
+                 ! [NOTE] The Uncovered MSI is 5% percentage points over the required Uncovered MSI. Consider
+                 !        increasing the required Uncovered MSI percentage the next time you run Infection.
 
 
                 TXT

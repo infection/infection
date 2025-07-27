@@ -47,7 +47,7 @@ class MinMsiChecker
 
     public function __construct(
         private readonly bool $ignoreMsiWithNoMutations,
-        private readonly float $minMsi,
+        private readonly float $minUncoveredMsi,
         private readonly float $minCoveredCodeMsi,
     ) {
     }
@@ -73,9 +73,9 @@ class MinMsiChecker
             return;
         }
 
-        if ($this->isMsiInsufficient($msi)) {
-            throw MinMsiCheckFailed::createForMsi(
-                $this->minMsi,
+        if ($this->isUncoveredMsiInsufficient($msi)) {
+            throw MinMsiCheckFailed::createUncoveredMsi(
+                $this->minUncoveredMsi,
                 $msi,
             );
         }
@@ -90,9 +90,9 @@ class MinMsiChecker
 
     private function checkIfMinMsiCanBeIncreased(float $msi, float $coveredCodeMsi, ConsoleOutput $output): void
     {
-        if ($this->canIncreaseMsi($msi)) {
-            $output->logMinMsiCanGetIncreasedNotice(
-                $this->minMsi,
+        if ($this->canIncreaseUncoveredMsi($msi)) {
+            $output->logMinUncoveredMsiCanGetIncreasedNotice(
+                $this->minUncoveredMsi,
                 $msi,
             );
         }
@@ -105,9 +105,9 @@ class MinMsiChecker
         }
     }
 
-    private function isMsiInsufficient(float $msi): bool
+    private function isUncoveredMsiInsufficient(float $uncoveredMsi): bool
     {
-        return $this->minMsi > 0 && $msi < $this->minMsi;
+        return $this->minUncoveredMsi > 0 && $uncoveredMsi < $this->minUncoveredMsi;
     }
 
     private function isCoveredCodeMsiInsufficient(float $coveredCodeMsi): bool
@@ -115,13 +115,13 @@ class MinMsiChecker
         return $this->minCoveredCodeMsi > 0 && $coveredCodeMsi < $this->minCoveredCodeMsi;
     }
 
-    private function canIncreaseMsi(float $msi): bool
+    private function canIncreaseUncoveredMsi(float $msi): bool
     {
-        if ($this->minMsi === 0.0) {
+        if ($this->minUncoveredMsi === 0.0) {
             return false;
         }
 
-        return $msi > $this->minMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
+        return $msi > $this->minUncoveredMsi + self::VALUE_OVER_REQUIRED_TOLERANCE;
     }
 
     private function canIncreaseCoveredCodeMsi(float $coveredCodeMsi): bool

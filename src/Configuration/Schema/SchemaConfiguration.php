@@ -66,7 +66,7 @@ final class SchemaConfiguration
         private readonly PhpUnit $phpUnit,
         private readonly PhpStan $phpStan,
         private readonly ?bool $ignoreMsiWithNoMutations,
-        private readonly ?float $minMsi,
+        private readonly ?float $minUncoveredMsi,
         private readonly ?float $minCoveredMsi,
         private readonly array $mutators,
         ?string $testFramework,
@@ -124,9 +124,9 @@ final class SchemaConfiguration
         return $this->ignoreMsiWithNoMutations;
     }
 
-    public function getMinMsi(): ?float
+    public function getMinUncoveredMsi(): ?float
     {
-        return $this->minMsi;
+        return $this->minUncoveredMsi;
     }
 
     public function getMinCoveredMsi(): ?float
