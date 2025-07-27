@@ -79,7 +79,7 @@ jobs:
         run: |
           php bin/infection \
             --skip-initial-tests \
-            --min-msi=$MIN_MSI \
+            --min-uncovered-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
             --coverage=build/logs \
             --log-verbosity=none \
