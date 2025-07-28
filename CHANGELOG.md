@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.30.3](https://github.com/infection/infection/tree/0.31.0) (2025-07-28)
+## [0.31.0](https://github.com/infection/infection/tree/0.31.0) (2025-07-28)
 
 **Changed:**
 
