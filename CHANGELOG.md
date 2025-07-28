@@ -1,5 +1,49 @@
 # Change Log
 
+## [0.31.0](https://github.com/infection/infection/tree/0.31.0) (2025-07-28)
+
+**Changed:**
+
+* [BR BREAK!] Remove `--only-covered`; Introduce `--with-uncovered` instead by @staabm in https://github.com/infection/infection/pull/2336
+* Directly enqueue follow-up processes by @sanmai in https://github.com/infection/infection/pull/2322
+* Use `executionOrder="defects,random"` for `phpunit.xml` by @staabm in https://github.com/infection/infection/pull/2328
+
+**Fixed:**
+
+* Fix CLI output rendering for diffs which contain symfony-style like text by @staabm in https://github.com/infection/infection/pull/2338
+
+**Internal:**
+
+* Update the pipeline library to version 7 by @sanmai in https://github.com/infection/infection/pull/2342
+* Switch to sanmai/di-container by @sanmai in https://github.com/infection/infection/pull/2343
+
+### Backward Compatibility Break
+
+This version introduces BC Break. Do the following:
+
+1. If you used Infection for all the code, including uncovered, like `bin/infection`, now you need to add `--with-uncovered`, because by default, Infection doesn't mutate uncovered code anymore
+
+```diff
+- bin/infection
++ bin/infection --with-uncovered
+```
+
+2. If you used Infection for the only code covered by tests, like `bin/infection --only-covered`, you need to remove this option because now this is a default behavior and this options has been removed
+
+```diff
+- bin/infection --only-covered
++ bin/infection
+```
+
+3. If you used Infection for all the code, including uncovered, but now you want to mutated only covered code, do nothing (default behavior has been changed)
+
+```
+# continue using
+bin/infection
+```
+
+**Full Changelog**: https://github.com/infection/infection/compare/0.30.3...0.31.0
+
 ## [0.30.3](https://github.com/infection/infection/tree/0.30.3) (2025-07-11)
 
 **Added:**
