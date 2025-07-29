@@ -4484,27 +4484,27 @@
         },
         {
             "name": "sidz/phpstan-rules",
-            "version": "0.5.1",
+            "version": "0.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sidz/phpstan-rules.git",
-                "reference": "66185a347136c3f4bc2951651fe1a3fe4c17b894"
+                "reference": "81af1a29ef92e946a7d84b226f641ef5c8a2054e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/66185a347136c3f4bc2951651fe1a3fe4c17b894",
-                "reference": "66185a347136c3f4bc2951651fe1a3fe4c17b894",
+                "url": "https://api.github.com/repos/sidz/phpstan-rules/zipball/81af1a29ef92e946a7d84b226f641ef5c8a2054e",
+                "reference": "81af1a29ef92e946a7d84b226f641ef5c8a2054e",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1, <8.5",
+                "php": "^8.1, <8.6",
                 "phpstan/phpstan": "^2.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.59",
-                "infection/infection": "^0.28.0",
-                "nikic/php-parser": "^5.3",
-                "phpunit/phpunit": "^10.1"
+                "friendsofphp/php-cs-fixer": "^3.84",
+                "infection/infection": "^0.29.8",
+                "nikic/php-parser": "^5.5",
+                "phpunit/phpunit": "^10.5"
             },
             "type": "phpstan-extension",
             "extra": {
@@ -4541,7 +4541,7 @@
                 "issues": "https://github.com/sidz/phpstan-rules/issues",
                 "source": "https://github.com/sidz/phpstan-rules"
             },
-            "time": "2024-12-08T16:42:36+00:00"
+            "time": "2025-07-26T12:56:48+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
