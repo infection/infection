@@ -1028,21 +1028,24 @@
         },
         {
             "name": "sanmai/duoclock",
-            "version": "0.1",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/DuoClock.git",
-                "reference": "dd6b6e14ae0da606b10e3bb87aa4b68f337c75db"
+                "reference": "30aa40092396dc96b68c8e8d49162619574477e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/DuoClock/zipball/dd6b6e14ae0da606b10e3bb87aa4b68f337c75db",
-                "reference": "dd6b6e14ae0da606b10e3bb87aa4b68f337c75db",
+                "url": "https://api.github.com/repos/sanmai/DuoClock/zipball/30aa40092396dc96b68c8e8d49162619574477e2",
+                "reference": "30aa40092396dc96b68c8e8d49162619574477e2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
                 "psr/clock": "^1.0"
+            },
+            "provide": {
+                "psr/clock-implementation": "1.0"
             },
             "require-dev": {
                 "ergebnis/composer-normalize": "^2.8",
@@ -1077,7 +1080,7 @@
             "description": "PHP time mocking for tests - PSR-20 clock with mockable sleep(), time(), and TimeSpy for PHPUnit testing",
             "support": {
                 "issues": "https://github.com/sanmai/DuoClock/issues",
-                "source": "https://github.com/sanmai/DuoClock/tree/0.1"
+                "source": "https://github.com/sanmai/DuoClock/tree/0.1.1"
             },
             "funding": [
                 {
@@ -1085,7 +1088,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-12T08:35:17+00:00"
+            "time": "2025-07-28T02:17:28+00:00"
         },
         {
             "name": "sanmai/later",
@@ -1153,16 +1156,16 @@
         },
         {
             "name": "sanmai/pipeline",
-            "version": "7.0",
+            "version": "7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/pipeline.git",
-                "reference": "b760e0f670555507fbdd0659f739f2ccf625a052"
+                "reference": "d01565ef9f5cd7d1019c5f8bee09497067511f36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/b760e0f670555507fbdd0659f739f2ccf625a052",
-                "reference": "b760e0f670555507fbdd0659f739f2ccf625a052",
+                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/d01565ef9f5cd7d1019c5f8bee09497067511f36",
+                "reference": "d01565ef9f5cd7d1019c5f8bee09497067511f36",
                 "shasum": ""
             },
             "require": {
@@ -1209,7 +1212,7 @@
             "description": "General-purpose collections pipeline",
             "support": {
                 "issues": "https://github.com/sanmai/pipeline/issues",
-                "source": "https://github.com/sanmai/pipeline/tree/7.0"
+                "source": "https://github.com/sanmai/pipeline/tree/7.1"
             },
             "funding": [
                 {
@@ -1217,7 +1220,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-23T10:09:26+00:00"
+            "time": "2025-07-27T07:02:29+00:00"
         },
         {
             "name": "sebastian/diff",
