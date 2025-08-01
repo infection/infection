@@ -99,10 +99,10 @@ class DiffColorizer
         $previousLineLength = mb_strlen($previousLine);
         $nextLineLength = mb_strlen($nextLine);
 
-        $start = $previousLineLength;
-
-        while ($start !== 0 && mb_strpos($nextLine, mb_substr($previousLine, 0, $start)) !== 0) {
-            --$start;
+        for ($start = $previousLineLength; $start !== 0; --$start) {
+            if (mb_strpos($nextLine, mb_substr($previousLine, 0, $start)) === 0) {
+                break;
+            }
         }
 
         $end = $start;
