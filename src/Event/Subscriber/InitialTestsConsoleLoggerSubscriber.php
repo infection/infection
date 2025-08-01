@@ -63,37 +63,14 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscri
 
     public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            'Running initial test suite...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-            '',
-        ]);
-        $this->progressBar->start();
     }
 
     public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
     {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->getOutputText());
-        }
+        $this->output->writeln(PHP_EOL . $event->getOutputText());
     }
 
     public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
     {
-        $this->progressBar->advance();
     }
 }
