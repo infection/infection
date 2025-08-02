@@ -105,10 +105,10 @@ class DiffColorizer
             }
         }
 
-        $end = $start;
-
-        while ($end < $previousLineLength && mb_strrpos($nextLine, $t = mb_substr($previousLine, $end), $start) !== ($nextLineLength - mb_strlen($t))) {
-            ++$end;
+        for ($end = $start; $end < $previousLineLength; ++$end) {
+            if (mb_strrpos($nextLine, $t = mb_substr($previousLine, $end), $start) === ($nextLineLength - mb_strlen($t))) {
+                break;
+            }
         }
 
         $return = $previousLine;
