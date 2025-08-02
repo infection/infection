@@ -250,6 +250,5 @@ final class DiffColorizerTest extends TestCase
                      }</code>
                 CODE,
         ];
-
     }
 }
