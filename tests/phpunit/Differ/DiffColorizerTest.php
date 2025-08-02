@@ -218,5 +218,38 @@ final class DiffColorizerTest extends TestCase
                 <diff-add>+        $changedLinesRangeXX = <diff-add-inline>2</diff-add-inline>;</diff-add></code>
                 CODE,
         ];
+
+        yield 'multibyte characters full-deletion' => [
+            <<<'CODE'
+                     function ($a) {
+                -        return 'déjà_vu';
+                +
+                     }
+                CODE,
+            <<<'CODE'
+                <code>
+                     function ($a) {
+                <diff-del>-<diff-del-inline>        return 'déjà_vu</diff-del-inline>';</diff-del>
+                <diff-add>+</diff-add>
+                     }</code>
+                CODE,
+        ];
+
+        yield 'multibyte characters partial-deletion' => [
+            <<<'CODE'
+                     function ($a) {
+                -        return 'déjà_vu' . 'bar';
+                +        return 'déjà_vu';
+                     }
+                CODE,
+            <<<'CODE'
+                <code>
+                     function ($a) {
+                <diff-del>-        return 'déjà_v<diff-del-inline>u' . 'ba</diff-del-inline>r';</diff-del>
+                <diff-add>+        return 'déjà_vu';</diff-add>
+                     }</code>
+                CODE,
+        ];
+
     }
 }
