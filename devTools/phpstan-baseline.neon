@@ -19,6 +19,18 @@ parameters:
 			path: ../src/Container.php
 
 		-
+			message: '#^Variable \$end might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			message: '#^Variable \$start might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: ../src/Differ/DiffColorizer.php
+
+		-
 			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
