@@ -59,7 +59,7 @@ jobs:
         run: composer config --unset platform.php
 
       - name: Configure for PHP >= 8.4
-        if: "matrix.php-version >= '8.4"
+        if: "matrix.php-version >= '8.4'"
         run: |
           composer config platform.php 8.4.99
 
