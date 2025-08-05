@@ -39,6 +39,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
+use const LIBXML_NONET;
 use Webmozart\Assert\Assert;
 
 /**
@@ -64,7 +65,7 @@ final readonly class SafeDOMXPath
     public static function fromString(string $content): self
     {
         $document = new DOMDocument();
-        $success = @$document->loadXML($content);
+        $success = @$document->loadXML($content, LIBXML_NONET);
 
         Assert::true($success);
 
