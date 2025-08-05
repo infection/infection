@@ -11,5 +11,8 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "PublicVisibility": true
+    }
 }

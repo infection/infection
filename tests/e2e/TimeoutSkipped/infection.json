@@ -8,5 +8,11 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "DecrementInteger": true,
+        "FunctionCallRemoval": true,
+        "Plus": true,
+        "PublicVisibility": true
+    }
 }

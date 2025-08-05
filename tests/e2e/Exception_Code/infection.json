@@ -9,5 +9,12 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": "."
+    "tmpDir": ".",
+    "mutators": {
+        "DecrementInteger": true,
+        "IncrementInteger": true,
+        "MethodCallRemoval": true,
+        "PublicVisibility": true,
+        "Throw_": true
+    }
 }
