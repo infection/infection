@@ -8,9 +8,9 @@
     "logs": {
         "summary": "infection.log"
     },
-    "tmpDir": ".",
     "mutators": {
         "Plus": true,
         "PublicVisibility": true
-    }
+    },
+    "tmpDir": "."
 }
