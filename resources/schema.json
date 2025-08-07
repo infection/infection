@@ -398,6 +398,7 @@
                 "SpreadAssignment": { "$ref": "#/definitions/default-mutator-config" },
                 "SpreadRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SyntaxError": { "$ref": "#/definitions/default-mutator-config" },
+                "ForeachKeyRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "Foreach_": { "$ref": "#/definitions/default-mutator-config" },
                 "For_": { "$ref": "#/definitions/default-mutator-config" },
                 "DoWhile": { "$ref": "#/definitions/default-mutator-config" },

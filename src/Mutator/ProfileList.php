@@ -216,6 +216,7 @@ final class ProfileList
     public const LOOP_PROFILE = [
         Loop\DoWhile::class,
         Loop\For_::class,
+        Loop\ForeachKeyRemoval::class,
         Loop\Foreach_::class,
         Loop\While_::class,
     ];
@@ -433,6 +434,7 @@ final class ProfileList
 
         // Loop
         'DoWhile' => Loop\DoWhile::class,
+        'ForeachKeyRemoval' => Loop\ForeachKeyRemoval::class,
         'Foreach_' => Loop\Foreach_::class,
         'For_' => Loop\For_::class,
         'While_' => Loop\While_::class,
