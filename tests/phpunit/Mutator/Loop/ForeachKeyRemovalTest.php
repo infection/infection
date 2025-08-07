@@ -71,11 +71,65 @@ final class ForeachKeyRemovalTest extends BaseMutatorTestCase
             ,
         ];
 
-        yield 'It does not change when no foreach key exists' => [
+        yield 'It mutates by removing foreach key when items were passed by reference' => [
+            <<<'PHP'
+                <?php
+
+                foreach ($array as $key => &$value) {
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                foreach ($array as &$value) {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It mutates by removing foreach key when unpacking value' => [
+            <<<'PHP'
+                <?php
+
+                foreach ($array as $key => [$a, $b]) {
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                foreach ($array as [$a, $b]) {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not change when no foreach key exists for simple loop' => [
             <<<'PHP'
                 <?php
 
                 foreach ($array as $value) {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not change when no foreach key exists and items were passed by reference' => [
+            <<<'PHP'
+                <?php
+
+                foreach ($array as &$value) {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not change when no foreach key exists and when unpacking value' => [
+            <<<'PHP'
+                <?php
+
+                foreach ($array as [$a, $b]) {
                 }
                 PHP
             ,
