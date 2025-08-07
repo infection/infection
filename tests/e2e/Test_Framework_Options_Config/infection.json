@@ -9,5 +9,8 @@
         "summary": "infection.log"
     },
     "tmpDir": ".",
+    "mutators": {
+        "PublicVisibility": true
+    },
     "testFrameworkOptions": "--strict-global-state"
 }

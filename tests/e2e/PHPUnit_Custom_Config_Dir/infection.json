@@ -11,5 +11,8 @@
     "phpUnit": {
         "configDir": "build"
     },
+    "mutators": {
+        "PublicVisibility": true
+    },
     "tmpDir": "."
 }
