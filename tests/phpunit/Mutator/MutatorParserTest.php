@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\Arithmetic\Assignment;
 use Infection\Mutator\MutatorParser;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -67,6 +68,11 @@ final class MutatorParserTest extends TestCase
     public static function mutatorInputProvider(): iterable
     {
         yield 'empty string' => ['', []];
+
+        yield 'long name to be replaced with short name' => [
+            Assignment::class,
+            ['Assignment'],
+        ];
 
         yield 'string with only spaces' => ['  ', []];
 
