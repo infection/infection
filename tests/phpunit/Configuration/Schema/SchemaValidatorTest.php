@@ -170,9 +170,6 @@ final class SchemaValidatorTest extends TestCase
         $configReflection = new ReflectionClass(SchemaConfigurationFile::class);
 
         $decodedContentsReflection = $configReflection->getProperty('decodedContents');
-        if (version_compare(PHP_VERSION, '8.1.0', '<')) {
-            $decodedContentsReflection->setAccessible(true);
-        }
         $decodedContentsReflection->setValue($config, $decodedContents);
 
         return $config;

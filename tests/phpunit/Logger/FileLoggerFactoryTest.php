@@ -337,10 +337,6 @@ final class FileLoggerFactoryTest extends TestCase
         $this->assertInstanceOf(FederatedLogger::class, $logger);
 
         $loggersReflection = (new ReflectionClass(FederatedLogger::class))->getProperty('loggers');
-        if (version_compare(PHP_VERSION, '8.1.0', '<')) {
-            $loggersReflection->setAccessible(true);
-        }
-
         $loggers = $loggersReflection->getValue($logger);
 
         $fileLoggerDecoratedLogger = (new ReflectionClass(FileLogger::class))->getProperty('lineLogger');
