@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Mutator\Cast\CastFloat;
 use Infection\Testing\BaseMutatorTestCase;
-use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -73,16 +72,16 @@ final class CastFloatTest extends BaseMutatorTestCase
         if (PHP_VERSION_ID < 80500) {
             yield 'It removes casting to double' => [
                 <<<'PHP'
-                    <?php
+                <?php
 
-                    (double) '1.1';
-                    PHP
+                (double) '1.1';
+                PHP
                 ,
                 <<<'PHP'
-                    <?php
+                <?php
 
-                    '1.1';
-                    PHP
+                '1.1';
+                PHP
                 ,
             ];
         }
