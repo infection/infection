@@ -340,9 +340,6 @@ final class FileLoggerFactoryTest extends TestCase
         $loggers = $loggersReflection->getValue($logger);
 
         $fileLoggerDecoratedLogger = (new ReflectionClass(FileLogger::class))->getProperty('lineLogger');
-        if (version_compare(PHP_VERSION, '8.1.0', '<')) {
-            $fileLoggerDecoratedLogger->setAccessible(true);
-        }
 
         $actualLoggerClasses = array_map(
             static function ($logger) use ($fileLoggerDecoratedLogger): string {
