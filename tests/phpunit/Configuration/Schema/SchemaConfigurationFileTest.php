@@ -94,7 +94,9 @@ final class SchemaConfigurationFileTest extends TestCase
 
         $decodedContentsReflection = (new ReflectionClass(
             SchemaConfigurationFile::class))->getProperty('decodedContents');
-        $decodedContentsReflection->setAccessible(true);
+        if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+            $decodedContentsReflection->setAccessible(true);
+        }
         $decodedContentsReflection->setValue($config, $expectedValue);
 
         $this->assertSame($expectedValue, $config->getDecodedContents());
