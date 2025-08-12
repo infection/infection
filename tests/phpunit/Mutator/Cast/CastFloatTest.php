@@ -69,22 +69,20 @@ final class CastFloatTest extends BaseMutatorTestCase
             ,
         ];
 
-        if (PHP_VERSION_ID < 80500) {
-            yield 'It removes casting to double' => [
-                <<<'PHP'
+        yield 'It removes casting to double' => [
+            <<<'PHP'
                 <?php
 
                 (double) '1.1';
                 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
                 <?php
 
                 '1.1';
                 PHP
-                ,
-            ];
-        }
+            ,
+        ];
 
         yield 'It removes casting to real' => [
             <<<'PHP'

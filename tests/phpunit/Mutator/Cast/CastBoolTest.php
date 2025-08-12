@@ -70,22 +70,20 @@ final class CastBoolTest extends BaseMutatorTestCase
             ,
         ];
 
-        if (PHP_VERSION_ID < 80500) {
-            yield 'It removes casting to bool with "boolean"' => [
-                <<<'PHP'
+        yield 'It removes casting to bool with "boolean"' => [
+            <<<'PHP'
                 <?php
 
                 (boolean) 1;
                 PHP
-                ,
-                <<<'PHP'
+            ,
+            <<<'PHP'
                 <?php
 
                 1;
                 PHP
-                ,
-            ];
-        }
+            ,
+        ];
 
         yield 'It removes casting to bool in conditions' => [
             <<<'PHP'
