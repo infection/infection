@@ -170,7 +170,6 @@ final class SchemaValidatorTest extends TestCase
         $configReflection = new ReflectionClass(SchemaConfigurationFile::class);
 
         $decodedContentsReflection = $configReflection->getProperty('decodedContents');
-        $decodedContentsReflection->setAccessible(true);
         $decodedContentsReflection->setValue($config, $decodedContents);
 
         return $config;
