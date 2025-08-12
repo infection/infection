@@ -38,6 +38,7 @@ namespace Infection\Tests\Mutator\Cast;
 use Infection\Mutator\Cast\CastBool;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -73,16 +74,16 @@ final class CastBoolTest extends BaseMutatorTestCase
         if (PHP_VERSION_ID < 80500) {
             yield 'It removes casting to bool with "boolean"' => [
                 <<<'PHP'
-                <?php
+                    <?php
 
-                (boolean) 1;
-                PHP
+                    (boolean) 1;
+                    PHP
                 ,
                 <<<'PHP'
-                <?php
+                    <?php
 
-                1;
-                PHP
+                    1;
+                    PHP
                 ,
             ];
         }
