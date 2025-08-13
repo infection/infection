@@ -94,7 +94,6 @@ final class SchemaConfigurationFileTest extends TestCase
 
         $decodedContentsReflection = (new ReflectionClass(
             SchemaConfigurationFile::class))->getProperty('decodedContents');
-        $decodedContentsReflection->setAccessible(true);
         $decodedContentsReflection->setValue($config, $expectedValue);
 
         $this->assertSame($expectedValue, $config->getDecodedContents());

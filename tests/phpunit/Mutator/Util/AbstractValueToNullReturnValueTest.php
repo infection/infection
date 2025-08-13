@@ -153,7 +153,6 @@ final class AbstractValueToNullReturnValueTest extends TestCase
     private function invokeMethod(Node $mockNode)
     {
         $reflectionMethod = new ReflectionMethod(AbstractValueToNullReturnValue::class, 'isNullReturnValueAllowed');
-        $reflectionMethod->setAccessible(true);
 
         return $reflectionMethod->invoke($this->testSubject, $mockNode);
     }
