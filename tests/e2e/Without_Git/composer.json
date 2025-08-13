@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "^10",
+        "phpunit/phpunit": "^9",
         "infection/infection": "dev-master"
     },
     "autoload": {
