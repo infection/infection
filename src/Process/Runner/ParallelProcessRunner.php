@@ -38,33 +38,27 @@ namespace Infection\Process\Runner;
 use function array_shift;
 use Composer\XdebugHandler\Process;
 use function count;
+use DuoClock\DuoClock;
 use Generator;
 use Infection\Process\MutantProcessContainer;
+use Iterator;
 use function max;
-use function microtime;
 use function range;
+use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use function usleep;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  *
  * This ProcessManager is an elaborate wrapper to enable parallel processing using Symfony Process component
+ * @final
  */
-final class ParallelProcessRunner implements ProcessRunner
+class ParallelProcessRunner implements ProcessRunner
 {
     private const POLL_WAIT_IN_MS = 1000;
 
     private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
-
-    /**
-     * Here we store "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
-     * For example: static analysis process to try to kill a Mutant
-     *
-     * @var array<int, MutantProcessContainer>
-     */
-    private array $nextMutantProcessKillerContainer = [];
 
     /**
      * @var array<int, IndexedMutantProcessContainer>
@@ -84,6 +78,7 @@ final class ParallelProcessRunner implements ProcessRunner
     public function __construct(
         private readonly int $threadCount,
         private readonly int $poll = self::POLL_WAIT_IN_MS,
+        private readonly DuoClock $clock = new DuoClock(),
     ) {
     }
 
@@ -92,6 +87,10 @@ final class ParallelProcessRunner implements ProcessRunner
         $this->shouldStop = true;
     }
 
+    /**
+     * @param iterable<MutantProcessContainer> $processContainers
+     * @return iterable<MutantProcessContainer>
+     */
     public function run(iterable $processContainers): iterable
     {
         /*
@@ -102,11 +101,15 @@ final class ParallelProcessRunner implements ProcessRunner
          *
          * For our purposes we need to make sure we only see one process only once. Thus,
          * we use a generator here which is both non-rewindable, and will fail loudly if tried.
+         * That said, we permit iterators for testing purposes, as they can be mocked.
          */
-        $generator = self::toGenerator($processContainers);
+        $generator = $processContainers instanceof Iterator
+            ? $processContainers
+            : self::toGenerator($processContainers);
 
         // Bucket for processes to be executed
-        $bucket = [];
+        /** @var SplQueue<MutantProcessContainer> $bucket */
+        $bucket = new SplQueue();
 
         // Load the first process from the queue to buy us some time.
         $this->fillBucketOnce($bucket, $generator, 1);
@@ -120,9 +123,8 @@ final class ParallelProcessRunner implements ProcessRunner
                 break;
             }
 
-            $mutantProcessContainer = array_shift($bucket);
-
-            if ($mutantProcessContainer !== null) {
+            if (!$bucket->isEmpty()) {
+                $mutantProcessContainer = $bucket->dequeue();
                 $threadIndex = array_shift($this->availableThreadIndexes);
 
                 Assert::integer($threadIndex, 'Thread index can not be null.');
@@ -130,37 +132,73 @@ final class ParallelProcessRunner implements ProcessRunner
                 $this->startProcess($mutantProcessContainer, $threadIndex);
             }
 
-            if (count($this->runningProcessContainers) >= $threadCount) {
-                do {
-                    // While we wait, try fetch a good amount of next processes from the queue,
-                    // reducing the poll delay with each loaded process
-                    usleep(max(0, $this->poll - $this->fillBucketOnce($bucket, $generator, $threadCount)));
+            while ($this->hasProcessesThatCouldBeFreed($threadCount)) {
+                // While we wait, try fetch a good amount of next processes from the queue,
+                // reducing the poll delay with each loaded process
+                $this->wait($this->fillBucketOnce($bucket, $generator, $threadCount));
 
-                    $terminatedProcess = $this->tryToFreeNotRunningProcess();
-
-                    if ($terminatedProcess !== null) {
-                        // yield back so that we can work on process result
-                        yield $terminatedProcess;
-                    }
-
-                    // Continue if we still have too many running processes and no processes were terminated
-                } while (count($this->runningProcessContainers) >= $threadCount && $terminatedProcess === null);
-            }
-
-            // this termination is added for the case when there are few processes than threads and we don't fill/free processes above
-            $terminatedProcess = $this->tryToFreeNotRunningProcess();
-
-            if ($terminatedProcess !== null) {
                 // yield back so that we can work on process result
-                yield $terminatedProcess;
+                yield from $this->tryToFreeNotRunningProcess($bucket);
+
+                // Continue if we still have too many running processes and no processes were terminated
             }
+
+            // this termination is added for the case when there are few processes than threads, and we don't fill/free processes above
+            // yield back so that we can work on process result
+            yield from $this->tryToFreeNotRunningProcess($bucket);
 
             // In any case try to load at least one process to the bucket
             $this->fillBucketOnce($bucket, $generator, 1);
-        } while ($bucket !== [] || $this->runningProcessContainers !== [] || $this->nextMutantProcessKillerContainer !== []);
+        } while (!$bucket->isEmpty() || $this->runningProcessContainers !== []);
     }
 
-    private function tryToFreeNotRunningProcess(): ?MutantProcessContainer
+    /**
+     * This method checks if we have enough processes running that could be freed.
+     * Left as protected to allow spying off a mock in tests.
+     */
+    protected function hasProcessesThatCouldBeFreed(int $threadCount): bool
+    {
+        return count($this->runningProcessContainers) >= $threadCount;
+    }
+
+    /**
+     * This fills the bucket from the input stream of processes containers (original mutant processes)
+     *
+     * @param SplQueue<MutantProcessContainer> $bucket
+     * @param Iterator<MutantProcessContainer> $input
+     */
+    protected function fillBucketOnce(SplQueue $bucket, Iterator $input, int $threadCount): int
+    {
+        Assert::greaterThan($threadCount, 0, 'Thread count must be positive.');
+
+        if (count($bucket) >= $threadCount || !$input->valid()) {
+            return 0;
+        }
+
+        $start = $this->clock->microtime();
+
+        $current = $input->current();
+        Assert::notNull($current);
+
+        $bucket->enqueue($current);
+        $input->next();
+
+        return (int) ($this->clock->microtime() - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
+    }
+
+    /**
+     * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
+     */
+    protected function wait(int $timeSpentDoingWork): void
+    {
+        $this->clock->usleep(max(0, $this->poll - $timeSpentDoingWork));
+    }
+
+    /**
+     * @param SplQueue<MutantProcessContainer> $bucket
+     * @return iterable<MutantProcessContainer>
+     */
+    private function tryToFreeNotRunningProcess(SplQueue $bucket): iterable
     {
         // remove any finished process from the stack
         foreach ($this->runningProcessContainers as $index => $indexedMutantProcess) {
@@ -174,28 +212,28 @@ final class ParallelProcessRunner implements ProcessRunner
                 $mutantProcess->markAsTimedOut();
             }
 
-            if (!$process->isRunning()) {
-                $mutantProcess->markAsFinished();
-
-                $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
-
-                unset($this->runningProcessContainers[$index]->mutantProcessContainer);
-                unset($this->runningProcessContainers[$index]);
-
-                if ($mutantProcessContainer->hasNext()) {
-                    $mutantProcessContainer->createNext();
-
-                    // Process needs static analysis run
-                    $this->nextMutantProcessKillerContainer[] = $mutantProcessContainer;
-
-                    return null;
-                }
-
-                return $mutantProcessContainer;
+            if ($process->isRunning()) {
+                continue;
             }
-        }
 
-        return null;
+            $mutantProcess->markAsFinished();
+
+            $this->availableThreadIndexes[] = $indexedMutantProcess->threadIndex;
+
+            unset($this->runningProcessContainers[$index]->mutantProcessContainer);
+            unset($this->runningProcessContainers[$index]);
+
+            if ($mutantProcessContainer->hasNext()) {
+                $mutantProcessContainer->createNext();
+
+                // Enqueue the needed static analysis run
+                $bucket->enqueue($mutantProcessContainer);
+
+                return;
+            }
+
+            yield $mutantProcessContainer;
+        }
     }
 
     private function startProcess(MutantProcessContainer $mutantProcessContainer, int $threadIndex): void
@@ -206,32 +244,6 @@ final class ParallelProcessRunner implements ProcessRunner
         ]);
 
         $this->runningProcessContainers[] = new IndexedMutantProcessContainer($threadIndex, $mutantProcessContainer);
-    }
-
-    /**
-     * This fills the bucket from 2 sources:
-     *  - from the input stream of processes containers (original mutant processes)
-     *  - from the "next" killer processes, created if a PHPUnit process doesn't kill a Mutant
-     *
-     * @param MutantProcessContainer[] $bucket
-     * @param Generator<MutantProcessContainer> $input
-     */
-    private function fillBucketOnce(array &$bucket, Generator $input, int $threadCount): int
-    {
-        if (count($bucket) >= $threadCount || !$input->valid()) {
-            if ($this->nextMutantProcessKillerContainer !== []) {
-                $bucket[] = array_shift($this->nextMutantProcessKillerContainer);
-            }
-
-            return 0;
-        }
-
-        $start = microtime(true);
-
-        $bucket[] = $input->current();
-        $input->next();
-
-        return (int) (microtime(true) - $start) * self::NANO_SECONDS_IN_MILLI_SECOND; // ns to ms
     }
 
     /**

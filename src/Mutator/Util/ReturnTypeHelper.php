@@ -35,51 +35,77 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use function is_string;
 use PhpParser\Node;
+use PhpParser\Node\ComplexType;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
 
 /**
  * @internal
- *
- * @template TNode of Node
- * @implements Mutator<TNode>
  */
-abstract class AbstractValueToNullReturnValue implements Mutator
+final class ReturnTypeHelper
 {
-    use GetMutatorName;
+    private const VOID = 'void';
 
-    protected function isNullReturnValueAllowed(Node $node): bool
+    private const NULL = 'null';
+
+    private readonly Identifier|Name|ComplexType|null $returnType;
+
+    public function __construct(
+        private readonly Node\Stmt\Return_ $node,
+    ) {
+        // We do not expect to see a return statement outside a function-like node.
+        $this->returnType = ReflectionVisitor::getFunctionScope($this->node)->getReturnType();
+    }
+
+    public function hasVoidReturnType(): bool
     {
-        $functionScope = ReflectionVisitor::findFunctionScope($node);
-
-        if ($functionScope === null) {
-            return true;
-        }
-
-        $returnType = $functionScope->getReturnType();
-
-        if ($returnType instanceof Node\Identifier) {
-            $returnType = $returnType->toString();
-        }
-
-        // no return value specified
-        if ($returnType === null) {
-            return true;
-        }
-
-        // scalar typehint
-        if (is_string($returnType)) {
+        if ($this->returnType === null) {
             return false;
         }
 
-        // nullable typehint, e.g. "?int" or "?CustomClass"
-        if ($returnType instanceof Node\NullableType) {
+        if ($this->returnType instanceof ComplexType) {
+            return false;
+        }
+
+        return $this->returnType->toLowerString() === self::VOID;
+    }
+
+    public function hasSpecificReturnType(): bool
+    {
+        if ($this->returnType === null) {
+            return false;
+        }
+
+        // Complex types are specific return types
+        if ($this->returnType instanceof ComplexType) {
             return true;
         }
 
-        return !$returnType instanceof Node\Name;
+        // Void is not considered a "real" return type for our purposes
+        return $this->returnType->toLowerString() !== self::VOID;
+    }
+
+    public function isNullReturn(): bool
+    {
+        // Empty return (return;)
+        if ($this->node->expr === null) {
+            return true;
+        }
+
+        // Not a constant fetch, so it cannot be a return null
+        if (!$this->node->expr instanceof Node\Expr\ConstFetch) {
+            return false;
+        }
+
+        // Check for return null;
+        return $this->node->expr->name->toLowerString() === self::NULL;
+    }
+
+    public function hasNextStmtNode(): bool
+    {
+        return $this->node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE) !== null;
     }
 }

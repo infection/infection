@@ -41,6 +41,7 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
@@ -66,7 +67,7 @@ final class NodeTraverserFactoryTest extends TestCase
         $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
 
         $visitors = array_map(
-            'get_class',
+            get_class(...),
             self::getVisitorReflection()->getValue($traverser),
         );
 
@@ -95,7 +96,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $visitors = self::getVisitorReflection()->getValue($traverser);
 
-        $visitorClasses = array_map('get_class', $visitors);
+        $visitorClasses = array_map(get_class(...), $visitors);
 
         $this->assertSame(
             [
@@ -110,10 +111,9 @@ final class NodeTraverserFactoryTest extends TestCase
         );
 
         $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('nodeIgnorers');
-        $nodeIgnorersReflection->setAccessible(true);
 
         $actualNodeIgnorers = array_map(
-            'get_class',
+            get_class(...),
             $nodeIgnorersReflection->getValue($visitors[1]),
         );
 
@@ -129,6 +129,23 @@ final class NodeTraverserFactoryTest extends TestCase
         );
     }
 
+    public function test_it_can_create_a_pre_traverser(): void
+    {
+        $traverser = (new NodeTraverserFactory())->createPreTraverser();
+
+        $visitors = array_map(
+            get_class(...),
+            self::getVisitorReflection()->getValue($traverser),
+        );
+
+        $this->assertSame(
+            [
+                NextConnectingVisitor::class,
+            ],
+            $visitors,
+        );
+    }
+
     private static function getVisitorReflection(): ReflectionProperty
     {
         if (self::$visitorsReflection !== null) {
@@ -136,7 +153,6 @@ final class NodeTraverserFactoryTest extends TestCase
         }
 
         self::$visitorsReflection = (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
-        self::$visitorsReflection->setAccessible(true);
 
         return self::$visitorsReflection;
     }

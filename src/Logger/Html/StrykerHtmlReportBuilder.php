@@ -81,6 +81,7 @@ final readonly class StrykerHtmlReportBuilder
 {
     private const DETECTION_STATUS_MAP = [
         DetectionStatus::KILLED_BY_TESTS => 'Killed',
+        DetectionStatus::KILLED_BY_STATIC_ANALYSIS => 'Killed',
         DetectionStatus::ESCAPED => 'Survived',
         DetectionStatus::ERROR => 'RuntimeError',
         DetectionStatus::TIMED_OUT => 'Timeout',

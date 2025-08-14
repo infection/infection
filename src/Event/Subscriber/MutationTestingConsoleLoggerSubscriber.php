@@ -184,14 +184,38 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->output->writeln(['', '']);
         $this->output->writeln('<options=bold>' . $this->metricsCalculator->getTotalMutantsCount() . '</options=bold> mutations were generated:');
         $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByTestsCount()) . '</options=bold> mutants were killed by Test Framework');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByStaticAnalysisCount()) . '</options=bold> mutants were caught by Static Analysis');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getIgnoredCount()) . '</options=bold> mutants were configured to be ignored');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSyntaxErrorCount()) . '</options=bold> syntax errors were encountered');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
-        $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSkippedCount()) . '</options=bold> mutants required more time than configured');
+
+        if ($this->metricsCalculator->getKilledByStaticAnalysisCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getKilledByStaticAnalysisCount()) . '</options=bold> mutants were caught by Static Analysis');
+        }
+
+        if ($this->metricsCalculator->getIgnoredCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getIgnoredCount()) . '</options=bold> mutants were configured to be ignored');
+        }
+
+        if ($this->metricsCalculator->getNotTestedCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getNotTestedCount()) . '</options=bold> mutants were not covered by tests');
+        }
+
+        if ($this->metricsCalculator->getEscapedCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getEscapedCount()) . '</options=bold> covered mutants were not detected');
+        }
+
+        if ($this->metricsCalculator->getErrorCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getErrorCount()) . '</options=bold> errors were encountered');
+        }
+
+        if ($this->metricsCalculator->getSyntaxErrorCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSyntaxErrorCount()) . '</options=bold> syntax errors were encountered');
+        }
+
+        if ($this->metricsCalculator->getTimedOutCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getTimedOutCount()) . '</options=bold> time outs were encountered');
+        }
+
+        if ($this->metricsCalculator->getSkippedCount() > 0) {
+            $this->output->writeln('<options=bold>' . $this->getPadded($this->metricsCalculator->getSkippedCount()) . '</options=bold> mutants required more time than configured');
+        }
 
         $mutationScoreIndicator = floor($this->metricsCalculator->getMutationScoreIndicator());
         $msiTag = $this->getPercentageTag($mutationScoreIndicator);
@@ -236,7 +260,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
         // for the case when no file loggers are configured and `--show-mutations` is not used
         if ($this->numberOfShownMutations === 0) {
-            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.']);
+            $this->output->writeln(['', 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.']);
         }
     }
 

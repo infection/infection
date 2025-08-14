@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: [ ubuntu-latest ]
-        php-version: [ '8.2', '8.3', '8.4' ]
+        php-version: [ '8.2', '8.3', '8.4', '8.5' ]
         dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
         symfony-version: [ '6.4.*', '7.*.*' ]
@@ -54,6 +54,11 @@ jobs:
       - name: Remove the configured PHP platform
         if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
+
+      - name: Configure for PHP >= 8.4
+        if: "matrix.php-version >= '8.4'"
+        run: |
+          composer config platform.php 8.4.99
 
       - name: Enforce the Symfony version used
         if: matrix.dependencies != 'locked'

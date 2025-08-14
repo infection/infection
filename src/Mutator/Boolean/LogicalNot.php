@@ -80,6 +80,10 @@ final class LogicalNot implements Mutator
             return false;
         }
 
+        if ($node->expr instanceof Node\Expr\Match_) {
+            return false;
+        }
+
         // e.g. "!!someFunc()"
         $isDoubledLogicalNot = ($node->expr instanceof Node\Expr\BooleanNot)
             || ParentConnector::findParent($node) instanceof Node\Expr\BooleanNot;

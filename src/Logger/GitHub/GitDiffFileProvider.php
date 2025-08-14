@@ -37,10 +37,13 @@ namespace Infection\Logger\GitHub;
 
 use function array_filter;
 use function array_merge;
+use function array_slice;
+use function count;
 use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
+use RuntimeException;
 use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -51,11 +54,43 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 class GitDiffFileProvider
 {
-    final public const DEFAULT_BASE = 'origin/master';
+    private const NUM_ORIGIN_AND_BRANCH_PARTS = 2;
+
+    private const DEFAULT_BASE = 'origin/master';
+
+    private ?string $defaultBase = null;
 
     public function __construct(
         private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
+    }
+
+    public function provideDefaultBase(): string
+    {
+        if ($this->defaultBase !== null) {
+            return $this->defaultBase;
+        }
+
+        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
+        try {
+            $gitRefs = $this->shellCommandLineExecutor->execute([
+                'git',
+                'symbolic-ref',
+                'refs/remotes/origin/HEAD',
+            ]);
+
+            $parts = explode('/', $gitRefs);
+
+            if (count($parts) > self::NUM_ORIGIN_AND_BRANCH_PARTS) {
+                // extract origin/branch from a string like 'refs/remotes/origin/master'
+                return $this->defaultBase = implode('/', array_slice($parts, -self::NUM_ORIGIN_AND_BRANCH_PARTS));
+            }
+        } catch (RuntimeException) {
+            // e.g. no symbolic ref might be configured for a remote named "origin"
+        }
+
+        // unable to figure it out, return the default
+        return $this->defaultBase = self::DEFAULT_BASE;
     }
 
     /**

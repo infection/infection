@@ -98,7 +98,7 @@ class ConfigurationFactory
         bool $skipInitialTests,
         string $logVerbosity,
         bool $debug,
-        bool $onlyCovered,
+        bool $withUncovered,
         bool $noProgress,
         ?bool $ignoreMsiWithNoMutations,
         ?float $minMsi,
@@ -129,6 +129,7 @@ class ConfigurationFactory
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
         $testFramework ??= $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
+        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->getStaticAnalysisTool();
 
         $skipCoverage = $existingCoveragePath !== null;
 
@@ -168,7 +169,7 @@ class ConfigurationFactory
             $skipCoverage,
             $skipInitialTests,
             $debug,
-            $onlyCovered,
+            $withUncovered,
             $this->retrieveNoProgress($noProgress),
             self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
             self::retrieveMinMsi($minMsi, $schema),
@@ -183,7 +184,7 @@ class ConfigurationFactory
             $gitDiffBase,
             $mapSourceClassToTestStrategy,
             $loggerProjectRootDirectory,
-            $staticAnalysisTool,
+            $resultStaticAnalysisTool,
             $mutantId,
         );
     }
@@ -354,7 +355,7 @@ class ConfigurationFactory
             return $filter;
         }
 
-        $baseBranch = $gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE;
+        $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
 
         if ($isForGitDiffLines) {
             return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);

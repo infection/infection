@@ -147,6 +147,58 @@ final class FileMutationGeneratorTest extends TestCase
         );
     }
 
+    public function test_it_pre_traverses_nodes_before_mutation_collection(): void
+    {
+        $nodeIgnorers = [new FakeIgnorer()];
+        $initialStatements = [
+            new FakeNode(),
+            new FakeNode(),
+        ];
+
+        $this->fileParserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->with('/path/to/file')
+            ->willReturn($initialStatements)
+        ;
+
+        // Pre-traverser should be created and called first
+        $preTraverserMock = $this->createMock(NodeTraverserInterface::class);
+        $preTraverserMock
+            ->expects($this->once())
+            ->method('traverse')
+            ->with($initialStatements)
+            ->willReturn($initialStatements)
+        ;
+
+        // Main traverser should be created and called after
+        $traverserMock = $this->createMock(NodeTraverserInterface::class);
+        $traverserMock
+            ->expects($this->once())
+            ->method('traverse')
+            ->with($initialStatements)
+            ->willReturn($initialStatements)
+        ;
+
+        // Set up expectations in order
+        $this->traverserFactoryMock
+            ->expects($this->exactly(2))
+            ->method($this->anything())
+            ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock)
+        ;
+
+        $trace = $this->createTraceMock('/path/to/file', 'relativePath', 'relativePathName', true);
+
+        $mutations = $this->mutationGenerator->generate(
+            $trace,
+            false,
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
+            $nodeIgnorers,
+        );
+
+        $this->assertCount(0, iterator_to_array($mutations, false));
+    }
+
     #[DataProvider('parsedFilesProvider')]
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
         string $file,
@@ -168,11 +220,25 @@ final class FileMutationGeneratorTest extends TestCase
             ])
         ;
 
+        $preTraverserMock = $this->createMock(NodeTraverserInterface::class);
+        $preTraverserMock
+            ->expects($this->once())
+            ->method('traverse')
+            ->with($initialStatements)
+            ->willReturn($initialStatements)
+        ;
+
         $traverserMock = $this->createMock(NodeTraverserInterface::class);
         $traverserMock
             ->expects($this->once())
             ->method('traverse')
             ->willReturn($initialStatements)
+        ;
+
+        $this->traverserFactoryMock
+            ->expects($this->once())
+            ->method('createPreTraverser')
+            ->willReturn($preTraverserMock)
         ;
 
         $this->traverserFactoryMock
@@ -211,6 +277,11 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock
             ->expects($this->never())
             ->method('create')
+        ;
+
+        $this->traverserFactoryMock
+            ->expects($this->never())
+            ->method('createPreTraverser')
         ;
 
         $mutationGenerator = new FileMutationGenerator(

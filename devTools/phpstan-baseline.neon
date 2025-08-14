@@ -13,6 +13,24 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
+			message: '#^Parameter \#2 \$value of method DIContainer\\Container\:\:set\(\) expects \(callable\(DIContainer\\Container\)\: object\)\|class\-string\<DIContainer\\Builder\<object\>\>, callable\(Infection\\Container\)\: object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../src/Container.php
+
+		-
+			message: '#^Variable \$end might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../src/Differ/DiffColorizer.php
+
+		-
+			message: '#^Variable \$start might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: ../src/Differ/DiffColorizer.php
+
+		-
 			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -109,12 +127,6 @@ parameters:
 			path: ../src/PhpParser/Visitor/ReflectionVisitor.php
 
 		-
-			message: '#^Parameter &\$bucket by\-ref type of method Infection\\Process\\Runner\\ParallelProcessRunner\:\:fillBucketOnce\(\) expects array\<Infection\\Process\\MutantProcessContainer\>, array\<Infection\\Process\\MutantProcessContainer\|null\> given\.$#'
-			identifier: parameterByRef.type
-			count: 1
-			path: ../src/Process/Runner/ParallelProcessRunner.php
-
-		-
 			message: '#^Unused Infection\\StaticAnalysis\\StaticAnalysisToolAdapterFactory\:\:create$#'
 			identifier: shipmonk.deadMethod
 			count: 1
@@ -175,19 +187,7 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverserInterface\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
 			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<string, array\{settings\: array\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Testing/BaseMutatorTestCase.php
-
-		-
-			message: '#^Parameter \#2 \$fileAst of class Infection\\Testing\\SimpleMutationsCollectorVisitor constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../src/Testing/BaseMutatorTestCase.php
@@ -289,9 +289,33 @@ parameters:
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
+			message: '#^Parameter \#1 \$func of method Pipeline\\Standard\<int,string\>\:\:map\(\) expects \(callable\(\)\: \(Generator\<mixed, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|\(callable\(string\)\: \(Generator\<mixed, iterable\<class\-string, string\>, mixed, mixed\>\|iterable\<class\-string, string\>\)\)\|null, Closure\(class\-string\)\: iterable\<class\-string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 2
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#^Parameter \#1 \$values of method Pipeline\\Standard\<mixed,list\<string\>\|null\>\:\:append\(\) expects iterable\<array\{string, string\}\|null\>\|null, list\<array\{mixed, iterable\<class\-string, string\>\}\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#^Static property Infection\\Tests\\AutoReview\\IntegrationGroup\\IntegrationGroupProvider\:\:\$ioTestCaseClassesTuple \(array\<array\<string\>\>\|null\) does not accept list\<list\<string\>\|null\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<int,string\>\:\:map\(\)$#'
+			identifier: argument.templateType
+			count: 1
 			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
 
 		-
@@ -475,6 +499,12 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisTool\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+
+		-
 			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFramework\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -605,18 +635,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Schema\\SchemaConfigurationTest\:\:test_it_can_be_instantiated\(\) has parameter \$minCoveredMsi with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Schema\\SchemaConfigurationTest\:\:test_it_can_be_instantiated\(\) has parameter \$minMsi with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Configuration\\Schema\\SchemaConfigurationTest\:\:test_it_can_be_instantiated\(\) has parameter \$mutators with no value type specified in iterable type array\.$#'
@@ -895,6 +913,12 @@ parameters:
 			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
 
 		-
+			message: '#^Parameter \#1 \$files of static method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:normalizePaths\(\) expects array\<string\>, list\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
+
+		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -903,6 +927,18 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\> given\.$#'
 			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<\(int\|string\),string\>\:\:map\(\)$#'
+			identifier: argument.templateType
+			count: 2
+			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
+
+		-
+			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<mixed,Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:map\(\)$#'
+			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
@@ -1185,7 +1221,7 @@ parameters:
 		-
 			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects array\<Infection\\Mutator\\Mutator\<PhpParser\\Node\>\>, array\{Infection\\Mutator\\IgnoreMutator\<PhpParser\\Node\\Expr\\BinaryOp\\Plus\>\} given\.$#'
 			identifier: argument.type
-			count: 3
+			count: 4
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
 
 		-
@@ -1888,4 +1924,16 @@ parameters:
 			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:mainlineConfigurationsProvider\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function Pipeline\\take$#'
+			identifier: argument.templateType
+			count: 2
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+
+		-
+			message: '#^Unable to resolve the template type TTake in call to function Pipeline\\take$#'
+			identifier: argument.templateType
+			count: 2
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php

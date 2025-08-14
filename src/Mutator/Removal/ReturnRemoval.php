@@ -33,35 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\FunctionSignature;
+namespace Infection\Mutator\Removal;
 
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Reflection\Visibility;
+use Infection\Mutator\Util\ReturnTypeHelper;
 use PhpParser\Node;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Stmt\ClassMethod>
+ * @implements Mutator<Node\Stmt\Return_>
  */
-final class ProtectedVisibility implements Mutator
+final class ReturnRemoval implements Mutator
 {
     use GetMutatorName;
 
     public static function getDefinition(): Definition
     {
         return new Definition(
-            'Replaces the `protected` method visibility keyword with `private`.',
+            'Removes a return statement.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-                - protected function foo() {
-                + private function foo() {
+                - return $foo;
                 DIFF,
         );
     }
@@ -69,53 +66,39 @@ final class ProtectedVisibility implements Mutator
     /**
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Stmt\ClassMethod>
+     * @return iterable<Node\Stmt\Nop>
      */
     public function mutate(Node $node): iterable
     {
-        /* @var Node\Stmt\ClassMethod $node */
-        yield new Node\Stmt\ClassMethod(
-            $node->name,
-            [
-                'flags' => ($node->flags & ~Node\Stmt\Class_::MODIFIER_PROTECTED) | Node\Stmt\Class_::MODIFIER_PRIVATE,
-                'byRef' => $node->returnsByRef(),
-                'params' => $node->getParams(),
-                'returnType' => $node->getReturnType(),
-                'stmts' => $node->getStmts(),
-                'attrGroups' => $node->getAttrGroups(),
-            ],
-            $node->getAttributes(),
-        );
+        yield new Node\Stmt\Nop();
     }
 
     public function canMutate(Node $node): bool
     {
-        if (!$node instanceof Node\Stmt\ClassMethod) {
+        if (!$node instanceof Node\Stmt\Return_) {
             return false;
         }
 
-        $class = ReflectionVisitor::findReflectionClass($node);
+        $returnHelper = new ReturnTypeHelper($node);
 
-        if ($node->isFinal() || $class !== null && $class->isFinal()) {
-            return false;
+        // In void functions, any return statement can be removed
+        if ($returnHelper->hasVoidReturnType()) {
+            return true;
         }
 
-        if ($node->isAbstract()) {
-            return false;
+        // Check if there's a non-void return type defined
+        if ($returnHelper->hasSpecificReturnType()) {
+            // For functions with return types, we can remove it only if there's more after this return
+            return $returnHelper->hasNextStmtNode();
         }
 
-        if (!$node->isProtected()) {
-            return false;
+        // For functions without return types, we can only remove the return if:
+        // 1. There's another statement after it, OR
+        if ($returnHelper->hasNextStmtNode()) {
+            return true;
         }
 
-        return !$this->hasSameProtectedParentMethod($node);
-    }
-
-    private function hasSameProtectedParentMethod(Node\Stmt\ClassMethod $node): bool
-    {
-        $reflection = ReflectionVisitor::findReflectionClass($node);
-        Assert::notNull($reflection);
-
-        return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asProtected());
+        // 2. It returns a non-null value (not `return;` or `return null;`)
+        return !$returnHelper->isNullReturn();
     }
 }

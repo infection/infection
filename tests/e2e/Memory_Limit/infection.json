@@ -8,5 +8,13 @@
     "logs": {
         "summary": "infection.log"
     },
+    "mutators": {
+        "DoWhile": true,
+        "DecrementInteger": true,
+        "IncrementInteger": true,
+        "ShiftLeft": true,
+        "PublicVisibility": true,
+        "FalseValue": true
+    },
     "tmpDir": "."
 }

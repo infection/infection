@@ -9,5 +9,8 @@
         "summary": "infection.log"
     },
     "tmpDir": ".",
+    "mutators": {
+        "PublicVisibility": true
+    },
     "initialTestsPhpOptions": "-d memory_limit=123M"
 }
