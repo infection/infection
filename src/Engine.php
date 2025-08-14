@@ -118,6 +118,7 @@ final readonly class Engine
             $this->config->getTestFrameworkExtraOptions(),
             $this->getInitialTestsPhpOptionsArray(),
             $this->config->shouldSkipCoverage(),
+            $this->config->noProgress()
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
