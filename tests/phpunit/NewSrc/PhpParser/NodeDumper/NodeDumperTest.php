@@ -250,6 +250,18 @@ final class NodeDumperTest extends TestCase
             ->withExpected(
             <<<'OUT'
                 Name(
+                )
+                OUT,
+            )
+        ->build();
+
+        yield 'name with extra properties' => NodeDumperScenario::forNode(
+            new Name(['Hallo', 'World']),
+        )
+            ->withDumpProperties()
+            ->withExpected(
+            <<<'OUT'
+                Name(
                     name: Hallo\World
                 )
                 OUT,
@@ -261,6 +273,26 @@ final class NodeDumperTest extends TestCase
                 new ArrayItem(new String_('Foo')),
             ]),
         )
+            ->withExpected(
+            <<<'OUT'
+                Expr_Array(
+                    items: array(
+                        0: ArrayItem(
+                            value: Scalar_String(
+                            )
+                        )
+                    )
+                )
+                OUT,
+            )
+        ->build();
+
+        yield 'array expression with extra properties' => NodeDumperScenario::forNode(
+            new Array_([
+                new ArrayItem(new String_('Foo')),
+            ]),
+        )
+            ->withDumpProperties()
             ->withExpected(
             <<<'OUT'
                 Expr_Array(

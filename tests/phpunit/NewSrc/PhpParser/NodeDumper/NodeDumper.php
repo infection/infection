@@ -124,9 +124,14 @@ final class NodeDumper
             $this->res .= '(';
 
             foreach ($node->getSubNodeNames() as $key) {
-                $this->res .= "$this->nl    " . $key . ': ';
-
                 $value = $node->$key;
+
+                // Skip "extra" properties unless configured to dump them
+                if (!$this->dumpProperties && !$this->isNodeOrNodeArray($value)) {
+                    continue;
+                }
+
+                $this->res .= "$this->nl    " . $key . ': ';
 
                 if (is_int($value)) {
                     if ($key === 'flags' || $key === 'newModifier') {
@@ -222,6 +227,29 @@ final class NodeDumper
         if ($indent) {
             $this->nl = substr($this->nl, 0, -4);
         }
+    }
+
+    /**
+     * Check if a value is a Node or an array of Node values
+     */
+    private function isNodeOrNodeArray(mixed $value): bool
+    {
+        if ($value instanceof Node) {
+            return true;
+        }
+
+        if (!is_array($value)) {
+            return false;
+        }
+
+        // Check if it's an array of nodes
+        foreach ($value as $item) {
+            if (!($item instanceof Node)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function dumpFlags(int $flags): string
