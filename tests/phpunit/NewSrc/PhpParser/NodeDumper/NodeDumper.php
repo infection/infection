@@ -33,14 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser;
+namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
-use function implode;
 use InvalidArgumentException;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_string;
+use PhpParser\Comment;
+use PhpParser\Modifiers;
+use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\Include_;
 use PhpParser\Node\Expr\List_;
@@ -51,6 +49,11 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
+use function implode;
+use function is_array;
+use function is_float;
+use function is_int;
+use function is_string;
 use function str_replace;
 use function strlen;
 use function strrpos;
@@ -67,29 +70,23 @@ final class NodeDumper
         'startTokenPos' => true,
         'endTokenPos' => true,
     ];
-    private bool $dumpComments;
-    private bool $dumpPositions;
-    private bool $dumpOtherAttributes;
+
     private ?string $code;
     private string $res;
     private string $nl;
 
     /**
-     * Constructs a NodeDumper.
-     *
-     * Supported options:
-     *  * bool dumpComments: Whether comments should be dumped.
-     *  * bool dumpPositions: Whether line/offset information should be dumped. To dump offset
-     *                        information, the code needs to be passed to dump().
-     *  * bool dumpOtherAttributes: Whether non-comment, non-position attributes should be dumped.
-     *
-     * @param array $options Options (see description)
+     * @param bool $dumpComments whether comments should be dumped
+     * @param bool $dumpPositions Whether line/offset information should be dumped. To dump offset
+     *                            information, the code needs to be passed to dump().
+     * @param bool $dumpOtherAttributes whether non-comment, non-position attributes should be dumped
      */
-    public function __construct(array $options = [])
-    {
-        $this->dumpComments = !empty($options['dumpComments']);
-        $this->dumpPositions = !empty($options['dumpPositions']);
-        $this->dumpOtherAttributes = !empty($options['dumpOtherAttributes']);
+    public function __construct(
+        private readonly bool $dumpProperties = false,
+        private readonly bool $dumpComments = false,
+        private readonly bool $dumpPositions = false,
+        private readonly bool $dumpOtherAttributes = true,
+    ) {
     }
 
     /**
@@ -102,7 +99,7 @@ final class NodeDumper
      *
      * @return string Dumped value
      */
-    public function dump($node, ?string $code = null): string
+    public function dump(array|Node $node, ?string $code = null): string
     {
         $this->code = $code;
         $this->res = '';
@@ -145,7 +142,7 @@ final class NodeDumper
                     }
 
                     if ($key === 'type'
-                            && ($node instanceof Use_ || $node instanceof UseItem || $node instanceof GroupUse)) {
+                        && ($node instanceof Use_ || $node instanceof UseItem || $node instanceof GroupUse)) {
                         $this->res .= $this->dumpUseType($value);
 
                         continue;
