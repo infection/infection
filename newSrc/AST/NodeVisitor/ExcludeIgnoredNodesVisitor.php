@@ -35,24 +35,26 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
+use function iter\any;
 use newSrc\AST\Annotation;
 use newSrc\AST\NodeAnnotator;
 use PhpParser\Comment;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use function iter\any;
 use function str_contains;
 
 final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 {
     private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
-    public function enterNode(Node $node): int|null
+    public function enterNode(Node $node): ?int
     {
         if ($this->hasIgnoreAnnotation($node)) {
             NodeAnnotator::annotate($node, Annotation::IGNORED_WITH_ANNOTATION);
 
-            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+            // return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
         return null;
@@ -60,10 +62,18 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 
     private function hasIgnoreAnnotation(Node $node): bool
     {
-        return any(
-            self::commentContainsAnnotation(...),
-            $node->getComments(),
-        );
+        foreach ($node->getComments() as $comment) {
+            if (self::commentContainsAnnotation($comment)) {
+                return true;
+            }
+        }
+
+        return false;
+
+        //        return any(
+        //            self::commentContainsAnnotation(...),
+        //            $node->getComments(),
+        //        );
     }
 
     private static function commentContainsAnnotation(Comment $comment): bool

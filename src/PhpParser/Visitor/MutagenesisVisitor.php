@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * @internal
  */
-final class MutationCollectorVisitor extends NodeVisitorAbstract
+final class MutagenesisVisitor extends NodeVisitorAbstract
 {
     /**
      * @var array<iterable<Mutation>>

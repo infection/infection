@@ -44,8 +44,8 @@ use newSrc\Mutagenesis\Mutation;
 use newSrc\MutationAnalyzer\MutantExecutionResult;
 use newSrc\MutationAnalyzer\MutationAnalyzer;
 use newSrc\Reporter\Reporter;
-use SplFileInfo;
 use function Pipeline\take;
+use SplFileInfo;
 
 // Taken from the existing Engine
 final readonly class Engine
@@ -131,9 +131,8 @@ final readonly class Engine
     private function mapWithEnvelope(
         Closure $map,
         Closure $mapEnvelope,
-    ): Closure
-    {
-        return function (mixed $input, Envelope $envelope) use ($map, $mapEnvelope) {
+    ): Closure {
+        return static function (mixed $input, Envelope $envelope) use ($map, $mapEnvelope) {
             $output = $map($input);
 
             $newEnvelope = $mapEnvelope($envelope, $output);

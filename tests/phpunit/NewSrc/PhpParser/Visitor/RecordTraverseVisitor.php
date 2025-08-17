@@ -33,49 +33,44 @@
 
 declare(strict_types=1);
 
-namespace newSrc\MutationAnalyzer\MutantExecutor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 
-use newSrc\MutationAnalyzer\Mutant;
-use newSrc\MutationAnalyzer\MutantExecutionResult;
-use newSrc\MutationAnalyzer\MutantExecutionStatus;
-use newSrc\TestFramework\TestFramework;
+use function func_get_args;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-final class SynchronousMutantExecutor implements MutantExecutor
+final class RecordTraverseVisitor extends NodeVisitorAbstract
 {
     /**
-     * @param TestFramework[] $testFrameworks
+     * @var list<array{string, list<mixed>}>
      */
-    public function __construct(
-        private array $testFrameworks,
-    ) {
+    private array $records = [];
+
+    public function fetch(): array
+    {
+        $records = $this->records;
+        $this->records = [];
+
+        return $records;
     }
 
-    public function execute(Mutant $mutant): MutantExecutionResult
+    public function beforeTraverse(array $nodes): void
     {
-        $results = [];
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
 
-        foreach ($this->testFrameworks as $testFramework) {
-            $result = $testFramework->test($mutant);
-            $resultStatus = $result->getStatus();
+    public function enterNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
 
-            $results[] = $result;
+    public function leaveNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
 
-            if ($resultStatus === MutantExecutionStatus::COVERED) {
-                return $result;
-            }
-
-            if ($resultStatus === MutantExecutionStatus::SUSPICIOUS) {
-                // TODO: discuss the strategy
-                // an idea: retry this test framework with a noop test
-                // if noop test passes, continue with test frameworks
-                // other test framework may cover or not
-            }
-        }
-
-        // Here there two possible statuses for each result: NOT_COVERED and SUSPICIOUS
-        //
-        // If all NOT_COVERED => aggregate = NOT COVERED
-        // Otherwise (at least one suspicious) => SUSPICIOUS
-        return MutantExecutionResult::aggregate($results);
+    public function afterTraverse(array $nodes): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 }

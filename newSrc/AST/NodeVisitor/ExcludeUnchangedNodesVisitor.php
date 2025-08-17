@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 // Excludes nodes that do not belong to changed code from the git diff.
 final class ExcludeUnchangedNodesVisitor extends NodeVisitorAbstract
 {
-    public function enterNode(Node $node): int|null
+    public function enterNode(Node $node): ?int
     {
         if ($this->isPartOfTheDiff($node)) {
             NodeAnnotator::annotate($node, Annotation::NOT_PART_OF_THE_GIT_DIFF);

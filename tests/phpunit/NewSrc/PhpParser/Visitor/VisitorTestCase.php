@@ -33,49 +33,61 @@
 
 declare(strict_types=1);
 
-namespace newSrc\MutationAnalyzer\MutantExecutor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 
-use newSrc\MutationAnalyzer\Mutant;
-use newSrc\MutationAnalyzer\MutantExecutionResult;
-use newSrc\MutationAnalyzer\MutantExecutionStatus;
-use newSrc\TestFramework\TestFramework;
+use function array_map;
+use function is_array;
+use PhpParser\Node;
+use PhpParser\NodeDumper;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+use PHPUnit\Framework\TestCase;
 
-final class SynchronousMutantExecutor implements MutantExecutor
+abstract class VisitorTestCase extends TestCase
 {
-    /**
-     * @param TestFramework[] $testFrameworks
-     */
-    public function __construct(
-        private array $testFrameworks,
-    ) {
+    protected Parser $parser;
+    protected NodeDumper $dumper;
+
+    protected function setUp(): void
+    {
+        $this->parser = $this->createParser();
+        $this->dumper = new NodeDumper();
     }
 
-    public function execute(Mutant $mutant): MutantExecutionResult
+    final protected function createParser(): Parser
     {
-        $results = [];
+        return (new ParserFactory())->createForNewestSupportedVersion();
+    }
 
-        foreach ($this->testFrameworks as $testFramework) {
-            $result = $testFramework->test($mutant);
-            $resultStatus = $result->getStatus();
+    /**
+     * @param array<string, list<mixed>> $records
+     * @return array<string, list<string|list<string>>>
+     */
+    final protected function dumpRecordNodes(array $records): array
+    {
+        return array_map(
+            fn (array $record) => [
+                $record[0],
+                $this->dumpRecursively($record[1]),
+            ],
+            $records,
+        );
+    }
 
-            $results[] = $result;
-
-            if ($resultStatus === MutantExecutionStatus::COVERED) {
-                return $result;
-            }
-
-            if ($resultStatus === MutantExecutionStatus::SUSPICIOUS) {
-                // TODO: discuss the strategy
-                // an idea: retry this test framework with a noop test
-                // if noop test passes, continue with test frameworks
-                // other test framework may cover or not
-            }
+    /**
+     * @return array<string, list<string|list<string>>>
+     */
+    private function dumpRecursively(mixed $potentialNodes): array|string
+    {
+        if (is_array($potentialNodes)) {
+            return array_map(
+                $this->dumpRecursively(...),
+                $potentialNodes,
+            );
         }
 
-        // Here there two possible statuses for each result: NOT_COVERED and SUSPICIOUS
-        //
-        // If all NOT_COVERED => aggregate = NOT COVERED
-        // Otherwise (at least one suspicious) => SUSPICIOUS
-        return MutantExecutionResult::aggregate($results);
+        $this->assertInstanceOf(Node::class, $potentialNodes);
+
+        return $this->dumper->dump($potentialNodes);
     }
 }

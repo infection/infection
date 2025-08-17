@@ -102,7 +102,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Infection\\": "src/"
+            "Infection\\": "src/",
+            "newSrc\\": "newSrc/"
         }
     },
     "autoload-dev": {

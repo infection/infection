@@ -51,5 +51,7 @@ final class NodeStateTracker
         $this->ignore = false;
     }
 
-    public function isEligible(Node $node): bool {}
+    public function isEligible(Node $node): bool
+    {
+    }
 }
