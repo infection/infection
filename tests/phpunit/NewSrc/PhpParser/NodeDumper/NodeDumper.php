@@ -71,10 +71,7 @@ final class NodeDumper
         'endTokenPos' => true,
     ];
 
-    private ?string $code;
-    private string $res;
-    private string $nl;
-
+    // Removed instance properties for stateless refactor
     /**
      * @param bool $dumpComments whether comments should be dumped
      * @param bool $dumpPositions Whether line/offset information should be dumped. To dump offset
@@ -101,27 +98,39 @@ final class NodeDumper
      */
     public function dump(array|Node $node, ?string $code = null): string
     {
-        $this->code = $code;
-        $this->res = '';
-        $this->nl = "\n";
-        $this->dumpRecursive($node, false);
+        $result = '';
+        $newLine = "\n";
 
-        return $this->res;
+        $this->dumpRecursive(
+            $node,
+            $code,
+            $result,
+            $newLine,
+            indent: false,
+        );
+
+        return $result;
     }
 
-    protected function dumpRecursive($node, bool $indent = true): void
+    private function dumpRecursive(
+        mixed $node,
+        ?string $code,
+        string &$result,
+        string &$newLine,
+        bool $indent = true,
+    ): void
     {
         if ($indent) {
-            $this->nl .= '    ';
+            $newLine .= '    ';
         }
 
         if ($node instanceof Node) {
-            $this->res .= $node->getType();
+            $result .= $node->getType();
 
-            if ($this->dumpPositions && null !== $p = $this->dumpPosition($node)) {
-                $this->res .= $p;
+            if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
+                $result .= $p;
             }
-            $this->res .= '(';
+            $result .= '(';
 
             foreach ($node->getSubNodeNames() as $key) {
                 $value = $node->$key;
@@ -131,34 +140,34 @@ final class NodeDumper
                     continue;
                 }
 
-                $this->res .= "$this->nl    " . $key . ': ';
+                $result .= "$newLine    " . $key . ': ';
 
                 if (is_int($value)) {
                     if ($key === 'flags' || $key === 'newModifier') {
-                        $this->res .= $this->dumpFlags($value);
+                        $result .= $this->dumpFlags($value);
 
                         continue;
                     }
 
                     if ($key === 'type' && $node instanceof Include_) {
-                        $this->res .= $this->dumpIncludeType($value);
+                        $result .= $this->dumpIncludeType($value);
 
                         continue;
                     }
 
                     if ($key === 'type'
                         && ($node instanceof Use_ || $node instanceof UseItem || $node instanceof GroupUse)) {
-                        $this->res .= $this->dumpUseType($value);
+                        $result .= $this->dumpUseType($value);
 
                         continue;
                     }
                 }
-                $this->dumpRecursive($value);
+                $this->dumpRecursive($value, $code, $result, $newLine);
             }
 
             if ($this->dumpComments && $comments = $node->getComments()) {
-                $this->res .= "$this->nl    comments: ";
-                $this->dumpRecursive($comments);
+                $result .= "$newLine    comments: ";
+                $this->dumpRecursive($comments, $code, $result, $newLine);
             }
 
             if ($this->dumpOtherAttributes) {
@@ -167,65 +176,65 @@ final class NodeDumper
                         continue;
                     }
 
-                    $this->res .= "$this->nl    $key: ";
+                    $result .= "$newLine    $key: ";
 
                     if (is_int($value)) {
                         if ($key === 'kind') {
                             if ($node instanceof Int_) {
-                                $this->res .= $this->dumpIntKind($value);
+                                $result .= $this->dumpIntKind($value);
 
                                 continue;
                             }
 
                             if ($node instanceof String_ || $node instanceof InterpolatedString) {
-                                $this->res .= $this->dumpStringKind($value);
+                                $result .= $this->dumpStringKind($value);
 
                                 continue;
                             }
 
                             if ($node instanceof Array_) {
-                                $this->res .= $this->dumpArrayKind($value);
+                                $result .= $this->dumpArrayKind($value);
 
                                 continue;
                             }
 
                             if ($node instanceof List_) {
-                                $this->res .= $this->dumpListKind($value);
+                                $result .= $this->dumpListKind($value);
 
                                 continue;
                             }
                         }
                     }
-                    $this->dumpRecursive($value);
-                }
+                    $this->dumpRecursive($value, $code, $result, $newLine);
             }
-            $this->res .= "$this->nl)";
+            }
+            $result .= "$newLine)";
         } elseif (is_array($node)) {
-            $this->res .= 'array(';
+            $result .= 'array(';
 
             foreach ($node as $key => $value) {
-                $this->res .= "$this->nl    " . $key . ': ';
-                $this->dumpRecursive($value);
+                $result .= "$newLine    " . $key . ': ';
+                $this->dumpRecursive($value, $code, $result, $newLine);
             }
-            $this->res .= "$this->nl)";
+            $result .= "$newLine)";
         } elseif ($node instanceof Comment) {
-            $this->res .= str_replace("\n", $this->nl, $node->getReformattedText());
+            $result .= str_replace("\n", $newLine, $node->getReformattedText());
         } elseif (is_string($node)) {
-            $this->res .= str_replace("\n", $this->nl, $node);
+            $result .= str_replace("\n", $newLine, $node);
         } elseif (is_int($node) || is_float($node)) {
-            $this->res .= $node;
+            $result .= $node;
         } elseif ($node === null) {
-            $this->res .= 'null';
+            $result .= 'null';
         } elseif ($node === false) {
-            $this->res .= 'false';
+            $result .= 'false';
         } elseif ($node === true) {
-            $this->res .= 'true';
+            $result .= 'true';
         } else {
             throw new InvalidArgumentException('Can only dump nodes and arrays.');
         }
 
         if ($indent) {
-            $this->nl = substr($this->nl, 0, -4);
+            $newLine = substr($newLine, 0, -4);
         }
     }
 
@@ -310,7 +319,7 @@ final class NodeDumper
      *
      * @return string|null Dump of position, or null if position information not available
      */
-    protected function dumpPosition(Node $node): ?string
+    protected function dumpPosition(Node $node, ?string $code): ?string
     {
         if (!$node->hasAttribute('startLine') || !$node->hasAttribute('endLine')) {
             return null;
@@ -320,10 +329,10 @@ final class NodeDumper
         $end = $node->getEndLine();
 
         if ($node->hasAttribute('startFilePos') && $node->hasAttribute('endFilePos')
-            && $this->code !== null
+            && $code !== null
         ) {
-            $start .= ':' . $this->toColumn($this->code, $node->getStartFilePos());
-            $end .= ':' . $this->toColumn($this->code, $node->getEndFilePos());
+            $start .= ':' . $this->toColumn($code, $node->getStartFilePos());
+            $end .= ':' . $this->toColumn($code, $node->getEndFilePos());
         }
 
         return "[$start - $end]";
