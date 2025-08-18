@@ -51,12 +51,17 @@ abstract class VisitorTestCase extends TestCase
     protected function setUp(): void
     {
         $this->parser = $this->createParser();
-        $this->dumper = new NodeDumper();
+        $this->dumper = $this->createDumper();
     }
 
-    final protected function createParser(): Parser
+    protected function createParser(): Parser
     {
         return (new ParserFactory())->createForNewestSupportedVersion();
+    }
+
+    protected function createDumper(): NodeDumper
+    {
+        return new NodeDumper();
     }
 
     /**

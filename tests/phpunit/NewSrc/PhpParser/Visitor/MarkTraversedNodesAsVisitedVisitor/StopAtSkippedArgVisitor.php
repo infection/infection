@@ -33,51 +33,31 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST\NodeVisitor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use function iter\any;
-use newSrc\AST\Annotation;
-use newSrc\AST\NodeAnnotator;
-use PhpParser\Comment;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use function str_contains;
 
-final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
+final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
+    public const SKIP_ATTRIBUTE = 'skip';
 
-    public function enterNode(Node $node): ?int
+    public static function markNodeAsSkipped(Node $node): Node
     {
-        if ($this->hasIgnoreAnnotation($node)) {
-            NodeAnnotator::annotate($node, Annotation::IGNORED_WITH_ANNOTATION);
+        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
 
-            //            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        return $node;
+    }
+
+    public static function isNodeMarkedAsSkipped(Node $node): bool
+    {
+        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+    }
+
+    public function enterNode(Node $node)
+    {
+        if (self::isNodeMarkedAsSkipped($node)) {
             return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
-
-        return null;
-    }
-
-    private function hasIgnoreAnnotation(Node $node): bool
-    {
-        foreach ($node->getComments() as $comment) {
-            if (self::commentContainsAnnotation($comment)) {
-                return true;
-            }
-        }
-
-        return false;
-
-        //        return any(
-        //            self::commentContainsAnnotation(...),
-        //            $node->getComments(),
-        //        );
-    }
-
-    private static function commentContainsAnnotation(Comment $comment): bool
-    {
-        return str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION);
     }
 }

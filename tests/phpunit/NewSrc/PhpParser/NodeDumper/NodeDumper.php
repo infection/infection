@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor\MarkTraversedNodesAsVisitedVisitor;
 use function implode;
+use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;
 use function is_float;
@@ -56,7 +56,6 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
 use function str_replace;
-use function str_starts_with;
 use function strlen;
 use function strrpos;
 use function substr;
@@ -71,6 +70,7 @@ final class NodeDumper
         'endFilePos' => true,
         'startTokenPos' => true,
         'endTokenPos' => true,
+        MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
     ];
 
     // Removed instance properties for stateless refactor
@@ -207,7 +207,7 @@ final class NodeDumper
 
         if ($node instanceof Node) {
             if ($this->onlyVisitedNodes && !MarkTraversedNodesAsVisitedVisitor::wasVisited($node)) {
-                $result.= '<skipped>';
+                $result .= '<skipped>';
                 $newLine = $previousNewLine;
 
                 return;

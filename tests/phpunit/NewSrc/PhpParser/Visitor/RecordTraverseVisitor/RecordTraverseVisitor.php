@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor;
 
+use function func_get_args;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function func_get_args;
 
 final class RecordTraverseVisitor extends NodeVisitorAbstract
 {

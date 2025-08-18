@@ -47,8 +47,7 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
 {
     public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
         string $code,
-    ): void
-    {
+    ): void {
         $nodes = $this->createParser()->parse(
             <<<'PHP'
                 <?php

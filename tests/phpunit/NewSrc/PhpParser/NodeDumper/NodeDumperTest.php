@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\ArrowFunction;
-use PhpParser\Node\Expr\FuncCall;
 use function is_string;
 use PhpParser\Node;
+use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ArrowFunction;
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;

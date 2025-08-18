@@ -33,15 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function func_get_args;
 
 final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    private const VISITED_ATTRIBUTE = 'visited';
+    public const VISITED_ATTRIBUTE = 'visited';
 
     public static function wasVisited(Node $node): bool
     {
