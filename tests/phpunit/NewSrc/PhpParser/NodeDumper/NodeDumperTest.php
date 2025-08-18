@@ -74,6 +74,7 @@ final class NodeDumperTest extends TestCase
             $scenario->dumpComments,
             $scenario->dumpPositions,
             $scenario->dumpOtherAttributes,
+            $scenario->onlyVisitedNodes,
         );
 
         $actual = $dumper->dump($node);
@@ -230,13 +231,9 @@ final class NodeDumperTest extends TestCase
                                     )
                                 )
                                 1: Arg(
-                                    value: Expr_ArrowFunction(
-                                        expr: Scalar_String
-                                    )
+                                    value: <skipped>
                                 )
-                                2: Arg(
-                                    value: Scalar_String
-                                )
+                                2: <skipped>
                             )
                         )
                     )
@@ -356,6 +353,7 @@ final class NodeDumperTest extends TestCase
             ]),
         )
             ->withDumpProperties()
+            ->withShowAllNodes()
             ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'

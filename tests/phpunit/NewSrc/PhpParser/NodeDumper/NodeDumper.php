@@ -56,6 +56,7 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
 use function str_replace;
+use function str_starts_with;
 use function strlen;
 use function strrpos;
 use function substr;
@@ -198,13 +199,16 @@ final class NodeDumper
         string &$newLine,
         bool $indent = true,
     ): void {
+        $previousNewLine = $newLine;
+
         if ($indent) {
             $newLine .= '    ';
         }
 
         if ($node instanceof Node) {
-            if (!MarkTraversedNodesAsVisitedVisitor::wasVisited($node)) {
+            if ($this->onlyVisitedNodes && !MarkTraversedNodesAsVisitedVisitor::wasVisited($node)) {
                 $result.= '<skipped>';
+                $newLine = $previousNewLine;
 
                 return;
             }
@@ -223,6 +227,12 @@ final class NodeDumper
 
                 // Skip "extra" properties unless configured to dump them
                 if (!$this->dumpProperties && !$this->isNodeOrNodeArray($value)) {
+                    continue;
+                }
+
+                if ($this->onlyVisitedNodes && !MarkTraversedNodesAsVisitedVisitor::wasVisited($node)) {
+                    $nodeDetails .= '<skipped>';
+
                     continue;
                 }
 
@@ -249,6 +259,7 @@ final class NodeDumper
                         continue;
                     }
                 }
+
                 $this->dumpRecursive($value, $code, $nodeDetails, $newLine);
             }
 
@@ -310,8 +321,10 @@ final class NodeDumper
 
             foreach ($node as $key => $value) {
                 $result .= "$newLine    " . $key . ': ';
+
                 $this->dumpRecursive($value, $code, $result, $newLine);
             }
+
             $result .= "$newLine)";
         } elseif ($node instanceof Comment) {
             $result .= str_replace("\n", $newLine, $node->getReformattedText());
