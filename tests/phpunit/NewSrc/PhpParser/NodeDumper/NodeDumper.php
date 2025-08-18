@@ -35,7 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
+use function implode;
 use InvalidArgumentException;
+use function is_array;
+use function is_float;
+use function is_int;
+use function is_string;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
 use PhpParser\Node;
@@ -49,11 +54,6 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
-use function implode;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_string;
 use function str_replace;
 use function strlen;
 use function strrpos;
@@ -110,155 +110,6 @@ final class NodeDumper
         );
 
         return $result;
-    }
-
-    private function dumpRecursive(
-        mixed $node,
-        ?string $code,
-        string &$result,
-        string &$newLine,
-        bool $indent = true,
-    ): void
-    {
-        if ($indent) {
-            $newLine .= '    ';
-        }
-
-        if ($node instanceof Node) {
-            $result .= $node->getType();
-
-            if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
-                $result .= $p;
-            }
-            $result .= '(';
-
-            foreach ($node->getSubNodeNames() as $key) {
-                $value = $node->$key;
-
-                // Skip "extra" properties unless configured to dump them
-                if (!$this->dumpProperties && !$this->isNodeOrNodeArray($value)) {
-                    continue;
-                }
-
-                $result .= "$newLine    " . $key . ': ';
-
-                if (is_int($value)) {
-                    if ($key === 'flags' || $key === 'newModifier') {
-                        $result .= $this->dumpFlags($value);
-
-                        continue;
-                    }
-
-                    if ($key === 'type' && $node instanceof Include_) {
-                        $result .= $this->dumpIncludeType($value);
-
-                        continue;
-                    }
-
-                    if ($key === 'type'
-                        && ($node instanceof Use_ || $node instanceof UseItem || $node instanceof GroupUse)) {
-                        $result .= $this->dumpUseType($value);
-
-                        continue;
-                    }
-                }
-                $this->dumpRecursive($value, $code, $result, $newLine);
-            }
-
-            if ($this->dumpComments && $comments = $node->getComments()) {
-                $result .= "$newLine    comments: ";
-                $this->dumpRecursive($comments, $code, $result, $newLine);
-            }
-
-            if ($this->dumpOtherAttributes) {
-                foreach ($node->getAttributes() as $key => $value) {
-                    if (isset(self::IGNORE_ATTRIBUTES[$key])) {
-                        continue;
-                    }
-
-                    $result .= "$newLine    $key: ";
-
-                    if (is_int($value)) {
-                        if ($key === 'kind') {
-                            if ($node instanceof Int_) {
-                                $result .= $this->dumpIntKind($value);
-
-                                continue;
-                            }
-
-                            if ($node instanceof String_ || $node instanceof InterpolatedString) {
-                                $result .= $this->dumpStringKind($value);
-
-                                continue;
-                            }
-
-                            if ($node instanceof Array_) {
-                                $result .= $this->dumpArrayKind($value);
-
-                                continue;
-                            }
-
-                            if ($node instanceof List_) {
-                                $result .= $this->dumpListKind($value);
-
-                                continue;
-                            }
-                        }
-                    }
-                    $this->dumpRecursive($value, $code, $result, $newLine);
-            }
-            }
-            $result .= "$newLine)";
-        } elseif (is_array($node)) {
-            $result .= 'array(';
-
-            foreach ($node as $key => $value) {
-                $result .= "$newLine    " . $key . ': ';
-                $this->dumpRecursive($value, $code, $result, $newLine);
-            }
-            $result .= "$newLine)";
-        } elseif ($node instanceof Comment) {
-            $result .= str_replace("\n", $newLine, $node->getReformattedText());
-        } elseif (is_string($node)) {
-            $result .= str_replace("\n", $newLine, $node);
-        } elseif (is_int($node) || is_float($node)) {
-            $result .= $node;
-        } elseif ($node === null) {
-            $result .= 'null';
-        } elseif ($node === false) {
-            $result .= 'false';
-        } elseif ($node === true) {
-            $result .= 'true';
-        } else {
-            throw new InvalidArgumentException('Can only dump nodes and arrays.');
-        }
-
-        if ($indent) {
-            $newLine = substr($newLine, 0, -4);
-        }
-    }
-
-    /**
-     * Check if a value is a Node or an array of Node values
-     */
-    private function isNodeOrNodeArray(mixed $value): bool
-    {
-        if ($value instanceof Node) {
-            return true;
-        }
-
-        if (!is_array($value)) {
-            return false;
-        }
-
-        // Check if it's an array of nodes
-        foreach ($value as $item) {
-            if ($item instanceof Node) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     protected function dumpFlags(int $flags): string
@@ -336,6 +187,166 @@ final class NodeDumper
         }
 
         return "[$start - $end]";
+    }
+
+    private function dumpRecursive(
+        mixed $node,
+        ?string $code,
+        string &$result,
+        string &$newLine,
+        bool $indent = true,
+    ): void {
+        if ($indent) {
+            $newLine .= '    ';
+        }
+
+        if ($node instanceof Node) {
+            $result .= $node->getType();
+
+            if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
+                $result .= $p;
+            }
+
+            $hasDetails = false;
+            $nodeDetails = '(';
+
+            foreach ($node->getSubNodeNames() as $key) {
+                $value = $node->$key;
+
+                // Skip "extra" properties unless configured to dump them
+                if (!$this->dumpProperties && !$this->isNodeOrNodeArray($value)) {
+                    continue;
+                }
+
+                $hasDetails = true;
+                $nodeDetails .= "$newLine    " . $key . ': ';
+
+                if (is_int($value)) {
+                    if ($key === 'flags' || $key === 'newModifier') {
+                        $nodeDetails .= $this->dumpFlags($value);
+
+                        continue;
+                    }
+
+                    if ($key === 'type' && $node instanceof Include_) {
+                        $nodeDetails .= $this->dumpIncludeType($value);
+
+                        continue;
+                    }
+
+                    if ($key === 'type'
+                        && ($node instanceof Use_ || $node instanceof UseItem || $node instanceof GroupUse)) {
+                        $nodeDetails .= $this->dumpUseType($value);
+
+                        continue;
+                    }
+                }
+                $this->dumpRecursive($value, $code, $nodeDetails, $newLine);
+            }
+
+            if ($this->dumpComments && $comments = $node->getComments()) {
+                $hasDetails = true;
+                $nodeDetails .= "$newLine    comments: ";
+
+                $this->dumpRecursive($comments, $code, $nodeDetails, $newLine);
+            }
+
+            if ($this->dumpOtherAttributes) {
+                foreach ($node->getAttributes() as $key => $value) {
+                    if (isset(self::IGNORE_ATTRIBUTES[$key])) {
+                        continue;
+                    }
+
+                    $hasDetails = true;
+                    $nodeDetails .= "$newLine    $key: ";
+
+                    if (is_int($value)) {
+                        if ($key === 'kind') {
+                            if ($node instanceof Int_) {
+                                $nodeDetails .= $this->dumpIntKind($value);
+
+                                continue;
+                            }
+
+                            if ($node instanceof String_ || $node instanceof InterpolatedString) {
+                                $nodeDetails .= $this->dumpStringKind($value);
+
+                                continue;
+                            }
+
+                            if ($node instanceof Array_) {
+                                $nodeDetails .= $this->dumpArrayKind($value);
+
+                                continue;
+                            }
+
+                            if ($node instanceof List_) {
+                                $nodeDetails .= $this->dumpListKind($value);
+
+                                continue;
+                            }
+                        }
+                    }
+
+                    $this->dumpRecursive($value, $code, $nodeDetails, $newLine);
+                }
+            }
+
+            $nodeDetails .= "$newLine)";
+
+            if ($hasDetails) {
+                $result .= $nodeDetails;
+            }
+        } elseif (is_array($node)) {
+            $result .= 'array(';
+
+            foreach ($node as $key => $value) {
+                $result .= "$newLine    " . $key . ': ';
+                $this->dumpRecursive($value, $code, $result, $newLine);
+            }
+            $result .= "$newLine)";
+        } elseif ($node instanceof Comment) {
+            $result .= str_replace("\n", $newLine, $node->getReformattedText());
+        } elseif (is_string($node)) {
+            $result .= str_replace("\n", $newLine, $node);
+        } elseif (is_int($node) || is_float($node)) {
+            $result .= $node;
+        } elseif ($node === null) {
+            $result .= 'null';
+        } elseif ($node === false) {
+            $result .= 'false';
+        } elseif ($node === true) {
+            $result .= 'true';
+        } else {
+            throw new InvalidArgumentException('Can only dump nodes and arrays.');
+        }
+
+        if ($indent) {
+            $newLine = substr($newLine, 0, -4);
+        }
+    }
+
+    /**
+     * Check if a value is a Node or an array of Node values
+     */
+    private function isNodeOrNodeArray(mixed $value): bool
+    {
+        if ($value instanceof Node) {
+            return true;
+        }
+
+        if (!is_array($value)) {
+            return false;
+        }
+
+        // Check if it's an array of nodes
+        foreach ($value as $item) {
+            if ($item instanceof Node) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @param array<int, string> $map */

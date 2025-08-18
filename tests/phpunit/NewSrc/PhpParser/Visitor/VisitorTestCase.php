@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 
-use Infection\Tests\NewSrc\PhpParser\NodeDumper\NodeDumper;
 use function array_map;
+use Infection\Tests\NewSrc\PhpParser\NodeDumper\NodeDumper;
 use function is_array;
 use PhpParser\Node;
 use PhpParser\Parser;

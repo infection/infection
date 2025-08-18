@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
 use InvalidArgumentException;
+use function is_string;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
@@ -49,7 +50,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\Filesystem\Path;
-use function is_string;
 
 #[CoversClass(NodeDumper::class)]
 final class NodeDumperTest extends TestCase
@@ -84,40 +84,39 @@ final class NodeDumperTest extends TestCase
     {
         $variableAssignment = NodeDumperScenario::forCode(
             <<<'PHP'
-            <?php
+                <?php
 
-            /** @var string */
-            $a = 1;
-            echo $a;    // Salutation
-            PHP,
+                /** @var string */
+                $a = 1;
+                echo $a;    // Salutation
+                PHP,
         )
         ->withDumpProperties();
 
         yield 'variable' => $variableAssignment
             ->withExpected(
                 <<<'OUT'
-                array(
-                    0: Stmt_Expression(
-                        expr: Expr_Assign(
-                            var: Expr_Variable(
-                                name: a
-                            )
-                            expr: Scalar_Int(
-                                value: 1
-                            )
-                        )
-                    )
-                    1: Stmt_Echo(
-                        exprs: array(
-                            0: Expr_Variable(
-                                name: a
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                )
+                                expr: Scalar_Int(
+                                    value: 1
+                                )
                             )
                         )
+                        1: Stmt_Echo(
+                            exprs: array(
+                                0: Expr_Variable(
+                                    name: a
+                                )
+                            )
+                        )
+                        2: Stmt_Nop
                     )
-                    2: Stmt_Nop(
-                    )
-                )
-                OUT,
+                    OUT,
             )
             ->build();
 
@@ -125,34 +124,34 @@ final class NodeDumperTest extends TestCase
             ->withDumpComments()
             ->withExpected(
                 <<<'OUT'
-                array(
-                    0: Stmt_Expression(
-                        expr: Expr_Assign(
-                            var: Expr_Variable(
-                                name: a
+                    array(
+                        0: Stmt_Expression(
+                            expr: Expr_Assign(
+                                var: Expr_Variable(
+                                    name: a
+                                )
+                                expr: Scalar_Int(
+                                    value: 1
+                                )
                             )
-                            expr: Scalar_Int(
-                                value: 1
-                            )
-                        )
-                        comments: array(
-                            0: /** @var string */
-                        )
-                    )
-                    1: Stmt_Echo(
-                        exprs: array(
-                            0: Expr_Variable(
-                                name: a
+                            comments: array(
+                                0: /** @var string */
                             )
                         )
-                    )
-                    2: Stmt_Nop(
-                        comments: array(
-                            0: / Salutation
+                        1: Stmt_Echo(
+                            exprs: array(
+                                0: Expr_Variable(
+                                    name: a
+                                )
+                            )
+                        )
+                        2: Stmt_Nop(
+                            comments: array(
+                                0: / Salutation
+                            )
                         )
                     )
-                )
-                OUT,
+                    OUT,
             )
         ->build();
 
@@ -160,28 +159,27 @@ final class NodeDumperTest extends TestCase
             ->withDumpPositions()
             ->withExpected(
                 <<<'OUT'
-                array(
-                    0: Stmt_Expression[4 - 4](
-                        expr: Expr_Assign[4 - 4](
-                            var: Expr_Variable[4 - 4](
-                                name: a
-                            )
-                            expr: Scalar_Int[4 - 4](
-                                value: 1
-                            )
-                        )
-                    )
-                    1: Stmt_Echo[5 - 5](
-                        exprs: array(
-                            0: Expr_Variable[5 - 5](
-                                name: a
+                    array(
+                        0: Stmt_Expression[4 - 4](
+                            expr: Expr_Assign[4 - 4](
+                                var: Expr_Variable[4 - 4](
+                                    name: a
+                                )
+                                expr: Scalar_Int[4 - 4](
+                                    value: 1
+                                )
                             )
                         )
+                        1: Stmt_Echo[5 - 5](
+                            exprs: array(
+                                0: Expr_Variable[5 - 5](
+                                    name: a
+                                )
+                            )
+                        )
+                        2: Stmt_Nop[5 - 5]
                     )
-                    2: Stmt_Nop[5 - 5](
-                    )
-                )
-                OUT,
+                    OUT,
             )
         ->build();
 
@@ -203,30 +201,30 @@ final class NodeDumperTest extends TestCase
             ->withDumpOtherAttributes()
             ->withExpected(
                 <<<'OUT'
-                array(
-                    0: Expr_Assign(
-                        var: Expr_Variable(
-                            name: Name(
-                                name: x
+                    array(
+                        0: Expr_Assign(
+                            var: Expr_Variable(
+                                name: Name(
+                                    name: x
+                                )
                             )
+                            expr: Scalar_String(
+                                value: Hello World!
+                                unspecifiedAttribute: Hi
+                            )
+                            anotherUnspecifiedAttribute: ...
                         )
-                        expr: Scalar_String(
-                            value: Hello World!
-                            unspecifiedAttribute: Hi
-                        )
-                        anotherUnspecifiedAttribute: ...
                     )
-                )
-                OUT,
+                    OUT,
             )
         ->build();
 
         yield 'empty array' => NodeDumperScenario::forNode([])
             ->withExpected(
-            <<<'OUT'
-                array(
-                )
-                OUT,
+                <<<'OUT'
+                    array(
+                    )
+                    OUT,
             )
         ->build();
 
@@ -234,13 +232,13 @@ final class NodeDumperTest extends TestCase
             ['Foo', 'Bar', 'Key' => 'FooBar'],
         )
             ->withExpected(
-            <<<'OUT'
-                array(
-                    0: Foo
-                    1: Bar
-                    Key: FooBar
-                )
-                OUT,
+                <<<'OUT'
+                    array(
+                        0: Foo
+                        1: Bar
+                        Key: FooBar
+                    )
+                    OUT,
             )
             ->build();
 
@@ -248,10 +246,9 @@ final class NodeDumperTest extends TestCase
             new Name(['Hallo', 'World']),
         )
             ->withExpected(
-            <<<'OUT'
-                Name(
-                )
-                OUT,
+                <<<'OUT'
+                    Name
+                    OUT,
             )
         ->build();
 
@@ -260,11 +257,11 @@ final class NodeDumperTest extends TestCase
         )
             ->withDumpProperties()
             ->withExpected(
-            <<<'OUT'
-                Name(
-                    name: Hallo\World
-                )
-                OUT,
+                <<<'OUT'
+                    Name(
+                        name: Hallo\World
+                    )
+                    OUT,
             )
         ->build();
 
@@ -274,16 +271,15 @@ final class NodeDumperTest extends TestCase
             ]),
         )
             ->withExpected(
-            <<<'OUT'
-                Expr_Array(
-                    items: array(
-                        0: ArrayItem(
-                            value: Scalar_String(
+                <<<'OUT'
+                    Expr_Array(
+                        items: array(
+                            0: ArrayItem(
+                                value: Scalar_String
                             )
                         )
                     )
-                )
-                OUT,
+                    OUT,
             )
         ->build();
 
@@ -294,20 +290,20 @@ final class NodeDumperTest extends TestCase
         )
             ->withDumpProperties()
             ->withExpected(
-            <<<'OUT'
-                Expr_Array(
-                    items: array(
-                        0: ArrayItem(
-                            key: null
-                            value: Scalar_String(
-                                value: Foo
+                <<<'OUT'
+                    Expr_Array(
+                        items: array(
+                            0: ArrayItem(
+                                key: null
+                                value: Scalar_String(
+                                    value: Foo
+                                )
+                                byRef: false
+                                unpack: false
                             )
-                            byRef: false
-                            unpack: false
                         )
                     )
-                )
-                OUT,
+                    OUT,
             )
         ->build();
 
@@ -317,12 +313,11 @@ final class NodeDumperTest extends TestCase
             ),
         )
             ->withExpected(
-            <<<'OUT'
-                Stmt_ClassMethod(
-                    name: Identifier(
+                <<<'OUT'
+                    Stmt_ClassMethod(
+                        name: Identifier
                     )
-                )
-                OUT,
+                    OUT,
             )
         ->build();
     }
