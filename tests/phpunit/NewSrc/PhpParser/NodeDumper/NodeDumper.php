@@ -230,12 +230,6 @@ final class NodeDumper
                     continue;
                 }
 
-                if ($this->onlyVisitedNodes && !MarkTraversedNodesAsVisitedVisitor::wasVisited($node)) {
-                    $nodeDetails .= '<skipped>';
-
-                    continue;
-                }
-
                 $hasDetails = true;
                 $nodeDetails .= "$newLine    " . $key . ': ';
 
