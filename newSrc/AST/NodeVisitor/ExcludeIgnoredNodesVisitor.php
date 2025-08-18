@@ -53,7 +53,6 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
         if ($this->hasIgnoreAnnotation($node)) {
             NodeAnnotator::annotate($node, Annotation::IGNORED_WITH_ANNOTATION);
 
-            //            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
             return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
@@ -62,22 +61,17 @@ final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
 
     private function hasIgnoreAnnotation(Node $node): bool
     {
-        foreach ($node->getComments() as $comment) {
-            if (self::commentContainsAnnotation($comment)) {
-                return true;
-            }
-        }
-
-        return false;
-
-        //        return any(
-        //            self::commentContainsAnnotation(...),
-        //            $node->getComments(),
-        //        );
+        return any(
+            self::commentContainsAnnotation(...),
+            $node->getComments(),
+        );
     }
 
     private static function commentContainsAnnotation(Comment $comment): bool
     {
-        return str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION);
+        return str_contains(
+            $comment->getText(),
+            self::IGNORE_ALL_MUTATIONS_ANNOTATION,
+        );
     }
 }

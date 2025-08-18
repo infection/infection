@@ -125,6 +125,7 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
 
         (new NodeTraverser($fullTraverseVisitor))->traverse($fullTraverseNodes);
 
+        // Sanity check
         $this->assertSame(
             $expectedFullyTraversed,
             $this->dumper->dump($fullTraverseNodes),
