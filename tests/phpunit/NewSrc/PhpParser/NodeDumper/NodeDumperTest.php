@@ -310,6 +310,21 @@ final class NodeDumperTest extends TestCase
                 OUT,
             )
         ->build();
+
+        yield 'empty method' => NodeDumperScenario::forNode(
+            new Node\Stmt\ClassMethod(
+                new Node\Identifier('salute'),
+            ),
+        )
+            ->withExpected(
+            <<<'OUT'
+                Stmt_ClassMethod(
+                    name: Identifier(
+                    )
+                )
+                OUT,
+            )
+        ->build();
     }
 
     public function test_error(): void

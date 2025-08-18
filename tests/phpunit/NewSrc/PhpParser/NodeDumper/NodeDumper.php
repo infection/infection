@@ -244,12 +244,12 @@ final class NodeDumper
 
         // Check if it's an array of nodes
         foreach ($value as $item) {
-            if (!($item instanceof Node)) {
-                return false;
+            if ($item instanceof Node) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     protected function dumpFlags(int $flags): string
