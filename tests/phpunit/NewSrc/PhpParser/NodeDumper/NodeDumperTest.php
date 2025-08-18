@@ -35,7 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
+use Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\ArrowFunction;
+use PhpParser\Node\Expr\FuncCall;
 use function is_string;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
@@ -91,6 +95,7 @@ final class NodeDumperTest extends TestCase
                 echo $a;    // Salutation
                 PHP,
         )
+            ->withShowAllNodes()
         ->withDumpProperties();
 
         yield 'variable' => $variableAssignment
@@ -183,6 +188,62 @@ final class NodeDumperTest extends TestCase
             )
         ->build();
 
+        yield 'tree with only some nodes marked as visited' => NodeDumperScenario::forNode(
+            [
+                MarkTraversedNodesAsVisitedVisitor::markAsVisited(
+                    new FuncCall(
+                        MarkTraversedNodesAsVisitedVisitor::markAsVisited(new Name('salute')),
+                        [
+                            MarkTraversedNodesAsVisitedVisitor::markAsVisited(
+                                new Arg(
+                                    MarkTraversedNodesAsVisitedVisitor::markAsVisited(
+                                        new ArrowFunction([
+                                            'expr' => MarkTraversedNodesAsVisitedVisitor::markAsVisited(
+                                                new String_('first'),
+                                            ),
+                                        ]),
+                                    ),
+                                ),
+                            ),
+                            MarkTraversedNodesAsVisitedVisitor::markAsVisited(
+                                new Arg(
+                                    new ArrowFunction(['expr' => new String_('second')]),
+                                ),
+                            ),
+                            new Arg(
+                                new String_('Hello world!'),
+                            ),
+                        ],
+                    ),
+                ),
+            ],
+        )
+            ->withExpected(
+                <<<'OUT'
+                    array(
+                        0: Expr_FuncCall(
+                            name: Name
+                            args: array(
+                                0: Arg(
+                                    value: Expr_ArrowFunction(
+                                        expr: Scalar_String
+                                    )
+                                )
+                                1: Arg(
+                                    value: Expr_ArrowFunction(
+                                        expr: Scalar_String
+                                    )
+                                )
+                                2: Arg(
+                                    value: Scalar_String
+                                )
+                            )
+                        )
+                    )
+                    OUT,
+            )
+        ->build();
+
         yield 'variable other attributes' => NodeDumperScenario::forNode(
             [
                 new Assign(
@@ -199,6 +260,7 @@ final class NodeDumperTest extends TestCase
         )
             ->withDumpProperties()
             ->withDumpOtherAttributes()
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     array(
@@ -220,6 +282,7 @@ final class NodeDumperTest extends TestCase
         ->build();
 
         yield 'empty array' => NodeDumperScenario::forNode([])
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     array(
@@ -231,6 +294,7 @@ final class NodeDumperTest extends TestCase
         yield 'array with values' => NodeDumperScenario::forNode(
             ['Foo', 'Bar', 'Key' => 'FooBar'],
         )
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     array(
@@ -245,6 +309,7 @@ final class NodeDumperTest extends TestCase
         yield 'name' => NodeDumperScenario::forNode(
             new Name(['Hallo', 'World']),
         )
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     Name
@@ -256,6 +321,7 @@ final class NodeDumperTest extends TestCase
             new Name(['Hallo', 'World']),
         )
             ->withDumpProperties()
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     Name(
@@ -270,6 +336,7 @@ final class NodeDumperTest extends TestCase
                 new ArrayItem(new String_('Foo')),
             ]),
         )
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     Expr_Array(
@@ -289,6 +356,7 @@ final class NodeDumperTest extends TestCase
             ]),
         )
             ->withDumpProperties()
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     Expr_Array(
@@ -312,6 +380,7 @@ final class NodeDumperTest extends TestCase
                 new Node\Identifier('salute'),
             ),
         )
+            ->withShowAllNodes()
             ->withExpected(
                 <<<'OUT'
                     Stmt_ClassMethod(

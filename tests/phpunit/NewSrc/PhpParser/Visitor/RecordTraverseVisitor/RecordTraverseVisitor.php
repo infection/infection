@@ -33,51 +33,44 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST\NodeVisitor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor;
 
-use function iter\any;
-use newSrc\AST\Annotation;
-use newSrc\AST\NodeAnnotator;
-use PhpParser\Comment;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use function str_contains;
+use function func_get_args;
 
-final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
+final class RecordTraverseVisitor extends NodeVisitorAbstract
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
+    /**
+     * @var list<array{string, list<mixed>}>
+     */
+    private array $records = [];
 
-    public function enterNode(Node $node): ?int
+    public function fetch(): array
     {
-        if ($this->hasIgnoreAnnotation($node)) {
-            NodeAnnotator::annotate($node, Annotation::IGNORED_WITH_ANNOTATION);
+        $records = $this->records;
+        $this->records = [];
 
-//            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-             return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
-
-        return null;
+        return $records;
     }
 
-    private function hasIgnoreAnnotation(Node $node): bool
+    public function beforeTraverse(array $nodes): void
     {
-        foreach ($node->getComments() as $comment) {
-            if (self::commentContainsAnnotation($comment)) {
-                return true;
-            }
-        }
-
-        return false;
-
-        //        return any(
-        //            self::commentContainsAnnotation(...),
-        //            $node->getComments(),
-        //        );
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 
-    private static function commentContainsAnnotation(Comment $comment): bool
+    public function enterNode(Node $node): void
     {
-        return str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION);
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function leaveNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function afterTraverse(array $nodes): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 }

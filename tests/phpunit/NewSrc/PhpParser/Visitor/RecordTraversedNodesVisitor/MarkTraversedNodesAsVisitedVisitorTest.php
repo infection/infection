@@ -33,16 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor;
 
+use Infection\Tests\NewSrc\PhpParser\Visitor\VisitorTestCase;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
 
-#[CoversClass(RecordTraverseVisitor::class)]
-final class RecordTraverseVisitorTest extends VisitorTestCase
+#[CoversClass(MarkTraversedNodesAsVisitedVisitor::class)]
+final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
 {
-    public function test_it_records_the_traversal(): void
+    public function test_it_records_the_traversed_nodes(): void
     {
         $nodes = $this->parser->parse(
             <<<'PHP'
@@ -50,7 +52,10 @@ final class RecordTraverseVisitorTest extends VisitorTestCase
 
                 namespace Infection\Tests\Virtual;
 
-                $engine = new Engine();
+                $engine = new Engine(
+                    static fn () => 'first',
+                    static fn () => 'second',
+                );
 
                 PHP,
         );
@@ -69,6 +74,8 @@ final class RecordTraverseVisitorTest extends VisitorTestCase
         $newStmt = $assignmentStmt->expr;
         /** @var Node\Name $newClassName */
         $newClassName = $newStmt->class;
+        /** @var Node\Arg $newStmtArg */
+        $newStmtArg = $newStmt->args[0];
 
         $expected = [
             ['beforeTraverse', [$nodes]],
@@ -89,16 +96,33 @@ final class RecordTraverseVisitorTest extends VisitorTestCase
             ['afterTraverse', [$nodes]],
         ];
 
-        $recorder = new RecordTraverseVisitor();
+        $recorder = new MarkTraversedNodesAsVisitedVisitor();
 
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor($recorder);
+        $stopAtFirstArgVisitor = new class($newStmt) extends NodeVisitorAbstract {
+            public function __construct(private readonly Node $nodeToStopOn)
+            {
+            }
+
+            public function enterNode(Node $node)
+            {
+                if ($node === $this->nodeToStopOn) {
+                    return NodeVisitorAbstract::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+                }
+            }
+        };
+
+        $traverser = new NodeTraverser(
+            $stopAtFirstArgVisitor,
+            $recorder,
+        );
 
         $traverser->traverse($nodes);
 
         $this->assertSame(
-            $expected,
-            $recorder->fetch(),
+            '',
+            $this->dumper->dump(
+                $recorder->fetch(),
+            ),
         );
     }
 }

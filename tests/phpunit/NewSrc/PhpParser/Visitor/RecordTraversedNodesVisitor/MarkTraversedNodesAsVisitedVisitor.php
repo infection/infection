@@ -33,44 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor;
+namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor;
 
-use function func_get_args;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use function func_get_args;
 
-final class RecordTraverseVisitor extends NodeVisitorAbstract
+final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
+    private const VISITED_ATTRIBUTE = 'visited';
+
+    public static function wasVisited(Node $node): bool
+    {
+        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
+    }
+
     /**
-     * @var list<array{string, list<mixed>}>
+     * @template T extends Node
+     *
+     * @param T $node
+     * @return T
      */
-    private array $records = [];
-
-    public function fetch(): array
+    public static function markAsVisited(Node $node): Node
     {
-        $records = $this->records;
-        $this->records = [];
+        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
 
-        return $records;
-    }
-
-    public function beforeTraverse(array $nodes): void
-    {
-        $this->records[] = [__FUNCTION__, func_get_args()];
-    }
-
-    public function enterNode(Node $node): void
-    {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        return $node;
     }
 
     public function leaveNode(Node $node): void
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
-    }
-
-    public function afterTraverse(array $nodes): void
-    {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        self::markAsVisited($node);
     }
 }

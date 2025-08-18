@@ -50,6 +50,7 @@ final class NodeDumperScenario
         public bool $dumpComments = false,
         public bool $dumpPositions = false,
         public bool $dumpOtherAttributes = false,
+        public bool $onlyVisitedNodes = true,
     ) {
     }
 
@@ -94,6 +95,14 @@ final class NodeDumperScenario
     {
         $clone = clone $this;
         $clone->dumpOtherAttributes = true;
+
+        return $clone;
+    }
+
+    public function withShowAllNodes(): self
+    {
+        $clone = clone $this;
+        $clone->onlyVisitedNodes = false;
 
         return $clone;
     }

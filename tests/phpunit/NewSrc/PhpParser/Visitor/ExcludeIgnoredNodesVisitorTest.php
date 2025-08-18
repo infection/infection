@@ -35,20 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+use Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor\RecordTraverseVisitor;
 use newSrc\AST\NodeVisitor\ExcludeIgnoredNodesVisitor;
-use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use SplObjectStorage;
 use function var_dump;
 
 #[CoversClass(ExcludeIgnoredNodesVisitor::class)]
 final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
 {
-    public function test_it_annotates_excluded_nodes_and_stops_the_traversal(): void
+    public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
+        string $code,
+    ): void
     {
         $nodes = $this->createParser()->parse(
             <<<'PHP'
@@ -534,6 +533,25 @@ final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
         exit;
 
         $this->assertSame($expected, $actual);
+    }
+
+    public static function nodeProvider(): iterable
+    {
+        yield 'annotation on method' => [
+            <<<'PHP'
+                <?php
+
+                namespace Infection\Tests\Virtual;
+
+                class ClassWithExcludedMethod {
+                    function nonExcludedMethod() {}
+
+                    // @infection-ignore-all
+                    function excludedMethod() {}
+                }
+
+                PHP,
+        ];
     }
 
     //    public function test_it_does_not_toggle_ignorer_for_nodes_without_comments(): void

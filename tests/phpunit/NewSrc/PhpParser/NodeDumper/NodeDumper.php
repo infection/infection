@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
+use Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraversedNodesVisitor\MarkTraversedNodesAsVisitedVisitor;
 use function implode;
 use InvalidArgumentException;
 use function is_array;
@@ -83,6 +84,7 @@ final class NodeDumper
         private readonly bool $dumpComments = false,
         private readonly bool $dumpPositions = false,
         private readonly bool $dumpOtherAttributes = true,
+        private readonly bool $onlyVisitedNodes = true,
     ) {
     }
 
@@ -201,6 +203,12 @@ final class NodeDumper
         }
 
         if ($node instanceof Node) {
+            if (!MarkTraversedNodesAsVisitedVisitor::wasVisited($node)) {
+                $result.= '<skipped>';
+
+                return;
+            }
+
             $result .= $node->getType();
 
             if ($this->dumpPositions && null !== $p = $this->dumpPosition($node, $code)) {
