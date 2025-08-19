@@ -298,7 +298,7 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
-        null,
+            null,
         );
 
         $this->expectExceptionMessage('Expected one of: "phpstan". Got: "non-supported-static-analysis-tool"');
@@ -1197,7 +1197,7 @@ final class ConfigurationFactoryTest extends TestCase
             $useGitHubAnnotationsLogger,
             null,
             null,
-        null,
+            null,
         );
 
         return [
@@ -1634,7 +1634,7 @@ final class ConfigurationFactoryTest extends TestCase
             true,
             null,
             null,
-        null,
+            null,
         );
 
         return [
@@ -1700,7 +1700,6 @@ final class ConfigurationFactoryTest extends TestCase
         SchemaConfiguration $schema,
     ): ConfigurationFactory {
         /** @var SourceFileCollector&MockObject $sourceFilesCollector */
-        null,
         $sourceFilesCollector = $this->createMock(SourceFileCollector::class);
 
         $sourceFilesCollector->expects($this->once())
