@@ -298,7 +298,6 @@ final class ConfigurationFactoryTest extends TestCase
             null,
             null,
             StaticAnalysisToolTypes::PHPSTAN,
-            null,
         );
 
         $this->expectExceptionMessage('Expected one of: "phpstan". Got: "non-supported-static-analysis-tool"');
