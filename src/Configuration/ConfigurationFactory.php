@@ -108,6 +108,7 @@ class ConfigurationFactory
         string $mutatorsInput,
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
+        ?string $staticAnalysisToolOptions,
         string $filter,
         ?int $threadCount,
         bool $dryRun,
@@ -165,6 +166,7 @@ class ConfigurationFactory
             $schema->getBootstrap(),
             $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
+            self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
             $coverageBasePath,
             $skipCoverage,
             $skipInitialTests,
@@ -300,6 +302,13 @@ class ConfigurationFactory
         SchemaConfiguration $schema,
     ): string {
         return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+    }
+
+    private static function retrieveStaticAnalysisToolOptions(
+        ?string $staticAnalysisToolOptions,
+        SchemaConfiguration $schema,
+    ): ?string {
+        return $staticAnalysisToolOptions ?? $schema->getStaticAnalysisToolOptions();
     }
 
     private function retrieveNoProgress(bool $noProgress): bool

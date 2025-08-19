@@ -57,6 +57,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly float $timeout,
         private readonly string $tmpDir,
+        private readonly ?string $staticAnalysisToolOptions,
     ) {
     }
 
@@ -88,19 +89,25 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         string $mutationOriginalFilePath,
         string $mutantConfigFile,
     ): array {
+        $options = [
+            "--tmp-file=$mutatedFilePath",
+            "--instead-of=$mutationOriginalFilePath",
+            "--configuration=$mutantConfigFile",
+            '--error-format=json',
+            '--no-progress',
+            '-vv',
+            '--fail-without-result-cache',
+            // todo [phpstan-integration] --stop-on-first-error
+        ];
+
+        if ($this->staticAnalysisToolOptions !== null) {
+            $options[] = $this->staticAnalysisToolOptions;
+        }
+
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
-            [
-                "--tmp-file=$mutatedFilePath",
-                "--instead-of=$mutationOriginalFilePath",
-                "--configuration=$mutantConfigFile",
-                '--error-format=json',
-                '--no-progress',
-                '-vv',
-                '--fail-without-result-cache',
-                // todo [phpstan-integration] --stop-on-first-error
-            ],
+            $options,
         );
     }
 

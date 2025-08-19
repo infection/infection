@@ -67,6 +67,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
         private readonly string $tmpDir,
+        private readonly ?string $staticAnalysisToolOptions,
         private ?string $version = null,
     ) {
     }
@@ -84,13 +85,19 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         // we can't rely on stderr because it's used for other output (non-error)
         // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
 
+        $options = [
+            "--configuration=$this->staticAnalysisConfigPath",
+            // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
+        ];
+
+        if ($this->staticAnalysisToolOptions !== null) {
+            $options[] = $this->staticAnalysisToolOptions;
+        }
+
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
-            [
-                "--configuration=$this->staticAnalysisConfigPath",
-                // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
-            ],
+            $options,
         );
     }
 
@@ -104,6 +111,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             $this->commandLineBuilder,
             $this->timeout,
             $this->tmpDir,
+            $this->staticAnalysisToolOptions,
         );
     }
 

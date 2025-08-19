@@ -52,6 +52,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         string $staticAnalysisToolExecutable,
         float $timeout,
         string $tmpDir,
+        ?string $staticAnalysisToolOptions,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
             new Filesystem(),
@@ -62,6 +63,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
             new VersionParser(),
             $timeout,
             $tmpDir,
+            $staticAnalysisToolOptions,
         );
     }
 }

@@ -635,6 +635,10 @@
         "testFrameworkOptions": {
             "type": "string",
             "description": "Specify an additional options to pass to the test framework (e.g. enabling Verbose Mode). --test-framework-options will override this option."
+        },
+        "staticAnalysisToolOptions": {
+            "type": "string",
+            "description": "Specify an additional options to pass to the static analysis tool (e.g. memory limit). --static-analysis-tool-options will override this option."
         }
     },
     "definitions": {

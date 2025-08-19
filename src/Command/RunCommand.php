@@ -90,6 +90,9 @@ final class RunCommand extends BaseCommand
     private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
 
     /** @var string */
+    private const OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
+
+    /** @var string */
     private const OPTION_WITH_UNCOVERED = 'with-uncovered';
 
     /** @var string */
@@ -190,6 +193,13 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Options to be passed to the test framework',
                 Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+            )
+            ->addOption(
+                self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Options to be passed to the static analysis tool',
+                Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
             )
             ->addOption(
                 self::OPTION_THREADS,
@@ -450,6 +460,7 @@ final class RunCommand extends BaseCommand
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
         $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
         $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
+        $staticAnalysisToolOptions = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS));
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
@@ -531,6 +542,9 @@ final class RunCommand extends BaseCommand
             $testFrameworkExtraOptions === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
+            $staticAnalysisToolOptions === ''
+                ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
+                : $staticAnalysisToolOptions,
             $filter,
             $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN

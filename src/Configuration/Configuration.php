@@ -98,6 +98,7 @@ class Configuration
         private readonly ?string $bootstrap,
         private readonly ?string $initialTestsPhpOptions,
         private readonly string $testFrameworkExtraOptions,
+        private readonly ?string $staticAnalysisToolOptions,
         private readonly string $coveragePath,
         private readonly bool $skipCoverage,
         private readonly bool $skipInitialTests,
@@ -234,6 +235,11 @@ class Configuration
     public function getTestFrameworkExtraOptions(): string
     {
         return $this->testFrameworkExtraOptions;
+    }
+
+    public function getStaticAnalysisToolOptions(): ?string
+    {
+        return $this->staticAnalysisToolOptions;
     }
 
     public function getCoveragePath(): string
