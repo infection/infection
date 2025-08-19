@@ -37,15 +37,14 @@ Infection is a PHP mutation testing framework that helps developers measure the 
 ### Setup
 ```bash
 composer install
-./setup_environment.sh  # Sets up pre-push hooks (Unix-like systems)
 ```
 
 ### Quality Assurance
 ```bash
-make test      # Run full test suite (requires Docker)
-make cs        # Fix code style
-make phpstan   # Static analysis
-make rector    # Automated refactoring
+make autoreview                                      # Run majority of tools needed before pushing
+make cs                                              # Automatically fix code styles (use before pushing)
+vendor/bin/phpunit                                   # Run tests
+vendor/bin/phpunit --filter=MutatorGenerator        # Run specific test (replace MutatorGenerator with any file name)
 ```
 
 ### Key Configuration Files
