@@ -149,4 +149,11 @@ final class SchemaConfigurationTest extends TestCase
             'staticAnalysisTool' => 'phpstan',
         ];
     }
+
+    public function test_it_can_be_instantiated_with_multiple_static_analysis_tool_options(): void
+    {
+        $this->test_it_can_be_instantiated(
+            staticAnalysisToolOptions: '--memory-limit=-1 --no-progress --level=max',
+        );
+    }
 }

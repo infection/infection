@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use function array_map;
+use function array_merge;
 use function explode;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
@@ -42,6 +44,7 @@ use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
+use function ltrim;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
@@ -90,8 +93,11 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
             // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
         ];
 
-        if ($this->staticAnalysisToolOptions !== null) {
-            $options[] = $this->staticAnalysisToolOptions;
+        if ($this->staticAnalysisToolOptions !== null && $this->staticAnalysisToolOptions !== '') {
+            $options = array_merge(
+                $options,
+                $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions),
+            );
         }
 
         return $this->commandLineBuilder->build(
@@ -168,5 +174,16 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         $process->mustRun();
 
         return $this->versionParser->parse($process->getOutput());
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseStaticAnalysisToolOptions(string $extraOptions): array
+    {
+        return array_map(
+            static fn ($option): string => '--' . $option,
+            explode(' --', ltrim($extraOptions, '-')),
+        );
     }
 }

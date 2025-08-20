@@ -149,4 +149,185 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
         $this->assertSame($mutant, $mutantProcess->getMutant());
         $this->assertFalse($mutantProcess->isTimedOut());
     }
+
+    public function test_it_creates_a_process_with_multiple_options(): void
+    {
+        $mutant = MutantBuilder::build(
+            $mutantFilePath = '/path/to/mutant',
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                [],
+                For_::class,
+                MutatorName::getName(For_::class),
+                [
+                    'startLine' => 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                'Unknown',
+                MutatedNode::wrap(new Nop()),
+                0,
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01,
+                    ),
+                ],
+            ),
+            'killed#0',
+            <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed#0';
+
+                DIFF,
+            '<?php $a = 1;',
+        );
+
+        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
+        $commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], [
+                "--tmp-file=$mutantFilePath",
+                "--instead-of=$originalFilePath",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
+                '--fail-without-result-cache',
+                '--memory-limit=-1',
+                '--level=max',
+            ])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+        ;
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('dumpFile')
+            ->with(
+                '/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                <<<NEON
+                        includes:
+                            - /path/to/phpstan-config-folder
+                        parameters:
+                            reportUnmatchedIgnoredErrors: false
+                            parallel:
+                                maximumNumberOfProcesses: 1
+                    NEON,
+            );
+
+        $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
+            $phpStanMutantExecutionResultFactory,
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
+            $commandLineBuilder,
+            100.0,
+            '/tmp',
+            '--memory-limit=-1 --level=max',
+        );
+
+        $mutantProcess = $factory->create($mutant);
+
+        $process = $mutantProcess->getProcess();
+
+        $this->assertSame(100.0, $process->getTimeout());
+        $this->assertFalse($process->isStarted());
+
+        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertFalse($mutantProcess->isTimedOut());
+    }
+
+    public function test_it_creates_a_process_without_options(): void
+    {
+        $mutant = MutantBuilder::build(
+            $mutantFilePath = '/path/to/mutant',
+            new Mutation(
+                $originalFilePath = 'path/to/Foo.php',
+                [],
+                For_::class,
+                MutatorName::getName(For_::class),
+                [
+                    'startLine' => 10,
+                    'endLine' => 15,
+                    'startTokenPos' => 0,
+                    'endTokenPos' => 8,
+                    'startFilePos' => 2,
+                    'endFilePos' => 4,
+                ],
+                'Unknown',
+                MutatedNode::wrap(new Nop()),
+                0,
+                [
+                    new TestLocation(
+                        'FooTest::test_it_can_instantiate',
+                        '/path/to/acme/FooTest.php',
+                        0.01,
+                    ),
+                ],
+            ),
+            'killed#0',
+            <<<'DIFF'
+                --- Original
+                +++ New
+                @@ @@
+
+                - echo 'original';
+                + echo 'killed#0';
+
+                DIFF,
+            '<?php $a = 1;',
+        );
+
+        $phpStanMutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
+        $commandLineBuilder = $this->createMock(CommandLineBuilder::class);
+        $commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], [
+                "--tmp-file=$mutantFilePath",
+                "--instead-of=$originalFilePath",
+                '--configuration=/tmp/phpstan.83a21d5b6b2410a132e35273b02a3424.infection.neon',
+                '--error-format=json',
+                '--no-progress',
+                '-vv',
+                '--fail-without-result-cache',
+            ])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
+        ;
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('dumpFile');
+
+        $factory = new PHPStanMutantProcessFactory(
+            $filesystem,
+            $phpStanMutantExecutionResultFactory,
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
+            $commandLineBuilder,
+            100.0,
+            '/tmp',
+            null,
+        );
+
+        $mutantProcess = $factory->create($mutant);
+
+        $process = $mutantProcess->getProcess();
+
+        $this->assertSame(100.0, $process->getTimeout());
+        $this->assertFalse($process->isStarted());
+
+        $this->assertSame($mutant, $mutantProcess->getMutant());
+        $this->assertFalse($mutantProcess->isTimedOut());
+    }
 }

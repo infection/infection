@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
+use function array_map;
+use function array_merge;
+use function explode;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
+use function ltrim;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -100,8 +104,11 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             // todo [phpstan-integration] --stop-on-first-error
         ];
 
-        if ($this->staticAnalysisToolOptions !== null) {
-            $options[] = $this->staticAnalysisToolOptions;
+        if ($this->staticAnalysisToolOptions !== null && $this->staticAnalysisToolOptions !== '') {
+            $options = array_merge(
+                $options,
+                $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions),
+            );
         }
 
         return $this->commandLineBuilder->build(
@@ -132,5 +139,16 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         );
 
         return $mutantConfigPath;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseStaticAnalysisToolOptions(string $extraOptions): array
+    {
+        return array_map(
+            static fn ($option): string => '--' . $option,
+            explode(' --', ltrim($extraOptions, '-')),
+        );
     }
 }
