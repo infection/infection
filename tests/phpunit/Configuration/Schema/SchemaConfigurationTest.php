@@ -65,6 +65,7 @@ final class SchemaConfigurationTest extends TestCase
         ?string $bootstrap = null,
         ?string $initialTestsPhpOptions = null,
         ?string $testFrameworkExtraOptions = null,
+        ?string $staticAnalysisToolOptions = null,
         string|int|null $threadCount = null,
         ?string $staticAnalysisTool = null,
     ): void {
@@ -85,6 +86,7 @@ final class SchemaConfigurationTest extends TestCase
             $bootstrap,
             $initialTestsPhpOptions,
             $testFrameworkExtraOptions,
+            $staticAnalysisToolOptions,
             $threadCount,
             $staticAnalysisTool,
         );
@@ -142,6 +144,7 @@ final class SchemaConfigurationTest extends TestCase
             'bootstrap' => 'bin/bootstrap.php',
             'initialTestsPhpOptions' => '-d zend_extension=xdebug.so',
             'testFrameworkExtraOptions' => '--debug',
+            'staticAnalysisToolOptions' => '--memory-limit=1G',
             'threadCount' => 'max',
             'staticAnalysisTool' => 'phpstan',
         ];

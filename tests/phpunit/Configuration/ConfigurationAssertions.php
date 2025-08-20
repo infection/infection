@@ -72,6 +72,7 @@ trait ConfigurationAssertions
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
         string $expectedTestFrameworkExtraOptions,
+        ?string $expectedStaticAnalysisToolOptions,
         string $expectedCoveragePath,
         bool $expectedSkipCoverage,
         bool $expectedSkipInitialTests,
@@ -133,6 +134,11 @@ trait ConfigurationAssertions
             $expectedTestFrameworkExtraOptions,
             $configuration->getTestFrameworkExtraOptions(),
             'Failed testFrameworkExtraOptions check',
+        );
+        $this->assertSame(
+            $expectedStaticAnalysisToolOptions,
+            $configuration->getStaticAnalysisToolOptions(),
+            'Failed staticAnalysisToolOptions check',
         );
         $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath(), 'Failed coveragePath check');
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage(), 'Failed skipCoverage check');

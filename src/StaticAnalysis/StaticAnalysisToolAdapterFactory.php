@@ -45,5 +45,6 @@ interface StaticAnalysisToolAdapterFactory
         string $staticAnalysisToolExecutable,
         float $timeout,
         string $tmpDir,
+        ?string $staticAnalysisToolOptions,
     ): StaticAnalysisToolAdapter;
 }

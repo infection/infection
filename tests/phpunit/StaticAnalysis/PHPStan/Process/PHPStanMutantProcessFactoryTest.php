@@ -108,6 +108,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--no-progress',
                 '-vv',
                 '--fail-without-result-cache',
+                '--memory-limit=-1',
             ])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
@@ -135,6 +136,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
+            '--memory-limit=-1',
         );
 
         $mutantProcess = $factory->create($mutant);

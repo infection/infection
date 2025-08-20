@@ -77,6 +77,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
+            null,
             '9.0',
         );
     }
@@ -127,6 +128,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
+            '--memory-limit=-1',
             $version,
         );
 
@@ -148,6 +150,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
+            null,
             $version,
         );
 

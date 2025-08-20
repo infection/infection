@@ -64,6 +64,7 @@ $container = Container::create()->withValues(
     Container::DEFAULT_MSI_PRECISION,
     Container::DEFAULT_TEST_FRAMEWORK,
     Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+    Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
     Container::DEFAULT_FILTER,
     Container::DEFAULT_THREAD_COUNT,
     Container::DEFAULT_DRY_RUN,
