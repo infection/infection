@@ -671,7 +671,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $displayOutput = $this->getDisplay($output);
-        
+
         $this->assertStringContainsString('Mutation Score Indicator (MSI): <medium>80%</medium>', $displayOutput);
         $this->assertStringContainsString('Mutation Code Coverage: <high>100%</high>', $displayOutput);
         $this->assertStringContainsString('Covered Code MSI: <high>90%</high>', $displayOutput);
@@ -712,7 +712,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
         $displayOutput = $this->getDisplay($output);
-        
+
         $this->assertStringNotContainsString('Mutation Score Indicator (MSI):', $displayOutput);
         $this->assertStringContainsString('Mutation Code Coverage: <high>100%</high>', $displayOutput);
         $this->assertStringContainsString('Covered Code MSI: <high>90%</high>', $displayOutput);
