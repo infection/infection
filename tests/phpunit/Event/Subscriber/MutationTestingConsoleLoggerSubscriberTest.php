@@ -117,6 +117,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             0,
+            true, // showMutationScoreIndicator
         ));
 
         $processRunner = $this->createMock(ProcessRunner::class);
@@ -143,6 +144,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             0,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(
@@ -167,6 +169,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             0,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -206,6 +209,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             20,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -272,6 +276,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             20,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -373,6 +378,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             20,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -455,6 +461,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 new FakeMutationTestingResultsLogger(),
             ),
             0,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -488,6 +495,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(/* no file loggers */),
             0,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -511,6 +519,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(/* no file loggers */),
             20,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -551,6 +560,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             1,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -591,6 +601,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             null,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -619,9 +630,92 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             1,
+            true, // showMutationScoreIndicator
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    public function test_it_shows_mutation_score_indicator_when_flag_is_true(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        // Setup all the necessary mocks similar to existing tests
+        $this->resultsCollector->method('getEscapedExecutionResults')->willReturn([]);
+        $this->metricsCalculator->method('getTotalMutantsCount')->willReturn(10);
+        $this->metricsCalculator->method('getKilledByTestsCount')->willReturn(8);
+        $this->metricsCalculator->method('getMutationScoreIndicator')->willReturn(80.0);
+        $this->metricsCalculator->method('getCoverageRate')->willReturn(100.0);
+        $this->metricsCalculator->method('getCoveredCodeMutationScoreIndicator')->willReturn(90.0);
+        $this->metricsCalculator->method('getKilledByStaticAnalysisCount')->willReturn(0);
+        $this->metricsCalculator->method('getIgnoredCount')->willReturn(0);
+        $this->metricsCalculator->method('getNotTestedCount')->willReturn(0);
+        $this->metricsCalculator->method('getEscapedCount')->willReturn(0);
+        $this->metricsCalculator->method('getErrorCount')->willReturn(0);
+        $this->metricsCalculator->method('getSyntaxErrorCount')->willReturn(0);
+        $this->metricsCalculator->method('getTimedOutCount')->willReturn(0);
+        $this->metricsCalculator->method('getSkippedCount')->willReturn(0);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
+            true, // showMutationScoreIndicator = true
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $displayOutput = $this->getDisplay($output);
+        
+        $this->assertStringContainsString('Mutation Score Indicator (MSI): <medium>80%</medium>', $displayOutput);
+        $this->assertStringContainsString('Mutation Code Coverage: <high>100%</high>', $displayOutput);
+        $this->assertStringContainsString('Covered Code MSI: <high>90%</high>', $displayOutput);
+    }
+
+    public function test_it_hides_mutation_score_indicator_when_flag_is_false(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        // Setup all the necessary mocks similar to existing tests
+        $this->resultsCollector->method('getEscapedExecutionResults')->willReturn([]);
+        $this->metricsCalculator->method('getTotalMutantsCount')->willReturn(10);
+        $this->metricsCalculator->method('getKilledByTestsCount')->willReturn(8);
+        $this->metricsCalculator->method('getMutationScoreIndicator')->willReturn(80.0);
+        $this->metricsCalculator->method('getCoverageRate')->willReturn(100.0);
+        $this->metricsCalculator->method('getCoveredCodeMutationScoreIndicator')->willReturn(90.0);
+        $this->metricsCalculator->method('getKilledByStaticAnalysisCount')->willReturn(0);
+        $this->metricsCalculator->method('getIgnoredCount')->willReturn(0);
+        $this->metricsCalculator->method('getNotTestedCount')->willReturn(0);
+        $this->metricsCalculator->method('getEscapedCount')->willReturn(0);
+        $this->metricsCalculator->method('getErrorCount')->willReturn(0);
+        $this->metricsCalculator->method('getSyntaxErrorCount')->willReturn(0);
+        $this->metricsCalculator->method('getTimedOutCount')->willReturn(0);
+        $this->metricsCalculator->method('getSkippedCount')->willReturn(0);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
+            false, // showMutationScoreIndicator = false
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $displayOutput = $this->getDisplay($output);
+        
+        $this->assertStringNotContainsString('Mutation Score Indicator (MSI):', $displayOutput);
+        $this->assertStringContainsString('Mutation Code Coverage: <high>100%</high>', $displayOutput);
+        $this->assertStringContainsString('Covered Code MSI: <high>90%</high>', $displayOutput);
     }
 
     private function getDisplay(StreamOutput $output): string

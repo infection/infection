@@ -82,6 +82,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly DiffColorizer $diffColorizer,
         private readonly FederatedLogger $mutationTestingResultsLogger,
         private readonly ?int $numberOfShownMutations,
+        private readonly bool $showMutationScoreIndicator,
     ) {
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
@@ -228,9 +229,11 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
         $this->output->writeln(['', 'Metrics:']);
 
-        $this->output->writeln(
-            $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>"),
-        );
+        if ($this->showMutationScoreIndicator) {
+            $this->output->writeln(
+                $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>"),
+            );
+        }
 
         $this->output->writeln(
             $this->addIndentation("Mutation Code Coverage: <{$mutationCoverageTag}>{$coverageRate}%</{$mutationCoverageTag}>"),
