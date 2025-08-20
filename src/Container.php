@@ -415,9 +415,6 @@ final class Container extends DIContainer
                 /** @var FederatedLogger $federatedMutationTestingResultsLogger */
                 $federatedMutationTestingResultsLogger = $container->getMutationTestingResultsLogger();
 
-                // Show MSI when with-uncovered flag is used (mutateOnlyCoveredCode is false)
-                $showMutationScoreIndicator = $config->mutateOnlyCoveredCode() === false;
-
                 return new MutationTestingConsoleLoggerSubscriberFactory(
                     $container->getMetricsCalculator(),
                     $container->getResultsCollector(),
@@ -425,7 +422,7 @@ final class Container extends DIContainer
                     $federatedMutationTestingResultsLogger,
                     $config->getNumberOfShownMutations(),
                     $container->getOutputFormatter(),
-                    $showMutationScoreIndicator,
+                    !$config->mutateOnlyCoveredCode(),
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
