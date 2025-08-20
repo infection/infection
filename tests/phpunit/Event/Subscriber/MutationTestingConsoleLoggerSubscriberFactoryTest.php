@@ -111,6 +111,52 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
     }
 
+    public function test_it_creates_a_subscriber_with_show_mutation_score_indicator_true(): void
+    {
+        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+            $this->metricsCalculatorMock,
+            $this->resultsCollectorMock,
+            $this->diffColorizerMock,
+            new FederatedLogger(),
+            null,
+            new FakeOutputFormatter(),
+            true, // showMutationScoreIndicator
+        );
+
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
+
+        $subscriber = $factory->create($outputMock);
+
+        $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
+    }
+
+    public function test_it_creates_a_subscriber_with_show_mutation_score_indicator_false(): void
+    {
+        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+            $this->metricsCalculatorMock,
+            $this->resultsCollectorMock,
+            $this->diffColorizerMock,
+            new FederatedLogger(),
+            null,
+            new FakeOutputFormatter(),
+            false, // showMutationScoreIndicator
+        );
+
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
+
+        $subscriber = $factory->create($outputMock);
+
+        $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
+    }
+
     public static function showMutationsProvider(): iterable
     {
         foreach ([20, 0, null] as $showMutations) {
