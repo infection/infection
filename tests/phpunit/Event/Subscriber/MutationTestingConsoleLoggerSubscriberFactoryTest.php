@@ -97,6 +97,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             new FederatedLogger(),
             $numberOfShownMutations,
             new FakeOutputFormatter(),
+            true, // showMutationScoreIndicator
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
