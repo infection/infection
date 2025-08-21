@@ -424,6 +424,7 @@ final class Container extends DIContainer
                     $federatedMutationTestingResultsLogger,
                     $config->getNumberOfShownMutations(),
                     $container->getOutputFormatter(),
+                    !$config->mutateOnlyCoveredCode(),
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
