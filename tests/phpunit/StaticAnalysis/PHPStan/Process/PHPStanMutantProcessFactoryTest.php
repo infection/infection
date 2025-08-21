@@ -136,7 +136,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
-            '--memory-limit=-1',
+            ['--memory-limit=-1'],
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -233,7 +233,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
-            '--memory-limit=-1 --level=max',
+            ['--memory-limit=-1', '--level=max'],
         );
 
         $mutantProcess = $factory->create($mutant);
@@ -317,7 +317,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             $commandLineBuilder,
             100.0,
             '/tmp',
-            null,
+            [],
         );
 
         $mutantProcess = $factory->create($mutant);

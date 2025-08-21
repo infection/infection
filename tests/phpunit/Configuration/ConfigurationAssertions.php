@@ -36,12 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use function array_map;
+use function explode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
+use function ltrim;
 use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
@@ -136,7 +138,7 @@ trait ConfigurationAssertions
             'Failed testFrameworkExtraOptions check',
         );
         $this->assertSame(
-            $expectedStaticAnalysisToolOptions,
+            $this->parseStaticAnalysisToolOptionsForAssertion($expectedStaticAnalysisToolOptions),
             $configuration->getStaticAnalysisToolOptions(),
             'Failed staticAnalysisToolOptions check',
         );
@@ -173,6 +175,21 @@ trait ConfigurationAssertions
         return array_map(
             static fn (SplFileInfo $fileInfo): string => $fileInfo->getPathname(),
             $fileInfos,
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseStaticAnalysisToolOptionsForAssertion(?string $extraOptions): array
+    {
+        if ($extraOptions === null || $extraOptions === '') {
+            return [];
+        }
+
+        return array_map(
+            static fn ($option): string => '--' . $option,
+            explode(' --', ltrim($extraOptions, '-')),
         );
     }
 }

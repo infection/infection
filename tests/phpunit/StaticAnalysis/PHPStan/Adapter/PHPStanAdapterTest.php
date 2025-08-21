@@ -77,7 +77,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            null,
+            [],
             '9.0',
         );
     }
@@ -114,7 +114,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            '--memory-limit=1G',
+            ['--memory-limit=1G'],
             '9.0',
         );
 
@@ -147,7 +147,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            '--memory-limit=-1 --no-progress',
+            ['--memory-limit=-1', '--no-progress'],
             '9.0',
         );
 
@@ -182,7 +182,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            '--memory-limit=2G --level=max --no-progress',
+            ['--memory-limit=2G', '--level=max', '--no-progress'],
             '9.0',
         );
 
@@ -233,7 +233,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            '--memory-limit=-1',
+            ['--memory-limit=-1'],
             $version,
         );
 
@@ -255,7 +255,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
-            null,
+            [],
             $version,
         );
 

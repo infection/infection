@@ -47,12 +47,15 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
 {
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
     public static function create(
         string $staticAnalysisConfigPath,
         string $staticAnalysisToolExecutable,
         float $timeout,
         string $tmpDir,
-        ?string $staticAnalysisToolOptions,
+        array $staticAnalysisToolOptions,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
             new Filesystem(),

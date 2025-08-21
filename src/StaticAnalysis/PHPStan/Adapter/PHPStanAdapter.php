@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
-use function array_map;
 use function array_merge;
 use function explode;
 use Infection\Process\Factory\LazyMutantProcessFactory;
@@ -44,7 +43,6 @@ use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
-use function ltrim;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
@@ -61,6 +59,9 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
 
     private const VERSION_2 = 2;
 
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
     public function __construct(
         private readonly Filesystem $fileSystem,
         private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
@@ -70,7 +71,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         private readonly VersionParser $versionParser,
         private readonly float $timeout,
         private readonly string $tmpDir,
-        private readonly ?string $staticAnalysisToolOptions,
+        private readonly array $staticAnalysisToolOptions,
         private ?string $version = null,
     ) {
     }
@@ -88,17 +89,10 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         // we can't rely on stderr because it's used for other output (non-error)
         // see https://github.com/phpstan/phpstan/issues/11352#issuecomment-2233403781
 
-        $options = [
+        $options = array_merge([
             "--configuration=$this->staticAnalysisConfigPath",
             // todo [phpstan-integration] add --stop-on-first-error when it's implemented on PHPStan side
-        ];
-
-        if ($this->staticAnalysisToolOptions !== null && $this->staticAnalysisToolOptions !== '') {
-            $options = array_merge(
-                $options,
-                $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions),
-            );
-        }
+        ], $this->staticAnalysisToolOptions);
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
@@ -174,16 +168,5 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
         $process->mustRun();
 
         return $this->versionParser->parse($process->getOutput());
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function parseStaticAnalysisToolOptions(string $extraOptions): array
-    {
-        return array_map(
-            static fn ($option): string => '--' . $option,
-            explode(' --', ltrim($extraOptions, '-')),
-        );
     }
 }

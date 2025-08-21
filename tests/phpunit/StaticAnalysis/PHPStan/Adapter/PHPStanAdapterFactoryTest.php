@@ -51,7 +51,7 @@ final class PHPStanAdapterFactoryTest extends TestCase
             '/path/to/phpstan',
             32.3,
             '/tmp',
-            null,
+            [],
         );
 
         $this->assertSame('PHPStan', $adapter->getName());

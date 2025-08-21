@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
-use function array_map;
 use function array_merge;
-use function explode;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\TestFramework\CommandLineBuilder;
-use function ltrim;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -53,15 +50,18 @@ use Symfony\Component\Process\Process;
  */
 final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
     public function __construct(
         private readonly Filesystem $fileSystem,
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly float $timeout,
         private readonly string $tmpDir,
-        private readonly ?string $staticAnalysisToolOptions,
+        private readonly array $staticAnalysisToolOptions,
     ) {
     }
 
@@ -93,7 +93,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         string $mutationOriginalFilePath,
         string $mutantConfigFile,
     ): array {
-        $options = [
+        $options = array_merge([
             "--tmp-file=$mutatedFilePath",
             "--instead-of=$mutationOriginalFilePath",
             "--configuration=$mutantConfigFile",
@@ -102,14 +102,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
             '-vv',
             '--fail-without-result-cache',
             // todo [phpstan-integration] --stop-on-first-error
-        ];
-
-        if ($this->staticAnalysisToolOptions !== null && $this->staticAnalysisToolOptions !== '') {
-            $options = array_merge(
-                $options,
-                $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions),
-            );
-        }
+        ], $this->staticAnalysisToolOptions);
 
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
@@ -139,16 +132,5 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         );
 
         return $mutantConfigPath;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function parseStaticAnalysisToolOptions(string $extraOptions): array
-    {
-        return array_map(
-            static fn ($option): string => '--' . $option,
-            explode(' --', ltrim($extraOptions, '-')),
-        );
     }
 }
