@@ -73,6 +73,7 @@ final class SchemaConfiguration
         private readonly ?string $bootstrap,
         private readonly ?string $initialTestsPhpOptions,
         private readonly ?string $testFrameworkExtraOptions,
+        private readonly ?string $staticAnalysisToolOptions,
         private readonly string|int|null $threads,
         ?string $staticAnalysisTool,
     ) {
@@ -165,6 +166,11 @@ final class SchemaConfiguration
     public function getTestFrameworkExtraOptions(): ?string
     {
         return $this->testFrameworkExtraOptions;
+    }
+
+    public function getStaticAnalysisToolOptions(): ?string
+    {
+        return $this->staticAnalysisToolOptions;
     }
 
     public function getThreads(): string|int|null

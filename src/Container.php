@@ -220,6 +220,8 @@ final class Container extends DIContainer
 
     public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
 
+    public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
+
     public const DEFAULT_FILTER = '';
 
     public const DEFAULT_THREAD_COUNT = null;
@@ -577,6 +579,7 @@ final class Container extends DIContainer
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         string $filter = self::DEFAULT_FILTER,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
@@ -650,6 +653,7 @@ final class Container extends DIContainer
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
+                $staticAnalysisToolOptions,
                 $filter,
                 $threadCount,
                 $dryRun,

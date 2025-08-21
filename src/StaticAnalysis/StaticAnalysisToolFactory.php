@@ -73,6 +73,7 @@ final readonly class StaticAnalysisToolFactory
                 ),
                 $timeout,
                 $this->infectionConfig->getTmpDir(),
+                $this->infectionConfig->getStaticAnalysisToolOptions(),
             );
         }
 

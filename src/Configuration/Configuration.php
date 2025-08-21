@@ -35,12 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_map;
+use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
+use function ltrim;
 use PhpParser\Node;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -98,6 +101,7 @@ class Configuration
         private readonly ?string $bootstrap,
         private readonly ?string $initialTestsPhpOptions,
         private readonly string $testFrameworkExtraOptions,
+        private readonly ?string $staticAnalysisToolOptions,
         private readonly string $coveragePath,
         private readonly bool $skipCoverage,
         private readonly bool $skipInitialTests,
@@ -236,6 +240,18 @@ class Configuration
         return $this->testFrameworkExtraOptions;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getStaticAnalysisToolOptions(): array
+    {
+        if ($this->staticAnalysisToolOptions === null || $this->staticAnalysisToolOptions === '') {
+            return [];
+        }
+
+        return $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions);
+    }
+
     public function getCoveragePath(): string
     {
         return $this->coveragePath;
@@ -337,5 +353,16 @@ class Configuration
     public function getMutantId(): ?string
     {
         return $this->mutantId;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseStaticAnalysisToolOptions(string $extraOptions): array
+    {
+        return array_map(
+            static fn ($option): string => '--' . $option,
+            explode(' --', ltrim($extraOptions, '-')),
+        );
     }
 }
