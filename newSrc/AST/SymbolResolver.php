@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace newSrc\AST;
 
 use Infection\PhpParser\Visitor\ParentConnector;
-use newSrc\Trace\Symbol\ClassReference;
-use newSrc\Trace\Symbol\FunctionReference;
-use newSrc\Trace\Symbol\MethodReference;
-use newSrc\Trace\Symbol\NamespaceReference;
-use newSrc\Trace\Symbol\Symbol;
+use newSrc\TestFramework\Trace\Symbol\ClassReference;
+use newSrc\TestFramework\Trace\Symbol\FunctionReference;
+use newSrc\TestFramework\Trace\Symbol\MethodReference;
+use newSrc\TestFramework\Trace\Symbol\NamespaceReference;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 use function sprintf;

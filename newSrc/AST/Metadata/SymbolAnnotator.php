@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace newSrc\AST\Metadata;
 
-use newSrc\Trace\Symbol\Symbol;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Node;
 use function array_values;
 

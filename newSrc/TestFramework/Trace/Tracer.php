@@ -33,40 +33,11 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST\NodeVisitor;
+namespace newSrc\TestFramework\Trace;
 
-use newSrc\AST\Metadata\Annotation;
-use newSrc\AST\NodeLabeler;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
 
-// Propagate the labels. For instance if the parent node is marked as uncovered by tests
-final class PropagateNodeLabelVisitor extends NodeVisitorAbstract
+interface Tracer
 {
-    public function __construct(
-        private NodeLabeler $nodeStateTracker,
-    ) {
-    }
-
-    public function enterNode(Node $node): ?Node
-    {
-        if ($this->aridCodeDetector->isArid($node)) {
-            $this->nodeStateTracker->start(Annotation::ARID_CODE);
-        }
-
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        $this->nodeStateTracker->stopLabeling();
-
-        return null;
-    }
-
-    private function getSymbol(Node $node): ?string
-    {
-        // TODO
-        return 'Foo::bar()';
-    }
+    public function hasTests(Symbol $symbol): bool;
 }

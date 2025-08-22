@@ -37,8 +37,8 @@ namespace newSrc\AST\NodeVisitor;
 
 use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\Metadata\NodeAnnotator;
-use newSrc\Trace\Symbol\Symbol;
-use newSrc\Trace\Tracer;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use newSrc\TestFramework\Trace\Tracer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

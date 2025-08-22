@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace newSrc\Trace\Symbol;
+namespace newSrc\TestFramework\Trace\Symbol;
 
 final readonly class FunctionReference implements Symbol
 {

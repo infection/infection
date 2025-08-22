@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace newSrc\Trace\Symbol;
-
-use Stringable;
+namespace newSrc\TestFramework\Trace\Symbol;
 
 /**
  * Represents a PHP Symbol: a class, a method or a function.

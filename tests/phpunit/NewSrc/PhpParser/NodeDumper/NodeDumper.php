@@ -35,14 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
-use newSrc\Trace\Symbol\Symbol;
-use function implode;
 use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_string;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
 use PhpParser\Node;
@@ -56,6 +51,11 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
+use function implode;
+use function is_array;
+use function is_float;
+use function is_int;
+use function is_string;
 use function str_replace;
 use function strlen;
 use function strrpos;
