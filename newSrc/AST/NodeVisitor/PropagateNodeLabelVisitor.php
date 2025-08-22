@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
-use newSrc\AST\Annotation;
+use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\NodeLabeler;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;

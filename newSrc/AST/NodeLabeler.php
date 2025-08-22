@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace newSrc\AST;
 
-use PhpParser\Node;
+use newSrc\AST\Metadata\Annotation;
 
 final class NodeLabeler
 {

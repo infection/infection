@@ -12,6 +12,7 @@ use Stringable;
  * Currently, in the context of a traditional test framework, only those matter. Maybe for a static analyser there are
  * more advanced symbols.
  */
-interface Symbol extends Stringable
+interface Symbol
 {
+    public function toString(): string;
 }

@@ -33,44 +33,29 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST\NodeVisitor;
+namespace newSrc\AST\Metadata;
 
-use newSrc\AST\Metadata\Annotation;
-use newSrc\AST\Metadata\NodeAnnotator;
-use PhpParser\Comment;
+use newSrc\Trace\Symbol\Symbol;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-use function iter\any;
-use function str_contains;
+use function array_values;
 
-final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract
+final class SymbolAnnotator
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
-
-    public function enterNode(Node $node): ?int
+    private function __construct()
     {
-        if ($this->hasIgnoreAnnotation($node)) {
-            NodeAnnotator::annotate($node, Annotation::IGNORED_WITH_ANNOTATION);
-
-            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
-
-        return null;
     }
 
-    private function hasIgnoreAnnotation(Node $node): bool
+    /**
+     * @param Symbol[] $symbols
+     */
+    public static function annotate(
+        Node $node,
+        array $symbols,
+    ): void
     {
-        return any(
-            self::commentContainsAnnotation(...),
-            $node->getComments(),
-        );
-    }
-
-    private static function commentContainsAnnotation(Comment $comment): bool
-    {
-        return str_contains(
-            $comment->getText(),
-            self::IGNORE_ALL_MUTATIONS_ANNOTATION,
+        $node->setAttribute(
+            Annotation::SYMBOL->name,
+            array_values($symbols),
         );
     }
 }

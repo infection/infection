@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
-use newSrc\AST\Annotation;
 use newSrc\AST\AridCodeDetector\AridCodeDetector;
-use newSrc\AST\NodeAnnotator;
-use newSrc\AST\NodeLabeler;
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

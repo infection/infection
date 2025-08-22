@@ -4,7 +4,15 @@ declare(strict_types=1);
 
 namespace newSrc\Trace\Symbol;
 
-final class ClassReference implements Symbol
+final readonly class ClassReference implements Symbol
 {
+    public function __construct(
+        private string $name,
+    ) {
+    }
 
+    public function toString(): string
+    {
+        return $this->name;
+    }
 }

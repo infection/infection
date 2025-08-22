@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace newSrc\Trace\Symbol;
 
-final readonly class MethodReference implements Symbol
+final readonly class NamespaceReference implements Symbol
 {
     public function __construct(
         private string $name,

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
-use newSrc\AST\Annotation;
-use newSrc\AST\NodeAnnotator;
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
 use newSrc\Trace\Symbol\Symbol;
 use newSrc\Trace\Tracer;
 use PhpParser\Node;

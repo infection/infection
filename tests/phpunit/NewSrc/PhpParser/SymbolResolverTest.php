@@ -16,6 +16,8 @@ final class SymbolResolverTest extends TestCase
 
     public static function symbolProvider(): iterable
     {
-        yield
+        // We only provide minimal tests here. A more complete suite is provided with its
+        // corresponding visitor.
+        yield [];
     }
 }

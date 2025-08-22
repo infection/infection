@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
 
+use newSrc\Trace\Symbol\Symbol;
 use function implode;
 use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
@@ -70,7 +71,9 @@ final class NodeDumper
         'endFilePos' => true,
         'startTokenPos' => true,
         'endTokenPos' => true,
+        // TODO: new
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
+        'parent' => true,
     ];
 
     // Removed instance properties for stateless refactor
@@ -345,6 +348,9 @@ final class NodeDumper
             $result .= 'false';
         } elseif ($node === true) {
             $result .= 'true';
+        } elseif ($node instanceof Symbol) {
+            // TODO: this condition was changed compared to the original PHP-Parser code.
+            $result .= $node->toString();
         } else {
             throw new InvalidArgumentException('Can only dump nodes and arrays.');
         }
