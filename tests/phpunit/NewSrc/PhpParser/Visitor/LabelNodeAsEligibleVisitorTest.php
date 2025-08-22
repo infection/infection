@@ -37,12 +37,12 @@ namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 
 use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\NewSrc\PhpParser\AstTestCase;
-use newSrc\AST\NodeVisitor\LabelNodeAsEligibleVisitor;
+use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(LabelNodeAsEligibleVisitor::class)]
+#[CoversClass(LabelNodesAsEligibleVisitor::class)]
 final class LabelNodeAsEligibleVisitorTest extends AstTestCase
 {
     #[DataProvider('nodeProvider')]
@@ -53,7 +53,7 @@ final class LabelNodeAsEligibleVisitorTest extends AstTestCase
         $nodes = $this->createParser()->parse($code);
 
         $traverser = new NodeTraverser(
-            new LabelNodeAsEligibleVisitor(),
+            new LabelNodesAsEligibleVisitor(),
             new MarkTraversedNodesAsVisitedVisitor(),
         );
         $traverser->traverse($nodes);

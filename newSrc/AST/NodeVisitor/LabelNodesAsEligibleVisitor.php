@@ -33,11 +33,24 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Trace;
+namespace newSrc\AST\NodeVisitor;
 
-use newSrc\TestFramework\Trace\Symbol\Symbol;
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-interface Tracer
+/**
+ * Mark all node as eligible. This visitor should be registered as last, so if
+ * a node is code that should be ignored because not covered by tests, for example,
+ * then this visitor should not traverse that node at all.
+ */
+final class LabelNodesAsEligibleVisitor extends NodeVisitorAbstract
 {
-    public function hasTests(Symbol $symbol): bool;
+    public function enterNode(Node $node): ?int
+    {
+        NodeAnnotator::annotate($node, Annotation::ELIGIBLE);
+
+        return null;
+    }
 }

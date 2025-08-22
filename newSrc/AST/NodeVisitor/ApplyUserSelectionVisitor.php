@@ -35,48 +35,38 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
-use newSrc\AST\AridCodeDetector\AridCodeDetector;
 use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\Metadata\NodeAnnotator;
+use newSrc\AST\Metadata\SymbolAnnotator;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use newSrc\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Once a node is detected as arid, it labels it and all its children as arid code.
+ * A user can select a piece of source code to mutation. For example "*Str::trim*()". When
+ * such a selection is provided, this visitor will exclude any node that do not belong to
+ * this selection.
  *
- * TODO: we may want to be able to have some children marked as not arid despite the parent being arid.
+ * Note that this strategy is incompatible with LabelNodesAsEligibleVisitor.
+ *
+ * @see LabelNodesAsEligibleVisitor
  */
-final class LabelAridCodeVisitor extends NodeVisitorAbstract
+final class ApplyUserSelectionVisitor extends NodeVisitorAbstract
 {
-    private bool $isArid = false;
-    private Node|null $startNode = null;
-
-    public function __construct(
-        private readonly AridCodeDetector $aridCodeDetector,
-    ) {
-    }
-
-    public function enterNode(Node $node): ?Node
-    {
-        if ($this->isArid) {
-            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
-        } elseif ($this->aridCodeDetector->isArid($node)) {
-            $this->isArid = true;
-            $this->startNode = $node;
-
-            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
-        }
-
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        if ($node === $this->startNode) {
-            $this->isArid = false;
-            $this->startNode = null;
-        }
-
-        return null;
-    }
+    // TODO
+    // Will make use of the SymbolAnnotator.
+    // A few examples of how it should work:
+    //
+    // Case: "Acme\Str::trimLineReturns()" -> MethodReference Symbol
+    //      - we enter a namespace Foo -> stop the the traversal of the current node & children
+    //      - we enter the namespace "Acme": continue
+    //      - we enter a class A -> stop the the traversal of the current node & children
+    //      - we enter a class Str: continue
+    //      - we enter a method "::bar()": stop the the traversal of the current node & children
+    //      - we enter a method "::trimLineReturns()": start to mark nodes as eligible
+    //      - we leave the method "::trimLineReturns()": stop the the traversal of the current node & children?
+    //
+    // Case: to specify how it works with patterns
+    // Note that maybe we should allow multiple selections in which case there is a bit more to figure out/specify.
 }

@@ -37,27 +37,35 @@ namespace newSrc\AST\NodeVisitor;
 
 use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\Metadata\NodeAnnotator;
+use newSrc\AST\Metadata\SymbolAnnotator;
+use newSrc\AST\Metadata\TraverseContext;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
-use newSrc\TestFramework\Trace\Tracer;
+use newSrc\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-// All files being traversed are covered by tests, but not all the code of that file is covered by tests.
-final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
+/**
+ * All files being traversed are covered by tests, but not all the code of that file is covered by tests.
+ *
+ * Indeed, files that are not covered at all by tests can be excluded upstream before any parsing is done.
+ */
+final readonly class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
 {
     public function __construct(
         private Tracer $tracer,
+        private TraverseContext $context,
     ) {
     }
 
     public function enterNode(Node $node): ?int
     {
-        // TODO: get the node symbol
-        $symbol = $this->getSymbol($node);
+        $symbols = SymbolAnnotator::getSymbols($node);
 
         if ($symbol === null) {
             return null;
         }
+
+        $hasTests = $this->tracer->hasTests($symbol);
 
         // Note that, for instance, a static Analyser may or may not cover a symbol. We could configure
         // that within the tracer if we want to take PHPStan as a full-fledged test framework.
@@ -68,6 +76,13 @@ final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
         }
 
         return null;
+    }
+
+    private function hasTests(Node $node): bool
+    {
+        return $this->tracer->hasTests(
+            $this->context->filePathname,
+        );
     }
 
     private function getSymbol(Node $node): ?Symbol

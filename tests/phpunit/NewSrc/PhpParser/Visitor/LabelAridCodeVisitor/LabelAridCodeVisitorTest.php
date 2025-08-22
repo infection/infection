@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\NewSrc\PhpParser\Visitor\LabelAridCodeVisitor;
 
 use Infection\Tests\NewSrc\PhpParser\AstTestCase;
-use newSrc\AST\NodeVisitor\LabelAridCodeVisitor;
+use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(LabelAridCodeVisitor::class)]
+#[CoversClass(DetectAridCodeVisitor::class)]
 final class LabelAridCodeVisitorTest extends AstTestCase
 {
     #[DataProvider('nodeProvider')]
@@ -52,7 +52,7 @@ final class LabelAridCodeVisitorTest extends AstTestCase
         $nodes = $this->createParser()->parse($code);
 
         $traverser = new NodeTraverser(
-            new LabelAridCodeVisitor(
+            new DetectAridCodeVisitor(
                 new CommentAridNodeDetector(),
             ),
         );

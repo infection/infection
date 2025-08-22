@@ -35,19 +35,47 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
+use newSrc\AST\AridCodeDetector\AridCodeDetector;
 use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-// Mark all node as eligible. This visitor should be registered as last, so if
-// a node is code that should be ignored because not covered by tests, for example,
-// then this visitor should not traverse that node at all.
-final class LabelNodeAsEligibleVisitor extends NodeVisitorAbstract
+/**
+ * Once a node is detected as arid, it labels it and all its children as arid code.
+ *
+ * TODO: we may want to be able to have some children marked as not arid despite the parent being arid.
+ */
+final class DetectAridCodeVisitor extends NodeVisitorAbstract
 {
-    public function enterNode(Node $node): ?int
+    private bool $isArid = false;
+    private Node|null $startNode = null;
+
+    public function __construct(
+        private readonly AridCodeDetector $aridCodeDetector,
+    ) {
+    }
+
+    public function enterNode(Node $node): ?Node
     {
-        NodeAnnotator::annotate($node, Annotation::ELIGIBLE);
+        if ($this->isArid) {
+            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
+        } elseif ($this->aridCodeDetector->isArid($node)) {
+            $this->isArid = true;
+            $this->startNode = $node;
+
+            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
+        }
+
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        if ($node === $this->startNode) {
+            $this->isArid = false;
+            $this->startNode = null;
+        }
 
         return null;
     }

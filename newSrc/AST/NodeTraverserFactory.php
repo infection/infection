@@ -35,22 +35,46 @@ declare(strict_types=1);
 
 namespace newSrc\AST;
 
+use newSrc\AST\AridCodeDetector\AridCodeDetector;
+use newSrc\AST\Metadata\TraverseContext;
+use newSrc\AST\NodeVisitor\AddNodesSymbolsVisitor;
+use newSrc\AST\NodeVisitor\AddTypesVisitor;
+use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
+use newSrc\AST\NodeVisitor\ExcludeIgnoredNodesVisitor;
+use newSrc\AST\NodeVisitor\ExcludeUnchangedNodesVisitor;
+use newSrc\AST\NodeVisitor\ExcludeUncoveredNodesVisitor;
+use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
+use newSrc\AST\NodeVisitor\NameResolverFactory;
+use newSrc\TestFramework\Tracing\Tracer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 
-final class NodeTraverserFactory
+final readonly class NodeTraverserFactory
 {
-    /**
-     * @param NodeVisitor[] $nodeVisitors
-     */
     public function __construct(
-        private array $nodeVisitors,
+        private Tracer           $tracer,
+        private AridCodeDetector $aridCodeDetector,
+        private SymbolResolver   $symbolsResolver,
     ) {
     }
 
-    public function create(): NodeTraverserInterface
+    public function create(string $filePathname): NodeTraverserInterface
     {
-        return new NodeTraverser(...$this->nodeVisitors);
+        $context = new TraverseContext($filePathname);
+
+        return new NodeTraverser(
+            // ApplyUserSelectionVisitor    // only if user did a selection
+            new ExcludeUncoveredNodesVisitor($this->tracer),
+            // new ExcludeUnchangedNodesVisitor(), // only if we do a diff execution
+            new ExcludeIgnoredNodesVisitor(),
+            //  new AddTypesVisitor(),  // TODO
+            NameResolverFactory::create(),
+            new ParentConnectingVisitor(),
+            new AddNodesSymbolsVisitor($this->symbolsResolver),
+            new DetectAridCodeVisitor($this->aridCodeDetector),
+            new LabelNodesAsEligibleVisitor(),
+        );
     }
 }

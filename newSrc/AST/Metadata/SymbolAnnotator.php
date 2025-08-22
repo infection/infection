@@ -58,4 +58,12 @@ final class SymbolAnnotator
             array_values($symbols),
         );
     }
+
+    /**
+     * @return list<Symbol>
+     */
+    public static function getSymbols(Node $node): array
+    {
+        return $node->getAttribute(Annotation::SYMBOL->name);
+    }
 }

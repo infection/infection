@@ -38,7 +38,7 @@ namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 use Infection\Tests\NewSrc\PhpParser\AstTestCase;
 use Infection\Tests\NewSrc\PhpParser\Visitor\LabelAridCodeVisitor\CommentAridNodeDetector;
 use newSrc\AST\NodeVisitor\AddNodesSymbolsVisitor;
-use newSrc\AST\NodeVisitor\LabelAridCodeVisitor;
+use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
 use newSrc\AST\NodeVisitor\NameResolverFactory;
 use newSrc\AST\SymbolResolver;
 use PhpParser\NodeTraverser;

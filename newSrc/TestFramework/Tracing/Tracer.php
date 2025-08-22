@@ -33,19 +33,11 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST;
+namespace newSrc\TestFramework\Tracing;
 
-use newSrc\AST\Metadata\Annotation;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
 
-final class NodeLabeler
+interface Tracer
 {
-    public function start(Annotation $annotation): void
-    {
-        $this->ignore = true;
-    }
-
-    public function stopLabeling(): void
-    {
-        $this->ignore = false;
-    }
+    public function hasTests(Symbol $symbol): bool;
 }

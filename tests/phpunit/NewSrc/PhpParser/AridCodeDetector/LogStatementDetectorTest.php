@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\AridCodeDetector;
 
-use newSrc\AST\NodeVisitor\LabelAridCodeVisitor;
+use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
 use PhpParser\Node;
 use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\NewSrc\PhpParser\AstTestCase;
 use newSrc\AST\AridCodeDetector\LogStatementDetector;
-use newSrc\AST\NodeVisitor\LabelNodeAsEligibleVisitor;
+use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -56,7 +56,7 @@ final class LogStatementDetectorTest extends AstTestCase
         $nodes = $this->createParser()->parse($code);
 
         $traverser = new NodeTraverser(
-            new LabelAridCodeVisitor(
+            new DetectAridCodeVisitor(
                 new LogStatementDetector(),
             ),
         );

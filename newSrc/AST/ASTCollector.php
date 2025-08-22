@@ -40,32 +40,24 @@ use newSrc\AST\NodeVisitor\AddTypesVisitor;
 use newSrc\AST\NodeVisitor\ExcludeIgnoredNodesVisitor;
 use newSrc\AST\NodeVisitor\ExcludeUnchangedNodesVisitor;
 use newSrc\AST\NodeVisitor\ExcludeUncoveredNodesVisitor;
-use newSrc\AST\NodeVisitor\LabelAridCodeVisitor;
-use newSrc\AST\NodeVisitor\LabelNodeAsEligibleVisitor;
+use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
+use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
 
 // Parses the sources and provide a rich annotated AST.
-final class ASTCollector
+final readonly class ASTCollector
 {
     /**
      * @param NodeVisitor[] $nodeVisitors
      */
     public function __construct(
         private FileParser $parser,
-        private array $nodeVisitors,
+        private NodeTraverserFactory $traverserFactory,
     ) {
-        // This should be injected
-        $this->nodeVisitors = [
-            new ExcludeUncoveredNodesVisitor(),
-            new ExcludeUnchangedNodesVisitor(), // only if we do a diff execution
-            new ExcludeIgnoredNodesVisitor(),
-            new AddTypesVisitor(),
-            new LabelAridCodeVisitor(),
-            new LabelNodeAsEligibleVisitor(),
-        ];
     }
 
     /**
@@ -75,9 +67,8 @@ final class ASTCollector
     {
         $statements = $this->parser->parse($sourceFile);
 
-        $traverser = new NodeTraverser(...$this->nodeVisitors);
-        $traversedStatements = $traverser->traverse($statements);
-
-        yield $traversedStatements;
+        yield $this->traverserFactory
+            ->create(Path::canonicalize($sourceFile->getPathname()))
+            ->traverse($statements);
     }
 }
