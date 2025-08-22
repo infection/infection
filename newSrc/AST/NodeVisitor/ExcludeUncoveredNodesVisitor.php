@@ -37,6 +37,7 @@ namespace newSrc\AST\NodeVisitor;
 
 use newSrc\AST\Annotation;
 use newSrc\AST\NodeAnnotator;
+use newSrc\Trace\Symbol\Symbol;
 use newSrc\Trace\Tracer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -69,7 +70,7 @@ final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    private function getSymbol(Node $node): ?string
+    private function getSymbol(Node $node): ?Symbol
     {
         // TODO
         return 'Foo::bar()';

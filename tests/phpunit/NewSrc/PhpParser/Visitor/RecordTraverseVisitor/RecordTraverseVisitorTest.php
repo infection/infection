@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\NewSrc\PhpParser\AstTestCase;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(RecordTraverseVisitor::class)]
-final class RecordTraverseVisitorTest extends VisitorTestCase
+final class RecordTraverseVisitorTest extends AstTestCase
 {
     public function test_it_records_the_traversal(): void
     {

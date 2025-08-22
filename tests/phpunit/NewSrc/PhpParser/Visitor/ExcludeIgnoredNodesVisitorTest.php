@@ -36,16 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\NewSrc\PhpParser\Visitor;
 
 use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor\RecordTraverseVisitor;
+use Infection\Tests\NewSrc\PhpParser\AstTestCase;
 use newSrc\AST\NodeVisitor\ExcludeIgnoredNodesVisitor;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function var_dump;
 
 #[CoversClass(ExcludeIgnoredNodesVisitor::class)]
-final class ExcludeIgnoredNodesVisitorTest extends VisitorTestCase
+final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
 {
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_excluded_nodes_and_stops_the_traversal(

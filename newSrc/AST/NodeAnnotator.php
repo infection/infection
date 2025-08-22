@@ -43,8 +43,12 @@ final class NodeAnnotator
     {
     }
 
-    public static function annotate(Node $node, Annotation $annotation): void
+    public static function annotate(
+        Node $node,
+        Annotation $annotation,
+        mixed $value = null,
+    ): void
     {
-        $node->setAttribute($annotation->name, $annotation->value);
+        $node->setAttribute($annotation->name, $value ?? $annotation->value);
     }
 }

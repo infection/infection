@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
-use newSrc\AST\NodeStateTracker;
+use newSrc\AST\NodeLabeler;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -43,7 +43,7 @@ use PhpParser\NodeVisitorAbstract;
 final class AddTypesVisitor extends NodeVisitorAbstract
 {
     public function __construct(
-        private NodeStateTracker $nodeStateTracker,
+        private NodeLabeler $nodeStateTracker,
     ) {
     }
 

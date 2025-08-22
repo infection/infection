@@ -42,4 +42,5 @@ enum Annotation: int
     case IGNORED_WITH_ANNOTATION = 1;   // Was tagged by the user with @infection-ignore-all.
     case NOT_PART_OF_THE_GIT_DIFF = 3;  // The file is included in the git diff, but not this part of the code.
     case ARID_CODE = 2;                 // Maybe in the future we want different level of aridness.
+    case SYMBOL = 10;
 }

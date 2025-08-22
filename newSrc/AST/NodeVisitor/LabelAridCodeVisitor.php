@@ -36,24 +36,36 @@ declare(strict_types=1);
 namespace newSrc\AST\NodeVisitor;
 
 use newSrc\AST\Annotation;
-use newSrc\AST\AridCodeDetector;
-use newSrc\AST\NodeStateTracker;
+use newSrc\AST\AridCodeDetector\AridCodeDetector;
+use newSrc\AST\NodeAnnotator;
+use newSrc\AST\NodeLabeler;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-// All files being traversed are covered by tests, but not all the code of that file is covered by tests.
+/**
+ * Once a node is detected as arid, it labels it and all its children as arid code.
+ *
+ * TODO: we may want to be able to have some children marked as not arid despite the parent being arid.
+ */
 final class LabelAridCodeVisitor extends NodeVisitorAbstract
 {
+    private bool $isArid = false;
+    private Node|null $startNode = null;
+
     public function __construct(
-        private NodeStateTracker $nodeStateTracker,
-        private AridCodeDetector $aridCodeDetector,
+        private readonly AridCodeDetector $aridCodeDetector,
     ) {
     }
 
     public function enterNode(Node $node): ?Node
     {
-        if ($this->aridCodeDetector->isArid($node)) {
-            $this->nodeStateTracker->startLabelNodesAs(Annotation::ARID_CODE);
+        if ($this->isArid) {
+            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
+        } elseif ($this->aridCodeDetector->isArid($node)) {
+            $this->isArid = true;
+            $this->startNode = $node;
+
+            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
         }
 
         return null;
@@ -61,7 +73,10 @@ final class LabelAridCodeVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): ?Node
     {
-        $this->nodeStateTracker->stopIgnoring();
+        if ($node === $this->startNode) {
+            $this->isArid = false;
+            $this->startNode = null;
+        }
 
         return null;
     }

@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace newSrc\Trace;
 
+use newSrc\Trace\Symbol\Symbol;
+
 interface Tracer
 {
-    public function hasTests(string $symbol): bool;
+    public function hasTests(Symbol $symbol): bool;
 }

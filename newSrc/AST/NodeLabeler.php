@@ -33,40 +33,19 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST\NodeVisitor;
+namespace newSrc\AST;
 
-use newSrc\AST\Annotation;
-use newSrc\AST\NodeLabeler;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
 
-// Propagate the labels. For instance if the parent node is marked as uncovered by tests
-final class PropagateNodeLabelVisitor extends NodeVisitorAbstract
+final class NodeLabeler
 {
-    public function __construct(
-        private NodeLabeler $nodeStateTracker,
-    ) {
+    public function start(Annotation $annotation): void
+    {
+        $this->ignore = true;
     }
 
-    public function enterNode(Node $node): ?Node
+    public function stopLabeling(): void
     {
-        if ($this->aridCodeDetector->isArid($node)) {
-            $this->nodeStateTracker->start(Annotation::ARID_CODE);
-        }
-
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        $this->nodeStateTracker->stopLabeling();
-
-        return null;
-    }
-
-    private function getSymbol(Node $node): ?string
-    {
-        // TODO
-        return 'Foo::bar()';
+        $this->ignore = false;
     }
 }

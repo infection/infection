@@ -85,7 +85,7 @@ final class NodeDumper
         private readonly bool $dumpComments = false,
         private readonly bool $dumpPositions = false,
         private readonly bool $dumpOtherAttributes = true,
-        private readonly bool $onlyVisitedNodes = true,
+        private bool $onlyVisitedNodes = true,
     ) {
     }
 
@@ -99,10 +99,19 @@ final class NodeDumper
      *
      * @return string Dumped value
      */
-    public function dump(array|Node $node, ?string $code = null): string
+    public function dump(
+        array|Node $node,
+        ?string $code = null,
+        ?bool $onlyVisitedNodes = null,
+    ): string
     {
         $result = '';
         $newLine = "\n";
+
+        if (null !== $onlyVisitedNodes) {
+            $originalOnlyVisitedNodes = $this->onlyVisitedNodes;
+            $this->onlyVisitedNodes = $onlyVisitedNodes;
+        }
 
         $this->dumpRecursive(
             $node,
@@ -111,6 +120,10 @@ final class NodeDumper
             $newLine,
             indent: false,
         );
+
+        if (null !== $onlyVisitedNodes) {
+            $this->onlyVisitedNodes = $originalOnlyVisitedNodes;
+        }
 
         return $result;
     }

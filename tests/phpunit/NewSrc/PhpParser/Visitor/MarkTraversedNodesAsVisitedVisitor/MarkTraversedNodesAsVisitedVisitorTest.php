@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\NewSrc\PhpParser\AstTestCase;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,7 +43,7 @@ use function serialize;
 use function unserialize;
 
 #[CoversClass(MarkTraversedNodesAsVisitedVisitor::class)]
-final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
+final class MarkTraversedNodesAsVisitedVisitorTest extends AstTestCase
 {
     public function test_it_records_the_traversed_nodes(): void
     {

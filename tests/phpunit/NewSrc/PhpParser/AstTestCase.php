@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor;
+namespace Infection\Tests\NewSrc\PhpParser;
 
-use function array_map;
 use Infection\Tests\NewSrc\PhpParser\NodeDumper\NodeDumper;
-use function is_array;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
+use function array_map;
+use function is_array;
 
-abstract class VisitorTestCase extends TestCase
+abstract class AstTestCase extends TestCase
 {
     protected Parser $parser;
     protected NodeDumper $dumper;

@@ -33,25 +33,11 @@
 
 declare(strict_types=1);
 
-namespace newSrc\AST;
+namespace newSrc\AST\AridCodeDetector;
 
 use PhpParser\Node;
 
-final class NodeStateTracker
+interface AridCodeDetector
 {
-    private bool $ignore = false;
-
-    public function startLabelNodesAs(Annotation $annotation): void
-    {
-        $this->ignore = true;
-    }
-
-    public function stopIgnoring(): void
-    {
-        $this->ignore = false;
-    }
-
-    public function isEligible(Node $node): bool
-    {
-    }
+    public function isArid(Node $node): bool;
 }
