@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace newSrc\AST\NodeVisitor;
 
+use function iter\any;
 use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\Metadata\NodeAnnotator;
 use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function iter\any;
 use function str_contains;
 
 final class ExcludeIgnoredNodesVisitor extends NodeVisitorAbstract

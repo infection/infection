@@ -33,35 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+namespace Infection\Tests\NewSrc\AST\Visitor\LabelAridCodeVisitor;
 
+use function iter\any;
+use newSrc\AST\AridCodeDetector\AridCodeDetector;
+use PhpParser\Comment;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use function str_contains;
 
-final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
+final class CommentAridNodeDetector implements AridCodeDetector
 {
-    public const VISITED_ATTRIBUTE = 'visited';
+    public const ARID_START_COMMENT = 'ARID_START';
+    public const ARID_END_COMMENT = 'ARID_END';
 
-    public static function wasVisited(Node $node): bool
+    private bool $arid = false;
+
+    public function isArid(Node $node): bool
     {
-        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
+        if (self::shouldStartMarkingNodeAsArid($node)) {
+            $this->arid = true;
+        }
+
+        if (self::shouldStopMarkingNodeAsArid($node)) {
+            $this->arid = false;
+        }
+
+        return $this->arid;
     }
 
-    /**
-     * @template T extends Node
-     *
-     * @param T $node
-     * @return T
-     */
-    public static function markAsVisited(Node $node): Node
+    private static function shouldStartMarkingNodeAsArid(Node $node): bool
     {
-        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
-
-        return $node;
+        return any(
+            static fn (Comment $comment) => str_contains(
+                $comment->getText(),
+                self::ARID_START_COMMENT,
+            ),
+            $node->getComments(),
+        );
     }
 
-    public function leaveNode(Node $node): void
+    private static function shouldStopMarkingNodeAsArid(Node $node): bool
     {
-        self::markAsVisited($node);
+        return any(
+            static fn (Comment $comment) => str_contains(
+                $comment->getText(),
+                self::ARID_END_COMMENT,
+            ),
+            $node->getComments(),
+        );
     }
 }

@@ -58,7 +58,7 @@ final class AddNodesSymbolsVisitor extends NodeVisitorAbstract
     {
         $symbol = $this->resolver->tryToResolve($node);
 
-        if (null !== $symbol) {
+        if ($symbol !== null) {
             $this->symbols[spl_object_id($node)] = $symbol;
         }
 

@@ -33,14 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\AridCodeDetector;
+namespace Infection\Tests\NewSrc\AST\AridCodeDetector;
 
-use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
-use PhpParser\Node;
-use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Tests\NewSrc\PhpParser\AstTestCase;
+use Infection\Tests\NewSrc\AST\AstTestCase;
 use newSrc\AST\AridCodeDetector\LogStatementDetector;
-use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
+use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -80,33 +77,33 @@ final class LogStatementDetectorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Expression(
-                    expr: Expr_FuncCall(
-                        name: Name(
-                            ARID_CODE: 2
-                        )
-                        args: array(
-                            0: Arg(
-                                value: Expr_BinaryOp_Concat(
-                                    left: Scalar_String(
-                                        kind: KIND_DOUBLE_QUOTED (2)
-                                        rawValue: "Processing user: "
-                                        ARID_CODE: 2
-                                    )
-                                    right: Expr_Variable(
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Name(
+                                ARID_CODE: 2
+                            )
+                            args: array(
+                                0: Arg(
+                                    value: Expr_BinaryOp_Concat(
+                                        left: Scalar_String(
+                                            kind: KIND_DOUBLE_QUOTED (2)
+                                            rawValue: "Processing user: "
+                                            ARID_CODE: 2
+                                        )
+                                        right: Expr_Variable(
+                                            ARID_CODE: 2
+                                        )
                                         ARID_CODE: 2
                                     )
                                     ARID_CODE: 2
                                 )
-                                ARID_CODE: 2
                             )
+                            ARID_CODE: 2
                         )
-                        ARID_CODE: 2
                     )
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'PHP native error log function (incorrect case)' => [
@@ -117,33 +114,33 @@ final class LogStatementDetectorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Expression(
-                    expr: Expr_FuncCall(
-                        name: Name(
-                            ARID_CODE: 2
-                        )
-                        args: array(
-                            0: Arg(
-                                value: Expr_BinaryOp_Concat(
-                                    left: Scalar_String(
-                                        kind: KIND_DOUBLE_QUOTED (2)
-                                        rawValue: "Processing user: "
-                                        ARID_CODE: 2
-                                    )
-                                    right: Expr_Variable(
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_FuncCall(
+                            name: Name(
+                                ARID_CODE: 2
+                            )
+                            args: array(
+                                0: Arg(
+                                    value: Expr_BinaryOp_Concat(
+                                        left: Scalar_String(
+                                            kind: KIND_DOUBLE_QUOTED (2)
+                                            rawValue: "Processing user: "
+                                            ARID_CODE: 2
+                                        )
+                                        right: Expr_Variable(
+                                            ARID_CODE: 2
+                                        )
                                         ARID_CODE: 2
                                     )
                                     ARID_CODE: 2
                                 )
-                                ARID_CODE: 2
                             )
+                            ARID_CODE: 2
                         )
-                        ARID_CODE: 2
                     )
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'Laravel log facade' => [
@@ -157,9 +154,9 @@ final class LogStatementDetectorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-            )
-            OUT,
+                array(
+                )
+                OUT,
         ];
 
         yield '(PSR based) logger variable' => [
@@ -171,9 +168,9 @@ final class LogStatementDetectorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-            )
-            OUT,
+                array(
+                )
+                OUT,
         ];
 
         yield '(PSR based) logger property' => [
@@ -195,89 +192,89 @@ final class LogStatementDetectorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Use(
-                    uses: array(
-                        0: UseItem(
-                            name: Name
-                        )
-                    )
-                )
-                1: Stmt_Class(
-                    name: Identifier
-                    stmts: array(
-                        0: Stmt_ClassMethod(
-                            name: Identifier
-                            params: array(
-                                0: Param(
-                                    type: Name
-                                    var: Expr_Variable
-                                )
+                array(
+                    0: Stmt_Use(
+                        uses: array(
+                            0: UseItem(
+                                name: Name
                             )
                         )
-                        1: Stmt_ClassMethod(
-                            name: Identifier
-                            stmts: array(
-                                0: Stmt_Expression(
-                                    expr: Expr_MethodCall(
-                                        var: Expr_PropertyFetch(
-                                            var: Expr_Variable(
+                    )
+                    1: Stmt_Class(
+                        name: Identifier
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier
+                                params: array(
+                                    0: Param(
+                                        type: Name
+                                        var: Expr_Variable
+                                    )
+                                )
+                            )
+                            1: Stmt_ClassMethod(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_MethodCall(
+                                            var: Expr_PropertyFetch(
+                                                var: Expr_Variable(
+                                                    ARID_CODE: 2
+                                                )
+                                                name: Identifier(
+                                                    ARID_CODE: 2
+                                                )
                                                 ARID_CODE: 2
                                             )
                                             name: Identifier(
                                                 ARID_CODE: 2
                                             )
-                                            ARID_CODE: 2
-                                        )
-                                        name: Identifier(
-                                            ARID_CODE: 2
-                                        )
-                                        args: array(
-                                            0: Arg(
-                                                value: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'This is an informational message.'
+                                            args: array(
+                                                0: Arg(
+                                                    value: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'This is an informational message.'
+                                                        ARID_CODE: 2
+                                                    )
                                                     ARID_CODE: 2
                                                 )
-                                                ARID_CODE: 2
                                             )
+                                            ARID_CODE: 2
                                         )
-                                        ARID_CODE: 2
                                     )
-                                )
-                                1: Stmt_Expression(
-                                    expr: Expr_MethodCall(
-                                        var: Expr_PropertyFetch(
-                                            var: Expr_Variable(
+                                    1: Stmt_Expression(
+                                        expr: Expr_MethodCall(
+                                            var: Expr_PropertyFetch(
+                                                var: Expr_Variable(
+                                                    ARID_CODE: 2
+                                                )
+                                                name: Identifier(
+                                                    ARID_CODE: 2
+                                                )
                                                 ARID_CODE: 2
                                             )
                                             name: Identifier(
                                                 ARID_CODE: 2
                                             )
-                                            ARID_CODE: 2
-                                        )
-                                        name: Identifier(
-                                            ARID_CODE: 2
-                                        )
-                                        args: array(
-                                            0: Arg(
-                                                value: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'An error happened!'
+                                            args: array(
+                                                0: Arg(
+                                                    value: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'An error happened!'
+                                                        ARID_CODE: 2
+                                                    )
                                                     ARID_CODE: 2
                                                 )
-                                                ARID_CODE: 2
                                             )
+                                            ARID_CODE: 2
                                         )
-                                        ARID_CODE: 2
                                     )
                                 )
                             )
                         )
                     )
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'log-alike method call' => [
@@ -289,9 +286,9 @@ final class LogStatementDetectorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-            )
-            OUT,
+                array(
+                )
+                OUT,
         ];
 
         // TODO: A LOT more tests, there is more to capture and check that we do not capture.

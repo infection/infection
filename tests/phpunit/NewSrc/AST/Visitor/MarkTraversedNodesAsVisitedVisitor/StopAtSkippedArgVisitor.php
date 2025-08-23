@@ -33,18 +33,31 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-/**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
- */
-final class PHPUnitXmlParser
+final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    public function parse(string $fileName): PHPUnitXmlReport
+    public const SKIP_ATTRIBUTE = 'skip';
+
+    public static function markNodeAsSkipped(Node $node): Node
     {
-        // TODO: the implementation need to be lazy and streamed.
+        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
+
+        return $node;
+    }
+
+    public static function isNodeMarkedAsSkipped(Node $node): bool
+    {
+        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+    }
+
+    public function enterNode(Node $node)
+    {
+        if (self::isNodeMarkedAsSkipped($node)) {
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
     }
 }

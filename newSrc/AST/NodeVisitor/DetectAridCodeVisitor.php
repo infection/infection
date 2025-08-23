@@ -49,7 +49,7 @@ use PhpParser\NodeVisitorAbstract;
 final class DetectAridCodeVisitor extends NodeVisitorAbstract
 {
     private bool $isArid = false;
-    private Node|null $startNode = null;
+    private ?Node $startNode = null;
 
     public function __construct(
         private readonly AridCodeDetector $aridCodeDetector,

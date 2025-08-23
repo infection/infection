@@ -33,31 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+namespace Infection\Tests\NewSrc\AST;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use newSrc\AST\SymbolResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
+#[CoversClass(SymbolResolver::class)]
+final class SymbolResolverTest extends TestCase
 {
-    public const SKIP_ATTRIBUTE = 'skip';
-
-    public static function markNodeAsSkipped(Node $node): Node
+    public function test_it_can_resolve_a_symbol(): void
     {
-        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
-
-        return $node;
     }
 
-    public static function isNodeMarkedAsSkipped(Node $node): bool
+    public static function symbolProvider(): iterable
     {
-        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
-    }
-
-    public function enterNode(Node $node)
-    {
-        if (self::isNodeMarkedAsSkipped($node)) {
-            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
+        // We only provide minimal tests here. A more complete suite is provided with its
+        // corresponding visitor.
+        yield [];
     }
 }

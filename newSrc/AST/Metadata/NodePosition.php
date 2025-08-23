@@ -33,90 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
+namespace newSrc\AST\Metadata;
 
 use PhpParser\Node;
 
-final class NodeDumperScenario
+final readonly class NodePosition
 {
-    /**
-     * @param list<Node>|Node $node
-     */
     public function __construct(
-        public array|Node|string $node,
-        public string $expected = '',
-        // It should have the same defaults as NodeDumper
-        public bool $dumpProperties = false,
-        public bool $dumpComments = false,
-        public bool $dumpPositions = false,
-        public bool $dumpOtherAttributes = false,
-        public bool $onlyVisitedNodes = true,
+        public int $startLine,
+        public int $startTokenPosition,
+        public int $endLine,
+        public int $endTokenPosition,
     ) {
     }
 
-    /**
-     * @param list<Node>|Node $node
-     */
-    public static function forNode(array|Node $node): self
+    public static function create(Node $node): self
     {
-        return new self($node);
-    }
-
-    public static function forCode(string $code): self
-    {
-        return new self($code);
-    }
-
-    public function withDumpProperties(): self
-    {
-        $clone = clone $this;
-        $clone->dumpProperties = true;
-
-        return $clone;
-    }
-
-    public function withDumpComments(): self
-    {
-        $clone = clone $this;
-        $clone->dumpComments = true;
-
-        return $clone;
-    }
-
-    public function withDumpPositions(): self
-    {
-        $clone = clone $this;
-        $clone->dumpPositions = true;
-
-        return $clone;
-    }
-
-    public function withDumpOtherAttributes(): self
-    {
-        $clone = clone $this;
-        $clone->dumpOtherAttributes = true;
-
-        return $clone;
-    }
-
-    public function withShowAllNodes(): self
-    {
-        $clone = clone $this;
-        $clone->onlyVisitedNodes = false;
-
-        return $clone;
-    }
-
-    public function withExpected(string $expected): self
-    {
-        $clone = clone $this;
-        $clone->expected = $expected;
-
-        return $clone;
-    }
-
-    public function build(): array
-    {
-        return [$this];
+        return new self(
+            $node->getStartLine(),
+            $node->getStartTokenPos(),
+            $node->getEndLine(),
+            $node->getEndTokenPos(),
+        );
     }
 }

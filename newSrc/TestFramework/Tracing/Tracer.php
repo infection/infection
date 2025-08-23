@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace newSrc\TestFramework\Tracing;
 
-use newSrc\TestFramework\Trace\Symbol\Symbol;
+use newSrc\AST\Metadata\NodePosition;
 
 interface Tracer
 {
-    public function hasTests(Symbol $symbol): bool;
+    public function hasTests(
+        string $sourceFilePathname,
+        NodePosition $nodePosition,
+    ): bool;
 }

@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor;
+namespace Infection\Tests\NewSrc\AST\Visitor;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Tests\NewSrc\PhpParser\AstTestCase;
+use Infection\Tests\NewSrc\AST\AstTestCase;
+use Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -59,7 +59,7 @@ final class LabelNodeAsEligibleVisitorTest extends AstTestCase
         $traverser->traverse($nodes);
 
         $actual = $this->dumper->dump(
-                              $nodes,
+            $nodes,
             onlyVisitedNodes: false,
         );
 
@@ -82,38 +82,38 @@ final class LabelNodeAsEligibleVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name(
-                        ELIGIBLE: -1
-                    )
-                    stmts: array(
-                        0: Stmt_Class(
-                            name: Identifier(
-                                ELIGIBLE: -1
-                            )
-                            stmts: array(
-                                0: Stmt_ClassMethod(
-                                    name: Identifier(
-                                        ELIGIBLE: -1
-                                    )
-                                    ELIGIBLE: -1
-                                )
-                                1: Stmt_ClassMethod(
-                                    name: Identifier(
-                                        ELIGIBLE: -1
-                                    )
-                                    ELIGIBLE: -1
-                                )
-                            )
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
                             ELIGIBLE: -1
                         )
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier(
+                                    ELIGIBLE: -1
+                                )
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            ELIGIBLE: -1
+                                        )
+                                        ELIGIBLE: -1
+                                    )
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            ELIGIBLE: -1
+                                        )
+                                        ELIGIBLE: -1
+                                    )
+                                )
+                                ELIGIBLE: -1
+                            )
+                        )
+                        kind: 1
+                        ELIGIBLE: -1
                     )
-                    kind: 1
-                    ELIGIBLE: -1
                 )
-            )
-            OUT,
+                OUT,
         ];
     }
 }

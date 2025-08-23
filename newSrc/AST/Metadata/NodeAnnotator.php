@@ -47,8 +47,7 @@ final class NodeAnnotator
         Node $node,
         Annotation $annotation,
         mixed $value = null,
-    ): void
-    {
+    ): void {
         $node->setAttribute($annotation->name, $value ?? $annotation->value);
     }
 }

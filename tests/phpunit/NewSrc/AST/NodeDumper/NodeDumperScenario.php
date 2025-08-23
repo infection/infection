@@ -33,44 +33,90 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor;
+namespace Infection\Tests\NewSrc\AST\NodeDumper;
 
-use function func_get_args;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
 
-final class RecordTraverseVisitor extends NodeVisitorAbstract
+final class NodeDumperScenario
 {
     /**
-     * @var list<array{string, list<mixed>}>
+     * @param list<Node>|Node $node
      */
-    private array $records = [];
-
-    public function fetch(): array
-    {
-        $records = $this->records;
-        $this->records = [];
-
-        return $records;
+    public function __construct(
+        public array|Node|string $node,
+        public string $expected = '',
+        // It should have the same defaults as NodeDumper
+        public bool $dumpProperties = false,
+        public bool $dumpComments = false,
+        public bool $dumpPositions = false,
+        public bool $dumpOtherAttributes = false,
+        public bool $onlyVisitedNodes = true,
+    ) {
     }
 
-    public function beforeTraverse(array $nodes): void
+    /**
+     * @param list<Node>|Node $node
+     */
+    public static function forNode(array|Node $node): self
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        return new self($node);
     }
 
-    public function enterNode(Node $node): void
+    public static function forCode(string $code): self
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        return new self($code);
     }
 
-    public function leaveNode(Node $node): void
+    public function withDumpProperties(): self
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        $clone = clone $this;
+        $clone->dumpProperties = true;
+
+        return $clone;
     }
 
-    public function afterTraverse(array $nodes): void
+    public function withDumpComments(): self
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        $clone = clone $this;
+        $clone->dumpComments = true;
+
+        return $clone;
+    }
+
+    public function withDumpPositions(): self
+    {
+        $clone = clone $this;
+        $clone->dumpPositions = true;
+
+        return $clone;
+    }
+
+    public function withDumpOtherAttributes(): self
+    {
+        $clone = clone $this;
+        $clone->dumpOtherAttributes = true;
+
+        return $clone;
+    }
+
+    public function withShowAllNodes(): self
+    {
+        $clone = clone $this;
+        $clone->onlyVisitedNodes = false;
+
+        return $clone;
+    }
+
+    public function withExpected(string $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
+    }
+
+    public function build(): array
+    {
+        return [$this];
     }
 }

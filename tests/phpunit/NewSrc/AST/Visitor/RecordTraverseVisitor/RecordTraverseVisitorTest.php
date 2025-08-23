@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor\RecordTraverseVisitor;
+namespace Infection\Tests\NewSrc\AST\Visitor\RecordTraverseVisitor;
 
-use Infection\Tests\NewSrc\PhpParser\AstTestCase;
+use Infection\Tests\NewSrc\AST\AstTestCase;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor;
+namespace Infection\Tests\NewSrc\AST\Visitor;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Tests\NewSrc\PhpParser\AstTestCase;
+use Infection\Tests\NewSrc\AST\AstTestCase;
+use Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use newSrc\AST\NodeVisitor\ExcludeIgnoredNodesVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -80,26 +80,26 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name
-                    stmts: array(
-                        0: Stmt_Class(
-                            name: Identifier
-                            stmts: array(
-                                0: Stmt_ClassMethod(
-                                    name: Identifier
-                                )
-                                1: Stmt_ClassMethod(
-                                    name: Identifier
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                    1: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
                                 )
                             )
                         )
+                        kind: 1
                     )
-                    kind: 1
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'comment on a method' => [
@@ -117,24 +117,24 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name
-                    stmts: array(
-                        0: Stmt_Class(
-                            name: Identifier
-                            stmts: array(
-                                0: Stmt_ClassMethod(
-                                    name: Identifier
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                    1: <skipped>
                                 )
-                                1: <skipped>
                             )
                         )
+                        kind: 1
                     )
-                    kind: 1
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'phpdoc on a method' => [
@@ -152,24 +152,24 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name
-                    stmts: array(
-                        0: Stmt_Class(
-                            name: Identifier
-                            stmts: array(
-                                0: Stmt_ClassMethod(
-                                    name: Identifier
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier
+                                    )
+                                    1: <skipped>
                                 )
-                                1: <skipped>
                             )
                         )
+                        kind: 1
                     )
-                    kind: 1
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'comment on the class' => [
@@ -187,16 +187,16 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name
-                    stmts: array(
-                        0: <skipped>
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: <skipped>
+                        )
+                        kind: 1
                     )
-                    kind: 1
                 )
-            )
-            OUT,
+                OUT,
         ];
 
         yield 'comment on an expression' => [
@@ -214,30 +214,31 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name
-                    stmts: array(
-                        0: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable
-                                expr: Expr_New(
-                                    class: Name
-                                    args: array(
-                                        0: Arg(
-                                            value: Expr_ArrowFunction(
-                                                expr: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'first'
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable
+                                    expr: Expr_New(
+                                        class: Name
+                                        args: array(
+                                            0: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'first'
+                                                    )
                                                 )
                                             )
-                                        )
-                                        1: <skipped>
-                                        2: Arg(
-                                            value: Expr_ArrowFunction(
-                                                expr: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'third'
+                                            1: <skipped>
+                                            2: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'third'
+                                                    )
                                                 )
                                             )
                                         )
@@ -245,11 +246,10 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                                 )
                             )
                         )
+                        kind: 1
                     )
-                    kind: 1
                 )
-            )
-            OUT,
+                OUT,
         ];
     }
 }

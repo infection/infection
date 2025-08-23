@@ -33,66 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser;
+namespace Infection\Tests\NewSrc\AST\Visitor\RecordTraverseVisitor;
 
-use Infection\Tests\NewSrc\PhpParser\NodeDumper\NodeDumper;
+use function func_get_args;
 use PhpParser\Node;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
-use PHPUnit\Framework\TestCase;
-use function array_map;
-use function is_array;
+use PhpParser\NodeVisitorAbstract;
 
-abstract class AstTestCase extends TestCase
+final class RecordTraverseVisitor extends NodeVisitorAbstract
 {
-    protected Parser $parser;
-    protected NodeDumper $dumper;
-
-    protected function setUp(): void
-    {
-        $this->parser = $this->createParser();
-        $this->dumper = $this->createDumper();
-    }
-
-    protected function createParser(): Parser
-    {
-        return (new ParserFactory())->createForNewestSupportedVersion();
-    }
-
-    protected function createDumper(): NodeDumper
-    {
-        return new NodeDumper();
-    }
-
     /**
-     * @param array<string, list<mixed>> $records
-     * @return array<string, list<string|list<string>>>
+     * @var list<array{string, list<mixed>}>
      */
-    final protected function dumpRecordNodes(array $records): array
+    private array $records = [];
+
+    public function fetch(): array
     {
-        return array_map(
-            fn (array $record) => [
-                $record[0],
-                $this->dumpRecursively($record[1]),
-            ],
-            $records,
-        );
+        $records = $this->records;
+        $this->records = [];
+
+        return $records;
     }
 
-    /**
-     * @return array<string, list<string|list<string>>>
-     */
-    private function dumpRecursively(mixed $potentialNodes): array|string
+    public function beforeTraverse(array $nodes): void
     {
-        if (is_array($potentialNodes)) {
-            return array_map(
-                $this->dumpRecursively(...),
-                $potentialNodes,
-            );
-        }
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
 
-        $this->assertInstanceOf(Node::class, $potentialNodes);
+    public function enterNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
 
-        return $this->dumper->dump($potentialNodes);
+    public function leaveNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function afterTraverse(array $nodes): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 }

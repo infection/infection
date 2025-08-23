@@ -33,18 +33,66 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\NewSrc\AST;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use function array_map;
+use Infection\Tests\NewSrc\AST\NodeDumper\NodeDumper;
+use function is_array;
+use PhpParser\Node;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+use PHPUnit\Framework\TestCase;
 
-/**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
- */
-final class PHPUnitXmlParser
+abstract class AstTestCase extends TestCase
 {
-    public function parse(string $fileName): PHPUnitXmlReport
+    protected Parser $parser;
+    protected NodeDumper $dumper;
+
+    protected function setUp(): void
     {
-        // TODO: the implementation need to be lazy and streamed.
+        $this->parser = $this->createParser();
+        $this->dumper = $this->createDumper();
+    }
+
+    protected function createParser(): Parser
+    {
+        return (new ParserFactory())->createForNewestSupportedVersion();
+    }
+
+    protected function createDumper(): NodeDumper
+    {
+        return new NodeDumper();
+    }
+
+    /**
+     * @param array<string, list<mixed>> $records
+     * @return array<string, list<string|list<string>>>
+     */
+    final protected function dumpRecordNodes(array $records): array
+    {
+        return array_map(
+            fn (array $record) => [
+                $record[0],
+                $this->dumpRecursively($record[1]),
+            ],
+            $records,
+        );
+    }
+
+    /**
+     * @return array<string, list<string|list<string>>>
+     */
+    private function dumpRecursively(mixed $potentialNodes): array|string
+    {
+        if (is_array($potentialNodes)) {
+            return array_map(
+                $this->dumpRecursively(...),
+                $potentialNodes,
+            );
+        }
+
+        $this->assertInstanceOf(Node::class, $potentialNodes);
+
+        return $this->dumper->dump($potentialNodes);
     }
 }

@@ -33,18 +33,35 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-/**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
- */
-final class PHPUnitXmlParser
+final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    public function parse(string $fileName): PHPUnitXmlReport
+    public const VISITED_ATTRIBUTE = 'visited';
+
+    public static function wasVisited(Node $node): bool
     {
-        // TODO: the implementation need to be lazy and streamed.
+        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
+    }
+
+    /**
+     * @template T extends Node
+     *
+     * @param T $node
+     * @return T
+     */
+    public static function markAsVisited(Node $node): Node
+    {
+        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
+
+        return $node;
+    }
+
+    public function leaveNode(Node $node): void
+    {
+        self::markAsVisited($node);
     }
 }

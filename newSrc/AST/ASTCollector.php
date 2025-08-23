@@ -36,24 +36,13 @@ declare(strict_types=1);
 namespace newSrc\AST;
 
 use Infection\PhpParser\FileParser;
-use newSrc\AST\NodeVisitor\AddTypesVisitor;
-use newSrc\AST\NodeVisitor\ExcludeIgnoredNodesVisitor;
-use newSrc\AST\NodeVisitor\ExcludeUnchangedNodesVisitor;
-use newSrc\AST\NodeVisitor\ExcludeUncoveredNodesVisitor;
-use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
-use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 
 // Parses the sources and provide a rich annotated AST.
 final readonly class ASTCollector
 {
-    /**
-     * @param NodeVisitor[] $nodeVisitors
-     */
     public function __construct(
         private FileParser $parser,
         private NodeTraverserFactory $traverserFactory,

@@ -48,15 +48,14 @@ use newSrc\AST\NodeVisitor\NameResolverFactory;
 use newSrc\TestFramework\Tracing\Tracer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
-use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 
 final readonly class NodeTraverserFactory
 {
     public function __construct(
-        private Tracer           $tracer,
+        private Tracer $tracer,
         private AridCodeDetector $aridCodeDetector,
-        private SymbolResolver   $symbolsResolver,
+        private SymbolResolver $symbolsResolver,
     ) {
     }
 

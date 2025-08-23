@@ -33,10 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\NodeDumper;
+namespace Infection\Tests\NewSrc\AST\NodeDumper;
 
-use Infection\Tests\NewSrc\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Webmozart\Assert\Assert;
+use function implode;
+use Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
+use function is_array;
+use function is_float;
+use function is_int;
+use function is_string;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -51,11 +57,6 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
-use function implode;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_string;
 use function str_replace;
 use function strlen;
 use function strrpos;
@@ -86,7 +87,7 @@ final class NodeDumper
     public function __construct(
         private readonly bool $dumpProperties = false,
         private readonly bool $dumpComments = false,
-        private readonly bool $dumpPositions = false,
+        private bool $dumpPositions = false,
         private readonly bool $dumpOtherAttributes = true,
         private bool $onlyVisitedNodes = true,
     ) {
@@ -105,15 +106,22 @@ final class NodeDumper
     public function dump(
         array|Node $node,
         ?string $code = null,
+        ?bool $dumpPositions = null,
         ?bool $onlyVisitedNodes = null,
-    ): string
-    {
+    ): string {
         $result = '';
         $newLine = "\n";
 
-        if (null !== $onlyVisitedNodes) {
+        if ($onlyVisitedNodes !== null) {
             $originalOnlyVisitedNodes = $this->onlyVisitedNodes;
             $this->onlyVisitedNodes = $onlyVisitedNodes;
+        }
+
+        if ($dumpPositions !== null) {
+            Assert::notNull($code, 'The original code is necessary for dumping positions.');
+
+            $originalDumpPositions = $this->dumpPositions;
+            $this->dumpPositions = $dumpPositions;
         }
 
         $this->dumpRecursive(
@@ -124,8 +132,12 @@ final class NodeDumper
             indent: false,
         );
 
-        if (null !== $onlyVisitedNodes) {
+        if ($onlyVisitedNodes !== null) {
             $this->onlyVisitedNodes = $originalOnlyVisitedNodes;
+        }
+
+        if ($dumpPositions !== null) {
+            $this->dumpPositions = $originalDumpPositions;
         }
 
         return $result;

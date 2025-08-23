@@ -33,18 +33,66 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\NewSrc\AST\Visitor\ExcludeUncoveredNodesVisitor;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use function iter\any;
+use newSrc\AST\Metadata\NodePosition;
+use newSrc\TestFramework\Tracing\Tracer;
 
-/**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
- */
-final class PHPUnitXmlParser
+final readonly class TestTracer implements Tracer
 {
-    public function parse(string $fileName): PHPUnitXmlReport
-    {
-        // TODO: the implementation need to be lazy and streamed.
+    /**
+     * @param list<NodePosition> $coveredLines
+     */
+    public function __construct(
+        public array $coveredLines = [],
+    ) {
+    }
+
+    public function hasTests(
+        string $sourceFilePathname,
+        NodePosition $nodePosition,
+    ): bool {
+        return any(
+            static fn (NodePosition $coveredLine) => self::isCovered(
+                $coveredLine,
+                $nodePosition,
+            ),
+            $this->coveredLines,
+        );
+    }
+
+    private static function isCovered(
+        NodePosition $coveredLine,
+        NodePosition $nodePosition,
+    ): bool {
+        // 1.
+        // 2.
+        // 3.         covered
+        // 4.   covered
+        // 5.
+
+        if (
+            $coveredLine->startLine > $nodePosition->startLine
+            || $coveredLine->endLine < $nodePosition->endLine
+        ) {
+            return false;
+        }
+
+        if (
+            $coveredLine->startLine === $nodePosition->startLine
+            && $coveredLine->startTokenPosition > $nodePosition->startTokenPosition
+        ) {
+            return false;
+        }
+
+        if (
+            $coveredLine->endLine === $nodePosition->endLine
+            && $coveredLine->endTokenPosition < $nodePosition->endTokenPosition
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

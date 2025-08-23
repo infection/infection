@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\PhpParser\Visitor\LabelAridCodeVisitor;
+namespace Infection\Tests\NewSrc\AST\Visitor\LabelAridCodeVisitor;
 
-use Infection\Tests\NewSrc\PhpParser\AstTestCase;
+use Infection\Tests\NewSrc\AST\AstTestCase;
 use newSrc\AST\NodeVisitor\DetectAridCodeVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -86,50 +86,52 @@ final class LabelAridCodeVisitorTest extends AstTestCase
 
                 PHP,
             <<<'OUT'
-            array(
-                0: Stmt_Namespace(
-                    name: Name
-                    stmts: array(
-                        0: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable
-                                expr: Scalar_String(
-                                    kind: KIND_SINGLE_QUOTED (1)
-                                    rawValue: ''
+                array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable
+                                    expr: Scalar_String(
+                                        kind: KIND_SINGLE_QUOTED (1)
+                                        rawValue: ''
+                                    )
                                 )
                             )
-                        )
-                        1: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable
-                                expr: Scalar_String(
-                                    kind: KIND_SINGLE_QUOTED (1)
-                                    rawValue: ''
+                            1: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable
+                                    expr: Scalar_String(
+                                        kind: KIND_SINGLE_QUOTED (1)
+                                        rawValue: ''
+                                    )
                                 )
                             )
-                        )
-                        2: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable(
-                                    ARID_CODE: 2
-                                )
-                                expr: Scalar_String(
-                                    kind: KIND_SINGLE_QUOTED (1)
-                                    rawValue: ''
+                            2: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        ARID_CODE: 2
+                                    )
+                                    expr: Scalar_String(
+                                        kind: KIND_SINGLE_QUOTED (1)
+                                        rawValue: ''
+                                        ARID_CODE: 2
+                                    )
                                     ARID_CODE: 2
                                 )
                                 ARID_CODE: 2
                             )
-                            ARID_CODE: 2
-                        )
-                        3: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable(
-                                    ARID_CODE: 2
-                                )
-                                expr: Expr_ArrowFunction(
-                                    expr: Expr_ConstFetch(
-                                        name: Name(
+                            3: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        ARID_CODE: 2
+                                    )
+                                    expr: Expr_ArrowFunction(
+                                        expr: Expr_ConstFetch(
+                                            name: Name(
+                                                ARID_CODE: 2
+                                            )
                                             ARID_CODE: 2
                                         )
                                         ARID_CODE: 2
@@ -138,22 +140,20 @@ final class LabelAridCodeVisitorTest extends AstTestCase
                                 )
                                 ARID_CODE: 2
                             )
-                            ARID_CODE: 2
-                        )
-                        4: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable
-                                expr: Scalar_String(
-                                    kind: KIND_SINGLE_QUOTED (1)
-                                    rawValue: ''
+                            4: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable
+                                    expr: Scalar_String(
+                                        kind: KIND_SINGLE_QUOTED (1)
+                                        rawValue: ''
+                                    )
                                 )
                             )
                         )
+                        kind: 1
                     )
-                    kind: 1
                 )
-            )
-            OUT,
+                OUT,
         ];
     }
 }

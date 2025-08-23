@@ -46,7 +46,6 @@ use newSrc\AST\NodeVisitor\NameResolverFactory;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use SplObjectStorage;
 

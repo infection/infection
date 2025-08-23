@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace newSrc\AST\Metadata;
 
+use function array_values;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Node;
-use function array_values;
 
 final class SymbolAnnotator
 {
@@ -51,8 +51,7 @@ final class SymbolAnnotator
     public static function annotate(
         Node $node,
         array $symbols,
-    ): void
-    {
+    ): void {
         $node->setAttribute(
             Annotation::SYMBOL->name,
             array_values($symbols),

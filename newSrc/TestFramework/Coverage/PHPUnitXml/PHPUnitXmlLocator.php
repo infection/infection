@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace newSrc\TestFramework\Coverage\JUnit;
 
+use function count;
+use function current;
 use DomainException;
+use function implode;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use function iter\map;
+use function iter\toArray;
 use newSrc\Framework\Filesystem;
 use newSrc\TestFramework\Coverage\Locator\NoReportFound;
 use newSrc\TestFramework\Coverage\Locator\ReportLocator;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use function count;
-use function current;
-use function implode;
-use function iter\map;
-use function iter\toArray;
-use function sprintf;
 
 /**
  * TODO: heavily copied from IndexXmlCoverageLocator
@@ -64,8 +64,8 @@ final readonly class PHPUnitXmlLocator implements ReportLocator
      */
     public function __construct(
         private Filesystem $filesystem,
-        private string     $coverageDirPath,
-        private string     $defaultJUnitPath,
+        private string $coverageDirPath,
+        private string $defaultJUnitPath,
     ) {
     }
 
@@ -73,8 +73,7 @@ final readonly class PHPUnitXmlLocator implements ReportLocator
         Filesystem $filesystem,
         string $coverageDirPath,
         string $defaultJUnitPath,
-    ): self
-    {
+    ): self {
         return new self(
             $filesystem,
             $coverageDirPath,
@@ -85,6 +84,7 @@ final readonly class PHPUnitXmlLocator implements ReportLocator
     public function locate(): string
     {
         throw new DomainException('TODO: not implemented.');
+
         if ($this->filesystem->isReadableFile($this->defaultJUnitPath)) {
             return $this->defaultJUnitPath;
         }
