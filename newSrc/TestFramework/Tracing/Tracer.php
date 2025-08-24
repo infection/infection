@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace newSrc\TestFramework\Tracing;
 
-use newSrc\AST\Metadata\NodePosition;
+use PhpParser\Node;
 
 interface Tracer
 {
     public function hasTests(
         string $sourceFilePathname,
-        NodePosition $nodePosition,
+        Node $node,
     ): bool;
 }

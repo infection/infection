@@ -40,6 +40,9 @@ use Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTr
 use newSrc\AST\Metadata\NodePosition;
 use newSrc\AST\Metadata\TraverseContext;
 use newSrc\AST\NodeVisitor\ExcludeUncoveredNodesVisitor;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,6 +50,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(ExcludeUncoveredNodesVisitor::class)]
 final class ExcludeUncoveredNodesVisitorTest extends AstTestCase
 {
+    private const IGNORED_NODE_CLASS_NAMES = [
+        Namespace_::class,
+        Class_::class,
+        ClassMethod::class,
+    ];
+
     /**
      * @param list<NodePosition> $coveredLines
      */
@@ -60,7 +69,10 @@ final class ExcludeUncoveredNodesVisitorTest extends AstTestCase
 
         $traverser = new NodeTraverser(
             new ExcludeUncoveredNodesVisitor(
-                new TestTracer($coveredLines),
+                new TestTracer(
+                    self::IGNORED_NODE_CLASS_NAMES,
+                    $coveredLines,
+                ),
                 new TraverseContext('/path/to/file.php'),
             ),
             new MarkTraversedNodesAsVisitedVisitor(),
@@ -94,22 +106,22 @@ final class ExcludeUncoveredNodesVisitorTest extends AstTestCase
                 PHP,
             [
                 new NodePosition(
-                    startLine: 0,
+                    startLine: 7,
                     startTokenPosition: 0,
-                    endLine: 100,
-                    endTokenPosition: 0,
+                    endLine: 8,
+                    endTokenPosition: 99,
                 ),
             ],
             <<<'OUT'
                 array(
                     0: Stmt_Namespace[3:1 - 10:1](
-                        name: Name[3:11 - 3:33]
+                        name: <skipped>
                         stmts: array(
                             0: Stmt_Class[5:1 - 10:1](
-                                name: Identifier[5:7 - 5:15]
+                                name: <skipped>
                                 stmts: array(
                                     0: Stmt_ClassMethod[6:5 - 9:5](
-                                        name: Identifier[6:14 - 6:20]
+                                        name: <skipped>
                                         stmts: array(
                                             0: Stmt_Expression[7:9 - 7:17](
                                                 expr: Expr_Assign[7:9 - 7:16](
@@ -157,21 +169,21 @@ final class ExcludeUncoveredNodesVisitorTest extends AstTestCase
             [
                 new NodePosition(
                     startLine: 7,
-                    startTokenPosition: 9,
+                    startTokenPosition: 0,
                     endLine: 7,
-                    endTokenPosition: 16,
+                    endTokenPosition: 99,
                 ),
             ],
             <<<'OUT'
                 array(
                     0: Stmt_Namespace[3:1 - 10:1](
-                        name: Name[3:11 - 3:33]
+                        name: <skipped>
                         stmts: array(
                             0: Stmt_Class[5:1 - 10:1](
-                                name: Identifier[5:7 - 5:15]
+                                name: <skipped>
                                 stmts: array(
                                     0: Stmt_ClassMethod[6:5 - 9:5](
-                                        name: Identifier[6:14 - 6:20]
+                                        name: <skipped>
                                         stmts: array(
                                             0: Stmt_Expression[7:9 - 7:17](
                                                 expr: Expr_Assign[7:9 - 7:16](
@@ -182,15 +194,7 @@ final class ExcludeUncoveredNodesVisitorTest extends AstTestCase
                                                     )
                                                 )
                                             )
-                                            1: Stmt_Expression[8:9 - 8:17](
-                                                expr: Expr_Assign[8:9 - 8:16](
-                                                    var: Expr_Variable[8:9 - 8:11]
-                                                    expr: Scalar_String[8:15 - 8:16](
-                                                        kind: KIND_SINGLE_QUOTED (1)
-                                                        rawValue: ''
-                                                    )
-                                                )
-                                            )
+                                            1: <skipped>
                                         )
                                     )
                                 )

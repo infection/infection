@@ -35,24 +35,41 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\AST\Visitor\ExcludeUncoveredNodesVisitor;
 
+use function array_flip;
+use function array_key_exists;
 use function iter\any;
 use newSrc\AST\Metadata\NodePosition;
 use newSrc\TestFramework\Tracing\Tracer;
+use PhpParser\Node;
 
 final readonly class TestTracer implements Tracer
 {
     /**
+     * @var array<class-string<Node>, mixed>
+     */
+    private array $ignoredNodeClassNamesAsKeys;
+
+    /**
+     * @param list<class-string<Node>> $ignoredNodeClassNames
      * @param list<NodePosition> $coveredLines
      */
     public function __construct(
-        public array $coveredLines = [],
+        array $ignoredNodeClassNames,
+        private array $coveredLines = [],
     ) {
+        $this->ignoredNodeClassNamesAsKeys = array_flip($ignoredNodeClassNames);
     }
 
     public function hasTests(
         string $sourceFilePathname,
-        NodePosition $nodePosition,
+        Node $node,
     ): bool {
+        $nodePosition = NodePosition::create($node);
+
+        if (array_key_exists($node::class, $this->ignoredNodeClassNamesAsKeys)) {
+            return true;
+        }
+
         return any(
             static fn (NodePosition $coveredLine) => self::isCovered(
                 $coveredLine,

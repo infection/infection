@@ -37,7 +37,6 @@ namespace newSrc\AST\NodeVisitor;
 
 use newSrc\AST\Metadata\Annotation;
 use newSrc\AST\Metadata\NodeAnnotator;
-use newSrc\AST\Metadata\NodePosition;
 use newSrc\AST\Metadata\TraverseContext;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
 use newSrc\TestFramework\Tracing\Tracer;
@@ -61,7 +60,7 @@ final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
     {
         $hasTests = $this->tracer->hasTests(
             $this->context->filePathname,
-            $nodePosition = NodePosition::create($node),
+            $node,
         );
 
         // Note that, for instance, a static Analyser may or may not cover a symbol. We could configure
