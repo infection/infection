@@ -281,7 +281,7 @@ TODO: find more docs about this that would not be covered by the part 1.
 #### Mutations without traces
 
 Depending on the execution mode employed, mutations affected non-tested code may be created still, for instance, for
-debugging or inspection purposes. In this case those mutations should be labeled as _not covered_.
+debugging or inspection purposes. In this case those mutations should be labelled as _not covered_.
 
 #### Tests too slow
 

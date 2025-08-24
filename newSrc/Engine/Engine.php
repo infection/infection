@@ -83,12 +83,32 @@ final readonly class Engine
         // The configuration can use the Tracer to avoid including in the source
         // files that are not covered at all.
 
+        // infection.json5
+        // "source"
+        //
+        // CLI options: --git-diff or --filter
+        //
+        // coverage reports:
+        // - PHPUnit XML + JUnit
+        // - Behat Coverage Report
+        //
+        // =>
+        //
+        // $ infection --filter=X
+        // -> source files = source AND X
+        // -> initial run with coverage = source files
+        //
+        //
+        // Currently:
+        // $traces = $this->traceProvider->provideTraces();
+        //
+
         // Without envelope
         take($this->configuration->getSourceFiles())
             ->map($this->astCollector->collect(...))
             ->unpack($this->mutagenesis->generate(...))
             ->map($this->mutationAnalyzer->analyze(...))
-            ->map($this->reporter->report(...))
+            ->map($this->reporter->collect(...))
             ->toList();
 
         // With envelope

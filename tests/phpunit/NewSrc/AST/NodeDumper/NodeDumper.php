@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\NewSrc\AST\NodeDumper;
 
-use Webmozart\Assert\Assert;
 use function implode;
 use Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
@@ -61,6 +60,7 @@ use function str_replace;
 use function strlen;
 use function strrpos;
 use function substr;
+use Webmozart\Assert\Assert;
 
 final class NodeDumper
 {

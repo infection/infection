@@ -18,6 +18,23 @@
             "report": "master"
         }
     },
+    "testFrameworks": {
+        "phpunit9": {
+            "type": "phpunit",
+            "configuration": "phpunit.xml",
+            ...
+        },
+        "phpunit10": {
+            type:
+            ...
+        },
+        "behat": {
+
+        },
+        "phpstan": {
+
+        }
+    },
     "phpStan": {
         "configDir": "devTools"
     },

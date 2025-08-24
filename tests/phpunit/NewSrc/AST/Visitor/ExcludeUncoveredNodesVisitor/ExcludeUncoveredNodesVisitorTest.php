@@ -40,7 +40,6 @@ use Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTr
 use newSrc\AST\Metadata\NodePosition;
 use newSrc\AST\Metadata\TraverseContext;
 use newSrc\AST\NodeVisitor\ExcludeUncoveredNodesVisitor;
-use newSrc\TestFramework\Adapter\PHPUnit\PHPUnitTracer;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -79,8 +78,6 @@ final class ExcludeUncoveredNodesVisitorTest extends AstTestCase
 
     public static function nodeProvider(): iterable
     {
-
-
         yield 'method fully covered' => [
             <<<'PHP'
                 <?php
