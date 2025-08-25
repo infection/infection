@@ -258,6 +258,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
+                // TODO: give more examples or a link to the doc
                 'Filter which files to mutate',
                 Container::DEFAULT_FILTER,
             )

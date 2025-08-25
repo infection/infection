@@ -35,19 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function array_fill_keys;
-use function array_key_exists;
-use function array_unique;
-use function array_values;
-use function dirname;
-use function file_exists;
-use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\FileLogger;
 use Infection\Logger\GitHub\GitDiffFileProvider;
@@ -57,17 +49,25 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\SourceCollection\SchemaSourceCollector;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_numeric;
-use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
-use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
+use function array_fill_keys;
+use function array_key_exists;
+use function array_unique;
+use function array_values;
+use function dirname;
+use function file_exists;
+use function in_array;
+use function is_numeric;
+use function max;
+use function sprintf;
+use function sys_get_temp_dir;
 
 /**
  * @internal
@@ -85,7 +85,7 @@ class ConfigurationFactory
         private readonly MutatorResolver $mutatorResolver,
         private readonly MutatorFactory $mutatorFactory,
         private readonly MutatorParser $mutatorParser,
-        private readonly SourceFileCollector $sourceFileCollector,
+        private readonly SchemaSourceCollector $sourceFileCollector,
         private readonly CiDetectorInterface $ciDetector,
         private readonly GitDiffFileProvider $gitDiffFileProvider,
     ) {
@@ -150,7 +150,7 @@ class ConfigurationFactory
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collectFiles(
+            $this->sourceFileCollector->collect(
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes(),
             ),
@@ -360,15 +360,14 @@ class ConfigurationFactory
      */
     private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
     {
+        // TODO: I do not understand this return here
         if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
         }
 
         $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
-
-        if ($isForGitDiffLines) {
-            return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);
-        }
+        // TODO:
+        $gitDiffFilter = $isForGitDiffLines ? 'AM' : $gitDiffFilter;
 
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
