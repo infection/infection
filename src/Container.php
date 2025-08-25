@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -80,7 +79,6 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
@@ -117,6 +115,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\SourceCollection\SchemaSourceCollector;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -141,7 +140,6 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -150,12 +148,14 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
-use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function php_ini_loaded_file;
+use function sprintf;
 
 /**
  * @internal
@@ -790,9 +790,9 @@ final class Container extends DIContainer
         return $this->get(PerformanceLoggerSubscriberFactory::class);
     }
 
-    public function getSourceFileCollector(): SourceFileCollector
+    public function getSourceFileCollector(): SchemaSourceCollector
     {
-        return $this->get(SourceFileCollector::class);
+        return $this->get(SchemaSourceCollector::class);
     }
 
     public function getNodeTraverserFactory(): NodeTraverserFactory

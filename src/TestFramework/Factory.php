@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\SourceCollection\SourceCollector;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -45,6 +46,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
+use function iter\toArray;
 use function iterator_to_array;
 use SplFileInfo;
 use function sprintf;
@@ -67,12 +69,13 @@ final readonly class Factory
         private Configuration $infectionConfig,
         private SourceFileFilter $sourceFileFilter,
         private array $installedExtensions,
+        private SourceCollector $sourceCollector,
     ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
+        $filteredSourceFilesToMutate = toArray($this->sourceCollector->collect());
 
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
@@ -140,6 +143,7 @@ final readonly class Factory
             return [];
         }
 
+        // TODO: isn't this triggering the loading of the sources twice?
         /** @var list<SplFileInfo> $files */
         $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
 

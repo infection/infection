@@ -36,7 +36,7 @@
                 "directories": {
                     "type": "array",
                     "minItems": 1,
-                    "description": "Contains all folders with source code you want to mutate.",
+                    "description": "Contains all folders with source code you want to mutate. TODO: mention it does not support globs/patterns",
                     "items": {
                         "type": "string"
                     },
@@ -45,7 +45,7 @@
                 "excludes": {
                     "type": "array",
                     "minItems": 1,
-                    "description": "Contains all folders or files you want to exclude withing your source folders.",
+                    "description": "Contains all folders or files you want to exclude withing your source folders. TODO: mention that it does not support globs/patterns",
                     "items": {
                         "type": "string"
                     },

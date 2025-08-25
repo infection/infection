@@ -43,7 +43,6 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\LogVerbosity;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
@@ -56,19 +55,20 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\SourceCollection\SchemaSourceCollector;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
-use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
+use function Infection\Tests\normalizePath;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -1697,11 +1697,11 @@ final class ConfigurationFactoryTest extends TestCase
         bool $githubActionsDetected,
         SchemaConfiguration $schema,
     ): ConfigurationFactory {
-        /** @var SourceFileCollector&MockObject $sourceFilesCollector */
-        $sourceFilesCollector = $this->createMock(SourceFileCollector::class);
+        /** @var SchemaSourceCollector&MockObject $sourceFilesCollector */
+        $sourceFilesCollector = $this->createMock(SchemaSourceCollector::class);
 
         $sourceFilesCollector->expects($this->once())
-            ->method('collectFiles')
+            ->method('collect')
             ->with($schema->getSource()->getDirectories(), $schema->getSource()->getExcludes())
             ->willReturnCallback(
                 static function (array $source, array $excludes) {

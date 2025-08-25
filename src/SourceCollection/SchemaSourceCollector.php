@@ -33,36 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem;
+namespace Infection\SourceCollection;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * TODO: extract the rename in a separate PR
  * @final
  *
  * @internal
  */
-class SourceFileCollector
+final readonly class SchemaSourceCollector implements SourceCollector
 {
     /**
      * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
-     *
-     * @return iterable<SplFileInfo>
+     * @param string[] $excludedDirectoriesOrFiles
      */
-    public function collectFiles(
-        array $sourceDirectories,
-        array $excludeDirectories,
-    ): iterable {
-        if ($sourceDirectories === []) {
+    public function __construct(
+        private array $sourceDirectories,
+        private array $excludedDirectoriesOrFiles,
+    ) {
+    }
+
+    // TODO: I think the file/glob based filter could be applied here directly.
+    //  For performance reasons, most collectors already apply a filtering of some kind
+    //  e.g. the git diff. So currently if feels we are a bit in-between for all of them:
+    //  - git diff uses the sources for further filter but doesn't account for the excluded directories neither the user filter (but the git diff filter)
+    //  - the schema source collector does not account for the user filter
+    //  - traces don't account for either, we decorate them with the source filter
+    public function collect(): iterable {
+        if ($this->sourceDirectories === []) {
             return [];
         }
 
+        // TODO: to use the filesystem factory method as per the PoC
         return Finder::create()
-            ->in($sourceDirectories)
-            ->exclude($excludeDirectories)
-            ->notPath($excludeDirectories)
+            ->in($this->sourceDirectories)
+            ->exclude($this->excludedDirectoriesOrFiles)
+            ->notPath($this->excludedDirectoriesOrFiles)
             ->files()
             ->name('*.php')
         ;
