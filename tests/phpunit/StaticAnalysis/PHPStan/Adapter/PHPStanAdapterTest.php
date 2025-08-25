@@ -59,6 +59,7 @@ final class PHPStanAdapterTest extends TestCase
     private commandLineBuilder&MockObject $commandLineBuilder;
 
     private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
+
     private Filesystem&MockObject $fileSystem;
 
     protected function setUp(): void
@@ -76,6 +77,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
+            [],
             '9.0',
         );
     }
@@ -99,6 +101,111 @@ final class PHPStanAdapterTest extends TestCase
             '/path/to/phpstan',
             '--configuration=/path/to/phpstan-config-path',
         ], $this->adapter->getInitialRunCommandLine());
+    }
+
+    public function test_it_builds_initial_run_command_line_with_single_option(): void
+    {
+        $adapter = new PHPStanAdapter(
+            $this->fileSystem,
+            $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            $this->commandLineBuilder,
+            new VersionParser(),
+            31.0,
+            '/tmp',
+            ['--memory-limit=1G'],
+            '9.0',
+        );
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], [
+                '--configuration=/path/to/phpstan-config-path',
+                '--memory-limit=1G',
+            ])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=1G'])
+        ;
+
+        $this->assertSame([
+            '/usr/bin/php',
+            '/path/to/phpstan',
+            '--configuration=/path/to/phpstan-config-path',
+            '--memory-limit=1G',
+        ], $adapter->getInitialRunCommandLine());
+    }
+
+    public function test_it_builds_initial_run_command_line_with_multiple_options(): void
+    {
+        $adapter = new PHPStanAdapter(
+            $this->fileSystem,
+            $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            $this->commandLineBuilder,
+            new VersionParser(),
+            31.0,
+            '/tmp',
+            ['--memory-limit=-1', '--no-progress'],
+            '9.0',
+        );
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], [
+                '--configuration=/path/to/phpstan-config-path',
+                '--memory-limit=-1',
+                '--no-progress',
+            ])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=-1', '--no-progress'])
+        ;
+
+        $this->assertSame([
+            '/usr/bin/php',
+            '/path/to/phpstan',
+            '--configuration=/path/to/phpstan-config-path',
+            '--memory-limit=-1',
+            '--no-progress',
+        ], $adapter->getInitialRunCommandLine());
+    }
+
+    public function test_it_builds_initial_run_command_line_with_complex_options(): void
+    {
+        $adapter = new PHPStanAdapter(
+            $this->fileSystem,
+            $this->mutantExecutionResultFactory,
+            '/path/to/phpstan-config-path',
+            '/path/to/phpstan',
+            $this->commandLineBuilder,
+            new VersionParser(),
+            31.0,
+            '/tmp',
+            ['--memory-limit=2G', '--level=max', '--no-progress'],
+            '9.0',
+        );
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpstan', [], [
+                '--configuration=/path/to/phpstan-config-path',
+                '--memory-limit=2G',
+                '--level=max',
+                '--no-progress',
+            ])
+            ->willReturn(['/usr/bin/php', '/path/to/phpstan', '--configuration=/path/to/phpstan-config-path', '--memory-limit=2G', '--level=max', '--no-progress'])
+        ;
+
+        $this->assertSame([
+            '/usr/bin/php',
+            '/path/to/phpstan',
+            '--configuration=/path/to/phpstan-config-path',
+            '--memory-limit=2G',
+            '--level=max',
+            '--no-progress',
+        ], $adapter->getInitialRunCommandLine());
     }
 
     public function test_it_returns_version(): void
@@ -126,6 +233,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
+            ['--memory-limit=-1'],
             $version,
         );
 
@@ -147,6 +255,7 @@ final class PHPStanAdapterTest extends TestCase
             new VersionParser(),
             31.0,
             '/tmp',
+            [],
             $version,
         );
 

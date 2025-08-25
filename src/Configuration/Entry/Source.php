@@ -44,6 +44,7 @@ final class Source
 {
     /** @var string[] */
     private readonly array $directories;
+
     /** @var string[] */
     private readonly array $excludes;
 

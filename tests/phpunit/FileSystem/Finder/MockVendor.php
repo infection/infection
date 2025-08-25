@@ -45,6 +45,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class MockVendor
 {
     public const VENDOR = 'phptester';
+
     public const PACKAGE = 'awesome-php-tester';
 
     /**

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Process;
 
+use function array_merge;
 use Infection\Mutant\Mutant;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
@@ -49,14 +50,18 @@ use Symfony\Component\Process\Process;
  */
 final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
+    /**
+     * @param list<string> $staticAnalysisToolOptions
+     */
     public function __construct(
         private readonly Filesystem $fileSystem,
-        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
         private readonly CommandLineBuilder $commandLineBuilder,
         private readonly float $timeout,
         private readonly string $tmpDir,
+        private readonly array $staticAnalysisToolOptions,
     ) {
     }
 
@@ -88,19 +93,21 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
         string $mutationOriginalFilePath,
         string $mutantConfigFile,
     ): array {
+        $options = array_merge([
+            "--tmp-file=$mutatedFilePath",
+            "--instead-of=$mutationOriginalFilePath",
+            "--configuration=$mutantConfigFile",
+            '--error-format=json',
+            '--no-progress',
+            '-vv',
+            '--fail-without-result-cache',
+            // todo [phpstan-integration] --stop-on-first-error
+        ], $this->staticAnalysisToolOptions);
+
         return $this->commandLineBuilder->build(
             $this->staticAnalysisToolExecutable,
             [],
-            [
-                "--tmp-file=$mutatedFilePath",
-                "--instead-of=$mutationOriginalFilePath",
-                "--configuration=$mutantConfigFile",
-                '--error-format=json',
-                '--no-progress',
-                '-vv',
-                '--fail-without-result-cache',
-                // todo [phpstan-integration] --stop-on-first-error
-            ],
+            $options,
         );
     }
 
@@ -118,6 +125,7 @@ final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
                     includes:
                         - $this->staticAnalysisConfigPath
                     parameters:
+                        reportUnmatchedIgnoredErrors: false
                         parallel:
                             maximumNumberOfProcesses: 1
                 NEON,

@@ -13,7 +13,6 @@
 name: Mutation Testing
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -30,6 +29,7 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     name: Infection complete run on Infection
 
@@ -73,11 +73,11 @@ jobs:
             --coverage-xml=build/logs/coverage-xml \
             --log-junit=build/logs/junit.xml
 
-      - name: Run Infection
+      - name: Run Infection on the full codebase
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
         run: |
-          php bin/infection --threads=max \
+          php bin/infection \
             --skip-initial-tests \
             --min-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
@@ -91,6 +91,7 @@ jobs:
   tests-status:
       name: Mutation Testing Status
       runs-on: ubuntu-latest
+      timeout-minutes: 30
       needs: tests
       if: always()
       steps:

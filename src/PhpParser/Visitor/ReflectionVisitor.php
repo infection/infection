@@ -44,6 +44,7 @@ use Infection\Reflection\NullReflection;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use ReflectionException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -52,10 +53,15 @@ use Webmozart\Assert\Assert;
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
     public const STRICT_TYPES_KEY = 'isStrictTypes';
+
     public const REFLECTION_CLASS_KEY = 'reflectionClass';
+
     public const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
+
     public const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
+
     public const FUNCTION_SCOPE_KEY = 'functionScope';
+
     public const FUNCTION_NAME = 'functionName';
 
     /** @var array<int, Node> */
@@ -145,6 +151,35 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    public static function findReflectionClass(Node $node): ?ClassReflection
+    {
+        $reflection = $node->getAttribute(self::REFLECTION_CLASS_KEY);
+        Assert::nullOrIsInstanceOf($reflection, ClassReflection::class);
+
+        return $reflection;
+    }
+
+    public static function findFunctionScope(Node $node): ?Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
+    public static function getFunctionScope(Node $node): Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::isInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
+    public static function isStrictTypesEnabled(Node\FunctionLike $node): ?bool
+    {
+        return $node->getAttribute(self::STRICT_TYPES_KEY);
+    }
+
     /**
      * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
      * signature.
@@ -206,7 +241,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
 
         if ($fqn !== null) {
-            return CoreClassReflection::fromClassName($fqn->toString());
+            try {
+                return CoreClassReflection::fromClassName($fqn->toString());
+            } catch (ReflectionException) {
+                // Fallback to the workaround
+            }
         }
 
         // TODO: check against interfaces

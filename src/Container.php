@@ -36,9 +36,7 @@ declare(strict_types=1);
 namespace Infection;
 
 use function array_filter;
-use function array_key_exists;
-use Closure;
-use function count;
+use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -142,21 +140,14 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use InvalidArgumentException;
-use function is_a;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use function Pipeline\take;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ReflectionClass;
-use ReflectionNamedType;
-use ReflectionParameter;
-use function reset;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
@@ -169,63 +160,77 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class Container
+final class Container extends DIContainer
 {
     public const DEFAULT_CONFIG_FILE = null;
+
     public const DEFAULT_MUTATORS_INPUT = '';
+
     public const DEFAULT_SHOW_MUTATIONS = 20;
+
     public const DEFAULT_LOG_VERBOSITY = LogVerbosity::NORMAL;
+
     public const DEFAULT_DEBUG = false;
-    public const DEFAULT_ONLY_COVERED = false;
+
+    public const DEFAULT_WITH_UNCOVERED = false;
+
     public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+
     public const DEFAULT_MUTANT_ID = null;
+
     public const DEFAULT_GIT_DIFF_FILTER = null;
+
     public const DEFAULT_GIT_DIFF_LINES = false;
+
     public const DEFAULT_GIT_DIFF_BASE = null;
+
     public const DEFAULT_USE_GITHUB_LOGGER = null;
+
     public const DEFAULT_GITLAB_LOGGER_PATH = null;
+
     public const DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY = null;
+
     public const DEFAULT_HTML_LOGGER_PATH = null;
+
     public const DEFAULT_USE_NOOP_MUTATORS = false;
+
     public const DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES = false;
+
     public const DEFAULT_NO_PROGRESS = false;
+
     public const DEFAULT_FORCE_PROGRESS = false;
+
     public const DEFAULT_EXISTING_COVERAGE_PATH = null;
+
     public const DEFAULT_INITIAL_TESTS_PHP_OPTIONS = null;
+
     public const DEFAULT_SKIP_INITIAL_TESTS = false;
+
     public const DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS = false;
+
     public const DEFAULT_MIN_MSI = null;
+
     public const DEFAULT_MIN_COVERED_MSI = null;
+
     public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
+
     public const DEFAULT_TEST_FRAMEWORK = null;
+
     public const DEFAULT_STATIC_ANALYSIS_TOOL = null;
+
     public const DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS = null;
+
+    public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
+
     public const DEFAULT_FILTER = '';
+
     public const DEFAULT_THREAD_COUNT = null;
+
     public const DEFAULT_DRY_RUN = false;
+
     public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
-    /**
-     * @var array<class-string<object>, object>
-     */
-    private array $values = [];
-
-    /**
-     * @var array<class-string<object>, Closure(self): object>
-     */
-    private array $factories = [];
-
     private ?string $defaultJUnitPath = null;
-
-    /**
-     * @param array<class-string<object>, Closure(self): object> $values
-     */
-    public function __construct(array $values)
-    {
-        foreach ($values as $id => $value) {
-            $this->offsetSet($id, $value);
-        }
-    }
 
     public static function create(): self
     {
@@ -419,6 +424,7 @@ final class Container
                     $federatedMutationTestingResultsLogger,
                     $config->getNumberOfShownMutations(),
                     $container->getOutputFormatter(),
+                    !$config->mutateOnlyCoveredCode(),
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
@@ -560,7 +566,7 @@ final class Container
         ?int $numberOfShownMutations = self::DEFAULT_SHOW_MUTATIONS,
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
-        bool $onlyCovered = self::DEFAULT_ONLY_COVERED,
+        bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
         string $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
@@ -573,6 +579,7 @@ final class Container
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         string $filter = self::DEFAULT_FILTER,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
@@ -636,7 +643,7 @@ final class Container
                 $skipInitialTests,
                 $logVerbosity,
                 $debug,
-                $onlyCovered,
+                $withUncovered,
                 $noProgress,
                 $ignoreMsiWithNoMutations,
                 $minMsi,
@@ -646,6 +653,7 @@ final class Container
                 $mutatorsInput,
                 $testFramework,
                 $testFrameworkExtraOptions,
+                $staticAnalysisToolOptions,
                 $filter,
                 $threadCount,
                 $dryRun,
@@ -1140,146 +1148,10 @@ final class Container
 
     /**
      * @param class-string<object> $id
-     * @param Closure(self): object $value
+     * @param callable(static): object $value
      */
-    private function offsetSet(string $id, Closure $value): void
+    private function offsetSet(string $id, callable $value): void
     {
-        $this->factories[$id] = $value;
-        unset($this->values[$id]);
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @phpstan-return T
-     */
-    private function setValueOrThrow(string $id, object $value): object
-    {
-        Assert::isInstanceOf($value, $id);
-        $this->values[$id] = $value;
-
-        return $value;
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @phpstan-return T
-     */
-    private function get(string $id): object
-    {
-        if (array_key_exists($id, $this->values)) {
-            $value = $this->values[$id];
-            Assert::isInstanceOf($value, $id);
-
-            return $value;
-        }
-
-        if (array_key_exists($id, $this->factories)) {
-            $value = $this->factories[$id]($this);
-
-            return $this->setValueOrThrow($id, $value);
-        }
-
-        $value = $this->createService($id);
-
-        if ($value === null) {
-            throw new InvalidArgumentException(sprintf('Unknown service "%s"', $id));
-        }
-
-        return $this->setValueOrThrow($id, $value);
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $id
-     * @phpstan-return ?T
-     */
-    private function createService(string $id): ?object
-    {
-        $reflectionClass = new ReflectionClass($id);
-        $constructor = $reflectionClass->getConstructor();
-
-        if (!$reflectionClass->isInstantiable()) {
-            return null;
-        }
-
-        if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
-            return $reflectionClass->newInstance();
-        }
-
-        $resolvedArguments = take($constructor->getParameters())
-            ->map($this->resolveParameter(...))
-            ->toList();
-
-        // Check if we identified all parameters for the service
-        if (count($resolvedArguments) !== $constructor->getNumberOfParameters()) {
-            return null;
-        }
-
-        return $reflectionClass->newInstanceArgs($resolvedArguments);
-    }
-
-    /**
-     * Builds a potentially incomplete list of arguments for a constructor; as list of arguments may
-     * contain null values, we use a generator that can yield none or one value as an option type.
-     *
-     * @return iterable<object>
-     */
-    private function resolveParameter(ReflectionParameter $parameter): iterable
-    {
-        // Variadic parameters need hand-weaving
-        if ($parameter->isVariadic()) {
-            return;
-        }
-
-        $paramType = $parameter->getType();
-
-        // Not considering composite types, such as unions or intersections, for now
-        Assert::isInstanceOf($paramType, ReflectionNamedType::class);
-
-        // Only attempt to resolve a non-built-in named type (a class/interface)
-        if ($paramType->isBuiltin()) {
-            return;
-        }
-
-        /** @var class-string $paramTypeName */
-        $paramTypeName = $paramType->getName();
-
-        // Found an instantiable class, done
-        if ((new ReflectionClass($paramTypeName))->isInstantiable()) {
-            yield $this->get($paramTypeName);
-
-            return;
-        }
-
-        // Look for a factory that can create an instance of an interface or abstract class
-        $matchingTypes = $this->factoriesForType($paramTypeName);
-
-        // We expect exactly one factory to match the type, otherwise we cannot resolve the parameter
-        if (count($matchingTypes) !== 1) {
-            return;
-        }
-
-        yield $this->get(reset($matchingTypes));
-    }
-
-    /**
-     * Retrieves the class or interface names of all registered factories that can produce instances of the given type.
-     * This includes direct implementations, subclasses, or the type itself.
-     *
-     * @template T of object
-     * @param class-string<T> $type the class or interface name to find factories for
-     * @return class-string<T>[] a list of factory IDs (class-strings) that are compatible with the given type
-     */
-    private function factoriesForType(string $type): array
-    {
-        return take($this->factories)
-            ->keys()
-            ->filter(static fn (string $id) => is_a($id, $type, true))
-            ->toList();
+        $this->set($id, $value);
     }
 }

@@ -41,6 +41,7 @@ namespace Infection\Console\OutputFormatter;
 final class FormatterName
 {
     public const DOT = 'dot';
+
     public const PROGRESS = 'progress';
 
     public const ALL = [

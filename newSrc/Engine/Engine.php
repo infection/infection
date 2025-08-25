@@ -61,20 +61,20 @@ final readonly class Engine
     ) {
     }
 
-    public function execute(): void
-    {
-        // Unlike the original, we do not execute the "initial test suite + initial static analysis"
-        // but instead we execute the initial run, which contains any supported test framework
-        $this->initialExecutionRunner->run();
+public function execute(): void
+{
+    // Unlike the original, we do not execute the "initial test suite + initial static analysis"
+    // but instead we execute the initial run, which contains any supported test framework
+    $this->initialExecutionRunner->run();
 
-        $this->executeMutationTesting();
+    $this->executeMutationTesting();
 
-        try {
-            $this->msiChecker->check();
-        } finally {
-            $this->reporter->report();
-        }
+    try {
+        $this->msiChecker->check();
+    } finally {
+        $this->reporter->report();
     }
+}
 
     private function executeMutationTesting(): void
     {

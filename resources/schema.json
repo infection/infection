@@ -242,7 +242,6 @@
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },
-                "IdenticalEqual": { "$ref": "#/definitions/default-mutator-config" },
                 "InstanceOf_": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalAnd": { "$ref": "#/definitions/default-mutator-config" },
                 "LogicalAndAllSubExprNegation": { "$ref": "#/definitions/default-mutator-config" },
@@ -387,6 +386,7 @@
                 "CloneRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ConcatOperandRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "SharedCaseRemoval": { "$ref": "#/definitions/default-mutator-config" },
+                "ReturnRemoval": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayOneItem": { "$ref": "#/definitions/default-mutator-config" },
                 "FloatNegation": { "$ref": "#/definitions/default-mutator-config" },
                 "FunctionCall": { "$ref": "#/definitions/default-mutator-config" },
@@ -616,6 +616,17 @@
                 "phpspec",
                 "codeception"
             ]
+        },
+        "staticAnalysisTool": {
+            "type": "string",
+            "description": "Sets the Static Analysis tool to use to catch escaped Mutants.",
+            "anyOf": [
+                "phpstan"
+            ]
+        },
+        "staticAnalysisToolOptions": {
+            "type": "string",
+            "description": "Specify additional options to pass to the static analysis tool (e.g. memory limit). --static-analysis-tool-options will override this option."
         },
         "bootstrap": {
             "type": "string",

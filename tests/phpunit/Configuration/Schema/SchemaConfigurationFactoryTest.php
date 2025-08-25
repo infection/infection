@@ -2413,7 +2413,6 @@ final class SchemaConfigurationFactoryTest extends TestCase
                         "ArrayItem": true,
                         "EqualIdentical": true,
                         "FalseValue": true,
-                        "IdenticalEqual": true,
                         "LogicalAnd": true,
                         "LogicalLowerAnd": true,
                         "LogicalLowerOr": true,
@@ -2629,7 +2628,6 @@ final class SchemaConfigurationFactoryTest extends TestCase
                     'ArrayItem' => true,
                     'EqualIdentical' => true,
                     'FalseValue' => true,
-                    'IdenticalEqual' => true,
                     'LogicalAnd' => true,
                     'LogicalLowerAnd' => true,
                     'LogicalLowerOr' => true,
@@ -2759,7 +2757,9 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'bootstrap' => null,
             'initialTestsPhpOptions' => null,
             'testFrameworkOptions' => null,
+            'staticAnalysisToolOptions' => null,
             'threadCount' => null,
+            'staticAnalysisTool' => null,
         ];
 
         $args = array_values(array_merge($defaultArgs, $args));

@@ -9,5 +9,8 @@
         "summary": "infection.log"
     },
     "bootstrap": "src/bootstrap.php",
+    "mutators": {
+        "PublicVisibility": true
+    },
     "tmpDir": "."
 }

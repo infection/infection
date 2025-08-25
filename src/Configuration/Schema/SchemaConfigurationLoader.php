@@ -48,10 +48,13 @@ final readonly class SchemaConfigurationLoader
         self::DEFAULT_DIST_JSON5_CONFIG_FILE,
         self::DEFAULT_DIST_JSON_CONFIG_FILE,
     ];
+
     public const DEFAULT_JSON5_CONFIG_FILE = 'infection.json5';
 
     private const DEFAULT_DIST_JSON5_CONFIG_FILE = 'infection.json5.dist';
+
     private const DEFAULT_DIST_JSON_CONFIG_FILE = 'infection.json.dist';
+
     private const DEFAULT_JSON_CONFIG_FILE = 'infection.json';
 
     public function __construct(

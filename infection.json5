@@ -1,6 +1,7 @@
 {
     "$schema": "./resources/schema.json",
     "timeout": 25,
+    "threads": "max",
     "source": {
         "directories": [
             "src"
@@ -43,20 +44,5 @@
             "Assert::.*"
         ],
         "@default": true,
-        "InstanceOf_": {
-            ignore: [
-                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
-            ]
-        },
-        "LogicalAnd": {
-            ignore: [
-                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
-            ]
-        },
-        "LogicalOr": {
-            ignore: [
-                "Infection\\Mutator\\Boolean\\LogicalOr::canMutate"
-            ]
-        }
     }
 }

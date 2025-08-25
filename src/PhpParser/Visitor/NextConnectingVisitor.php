@@ -33,59 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Boolean;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
-use PhpParser\Node\Expr;
+use PhpParser\NodeVisitorAbstract;
 
 /**
+ * Connects sequential statement nodes by adding a "next" attribute pointing to the following statement.
+ * This visitor tracks execution order between statements only (ignoring expressions and other non-statement nodes),
+ * while skipping comment nodes (Nop) and resetting the chain at function boundaries.
+ *
  * @internal
- *
- * @deprecated This mutator is a semantic addition
- *
- * @extends  AbstractIdenticalComparison<Node\Expr\BinaryOp\Identical>
  */
-final class IdenticalEqual extends AbstractIdenticalComparison
+final class NextConnectingVisitor extends NodeVisitorAbstract
 {
-    use GetMutatorName;
+    public const NEXT_ATTRIBUTE = 'next';
 
-    public static function getDefinition(): Definition
+    private ?Node $previous = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function beforeTraverse(array $nodes)
     {
-        return new Definition(
-            <<<'TXT'
-                Replaces a strict comparison (using the identical operator (`===`)) with a loose comparison (using
-                the loose operator (`==`)).
-                TXT
-            ,
-            MutatorCategory::SEMANTIC_ADDITION,
-            null,
-            <<<'DIFF'
-                - $a = $b === $c;
-                + $a = $b == $c;
-                DIFF,
-        );
+        $this->previous = null;
+
+        return null;
     }
 
     /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<Expr\BinaryOp\Equal>
+     * {@inheritDoc}
      */
-    public function mutate(Node $node): iterable
+    public function enterNode(Node $node)
     {
-        yield new Expr\BinaryOp\Equal($node->left, $node->right, $node->getAttributes());
-    }
+        if ($node instanceof Node\FunctionLike) {
+            $this->previous = null;
 
-    public function canMutate(Node $node): bool
-    {
-        if (!$node instanceof Expr\BinaryOp\Identical) {
-            return false;
+            return null;
         }
 
-        return !$this->isSameTypeIdenticalComparison($node);
+        // We only interested in statements, not their sub-nodes
+        if (!$node instanceof Node\Stmt) {
+            return null;
+        }
+
+        // We do not account comment nodes for next connections
+        if ($node instanceof Node\Stmt\Nop) {
+            return null;
+        }
+
+        $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
+        $this->previous = $node;
+
+        return null;
     }
 }

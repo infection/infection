@@ -85,6 +85,8 @@ final class LogicalOrTest extends BaseMutatorTestCase
         yield from self::mutableSmallerAndGreaterMatrixMutationsProvider();
 
         yield from self::smallerAndGreaterMatrixWithSameValueMutationsProvider();
+
+        yield from self::instanceOfMutationsProvider();
     }
 
     private static function equalityMutationsProvider(): iterable
@@ -517,6 +519,66 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 $myVar <= 10.1 && $myVar > 5;
                 PHP,
         ];
+
+        yield 'It mutates logical or when used with 2 variables' => [
+            <<<'PHP'
+                <?php
+
+                $myVar <= $other || $myVar > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $myVar <= $other && $myVar > 5;
+                PHP,
+        ];
+
+        yield 'It mutates logical or when used with 2 variables (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                $myVar <= 5 || $myVar > $other;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $myVar <= 5 && $myVar > $other;
+                PHP,
+        ];
+
+        yield 'It mutates logical or when used with variable variables' => [
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= ${$s} || $myVar > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= ${$s} && $myVar > 5;
+                PHP,
+        ];
+
+        yield 'It mutates logical or when used with variable variables (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= 5 || $myVar > ${$s};
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $s = 'other';
+                $myVar <= 5 && $myVar > ${$s};
+                PHP,
+        ];
     }
 
     private static function smallerAndGreaterMatrixWithSameValueMutationsProvider(): iterable
@@ -595,6 +657,125 @@ final class LogicalOrTest extends BaseMutatorTestCase
 
                 $myVar > 5 || $myVar <= 5;
                 PHP,
+        ];
+    }
+
+    private static function instanceOfMutationsProvider(): iterable
+    {
+        yield 'It mutates negated instanceof with 1 concrete class and 1 trait' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec || $node instanceof Infection\Tests\Mutant\MutantAssertions;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec && $node instanceof Infection\Tests\Mutant\MutantAssertions;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates negated instanceof with 1 concrete class and 1 interface' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable || $node instanceof Node\Expr\PostDec;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable && $node instanceof Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates negated instanceof with 1 concrete class and 1 interface (inverse)' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec || $node instanceof \Countable;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof Node\Expr\PostDec && $node instanceof \Countable;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates negated instanceof with 2 concrete classes (different variables)' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node1 instanceof PhpParser\Node\Expr\PreDec || $node2 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node1 instanceof PhpParser\Node\Expr\PreDec && $node2 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates variable instanceof' => [
+            <<<'PHP'
+                <?php
+
+                $class = PhpParser\Node\Expr\PreDec::class;
+                $var = $node1 instanceof $class || $node1 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $class = PhpParser\Node\Expr\PreDec::class;
+                $var = $node1 instanceof $class && $node1 instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate negated instanceof with 2 concrete classes (same variable)' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof PhpParser\Node\Expr\PreDec || $node instanceof PhpParser\Node\Expr\PostDec;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates left-side instanceof or non-instanceof expression' => [
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable || $i > 5;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $node instanceof \Countable && $i > 5;
+                PHP
+            ,
+        ];
+
+        yield 'It mutates right-side instanceof or non-instanceof expression' => [
+            <<<'PHP'
+                <?php
+
+                $var = $i > 5 || $node instanceof \Countable;
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                $var = $i > 5 && $node instanceof \Countable;
+                PHP
+            ,
         ];
     }
 }

@@ -54,9 +54,12 @@ use Webmozart\Assert\Assert;
 class Mutation
 {
     private readonly string $mutatorClass;
+
     /** @var array<string|int|float> */
     private readonly array $attributes;
+
     private readonly bool $coveredByTests;
+
     private ?float $nominalTimeToTest = null;
 
     private ?string $hash = null;

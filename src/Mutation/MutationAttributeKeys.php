@@ -45,10 +45,15 @@ final class MutationAttributeKeys
     use CannotBeInstantiated;
 
     public const START_LINE = 'startLine';
+
     public const END_LINE = 'endLine';
+
     public const START_TOKEN_POS = 'startTokenPos';
+
     public const END_TOKEN_POS = 'endTokenPos';
+
     public const START_FILE_POS = 'startFilePos';
+
     public const END_FILE_POS = 'endFilePos';
 
     public const ALL = [

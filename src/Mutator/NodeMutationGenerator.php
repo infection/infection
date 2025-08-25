@@ -38,7 +38,6 @@ namespace Infection\Mutator;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\FilesDiffChangedLines;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -60,9 +59,12 @@ class NodeMutationGenerator
     private readonly array $mutators;
 
     private Node $currentNode;
+
     /** @var TestLocation[]|null */
     private ?array $testsMemoized = null;
+
     private ?bool $isOnFunctionSignatureMemoized = null;
+
     private ?bool $isInsideFunctionMemoized = null;
 
     /**
@@ -101,7 +103,7 @@ class NodeMutationGenerator
             return;
         }
 
-        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine(), $this->gitDiffBase ?? GitDiffFileProvider::DEFAULT_BASE)) {
+        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine(), $this->gitDiffBase)) {
             return;
         }
 

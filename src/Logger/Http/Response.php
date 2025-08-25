@@ -43,7 +43,9 @@ use Webmozart\Assert\Assert;
 final class Response
 {
     public const HTTP_OK = 200;
+
     public const HTTP_CREATED = 201;
+
     public const HTTP_MAX_ERROR_CODE = 599;
 
     private readonly int $statusCode;

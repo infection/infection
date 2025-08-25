@@ -46,6 +46,7 @@ use function mb_strrpos;
 use function mb_substr;
 use function Safe\preg_match_all;
 use function sprintf;
+use function str_replace;
 use function str_starts_with;
 use function substr;
 use function substr_replace;
@@ -59,6 +60,10 @@ class DiffColorizer
 {
     public function colorize(string $diff): string
     {
+        // escape symfony console style like tags, so they don't mix up infections own output styles
+        // see https://symfony.com/doc/current/console/coloring.html
+        $diff = str_replace('<', '\<', $diff);
+
         // fallback for cases when diff has multiple added new lines
         if ($this->isMultiLineDiff($diff)) {
             return $this->simpleMultilineColorize($diff);
@@ -94,16 +99,18 @@ class DiffColorizer
         $previousLineLength = mb_strlen($previousLine);
         $nextLineLength = mb_strlen($nextLine);
 
-        $start = $previousLineLength;
-
-        while ($start !== 0 && mb_strpos($nextLine, mb_substr($previousLine, 0, $start)) !== 0) {
-            --$start;
+        for ($start = $previousLineLength; $start !== 0; --$start) {
+            if (mb_strpos($nextLine, mb_substr($previousLine, 0, $start)) === 0) {
+                break;
+            }
         }
 
-        $end = $start;
+        for ($end = $start; $end < $previousLineLength; ++$end) {
+            $t = mb_substr($previousLine, $end);
 
-        while ($end < $previousLineLength && mb_strrpos($nextLine, $t = mb_substr($previousLine, $end), $start) !== ($nextLineLength - mb_strlen($t))) {
-            ++$end;
+            if (mb_strrpos($nextLine, $t, $start) === ($nextLineLength - mb_strlen($t))) {
+                break;
+            }
         }
 
         $return = $previousLine;

@@ -97,7 +97,7 @@ final class Multiplication implements Mutator
             return false;
         }
 
-        $functionScope = $node->getAttribute(ReflectionVisitor::FUNCTION_SCOPE_KEY);
+        $functionScope = ReflectionVisitor::findFunctionScope($node);
 
         if (!$functionScope instanceof Node\Stmt\ClassMethod) {
             return true;

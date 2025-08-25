@@ -199,7 +199,6 @@ final class MutatorFactoryTest extends TestCase
         $this->assertCount(count($expectedMutatorClassNames), $actualMutators);
 
         $decoratedMutatorReflection = (new ReflectionClass(IgnoreMutator::class))->getProperty('mutator');
-        $decoratedMutatorReflection->setAccessible(true);
 
         foreach (array_values($actualMutators) as $index => $mutator) {
             $this->assertInstanceOf(Mutator::class, $mutator);

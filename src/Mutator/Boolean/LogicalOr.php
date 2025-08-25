@@ -36,12 +36,17 @@ declare(strict_types=1);
 namespace Infection\Mutator\Boolean;
 
 use function array_intersect;
+use function in_array;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\Util\NameResolver;
+use function is_string;
 use LogicException;
 use PhpParser\Node;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * @internal
@@ -51,6 +56,8 @@ use PhpParser\Node;
 final class LogicalOr implements Mutator
 {
     use GetMutatorName;
+
+    private ?string $seenVariabeName = null;
 
     public static function getDefinition(): Definition
     {
@@ -87,11 +94,21 @@ final class LogicalOr implements Mutator
         $nodeRight = $node->right;
 
         if (
+            $nodeLeft instanceof Node\Expr\Instanceof_
+            && $nodeRight instanceof Node\Expr\Instanceof_
+        ) {
+            return $this->isInstanceOfConditionMutable($nodeLeft) || $this->isInstanceOfConditionMutable($nodeRight);
+        }
+
+        if (
             !$nodeLeft instanceof Node\Expr\BinaryOp
             || !$nodeRight instanceof Node\Expr\BinaryOp
         ) {
             return true;
         }
+
+        $leftSigil = $nodeLeft->getOperatorSigil();
+        $rightSigil = $nodeRight->getOperatorSigil();
 
         $nodeLeftLeft = $nodeLeft->left;
         $nodeLeftRight = $nodeLeft->right;
@@ -99,10 +116,7 @@ final class LogicalOr implements Mutator
         $nodeRightLeft = $nodeRight->left;
         $nodeRightRight = $nodeRight->right;
 
-        if (
-            $nodeLeft instanceof Node\Expr\BinaryOp\Identical
-            && $nodeRight instanceof Node\Expr\BinaryOp\Identical
-        ) {
+        if ($leftSigil === '===' && $rightSigil === '===') {
             $varNameLeft = [];
 
             if ($nodeLeftLeft instanceof Node\Expr\Variable) {
@@ -126,39 +140,11 @@ final class LogicalOr implements Mutator
             return array_intersect($varNameLeft, $varNameRight) === [];
         }
 
+        $compareSigils = ['>', '<', '>=', '<='];
+
         if (
-            (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
-                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Greater
-                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\SmallerOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\GreaterOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\Smaller
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
-                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\Smaller
-                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\GreaterOrEqual
-            )
-            || (
-                $nodeLeft instanceof Node\Expr\BinaryOp\SmallerOrEqual
-                && $nodeRight instanceof Node\Expr\BinaryOp\Greater
-            )
+            in_array($leftSigil, $compareSigils, true)
+            && in_array($rightSigil, $compareSigils, true)
         ) {
             $varNameLeft = null;
             $valueLeft = null;
@@ -218,7 +204,7 @@ final class LogicalOr implements Mutator
                 return true;
             }
 
-            return (match ("{$nodeLeft->getOperatorSigil()}::{$nodeRight->getOperatorSigil()}") {
+            return (match ("{$leftSigil}::{$rightSigil}") {
                 '<::>' => static fn () => $valueRight < $valueLeft, // a<5 && a>7; 7<a<5; 7<5;
                 '<::>=' => static fn () => $valueRight < $valueLeft, // a<5 && a>=7; 7<=a<5; 7<5;
                 '<=::>=' => static fn () => $valueRight <= $valueLeft, // a<=5 && a>=7; 7<=a<=5; 7<=5;
@@ -229,6 +215,36 @@ final class LogicalOr implements Mutator
                 '>=::<' => static fn () => $valueRight > $valueLeft, // a>=5 && a<7; 7>a>=5; 7>5;
                 default => throw new LogicException('This is an unreachable statement.'),
             })();
+        }
+
+        return true;
+    }
+
+    private function isInstanceOfConditionMutable(Node\Expr\Instanceof_ $node): bool
+    {
+        if (
+            $node->expr instanceof Node\Expr\Variable
+            && is_string($node->expr->name)
+            && $node->class instanceof Node\Name
+        ) {
+            if ($this->seenVariabeName === null) {
+                $this->seenVariabeName = $node->expr->name;
+            } else {
+                if ($this->seenVariabeName !== $node->expr->name) {
+                    return true;
+                }
+            }
+
+            $resolvedName = NameResolver::resolveName($node->class);
+
+            try {
+                $reflectionClass = new ReflectionClass($resolvedName->name); // @phpstan-ignore argument.type
+
+                if (!$reflectionClass->isInterface() && !$reflectionClass->isTrait()) {
+                    return false;
+                }
+            } catch (ReflectionException) {
+            }
         }
 
         return true;

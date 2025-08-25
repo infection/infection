@@ -47,7 +47,9 @@ use Webmozart\Assert\Assert;
 final class TestFrameworkTypes
 {
     public const PHPUNIT = 'phpunit';
+
     public const PHPSPEC = 'phpspec';
+
     public const CODECEPTION = 'codeception';
 
     /**

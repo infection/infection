@@ -57,9 +57,13 @@ final class PhpUnitAdapterTest extends TestCase
     private $adapter;
 
     private $pcovDirectoryProvider;
+
     private $initialConfigBuilder;
+
     private $mutationConfigBuilder;
+
     private $cliArgumentsBuilder;
+
     private $commandLineBuilder;
 
     protected function setUp(): void

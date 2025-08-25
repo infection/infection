@@ -65,7 +65,10 @@ final readonly class NodeTraverserFactory
 
         return new NodeTraverser(
             // ApplyUserSelectionVisitor    // only if user did a selection
-            new ExcludeUncoveredNodesVisitor($this->tracer),
+            new ExcludeUncoveredNodesVisitor(
+                $this->tracer,
+                $context,
+            ),
             // new ExcludeUnchangedNodesVisitor(), // only if we do a diff execution
             new ExcludeIgnoredNodesVisitor(),
             //  new AddTypesVisitor(),  // TODO

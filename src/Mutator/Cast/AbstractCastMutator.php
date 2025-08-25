@@ -69,7 +69,7 @@ abstract class AbstractCastMutator implements Mutator
 
             if (
                 $functionScope !== null
-                && $functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === true
+                && ReflectionVisitor::isStrictTypesEnabled($functionScope) === true
             ) {
                 return true;
             }
@@ -79,7 +79,7 @@ abstract class AbstractCastMutator implements Mutator
             $functionScope = $this->findFunctionScope($parent);
 
             if ($functionScope !== null) {
-                if ($functionScope->getAttribute(ReflectionVisitor::STRICT_TYPES_KEY) === false) {
+                if (ReflectionVisitor::isStrictTypesEnabled($functionScope) === false) {
                     return false;
                 }
 

@@ -88,6 +88,9 @@ final class TextFileLoggerTest extends TestCase
             false,
             false,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -108,6 +111,8 @@ final class TextFileLoggerTest extends TestCase
             false,
             false,
             <<<'TXT'
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -140,6 +145,8 @@ final class TextFileLoggerTest extends TestCase
             false,
             true,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+
                 Escaped mutants:
                 ================
 
@@ -192,6 +199,9 @@ final class TextFileLoggerTest extends TestCase
             true,
             false,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -209,6 +219,8 @@ final class TextFileLoggerTest extends TestCase
             true,
             false,
             <<<'TXT'
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -238,6 +250,8 @@ final class TextFileLoggerTest extends TestCase
             true,
             true,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+
                 Escaped mutants:
                 ================
 
@@ -287,6 +301,9 @@ final class TextFileLoggerTest extends TestCase
             false,
             false,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -386,6 +403,8 @@ final class TextFileLoggerTest extends TestCase
             false,
             false,
             <<<'TXT'
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -597,6 +616,8 @@ final class TextFileLoggerTest extends TestCase
             false,
             true,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+
                 Escaped mutants:
                 ================
 
@@ -938,6 +959,9 @@ final class TextFileLoggerTest extends TestCase
             true,
             false,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -1014,6 +1038,8 @@ final class TextFileLoggerTest extends TestCase
             true,
             false,
             <<<'TXT'
+                Note: Pass `--debug` to log test-framework output.
+
                 Escaped mutants:
                 ================
 
@@ -1198,6 +1224,8 @@ final class TextFileLoggerTest extends TestCase
             true,
             true,
             <<<'TXT'
+                Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.
+
                 Escaped mutants:
                 ================
 

@@ -167,6 +167,19 @@ final class TrueValueTest extends BaseMutatorTestCase
             ,
         ];
 
+        yield 'It does not mutate match(true) to prevent overlap with MatchArmRemoval' => [
+            <<<'PHP'
+                <?php
+
+                match(true) {
+                    $count > 0 && $count <= 10 => 'small',
+                    $count <= 50 => 'medium',
+                    $count > 50 => 'huge',
+                };
+                PHP
+            ,
+        ];
+
         yield 'It mutates all caps true to false' => [
             <<<'PHP'
                 <?php

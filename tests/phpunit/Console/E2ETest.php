@@ -85,8 +85,11 @@ final class E2ETest extends TestCase
      * This group must be excluded from E2E testing to avoid endless recursive testing loop situation.
      */
     private const EXCLUDED_GROUP = 'integration';
+
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
+
     private const EXPECT_ERROR = 1;
+
     private const EXPECT_SUCCESS = 0;
 
     /**

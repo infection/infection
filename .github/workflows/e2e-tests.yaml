@@ -17,6 +17,7 @@ concurrency:
 jobs:
   tests:
     runs-on: ${{ matrix.operating-system }}
+    timeout-minutes: 30
 
     strategy:
       matrix:
@@ -56,6 +57,11 @@ jobs:
       - name: Remove the configured PHP platform
         if: matrix.dependencies != 'locked'
         run: composer config --unset platform.php
+
+      - name: Configure for PHP >= 8.4
+        if: "matrix.php-version >= '8.4'"
+        run: |
+          composer config platform.php 8.4.99
 
       - name: Get composer cache directory
         id: composer-cache
@@ -135,6 +141,7 @@ jobs:
   tests-status:
       name: E2E Tests Status
       runs-on: ubuntu-latest
+      timeout-minutes: 30
       needs: tests
       if: always()
       steps:

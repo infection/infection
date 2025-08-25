@@ -76,10 +76,16 @@ class BufferedSourceFileFilter implements FileFilter
         }
     }
 
+    /**
+     * We duck-typed the input to be iterable<SplFileInfo|Trace> in the interface,
+     * but we actually only use iterable<Trace> here.
+     */
     public function filter(iterable $input): iterable
     {
         return take($this->filter->filter($input))
-            ->filter(function (Trace $trace): bool {
+            ->filter(function ($trace): bool {
+                Assert::isInstanceOf($trace, Trace::class);
+
                 $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
                 Assert::string($traceRealPath);
