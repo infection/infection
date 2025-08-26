@@ -51,6 +51,11 @@ final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
+    /**
+     * @param string[] $sourceDirectories
+     * @param string[] $excludedFilesOrDirectories
+     * @param list<string> $expected
+     */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(
         array $sourceDirectories,
@@ -64,7 +69,9 @@ final class SourceFileCollectorTest extends TestCase
         $normalizedActual = self::normalizePaths($actual, self::FIXTURES_ROOT);
 
         $this->assertSame($expected, $normalizedActual);
-        $this->assertIsList($normalizedActual);
+        $this->assertIsList(
+            take($actual)->toAssoc(),
+        );
     }
 
     public static function sourceFilesProvider(): iterable
