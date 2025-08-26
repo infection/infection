@@ -47,13 +47,13 @@ class SourceFileCollector
 {
     /**
      * @param string[] $sourceDirectories
-     * @param string[] $excludeDirectories
+     * @param string[] $excludedFilesOrDirectories
      *
      * @return iterable<SplFileInfo>
      */
     public function collectFiles(
         array $sourceDirectories,
-        array $excludeDirectories,
+        array $excludedFilesOrDirectories,
     ): iterable {
         if ($sourceDirectories === []) {
             return [];
@@ -61,8 +61,8 @@ class SourceFileCollector
 
         return Finder::create()
             ->in($sourceDirectories)
-            ->exclude($excludeDirectories)
-            ->notPath($excludeDirectories)
+            ->exclude($excludedFilesOrDirectories)
+            ->notPath($excludedFilesOrDirectories)
             ->files()
             ->name('*.php')
         ;
