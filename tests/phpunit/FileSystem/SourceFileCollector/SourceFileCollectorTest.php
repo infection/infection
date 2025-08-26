@@ -43,6 +43,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(SourceFileCollector::class)]
@@ -50,6 +51,11 @@ final class SourceFileCollectorTest extends TestCase
 {
     private const FIXTURES = __DIR__ . '/Fixtures';
 
+    /**
+     * @param string[] $sourceDirectories
+     * @param string[] $excludedFiles
+     * @param list<string> $expected
+     */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
     {
@@ -66,6 +72,9 @@ final class SourceFileCollectorTest extends TestCase
         $this->assertIsList($files);
     }
 
+    /**
+     * @return iterable<string, array{string[], string[], list<string>}>
+     */
     public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
@@ -156,7 +165,7 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param string[] $files
+     * @param SplFileInfo[] $files
      *
      * @return string[] File real paths relative to the current temporary directory
      */
@@ -166,7 +175,7 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = array_values(
             array_map(
-                static fn (string $file): string => Path::makeRelative($file, $root),
+                static fn (SplFileInfo $fileInfo): string => Path::makeRelative($fileInfo->getPathname(), $root),
                 $files,
             ),
         );
