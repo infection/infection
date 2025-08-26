@@ -901,7 +901,7 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollector\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$excludedFiles with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollector\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$excludedFilesOrDirectories with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
