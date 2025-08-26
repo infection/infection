@@ -53,7 +53,7 @@ final class SourceFileCollectorTest extends TestCase
 
     /**
      * @param string[] $sourceDirectories
-     * @param string[] $excludedFiles
+     * @param string[] $excludedFilesOrDirectories
      * @param list<string> $expected
      */
     #[DataProvider('sourceFilesProvider')]
