@@ -54,11 +54,11 @@ final class SourceFileCollectorTest extends TestCase
     private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
 
     #[DataProvider('sourceFilesProvider')]
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
+    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expected): void
     {
         $root = self::FIXTURES;
 
-        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles);
+        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
 
         $files = take($files)->toList();
 
