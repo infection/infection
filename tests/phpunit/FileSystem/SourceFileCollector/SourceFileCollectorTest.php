@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
+namespace Infection\Tests\FileSystem\SourceFileCollector;
 
 use function array_map;
 use function array_values;
@@ -48,7 +48,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/../Fixtures/Files/SourceFileCollector';
+    private const FIXTURES = __DIR__ . '/Fixtures';
 
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void

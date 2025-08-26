@@ -901,28 +901,28 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$excludedFiles with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollector\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$excludedFiles with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollector\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$sourceDirectories with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\FileSystem\\SourceFileCollector\\SourceFileCollectorTest\:\:test_it_can_collect_files\(\) has parameter \$sourceDirectories with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
 
 		-
-			message: '#^Parameter \#1 \$files of static method Infection\\Tests\\FileSystem\\SourceFileCollectorTest\:\:normalizePaths\(\) expects array\<string\>, list\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			message: '#^Parameter \#1 \$files of static method Infection\\Tests\\FileSystem\\SourceFileCollector\\SourceFileCollectorTest\:\:normalizePaths\(\) expects array\<string\>, list\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileCollectorTest.php
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
 
 		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
