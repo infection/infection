@@ -57,11 +57,11 @@ final class SourceFileCollectorTest extends TestCase
      * @param list<string> $expected
      */
     #[DataProvider('sourceFilesProvider')]
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFiles, array $expected): void
+    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expected): void
     {
         $root = self::FIXTURES;
 
-        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFiles);
+        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
 
         $files = take($files)->toList();
 
