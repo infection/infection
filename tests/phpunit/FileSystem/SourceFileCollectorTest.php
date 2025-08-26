@@ -35,17 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use function array_keys;
 use function array_map;
 use function array_values;
-use function count;
 use Infection\FileSystem\SourceFileCollector;
 use function natcasesort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use function range;
 use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(SourceFileCollector::class)]
@@ -66,14 +63,7 @@ final class SourceFileCollectorTest extends TestCase
             $expected,
             self::normalizePaths($files, $root),
         );
-
-        if ($files !== []) {
-            $this->assertSame(
-                range(0, count($files) - 1),
-                array_keys($files),
-                'Expected the collected files to be a list',
-            );
-        }
+        $this->assertIsList($files);
     }
 
     public static function sourceFilesProvider(): iterable
