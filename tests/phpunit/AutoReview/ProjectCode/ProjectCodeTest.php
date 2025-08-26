@@ -77,12 +77,14 @@ final class ProjectCodeTest extends TestCase
     {
         $testClassName = SourceTestClassNameScheme::getTestClassName($className);
 
-        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false) {
+        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false
+            && in_array($className, ProjectCodeProvider::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION, true) === false
+        ) {
             $this->assertTrue(
                 class_exists($testClassName, true),
                 sprintf(
                     'Could not find the test "%s" for the class "%s". Please either add it'
-                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES',
+                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES or ::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION',
                     $testClassName,
                     $className,
                     ProjectCodeProvider::class,
