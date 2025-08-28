@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationAnalysisWasFinished;
 use Infection\Logger\MutationTestingResultsLogger;
 
 /**
@@ -48,7 +48,7 @@ final readonly class MutationTestingResultsLoggerSubscriber implements EventSubs
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function onMutationTestingWasFinished(MutationAnalysisWasFinished $event): void
     {
         $this->logger->log();
     }

@@ -40,9 +40,9 @@ use function floor;
 use Generator;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\MutantAnalysisWasFinished;
+use Infection\Event\MutationAnalysisWasFinished;
+use Infection\Event\MutationAnalysisWasStarted;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\MutationTestingResultsLogger;
@@ -87,21 +87,21 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
 
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    public function onMutationTestingWasStarted(MutationAnalysisWasStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();
 
         $this->outputFormatter->start($this->mutationCount);
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutantProcessWasFinished(MutantAnalysisWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
         $this->outputFormatter->advance($executionResult, $this->mutationCount);
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function onMutationTestingWasFinished(MutationAnalysisWasFinished $event): void
     {
         $this->outputFormatter->finish();
 

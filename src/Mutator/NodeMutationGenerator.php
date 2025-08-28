@@ -150,6 +150,7 @@ class NodeMutationGenerator
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests,
+                $this->trace,
             );
 
             ++$mutationByMutatorIndex;

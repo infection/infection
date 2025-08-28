@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutantAnalysisWasFinished;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Metrics\Collector;
 use Infection\Mutant\MutantExecutionResult;
@@ -67,7 +67,7 @@ final class MutationTestingResultsCollectorSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(
-            new MutantProcessWasFinished(
+            new MutantAnalysisWasFinished(
                 $this->createMock(MutantExecutionResult::class),
             ),
         );

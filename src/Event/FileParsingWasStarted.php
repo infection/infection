@@ -35,21 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\TestFramework\Coverage\Trace;
 
 /**
  * @internal
- * @final
  */
-class MutantProcessWasFinished
+final readonly class FileParsingWasStarted
 {
-    public function __construct(
-        private readonly MutantExecutionResult $executionResult,
-    ) {
-    }
-
-    public function getExecutionResult(): MutantExecutionResult
+    public function __construct(public Trace $trace)
     {
-        return $this->executionResult;
     }
 }

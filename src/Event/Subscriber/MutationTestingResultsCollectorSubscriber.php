@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutantAnalysisWasFinished;
 use Infection\Metrics\Collector;
 
 /**
@@ -51,7 +51,7 @@ final class MutationTestingResultsCollectorSubscriber implements EventSubscriber
         $this->collectors = $collectors;
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutantProcessWasFinished(MutantAnalysisWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 

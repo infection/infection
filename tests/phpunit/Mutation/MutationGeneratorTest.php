@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\FileParsingWasFinished;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
 use Infection\Mutation\FileMutationGenerator;
@@ -132,8 +132,8 @@ final class MutationGeneratorTest extends TestCase
             ->method('dispatch')
             ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(2)],
-                [new MutableFileWasProcessed()],
-                [new MutableFileWasProcessed()],
+                [new FileParsingWasFinished()],
+                [new FileParsingWasFinished()],
                 [new MutationGenerationWasFinished()],
             ))
         ;
@@ -191,8 +191,8 @@ final class MutationGeneratorTest extends TestCase
             ->method('dispatch')
             ->with(...WithConsecutive::create(
                 [new MutationGenerationWasStarted(0)],
-                [new MutableFileWasProcessed()],
-                [new MutableFileWasProcessed()],
+                [new FileParsingWasFinished()],
+                [new FileParsingWasFinished()],
                 [new MutationGenerationWasFinished()],
             ))
         ;

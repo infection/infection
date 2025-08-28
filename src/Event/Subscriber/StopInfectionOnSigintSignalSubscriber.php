@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function function_exists;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\MutationAnalysisWasStarted;
 use function Safe\pcntl_signal;
 use const SIGINT;
 
@@ -45,7 +45,7 @@ use const SIGINT;
  */
 final class StopInfectionOnSigintSignalSubscriber implements EventSubscriber
 {
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    public function onMutationTestingWasStarted(MutationAnalysisWasStarted $event): void
     {
         if (!function_exists('pcntl_signal')) {
             return;

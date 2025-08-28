@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Telemetry\Reporter\TracerDumper;
+use Infection\Telemetry\Tracing\Tracer;
+use Symfony\Component\Filesystem\Filesystem;
 use function extension_loaded;
 use function implode;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -431,6 +434,18 @@ final class RunCommand extends BaseCommand
             );
 
             $engine->execute();
+
+            // TODO: adjust
+            $trace = $container->get(Tracer::class)->getTrace();
+            $testDir = __DIR__.'/../../build/trace';
+            $filesystem = $container->get(Filesystem::class);
+            $filesystem->mkdir($testDir);
+
+            $reporter = new TracerDumper(
+                $filesystem,
+                $testDir,
+            );
+            $reporter->report($trace);
 
             return true;
         } catch (NoFilesInDiffToMutate|NoLineExecutedInDiffLinesMode $e) {

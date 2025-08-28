@@ -38,9 +38,9 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\MutantAnalysisWasFinished;
+use Infection\Event\MutationAnalysisWasFinished;
+use Infection\Event\MutationAnalysisWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
@@ -122,7 +122,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $processRunner = $this->createMock(ProcessRunner::class);
 
-        $dispatcher->dispatch(new MutationTestingWasStarted(1, $processRunner));
+        $dispatcher->dispatch(new MutationAnalysisWasStarted(1, $processRunner));
     }
 
     public function test_it_reacts_on_mutation_process_finished(): void
@@ -148,7 +148,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(
-            new MutantProcessWasFinished(
+            new MutantAnalysisWasFinished(
                 $this->createMock(MutantExecutionResult::class),
             ),
         );
@@ -172,7 +172,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
     }
 
     public function test_it_outputs_escaped_mutants_when_mutation_testing_is_finished(): void
@@ -212,7 +212,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringContainsString(
             "\nEscaped mutants:\n================\n",
@@ -279,7 +279,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringContainsString(
             "\n\nMetrics:\n",
@@ -381,7 +381,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringContainsString(
             "\n\nMetrics:\n",
@@ -464,7 +464,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $output = $this->getDisplay($output);
         $this->assertStringContainsString(
@@ -498,7 +498,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringContainsString(
             "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.',
@@ -522,7 +522,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringNotContainsString(
             "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
@@ -563,7 +563,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringContainsString(
             "\n\n\n" . '... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.',
@@ -604,7 +604,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $this->assertStringNotContainsString(
             'mutants were omitted.',
@@ -633,7 +633,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
     }
 
     public function test_it_shows_mutation_score_indicator_when_flag_is_true(): void
@@ -668,7 +668,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             true, // showMutationScoreIndicator = true
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $displayOutput = $this->getDisplay($output);
 
@@ -709,7 +709,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             false, // showMutationScoreIndicator = false
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationAnalysisWasFinished());
 
         $displayOutput = $this->getDisplay($output);
 

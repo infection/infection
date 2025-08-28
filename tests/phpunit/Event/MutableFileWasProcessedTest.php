@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\FileParsingWasFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutableFileWasProcessed::class)]
+#[CoversClass(FileParsingWasFinished::class)]
 final class MutableFileWasProcessedTest extends TestCase
 {
     /**
@@ -47,8 +47,8 @@ final class MutableFileWasProcessedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new MutableFileWasProcessed();
+        $class = new FileParsingWasFinished();
 
-        $this->assertInstanceOf(MutableFileWasProcessed::class, $class);
+        $this->assertInstanceOf(FileParsingWasFinished::class, $class);
     }
 }

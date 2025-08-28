@@ -33,35 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event;
 
-use Infection\Resource\Listener\PerformanceLoggerSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
+ * @final
  */
-final readonly class PerformanceLoggerSubscriberFactory implements SubscriberFactory
+// TODO: check why not final readonly here?
+class MutantAnalysisWasFinished
 {
     public function __construct(
-        private Stopwatch $stopwatch,
-        private TimeFormatter $timeFormatter,
-        private MemoryFormatter $memoryFormatter,
-        private int $threadCount,
+        private readonly MutantExecutionResult $executionResult,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function getExecutionResult(): MutantExecutionResult
     {
-        return new PerformanceLoggerSubscriber(
-            $this->stopwatch,
-            $this->timeFormatter,
-            $this->memoryFormatter,
-            $this->threadCount,
-            $output,
-        );
+        return $this->executionResult;
     }
 }

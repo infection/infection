@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Differ\FilesDiffChangedLines;
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\FileParsingWasFinished;
+use Infection\Event\FileParsingWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -61,6 +64,7 @@ class FileMutationGenerator
         private readonly FilesDiffChangedLines $filesDiffChangedLines,
         private readonly bool $isForGitDiffLines,
         private readonly ?string $gitDiffBase,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -84,6 +88,8 @@ class FileMutationGenerator
         if ($onlyCovered && !$trace->hasTests()) {
             return;
         }
+
+        $this->eventDispatcher->dispatch(new FileParsingWasStarted($trace));
 
         $initialStatements = $this->parser->parse($trace->getSourceFileInfo());
 
@@ -109,5 +115,7 @@ class FileMutationGenerator
         $traverser->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();
+
+        $this->eventDispatcher->dispatch(new FileParsingWasFinished($trace));
     }
 }

@@ -35,9 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
+use Infection\TestFramework\Coverage\Trace;
+
 /**
  * @internal
  */
-final class MutationTestingWasFinished
+final readonly class FileParsingWasFinished
 {
+    public function __construct(public Trace $trace)
+    {
+    }
 }
