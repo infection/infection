@@ -43,10 +43,10 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use newSrc\AST\NodeVisitor\NameResolverFactory;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use SplObjectStorage;
 
@@ -71,13 +71,7 @@ class NodeTraverserFactory
 
         $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                'replaceNodes' => false,
-            ]),
-        );
+        $traverser->addVisitor(NameResolverFactory::create());
         $traverser->addVisitor(new ParentConnectingVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
         $traverser->addVisitor($mutationVisitor);
