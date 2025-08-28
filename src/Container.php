@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -67,9 +66,9 @@ use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
+use Infection\Event\Subscriber\TracingSubscriberFactory;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -120,6 +119,14 @@ use Infection\Resource\Time\TimeFormatter;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Metric\GarbageCollection\GarbageCollectorInspector;
+use Infection\Telemetry\Metric\GarbageCollection\SystemGarbageCollectorInspector;
+use Infection\Telemetry\Metric\Memory\MemoryInspector;
+use Infection\Telemetry\Metric\Memory\SystemMemoryInspector;
+use Infection\Telemetry\Metric\ResourceInspector;
+use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
+use Infection\Telemetry\Metric\Time\SystemStopwatch;
+use Infection\Telemetry\Tracing\Tracer;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -141,7 +148,6 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -150,12 +156,14 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
-use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function php_ini_loaded_file;
+use function sprintf;
 
 /**
  * @internal
@@ -427,11 +435,19 @@ final class Container extends DIContainer
                     !$config->mutateOnlyCoveredCode(),
                 );
             },
-            PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
-                $container->getStopwatch(),
-                $container->getTimeFormatter(),
-                $container->getMemoryFormatter(),
-                $container->getConfiguration()->getThreadCount(),
+            GarbageCollectorInspector::class => static fn (): GarbageCollectorInspector => SystemGarbageCollectorInspector::create(),
+            MemoryInspector::class => static fn (): MemoryInspector => new SystemMemoryInspector(),
+            TelemetryStopwatch::class => static fn (): TelemetryStopwatch => new SystemStopwatch(),
+            ResourceInspector::class => static fn (self $container): ResourceInspector => new ResourceInspector(
+                $container->get(TelemetryStopwatch::class),
+                $container->get(MemoryInspector::class),
+                $container->get(GarbageCollectorInspector::class),
+            ),
+            Tracer::class => static fn (self $container): Tracer => new Tracer(
+                $container->get(ResourceInspector::class),
+            ),
+            TracingSubscriberFactory::class => static fn (self $container): TracingSubscriberFactory => new TracingSubscriberFactory(
+                $container->get(Tracer::class),
             ),
             FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
                 $configuration = $container->getConfiguration();
@@ -443,6 +459,7 @@ final class Container extends DIContainer
                     $container->getFilesDiffChangedLines(),
                     $configuration->isForGitDiffLines(),
                     $configuration->getGitDiffBase(),
+                    $container->getEventDispatcher(),
                 );
             },
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
@@ -785,9 +802,9 @@ final class Container extends DIContainer
         return $this->get(MutationTestingResultsLoggerSubscriberFactory::class);
     }
 
-    public function getPerformanceLoggerSubscriberFactory(): PerformanceLoggerSubscriberFactory
+    public function getPerformanceLoggerSubscriberFactory(): TracingSubscriberFactory
     {
-        return $this->get(PerformanceLoggerSubscriberFactory::class);
+        return $this->get(TracingSubscriberFactory::class);
     }
 
     public function getSourceFileCollector(): SourceFileCollector

@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Symfony\Component\Filesystem\Filesystem;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\MakeCustomMutatorCommand;
+use Infection\Command\Telemetry;
 use Infection\Command\RunCommand;
 use Infection\Container;
 use OutOfBoundsException;
@@ -107,6 +109,9 @@ final class Application extends BaseApplication
                 new RunCommand(),
                 new DescribeCommand(),
                 new MakeCustomMutatorCommand(),
+                new Telemetry\DumpTraceCommand(
+                    new Filesystem(),
+                ),
             ],
         );
 
