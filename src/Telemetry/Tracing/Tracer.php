@@ -60,20 +60,6 @@ final class Tracer implements TraceProvider
         return $span;
     }
 
-    public function createDetachedSpan(
-        string $scope,
-        string|int $id,
-    ): SpanBuilder {
-        $span = new SpanBuilder(
-            (string) $id ?? UniqueId::generate(),
-            $scope,
-            $this->inspector->snapshot(),
-        );
-        $this->allSpans[$span->id] = $span;
-
-        return $span;
-    }
-
     public function finishSpan(SpanBuilder ...$spans): void
     {
         $end = $this->inspector->snapshot();

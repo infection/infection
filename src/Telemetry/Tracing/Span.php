@@ -10,6 +10,7 @@ final readonly class Span
 {
     public function __construct(
         public string $id,
+        public string $scopeId,
         public string $scope,
         public Snapshot $start,
         public Snapshot $end,

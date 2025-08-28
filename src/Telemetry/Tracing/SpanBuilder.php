@@ -45,22 +45,6 @@ final class SpanBuilder
         $this->children[] = $span;
     }
 
-    public function withParent(
-        SpanBuilder $parent,
-        ?string $scope = null,
-    ): self
-    {
-        $newSpan = new self(
-            $this->scopeId,
-            $scope ?? $this->scope,
-            $this->start,
-        );
-
-        $parent->addChild($newSpan);
-
-        return $newSpan;
-    }
-
     public function build(): Span
     {
         if (count($this->children) > 0) {
@@ -70,6 +54,7 @@ final class SpanBuilder
         $this->assertSpanWasFinished();
 
         return new Span(
+            $this->id,
             $this->scopeId,
             $this->scope,
             $this->start,

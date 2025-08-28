@@ -10,7 +10,7 @@ use function serialize;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
-final readonly class TracerDumper implements TraceReporter, TraceProvider
+final readonly class TracerDumper implements TraceReporter
 {
     public function __construct(
         private Filesystem $filesystem,
@@ -25,12 +25,6 @@ final readonly class TracerDumper implements TraceReporter, TraceProvider
             serialize($trace),
         );
     }
-
-    public function getTrace(): Trace
-    {
-        // TODO: Implement getTrace() method.
-    }
-
     private static function createFileName(Trace $trace): string
     {
         return 'trace-'.$trace->id;
