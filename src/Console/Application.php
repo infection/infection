@@ -109,7 +109,7 @@ final class Application extends BaseApplication
                 new RunCommand(),
                 new DescribeCommand(),
                 new MakeCustomMutatorCommand(),
-                new Telemetry\DumpTraceCommand(
+                new Telemetry\ShowTraceCommand(
                     new Filesystem(),
                 ),
             ],

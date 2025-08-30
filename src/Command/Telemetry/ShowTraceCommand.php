@@ -82,7 +82,7 @@ use const PHP_SAPI;
 /**
  * @internal
  */
-final class DumpTraceCommand extends BaseCommand
+final class ShowTraceCommand extends BaseCommand
 {
     private const TRACE_PATHNAME_ARGUMENT = 'trace';
     private const FORMAT_OPTION = 'format';
@@ -96,9 +96,8 @@ final class DumpTraceCommand extends BaseCommand
     protected function configure(): void
     {
         $this
-            // TODO: dump? report? ...?
-            ->setName('telemetry:dump-trace')
-            ->setDescription('Dumps a trace')
+            ->setName('telemetry:trace:show')
+            ->setDescription('Shows a trace')
             ->addArgument(
                 self::TRACE_PATHNAME_ARGUMENT,
                 InputArgument::REQUIRED,

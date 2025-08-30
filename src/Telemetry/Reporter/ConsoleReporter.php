@@ -19,11 +19,14 @@ final readonly class ConsoleReporter implements TraceReporter
 {
     private const INDENT = '  ';
 
+    private BoxDrawer $boxDrawer;
+
     public function __construct(
         private TimeFormatter $timeFormatter,
         private MemoryFormatter $memoryFormatter,
         private IO $io,
     ) {
+        $this->boxDrawer = new BoxDrawer($io);
     }
 
     public function report(Trace $trace): void
@@ -34,8 +37,13 @@ final readonly class ConsoleReporter implements TraceReporter
         );
         $this->io->newLine();
 
-        foreach ($trace->spans as $span) {
-            $this->printSpan($span);
+        $spansCount = count($trace->spans);
+
+        foreach ($trace->spans as $index => $span) {
+            $this->printSpan(
+                $span,
+                isLast: $index === $spansCount - 1,
+            );
         }
 
 //        $totalDuration = $this->calculateTotalDuration($trace->spans);
@@ -50,16 +58,20 @@ final readonly class ConsoleReporter implements TraceReporter
 //        ]);
     }
 
-    private function printSpan(Span $span, int $depth = 0): void
+    private function printSpan(
+        Span $span,
+        int $depth = 0,
+        bool $isLast = false,
+    ): void
     {
         $indent = str_repeat(self::INDENT, $depth);
         //$duration = $this->calculateSpanDuration($span);
-        
+
         $this->io->writeln(
             sprintf(
-                '%s- %s',
+                '%s %s',
                 //'%s- %s (%s; %s)',
-                $indent,
+                $this->boxDrawer->draw($depth, $isLast),
                 $span->id,
 //                $this->timeFormatter->toHumanReadableString(
 //                    $span->duration,
@@ -69,15 +81,21 @@ final readonly class ConsoleReporter implements TraceReporter
             OutputInterface::VERBOSITY_NORMAL
         );
 
-        foreach ($span->children as $child) {
-            $this->printSpan($child, $depth + 1);
+        $childrenCount = count($span->children);
+
+        foreach ($span->children as $index => $child) {
+            $this->printSpan(
+                $child,
+                depth: $depth + 1,
+                isLast: $index === $childrenCount - 1,
+            );
         }
     }
 
     private function calculateSpanDuration(Span $span): float
     {
         $duration = $span->end->time->getDuration($span->start->time);
-        
+
         return $duration->seconds + ($duration->nanoseconds / 1_000_000_000);
     }
 
@@ -87,12 +105,12 @@ final readonly class ConsoleReporter implements TraceReporter
     private function calculateTotalDuration(array $spans): float
     {
         $totalDuration = 0.0;
-        
+
         foreach ($spans as $span) {
             $duration = $this->calculateSpanDuration($span);
             $totalDuration = max($totalDuration, $duration);
         }
-        
+
         return $totalDuration;
     }
 }

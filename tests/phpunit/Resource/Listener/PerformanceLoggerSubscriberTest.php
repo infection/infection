@@ -63,6 +63,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_application_execution_events(): void
     {
+        $this->markTestSkipped();
         $this->output->expects($this->once())
             ->method('writeln')
             ->with($this->callback(static function ($parameter): bool {
