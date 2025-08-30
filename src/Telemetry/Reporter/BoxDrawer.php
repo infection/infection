@@ -4,46 +4,53 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Reporter;
 
+use function array_key_exists;
 use function array_pop;
+use function count;
 use function end;
+use function implode;
 use function str_repeat;
 
 final class BoxDrawer
 {
-    private const INDENT = '  ';
-
     private const BOX_DRAWINGS_LIGHT_VERTICAL_AND_RIGHT = '├─';
     private const BOX_DRAWINGS_LIGHT_UP_AND_RIGHT = '└─';
     private const BOX_DRAWINGS_LIGHT_VERTICAL = '│';
     private const BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT = '┌─';
-    private const BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT = '┐';
-    private const BOX_DRAWINGS_LIGHT_UP_AND_LEFT = '┘';
-    private const BOX_DRAWINGS_LIGHT_UP_AND_HORIZONTAL = '┴─';
-    private const BOX_DRAWINGS_LIGHT_DOWN_AND_HORIZONTAL = '┬─';
-    private const BOX_DRAWINGS_LIGHT_VERTICAL_AND_HORIZONTAL = '┼─';
     private const BOX_DRAWINGS_LIGHT_HORIZONTAL = '─';
 
-    private int $drawCount = 0;
-    private array $history = [];
-    private string|null $connector = '';
+    private const INDENT = '    ';
+    private const PARTIAL_INDENT = '   ';   // Indent for when there is a vertical line
 
+    private int $drawCount = 0;
+
+    /**
+     * @var list<array{positive-int|0, bool}>
+     */
+    private array $history = [];
+
+    /**
+     * @var array<int, string>
+     */
+    private array $connectorCache = [];
+
+    /**
+     * @param positive-int|0 $depth
+     */
     public function draw(int $depth, bool $isLast): string
     {
-        $this->calculateConnectorIfNecessary($depth);
-
-        $result = $this->doDraw($depth, $isLast);
+        $result = $this->buildDrawing($depth, $isLast);
 
         $this->drawCount++;
-
-        $this->recordHistory($depth, $isLast);
+        $this->updateHistory($depth, $isLast);
 
         return $result;
     }
 
-    private function doDraw(int $depth, bool $isLast): string
+    private function buildDrawing(int $depth, bool $isLast): string
     {
         if ($depth === 0) {
-            if (0 === $this->drawCount) {
+            if ($this->drawCount === 0) {
                 return $isLast
                     ? self::BOX_DRAWINGS_LIGHT_HORIZONTAL
                     : self::BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT;
@@ -54,45 +61,52 @@ final class BoxDrawer
                 : self::BOX_DRAWINGS_LIGHT_VERTICAL_AND_RIGHT;
         }
 
+        $connector = $this->buildConnector($depth);
         $current = $isLast
             ? self::BOX_DRAWINGS_LIGHT_UP_AND_RIGHT
             : self::BOX_DRAWINGS_LIGHT_VERTICAL_AND_RIGHT;
 
-        return $this->connector.$current;
+        return $connector . $current;
     }
 
-    private function recordHistory(int $depth, bool $isLast): void
+    private function buildConnector(int $currentDepth): string
     {
-        [$previousDepth] = end($this->history);
-
-        if ($previousDepth === null) {
-            $this->history[] = [$depth, $isLast];
-        } elseif ($previousDepth < $depth) {
-            $this->history[] = [$depth, $isLast];
-        } elseif ($previousDepth > $depth) {
-            array_pop($this->history);
+        if (array_key_exists($currentDepth, $this->connectorCache)) {
+            return $this->connectorCache[$currentDepth];
         }
-    }
 
-    private function calculateConnectorIfNecessary(int $currentDepth): void
-    {
-        [$previousDepth] = end($this->history);
-
-        $this->calculateConnector($currentDepth);
-    }
-
-    private function calculateConnector(int $currentDepth): void
-    {
-        $this->connector = '';
+        $parts = [];
 
         foreach ($this->history as [$depth, $isLast]) {
             if ($depth >= $currentDepth) {
                 break;
             }
 
-            $this->connector .= $isLast
-                ? '    '
-                : self::BOX_DRAWINGS_LIGHT_VERTICAL. '   ';
+            $parts[] = $isLast
+                ? self::INDENT
+                : self::BOX_DRAWINGS_LIGHT_VERTICAL . self::PARTIAL_INDENT;
+        }
+
+        $connector = implode('', $parts);
+        $this->connectorCache[$currentDepth] = $connector;
+
+        return $connector;
+    }
+
+    private function updateHistory(int $depth, bool $isLast): void
+    {
+        $historyCount = count($this->history);
+        $lastHistoryEntryDepth = $this->history[$historyCount - 1][0] ?? null;
+
+        if (
+            null === $lastHistoryEntryDepth
+            || $lastHistoryEntryDepth < $depth
+        ) {
+            $this->history[] = [$depth, $isLast];
+            $this->connectorCache = [];
+        } elseif ($lastHistoryEntryDepth > $depth) {
+            array_pop($this->history);
+            $this->connectorCache = [];
         }
     }
 }

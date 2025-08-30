@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\DevTools\Telemetry\Reporter;
+namespace Infection\Tests\Telemetry\Reporter;
 
 use Infection\Telemetry\Reporter\BoxDrawer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function count;
 use function is_array;
-use function max;
 use function sprintf;
 use const PHP_EOL;
 
