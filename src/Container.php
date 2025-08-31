@@ -124,6 +124,7 @@ use Infection\Telemetry\Metric\GarbageCollection\SystemGarbageCollectorInspector
 use Infection\Telemetry\Metric\Memory\MemoryInspector;
 use Infection\Telemetry\Metric\Memory\SystemMemoryInspector;
 use Infection\Telemetry\Metric\ResourceInspector;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Metric\Time\Stopwatch as TelemetryStopwatch;
 use Infection\Telemetry\Metric\Time\SystemStopwatch;
 use Infection\Telemetry\Tracing\Tracer;
@@ -1030,6 +1031,11 @@ final class Container extends DIContainer
     private function getTimeFormatter(): TimeFormatter
     {
         return $this->get(TimeFormatter::class);
+    }
+
+    private function getDurationFormatter(): DurationFormatter
+    {
+        return $this->get(DurationFormatter::class);
     }
 
     private function getMemoryFormatter(): MemoryFormatter

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infection\Telemetry\Tracing;
 
+use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use Infection\Telemetry\Metric\Snapshot;
 use Infection\Telemetry\Metric\Time\Duration;
 
@@ -23,6 +24,13 @@ final readonly class Span
     {
         return $this->end->time->getDuration(
             $this->start->time,
+        );
+    }
+
+    public function getMemoryUsage(): MemoryUsage
+    {
+        return $this->end->memoryUsage->diff(
+            $this->start->memoryUsage,
         );
     }
 }

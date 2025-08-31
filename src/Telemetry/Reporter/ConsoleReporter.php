@@ -7,6 +7,7 @@ namespace Infection\Telemetry\Reporter;
 use Infection\Console\IO;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\Trace;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,11 +23,11 @@ final readonly class ConsoleReporter implements TraceReporter
     private BoxDrawer $boxDrawer;
 
     public function __construct(
-        private TimeFormatter $timeFormatter,
-        private MemoryFormatter $memoryFormatter,
-        private IO $io,
+        private DurationFormatter $durationFormatter,
+        private MemoryFormatter   $memoryFormatter,
+        private IO                $io,
     ) {
-        $this->boxDrawer = new BoxDrawer($io);
+        $this->boxDrawer = new BoxDrawer();
     }
 
     public function report(Trace $trace): void
@@ -69,13 +70,18 @@ final readonly class ConsoleReporter implements TraceReporter
 
         $this->io->writeln(
             sprintf(
-                '%s- %s (%s, %s)',
+                '%s- %s (%s, peak %s, Δ%s)',
                 $this->boxDrawer->draw($depth, $isLast),
                 $span->id,
-                $this->timeFormatter->toHumanReadableString(
-                    $span->duration,
+                $this->durationFormatter->toHumanReadableString(
+                    $span->getDuration(),
                 ),
-                $this->memoryFormatter->toHumanReadableString($duration),
+                $this->memoryFormatter->toHumanReadableString(
+                    $span->end->peakMemoryUsage,
+                ),
+                $this->memoryFormatter->toHumanReadableString(
+                    $span->getMemoryUsage(),
+                ),
             ),
             OutputInterface::VERBOSITY_NORMAL
         );

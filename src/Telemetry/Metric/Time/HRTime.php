@@ -6,7 +6,7 @@ use function sprintf;
 
 final readonly class HRTime
 {
-    private const NANOSECONDS_MAX = 10e9;
+    private const NANOSECONDS_MAX = 1e9;
 
     /**
      * @param positive-int|0 $seconds
@@ -42,7 +42,7 @@ final readonly class HRTime
         if ($nanoseconds < 0) {
             $seconds--;
 
-            $nanoseconds += self::NANOSECONDS_MAX;
+            $nanoseconds += (int) self::NANOSECONDS_MAX;
         }
 
         if ($seconds < 0) {

@@ -34,25 +34,9 @@ final readonly class Duration
         self::assertIsValidNanoSeconds($nanoseconds);
     }
 
-    public function toFloat(): float
+    public function toSeconds(): float
     {
-        $seconds     = $this->seconds - $start->seconds;
-        $nanoseconds = $this->nanoseconds - $start->nanoseconds;
-
-        if ($nanoseconds < 0) {
-            $seconds--;
-
-            $nanoseconds += self::NANOSECONDS_MAX;
-        }
-
-        if ($seconds < 0) {
-            return Duration::fromSecondsAndNanoseconds(0, 0);
-        }
-
-        return Duration::fromSecondsAndNanoseconds(
-            $seconds,
-            $nanoseconds,
-        );
+        return $this->seconds + ($this->nanoseconds / 1_000_000_000);
     }
 
     /**

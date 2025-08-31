@@ -36,68 +36,117 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Metric\Time;
 
 use function abs;
+use function floor;
 use function number_format;
 use function round;
-use function trim;
 
 /**
  * @internal
  */
 final class DurationFormatter
 {
-    private const TIME_HORIZONS = [
-        'min' => 60,
-        's' => 1,
-        'ms' => 0.001,
+    private const MILLISECOND_DIVISOR = 0.001;
+
+    private const THRESHOLDS = [
+        [
+            'threshold' => 60,
+            'unit' => 'min',
+            'divisor' => 60,
+        ],
+        [
+            'threshold' => 1,
+            'unit' => 's',
+            'divisor' => 1,
+        ],
+        [
+            'threshold' => 0,
+            'unit' => 'ms',
+            'divisor' => self::MILLISECOND_DIVISOR,
+        ],
     ];
 
     /**
-     * Formats time in seconds to a more human-friendly format.
+     * Formats duration to a more human-friendly format.
      */
     public function toHumanReadableString(Duration $duration): string
     {
-        $totalSeconds = $duration->seconds + ($duration->nanoseconds / 1_000_000_000);
+        $totalSeconds = $duration->toSeconds();
 
-        if ($totalSeconds >= 60) {
-            $minutes = $totalSeconds / 60;
-            if ($minutes == (int) $minutes) {
-                return (int) $minutes . 'min';
-            }
-
-            return number_format($minutes, 1) . 'min';
+        if ($totalSeconds < self::MILLISECOND_DIVISOR && $totalSeconds > 0) {
+            return '>1ms';
         }
 
-        if ($totalSeconds >= 1) {
-            $roundedSeconds = round($totalSeconds);
-            if ($roundedSeconds == $totalSeconds || abs($totalSeconds - $roundedSeconds) < 0.001) {
-                return (int) $roundedSeconds . 's';
+        foreach (self::THRESHOLDS as $config) {
+            if ($totalSeconds >= $config['threshold']) {
+                return self::formatForUnit($totalSeconds, $config);
             }
-
-            return number_format($totalSeconds, 1) . 's';
         }
 
+        return '0ms';
+    }
+
+    private static function formatForUnit(float $totalSeconds, array $config): string
+    {
+        if ($config['unit'] === 'ms') {
+            return self::formatMilliseconds($totalSeconds);
+        }
+
+        $value = $totalSeconds / $config['divisor'];
+        $unit = $config['unit'];
+
+        if (self::shouldDisplayAsWholeNumber($totalSeconds, $value)) {
+            return (int) round($value) . $unit;
+        }
+
+        return number_format($value, 1) . $unit;
+    }
+
+    private static function formatMilliseconds(float $totalSeconds): string
+    {
         if ($totalSeconds == 0) {
             return '0ms';
         }
 
         $totalMs = $totalSeconds * 1000;
 
-        if ($totalMs < 1) {
-            return '>1ms';
-        }
-
-        if ($totalMs >= 1.05 && $totalMs < 1.5) {
+        if (self::isInRoundingRange($totalMs, 1.05, 1.5)) {
             return '1ms';
         }
 
-        if ($totalMs == floor($totalMs)) {
+        if (self::isWholeNumber($totalMs)) {
             return (int) $totalMs . 'ms';
         }
 
-        if (abs($totalMs - round($totalMs * 10) / 10) < 0.001) {
+        if (self::hasCleanDecimal($totalMs)) {
             return number_format($totalMs, 1) . 'ms';
         }
 
         return (int) round($totalMs) . 'ms';
+    }
+
+    private static function shouldDisplayAsWholeNumber(float $totalSeconds, float $value): bool
+    {
+        $rounded = round($value);
+        $epsilon = abs($totalSeconds - ($rounded * ($totalSeconds / $value)));
+
+        return $rounded == $value
+            || $epsilon < self::MILLISECOND_DIVISOR;
+    }
+
+    private static function isInRoundingRange(float $value, float $min, float $max): bool
+    {
+        return $value >= $min && $value < $max;
+    }
+
+    private static function isWholeNumber(float $value): bool
+    {
+        return $value == floor($value);
+    }
+
+    private static function hasCleanDecimal(float $value): bool
+    {
+        $epsilon = abs($value - round($value * 10) / 10);
+
+        return $epsilon < self::MILLISECOND_DIVISOR;
     }
 }

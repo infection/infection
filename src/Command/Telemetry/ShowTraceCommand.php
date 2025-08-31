@@ -57,6 +57,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Reporter\ConsoleReporter;
 use Infection\Telemetry\Reporter\TracerDumper;
 use Infection\Telemetry\Reporter\TraceReporter;
@@ -157,7 +158,7 @@ final class ShowTraceCommand extends BaseCommand
 
         return match ($format) {
             default => new ConsoleReporter(
-                $container->get(TimeFormatter::class),
+                $container->get(DurationFormatter::class),
                 $container->get(MemoryFormatter::class),
                 $io,
             ),
