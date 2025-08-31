@@ -33,4 +33,12 @@ final readonly class Span
             $this->start->memoryUsage,
         );
     }
+
+    /**
+     * @return int<0, 100>
+     */
+    public function getDurationPercentage(Duration $totalDuration): int
+    {
+        return $this->getDuration()->getPercentage($totalDuration);
+    }
 }

@@ -8,17 +8,22 @@ use Infection\Console\IO;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Telemetry\Metric\Time\DurationFormatter;
+use Infection\Telemetry\Tracing\RootScopes;
 use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\Trace;
 use Symfony\Component\Console\Output\OutputInterface;
+use function array_filter;
+use function array_map;
+use function array_values;
 use function count;
+use function in_array;
 use function memory_get_peak_usage;
 use function sprintf;
 use function str_repeat;
 
-final readonly class ConsoleReporter implements TraceReporter
+final readonly class ConsoleReporter
 {
-    private const INDENT = '  ';
+    private const FILE_SCOPE = 'file';
 
     private BoxDrawer $boxDrawer;
 
@@ -30,7 +35,15 @@ final readonly class ConsoleReporter implements TraceReporter
         $this->boxDrawer = new BoxDrawer();
     }
 
-    public function report(Trace $trace): void
+    /**
+     * @param positive-int $maxDepth
+     * @param list<RootScopes> $rootScopes
+     */
+    public function report(
+        Trace $trace,
+        int   $maxDepth,
+        array  $rootScopes,
+    ): void
     {
         $this->io->newLine();
         $this->io->writeln(
@@ -38,43 +51,105 @@ final readonly class ConsoleReporter implements TraceReporter
         );
         $this->io->newLine();
 
-        $spansCount = count($trace->spans);
+        $filteredTrace = self::filterSpansByScope($trace, $rootScopes);
 
-        foreach ($trace->spans as $index => $span) {
+        $spansCount = count($filteredTrace->spans);
+
+        foreach ($filteredTrace->spans as $index => $span) {
             $this->printSpan(
                 $span,
+                $maxDepth,
+                parent: $filteredTrace,
                 isLast: $index === $spansCount - 1,
             );
         }
-
-//        $totalDuration = $this->calculateTotalDuration($trace->spans);
-//
-//        $this->io->writeln([
-//            '',
-//            sprintf(
-//                'Time: %s. Memory: %s.',
-//                $this->timeFormatter->toHumanReadableString($totalDuration),
-//                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true)),
-//            ),
-//        ]);
     }
 
+    /**
+     * @param list<RootScopes> $rootScopes
+     */
+    private static function filterSpansByScope(
+        Trace $trace,
+        array $rootScopes,
+    ): Trace
+    {
+        $rootScopeValues = array_map(
+            static fn (RootScopes $scope) => $scope->value,
+            $rootScopes,
+        );
+
+        $filter = static fn (Span $span) => in_array($span->scope, $rootScopeValues, true);
+
+        $filteredSpans = array_filter(
+            $trace->spans,
+            $filter,
+        );
+
+        return $trace->withSpans(
+            array_values($filteredSpans),
+        );
+    }
+
+    /**
+     * @param positive-int $maxDepth
+     */
     private function printSpan(
         Span $span,
+        int $maxDepth,
+        Trace|Span $parent,
         int $depth = 0,
         bool $isLast = false,
     ): void
     {
-        $indent = str_repeat(self::INDENT, $depth);
-        //$duration = $this->calculateSpanDuration($span);
+        $childrenCount = count($span->children);
+        $displayChildren = $childrenCount === 0 || $depth < $maxDepth;
 
+        self::printSpanLabel(
+            $span,
+            $depth,
+            $isLast,
+            $parent,
+            $displayChildren,
+            $childrenCount,
+        );
+
+        if (!$displayChildren) {
+            return;
+        }
+
+        foreach ($span->children as $index => $child) {
+            $this->printSpan(
+                $child,
+                $maxDepth,
+                parent: $span,
+                depth: $depth + 1,
+                isLast: $index === $childrenCount - 1,
+            );
+        }
+    }
+
+    /**
+     * @param positive-int $childrenCount
+     */
+    private function printSpanLabel(
+        Span $span,
+        int $depth,
+        bool $isLast,
+        Trace|Span $parent,
+        bool $displayChildren,
+        int $childrenCount,
+    ): void
+    {
         $this->io->writeln(
             sprintf(
-                '%s- %s (%s, peak %s, Δ%s)',
+                '%s- %s - %s (%s%%), peak %s, Δ%s%s',
                 $this->boxDrawer->draw($depth, $isLast),
                 $span->id,
                 $this->durationFormatter->toHumanReadableString(
                     $span->getDuration(),
+                ),
+                $span->getDurationPercentage(
+                    $parent->getDuration(),
                 ),
                 $this->memoryFormatter->toHumanReadableString(
                     $span->end->peakMemoryUsage,
@@ -82,40 +157,31 @@ final readonly class ConsoleReporter implements TraceReporter
                 $this->memoryFormatter->toHumanReadableString(
                     $span->getMemoryUsage(),
                 ),
+                $displayChildren
+                    ? ''
+                    : self::getHiddenChildrenLabel($childrenCount),
             ),
             OutputInterface::VERBOSITY_NORMAL
         );
-
-        $childrenCount = count($span->children);
-
-        foreach ($span->children as $index => $child) {
-            $this->printSpan(
-                $child,
-                depth: $depth + 1,
-                isLast: $index === $childrenCount - 1,
-            );
-        }
-    }
-
-    private function calculateSpanDuration(Span $span): float
-    {
-        $duration = $span->end->time->getDuration($span->start->time);
-
-        return $duration->seconds + ($duration->nanoseconds / 1_000_000_000);
     }
 
     /**
-     * @param list<Span> $spans
+     * @param positive-int $count
      */
-    private function calculateTotalDuration(array $spans): float
+    private static function getHiddenChildrenLabel(int $count): string
     {
-        $totalDuration = 0.0;
+        return sprintf(
+            ' [+%d %s]',
+            $count,
+            self::getChildrenText($count),
+        );
+    }
 
-        foreach ($spans as $span) {
-            $duration = $this->calculateSpanDuration($span);
-            $totalDuration = max($totalDuration, $duration);
-        }
-
-        return $totalDuration;
+    /**
+     * @param positive-int $count
+     */
+    private static function getChildrenText(int $count): string
+    {
+        return $count > 1 ? 'children' : 'child';
     }
 }

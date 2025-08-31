@@ -2,6 +2,9 @@
 namespace Infection\Telemetry\Metric\Time;
 
 use InvalidArgumentException;
+use function max;
+use function min;
+use function round;
 use function sprintf;
 
 final readonly class Duration
@@ -37,6 +40,34 @@ final readonly class Duration
     public function toSeconds(): float
     {
         return $this->seconds + ($this->nanoseconds / 1_000_000_000);
+    }
+
+
+
+    /**
+     * @return int<0, 100>
+     */
+    public function getPercentage(Duration $total): int
+    {
+        if ($total->isZero()) {
+            return 0;
+        }
+
+        $currentSeconds = $this->toSeconds();
+        $totalSeconds = $total->toSeconds();
+
+        $percentage = (int) round(($currentSeconds / $totalSeconds) * 100.0);
+
+        // TODO: is the min/max actually necessary here?
+        return min(
+            100,
+            max(0, $percentage),
+        );
+    }
+
+    private function isZero(): bool
+    {
+        return 0 === $this->seconds && 0 === $this->nanoseconds;
     }
 
     /**

@@ -56,6 +56,7 @@ use Infection\Mutation\Mutation;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Telemetry\Tracing\RootScopes;
 use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\SpanBuilder;
 use Infection\Telemetry\Tracing\SpanRecorder;
@@ -72,7 +73,6 @@ use function sprintf;
  */
 final class TracingSubscriber implements EventSubscriber
 {
-    private SpanBuilder $applicationSpan;
     private SpanBuilder $initialTestSuiteSpan;
     private SpanBuilder $initialStaticAnalysisRunSpan;
 
@@ -104,22 +104,11 @@ final class TracingSubscriber implements EventSubscriber
     ) {
     }
 
-    public function whenApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
-    {
-        $this->applicationSpan = $this->tracer->startSpan('application');
-    }
-
-    public function whenApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
-    {
-        $this->tracer->finishSpan($this->applicationSpan);
-    }
-
     public function whenInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
-        $this->initialTestSuiteSpan = $this->tracer->startChildSpan(
-            'initial_test_suite',
+        $this->initialTestSuiteSpan = $this->tracer->startSpan(
+            RootScopes::INITIAL_TEST_SUITE,
             UniqueId::generate(),
-            $this->applicationSpan,
         );
     }
 
@@ -130,10 +119,9 @@ final class TracingSubscriber implements EventSubscriber
 
     public function whenInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        $this->initialStaticAnalysisRunSpan = $this->tracer->startChildSpan(
-            'initial_static_analysis',
+        $this->initialStaticAnalysisRunSpan = $this->tracer->startSpan(
+            RootScopes::INITIAL_STATIC_ANALYSIS,
             UniqueId::generate(),
-            $this->applicationSpan,
         );
     }
 
@@ -144,10 +132,9 @@ final class TracingSubscriber implements EventSubscriber
 
     public function whenMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->mutationGenerationSpan = $this->tracer->startChildSpan(
-            'mutation_generation',
+        $this->mutationGenerationSpan = $this->tracer->startSpan(
+            RootScopes::MUTATION_GENERATION,
             UniqueId::generate(),
-            $this->applicationSpan,
         );
     }
 
@@ -159,10 +146,9 @@ final class TracingSubscriber implements EventSubscriber
     // This is the general process; not for a specific mutation
     public function whenMutationTestingWasStarted(MutationAnalysisWasStarted $event): void
     {
-        $this->mutationAnalysisSpan = $this->tracer->startChildSpan(
-            'mutation_analysis',
+        $this->mutationAnalysisSpan = $this->tracer->startSpan(
+            RootScopes::MUTATION_ANALYSIS,
             UniqueId::generate(),
-            $this->applicationSpan,
         );
     }
 
@@ -176,10 +162,9 @@ final class TracingSubscriber implements EventSubscriber
         $trace = $event->trace;
         $traceId = spl_object_id($trace);
 
-        $fileSpan = $this->tracer->startChildSpan(
-            'file',
+        $fileSpan = $this->tracer->startSpan(
+            RootScopes::FILE,
             $traceId,
-            $this->applicationSpan,
         );
         $this->fileSpans[$traceId] = $fileSpan;
 

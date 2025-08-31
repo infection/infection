@@ -61,6 +61,7 @@ use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Reporter\ConsoleReporter;
 use Infection\Telemetry\Reporter\TracerDumper;
 use Infection\Telemetry\Reporter\TraceReporter;
+use Infection\Telemetry\Tracing\RootScopes;
 use Infection\Telemetry\Tracing\Trace;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -73,11 +74,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use UnitEnum;
+use Webmozart\Assert\Assert;
 use function array_map;
 use function extension_loaded;
 use function implode;
 use function sprintf;
 use function trim;
+use const PHP_INT_MAX;
 use const PHP_SAPI;
 
 /**
@@ -87,6 +90,10 @@ final class ShowTraceCommand extends BaseCommand
 {
     private const TRACE_PATHNAME_ARGUMENT = 'trace';
     private const FORMAT_OPTION = 'format';
+    private const MAX_DEPTH_OPTION = 'max-depth';
+    private const TOP_SCOPES_OPTION = 'root-scopes';
+
+    private const NO_MAX_DEPTH = 'all';
 
     public function __construct(
         private readonly Filesystem $filesystem,
@@ -120,48 +127,102 @@ final class ShowTraceCommand extends BaseCommand
                 ),
                 TraceFormat::TEXT->value,
             )
+            ->addOption(
+                self::MAX_DEPTH_OPTION,
+                null,
+                InputOption::VALUE_REQUIRED,
+                sprintf(
+                    'The max depth displayed (int<1, max>|\'%s\'). Defaults to 1.',
+                    self::NO_MAX_DEPTH,
+                ),
+                1,
+            )
+            ->addOption(
+                self::TOP_SCOPES_OPTION,
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+                sprintf(
+                    'Scopes allowed. Default to "file" which is the most pertinent. Beware that a span may appear in multiple root scopes, which will distort the metrics. Allowed values: %s.',
+                    RootScopes::getQuotedListOfValues(),
+                ),
+                [RootScopes::FILE->value],
+            )
         ;
     }
 
     protected function executeCommand(IO $io): bool
     {
-        $tracePathname = self::getPathname($io->getInput());
-        $format = self::getFormat($io->getInput());
+        $tracePathname = self::getPathname($io);
+        $format = self::getFormat($io);
+        $maxDepth = self::getMaxDepth($io);
+        $rootScopes = self::getRootScopes($io);
 
         $trace = Trace::unserialize(
             $this->filesystem->readFile($tracePathname),
         );
-        $reporter = $this->getReporter($format, $io);
+        $reporter = $this->getConsoleReporter($io);
 
-        $reporter->report($trace);
+        $reporter->report(
+            $trace,
+            $maxDepth,
+            $rootScopes,
+        );
 
         return true;
     }
 
-    private static function getPathname(InputInterface $input): string
+    private static function getPathname(IO $io): string
     {
         return Path::canonicalize(
-            $input->getArgument(self::TRACE_PATHNAME_ARGUMENT),
+            $io->getInput()->getArgument(self::TRACE_PATHNAME_ARGUMENT),
         );
     }
 
-    private static function getFormat(InputInterface $input): TraceFormat
+    private static function getFormat(IO $io): TraceFormat
     {
         return TraceFormat::tryFrom(
-            $input->getOption(self::FORMAT_OPTION),
+            $io->getInput()->getOption(self::FORMAT_OPTION),
         );
     }
 
-    private function getReporter(TraceFormat $format, IO $io): TraceReporter
+    /**
+     * @return positive-int
+     */
+    private static function getMaxDepth(IO $io): int
+    {
+        $value = $io->getInput()->getOption(self::MAX_DEPTH_OPTION);
+
+        if (self::NO_MAX_DEPTH === $value) {
+            return PHP_INT_MAX;
+        }
+
+        $integerValue = (int) $value;
+
+        Assert::integerish($value);
+        Assert::positiveInteger($integerValue);
+
+        return $integerValue;
+    }
+
+    /**
+     * @return list<RootScopes>
+     */
+    private static function getRootScopes(IO $io): array
+    {
+        return array_map(
+            static fn (string $value) => RootScopes::from($value),
+            $io->getInput()->getOption(self::TOP_SCOPES_OPTION),
+        );
+    }
+
+    private function getConsoleReporter(IO $io): ConsoleReporter
     {
         $container = $this->getApplication()->getContainer();
 
-        return match ($format) {
-            default => new ConsoleReporter(
-                $container->get(DurationFormatter::class),
-                $container->get(MemoryFormatter::class),
-                $io,
-            ),
-        };
+        return new ConsoleReporter(
+            $container->get(DurationFormatter::class),
+            $container->get(MemoryFormatter::class),
+            $io,
+        );
     }
 }

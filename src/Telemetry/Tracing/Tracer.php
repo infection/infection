@@ -27,13 +27,13 @@ final class Tracer implements TraceProvider
     }
 
     public function startSpan(
-        string $scope,
-        ?string $id = null,
+        RootScopes $scope,
+        string|int|null $id = null,
     ): SpanBuilder
     {
         $span = new SpanBuilder(
             (string) $id ?? UniqueId::generate(),
-            $scope,
+            $scope->value,
             $this->inspector->snapshot(),
         );
 

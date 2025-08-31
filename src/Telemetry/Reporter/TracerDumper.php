@@ -7,10 +7,9 @@ namespace Infection\Telemetry\Reporter;
 use Infection\Telemetry\Tracing\Trace;
 use Symfony\Component\Filesystem\Filesystem;
 use function serialize;
-use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
-final readonly class TracerDumper implements TraceReporter
+final readonly class TracerDumper
 {
     public function __construct(
         private Filesystem $filesystem,
