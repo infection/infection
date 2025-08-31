@@ -95,8 +95,8 @@ final class BoxDrawer
 
     private function updateHistory(int $depth, bool $isLast): void
     {
-        $historyCount = count($this->history);
-        $lastHistoryEntryDepth = $this->history[$historyCount - 1][0] ?? null;
+        $lastEntry = end($this->history);
+        $lastHistoryEntryDepth = $lastEntry === false ? null : $lastEntry[0];
 
         if (
             null === $lastHistoryEntryDepth

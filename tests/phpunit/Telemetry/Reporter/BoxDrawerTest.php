@@ -138,6 +138,86 @@ final class BoxDrawerTest extends TestCase
 
             OUTPUT,
         );
+
+        yield 'single deep nesting to test connector caching' => [
+            [
+                0 => [
+                    1 => [
+                        2 => [
+                            3 => [4],
+                        ],
+                    ],
+                ],
+            ],
+            <<<'OUTPUT'
+            ─ d0
+                └─ d1
+                    └─ d2
+                        └─ d3
+                            └─ d4
+
+            OUTPUT,
+        ];
+
+        yield 'complex nesting with history management edge cases' => [
+            [
+                0 => [
+                    1 => [2],
+                    3,
+                ],
+                4 => [
+                    5 => [
+                        6,
+                        7,
+                    ],
+                ],
+                8,
+            ],
+            <<<'OUTPUT'
+            ┌─ d0
+            │   ├─ d1
+            │   │   └─ d2
+            │   └─ d3
+            ├─ d4
+            │   └─ d5
+            │       ├─ d6
+            │       └─ d7
+            └─ d8
+
+            OUTPUT,
+        ];
+
+        yield 'edge case' => [
+            [
+                0 => [
+                    1 => [2, 3],
+                    4 => [5, 6],
+                ],
+                7 => [
+                    8 => [9, 10],
+                    11 => [12, 13],
+                ],
+                14,
+            ],
+            <<<'OUTPUT'
+            ┌─ d0
+            │   ├─ d1
+            │   │   ├─ d2
+            │   │   └─ d3
+            │   └─ d4
+            │       ├─ d5
+            │       └─ d6
+            ├─ d7
+            │   ├─ d8
+            │   │   ├─ d9
+            │   │   └─ d10
+            │   └─ d11
+            │       ├─ d12
+            │       └─ d13
+            └─ d14
+
+            OUTPUT,
+        ];
     }
 
     /**
