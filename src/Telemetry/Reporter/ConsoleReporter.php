@@ -11,6 +11,7 @@ use Infection\Telemetry\Metric\Time\DurationFormatter;
 use Infection\Telemetry\Tracing\RootScopes;
 use Infection\Telemetry\Tracing\Span;
 use Infection\Telemetry\Tracing\Trace;
+use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_filter;
 use function array_map;
@@ -52,6 +53,7 @@ final class ConsoleReporter
         int   $maxDepth,
         array  $rootScopes,
         int $minTimeThreshold,
+        string|null $spanId,
     ): void
     {
         $this->boxDrawer = new BoxDrawer();
@@ -63,7 +65,11 @@ final class ConsoleReporter
         );
         $this->io->newLine();
 
-        $filteredTrace = self::filterSpansByScope($trace, $rootScopes);
+        $filteredTrace = self::filterSpans(
+            $trace,
+            $rootScopes,
+            $spanId,
+        );
 
         $spansCount = count($filteredTrace->spans);
 
@@ -81,9 +87,10 @@ final class ConsoleReporter
     /**
      * @param list<RootScopes> $rootScopes
      */
-    private static function filterSpansByScope(
+    private static function filterSpans(
         Trace $trace,
         array $rootScopes,
+        string|null $spanId,
     ): Trace
     {
         $rootScopeValues = array_map(
@@ -98,9 +105,53 @@ final class ConsoleReporter
             $filter,
         );
 
+        if (null !== $spanId) {
+            $filteredSpans = [self::findSpanById($spanId, $filteredSpans)];
+        }
+
         return $trace->withSpans(
             array_values($filteredSpans),
         );
+    }
+
+    private static function findSpanById(string $id, array $spans): Span
+    {
+        $span = self::findSpanByIdRecursively($id, $spans);
+
+        if (null === $span) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Not span with the ID "%s" was found.',
+                    $id,
+                ),
+            );
+        }
+
+        return $span;
+    }
+
+    /**
+     * @param Span[] $spans
+     */
+    private static function findSpanByIdRecursively(string $id, array $spans): Span|null
+    {
+        if (count($spans) === 0) {
+            return null;
+        }
+
+        foreach ($spans as $span) {
+            if ($span->id === $id) {
+                return $span;
+            }
+
+            $result = self::findSpanByIdRecursively($id, $span->children);
+
+            if (null !== $result) {
+                return $result;
+            }
+        }
+
+        return null;
     }
 
     /**

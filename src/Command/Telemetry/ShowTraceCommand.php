@@ -91,6 +91,8 @@ use const PHP_SAPI;
 final class ShowTraceCommand extends BaseCommand
 {
     private const TRACE_PATHNAME_ARGUMENT = 'trace';
+    private const SPAN_ID_ARGUMENT = 'span-id';
+
     private const FORMAT_OPTION = 'format';
     private const MAX_DEPTH_OPTION = 'max-depth';
     private const TOP_SCOPES_OPTION = 'root-scopes';
@@ -115,12 +117,17 @@ final class ShowTraceCommand extends BaseCommand
                 InputArgument::REQUIRED,
                 'Pathname to the trace file.',
             )
+            ->addArgument(
+                self::SPAN_ID_ARGUMENT,
+                InputArgument::OPTIONAL,
+                'ID of a span to display with its children.',
+            )
             ->addOption(
                 self::FORMAT_OPTION,
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
-                    'Format in which to display the dumped trace. One of: "%s"',
+                    'Format in which to display the dumped trace. One of: "%s".',
                     implode(
                         '", "',
                         array_map(
@@ -156,7 +163,7 @@ final class ShowTraceCommand extends BaseCommand
                 self::MIN_TIME_THRESHOLD_OPTION,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Minimum time (in %, int<0,100>) threshold to reach for a span to be displayed',
+                'Minimum time (in %, int<0,100>) threshold to reach for a span to be displayed.',
                 10,
             )
         ;
@@ -169,6 +176,7 @@ final class ShowTraceCommand extends BaseCommand
         $maxDepth = self::getMaxDepth($io);
         $rootScopes = self::getRootScopes($io);
         $minTimeThreshold = self::getMinTimeThreshold($io);
+        $spanId = self::getSpanId($io);
 
         $trace = Trace::unserialize(
             $this->filesystem->readFile($tracePathname),
@@ -180,6 +188,7 @@ final class ShowTraceCommand extends BaseCommand
             $maxDepth,
             $rootScopes,
             $minTimeThreshold,
+            $spanId,
         );
 
         return true;
@@ -247,6 +256,11 @@ final class ShowTraceCommand extends BaseCommand
         Assert::range($integerValue, 0, 100);
 
         return $integerValue;
+    }
+
+    private static function getSpanId(IO $io): string|null
+    {
+        return $io->getInput()->getArgument(self::SPAN_ID_ARGUMENT);
     }
 
     private function getConsoleReporter(IO $io): ConsoleReporter
