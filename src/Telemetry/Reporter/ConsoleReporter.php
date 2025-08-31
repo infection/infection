@@ -21,18 +21,25 @@ use function memory_get_peak_usage;
 use function sprintf;
 use function str_repeat;
 
-final readonly class ConsoleReporter
+final class ConsoleReporter
 {
-    private const FILE_SCOPE = 'file';
-
     private BoxDrawer $boxDrawer;
 
+    /**
+     * @var positive-int|0
+     */
+    private int $filteredCount = 0;
+
+    /**
+     * @var array{positive-int, bool}|null
+     */
+    private array|null $lastFiltered = [];
+
     public function __construct(
-        private DurationFormatter $durationFormatter,
-        private MemoryFormatter   $memoryFormatter,
-        private IO                $io,
+        private readonly DurationFormatter $durationFormatter,
+        private readonly MemoryFormatter   $memoryFormatter,
+        private readonly IO                $io,
     ) {
-        $this->boxDrawer = new BoxDrawer();
     }
 
     /**
@@ -47,6 +54,9 @@ final readonly class ConsoleReporter
         int $minTimeThreshold,
     ): void
     {
+        $this->boxDrawer = new BoxDrawer();
+        $this->resetLastFiltered();
+
         $this->io->newLine();
         $this->io->writeln(
             sprintf('Trace ID: <comment>%s</comment>', $trace->id),
@@ -114,7 +124,32 @@ final readonly class ConsoleReporter
         );
 
         if ($durationPercentage < $minTimeThreshold) {
+            if ($this->filteredCount > 0) {
+                [$lastFilteredDepth, $lastFilteredIsLast] = $this->lastFiltered;
+
+                if ($lastFilteredDepth !== $depth) {
+                    $this->printPreviouslyFilteredSpans(
+                        $this->filteredCount,
+                        $lastFilteredDepth,
+                        $lastFilteredIsLast,
+                    );
+                }
+            }
+
+            $this->filteredCount++;
+            $this->lastFiltered = [$depth, $isLast];
+
             return;
+        } else {
+            if ($this->filteredCount > 0) {
+                [$lastFilteredDepth, $lastFilteredIsLast] = $this->lastFiltered;
+
+                $this->printPreviouslyFilteredSpans(
+                    $this->filteredCount,
+                    $lastFilteredDepth,
+                    $lastFilteredIsLast,
+                );
+            }
         }
 
         self::printSpanLabel(
@@ -156,7 +191,7 @@ final readonly class ConsoleReporter
     {
         $this->io->writeln(
             sprintf(
-                '%s- %s - %s (%s%%), peak %s, Δ%s%s',
+                '%s %s - %s (%s%%), peak %s, Δ%s%s',
                 $this->boxDrawer->draw($depth, $isLast),
                 $span->id,
                 $this->durationFormatter->toHumanReadableString(
@@ -195,5 +230,35 @@ final readonly class ConsoleReporter
     private static function getChildrenText(int $count): string
     {
         return $count > 1 ? 'children' : 'child';
+    }
+
+    private function resetLastFiltered(): void
+    {
+        $this->filteredCount = 0;
+        $this->lastFiltered = null;
+    }
+
+    /**
+     * @param positive-int|0 $filteredCount
+     * @param positive-int|0 $lastFilteredDepth
+     * @param bool $lastFilteredIsLast
+     */
+    public function printPreviouslyFilteredSpans(
+        int $filteredCount,
+        int $lastFilteredDepth,
+        mixed $lastFilteredIsLast,
+    ): void
+    {
+        $this->io->writeln(
+            sprintf(
+                '%s filtered%s',
+                $this->boxDrawer->draw($lastFilteredDepth, $lastFilteredIsLast),
+                $filteredCount === 1
+                    ? ''
+                    : ' (x' . $filteredCount. ')',
+            ),
+        );
+
+        $this->resetLastFiltered();
     }
 }
