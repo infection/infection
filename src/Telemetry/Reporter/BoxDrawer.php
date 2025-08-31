@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Infection\Telemetry\Reporter;
 
 use function array_key_exists;
+use function array_key_last;
 use function array_pop;
 use function count;
 use function end;
@@ -95,8 +96,8 @@ final class BoxDrawer
 
     private function updateHistory(int $depth, bool $isLast): void
     {
-        $lastEntry = end($this->history);
-        $lastHistoryEntryDepth = $lastEntry === false ? null : $lastEntry[0];
+        $lastHistoryEntryKey = array_key_last($this->history);
+        [$lastHistoryEntryDepth, $lastHistoryEntryIsLast] = $this->history[$lastHistoryEntryKey] ?? [null, null];
 
         if (
             null === $lastHistoryEntryDepth
@@ -105,8 +106,24 @@ final class BoxDrawer
             $this->history[] = [$depth, $isLast];
             $this->connectorCache = [];
         } elseif ($lastHistoryEntryDepth > $depth) {
-            array_pop($this->history);
+            $this->popAllEntriesDeeperThanDepth($depth);
+
+            $this->history[] = [$depth, $isLast];
             $this->connectorCache = [];
+        } elseif ($lastHistoryEntryIsLast !== $isLast) {
+            $this->history[$lastHistoryEntryKey] = [$depth, $isLast];
         }
+    }
+
+    private function popAllEntriesDeeperThanDepth(int $currentDepth): void
+    {
+        do {
+            array_pop($this->history);
+
+            [$lastHistoryEntryDepth] = end($this->history);
+        } while (
+            null !== $lastHistoryEntryDepth
+            && $lastHistoryEntryDepth >= $currentDepth
+        );
     }
 }
