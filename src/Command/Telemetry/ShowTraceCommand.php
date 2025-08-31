@@ -78,8 +78,10 @@ use Webmozart\Assert\Assert;
 use function array_map;
 use function extension_loaded;
 use function implode;
+use function in_array;
 use function sprintf;
 use function trim;
+use function var_dump;
 use const PHP_INT_MAX;
 use const PHP_SAPI;
 
@@ -92,8 +94,10 @@ final class ShowTraceCommand extends BaseCommand
     private const FORMAT_OPTION = 'format';
     private const MAX_DEPTH_OPTION = 'max-depth';
     private const TOP_SCOPES_OPTION = 'root-scopes';
+    private const MIN_TIME_THRESHOLD_OPTION = 'min-time-threshold';
 
     private const NO_MAX_DEPTH = 'all';
+    private const ALL_TOP_SCOPES = 'all';
 
     public function __construct(
         private readonly Filesystem $filesystem,
@@ -142,10 +146,18 @@ final class ShowTraceCommand extends BaseCommand
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 sprintf(
-                    'Scopes allowed. Default to "file" which is the most pertinent. Beware that a span may appear in multiple root scopes, which will distort the metrics. Allowed values: %s.',
+                    'Scopes allowed. Default to "file" which is the most pertinent. Beware that a span may appear in multiple root scopes, which will distort the metrics. Allowed values: %s or "%s".',
                     RootScopes::getQuotedListOfValues(),
+                    self::ALL_TOP_SCOPES,
                 ),
                 [RootScopes::FILE->value],
+            )
+            ->addOption(
+                self::MIN_TIME_THRESHOLD_OPTION,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Minimum time (in %, int<0,100>) threshold to reach for a span to be displayed',
+                10,
             )
         ;
     }
@@ -156,6 +168,7 @@ final class ShowTraceCommand extends BaseCommand
         $format = self::getFormat($io);
         $maxDepth = self::getMaxDepth($io);
         $rootScopes = self::getRootScopes($io);
+        $minTimeThreshold = self::getMinTimeThreshold($io);
 
         $trace = Trace::unserialize(
             $this->filesystem->readFile($tracePathname),
@@ -166,6 +179,7 @@ final class ShowTraceCommand extends BaseCommand
             $trace,
             $maxDepth,
             $rootScopes,
+            $minTimeThreshold,
         );
 
         return true;
@@ -209,10 +223,30 @@ final class ShowTraceCommand extends BaseCommand
      */
     private static function getRootScopes(IO $io): array
     {
+        $topScopes = $io->getInput()->getOption(self::TOP_SCOPES_OPTION);
+
+        if (in_array(self::ALL_TOP_SCOPES, $topScopes, true)) {
+            return RootScopes::cases();
+        }
+
         return array_map(
             static fn (string $value) => RootScopes::from($value),
-            $io->getInput()->getOption(self::TOP_SCOPES_OPTION),
+            $topScopes,
         );
+    }
+
+    /**
+     * @return int<0,100>
+     */
+    private static function getMinTimeThreshold(IO $io): int
+    {
+        $value = $io->getInput()->getOption(self::MIN_TIME_THRESHOLD_OPTION);
+        $integerValue = (int) $value;
+
+        Assert::integerish($value);
+        Assert::range($integerValue, 0, 100);
+
+        return $integerValue;
     }
 
     private function getConsoleReporter(IO $io): ConsoleReporter

@@ -38,11 +38,13 @@ final readonly class ConsoleReporter
     /**
      * @param positive-int $maxDepth
      * @param list<RootScopes> $rootScopes
+     * @param int<0, 100> $minTimeThreshold
      */
     public function report(
         Trace $trace,
         int   $maxDepth,
         array  $rootScopes,
+        int $minTimeThreshold,
     ): void
     {
         $this->io->newLine();
@@ -60,6 +62,7 @@ final readonly class ConsoleReporter
                 $span,
                 $maxDepth,
                 parent: $filteredTrace,
+                minTimeThreshold: $minTimeThreshold,
                 isLast: $index === $spansCount - 1,
             );
         }
@@ -92,11 +95,13 @@ final readonly class ConsoleReporter
 
     /**
      * @param positive-int $maxDepth
+     * @param int<0,100> $minTimeThreshold
      */
     private function printSpan(
         Span $span,
         int $maxDepth,
         Trace|Span $parent,
+        int $minTimeThreshold,
         int $depth = 0,
         bool $isLast = false,
     ): void
@@ -104,13 +109,21 @@ final readonly class ConsoleReporter
         $childrenCount = count($span->children);
         $displayChildren = $childrenCount === 0 || $depth < $maxDepth;
 
+        $durationPercentage = $span->getDurationPercentage(
+            $parent->getDuration(),
+        );
+
+        if ($durationPercentage < $minTimeThreshold) {
+            return;
+        }
+
         self::printSpanLabel(
             $span,
             $depth,
             $isLast,
-            $parent,
             $displayChildren,
             $childrenCount,
+            $durationPercentage,
         );
 
         if (!$displayChildren) {
@@ -122,6 +135,7 @@ final readonly class ConsoleReporter
                 $child,
                 $maxDepth,
                 parent: $span,
+                minTimeThreshold: $minTimeThreshold,
                 depth: $depth + 1,
                 isLast: $index === $childrenCount - 1,
             );
@@ -135,9 +149,9 @@ final readonly class ConsoleReporter
         Span $span,
         int $depth,
         bool $isLast,
-        Trace|Span $parent,
         bool $displayChildren,
         int $childrenCount,
+        int $durationPercentage,
     ): void
     {
         $this->io->writeln(
@@ -148,9 +162,7 @@ final readonly class ConsoleReporter
                 $this->durationFormatter->toHumanReadableString(
                     $span->getDuration(),
                 ),
-                $span->getDurationPercentage(
-                    $parent->getDuration(),
-                ),
+                $durationPercentage,
                 $this->memoryFormatter->toHumanReadableString(
                     $span->end->peakMemoryUsage,
                 ),
