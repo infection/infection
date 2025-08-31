@@ -69,14 +69,13 @@ final readonly class ConsoleReporter implements TraceReporter
 
         $this->io->writeln(
             sprintf(
-                '%s %s',
-                //'%s- %s (%s; %s)',
+                '%s- %s (%s, %s)',
                 $this->boxDrawer->draw($depth, $isLast),
                 $span->id,
-//                $this->timeFormatter->toHumanReadableString(
-//                    $span->duration,
-//                ),
-//                $this->memoryFormatter->toHumanReadableString($duration),
+                $this->timeFormatter->toHumanReadableString(
+                    $span->duration,
+                ),
+                $this->memoryFormatter->toHumanReadableString($duration),
             ),
             OutputInterface::VERBOSITY_NORMAL
         );

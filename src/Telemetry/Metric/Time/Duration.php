@@ -34,7 +34,7 @@ final readonly class Duration
         self::assertIsValidNanoSeconds($nanoseconds);
     }
 
-    public function getDuration(self $start): Duration
+    public function toFloat(): float
     {
         $seconds     = $this->seconds - $start->seconds;
         $nanoseconds = $this->nanoseconds - $start->nanoseconds;

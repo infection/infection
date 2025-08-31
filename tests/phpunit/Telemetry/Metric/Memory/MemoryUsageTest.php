@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\Tests\Telemetry\Memory;
+namespace Infection\Tests\Telemetry\Metric\Memory;
 
 use Infection\Telemetry\Metric\Memory\MemoryUsage;
 use PHPUnit\Framework\Attributes\CoversClass;
