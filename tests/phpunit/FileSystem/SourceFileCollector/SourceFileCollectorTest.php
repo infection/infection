@@ -49,7 +49,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/Fixtures';
+    private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
     /**
      * @param string[] $sourceDirectories
@@ -57,24 +57,23 @@ final class SourceFileCollectorTest extends TestCase
      * @param list<string> $expected
      */
     #[DataProvider('sourceFilesProvider')]
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expected): void
-    {
-        $root = self::FIXTURES;
-
-        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
-
-        $files = take($files)->toList();
-
-        $this->assertSame(
-            $expected,
-            self::normalizePaths($files, $root),
+    public function test_it_can_collect_files(
+        array $sourceDirectories,
+        array $excludedFilesOrDirectories,
+        array $expected,
+    ): void {
+        $actual = (new SourceFileCollector())->collectFiles(
+            $sourceDirectories,
+            $excludedFilesOrDirectories,
         );
-        $this->assertIsList($files);
+        $normalizedActual = self::normalizePaths($actual, self::FIXTURES_ROOT);
+
+        $this->assertSame($expected, $normalizedActual);
+        $this->assertIsList(
+            take($actual)->toAssoc(),
+        );
     }
 
-    /**
-     * @return iterable<string, array{string[], string[], list<string>}>
-     */
     public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
@@ -83,8 +82,8 @@ final class SourceFileCollectorTest extends TestCase
             [],
         ];
 
-        yield 'one directory, no filter, no excludes' => [
-            [self::FIXTURES . '/case0'],
+        yield 'one directory' => [
+            [self::FIXTURES_ROOT . '/case0'],
             [],
             [
                 'case0/a.php',
@@ -93,8 +92,11 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'multiple directories, no filter, no excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+        yield 'multiple directories' => [
+            [
+                self::FIXTURES_ROOT . '/case0',
+                self::FIXTURES_ROOT . '/case1',
+            ],
             [],
             [
                 'case0/a.php',
@@ -105,8 +107,8 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'one directory, no filter, one excludes' => [
-            [self::FIXTURES . '/case0'],
+        yield 'one directory with a child directory excluded via its base name' => [
+            [self::FIXTURES_ROOT . '/case0'],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -114,28 +116,63 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'one directory, no filter, absolute path excludes' => [
-            [self::FIXTURES . '/case0'],
-            [self::FIXTURES . '/sub-dir'],
+        yield 'one directory with a child directory excluded via its full path' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            [self::FIXTURES_ROOT . '/case0/sub-dir'],
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',
+                'case0/sub-dir/b.php',  // Does not work
             ],
         ];
 
-        yield 'one directory, no filter, relative path excludes relative to source root' => [
-            [self::FIXTURES . '/case0'],
+        yield 'one directory with a child directory excluded via its path relative to the source root' => [
+            [self::FIXTURES_ROOT . '/case0'],
             ['case0/sub-dir'],
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',  // Does not work
+            ],
+        ];
+
+        yield 'one directory with a directory excluded via its full path with the same name as an included child directory' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            [self::FIXTURES_ROOT . '/sub-dir'],
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
                 'case0/sub-dir/b.php',
             ],
         ];
 
-        yield 'multiple directories, no filter, one common excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+        yield 'one directory with a directory excluded via its full path with the same name as an included directory' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
+            [
+                // Does not work
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'one directory with a directory excluded via its base name with the same name as an included directory' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            ['case0'],
+            [
+                // Does not work
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'multiple directories with a common child directory excluded via its base name' => [
+            [
+                self::FIXTURES_ROOT . '/case0',
+                self::FIXTURES_ROOT . '/case1',
+            ],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -144,16 +181,16 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'exclude file by its name' => [
-            [self::FIXTURES . '/case1'],
+        yield 'one directory with a child file excluded via its base name' => [
+            [self::FIXTURES_ROOT . '/case1'],
             ['a.php'],
             [
                 'case1/sub-dir/b.php',
             ],
         ];
 
-        yield 'one directory, no filter, one common excludes and one file exclude' => [
-            [self::FIXTURES . '/case0'],
+        yield 'one directory with a child file and directory excluded via its base name' => [
+            [self::FIXTURES_ROOT . '/case0'],
             [
                 'sub-dir',
                 'a.php',
@@ -165,23 +202,31 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param SplFileInfo[] $files
+     * @param iterable<SplFileInfo> $fileInfos
      *
-     * @return string[] File real paths relative to the current temporary directory
+     * @return list<string> File real paths relative to the current temporary directory
      */
-    private static function normalizePaths(array $files, string $root): array
+    private static function normalizePaths(iterable $fileInfos, string $root): array
     {
-        $root = Path::normalize($root);
+        $normalizedRoot = Path::normalize($root);
 
-        $files = array_values(
-            array_map(
-                static fn (SplFileInfo $fileInfo): string => Path::makeRelative($fileInfo->getPathname(), $root),
-                $files,
-            ),
+        $makePathRelativeToRoot = static fn (SplFileInfo $fileInfo) => Path::makeRelative(
+            $fileInfo->getPathname(),
+            $normalizedRoot,
         );
 
-        natcasesort($files);
+        $relativePaths = array_map(
+            $makePathRelativeToRoot,
+            take($fileInfos)->toList(),
+        );
 
-        return array_values($files);
+        natcasesort($relativePaths);
+
+        return array_values($relativePaths);
+    }
+
+    private static function makePathRelativeToRoot(string $path): string
+    {
+        return Path::makeRelative($path, self::FIXTURES_ROOT);
     }
 }
