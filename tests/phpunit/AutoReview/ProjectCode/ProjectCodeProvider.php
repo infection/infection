@@ -58,6 +58,7 @@ use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
@@ -134,6 +135,15 @@ final class ProjectCodeProvider
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+    ];
+
+    /**
+     * This array contains all classes that have tests but for which the test case
+     * does not follow the pattern "Acme\Service\Foo" -> "Acme\Tests\FooTest".
+     * For example, test cases that are in a child directory.
+     */
+    public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+        SourceFileCollector::class,
     ];
 
     /**
@@ -311,9 +321,10 @@ final class ProjectCodeProvider
 
     public static function nonTestedConcreteClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
-            self::NON_TESTED_CONCRETE_CLASSES,
-        );
+        yield from generator_to_phpunit_data_provider([
+            ...self::NON_TESTED_CONCRETE_CLASSES,
+            ...self::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION,
+        ]);
     }
 
     public static function nonFinalExtensionClasses(): iterable
