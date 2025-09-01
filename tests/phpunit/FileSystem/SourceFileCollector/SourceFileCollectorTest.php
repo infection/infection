@@ -63,7 +63,7 @@ final class SourceFileCollectorTest extends TestCase
 
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
 
-        $files = take($files)->toList();
+        $files = take($files)->toAssoc();
 
         $this->assertSame(
             $expected,
