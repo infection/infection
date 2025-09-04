@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
@@ -50,6 +51,7 @@ use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\SourceCollection\SchemaSourceCollector;
+use Infection\SourceCollection\SourceCollectorFactory;
 use Infection\TestFramework\TestFrameworkTypes;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
@@ -81,16 +83,19 @@ class ConfigurationFactory
     private const DEFAULT_TIMEOUT = 10;
 
     public function __construct(
-        private readonly TmpDirProvider $tmpDirProvider,
-        private readonly MutatorResolver $mutatorResolver,
-        private readonly MutatorFactory $mutatorFactory,
-        private readonly MutatorParser $mutatorParser,
-        private readonly SchemaSourceCollector $sourceFileCollector,
-        private readonly CiDetectorInterface $ciDetector,
-        private readonly GitDiffFileProvider $gitDiffFileProvider,
+        private readonly TmpDirProvider         $tmpDirProvider,
+        private readonly MutatorResolver        $mutatorResolver,
+        private readonly MutatorFactory         $mutatorFactory,
+        private readonly MutatorParser          $mutatorParser,
+        private readonly SourceCollectorFactory $sourceCollectorFactory,
+        private readonly CiDetectorInterface    $ciDetector,
+        private readonly GitDiffFileProvider    $gitDiffFileProvider,
     ) {
     }
 
+    /**
+     * @param non-empty-string|GitOptions|null $sourceFilter
+     */
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -99,30 +104,27 @@ class ConfigurationFactory
         string $logVerbosity,
         bool $debug,
         bool $withUncovered,
-        bool $noProgress,
-        ?bool $ignoreMsiWithNoMutations,
-        ?float $minMsi,
-        ?int $numberOfShownMutations,
-        ?float $minCoveredMsi,
-        int $msiPrecision,
-        string $mutatorsInput,
-        ?string $testFramework,
-        ?string $testFrameworkExtraOptions,
-        ?string $staticAnalysisToolOptions,
-        string $filter,
-        ?int $threadCount,
-        bool $dryRun,
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
-        ?bool $useGitHubLogger,
-        ?string $gitlabLogFilePath,
-        ?string $htmlLogFilePath,
-        bool $useNoopMutators,
-        bool $executeOnlyCoveringTestCases,
-        ?string $mapSourceClassToTestStrategy,
-        ?string $loggerProjectRootDirectory,
-        ?string $staticAnalysisTool,
+        bool                   $noProgress,
+        ?bool                  $ignoreMsiWithNoMutations,
+        ?float                 $minMsi,
+        ?int                   $numberOfShownMutations,
+        ?float                 $minCoveredMsi,
+        int                    $msiPrecision,
+        string                 $mutatorsInput,
+        ?string                $testFramework,
+        ?string                $testFrameworkExtraOptions,
+        ?string                $staticAnalysisToolOptions,
+        string|GitOptions|null $sourceFilter,
+        ?int                   $threadCount,
+        bool                   $dryRun,
+        ?bool                  $useGitHubLogger,
+        ?string                $gitlabLogFilePath,
+        ?string                $htmlLogFilePath,
+        bool                   $useNoopMutators,
+        bool                   $executeOnlyCoveringTestCases,
+        ?string                $mapSourceClassToTestStrategy,
+        ?string                $loggerProjectRootDirectory,
+        ?string                $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
         $configDir = dirname($schema->getFile());
@@ -147,14 +149,18 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        $sourceCollector = $this->sourceCollectorFactory->create(
+            $schema->getSource()->getDirectories(),
+            $schema->getSource()->getExcludes(),
+            $sourceFilter,
+            mutateOnlyCoveredCode: true,    // TODO
+        );
+
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collect(
-                $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes(),
-            ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
+            $sourceCollector->collect(),
+            $this->retrieveFilter($sourceFilter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
             $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
             $logVerbosity,

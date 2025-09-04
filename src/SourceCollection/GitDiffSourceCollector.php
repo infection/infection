@@ -60,6 +60,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         private string $gitDiffFilter,
         private string $gitDiffBase,
         private array $sourceDirectories,
+        // TODO: prob need the exclude too?
     ) {
     }
 

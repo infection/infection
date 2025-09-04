@@ -41,6 +41,7 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
@@ -222,7 +223,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
-    public const DEFAULT_FILTER = '';
+    public const DEFAULT_SOURCE_FILTER = null;
 
     public const DEFAULT_THREAD_COUNT = null;
 
@@ -570,27 +571,24 @@ final class Container extends DIContainer
         string $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
-        ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
-        ?string $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-        bool $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
-        bool $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-        ?float $minMsi = self::DEFAULT_MIN_MSI,
-        ?float $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
-        int $msiPrecision = self::DEFAULT_MSI_PRECISION,
-        ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
-        ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-        ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        string $filter = self::DEFAULT_FILTER,
-        ?int $threadCount = self::DEFAULT_THREAD_COUNT,
-        bool $dryRun = self::DEFAULT_DRY_RUN,
-        ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
-        bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
-        ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
-        ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
-        ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
-        ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
-        bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
-        bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+        ?string                $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
+        ?string                $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+        bool                   $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
+        bool                   $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+        ?float                 $minMsi = self::DEFAULT_MIN_MSI,
+        ?float                 $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
+        int                    $msiPrecision = self::DEFAULT_MSI_PRECISION,
+        ?string                $testFramework = self::DEFAULT_TEST_FRAMEWORK,
+        ?string                $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        ?string                $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
+        string|GitOptions|null $sourceFilter = self::DEFAULT_SOURCE_FILTER,
+        ?int                   $threadCount = self::DEFAULT_THREAD_COUNT,
+        bool                   $dryRun = self::DEFAULT_DRY_RUN,
+        ?bool                  $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
+        ?string                $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
+        ?string                $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
+        bool                   $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
+        bool                   $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,
@@ -654,12 +652,9 @@ final class Container extends DIContainer
                 $testFramework,
                 $testFrameworkExtraOptions,
                 $staticAnalysisToolOptions,
-                $filter,
+                $sourceFilter,
                 $threadCount,
                 $dryRun,
-                $gitDiffFilter,
-                $isForGitDiffLines,
-                $gitDiffBase,
                 $useGitHubLogger,
                 $gitlabLogFilePath,
                 $htmlLogFilePath,

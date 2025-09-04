@@ -4,49 +4,62 @@ declare(strict_types=1);
 
 namespace Infection\SourceCollection;
 
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Configuration\Entry\GitOptions;
 use Infection\Git\Git;
 use Infection\Process\ShellCommandLineExecutor;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\Tracing\Tracer;
 
 final readonly class SourceCollectorFactory
 {
     public function __construct(
         private Git $git,
-        private GitDiffFileProvider $gitDiffFileProvider,
         private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private Tracer $tracer,
     ) {
-
     }
 
     /**
      * @param string[] $sourceDirectories
      * @param string[] $excludedDirectoriesOrFiles
-     * @param string $filter E.g. "src/Service/Mailer.php", "Mailer.php", "src/Service/", "Mailer.php,Sender.php", etc.
+     * @param non-empty-string|GitOptions|null $sourceFilter E.g. "src/Service/Mailer.php", "Mailer.php", "src/Service/", "Mailer.php,Sender.php", etc.
      */
     public function create(
-        array $sourceDirectories,
-        array $excludedDirectoriesOrFiles,
-        string $filter,
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
-        bool $mutateOnlyCoveredCode,
+        array                  $sourceDirectories,
+        array                  $excludedDirectoriesOrFiles,
+        string|GitOptions|null $sourceFilter,
+        bool                   $mutateOnlyCoveredCode,
     ): SourceCollector
     {
-        if ($gitDiffFilter !== null && $isForGitDiffLines) {
+        $collector = self::createBasicCollector(
+            $sourceDirectories,
+            $excludedDirectoriesOrFiles,
+            $sourceFilter,
+        );
+
+        return $mutateOnlyCoveredCode
+            ? new CoveredSourceCollector(
+                $collector,
+                $this->tracer,
+            )
+            : $collector;
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     * @param string[] $excludedDirectoriesOrFiles
+     * @param non-empty-string|GitOptions|null $sourceFilter E.g. "src/Service/Mailer.php", "Mailer.php", "src/Service/", "Mailer.php,Sender.php", etc.
+     */
+    private function createBasicCollector(
+        array                  $sourceDirectories,
+        array                  $excludedDirectoriesOrFiles,
+        string|GitOptions|null $sourceFilter,
+    ): SourceCollector
+    {
+        if ($sourceFilter instanceof GitOptions) {
             return $this->createGitDiffSourceCollector(
-                $gitDiffFilter,
-                $gitDiffBase,
+                $sourceFilter,
                 $sourceDirectories,
                 $excludedDirectoriesOrFiles,    // TODO
-            );
-        }
-
-        if ($mutateOnlyCoveredCode) {
-            return new CoveredSourceCollector(
-                $sourceDirectories,
-                $excludedDirectoriesOrFiles,
             );
         }
 
@@ -61,18 +74,19 @@ final readonly class SourceCollectorFactory
      * @param string[] $sourceDirectories
      */
     private function createGitDiffSourceCollector(
-        ?string $gitDiffFilter,
-        ?string $gitDiffBase,
+        GitOptions $options,
         array $sourceDirectories,
     ): GitDiffSourceCollector
     {
         $baseBranch = $gitDiffBase ?? $this->git->getDefaultBase();
-        $gitDiffFilter = $gitDiffFilter ?? $this->git->getDefaultBaseFilter();
+        $filter = $options->isForGitDiffLines
+            ? $this->git->getDefaultBaseFilter()
+            : $options->gitDiffFilter;
 
         return new GitDiffSourceCollector(
             $this->shellCommandLineExecutor,
             $baseBranch,
-            $gitDiffFilter,
+            $filter,
             $sourceDirectories,
         );
     }

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Configuration\Entry\GitOptions;
+use Symfony\Component\Console\Input\InputInterface;
 use function extension_loaded;
 use function implode;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -260,7 +262,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 // TODO: give more examples or a link to the doc
                 'Filter which files to mutate',
-                Container::DEFAULT_FILTER,
+                Container::DEFAULT_SOURCE_FILTER,
             )
             ->addOption(
                 self::OPTION_FORMATTER,
@@ -486,26 +488,6 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
-        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
-        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
-
-        if ($isForGitDiffLines && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER) {
-            throw new InvalidArgumentException(sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_GIT_DIFF_LINES, self::OPTION_GIT_DIFF_FILTER));
-        }
-
-        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER && $isForGitDiffLines === Container::DEFAULT_GIT_DIFF_LINES) {
-            throw new InvalidArgumentException(sprintf('Cannot pass "--%s" without "--%s"', self::OPTION_GIT_DIFF_BASE, self::OPTION_GIT_DIFF_FILTER));
-        }
-
-        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
-
-        if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
-            throw new InvalidArgumentException(
-                sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_FILTER, self::OPTION_GIT_DIFF_FILTER),
-            );
-        }
-
         $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
@@ -546,13 +528,12 @@ final class RunCommand extends BaseCommand
             $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            $filter,
+            // TODO: I think it much better, from a cognitive load perspective, to have this "processing"
+            //  done here. There is no more carrying over 4 different options in several places.
+            self::getSourceFilter($input),
             $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             (bool) $input->getOption(self::OPTION_DRY_RUN),
-            $gitDiffFilter,
-            $isForGitDiffLines,
-            $gitDiffBase,
             $commandHelper->getUseGitHubLogger(),
             $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
@@ -662,6 +643,118 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logRunningWithDebugger('Xdebug');
         } elseif (extension_loaded('pcov')) {
             $consoleOutput->logRunningWithDebugger('PCOV');
+        }
+    }
+
+    /**
+     * @return non-empty-string|GitOptions|null
+     */
+    private static function getSourceFilter(InputInterface $input): string|GitOptions|null
+    {
+        $gitOptions = self::getGitOptions($input);
+        $filter = self::getFilter($input);
+
+        self::assertOnlyOneTypeOfFiltering($filter, $gitOptions);
+
+        return $filter ?? $gitOptions;
+    }
+
+    private static function getFilter(InputInterface $input): ?string
+    {
+        $value = trim((string) $input->getOption(self::OPTION_FILTER));
+
+        return '' === $value ? null : $value;
+    }
+
+    private static function assertOnlyOneTypeOfGitFiltering(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+    ): void
+    {
+        if (
+            null !== $gitDiffFilter
+            && $isForGitDiffLines
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass both "--%s" and "--%s" options: only one type of filtering is allowed.',
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
+        }
+    }
+
+    private static function getGitOptions(InputInterface $input): ?GitOptions
+    {
+        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
+        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+
+        self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
+        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $isForGitDiffLines, $gitDiffBase);
+
+        $filterSourceWithGit = null !== $gitDiffFilter
+            || $isForGitDiffLines
+            || null !== $gitDiffBase;
+
+        return $filterSourceWithGit
+            ? new GitOptions(
+                $gitDiffFilter,
+                $isForGitDiffLines,
+                $gitDiffBase,
+            )
+            : null;
+    }
+
+    private static function assertGitBaseHasRequiredFilter(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+    ): void
+    {
+        // TODO: previously was $gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
+        //  I do not understand the point of those default values if the default is not using git
+        //  If we provide a default there, then the requirement is still valid, as a base requires a filter.
+        if (null === $gitDiffBase) {
+            return;
+        }
+
+        $hasFilter = null !== $gitDiffFilter || $isForGitDiffLines;
+
+        if ($hasFilter) {
+            return;
+        }
+
+        // TODO: seems like you can pass DEFAULT_GIT_DIFF_LINES instead of DEFAULT_GIT_DIFF_FILTER
+        //  too thought?
+        // TODO: port the improve message
+        throw new InvalidArgumentException(
+            sprintf(
+                'The option "--%s" cannot be used without the option "--%s" or "--%s".',
+                self::OPTION_GIT_DIFF_BASE,
+                self::OPTION_GIT_DIFF_LINES,
+                self::OPTION_GIT_DIFF_FILTER,
+            ),
+        );
+    }
+
+    private static function assertOnlyOneTypeOfFiltering(
+        ?string     $filter,
+        ?GitOptions $gitOptions,
+    ): void
+    {
+        if (
+            null !== $filter
+            && null !== $gitOptions
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass both "--%s" and "--%s" options: only one type of filtering is allowed.',
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
         }
     }
 }
