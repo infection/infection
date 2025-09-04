@@ -37,6 +37,8 @@ namespace Infection\Configuration;
 
 use function array_map;
 use function explode;
+use Infection\Configuration\Entry\GitOptions;
+use Infection\Configuration\Entry\GitSource;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
@@ -89,7 +91,8 @@ class Configuration
         float $timeout,
         array $sourceDirectories,
         private readonly iterable $sourceFiles,
-        private readonly string $sourceFilesFilter,
+        private readonly ?string $sourceFilter,
+        public readonly ?GitSource $gitSource,
         private readonly array $sourceFilesExcludes,
         private readonly Logs $logs,
         string $logVerbosity,
@@ -117,8 +120,6 @@ class Configuration
         private readonly bool $dryRun,
         private readonly array $ignoreSourceCodeMutatorsMap,
         private readonly bool $executeOnlyCoveringTestCases,
-        private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
         private readonly ?string $mapSourceClassToTestStrategy,
         private readonly ?string $loggerProjectRootDirectory,
         ?string $staticAnalysisTool,
@@ -164,9 +165,9 @@ class Configuration
         return $this->sourceFiles;
     }
 
-    public function getSourceFilesFilter(): string
+    public function getSourceFilter(): string|GitOptions|null
     {
-        return $this->sourceFilesFilter;
+        return $this->sourceFilter;
     }
 
     /**
@@ -332,12 +333,16 @@ class Configuration
 
     public function isForGitDiffLines(): bool
     {
-        return $this->isForGitDiffLines;
+        return $this->sourceFilter instanceof GitOptions
+            ? $this->sourceFilter->isForDiffLines
+            : false;
     }
 
     public function getGitDiffBase(): ?string
     {
-        return $this->gitDiffBase;
+        return $this->sourceFilter instanceof GitOptions
+            ? $this->sourceFilter->baseBranch
+            : null;
     }
 
     public function getMapSourceClassToTestStrategy(): ?string
