@@ -42,6 +42,8 @@ use function array_values;
 use function dirname;
 use function file_exists;
 use function in_array;
+use Infection\Configuration\Entry\GitOptions;
+use Infection\Configuration\Entry\GitSource;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
@@ -109,12 +111,9 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         ?string $staticAnalysisToolOptions,
-        string $filter,
+        string|GitOptions|null $sourceFilter,
         ?int $threadCount,
         bool $dryRun,
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
@@ -154,7 +153,11 @@ class ConfigurationFactory
                 $schema->getSource()->getDirectories(),
                 $schema->getSource()->getExcludes(),
             ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
+            $this->retrieveFilter(
+                $sourceFilter,
+                $schema->getSource()->getDirectories(),
+            ),
+            $this->getGitSource($sourceFilter),
             $schema->getSource()->getExcludes(),
             $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
             $logVerbosity,
@@ -182,8 +185,6 @@ class ConfigurationFactory
             $dryRun,
             $ignoreSourceCodeMutatorsMap,
             $executeOnlyCoveringTestCases,
-            $isForGitDiffLines,
-            $gitDiffBase,
             $mapSourceClassToTestStrategy,
             $loggerProjectRootDirectory,
             $resultStaticAnalysisTool,
@@ -358,19 +359,28 @@ class ConfigurationFactory
     /**
      * @param string[] $sourceDirectories
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
-    {
-        if ($gitDiffFilter === null && !$isForGitDiffLines) {
-            return $filter;
-        }
+    private function retrieveFilter(
+        string|GitOptions|null $sourceFilter,
+        array $sourceDirectories,
+    ): string {
+        return $sourceFilter instanceof GitOptions
+            ? $this->retrieveGitFilter($sourceFilter, $sourceDirectories)
+            : $sourceFilter;
+    }
 
+    /**
+     * @param string[] $sourceDirectories
+     */
+    private function retrieveGitFilter(
+        GitOptions $options,
+        array $sourceDirectories,
+    ): string {
         $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
+        $filter = $options->isForDiffLines
+            ? 'AM'
+            : $options->filter;
 
-        if ($isForGitDiffLines) {
-            return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);
-        }
-
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
+        return $this->gitDiffFileProvider->provide($filter, $baseBranch, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath): Logs
@@ -458,5 +468,15 @@ class ConfigurationFactory
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    private function getGitSource(string|GitOptions|null $sourceFilter): ?GitSource
+    {
+        return $sourceFilter instanceof GitOptions
+            ? new GitSource(
+                $sourceFilter->baseBranch ?? $this->gitDiffFileProvider->provideDefaultBase(),
+                $sourceFilter->isForDiffLines,
+            )
+            : null;
     }
 }
