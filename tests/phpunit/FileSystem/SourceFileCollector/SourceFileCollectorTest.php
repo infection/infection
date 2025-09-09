@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
 use function array_map;
-use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\SourceFileCollector;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
