@@ -48,7 +48,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/Fixtures';
+    private const FIXTURES = __DIR__ . 'Fixtures';
 
     /**
      * @param string[] $sourceDirectories
@@ -202,7 +202,9 @@ final class SourceFileCollectorTest extends TestCase
         $expected = [];
 
         foreach ($expectedList as $path) {
-            $expected[$root . '/' . Path::normalize($path)] = $path;
+            $pathname = Path::normalize($root . '/' . $path);
+
+            $expected[$pathname] = Path::normalize($path);
         }
 
         return $expected;
