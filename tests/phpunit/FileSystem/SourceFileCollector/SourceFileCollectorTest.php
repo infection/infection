@@ -59,8 +59,6 @@ final class SourceFileCollectorTest extends TestCase
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expectedList): void
     {
-        $root = self::FIXTURES;
-
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
 
         self::assertIsEqualCanonicalizing(
@@ -181,9 +179,9 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param <string, SplFileInfo> $files
+     * @param array<string, SplFileInfo> $files
      *
-     * @return string<string, string> File real paths relative to the current temporary directory
+     * @return array<string, string> File real paths relative to the current temporary directory
      */
     private static function normalizePaths(array $files, string $root): array
     {
@@ -196,9 +194,9 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param <string, SplFileInfo> $files
+     * @param list<string> $expectedList
      *
-     * @return string<string, string> File real paths relative to the current temporary directory
+     * @return array<string, string> File real paths relative to the current temporary directory
      */
     private static function createExpected(array $expectedList, string $root): array
     {
