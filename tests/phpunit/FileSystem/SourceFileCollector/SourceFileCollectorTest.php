@@ -203,7 +203,7 @@ final class SourceFileCollectorTest extends TestCase
         $expected = [];
 
         foreach ($expectedList as $path) {
-            $expected[$root . DIRECTORY_SEPARATOR . $path] = $path;
+            $expected[$root . '/' . $path] = $path;
         }
 
         return $expected;
