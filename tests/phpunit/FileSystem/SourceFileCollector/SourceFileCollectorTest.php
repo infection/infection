@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
-use function array_map;
 use Infection\FileSystem\SourceFileCollector;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -186,10 +185,16 @@ final class SourceFileCollectorTest extends TestCase
     {
         $root = Path::normalize($root);
 
-        return array_map(
-            static fn (SplFileInfo $fileInfo): string => Path::makeRelative($fileInfo->getPathname(), $root),
-            $files,
-        );
+        $result = [];
+
+        foreach ($files as $pathName => $fileInfo) {
+            $result[Path::normalize($pathName)] = Path::makeRelative(
+                $fileInfo->getPathname(),
+                $root,
+            );
+        }
+
+        return $result;
     }
 
     /**
