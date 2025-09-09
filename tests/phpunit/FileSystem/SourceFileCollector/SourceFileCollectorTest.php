@@ -47,7 +47,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . 'Fixtures';
+    private const FIXTURES = __DIR__ . '/Fixtures';
 
     /**
      * @param string[] $sourceDirectories
