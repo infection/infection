@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
-use function array_map;
-use function array_values;
 use Infection\FileSystem\SourceFileCollector;
-use function natcasesort;
+use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -54,22 +52,17 @@ final class SourceFileCollectorTest extends TestCase
     /**
      * @param string[] $sourceDirectories
      * @param string[] $excludedFilesOrDirectories
-     * @param list<string> $expected
+     * @param list<string> $expectedList
      */
     #[DataProvider('sourceFilesProvider')]
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expected): void
+    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expectedList): void
     {
-        $root = self::FIXTURES;
-
         $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
 
-        $files = take($files)->toList();
-
-        $this->assertSame(
-            $expected,
-            self::normalizePaths($files, $root),
+        self::assertIsEqualCanonicalizing(
+            $expectedList,
+            take($files)->toAssoc(),
         );
-        $this->assertIsList($files);
     }
 
     /**
@@ -165,23 +158,60 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param SplFileInfo[] $files
+     * @param list<string> $expectedList
+     * @param array<string, SplFileInfo> $actual
+     */
+    private static function assertIsEqualCanonicalizing(
+        array $expectedList,
+        array $actual,
+    ): void {
+        $root = self::FIXTURES;
+
+        $normalizedExpected = self::createExpected($expectedList, $root);
+        $normalizedActual = self::normalizePaths($actual, $root);
+
+        ksort($normalizedExpected);
+        ksort($normalizedActual);
+
+        self::assertSame($normalizedExpected, $normalizedActual);
+    }
+
+    /**
+     * @param array<string, SplFileInfo> $files
      *
-     * @return string[] File real paths relative to the current temporary directory
+     * @return array<string, string> File real paths relative to the current temporary directory
      */
     private static function normalizePaths(array $files, string $root): array
     {
         $root = Path::normalize($root);
 
-        $files = array_values(
-            array_map(
-                static fn (SplFileInfo $fileInfo): string => Path::makeRelative($fileInfo->getPathname(), $root),
-                $files,
-            ),
-        );
+        $result = [];
 
-        natcasesort($files);
+        foreach ($files as $pathName => $fileInfo) {
+            $result[Path::normalize($pathName)] = Path::makeRelative(
+                $fileInfo->getPathname(),
+                $root,
+            );
+        }
 
-        return array_values($files);
+        return $result;
+    }
+
+    /**
+     * @param list<string> $expectedList
+     *
+     * @return array<string, string> File real paths relative to the current temporary directory
+     */
+    private static function createExpected(array $expectedList, string $root): array
+    {
+        $expected = [];
+
+        foreach ($expectedList as $path) {
+            $pathname = Path::normalize($root . '/' . $path);
+
+            $expected[$pathname] = Path::normalize($path);
+        }
+
+        return $expected;
     }
 }
