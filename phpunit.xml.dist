@@ -29,6 +29,7 @@
     <source>
         <include>
             <directory>src</directory>
+            <file>tests/NewSrc/PhpParser/Visitor/TrackTraverseVisitor.php</file>
         </include>
     </source>
 
