@@ -33,39 +33,65 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\TestFramework\DOM;
 
 use DOMDocument;
-use Infection\TestFramework\DOM\SafeDOMXPath;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use DOMElement;
+use DOMNodeList;
+use DOMXPath;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(SafeDOMXPath::class)]
-final class SafeDOMXPathTest extends TestCase
+/**
+ * @internal
+ *
+ * @property DOMDocument $document
+ */
+final readonly class SafeDOMXPath
 {
-    public function test_it_reads_xml(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    private DOMXPath $xPath;
+
+    public function __construct(
+        private DOMDocument $document,
+    ) {
+        $this->xPath = new DOMXPath($document);
     }
 
-    public function test_it_fails_on_invalid_query(): void
+    public function __get(string $property): DOMDocument
     {
-        $this->expectException(InvalidArgumentException::class);
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $xPath->query('#');
+        return $this->$property;
     }
 
-    public function test_it_fails_on_invalid_xml(): void
+    public static function fromFile(string $pathname): self
     {
-        $this->expectException(InvalidArgumentException::class);
-        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
+        Assert::fileExists($pathname);
+
+        $dom = new DOMDocument();
+        $success = @$dom->load($pathname);
+
+        Assert::true($success);
+
+        return new self($dom);
     }
 
-    public function test_it_has_document_property(): void
+    public static function fromString(string $content): self
     {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
-        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
+        $document = new DOMDocument();
+        $success = @$document->loadXML($content);
+
+        Assert::true($success);
+
+        return new self($document);
+    }
+
+    /**
+     * @return DOMNodeList<DOMElement>
+     */
+    public function query(string $query): DOMNodeList
+    {
+        $nodes = @$this->xPath->query($query);
+
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
+
+        return $nodes;
     }
 }

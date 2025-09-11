@@ -42,9 +42,9 @@ use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\SafeDOMXPath;
-use function Later\lazy;
+use Infection\TestFramework\DOM\SafeDOMXPath;
 use Webmozart\Assert\Assert;
+use function Later\lazy;
 
 /**
  * @internal

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php vendor/bin/phpunit:*)",
+      "Bash(vendor/bin/phpunit:*)",
+      "Bash(XDEBUG_MODE=coverage bin/infection)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

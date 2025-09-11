@@ -37,9 +37,9 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMDocument;
 use Infection\CannotBeInstantiated;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
+use Infection\TestFramework\DOM\SafeDOMXPath;
 use Webmozart\Assert\Assert;
+use function Safe\preg_replace;
 
 /**
  * @internal

@@ -33,39 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace newSrc\TestFramework\Coverage\JUnit;
+
+// TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
+//  Need to be revisted.
 
 use DOMDocument;
 use Infection\TestFramework\DOM\SafeDOMXPath;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(SafeDOMXPath::class)]
-final class SafeDOMXPathTest extends TestCase
+final class IndexReport
 {
-    public function test_it_reads_xml(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    private ?SafeDOMXPath $xPath = null;
+
+    public function __construct(
+        private readonly string $pathname,
+    ) {
     }
 
-    public function test_it_fails_on_invalid_query(): void
+    public function hasTest(string $sourcePathname): bool
     {
-        $this->expectException(InvalidArgumentException::class);
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $xPath->query('#');
+
     }
 
-    public function test_it_fails_on_invalid_xml(): void
+    private function getXPath(): SafeDOMXPath
     {
-        $this->expectException(InvalidArgumentException::class);
-        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
-    }
-
-    public function test_it_has_document_property(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
-        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
+        return $this->xPath ??= SafeDOMXPath::fromFile($this->pathname);
     }
 }

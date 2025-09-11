@@ -37,24 +37,24 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
 use DOMDocument;
-use const E_ALL;
+use Infection\TestFramework\DOM\SafeDOMXPath;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\TestFramework\SafeDOMXPath;
-use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use function Infection\Tests\normalizeLineReturn;
 use function restore_error_handler;
 use function set_error_handler;
 use function sprintf;
 use function str_replace;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
+use const E_ALL;
+use const PHP_OS_FAMILY;
 
 #[Group('integration')]
 #[CoversClass(XmlConfigurationManipulator::class)]

@@ -33,39 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace newSrc\TestFramework\Coverage\Locator;
 
-use DOMDocument;
-use Infection\TestFramework\DOM\SafeDOMXPath;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(SafeDOMXPath::class)]
-final class SafeDOMXPathTest extends TestCase
+interface ReportLocator
 {
-    public function test_it_reads_xml(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
-    }
-
-    public function test_it_fails_on_invalid_query(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $xPath->query('#');
-    }
-
-    public function test_it_fails_on_invalid_xml(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
-    }
-
-    public function test_it_has_document_property(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
-        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
-    }
+    /**
+     * @throws NoReportFound
+     */
+    public function locate(): string;
 }

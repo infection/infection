@@ -33,53 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework;
+namespace newSrc\TestFramework\Coverage\JUnit;
 
-use DOMDocument;
-use DOMElement;
-use DOMNodeList;
-use DOMXPath;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 /**
- * @internal
- *
- * @property DOMDocument $document
+ * TODO: heavily inspired from IndexXmlCoverageParser
+ * @see IndexXmlCoverageParser
  */
-final readonly class SafeDOMXPath
+final class PHPUnitXmlParser
 {
-    private DOMXPath $xPath;
-
-    public function __construct(
-        private DOMDocument $document,
-    ) {
-        $this->xPath = new DOMXPath($document);
-    }
-
-    public function __get(string $property): DOMDocument
+    public function parse(string $fileName): PHPUnitXmlReport
     {
-        return $this->$property;
-    }
-
-    public static function fromString(string $content): self
-    {
-        $document = new DOMDocument();
-        $success = @$document->loadXML($content);
-
-        Assert::true($success);
-
-        return new self($document);
-    }
-
-    /**
-     * @return DOMNodeList<DOMElement>
-     */
-    public function query(string $query): DOMNodeList
-    {
-        $nodes = @$this->xPath->query($query);
-
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
-
-        return $nodes;
+        // TODO: the implementation need to be lazy and streamed.
     }
 }

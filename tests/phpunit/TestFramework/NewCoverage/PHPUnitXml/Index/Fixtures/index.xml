@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+    <build time="Sun Dec 11 16:04:33 UTC 2022" phpunit="9.5.27" coverage="9.2.19">
+        <runtime name="PHP" version="8.1.13" url="https://secure.php.net/"/>
+        <driver name="pcov" version="1.0.11"/>
+    </build>
+    <project source="/path/to/infection/src">
+        <tests>
+            <test name="Infection\Tests\CI\MemoizedCiDetectorTest::test_it_can_be_instantiated_from_environment"
+                  size="unknown" result="0" status="PASSED"/>
+            <test name="Infection\Tests\CI\MemoizedCiDetectorTest::test_it_runs_the_detection_only_once" size="unknown"
+                  result="0" status="PASSED"/>
+            <test name="Infection\Tests\CI\NullCiDetectorTest::test_it_can_be_instantiated_from_environment"
+                  size="unknown" result="0" status="PASSED"/>
+            <test name="Infection\Tests\CI\NullCiDetectorTest::test_it_does_not_detect_any__ci" size="unknown"
+                  result="0" status="PASSED"/>
+            <test name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_parser_psr4" size="unknown"
+                  result="0" status="PASSED"/>
+            <test
+                name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_only_src_if_several_are_in_psr_config"
+                size="unknown" result="0" status="PASSED"/>
+            <test name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_parser_psr0" size="unknown"
+                  result="0" status="PASSED"/>
+            <test
+                name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_null_when_does_not_have_autoload"
+                size="unknown" result="0" status="PASSED"/>
+            <test
+                name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_null_when_does_not_have_psr_autoload"
+                size="unknown" result="0" status="PASSED"/>
+            <test
+                name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_only_src_if_contains_array_of_paths"
+                size="unknown" result="0" status="PASSED"/>
+            <test
+                name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_returns_list_if_contains_array_of_paths_without_src"
+                size="unknown" result="0" status="PASSED"/>
+            <test name="Infection\Tests\Config\Guesser\SourceDirGuesserTest::test_it_throw_invalid_autoload_exception"
+                  size="unknown" result="0" status="PASSED"/>
+            <test name="Infection\Tests\Config\ConsoleHelperTest::test_it_writes_to_section" size="unknown" result="0"
+                  status="PASSED"/>
+            <test name="Infection\Tests\Config\ConsoleHelperTest::test_get_question_with_no_default" size="unknown"
+                  result="0" status="PASSED"/>
+            <test name="Infection\Tests\Config\ConsoleHelperTest::test_get_question_with_default" size="unknown"
+                  result="0" status="PASSED"/>
+        </tests>
+        <directory name="/">
+            <totals>
+                <lines total="42826" comments="17211" code="25615" executable="5212" executed="3450" percent="66.19"/>
+                <methods count="1451" tested="886" percent="61.06"/>
+                <functions count="0" tested="0" percent="0"/>
+                <classes count="387" tested="128" percent="33.07"/>
+                <traits count="3" tested="0" percent="0.00"/>
+            </totals>
+            <directory name="CI">
+                <totals>
+                    <lines total="141" comments="76" code="65" executable="11" executed="11" percent="100.00"/>
+                    <methods count="5" tested="5" percent="100.00"/>
+                    <functions count="0" tested="0" percent="0"/>
+                    <classes count="2" tested="2" percent="100.00"/>
+                    <traits count="0" tested="0" percent="0"/>
+                </totals>
+                <file name="MemoizedCiDetector.php" href="CI/MemoizedCiDetector.php.xml">
+                    <totals>
+                        <lines total="78" comments="42" code="36" executable="8" executed="8" percent="100.00"/>
+                        <methods count="2" tested="2" percent="100.00"/>
+                        <functions count="0" tested="0" percent="0"/>
+                        <classes count="1" tested="1" percent="100.00"/>
+                        <traits count="0" tested="0" percent="0"/>
+                    </totals>
+                </file>
+                <file name="NullCiDetector.php" href="CI/NullCiDetector.php.xml">
+                    <totals>
+                        <lines total="63" comments="34" code="29" executable="3" executed="3" percent="100.00"/>
+                        <methods count="3" tested="3" percent="100.00"/>
+                        <functions count="0" tested="0" percent="0"/>
+                        <classes count="1" tested="1" percent="100.00"/>
+                        <traits count="0" tested="0" percent="0"/>
+                    </totals>
+                </file>
+            </directory>
+            <directory name="Config">
+                <totals>
+                    <lines total="967" comments="357" code="610" executable="154" executed="149" percent="96.75"/>
+                    <methods count="28" tested="25" percent="89.29"/>
+                    <functions count="0" tested="0" percent="0"/>
+                    <classes count="9" tested="7" percent="77.78"/>
+                    <traits count="0" tested="0" percent="0"/>
+                </totals>
+                <directory name="Guesser">
+                    <totals>
+                        <lines total="226" comments="88" code="138" executable="38" executed="38" percent="100.00"/>
+                        <methods count="8" tested="8" percent="100.00"/>
+                        <functions count="0" tested="0" percent="0"/>
+                        <classes count="2" tested="2" percent="100.00"/>
+                        <traits count="0" tested="0" percent="0"/>
+                    </totals>
+                    <file name="PhpUnitPathGuesser.php" href="Config/Guesser/PhpUnitPathGuesser.php.xml">
+                        <totals>
+                            <lines total="90" comments="38" code="52" executable="13" executed="13" percent="100.00"/>
+                            <methods count="3" tested="3" percent="100.00"/>
+                            <functions count="0" tested="0" percent="0"/>
+                            <classes count="1" tested="1" percent="100.00"/>
+                            <traits count="0" tested="0" percent="0"/>
+                        </totals>
+                    </file>
+                    <file name="SourceDirGuesser.php" href="Config/Guesser/SourceDirGuesser.php.xml">
+                        <totals>
+                            <lines total="136" comments="50" code="86" executable="25" executed="25" percent="100.00"/>
+                            <methods count="5" tested="5" percent="100.00"/>
+                            <functions count="0" tested="0" percent="0"/>
+                            <classes count="1" tested="1" percent="100.00"/>
+                            <traits count="0" tested="0" percent="0"/>
+                        </totals>
+                    </file>
+                </directory>
+                <file name="ConsoleHelper.php" href="Config/ConsoleHelper.php.xml">
+                    <totals>
+                        <lines total="70" comments="34" code="36" executable="6" executed="6" percent="100.00"/>
+                        <methods count="3" tested="3" percent="100.00"/>
+                        <functions count="0" tested="0" percent="0"/>
+                        <classes count="1" tested="1" percent="100.00"/>
+                        <traits count="0" tested="0" percent="0"/>
+                    </totals>
+                </file>
+            </directory>
+        </directory>
+    </project>
+</phpunit>
