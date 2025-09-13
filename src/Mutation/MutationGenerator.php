@@ -51,21 +51,22 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  * @final
+ * @deprecated Hides abstractions behind one name, but in practice you still have to grok everything
  */
-class MutationGenerator
+readonly class MutationGenerator
 {
     /** @var Mutator<Node>[] */
-    private readonly array $mutators;
+    private array $mutators;
 
     /**
      * @param Mutator<Node>[] $mutators
      */
     public function __construct(
-        private readonly TraceProvider $traceProvider,
+        private TraceProvider $traceProvider,
         array $mutators,
-        private readonly EventDispatcher $eventDispatcher,
-        private readonly FileMutationGenerator $fileMutationGenerator,
-        private readonly bool $runConcurrently,
+        private EventDispatcher $eventDispatcher,
+        private FileMutationGenerator $fileMutationGenerator,
+        private bool $runConcurrently,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         $this->mutators = $mutators;
@@ -78,6 +79,8 @@ class MutationGenerator
      * @throws UnparsableFile
      *
      * @return iterable<Mutation>
+     *
+     * @deprecated
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
