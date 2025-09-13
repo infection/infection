@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
+use Infection\TestFramework\DOM\XPathFactory;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;

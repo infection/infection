@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\DOM\SafeDOMXPath;
+use Infection\TestFramework\DOM\XPathFactory;
 use Safe\Exceptions\FilesystemException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
@@ -96,7 +97,7 @@ class SourceFileInfoProvider
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->query('/phpunit/file')[0];
+        $fileNode = $xPath->queryList('/phpunit/file')[0];
 
         Assert::notNull($fileNode);
 

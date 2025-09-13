@@ -37,9 +37,11 @@ namespace Infection\TestFramework\DOM;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use DOMNodeList;
 use DOMXPath;
 use Webmozart\Assert\Assert;
+use function sprintf;
 
 /**
  * @internal
@@ -51,7 +53,7 @@ final readonly class SafeDOMXPath
     private DOMXPath $xPath;
 
     public function __construct(
-        private DOMDocument $document,
+        public DOMDocument $document,
     ) {
         $this->xPath = new DOMXPath($document);
     }
@@ -86,12 +88,34 @@ final readonly class SafeDOMXPath
     /**
      * @return DOMNodeList<DOMElement>
      */
-    public function query(string $query): DOMNodeList
+    public function queryList(string $query, ?DOMNode $contextNode = null): DOMNodeList
     {
-        $nodes = @$this->xPath->query($query);
-
+        $nodes = @$this->xPath->query($query, $contextNode);
         Assert::isInstanceOf($nodes, DOMNodeList::class);
 
         return $nodes;
+    }
+
+    public function queryElement(string $query, ?DOMNode $contextNode = null): ?DOMElement
+    {
+        $nodes = @$this->xPath->query($query, $contextNode);
+        Assert::isInstanceOf($nodes, DOMNodeList::class);
+//        Assert::true(
+//            $nodes->length <= 1,
+//            sprintf(
+//                'Expected the query "%s" to return a "%s" with no or one node. Got "%s".',
+//                $query,
+//                DOMNodeList::class,
+//                $nodes->length,
+//            ),
+//        );
+
+        return $nodes[0] ?? null;
+    }
+
+    public function registerNamespace(string $prefix, string $namespace): void
+    {
+        $result = $this->xPath->registerNamespace($prefix, $namespace);
+        Assert::true($result);
     }
 }

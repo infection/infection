@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use Infection\TestFramework\DOM\SafeDOMXPath;
+use Infection\TestFramework\DOM\XPathFactory;
 
 /**
  * @internal
@@ -80,7 +81,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $projectSource = self::getProjectSource($xPath);
 
-        foreach ($xPath->query('//file') as $node) {
+        foreach ($xPath->queryList('//file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(
@@ -97,7 +98,7 @@ class IndexXmlCoverageParser
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
-        $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
+        $lineCoverage = $xPath->queryList('/phpunit/project/directory[1]/totals/lines')->item(0);
 
         if (
             !$lineCoverage instanceof DOMElement
@@ -113,13 +114,13 @@ class IndexXmlCoverageParser
     private static function getProjectSource(SafeDOMXPath $xPath): string
     {
         // PHPUnit >= 6
-        $sourceNodes = $xPath->query('//project/@source');
+        $sourceNodes = $xPath->queryList('//project/@source');
 
         if ($sourceNodes->length > 0) {
             return $sourceNodes[0]->nodeValue;
         }
 
         // PHPUnit < 6
-        return $xPath->query('//project/@name')[0]->nodeValue;
+        return $xPath->queryList('//project/@name')[0]->nodeValue;
     }
 }

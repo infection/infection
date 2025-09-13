@@ -173,12 +173,12 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function setCustomBootstrapPath(string $customAutoloadFilePath, SafeDOMXPath $xPath): void
     {
-        $bootstrap = $xPath->query('/phpunit/@bootstrap');
+        $bootstrap = $xPath->queryList('/phpunit/@bootstrap');
 
         if ($bootstrap->length > 0) {
             $bootstrap[0]->nodeValue = $customAutoloadFilePath;
         } else {
-            $node = $xPath->query('/phpunit')[0];
+            $node = $xPath->queryList('/phpunit')[0];
             $node->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
@@ -196,12 +196,12 @@ class MutationConfigBuilder extends ConfigBuilder
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuites/testsuite'),
+            $xPath->queryList('/phpunit/testsuites/testsuite'),
         );
 
         // Handle situation when test suite is directly inside root node
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuite'),
+            $xPath->queryList('/phpunit/testsuite'),
         );
     }
 
@@ -227,13 +227,13 @@ class MutationConfigBuilder extends ConfigBuilder
         DOMDocument $dom,
         SafeDOMXPath $xPath,
     ): void {
-        $testSuites = $xPath->query('/phpunit/testsuites');
+        $testSuites = $xPath->queryList('/phpunit/testsuites');
 
         $nodeToAppendTestSuite = $testSuites->item(0);
 
         // If there is no `testsuites` node, append to root
         if ($nodeToAppendTestSuite === null) {
-            $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
+            $nodeToAppendTestSuite = $xPath->queryList('/phpunit')->item(0);
         }
 
         $testSuite = $dom->createElement('testsuite');
@@ -254,7 +254,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getOriginalBootstrapFilePath(SafeDOMXPath $xPath): string
     {
-        $bootstrap = $xPath->query('/phpunit/@bootstrap');
+        $bootstrap = $xPath->queryList('/phpunit/@bootstrap');
 
         if ($bootstrap->length > 0) {
             return $bootstrap[0]->nodeValue;

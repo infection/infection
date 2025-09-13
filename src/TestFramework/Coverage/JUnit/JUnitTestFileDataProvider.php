@@ -66,7 +66,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         $nodes = null;
 
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
-            $nodes = $xPath->query(sprintf($queryString, $placeholder));
+            $nodes = $xPath->queryList(sprintf($queryString, $placeholder));
 
             if ($nodes->length !== 0) {
                 break;

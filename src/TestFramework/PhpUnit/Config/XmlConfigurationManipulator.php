@@ -73,7 +73,7 @@ final readonly class XmlConfigurationManipulator
             '//file',
         ];
 
-        foreach ($xPath->query(implode('|', $queries)) as $node) {
+        foreach ($xPath->queryList(implode('|', $queries)) as $node) {
             $this->pathReplacer->replaceInNode($node);
         }
     }
@@ -83,11 +83,11 @@ final readonly class XmlConfigurationManipulator
      */
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
-        foreach ($xPath->query('/phpunit/logging') as $node) {
+        foreach ($xPath->queryList('/phpunit/logging') as $node) {
             $node->parentNode?->removeChild($node);
         }
 
-        foreach ($xPath->query('/phpunit/coverage/report') as $node) {
+        foreach ($xPath->queryList('/phpunit/coverage/report') as $node) {
             $node->parentNode?->removeChild($node);
         }
     }
@@ -186,15 +186,15 @@ final readonly class XmlConfigurationManipulator
 
     public function validate(string $configPath, SafeDOMXPath $xPath): bool
     {
-        if ($xPath->query('/phpunit')->length === 0) {
+        if ($xPath->queryList('/phpunit')->length === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
         }
 
-        if ($xPath->query('namespace::xsi')->length === 0) {
+        if ($xPath->queryList('namespace::xsi')->length === 0) {
             return true;
         }
 
-        $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = $xPath->queryList('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
 
@@ -274,7 +274,7 @@ final readonly class XmlConfigurationManipulator
 
     private function nodeExists(SafeDOMXPath $xPath, string $nodeName): bool
     {
-        return $xPath->query(sprintf('/phpunit/%s', $nodeName))->length > 0;
+        return $xPath->queryList(sprintf('/phpunit/%s', $nodeName))->length > 0;
     }
 
     private function createNode(DOMDocument $dom, string $nodeName): DOMElement
@@ -326,7 +326,7 @@ final readonly class XmlConfigurationManipulator
 
     private function removeAttribute(SafeDOMXPath $xPath, string $name): void
     {
-        $nodeList = $xPath->query(sprintf(
+        $nodeList = $xPath->queryList(sprintf(
             '/phpunit/@%s',
             $name,
         ));
@@ -340,7 +340,7 @@ final readonly class XmlConfigurationManipulator
 
     private function setAttributeValue(SafeDOMXPath $xPath, string $name, string $value): void
     {
-        $nodeList = $xPath->query(sprintf(
+        $nodeList = $xPath->queryList(sprintf(
             '/phpunit/@%s',
             $name,
         ));
@@ -348,7 +348,7 @@ final readonly class XmlConfigurationManipulator
         if ($nodeList->length > 0) {
             $nodeList[0]->nodeValue = $value;
         } else {
-            $node = $xPath->query('/phpunit')[0];
+            $node = $xPath->queryList('/phpunit')[0];
             $node->setAttribute($name, $value);
         }
     }
@@ -372,14 +372,14 @@ final readonly class XmlConfigurationManipulator
 
     private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
     {
-        foreach ($xPath->query($nodeQuery) as $node) {
+        foreach ($xPath->queryList($nodeQuery) as $node) {
             $node->parentNode?->removeChild($node);
         }
     }
 
     private function getOrCreateNode(SafeDOMXPath $xPath, DOMDocument $dom, string $nodeName): DOMElement
     {
-        $node = $xPath->query(sprintf('/phpunit/%s', $nodeName));
+        $node = $xPath->queryList(sprintf('/phpunit/%s', $nodeName));
 
         if ($node->length > 0) {
             return $node[0];
@@ -390,10 +390,10 @@ final readonly class XmlConfigurationManipulator
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+        $nodeList = $xPath->queryList(sprintf('/phpunit/@%s', $attribute));
 
         if ($nodeList->length === 0) {
-            $node = $xPath->query('/phpunit')[0];
+            $node = $xPath->queryList('/phpunit')[0];
             $node->setAttribute($attribute, $value);
 
             return true;

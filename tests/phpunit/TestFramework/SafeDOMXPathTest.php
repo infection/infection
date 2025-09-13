@@ -47,14 +47,14 @@ final class SafeDOMXPathTest extends TestCase
     public function test_it_reads_xml(): void
     {
         $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+        $this->assertSame('Baz', $xPath->queryList('/foo/bar')[0]->nodeValue);
     }
 
     public function test_it_fails_on_invalid_query(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $xPath->query('#');
+        $xPath->queryList('#');
     }
 
     public function test_it_fails_on_invalid_xml(): void
