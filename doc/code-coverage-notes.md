@@ -1,3 +1,6 @@
 - we need a way to easily tell if a file (given its pathname) has tests. Currently it is a bit annoying because it's a breakdown of directories + files so the lookup is a bit annoying.
-- the coverage needs to be size efficient somehow (so split files like the current XML coverage report?)
+- the coverage needs to be size efficient somehow
+  - split files like the current XML coverage report is probably good?
+  - the coverage of a file (e.g. right now `MyFile.php.xml`) does not need to contain all the source code
+  - the index also contains a lot of unnecessary information as well (e.g. totals per directory)
 - a way to identify that the coverage is out of date with either the source code or the tests

@@ -33,11 +33,85 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\NewCoverage\PHPUnitXml\File;
 
-// TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
-//  Need to be revisted.
+use DOMElement;
+use Generator;
+use Infection\TestFramework\DOM\SafeDOMXPath;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
+use function array_key_exists;
+use function array_map;
+use function dirname;
+use function iterator_to_array;
+use function sprintf;
 
+/**
+ * Represents a coverage file of the PHPUnit XML coverage report. Typically, this
+ * is the `CI/MemoizedCiDetector.php.xml` found in the XML coverage directory
+ * for the source file `<project-source>/CI/MemoizedCiDetector.php`.
+ *
+ * This file contains:
+ * - A summary of the executable, executed and covered code.
+ * - A breakdown of the source code, its tokens, its namespace, classes, methods, etc.
+ * - Information about the coverage: which line is covered and by what test.
+ *
+ * In Infection, we use this file to know which lines are covered and by what tests.
+ */
 final class FileReport
 {
+    private SafeDOMXPath $xPath;
+
+    /**
+     * @param string $pathname Absolute canonical pathname of the XML coverage file.
+     */
+    public function __construct(
+        private readonly string $pathname,
+    ) {
+    }
+
+    /**
+     * This method is not expected to be called if the file has already been
+     * identified to not have any tests, i.e. we expect to have at least one
+     * line of executable code covered.
+     *
+     * @param string $sourcePathname Canonical pathname of the source file. It
+     *                               is expected to either be absolute, or it
+     *                               should be relative to the PHPUnit source
+     *                               (configured in the PHPUnit configuration file).
+     *
+     * @return non-empty-list<LineCoverage>
+     */
+    public function getCoverage(): array
+    {
+        return array_map(
+            LineCoverage::fromNode(...),
+            iterator_to_array(
+                $this->getXPath()->queryList('//coverage:coverage//coverage:line'),
+            ),
+        );
+    }
+
+    private function getXPath(): SafeDOMXPath
+    {
+        return $this->xPath ??= $this->createXPath();
+    }
+
+    private function createXPath(): SafeDOMXPath
+    {
+        $xPath = SafeDOMXPath::fromFile($this->pathname);
+
+        // The default PHPUnit namespace is "https://schema.phpunit.de/coverage/1.0".
+        // It is quite verbose and would be annoying to use it everywhere.
+        // Instead, it is better to introduce an easy to write and read namespace
+        // that we can use in the queries.
+        $xPath->registerNamespace(
+            'coverage',
+            $xPath->document->documentElement->namespaceURI,
+        );
+
+        return $xPath;
+    }
 }

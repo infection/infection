@@ -61,7 +61,6 @@ use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Traversable;
 
-#[Group('integration')]
 #[CoversClass(IndexReport::class)]
 final class IndexReportTest extends TestCase
 {
@@ -137,6 +136,8 @@ final class IndexReportTest extends TestCase
                 '/path/to/unknown.php' => false,
             ],
         ];
+
+        // TODO: case where there is multiple files with the same name
     }
 
     /**
@@ -205,5 +206,26 @@ final class IndexReportTest extends TestCase
                 '/path/to/unknown.php' => null,
             ],
         ];
+    }
+
+    public function test_the_information_is_memoized(): void
+    {
+        $report = new IndexReport(self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml');
+
+        $fileInfo1 = $report->findSourceFileInfo('CI/MemoizedCiDetector.php');
+        $fileInfo2 = $report->findSourceFileInfo('CI/MemoizedCiDetector.php');
+
+        self::assertSame($fileInfo1, $fileInfo2);
+    }
+
+    public function test_it_can_provide_information_even_once_a_full_traverse_is_done(): void
+    {
+        $report = new IndexReport(self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml');
+
+        // Looking for an unknown file will cause it to process the entire XML file.
+        $report->findSourceFileInfo('Unknown/Unknown.php');
+        $fileInfo = $report->findSourceFileInfo('CI/MemoizedCiDetector.php');
+
+        self::assertNotNull($fileInfo);
     }
 }

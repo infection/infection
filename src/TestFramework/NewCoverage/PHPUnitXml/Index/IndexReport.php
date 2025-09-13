@@ -49,7 +49,8 @@ use function dirname;
 use function sprintf;
 
 /**
- * Represents the index file of the PHPUnit XML coverage report.
+ * Represents the index file of the PHPUnit XML coverage report. Typically, this
+ * is the `index.xml` file found in the XML coverage directory.
  *
  * This file contains:
  * - The exhaustive list of tests executed and their status.
@@ -82,6 +83,12 @@ final class IndexReport
         $this->coverageDirPathname = dirname($pathname);
     }
 
+    /**
+     * @param string $sourcePathname Canonical pathname of the source file. It
+     *                               is expected to either be absolute, or it
+     *                               should be relative to the PHPUnit source
+     *                               (configured in the PHPUnit configuration file).
+     */
     public function findSourceFileInfo(string $sourcePathname): SourceFileIndexXmlInfo|null
     {
         return array_key_exists($sourcePathname, $this->indexedFileInfos)
@@ -89,6 +96,12 @@ final class IndexReport
             : $this->lookup($sourcePathname);
     }
 
+    /**
+     * @param string $sourcePathname Canonical pathname of the source file. It
+     *                               is expected to either be absolute, or it
+     *                               should be relative to the PHPUnit source
+     *                               (configured in the PHPUnit configuration file).
+     */
     public function hasTest(string $sourcePathname): bool
     {
         return $this->findSourceFileInfo($sourcePathname)?->hasExecutedCode() ?? false;
