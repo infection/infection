@@ -184,7 +184,7 @@ final readonly class XmlConfigurationManipulator
         $this->addOrUpdateCoverageNodes('source', 'include', $xPath, $srcDirs, $filteredSourceFilesToMutate);
     }
 
-    public function validate(string $configPath, SafeDOMXPath $xPath): bool
+    public function validate(string $configPath, SafeDOMXPath $xPath): true
     {
         if ($xPath->query('/phpunit')->length === 0) {
             throw InvalidPhpUnitConfiguration::byRootNode($configPath);
