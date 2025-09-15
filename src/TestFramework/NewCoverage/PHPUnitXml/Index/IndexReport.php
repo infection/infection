@@ -85,6 +85,27 @@ final class IndexReport
     }
 
     /**
+     * @return iterable<SourceFileIndexXmlInfo>
+     */
+    public function getSourceFileInfos(): iterable
+    {
+        // This method is used for BC, and in the current flow it is expected to
+        // be called first.
+        Assert::false($this->traversed);
+
+        $source = $this->getPhpunitSource();
+
+        foreach ($this->getFileInfos() as $fileInfo) {
+            $correctedSourcePathname = Path::join($source, $fileInfo->sourcePathname);
+
+            $this->indexedFileInfos[$fileInfo->sourcePathname] = $fileInfo;
+            $this->indexedFileInfos[$correctedSourcePathname] = $fileInfo;
+
+            yield $fileInfo;
+        }
+    }
+
+    /**
      * @param string $sourcePathname Canonical pathname of the source file. It
      *                               is expected to either be absolute, or it
      *                               should be relative to the PHPUnit source

@@ -33,11 +33,90 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\NewCoverage\PHPUnitXml;
 
 // TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
 //  Need to be revisted.
 
+use Closure;
+use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use PHPUnit\Framework\TestCase;
+use function array_key_exists;
+
 final class PHPUnitXmlReport
 {
+    private readonly JUnitReport $jUnitReport;
+    private readonly IndexReport $indexReport;
+
+    /**
+     * @param Closure():IndexReport $getIndexReport
+     * @param Closure():JUnitReport $getJUnitReport
+     * @param Closure $getJunitReport
+     */
+    public function __construct(
+        private readonly Closure $getIndexReport,
+        private readonly Closure $getJUnitReport,
+        private readonly Closure $getJunitReport,
+    ) {
+    }
+
+    /**
+     * @return iterable<SourceFileIndexXmlInfo>
+     */
+    public function getSourceFileInfos(): iterable
+    {
+        return $this->getIndexReport()->getSourceFileInfos();
+    }
+
+    /**
+     * This method is not expected to be called if the file has already been
+     *  identified to not have any tests, i.e. we expect to have at least one
+     *  line of executable code covered.
+     *
+     * @return non-empty-list<LineCoverage>
+     */
+    public function getCoverage(string $coveragePathname): array
+    {
+        FileReport
+    }
+
+    /**
+     * @param class-string<TestCase> $testCaseClassName FQCN
+     */
+    public function getTestSuiteExecutionTime(string $testCaseClassName): float
+    {
+        return $this->getJUnitReport()->getTestSuiteExecutionTime($testCaseClassName);
+    }
+
+    /**
+     * @param string $sourcePathname Canonical pathname of the source file. It
+     *                               is expected to either be absolute, or it
+     *                               should be relative to the PHPUnit source
+     *                               (configured in the PHPUnit configuration file).
+     */
+    public function hasTest(string $sourcePathname): bool
+    {
+        return $this->getIndexReport()->hasTest($sourcePathname);
+    }
+
+    private function getJUnitReport(): JUnitReport
+    {
+        if (!isset($this->jUnitReport)) {
+            $this->jUnitReport = ($this->getJUnitReport)();
+        }
+
+        return $this->jUnitReport;
+    }
+
+    private function getIndexReport(): IndexReport
+    {
+        if (!isset($this->indexReport)) {
+            $this->indexReport = ($this->getIndexReport)();
+        }
+
+        return $this->indexReport;
+    }
 }
