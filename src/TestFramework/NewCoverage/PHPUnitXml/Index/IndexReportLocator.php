@@ -37,7 +37,6 @@ namespace newSrc\TestFramework\Coverage\JUnit;
 
 use function count;
 use function current;
-use DomainException;
 use function implode;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use function iter\map;
@@ -83,8 +82,6 @@ final readonly class IndexReportLocator implements ReportLocator
 
     public function locate(): string
     {
-        throw new DomainException('TODO: not implemented.');
-
         if ($this->filesystem->isReadableFile($this->defaultJUnitPath)) {
             return $this->defaultJUnitPath;
         }

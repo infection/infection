@@ -33,18 +33,32 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\NewCoverage\PHPUnitXml;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
+use newSrc\TestFramework\Coverage\JUnit\IndexReportLocator;
 
-/**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
- */
-final class IndexReportParser
+final class PHPUnitXmlProvider
 {
-    public function parse(string $fileName): PHPUnitXmlReport
+    private PHPUnitXmlReport $report;
+
+    public function __construct(
+        private readonly IndexReportLocator $indexReportLocator,
+        private readonly JUnitReportLocator $jUnitReportLocator,
+    ) {
+    }
+
+    public function get(): PHPUnitXmlReport
     {
-        // TODO: the implementation need to be lazy and streamed.
+        if (!isset($this->report)) {
+            $this->report = new PHPUnitXmlReport(
+                fn () => new IndexReport($this->indexReportLocator->locate()),
+                fn () => new JUnitReport($this->jUnitReportLocator->locate()),
+            );
+        }
+
+        return $this->report;
     }
 }

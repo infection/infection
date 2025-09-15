@@ -33,18 +33,52 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Tracing;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\Trace;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
+ * This trace is meant for source files which have no test whatsoever.
  */
-final class PHPUnitXmlParser
+final class EmptyTrace implements Trace
 {
-    public function parse(string $fileName): PHPUnitXmlReport
+    public function __construct(
+        public readonly SplFileInfo $sourceFileInfo,
+    ) {
+    }
+
+    public function getSourceFileInfo(): SplFileInfo
     {
-        // TODO: the implementation need to be lazy and streamed.
+        // TODO: Implement getSourceFileInfo() method.
+    }
+
+    public function getRealPath(): string
+    {
+        // TODO: Implement getRealPath() method.
+    }
+
+    public function getRelativePathname(): string
+    {
+        // TODO: Implement getRelativePathname() method.
+    }
+
+    public function hasTests(): bool
+    {
+        // TODO: Implement hasTests() method.
+    }
+
+    public function getTests(): ?TestLocations
+    {
+        // TODO: Implement getTests() method.
+    }
+
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        // TODO: Implement getAllTestsForMutation() method.
     }
 }

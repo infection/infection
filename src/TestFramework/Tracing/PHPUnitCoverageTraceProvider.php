@@ -35,56 +35,37 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use Infection\FileSystem\FileFilter;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
-use newSrc\TestFramework\Coverage\JUnit\PHPUnitXmlParser;
-use SplFileInfo;
 
 /**
  * Filters traces and augments them with timing data from JUnit report.
  *
  * @internal
+ * TODO: replaces CoveredTraceProvider
  */
 final class PHPUnitCoverageTraceProvider implements TraceProvider
 {
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private TraceProvider $primaryTraceProvider,
-        private JUnitTestExecutionInfoAdder $testFileDataAdder,
-        private FileFilter $bufferedFilter,
-        private readonly PHPUnitXmlParser $parser,
+        private readonly PHPUnitXmlProvider $parser,
+        private readonly PHPUnitCoverageTracer $tracer,
     ) {
     }
 
     public function provideTraces(): iterable
     {
         foreach ($this->getReport()->getSourceFileInfos() as $sourceFileInfo) {
-            yield $this->createTrace($sourceFileInfo);
+            yield $this->tracer->trace($sourceFileInfo);
         }
-    }
-
-    private function createTrace(SourceFileIndexXmlInfo $fileInfo): Trace
-    {
-        $coverage = (new FileReport($fileInfo->coveragePathname))->getCoverage();
-        $this->getReport()->getTestSuiteExecutionTime();
-
-        return new LazyTrace(
-            // TODO: SplFileInfo compatibility issue
-            new SplFileInfo($fileInfo->sourcePathname),
-
-        );
     }
 
     private function getReport(): PHPUnitXmlReport
     {
         if (!isset($this->report)) {
-            $this->report = $this->parser->parse();
+            $this->report = $this->parser->get();
         }
 
         return $this->report;

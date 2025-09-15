@@ -35,94 +35,84 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\FileSystem\FileFilter;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
-use newSrc\TestFramework\Coverage\JUnit\PHPUnitXmlParser;
 use SplFileInfo;
-use function explode;
 
 /**
- * Filters traces and augments them with timing data from JUnit report.
- *
  * @internal
  */
-final class PHPUnitCoverageTraceFactory implements TraceProvider
+final class PHPUnitCoverageTracer
 {
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private TraceProvider $primaryTraceProvider,
-        private JUnitTestExecutionInfoAdder $testFileDataAdder,
-        private FileFilter $bufferedFilter,
-        private readonly PHPUnitXmlParser $parser,
+        private readonly PHPUnitXmlProvider $parser,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public function trace(SplFileInfo $fileInfo): Trace
     {
-        foreach ($this->getReport()->getSourceFileInfos() as $sourceFileInfo) {
-            yield $this->createTrace($sourceFileInfo);
-        }
-    }
+        $report = $this->getReport();
 
-    public function createTrace(SourceFileIndexXmlInfo $fileInfo): Trace
-    {
-        $coverage = (new FileReport($fileInfo->coveragePathname))->getCoverage();
-        $this->getReport()->getTestSuiteExecutionTime();
+        $reportFileInfo = $report->findSourceFileInfo($fileInfo->getPathname());
+
+        if ($reportFileInfo === null) {
+            return new EmptyTrace();
+        }
+
+        $testLocations = $this->createTestLocations($reportFileInfo);
 
         return new LazyTrace(
             // TODO: SplFileInfo compatibility issue
             new SplFileInfo($fileInfo->sourcePathname),
+            $testLocations,
+        );
+    }
 
+    /**
+     * @return list<TestLocation>
+     */
+    private function createTestLocations(SourceFileIndexXmlInfo $fileInfo): array
+    {
+        $coverage = $this->getReport()->getCoverage($fileInfo->coveragePathname);
+
+        return array_map(
+            fn (LineCoverage $coverage) => $this->createTestLocation(
+                $lineCoverage,
+                $fileInfo->coveragePathname,
+            ),
+            $coverage,
+        );
+    }
+
+    private function createTestLocation(LineCoverage $coverage): TestLocation
+    {
+        // TODO: maybe there is more to it here... We get the path from here
+        // but it is a bit unclear why/what.
+        // The report gives the exact coveredBy -> we should get the timing for that
+        $executionTime = $this->getReport()->getTestSuiteExecutionTime(
+            $coverage->testCaseClassName,
+        );
+
+        return new TestLocation(
+            $coverage->getMethod(), // TODO: review naming
+            $executionTime->path,
+            $executionTime->time,
         );
     }
 
     private function getReport(): PHPUnitXmlReport
     {
         if (!isset($this->report)) {
-            $this->report = $this->parser->parse();
+            $this->report = $this->parser->get();
         }
 
         return $this->report;
-    }
-
-    private function testExecutionInfoAdder(iterable $traces): iterable
-    {
-        /** @var Trace $trace */
-        foreach ($traces as $trace) {
-            $tests = $trace->getTests();
-
-            if ($tests === null) {
-                continue;
-            }
-
-            foreach ($tests->getTestsLocationsBySourceLine() as &$testsLocations) {
-                foreach ($testsLocations as $line => $test) {
-                    $testsLocations[$line] = $this->createCompleteTestLocation($test);
-                }
-            }
-            unset($testsLocations);
-
-            yield $trace;
-        }
-    }
-
-    private function createCompleteTestLocation(TestLocation $test): TestLocation
-    {
-        $class = explode(':', $test->getMethod(), self::MAX_EXPLODE_PARTS)[0];
-
-        $testFileData = $this->testFileDataProvider->getTestFileInfo($class);
-
-        return new TestLocation(
-            $test->getMethod(),
-            $testFileData->path,
-            $testFileData->time,
-        );
     }
 }

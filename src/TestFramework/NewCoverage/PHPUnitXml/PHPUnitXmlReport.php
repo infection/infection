@@ -40,26 +40,25 @@ namespace Infection\TestFramework\NewCoverage\PHPUnitXml;
 
 use Closure;
 use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 use PHPUnit\Framework\TestCase;
-use function array_key_exists;
 
 final class PHPUnitXmlReport
 {
     private readonly JUnitReport $jUnitReport;
+
     private readonly IndexReport $indexReport;
 
     /**
      * @param Closure():IndexReport $getIndexReport
      * @param Closure():JUnitReport $getJUnitReport
-     * @param Closure $getJunitReport
      */
     public function __construct(
         private readonly Closure $getIndexReport,
         private readonly Closure $getJUnitReport,
-        private readonly Closure $getJunitReport,
     ) {
     }
 
@@ -72,6 +71,17 @@ final class PHPUnitXmlReport
     }
 
     /**
+     * @param string $sourcePathname Canonical pathname of the source file. It
+     *                               is expected to either be absolute, or it
+     *                               should be relative to the PHPUnit source
+     *                               (configured in the PHPUnit configuration file).
+     */
+    public function findSourceFileInfo(string $sourcePathname): ?SourceFileIndexXmlInfo
+    {
+        return $this->getIndexReport()->findSourceFileInfo($sourcePathname);
+    }
+
+    /**
      * This method is not expected to be called if the file has already been
      *  identified to not have any tests, i.e. we expect to have at least one
      *  line of executable code covered.
@@ -80,7 +90,7 @@ final class PHPUnitXmlReport
      */
     public function getCoverage(string $coveragePathname): array
     {
-        FileReport
+        return (new FileReport($coveragePathname))->getCoverage();
     }
 
     /**
