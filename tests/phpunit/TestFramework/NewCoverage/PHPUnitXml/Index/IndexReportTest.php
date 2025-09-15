@@ -35,36 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\NewCoverage\PHPUnitXml\Index;
 
+use function array_keys;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\LinesCoverageSummary;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
-use function array_diff;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
-use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use function array_keys;
-use function array_map;
-use function Safe\file_put_contents;
-use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function Safe\preg_replace;
-use function Safe\realpath;
-use function sprintf;
-use function str_replace;
 use Symfony\Component\Filesystem\Path;
-use Traversable;
 
 #[CoversClass(IndexReport::class)]
 final class IndexReportTest extends TestCase
 {
-    private const FIXTURE_DIR = __DIR__.'/Fixtures';
+    private const FIXTURE_DIR = __DIR__ . '/Fixtures';
 
     /**
      * @param non-empty-array<string, bool> $expected
@@ -73,8 +56,7 @@ final class IndexReportTest extends TestCase
     public function test_it_can_tell_if_a_source_file_has_tests(
         string $xmlPathname,
         array $expected,
-    ): void
-    {
+    ): void {
         $report = new IndexReport(
             Path::canonicalize($xmlPathname),
         );
@@ -85,13 +67,13 @@ final class IndexReportTest extends TestCase
             $actual[$sourcePathname] = $report->hasTest($sourcePathname);
         }
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function hasTestsProvider(): iterable
     {
         yield 'same file with different forms' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 // Absolute path
                 '/path/to/infection/src/CI/MemoizedCiDetector.php' => true,
@@ -101,14 +83,14 @@ final class IndexReportTest extends TestCase
         ];
 
         yield 'file with no executable code' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 'Configuration/Configuration.php' => false,
             ],
         ];
 
         yield 'same file with deeper hierarchy with different forms' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 // Deeper Absolute path
                 '/path/to/infection/src/Configuration/Entry/PhpStan.php' => true,
@@ -121,7 +103,7 @@ final class IndexReportTest extends TestCase
         // but is not configured in the `source` of the PHPUnit configuration
         // file.
         yield 'non existent file' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 // Absolute path
                 '/path/to/infection/src/UnknownDirectory/Unknown.php' => false,
@@ -131,13 +113,19 @@ final class IndexReportTest extends TestCase
         ];
 
         yield 'file outside of the project source' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 '/path/to/unknown.php' => false,
             ],
         ];
 
-        // TODO: case where there is multiple files with the same name
+        yield 'file for which the basename exists multiple times' => [
+            self::FIXTURE_DIR . '/index-with-duplicate-entries.xml',
+            [
+                'Configuration/Config.php' => false,
+                'Configuration/Schema/Config.php' => true,
+            ],
+        ];
     }
 
     /**
@@ -147,8 +135,7 @@ final class IndexReportTest extends TestCase
     public function test_it_can_get_a_source_file_information(
         string $xmlPathname,
         array $expected,
-    ): void
-    {
+    ): void {
         $report = new IndexReport(
             Path::canonicalize($xmlPathname),
         );
@@ -159,17 +146,17 @@ final class IndexReportTest extends TestCase
             $actual[$sourcePathname] = $report->findSourceFileInfo($sourcePathname);
         }
 
-        self::assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function fileInfoProvider(): iterable
     {
         yield 'covered file' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 'CI/MemoizedCiDetector.php' => new SourceFileIndexXmlInfo(
                     '/path/to/infection/src/CI/MemoizedCiDetector.php',
-                    __DIR__.'/Fixtures/CI/MemoizedCiDetector.php.xml',
+                    __DIR__ . '/Fixtures/CI/MemoizedCiDetector.php.xml',
                     new LinesCoverageSummary(
                         78,
                         42,
@@ -183,11 +170,11 @@ final class IndexReportTest extends TestCase
         ];
 
         yield 'covered file with no tests' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 'Configuration/Configuration.php' => new SourceFileIndexXmlInfo(
                     '/path/to/infection/src/Configuration/Configuration.php',
-                    __DIR__.'/Fixtures/Configuration/Configuration.php.xml',
+                    __DIR__ . '/Fixtures/Configuration/Configuration.php.xml',
                     new LinesCoverageSummary(
                         369,
                         65,
@@ -201,7 +188,7 @@ final class IndexReportTest extends TestCase
         ];
 
         yield 'file outside of the project source' => [
-            self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml',
+            self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml',
             [
                 '/path/to/unknown.php' => null,
             ],
@@ -210,22 +197,22 @@ final class IndexReportTest extends TestCase
 
     public function test_the_information_is_memoized(): void
     {
-        $report = new IndexReport(self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml');
+        $report = new IndexReport(self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml');
 
         $fileInfo1 = $report->findSourceFileInfo('CI/MemoizedCiDetector.php');
         $fileInfo2 = $report->findSourceFileInfo('CI/MemoizedCiDetector.php');
 
-        self::assertSame($fileInfo1, $fileInfo2);
+        $this->assertSame($fileInfo1, $fileInfo2);
     }
 
     public function test_it_can_provide_information_even_once_a_full_traverse_is_done(): void
     {
-        $report = new IndexReport(self::FIXTURE_DIR.'/phpunit9-php81-pcov1.xml');
+        $report = new IndexReport(self::FIXTURE_DIR . '/phpunit9-php81-pcov1.xml');
 
         // Looking for an unknown file will cause it to process the entire XML file.
         $report->findSourceFileInfo('Unknown/Unknown.php');
         $fileInfo = $report->findSourceFileInfo('CI/MemoizedCiDetector.php');
 
-        self::assertNotNull($fileInfo);
+        $this->assertNotNull($fileInfo);
     }
 }

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
-use Infection\TestFramework\DOM\SafeDOMXPath;
 use Infection\TestFramework\DOM\XPathFactory;
+use Infection\TestFramework\XML\SafeDOMXPath;
 
 /**
  * @internal

@@ -42,11 +42,11 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Config\MutationConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
-use Infection\TestFramework\DOM\SafeDOMXPath;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\file_put_contents;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

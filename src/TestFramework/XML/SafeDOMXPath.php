@@ -33,15 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\DOM;
+namespace Infection\TestFramework\XML;
 
 use DOMDocument;
 use DOMElement;
+use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
-use Webmozart\Assert\Assert;
+use Error;
+use InvalidArgumentException;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -58,57 +61,82 @@ final readonly class SafeDOMXPath
         $this->xPath = new DOMXPath($document);
     }
 
-    public function __get(string $property): DOMDocument
-    {
-        return $this->$property;
-    }
-
     public static function fromFile(string $pathname): self
     {
-        Assert::fileExists($pathname);
+        Assert::file($pathname);
+        Assert::readable($pathname);
 
         $dom = new DOMDocument();
-        $success = @$dom->load($pathname);
+        $loaded = @$dom->load($pathname);
 
-        Assert::true($success);
+        Assert::true(
+            $loaded,
+            sprintf(
+                'The file "%s" does not contain valid XML.',
+                $pathname,
+            ),
+        );
 
         return new self($dom);
     }
 
-    public static function fromString(string $content): self
+    public static function fromString(string $xml): self
     {
         $document = new DOMDocument();
-        $success = @$document->loadXML($content);
+        $loaded = @$document->loadXML($xml);
 
-        Assert::true($success);
+        Assert::true(
+            $loaded,
+            sprintf(
+                'The string "%s" is not valid XML.',
+                $xml,
+            ),
+        );
 
         return new self($document);
     }
 
     /**
-     * @return DOMNodeList<DOMElement>
+     * @return DOMNodeList<DOMNode|DOMNameSpaceNode>
      */
     public function queryList(string $query, ?DOMNode $contextNode = null): DOMNodeList
     {
-        $nodes = @$this->xPath->query($query, $contextNode);
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
+        try {
+            $nodes = @$this->xPath->query($query, $contextNode);
+        } catch (Error) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The context node passed for the query "%s" is invalid.',
+                    $query,
+                ),
+            );
+        }
+
+        Assert::isInstanceOf(
+            $nodes,
+            DOMNodeList::class,
+            sprintf(
+                'The query "%s" is invalid.',
+                $query,
+            ),
+        );
 
         return $nodes;
     }
 
     public function queryElement(string $query, ?DOMNode $contextNode = null): ?DOMElement
     {
-        $nodes = @$this->xPath->query($query, $contextNode);
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
-//        Assert::true(
-//            $nodes->length <= 1,
-//            sprintf(
-//                'Expected the query "%s" to return a "%s" with no or one node. Got "%s".',
-//                $query,
-//                DOMNodeList::class,
-//                $nodes->length,
-//            ),
-//        );
+        $nodes = $this->queryList($query, $contextNode);
+
+        Assert::true(
+            $nodes->length <= 1,
+            sprintf(
+                'Expected the query "%s" to return a "%s" with no or one node. Got "%s".',
+                $query,
+                DOMNodeList::class,
+                $nodes->length,
+            ),
+        );
 
         return $nodes[0] ?? null;
     }

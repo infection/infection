@@ -37,21 +37,21 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use DOMDocument;
 use DOMElement;
-use Infection\TestFramework\DOM\SafeDOMXPath;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use LibXMLError;
-use LogicException;
-use Webmozart\Assert\Assert;
+use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
-use function libxml_get_errors;
-use function libxml_use_internal_errors;
-use function sprintf;
-use function version_compare;
-use const FILTER_VALIDATE_URL;
+use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use const LIBXML_ERR_ERROR;
 use const LIBXML_ERR_FATAL;
 use const LIBXML_ERR_WARNING;
+use function libxml_get_errors;
+use function libxml_use_internal_errors;
+use LibXMLError;
+use LogicException;
+use function sprintf;
+use function version_compare;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

@@ -35,18 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\NewCoverage\PHPUnitXml\File;
 
-use DOMElement;
-use Generator;
-use Infection\TestFramework\DOM\SafeDOMXPath;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
-use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
-use function array_key_exists;
 use function array_map;
-use function dirname;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function iterator_to_array;
-use function sprintf;
 
 /**
  * Represents a coverage file of the PHPUnit XML coverage report. Typically, this
@@ -65,7 +56,7 @@ final class FileReport
     private SafeDOMXPath $xPath;
 
     /**
-     * @param string $pathname Absolute canonical pathname of the XML coverage file.
+     * @param string $pathname absolute canonical pathname of the XML coverage file
      */
     public function __construct(
         private readonly string $pathname,
@@ -76,11 +67,6 @@ final class FileReport
      * This method is not expected to be called if the file has already been
      * identified to not have any tests, i.e. we expect to have at least one
      * line of executable code covered.
-     *
-     * @param string $sourcePathname Canonical pathname of the source file. It
-     *                               is expected to either be absolute, or it
-     *                               should be relative to the PHPUnit source
-     *                               (configured in the PHPUnit configuration file).
      *
      * @return non-empty-list<LineCoverage>
      */

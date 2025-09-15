@@ -37,8 +37,9 @@ namespace Infection\TestFramework\DOM;
 
 use DOMDocument;
 use Infection\CannotBeInstantiated;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\preg_replace;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

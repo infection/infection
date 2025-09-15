@@ -1,0 +1,664 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+    <file name="Str.php" path="/">
+        <totals>
+            <lines total="102" comments="37" code="65" executable="22" executed="20"
+                   percent="90.91"/>
+            <methods count="2" tested="1" percent="50.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <class name="Infection\Str" start="50" executable="22" executed="20" crap="6.03">
+            <namespace name="Infection"/>
+            <method name="trimLineReturns" signature="trimLineReturns(string $string): string"
+                    start="54" end="92" crap="5" executable="20" executed="20" coverage="100"/>
+            <method name="convertToUtf8" signature="convertToUtf8(string $string): string"
+                    start="94" end="100" crap="2" executable="2" executed="0" coverage="0"/>
+        </class>
+        <coverage>
+            <line nr="56">
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading &amp; trailing line returns"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with trailing line returns"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing &amp; in-between line returns"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#empty"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing &amp; in-between line returns &amp; dirty empty strings"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string without line return"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with untrimmed spaces"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading line returns"/>
+            </line>
+            <line nr="57">
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading &amp; trailing line returns"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with trailing line returns"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing &amp; in-between line returns"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#empty"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing &amp; in-between line returns &amp; dirty empty strings"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string without line return"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with untrimmed spaces"/>
+                <covered
+                        by="Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading line returns"/>
+            </line>
+        </coverage>
+        <source>
+            <line no="1">
+                <token name="T_OPEN_TAG">&lt;?php</token>
+            </line>
+            <line no="2">
+                <token name="T_DOC_COMMENT">/**</token>
+            </line>
+            <line no="3">
+                <token name="T_DOC_COMMENT">* This code is licensed under the BSD 3-Clause
+                    License.
+                </token>
+            </line>
+            <line no="4">
+                <token name="T_DOC_COMMENT">*</token>
+            </line>
+            <line no="5">
+                <token name="T_DOC_COMMENT">* Copyright (c) 2017, Maks Rafalko</token>
+            </line>
+            <line no="6">
+                <token name="T_DOC_COMMENT">* All rights reserved.</token>
+            </line>
+            <line no="7">
+                <token name="T_DOC_COMMENT">*</token>
+            </line>
+            <line no="8">
+                <token name="T_DOC_COMMENT">* Redistribution and use in source and binary forms,
+                    with or without
+                </token>
+            </line>
+            <line no="9">
+                <token name="T_DOC_COMMENT">* modification, are permitted provided that the
+                    following conditions are met:
+                </token>
+            </line>
+            <line no="10">
+                <token name="T_DOC_COMMENT">*</token>
+            </line>
+            <line no="11">
+                <token name="T_DOC_COMMENT">* * Redistributions of source code must retain the above
+                    copyright notice, this
+                </token>
+            </line>
+            <line no="12">
+                <token name="T_DOC_COMMENT">* list of conditions and the following disclaimer.
+                </token>
+            </line>
+            <line no="13">
+                <token name="T_DOC_COMMENT">*</token>
+            </line>
+            <line no="14">
+                <token name="T_DOC_COMMENT">* * Redistributions in binary form must reproduce the
+                    above copyright notice,
+                </token>
+            </line>
+            <line no="15">
+                <token name="T_DOC_COMMENT">* this list of conditions and the following disclaimer
+                    in the documentation
+                </token>
+            </line>
+            <line no="16">
+                <token name="T_DOC_COMMENT">* and/or other materials provided with the
+                    distribution.
+                </token>
+            </line>
+            <line no="17">
+                <token name="T_DOC_COMMENT">*</token>
+            </line>
+            <line no="18">
+                <token name="T_DOC_COMMENT">* * Neither the name of the copyright holder nor the
+                    names of its
+                </token>
+            </line>
+            <line no="19">
+                <token name="T_DOC_COMMENT">* contributors may be used to endorse or promote
+                    products derived from
+                </token>
+            </line>
+            <line no="20">
+                <token name="T_DOC_COMMENT">* this software without specific prior written
+                    permission.
+                </token>
+            </line>
+            <line no="21">
+                <token name="T_DOC_COMMENT">*</token>
+            </line>
+            <line no="22">
+                <token name="T_DOC_COMMENT">* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+                    CONTRIBUTORS "AS IS"
+                </token>
+            </line>
+            <line no="23">
+                <token name="T_DOC_COMMENT">* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+                    NOT LIMITED TO, THE
+                </token>
+            </line>
+            <line no="24">
+                <token name="T_DOC_COMMENT">* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+                    A PARTICULAR PURPOSE ARE
+                </token>
+            </line>
+            <line no="25">
+                <token name="T_DOC_COMMENT">* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+                    CONTRIBUTORS BE LIABLE
+                </token>
+            </line>
+            <line no="26">
+                <token name="T_DOC_COMMENT">* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+                    EXEMPLARY, OR CONSEQUENTIAL
+                </token>
+            </line>
+            <line no="27">
+                <token name="T_DOC_COMMENT">* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+                    SUBSTITUTE GOODS OR
+                </token>
+            </line>
+            <line no="28">
+                <token name="T_DOC_COMMENT">* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+                    INTERRUPTION) HOWEVER
+                </token>
+            </line>
+            <line no="29">
+                <token name="T_DOC_COMMENT">* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+                    CONTRACT, STRICT LIABILITY,
+                </token>
+            </line>
+            <line no="30">
+                <token name="T_DOC_COMMENT">* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+                    ANY WAY OUT OF THE USE
+                </token>
+            </line>
+            <line no="31">
+                <token name="T_DOC_COMMENT">* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+                    OF SUCH DAMAGE.
+                </token>
+            </line>
+            <line no="32">
+                <token name="T_DOC_COMMENT">*/</token>
+            </line>
+            <line no="33"/>
+            <line no="34">
+                <token name="T_DECLARE">declare</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_STRING">strict_types</token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_LNUMBER">1</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="35"/>
+            <line no="36">
+                <token name="T_NAMESPACE">namespace</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">Infection</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="37"/>
+            <line no="38">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">array_values</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="39">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">count</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="40">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">explode</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="41">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">implode</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="42">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONST">const</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">PHP_EOL</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="43">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_NAME_QUALIFIED">Safe\mb_convert_encoding</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="44">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">str_replace</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="45">
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">trim</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="46"/>
+            <line no="47">
+                <token name="T_DOC_COMMENT">/**</token>
+            </line>
+            <line no="48">
+                <token name="T_DOC_COMMENT">* @internal</token>
+            </line>
+            <line no="49">
+                <token name="T_DOC_COMMENT">*/</token>
+            </line>
+            <line no="50">
+                <token name="T_FINAL">final</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLASS">class</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">Str</token>
+            </line>
+            <line no="51">
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="52">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_USE">use</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">CannotBeInstantiated</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="53"/>
+            <line no="54">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_PUBLIC">public</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STATIC">static</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">trimLineReturns</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_STRING">string</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$string</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_COLON">:</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">string</token>
+            </line>
+            <line no="55">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="56">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">explode</token>
+                <token name="T_OPEN_BRACKET">(</token>
+            </line>
+            <line no="57">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">"\n"</token>
+                <token name="T_COMMA">,</token>
+            </line>
+            <line no="58">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">str_replace</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">"\r\n"</token>
+                <token name="T_COMMA">,</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">"\n"</token>
+                <token name="T_COMMA">,</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$string</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_COMMA">,</token>
+            </line>
+            <line no="59">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="60">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$linesCount</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">count</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="61"/>
+            <line no="62">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_COMMENT">// Trim leading empty lines</token>
+            </line>
+            <line no="63">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FOR">for</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_LNUMBER">0</token>
+                <token name="T_SEMICOLON">;</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_LT">&lt;</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$linesCount</token>
+                <token name="T_SEMICOLON">;</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_INC">++</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="64">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$line</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_OPEN_SQUARE">[</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_CLOSE_SQUARE">]</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="65"/>
+            <line no="66">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_IF">if</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_STRING">trim</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$line</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_IS_IDENTICAL">===</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">''</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="67">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_UNSET">unset</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_OPEN_SQUARE">[</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_CLOSE_SQUARE">]</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="68"/>
+            <line no="69">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONTINUE">continue</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="70">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="71"/>
+            <line no="72">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_BREAK">break</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="73">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="74"/>
+            <line no="75">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">array_values</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="76">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$linesCount</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">count</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="77"/>
+            <line no="78">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_COMMENT">// Trim trailing empty lines</token>
+            </line>
+            <line no="79">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FOR">for</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$linesCount</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_MINUS">-</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_LNUMBER">1</token>
+                <token name="T_SEMICOLON">;</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_IS_GREATER_OR_EQUAL">&gt;=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_LNUMBER">0</token>
+                <token name="T_SEMICOLON">;</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_DEC">--</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="80">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$line</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_OPEN_SQUARE">[</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_CLOSE_SQUARE">]</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="81"/>
+            <line no="82">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_IF">if</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_STRING">trim</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$line</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_IS_IDENTICAL">===</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">''</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="83">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_UNSET">unset</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_OPEN_SQUARE">[</token>
+                <token name="T_VARIABLE">$i</token>
+                <token name="T_CLOSE_SQUARE">]</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="84"/>
+            <line no="85">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONTINUE">continue</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="86">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="87"/>
+            <line no="88">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_BREAK">break</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="89">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="90"/>
+            <line no="91">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_RETURN">return</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">implode</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_STRING">PHP_EOL</token>
+                <token name="T_COMMA">,</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$lines</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="92">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="93"/>
+            <line no="94">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_PUBLIC">public</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STATIC">static</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_FUNCTION">function</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">convertToUtf8</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_STRING">string</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$string</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_COLON">:</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">string</token>
+            </line>
+            <line no="95">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_OPEN_CURLY">{</token>
+            </line>
+            <line no="96">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_DOC_COMMENT">/** @var string $utf8String */</token>
+            </line>
+            <line no="97">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$utf8String</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_EQUAL">=</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_STRING">mb_convert_encoding</token>
+                <token name="T_OPEN_BRACKET">(</token>
+                <token name="T_VARIABLE">$string</token>
+                <token name="T_COMMA">,</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">'UTF-8'</token>
+                <token name="T_COMMA">,</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CONSTANT_ENCAPSED_STRING">'UTF-8'</token>
+                <token name="T_CLOSE_BRACKET">)</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="98"/>
+            <line no="99">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_RETURN">return</token>
+                <token name="T_WHITESPACE"></token>
+                <token name="T_VARIABLE">$utf8String</token>
+                <token name="T_SEMICOLON">;</token>
+            </line>
+            <line no="100">
+                <token name="T_WHITESPACE"></token>
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="101">
+                <token name="T_CLOSE_CURLY">}</token>
+            </line>
+            <line no="102"/>
+        </source>
+    </file>
+</phpunit>

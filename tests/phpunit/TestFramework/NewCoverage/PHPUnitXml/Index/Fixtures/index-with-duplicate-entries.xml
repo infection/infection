@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+    <build time="Sun Dec 11 16:04:33 UTC 2022" phpunit="9.5.27" coverage="9.2.19">
+        <runtime name="PHP" version="8.1.13" url="https://secure.php.net/"/>
+        <driver name="pcov" version="1.0.11"/>
+    </build>
+    <project source="/path/to/infection/src">
+        <!-- ... -->
+        <directory name="/">
+            <totals>
+                <lines total="42826" comments="17211" code="25615" executable="5212" executed="3450" percent="66.19"/>
+                <methods count="1451" tested="886" percent="61.06"/>
+                <functions count="0" tested="0" percent="0"/>
+                <classes count="387" tested="128" percent="33.07"/>
+                <traits count="3" tested="0" percent="0.00"/>
+            </totals>
+            <directory name="Configuration">
+                <totals>
+                    <lines total="2084" comments="607" code="1477" executable="424" executed="401" percent="94.58"/>
+                    <methods count="131" tested="117" percent="89.31"/>
+                    <functions count="0" tested="0" percent="0"/>
+                    <classes count="15" tested="8" percent="53.33"/>
+                    <traits count="0" tested="0" percent="0"/>
+                </totals>
+                <directory name="Schema">
+                    <totals>
+                        <lines total="803" comments="296" code="507" executable="148" executed="146" percent="98.65"/>
+                        <methods count="40" tested="38" percent="95.00"/>
+                        <functions count="0" tested="0" percent="0"/>
+                        <classes count="8" tested="6" percent="75.00"/>
+                        <traits count="0" tested="0" percent="0"/>
+                    </totals>
+                    <file name="Config.php" href="Configuration/Schema/Config.php.xml">
+                        <totals>
+                            <lines total="87" comments="34" code="53" executable="21" executed="21" percent="100.00"/>
+                            <methods count="4" tested="4" percent="100.00"/>
+                            <functions count="0" tested="0" percent="0"/>
+                            <classes count="1" tested="1" percent="100.00"/>
+                            <traits count="0" tested="0" percent="0"/>
+                        </totals>
+                    </file>
+                </directory>
+                <file name="Config.php" href="Configuration/Config.php.xml">
+                    <totals>
+                        <lines total="369" comments="65" code="304" executable="60" executed="0" percent="00.00"/>
+                        <methods count="40" tested="37" percent="92.50"/>
+                        <functions count="0" tested="0" percent="0"/>
+                        <classes count="1" tested="0" percent="0.00"/>
+                        <traits count="0" tested="0" percent="0"/>
+                    </totals>
+                </file>
+            </directory>
+        </directory>
+    </project>
+</phpunit>

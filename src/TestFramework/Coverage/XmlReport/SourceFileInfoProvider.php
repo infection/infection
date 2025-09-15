@@ -35,21 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Infection\TestFramework\DOM\SafeDOMXPath;
-use Infection\TestFramework\DOM\XPathFactory;
-use Safe\Exceptions\FilesystemException;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 use function array_filter;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
+use Infection\TestFramework\DOM\XPathFactory;
+use Infection\TestFramework\XML\SafeDOMXPath;
+use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
 use function Safe\realpath;
 use function sprintf;
 use function str_replace;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 use function trim;
-use const DIRECTORY_SEPARATOR;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

@@ -42,9 +42,9 @@ use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\DOM\SafeDOMXPath;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Later\lazy;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -88,6 +88,7 @@ class XmlCoverageParser
             return new TestLocations();
         }
 
+        // Not entirely sure why we need the methods here
         $coveredMethodNodes = $xPath->queryList('/phpunit/file/class/method');
 
         if ($coveredMethodNodes->length === 0) {

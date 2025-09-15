@@ -37,13 +37,13 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use DOMDocument;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
-use Infection\TestFramework\DOM\SafeDOMXPath;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use function Safe\file_put_contents;
 use function sprintf;
 use function version_compare;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

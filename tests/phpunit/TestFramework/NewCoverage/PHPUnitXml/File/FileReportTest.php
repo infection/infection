@@ -35,38 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\NewCoverage\PHPUnitXml\File;
 
-use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\LinesCoverageSummary;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
-use function array_diff;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
-use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use function array_keys;
-use function array_map;
-use function Safe\file_put_contents;
-use function iterator_to_array;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use function Safe\preg_replace;
-use function Safe\realpath;
-use function sprintf;
-use function str_replace;
 use Symfony\Component\Filesystem\Path;
-use Traversable;
 
 #[CoversClass(FileReport::class)]
 final class FileReportTest extends TestCase
 {
-    private const FIXTURE_DIR = __DIR__.'/Fixtures';
+    private const FIXTURE_DIR = __DIR__ . '/Fixtures';
 
     /**
      * @param non-empty-list<LineCoverage> $expected
@@ -75,21 +54,20 @@ final class FileReportTest extends TestCase
     public function test_it_can_tell_if_a_source_file_has_tests(
         string $xmlPathname,
         array $expected,
-    ): void
-    {
+    ): void {
         $report = new FileReport(
             Path::canonicalize($xmlPathname),
         );
 
         $actual = $report->getCoverage();
 
-        self::assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function coverageProvider(): iterable
     {
         yield 'multiple lines covered by a single test each' => [
-            self::FIXTURE_DIR.'/MemoizedCiDetector.php.xml',
+            self::FIXTURE_DIR . '/MemoizedCiDetector.php.xml',
             [
                 new LineCoverage(
                     56,
@@ -106,8 +84,37 @@ final class FileReportTest extends TestCase
             ],
         ];
 
-        // TODO: case with more tests per line
-        //  case with data provider
+        yield 'multiple lines covered by multiple tests each' => [
+            self::FIXTURE_DIR . '/Str.php.xml',
+            [
+                new LineCoverage(
+                    56,
+                    [
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading & trailing line returns',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with trailing line returns',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing & in-between line returns',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#empty',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing & in-between line returns & dirty empty strings',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string without line return',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with untrimmed spaces',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading line returns',
+                    ],
+                ),
+                new LineCoverage(
+                    57,
+                    [
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading & trailing line returns',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with trailing line returns',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing & in-between line returns',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#empty',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading, trailing & in-between line returns & dirty empty strings',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string without line return',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with untrimmed spaces',
+                        'Infection\Tests\StrTest::test_it_can_trim_string_of_line_returns#string with leading line returns',
+                    ],
+                ),
+            ],
+        ];
     }
 
     // This is because we use to construct a Trace, hence we what should be
@@ -115,12 +122,12 @@ final class FileReportTest extends TestCase
     // unnecessarily.
     public function test_the_information_is_not_memoized(): void
     {
-        $report = new FileReport(self::FIXTURE_DIR.'/MemoizedCiDetector.php.xml');
+        $report = new FileReport(self::FIXTURE_DIR . '/MemoizedCiDetector.php.xml');
 
         $coverage1 = $report->getCoverage();
         $coverage2 = $report->getCoverage();
 
-        self::assertEquals($coverage1, $coverage2);
-        self::assertNotSame($coverage1, $coverage2);
+        $this->assertSame($coverage1, $coverage2);
+        $this->assertNotSame($coverage1, $coverage2);
     }
 }

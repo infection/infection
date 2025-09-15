@@ -38,15 +38,14 @@ namespace Infection\TestFramework\NewCoverage\PHPUnitXml\Index;
 // TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
 //  Need to be revisted.
 
+use function array_key_exists;
+use function dirname;
 use DOMElement;
 use Generator;
-use Infection\TestFramework\DOM\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use function array_key_exists;
-use function basename;
-use function dirname;
-use function sprintf;
 
 /**
  * Represents the index file of the PHPUnit XML coverage report. Typically, this
@@ -74,7 +73,9 @@ final class IndexReport
     private array $indexedFileInfos = [];
 
     private Generator $fileInfosGenerator;
+
     private bool $traversed = false;
+
     private string $source;
 
     public function __construct(
@@ -89,7 +90,7 @@ final class IndexReport
      *                               should be relative to the PHPUnit source
      *                               (configured in the PHPUnit configuration file).
      */
-    public function findSourceFileInfo(string $sourcePathname): SourceFileIndexXmlInfo|null
+    public function findSourceFileInfo(string $sourcePathname): ?SourceFileIndexXmlInfo
     {
         return array_key_exists($sourcePathname, $this->indexedFileInfos)
             ? $this->indexedFileInfos[$sourcePathname]
@@ -107,7 +108,7 @@ final class IndexReport
         return $this->findSourceFileInfo($sourcePathname)?->hasExecutedCode() ?? false;
     }
 
-    private function lookup(string $sourcePathname): SourceFileIndexXmlInfo|null
+    private function lookup(string $sourcePathname): ?SourceFileIndexXmlInfo
     {
         $source = $this->getPhpunitSource();
         $sourcePathIsAbsolute = Path::isAbsolute($sourcePathname);
