@@ -21,6 +21,20 @@ Please read documentation here: [infection.github.io][doc]
 Infection is an open source project that welcomes pull requests and issues from anyone. Before
 opening pull requests, please consider reading our short [Contribution Guide][contribution guide].
 
+### Sponsors
+
+Want your logo here? [Learn more »](https://infection.github.io/guide/github-sponsors.html)
+
+#### Companies
+
+<a href="https://www.lambdatest.com/" target="_blank"><img src="https://www.lambdatest.com/blue-logo.png" style="vertical-align: middle;" width="250" height="45" /></a>
+<a href="https://github.com/wwwoda" target="_blank"><img src="https://avatars.githubusercontent.com/u/37436231?s=200&v=4" style="vertical-align: middle;" width="45" height="45" /></a>
+<a href="https://github.com/Enrise" target="_blank"><img src="https://github.com/enrise/.github/raw/master/images/logo.png?raw=true" style="vertical-align: middle;" width="90" height="45" /></a>
+<a href="https://jetbrains.com" target="_blank"><img title="JetBrains - free licenses for core developers" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.png" style="vertical-align: middle;" width="209" height="45" /></a>
+
+#### Individuals
+
+The full list of awesome Infection sponsors is here: https://github.com/sponsors/infection
 
 ### Credits
 
