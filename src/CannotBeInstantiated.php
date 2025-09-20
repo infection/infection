@@ -43,6 +43,7 @@ namespace Infection;
  */
 trait CannotBeInstantiated
 {
+    // TODO: should be leverage in the new code
     private function __construct()
     {
     }
