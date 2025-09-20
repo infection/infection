@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
+use Closure;
 use function array_map;
 use Generator;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -43,6 +44,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
+use function implode;
+use function sprintf;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
@@ -193,6 +196,18 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             '/ServiceUnitTest\:\:test_case1|ServiceUnitTest\:\:test_case2|ServiceIntegrationTest\:\:test_case1|ServiceIntegrationTest\:\:test_case2/',
         ];
 
+        yield 'multiple tests with multiple test cases with identical test case short names' => [
+            true,
+            [
+                'App\Unit\ServiceTest::test_case1',
+                'App\Unit\ServiceTest::test_case2',
+                'App\Integration\ServiceTest::test_case1',
+                'App\Integration\ServiceTest::test_case2',
+            ],
+            $phpunit9,
+            '/ServiceTest\:\:test_case1|ServiceTest\:\:test_case2/',
+        ];
+
         yield 'single test from a data provider item (<=PHPUnit9)' => [
             true,
             [
@@ -286,21 +301,269 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         yield 'test from a data provider with a special character (<=PHPUnit9)' => [
             true,
             [
-                'App\ServiceTest::test_case1 with data set "With special character >@&"\\::',
+                'App\ServiceTest::test_case1 with data set "With special character >@&\\::"',
                 'App\ServiceTest::test_case2',
             ],
             $phpunit9,
-            '/ServiceTest\:\:test_case1 with data set "With special character \\>\\@\\&\\\\\:\:"|ServiceTest\:\:test_case2/',
+            '/ServiceTest\:\:test_case1 with data set "With special character \\>@&\\\\\\:\\:"|ServiceTest\:\:test_case2/',
         ];
 
         yield 'test from a data provider with a special character (>=PHPUnit10)' => [
             true,
             [
-                'App\ServiceTest::test_case1 with data set "With special character >@&"\\::',
+                'App\ServiceTest::test_case1#With special character >@&\\::',
                 'App\ServiceTest::test_case2',
             ],
             $phpunit10,
-            '/ServiceTest\:\:test_case1 with data set "With special character \\>\\@\\&\\\\\:\:"|ServiceTest\:\:test_case2/',
+            '/ServiceTest\:\:test_case1 with data set "With special character \\>@&\\\\\\:\\:"|ServiceTest\:\:test_case2/',
         ];
+
+        yield 'too many tests; all from the same test case' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_case' . $index,
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_case' . $index,
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; all from a different test case' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\Service1Test::test_something' . $index,
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'Service1Test\:\:test_something' . $index,
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; all from data providers (<=PHPUnit9)' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_case with data set "#' . $index . '"',
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "\#' . $index . '"',
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; all from data providers (>=PHPUnit10)' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_case##' . $index,
+                1000,
+            ),
+            $phpunit10,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "\#' . $index . '"',
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; mixed data providers and regular tests (<=PHPUnit9)' => [
+            true,
+            array_merge(
+                self::createArray(
+                    static fn (int $index) => 'App\ServiceTest::test_regular' . $index,
+                    500,
+                ),
+                self::createArray(
+                    static fn (int $index) => 'App\ServiceTest::test_provider with data set "#' . $index . '"',
+                    500,
+                ),
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    array_merge(
+                        self::createArray(
+                            static fn (int $index) => 'ServiceTest\:\:test_regular' . $index,
+                            500,
+                        ),
+                        self::createArray(
+                            static fn (int $index) => 'ServiceTest\:\:test_provider with data set "\#' . $index . '"',
+                            500,
+                        ),
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; multiple test cases with mixed methods' => [
+            true,
+            array_merge(
+                self::createArray(
+                    static fn (int $index) => 'App\Service' . ($index % 10) . 'Test::test_method' . $index,
+                    1000,
+                ),
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'Service' . ($index % 10) . 'Test\:\:test_method' . $index,
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; identical short names from different namespaces' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\Namespace' . ($index % 5) . '\ServiceTest::test_method' . $index,
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_method' . $index,
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; with special characters in data sets (<=PHPUnit9)' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_case with data set "Special >@&\\::' . $index . '"',
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "Special \\>@&\\\\\\:\\:' . $index . '"',
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; with very long test names' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_this_is_a_very_long_test_method_name_that_might_cause_issues_with_command_line_length_limits_' . $index,
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_this_is_a_very_long_test_method_name_that_might_cause_issues_with_command_line_length_limits_' . $index,
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; all from same method with different data sets (<=PHPUnit9)' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_case with data set "dataset_' . $index . '"',
+                1000,
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "dataset_' . $index . '"',
+                        1000,
+                    ),
+                ),
+            ),
+        ];
+
+        yield 'too many tests; with duplicate test cases' => [
+            true,
+            array_merge(
+                self::createArray(
+                    static fn (int $index) => 'App\ServiceTest::test_case' . ($index % 500),
+                    1000,
+                ),
+                self::createArray(
+                    static fn (int $index) => 'App\ServiceTest::test_case' . ($index % 500),
+                    1000,
+                ),
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    self::createArray(
+                        static fn (int $index) => 'ServiceTest\:\:test_case' . $index,
+                        500,
+                    ),
+                ),
+            ),
+        ];
+    }
+
+    /**
+     * @template T
+     *
+     * @param Closure(positive-int):T $createItem
+     * @param positive-int $count
+     *
+     * @return list<T>
+     */
+    private static function createArray(Closure $createItem, int $count): array
+    {
+        $items = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $items[] = $createItem($i);
+        }
+
+        return $items;
     }
 }
