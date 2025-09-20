@@ -106,7 +106,7 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         //$this->executeOnlyCoveringTestCases = true;
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $options[] = '--filter';
-            $options[] = $this->addFilterString(
+            $options[] = $this->createFilterString(
                 $tests,
                 $testFrameworkVersion,
             );
@@ -175,13 +175,32 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
      *
      * @return non-empty-string
      */
-    private function addFilterString(
+    private function createFilterString(
         array $tests,
         string $testFrameworkVersion,
     ): string
     {
-        $filterString = '/';
+        return sprintf(
+            '/%s/',
+            implode(
+                '|',
+                $this->createFilters($tests, $testFrameworkVersion),
+            ),
+        );
+    }
+
+    /**
+     * @param non-empty-array<TestLocation> $tests
+     *
+     * @return non-empty-array<string>
+     */
+    private function createFilters(
+        array $tests,
+        string $testFrameworkVersion,
+    ): array
+    {
         $usedTestCases = [];
+        $filters = [];
 
         foreach ($tests as $testLocation) {
             $testCaseString = $testLocation->getMethod();
@@ -205,9 +224,9 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 
             $usedTestCases[$testCaseString] = true;
 
-            $filterString .= preg_quote($testCaseString, '/') . '|';
+            $filters[] = preg_quote($testCaseString, '/');
         }
 
-        return rtrim($filterString, '|') . '/';
+        return $filters;
     }
 }
