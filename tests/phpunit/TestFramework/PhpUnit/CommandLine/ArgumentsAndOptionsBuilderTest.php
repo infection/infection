@@ -322,7 +322,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case' . $index,
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -331,7 +331,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_case' . $index,
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -341,7 +341,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\Service1Test::test_something' . $index,
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -350,7 +350,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'Service1Test\:\:test_something' . $index,
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -360,7 +360,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case with data set "#' . $index . '"',
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -369,7 +369,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_case with data set "\#' . $index . '"',
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -379,7 +379,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case##' . $index,
-                1000,
+                10_000,
             ),
             $phpunit10,
             sprintf(
@@ -388,7 +388,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_case with data set "\#' . $index . '"',
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -430,7 +430,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             array_merge(
                 self::createArray(
                     static fn (int $index) => 'App\Service' . ($index % 10) . 'Test::test_method' . $index,
-                    1000,
+                    10_000,
                 ),
             ),
             $phpunit9,
@@ -440,7 +440,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'Service' . ($index % 10) . 'Test\:\:test_method' . $index,
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -450,7 +450,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\Namespace' . ($index % 5) . '\ServiceTest::test_method' . $index,
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -459,7 +459,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_method' . $index,
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -469,7 +469,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case with data set "Special >@&\\::' . $index . '"',
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -478,7 +478,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_case with data set "Special \\>@&\\\\\\:\\:' . $index . '"',
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -488,7 +488,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_this_is_a_very_long_test_method_name_that_might_cause_issues_with_command_line_length_limits_' . $index,
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -497,7 +497,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_this_is_a_very_long_test_method_name_that_might_cause_issues_with_command_line_length_limits_' . $index,
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -507,7 +507,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case with data set "dataset_' . $index . '"',
-                1000,
+                10_000,
             ),
             $phpunit9,
             sprintf(
@@ -516,7 +516,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                     '|',
                     self::createArray(
                         static fn (int $index) => 'ServiceTest\:\:test_case with data set "dataset_' . $index . '"',
-                        1000,
+                        10_000,
                     ),
                 ),
             ),
@@ -527,11 +527,11 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             array_merge(
                 self::createArray(
                     static fn (int $index) => 'App\ServiceTest::test_case' . ($index % 500),
-                    1000,
+                    10_000,
                 ),
                 self::createArray(
                     static fn (int $index) => 'App\ServiceTest::test_case' . ($index % 500),
-                    1000,
+                    10_000,
                 ),
             ),
             $phpunit9,

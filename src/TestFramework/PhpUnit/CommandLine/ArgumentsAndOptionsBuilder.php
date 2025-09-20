@@ -60,6 +60,9 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
 {
     private const MAX_EXPLODE_PARTS = 2;
 
+    // The real limit is likely higher, but it is better to be safe than sorry.
+    private const PCRE_LIMIT = 30_000;
+
     /**
      * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
@@ -184,49 +187,8 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
             '/%s/',
             implode(
                 '|',
-                $this->createFilters($tests, $testFrameworkVersion),
+                FilterBuilder::createFilters($tests, $testFrameworkVersion),
             ),
         );
-    }
-
-    /**
-     * @param non-empty-array<TestLocation> $tests
-     *
-     * @return non-empty-array<string>
-     */
-    private function createFilters(
-        array $tests,
-        string $testFrameworkVersion,
-    ): array
-    {
-        $usedTestCases = [];
-        $filters = [];
-
-        foreach ($tests as $testLocation) {
-            $testCaseString = $testLocation->getMethod();
-
-            $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
-
-            if (count($partsDelimitedByColons) > 1) {
-                $methodNameWithDataProvider = $this->getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
-
-                $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
-
-                $parts = explode('\\', $testClassFullyQualifiedClassName);
-                $classNameWithoutNamespace = end($parts);
-
-                $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
-            }
-
-            if (array_key_exists($testCaseString, $usedTestCases)) {
-                continue;
-            }
-
-            $usedTestCases[$testCaseString] = true;
-
-            $filters[] = preg_quote($testCaseString, '/');
-        }
-
-        return $filters;
     }
 }
