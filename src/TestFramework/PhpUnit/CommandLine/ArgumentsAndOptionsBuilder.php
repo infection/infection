@@ -56,7 +56,7 @@ use function version_compare;
 /**
  * @internal
  */
-final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
+final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
     private const MAX_EXPLODE_PARTS = 2;
 
@@ -103,39 +103,13 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
+        //$this->executeOnlyCoveringTestCases = true;
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
-            $filterString = '/';
-            $usedTestCases = [];
-
-            foreach ($tests as $testLocation) {
-                $testCaseString = $testLocation->getMethod();
-
-                $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
-
-                if (count($partsDelimitedByColons) > 1) {
-                    $methodNameWithDataProvider = $this->getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
-
-                    $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
-
-                    $parts = explode('\\', $testClassFullyQualifiedClassName);
-                    $classNameWithoutNamespace = end($parts);
-
-                    $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
-                }
-
-                if (array_key_exists($testCaseString, $usedTestCases)) {
-                    continue;
-                }
-
-                $usedTestCases[$testCaseString] = true;
-
-                $filterString .= preg_quote($testCaseString, '/') . '|';
-            }
-
-            $filterString = rtrim($filterString, '|') . '/';
-
             $options[] = '--filter';
-            $options[] = $filterString;
+            $options[] = $this->addFilterString(
+                $tests,
+                $testFrameworkVersion,
+            );
         }
 
         return $options;
@@ -194,5 +168,46 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         return $methodNameWithDataProviderResult;
+    }
+
+    /**
+     * @param non-empty-array<TestLocation> $tests
+     *
+     * @return non-empty-string
+     */
+    private function addFilterString(
+        array $tests,
+        string $testFrameworkVersion,
+    ): string
+    {
+        $filterString = '/';
+        $usedTestCases = [];
+
+        foreach ($tests as $testLocation) {
+            $testCaseString = $testLocation->getMethod();
+
+            $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
+
+            if (count($partsDelimitedByColons) > 1) {
+                $methodNameWithDataProvider = $this->getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
+
+                $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
+
+                $parts = explode('\\', $testClassFullyQualifiedClassName);
+                $classNameWithoutNamespace = end($parts);
+
+                $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
+            }
+
+            if (array_key_exists($testCaseString, $usedTestCases)) {
+                continue;
+            }
+
+            $usedTestCases[$testCaseString] = true;
+
+            $filterString .= preg_quote($testCaseString, '/') . '|';
+        }
+
+        return rtrim($filterString, '|') . '/';
     }
 }

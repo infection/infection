@@ -117,7 +117,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     }
 
     #[DataProvider('provideTestCases')]
-    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue = null): void
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue): void
     {
         $configPath = '/the config/path';
 
@@ -150,165 +150,157 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public static function provideTestCases(): Generator
     {
+        $phpunit9 = '9.5';
+        $phpunit10 = '10.1';
+
         yield '--only-covering-test-cases is disabled' => [
             false,
             [
-                'App\Test::test_case1',
+                'App\ServiceTest::test_case1',
             ],
-            '9.5',
+            $phpunit9,
+            null,
         ];
 
-        yield '1 test case' => [
+        yield 'single test' => [
             true,
             [
-                'App\Test::test_case1',
+                'App\ServiceTest::test_case1',
             ],
-            '9.5',
-            '/Test\:\:test_case1/',
+            $phpunit9,
+            '/ServiceTest\:\:test_case1/',
         ];
 
-        yield '2 test cases' => [
+        yield 'multiple tests of the same test case' => [
             true,
             [
-                'App\Test::test_case1',
-                'App\Test::test_case2',
+                'App\ServiceTest::test_case1',
+                'App\ServiceTest::test_case2',
             ],
-            '9.5',
-            '/Test\:\:test_case1|Test\:\:test_case2/',
+            $phpunit9,
+            '/ServiceTest\:\:test_case1|ServiceTest\:\:test_case2/',
         ];
 
-        yield '1 simple test case, 1 with data set and special character >' => [
+        yield 'multiple tests with multiple test cases' => [
             true,
             [
-                'App\Test::test_case1 with data set "With special character >"',
-                'App\Test::test_case2',
+                'App\ServiceUnitTest::test_case1',
+                'App\ServiceUnitTest::test_case2',
+                'App\ServiceIntegrationTest::test_case1',
+                'App\ServiceIntegrationTest::test_case2',
             ],
-            '9.5',
-            '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
+            $phpunit9,
+            '/ServiceUnitTest\:\:test_case1|ServiceUnitTest\:\:test_case2|ServiceIntegrationTest\:\:test_case1|ServiceIntegrationTest\:\:test_case2/',
         ];
 
-        yield '1 simple test case, 1 with data set and special character @' => [
+        yield 'single test from a data provider item (<=PHPUnit9)' => [
             true,
             [
-                'App\Test::test_case1 with data set "With special character @"',
-                'App\Test::test_case2',
+                'App\ServiceTest::test_case1 with data set "#1"',
             ],
-            '9.5',
-            '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
+            $phpunit9,
+            '/ServiceTest\:\:test_case1 with data set "\#1"/',
         ];
 
-        yield '2 data sets from data provider for the same test case' => [
+        yield 'single test from a data provider item (>=PHPUnit10)' => [
             true,
             [
-                'App\Test::test_case1 with data set "#1"',
-                'App\Test::test_case1 with data set "#2"',
+                'App\ServiceTest::test_case1##1',
             ],
-            '9.5',
-            '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
+            $phpunit10,
+            '/ServiceTest\:\:test_case1 with data set "\#1"/',
         ];
 
-        yield '1 data set from data provider "With special char \\"' => [
+        yield 'multiple tests from the same data provider (<=PHPUnit9)' => [
             true,
             [
-                'App\Test::test_case1 with data set "With special char \\"',
+                'App\ServiceTest::test_case with data set "#1"',
+                'App\ServiceTest::test_case with data set "#2"',
             ],
-            '9.5',
-            '/Test\:\:test_case1 with data set "With special char \\\\"/',
+            $phpunit9,
+            '/ServiceTest\:\:test_case with data set "\#1"|ServiceTest\:\:test_case with data set "\#2"/',
         ];
 
-        yield '1 data set from data provider "With special chars ::"' => [
+        yield 'multiple tests from the same data provider (>=PHPUnit10)' => [
             true,
             [
-                'App\Test::test_case1 with data set "With special chars ::"',
+                'App\ServiceTest::test_case##1',
+                'App\ServiceTest::test_case##2',
             ],
-            '9.5',
-            '/Test\:\:test_case1 with data set "With special chars \:\:"/',
+            $phpunit10,
+            '/ServiceTest\:\:test_case with data set "\#1"|ServiceTest\:\:test_case with data set "\#2"/',
         ];
 
-        yield '1 test case - PHPUnit10' => [
+        yield 'multiple tests from a data provider of the same test case (<=PHPUnit9)' => [
             true,
             [
-                'App\Test::test_case1',
+                'App\ServiceTest::test_case1 with data set "#1"',
+                'App\ServiceTest::test_case2 with data set "#1"',
             ],
-            '10.1',
-            '/Test\:\:test_case1/',
+            $phpunit9,
+            '/ServiceTest\:\:test_case1 with data set "\#1"|ServiceTest\:\:test_case2 with data set "\#1"/',
         ];
 
-        yield '2 test cases - PHPUnit10' => [
+        yield 'multiple tests from a data provider of the same test case (>=PHPUnit10)' => [
             true,
             [
-                'App\Test::test_case1',
-                'App\Test::test_case2',
+                'App\ServiceTest::test_case1##1',
+                'App\ServiceTest::test_case2##1',
             ],
-            '10.1',
-            '/Test\:\:test_case1|Test\:\:test_case2/',
+            $phpunit10,
+            '/ServiceTest\:\:test_case1 with data set "\#1"|ServiceTest\:\:test_case2 with data set "\#1"/',
         ];
 
-        yield '1 simple test case, 1 with data set and special character > - PHPUnit10' => [
+        yield 'multiple tests with multiple test cases and multiple data provider items (<=PHPUnit9)' => [
             true,
             [
-                'App\Test::test_case1#With special character >',
-                'App\Test::test_case2',
+                'App\ServiceUnitTest::test_case1 with data set "#1"',
+                'App\ServiceUnitTest::test_case1 with data set "#2"',
+                'App\ServiceUnitTest::test_case2',
+                'App\ServiceUnitTest::test_case3',
+                'App\ServiceIntegrationTest::test_case1',
+                'App\ServiceIntegrationTest::test_case2',
+                'App\ServiceIntegrationTest::test_case3 with data set "#1"',
+                'App\ServiceIntegrationTest::test_case3 with data set "#2"',
             ],
-            '10.1',
-            '/Test\:\:test_case1 with data set "With special character \\>"|Test\:\:test_case2/',
+            $phpunit9,
+            '/ServiceUnitTest\:\:test_case1 with data set "\#1"|ServiceUnitTest\:\:test_case1 with data set "\#2"|ServiceUnitTest\:\:test_case2|ServiceUnitTest\:\:test_case3|ServiceIntegrationTest\:\:test_case1|ServiceIntegrationTest\:\:test_case2|ServiceIntegrationTest\:\:test_case3 with data set "\#1"|ServiceIntegrationTest\:\:test_case3 with data set "\#2"/',
         ];
 
-        yield '1 simple test case, 1 with data set and special character @ - PHPUnit10' => [
+        yield 'multiple tests with multiple test cases and multiple data provider items (>=PHPUnit10)' => [
             true,
             [
-                'App\Test::test_case1#With special character @',
-                'App\Test::test_case2',
+                'App\ServiceUnitTest::test_case1##1',
+                'App\ServiceUnitTest::test_case1##2',
+                'App\ServiceUnitTest::test_case2',
+                'App\ServiceUnitTest::test_case3',
+                'App\ServiceIntegrationTest::test_case1',
+                'App\ServiceIntegrationTest::test_case2',
+                'App\ServiceIntegrationTest::test_case3##1',
+                'App\ServiceIntegrationTest::test_case3##2',
             ],
-            '10.1',
-            '/Test\:\:test_case1 with data set "With special character @"|Test\:\:test_case2/',
+            $phpunit10,
+            '/ServiceUnitTest\:\:test_case1 with data set "\#1"|ServiceUnitTest\:\:test_case1 with data set "\#2"|ServiceUnitTest\:\:test_case2|ServiceUnitTest\:\:test_case3|ServiceIntegrationTest\:\:test_case1|ServiceIntegrationTest\:\:test_case2|ServiceIntegrationTest\:\:test_case3 with data set "\#1"|ServiceIntegrationTest\:\:test_case3 with data set "\#2"/',
         ];
 
-        yield '2 data sets from data provider for the same test case - PHPUnit10' => [
+        yield 'test from a data provider with a special character (<=PHPUnit9)' => [
             true,
             [
-                'App\Test::test_case1##1',
-                'App\Test::test_case1##2',
+                'App\ServiceTest::test_case1 with data set "With special character >@&"\\::',
+                'App\ServiceTest::test_case2',
             ],
-            '10.1',
-            '/Test\:\:test_case1 with data set "\#1"|Test\:\:test_case1 with data set "\#2"/',
+            $phpunit9,
+            '/ServiceTest\:\:test_case1 with data set "With special character \\>\\@\\&\\\\\:\:"|ServiceTest\:\:test_case2/',
         ];
 
-        yield '1 data set from data provider "With special char \\" - PHPUnit10' => [
+        yield 'test from a data provider with a special character (>=PHPUnit10)' => [
             true,
             [
-                'App\Test::test_case1#With special char \\"',
+                'App\ServiceTest::test_case1 with data set "With special character >@&"\\::',
+                'App\ServiceTest::test_case2',
             ],
-            '10.1',
-            '/Test\:\:test_case1 with data set "With special char \\\\""/',
-        ];
-
-        yield '1 data set from data provider "With special chars ::" - PHPUnit10' => [
-            true,
-            [
-                'App\Test::test_case1#With special chars ::',
-            ],
-            '10.1',
-            '/Test\:\:test_case1 with data set "With special chars \:\:"/',
-        ];
-
-        yield '1 test case from data provider with numeric data provider keys - PHPUnit10' => [
-            true,
-            [
-                'App\Test::test_case1#0',
-                'App\Test::test_case1#1',
-            ],
-            '10.5',
-            '/Test\:\:test_case1 with data set \#0|Test\:\:test_case1 with data set \#1/',
-        ];
-
-        yield '1 test case from data provider with leading numbers in the key string - PHPUnit10' => [
-            true,
-            [
-                'App\Test::test_case1#123a',
-            ],
-            '10.5',
-            '/Test\:\:test_case1 with data set "123a"/',
+            $phpunit10,
+            '/ServiceTest\:\:test_case1 with data set "With special character \\>\\@\\&\\\\\:\:"|ServiceTest\:\:test_case2/',
         ];
     }
 }
