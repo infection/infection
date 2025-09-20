@@ -35,34 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
-use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function count;
-use function end;
 use function explode;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use function is_numeric;
 use function ltrim;
-use function preg_quote;
-use function rtrim;
 use SplFileInfo;
 use function sprintf;
-use function version_compare;
 
 /**
  * @internal
  */
 final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    private const MAX_EXPLODE_PARTS = 2;
-
-    // The real limit is likely higher, but it is better to be safe than sorry.
-    private const PCRE_LIMIT = 30_000;
-
     /**
      * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
@@ -106,13 +95,17 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
-        //$this->executeOnlyCoveringTestCases = true;
+        // $this->executeOnlyCoveringTestCases = true;
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
-            $options[] = '--filter';
-            $options[] = $this->createFilterString(
+            $filter = $this->createFilterString(
                 $tests,
                 $testFrameworkVersion,
             );
+
+            if ($filter !== null) {
+                $options[] = '--filter';
+                $options[] = $filter;
+            }
         }
 
         return $options;
@@ -146,33 +139,6 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         return $options;
     }
 
-    private function getMethodNameWithDataProvider(string $methodNameWithDataProvider, string $testFrameworkVersion): string
-    {
-        $methodNameWithDataProviderResult = $methodNameWithDataProvider;
-
-        /*
-         * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
-         * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
-         *
-         * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
-         */
-        if (version_compare($testFrameworkVersion, '10', '>=')) {
-            $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
-
-            if (count($methodNameParts) > 1) {
-                [$methodName, $dataProviderKey] = $methodNameParts;
-
-                if (!is_numeric($dataProviderKey)) {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
-                } else {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
-                }
-            }
-        }
-
-        return $methodNameWithDataProviderResult;
-    }
-
     /**
      * @param non-empty-array<TestLocation> $tests
      *
@@ -181,14 +147,17 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     private function createFilterString(
         array $tests,
         string $testFrameworkVersion,
-    ): string
-    {
-        return sprintf(
-            '/%s/',
-            implode(
-                '|',
-                FilterBuilder::createFilters($tests, $testFrameworkVersion),
-            ),
-        );
+    ): ?string {
+        $filters = FilterBuilder::createFilters($tests, $testFrameworkVersion);
+
+        return count($filters) === 0
+            ? null
+            : sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    $filters,
+                ),
+            );
     }
 }

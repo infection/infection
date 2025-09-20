@@ -35,17 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 
-use Closure;
 use function array_map;
+use function array_merge;
+use Closure;
 use Generator;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
-use function implode;
 use function sprintf;
+use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
@@ -120,8 +121,12 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     }
 
     #[DataProvider('provideTestCases')]
-    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(bool $executeOnlyCoveringTestCases, array $testCases, string $phpUnitVersion, ?string $expectedFilterOptionValue): void
-    {
+    public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(
+        bool $executeOnlyCoveringTestCases,
+        array $testCases,
+        string $phpUnitVersion,
+        ?string $expectedFilterOptionValue,
+    ): void {
         $configPath = '/the config/path';
 
         $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null);
@@ -132,23 +137,22 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             '--path=/a path/with spaces',
         ];
 
-        if ($executeOnlyCoveringTestCases) {
+        if ($executeOnlyCoveringTestCases && $expectedFilterOptionValue !== null) {
             $expectedArgumentsAndOptions[] = '--filter';
             $expectedArgumentsAndOptions[] = $expectedFilterOptionValue;
         }
 
-        $this->assertSame(
-            $expectedArgumentsAndOptions,
-            $builder->buildForMutant(
-                $configPath,
-                '--path=/a path/with spaces',
-                array_map(
-                    static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
-                    $testCases,
-                ),
-                $phpUnitVersion,
+        $actual = $builder->buildForMutant(
+            $configPath,
+            '--path=/a path/with spaces',
+            array_map(
+                static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
+                $testCases,
             ),
+            $phpUnitVersion,
         );
+
+        $this->assertSame($expectedArgumentsAndOptions, $actual);
     }
 
     public static function provideTestCases(): Generator
@@ -322,19 +326,10 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case' . $index,
-                10_000,
+                100_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_case' . $index,
-                        10_000,
-                    ),
-                ),
-            ),
+            null,
         ];
 
         yield 'too many tests; all from a different test case' => [
@@ -344,16 +339,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'Service1Test\:\:test_something' . $index,
-                        10_000,
-                    ),
-                ),
-            ),
+            null,
         ];
 
         yield 'too many tests; all from data providers (<=PHPUnit9)' => [
@@ -363,16 +349,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "\#' . $index . '"',
-                        10_000,
-                    ),
-                ),
-            ),
+            '/ServiceTest\:\:test_case/',
         ];
 
         yield 'too many tests; all from data providers (>=PHPUnit10)' => [
@@ -382,16 +359,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit10,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "\#' . $index . '"',
-                        10_000,
-                    ),
-                ),
-            ),
+            '/ServiceTest\:\:test_case/',
         ];
 
         yield 'too many tests; mixed data providers and regular tests (<=PHPUnit9)' => [
@@ -411,16 +379,13 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '/%s/',
                 implode(
                     '|',
-                    array_merge(
-                        self::createArray(
+                    [
+                        ...self::createArray(
                             static fn (int $index) => 'ServiceTest\:\:test_regular' . $index,
                             500,
                         ),
-                        self::createArray(
-                            static fn (int $index) => 'ServiceTest\:\:test_provider with data set "\#' . $index . '"',
-                            500,
-                        ),
-                    ),
+                        'ServiceTest\:\:test_provider',
+                    ],
                 ),
             ),
         ];
@@ -434,16 +399,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 ),
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'Service' . ($index % 10) . 'Test\:\:test_method' . $index,
-                        10_000,
-                    ),
-                ),
-            ),
+            null,
         ];
 
         yield 'too many tests; identical short names from different namespaces' => [
@@ -453,16 +409,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_method' . $index,
-                        10_000,
-                    ),
-                ),
-            ),
+            null,
         ];
 
         yield 'too many tests; with special characters in data sets (<=PHPUnit9)' => [
@@ -472,16 +419,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "Special \\>@&\\\\\\:\\:' . $index . '"',
-                        10_000,
-                    ),
-                ),
-            ),
+            '/ServiceTest\:\:test_case/',
         ];
 
         yield 'too many tests; with very long test names' => [
@@ -491,16 +429,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_this_is_a_very_long_test_method_name_that_might_cause_issues_with_command_line_length_limits_' . $index,
-                        10_000,
-                    ),
-                ),
-            ),
+            null,
         ];
 
         yield 'too many tests; all from same method with different data sets (<=PHPUnit9)' => [
@@ -510,28 +439,19 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 10_000,
             ),
             $phpunit9,
-            sprintf(
-                '/%s/',
-                implode(
-                    '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_case with data set "dataset_' . $index . '"',
-                        10_000,
-                    ),
-                ),
-            ),
+            '/ServiceTest\:\:test_case/',
         ];
 
-        yield 'too many tests; with duplicate test cases' => [
+        yield 'too many tests; with multiple duplicate test cases of data providers' => [
             true,
             array_merge(
                 self::createArray(
-                    static fn (int $index) => 'App\ServiceTest::test_case' . ($index % 500),
-                    10_000,
+                    static fn (int $index) => 'App\ServiceTest::test_something_1' . $index,
+                    500,
                 ),
                 self::createArray(
-                    static fn (int $index) => 'App\ServiceTest::test_case' . ($index % 500),
-                    10_000,
+                    static fn (int $index) => 'App\ServiceTest::test_something_else_2' . $index,
+                    500,
                 ),
             ),
             $phpunit9,
@@ -539,9 +459,15 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '/%s/',
                 implode(
                     '|',
-                    self::createArray(
-                        static fn (int $index) => 'ServiceTest\:\:test_case' . $index,
-                        500,
+                    array_merge(
+                        self::createArray(
+                            static fn (int $index) => 'test_something_1' . $index,
+                            500,
+                        ),
+                        self::createArray(
+                            static fn (int $index) => 'test_something_else_2' . $index,
+                            500,
+                        ),
                     ),
                 ),
             ),
@@ -560,7 +486,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     {
         $items = [];
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $items[] = $createItem($i);
         }
 

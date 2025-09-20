@@ -36,20 +36,12 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_key_exists;
-use function array_map;
-use function array_merge;
 use function count;
 use function end;
 use function explode;
-use function implode;
-use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function is_numeric;
-use function ltrim;
 use function preg_quote;
-use function rtrim;
-use SplFileInfo;
 use function sprintf;
 use function strlen;
 use function version_compare;
@@ -73,14 +65,13 @@ final class FilterBuilder
         array $tests,
         string $testFrameworkVersion,
         int $optimizationLevel = 0,
-    ): array
-    {
+    ): array {
         $usedTestCases = [];
         $filters = [];
         $totalFilterLength = 0;
         $attemptsCount = 0;
 
-        if ($optimizationLevel === 1) {
+        if ($optimizationLevel === 3) {
             return [];
         }
 
@@ -94,11 +85,13 @@ final class FilterBuilder
                 $testMethod = self::getTestMethod($rawTestMethod, $testFrameworkVersion, $optimizationLevel);
                 $testCaseShortClassName = self::getShortClassName($testCaseClassName);
 
-                $test = sprintf(
-                    '%s::%s',
-                    $testCaseShortClassName,
-                    $testMethod,
-                );
+                $test = $optimizationLevel >= 2
+                    ? $testMethod
+                    : sprintf(
+                        '%s::%s',
+                        $testCaseShortClassName,
+                        $testMethod,
+                    );
             }
 
             if (array_key_exists($test, $usedTestCases)) {
@@ -126,8 +119,6 @@ final class FilterBuilder
 
     /**
      * @param class-string $className
-     *
-     * @return string
      */
     private static function getShortClassName(string $className): string
     {
@@ -140,9 +131,8 @@ final class FilterBuilder
         string $methodNameWithDataProvider,
         string $testFrameworkVersion,
         int $optimizationLevel,
-    ): string
-    {
-        if (1 === $optimizationLevel) {
+    ): string {
+        if ($optimizationLevel === 1) {
             // Drop the data provider key when there is one.
             [$testMethod] = self::splitMethodNameFromProviderKey($methodNameWithDataProvider, $testFrameworkVersion);
 
@@ -173,8 +163,7 @@ final class FilterBuilder
     private static function splitMethodNameFromProviderKey(
         string $testMethod,
         string $testFrameworkVersion,
-    ): array
-    {
+    ): array {
         return self::isPhpUnit10OrHigher($testFrameworkVersion)
             ? explode('#', $testMethod, self::MAX_EXPLODE_PARTS)
             : explode(' with data set ', $testMethod, self::MAX_EXPLODE_PARTS);
