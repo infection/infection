@@ -78,6 +78,7 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
             $mutant->getMutatedCode(),
             $mutant->getTests(),
             $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $mutation->trace,
         );
     }
 
