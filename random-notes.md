@@ -1,36 +1,22 @@
-- we need a way to easily tell if a file (given its pathname) has tests. Currently it is a bit annoying because it's a breakdown of directories + files so the lookup is a bit annoying.
-- the coverage needs to be size efficient somehow -> could be a binary serialized php (https://www.php.net/manual/en/function.igbinary-serialize.php)
-  - split files like the current XML coverage report is probably good?
-  - the coverage of a file (e.g. right now `MyFile.php.xml`) does not need to contain all the source code
-  - the index also contains a lot of unnecessary information as well (e.g. totals per directory)
-- a way to identify that the coverage is out of date with either the source code or the tests
-
-
-
-
-
-
-
-
 TestLocation initially looks like this:
 
 TestLocations
-byLine
-47: [TestLocation]
-51: [TestLocation]
-56: [TestLocation]
-byMethod
-__construct: SourceMethodLineRange(43, 47)
-getStartLine: SourceMethodLineRange(49, 52)
-getEndLine: SourceMethodLineRange(54, 57)
+    byLine
+        47: [TestLocation]
+        51: [TestLocation]
+        56: [TestLocation]
+    byMethod
+        __construct: SourceMethodLineRange(43, 47)
+        getStartLine: SourceMethodLineRange(49, 52)
+        getEndLine: SourceMethodLineRange(54, 57)
 
 TestLocation
-- method: 'Infection\Tests\Differ\ChangedLinesRangeTest::test_it_returns_lines'
-- filePath: null
-- executionTime: null
+    - method: 'Infection\Tests\Differ\ChangedLinesRangeTest::test_it_returns_lines'
+    - filePath: null
+    - executionTime: null
 
 -> TestLocation is more a "covered by" at this point, this is because with the XML coverage we need
-to aggregate information from multiple sources of data.
+   to aggregate information from multiple sources of data.
 
 -> the naming of "byMethod" seems odd
 
@@ -83,7 +69,7 @@ Mutation affects `DiffChangedLinesParser::parse()`
 Now there is two issues to distinguish here:
 
 - PHPUnit write each test executed, but in our case we would execute the test method with the entire data provider, not an item of the data provider
-  => For an infection PHPUnit report: this could be a big win to save space and make the coverage easier to consume
+=> For an infection PHPUnit report: this could be a big win to save space and make the coverage easier to consume
 
 Transformed/interpreted the above would be
 
