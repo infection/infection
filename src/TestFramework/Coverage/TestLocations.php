@@ -44,7 +44,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 final class TestLocations
 {
     /**
-     * @param array<int, array<int, TestLocation>> $byLine
+     * @param array<int, list<TestLocation>> $byLine
      * @param array<string, SourceMethodLineRange> $byMethod
      */
     public function __construct(
@@ -58,7 +58,7 @@ final class TestLocations
      *
      * @see JUnitTestExecutionInfoAdder
      *
-     * @return array<int, array<int, TestLocation>>
+     * @return array<int, list<TestLocation>>
      */
     public function &getTestsLocationsBySourceLine(): array
     {

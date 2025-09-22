@@ -33,33 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\NewCoverage\PHPUnitXml;
+namespace Infection\FileSystem;
 
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
-use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use function is_dir;
+use function is_file;
+use function is_readable;
 
-final class PHPUnitXmlProvider
+final class Filesystem extends SymfonyFilesystem
 {
-    private PHPUnitXmlReport $report;
-
-    public function __construct(
-        private readonly ReportLocator $indexReportLocator,
-        private readonly ReportLocator $jUnitReportLocator,
-    ) {
+    public function isReadableFile(string $path): bool
+    {
+        return is_file($path) && is_readable($path);
     }
 
-    public function get(): PHPUnitXmlReport
+    public function isReadableDirectory(string $path): bool
     {
-        if (!isset($this->report)) {
-            $this->report = new PHPUnitXmlReport(
-                fn () => new IndexReport($this->indexReportLocator->locate()),
-                fn () => new JUnitReport($this->jUnitReportLocator->locate()),
-            );
-        }
+        return is_dir($path) && is_readable($path);
+    }
 
-        return $this->report;
+    public function createFinder(): Finder
+    {
+        return Finder::create();
+    }
+
+    public static function mapFileInfoToCanonicalPathname(SplFileInfo $fileInfo): string
+    {
+        return Path::canonicalize($fileInfo->getPathname());
     }
 }

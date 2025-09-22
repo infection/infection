@@ -35,6 +35,12 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\FileSystem\Filesystem;
+use Infection\TestFramework\NewCoverage\JUnit\JUnitReportLocator as NewJUnitReportLocator;
+use Infection\TestFramework\NewCoverage\Locator\MemoizedLocator;
+use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -153,7 +159,6 @@ use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -262,7 +267,14 @@ final class Container extends DIContainer
                 $container->getXmlCoverageParser(),
             ),
             IndexXmlCoverageLocator::class => static fn (self $container): IndexXmlCoverageLocator => new IndexXmlCoverageLocator(
-                $container->getConfiguration()->getCoveragePath(),
+                $container->getConfiguration()->getCoverageDirPath(),
+            ),
+            IndexReportLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
+                IndexReportLocator::create(
+                    $container->getFileSystem(),
+                    $container->getConfiguration()->getCoverageDirPath(),
+                    IndexReportLocator::createPHPUnitDefaultCoverageXmlIndexPath($container->getConfiguration()->getCoverageDirPath()),
+                ),
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
                 [$container->getProjectDir()],
@@ -335,7 +347,7 @@ final class Container extends DIContainer
                     $config->shouldSkipCoverage(),
                     $config->shouldSkipInitialTests(),
                     $config->getInitialTestsPhpOptions() ?? '',
-                    $config->getCoveragePath(),
+                    $config->getCoverageDirPath(),
                     $testFrameworkAdapter->hasJUnitReport(),
                     $container->getJUnitReportLocator(),
                     $testFrameworkAdapter->getName(),
@@ -343,8 +355,19 @@ final class Container extends DIContainer
                 );
             },
             JUnitReportLocator::class => static fn (self $container): JUnitReportLocator => new JUnitReportLocator(
-                $container->getConfiguration()->getCoveragePath(),
+                $container->getConfiguration()->getCoverageDirPath(),
                 $container->getDefaultJUnitFilePath(),
+            ),
+            NewJUnitReportLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
+                NewJUnitReportLocator::create(
+                    $container->getFileSystem(),
+                    $container->getConfiguration()->getCoverageDirPath(),
+                    NewJUnitReportLocator::createPHPUnitDefaultJUnitPath($container->getConfiguration()->getCoverageDirPath()),
+                ),
+            ),
+            PHPUnitXmlProvider::class => static fn (self $container): PHPUnitXmlProvider => new PHPUnitXmlProvider(
+                $container->get(IndexReportLocator::class),
+                $container->get(NewJUnitReportLocator::class),
             ),
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
@@ -1125,7 +1148,7 @@ final class Container extends DIContainer
         return $this->defaultJUnitPath ??= sprintf(
             '%s/%s',
             Path::canonicalize(
-                $this->getConfiguration()->getCoveragePath(),
+                $this->getConfiguration()->getCoverageDirPath(),
             ),
             'junit.xml',
         );

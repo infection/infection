@@ -33,21 +33,20 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\NewCoverage\PHPUnitXml\Index;
 
-use function count;
-use function current;
-use function implode;
+use Infection\FileSystem\Filesystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use function iter\map;
-use function iter\toArray;
-use newSrc\Framework\Filesystem;
-use newSrc\TestFramework\Coverage\Locator\NoReportFound;
-use newSrc\TestFramework\Coverage\Locator\ReportLocator;
-use function sprintf;
+use Infection\TestFramework\NewCoverage\Locator\NoReportFound;
+use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function count;
+use function current;
+use function implode;
+use function Pipeline\take;
+use function sprintf;
 
 /**
  * TODO: heavily copied from IndexXmlCoverageLocator
@@ -56,7 +55,7 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 final readonly class IndexReportLocator implements ReportLocator
 {
-    private const JUNIT_NAME_REGEX = '/^(.+\.)?junit\.xml$/i';
+    private const INDEX_NAME_REGEX = '/^index\.xml$/i';
 
     /**
      * @internal
@@ -64,26 +63,33 @@ final readonly class IndexReportLocator implements ReportLocator
     public function __construct(
         private Filesystem $filesystem,
         private string $coverageDirPath,
-        private string $defaultJUnitPath,
+        private string $defaultCoverageXmlIndexPath,
     ) {
     }
 
     public static function create(
         Filesystem $filesystem,
         string $coverageDirPath,
-        string $defaultJUnitPath,
+        ?string $defaultCoverageXmlIndexPath = null,
     ): self {
         return new self(
             $filesystem,
-            $coverageDirPath,
-            Path::canonicalize($defaultJUnitPath),
+            Path::canonicalize($coverageDirPath),
+            null === $defaultCoverageXmlIndexPath
+                ? self::createPHPUnitDefaultCoverageXmlIndexPath($coverageDirPath)
+                : Path::canonicalize($defaultCoverageXmlIndexPath),
         );
+    }
+
+    public static function createPHPUnitDefaultCoverageXmlIndexPath(string $coverageDirPath): string
+    {
+        return Path::canonicalize($coverageDirPath . '/coverage-xml/index.xml');
     }
 
     public function locate(): string
     {
-        if ($this->filesystem->isReadableFile($this->defaultJUnitPath)) {
-            return $this->defaultJUnitPath;
+        if ($this->filesystem->isReadableFile($this->defaultCoverageXmlIndexPath)) {
+            return $this->defaultCoverageXmlIndexPath;
         }
 
         if (!$this->filesystem->isReadableDirectory($this->coverageDirPath)) {
@@ -109,19 +115,21 @@ final readonly class IndexReportLocator implements ReportLocator
     /**
      * @return list<string>
      */
-    private function find(): Finder
+    private function find(): array
     {
-        return toArray(
-            map(
-                static fn (SplFileInfo $fileInfo) => Path::canonicalize($fileInfo->getPathname()),
-                $this->filesystem
-                    ->createFinder()
-                    ->files()
-                    ->in($this->coverageDirPath)
-                    ->name(self::JUNIT_NAME_REGEX)
-                    ->sortByName(),
-            ),
-        );
+        return take($this->createIndexFinder())
+            ->map(Filesystem::mapFileInfoToCanonicalPathname(...))
+            ->toList();
+    }
+
+    private function createIndexFinder(): Finder
+    {
+        return $this->filesystem
+            ->createFinder()
+            ->files()
+            ->in($this->coverageDirPath)
+            ->name(self::INDEX_NAME_REGEX)
+            ->sortByName();
     }
 
     /**
@@ -131,7 +139,7 @@ final readonly class IndexReportLocator implements ReportLocator
     {
         throw new NoReportFound(
             sprintf(
-                'Could not find a JUnit report in "%s": the directory does not exist or is not readable.',
+                'Could not find a coverage XML index report in "%s": the directory does not exist or is not readable.',
                 $this->coverageDirPath,
             ),
         );
@@ -146,8 +154,9 @@ final readonly class IndexReportLocator implements ReportLocator
     {
         throw new NoReportFound(
             sprintf(
-                'Could not find a JUnit report in "%s": more than one file with the pattern ".*" has been found. Found: "%s"',
+                'Could not find a coverage XML index report in "%s": more than one file with the pattern "%s" has been found. Found: "%s".',
                 $this->coverageDirPath,
+                self::INDEX_NAME_REGEX,
                 implode(
                     '", "',
                     $files,
@@ -163,8 +172,9 @@ final readonly class IndexReportLocator implements ReportLocator
     {
         throw new NoReportFound(
             sprintf(
-                'Could not find a JUnit report in "%s": no file with the pattern ".*" has been found.',
+                'Could not find a coverage XML index report in "%s": no file with the pattern "%s" has been found.',
                 $this->coverageDirPath,
+                self::INDEX_NAME_REGEX,
             ),
         );
     }

@@ -102,7 +102,7 @@ class Configuration
         private readonly ?string $initialTestsPhpOptions,
         private readonly string $testFrameworkExtraOptions,
         private readonly ?string $staticAnalysisToolOptions,
-        private readonly string $coveragePath,
+        private readonly string $coverageDirPath,
         private readonly bool $skipCoverage,
         private readonly bool $skipInitialTests,
         private readonly bool $debug,
@@ -252,9 +252,9 @@ class Configuration
         return $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions);
     }
 
-    public function getCoveragePath(): string
+    public function getCoverageDirPath(): string
     {
-        return $this->coveragePath;
+        return $this->coverageDirPath;
     }
 
     public function shouldSkipCoverage(): bool

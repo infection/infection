@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use Infection\TestFramework\Coverage\TestLocations;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\Trace;
@@ -75,19 +76,25 @@ final class PHPUnitCoverageTracer
         );
     }
 
-    /**
-     * @return list<TestLocation>
-     */
-    private function createTestLocations(SourceFileIndexXmlInfo $fileInfo): array
+    private function createTestLocations(SourceFileIndexXmlInfo $fileInfo): TestLocations
     {
         $coverage = $this->getReport()->getCoverage($fileInfo->coveragePathname);
 
-        return array_map(
-            fn (LineCoverage $coverage) => $this->createTestLocation(
-                $lineCoverage,
-                $fileInfo->coveragePathname,
-            ),
-            $coverage,
+        $lines = [];
+
+        foreach ($coverage as $item) {
+            foreach ($item->coveredBy as $coveredBy) {
+                $lines[$item->lineNumber][] = new TestLocation(
+                    $coveredBy,
+                    null,   // TODO
+                    null,   // TODO
+                );
+            }
+        }
+
+        return new TestLocations(
+            $lines,
+            [],
         );
     }
 

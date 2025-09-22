@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use Infection\FileSystem\Filesystem;
 use function getenv;
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;
@@ -42,9 +43,9 @@ use PHPUnit\Framework\TestCase;
 use function Safe\getcwd;
 use function Safe\realpath;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
+// TODO: could take mine instead.
 /**
  * @private
  */
@@ -55,6 +56,8 @@ abstract class FileSystemTestCase extends TestCase
     protected string $cwd = '';
 
     protected string $tmp = '';
+
+    protected Filesystem $filesystem;
 
     public static function tearDownAfterClass(): void
     {
@@ -71,11 +74,12 @@ abstract class FileSystemTestCase extends TestCase
 
         $this->cwd = getcwd();
         $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
+        $this->filesystem = new Filesystem();
     }
 
     protected function tearDown(): void
     {
-        (new Filesystem())->remove($this->tmp);
+        $this->filesystem->remove($this->tmp);
     }
 
     final protected static function removeTmpDir(): void

@@ -142,7 +142,7 @@ trait ConfigurationAssertions
             $configuration->getStaticAnalysisToolOptions(),
             'Failed staticAnalysisToolOptions check',
         );
-        $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath(), 'Failed coveragePath check');
+        $this->assertSame($expectedCoveragePath, $configuration->getCoverageDirPath(), 'Failed coveragePath check');
         $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage(), 'Failed skipCoverage check');
         $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests(), 'Failed skipInitialTests check');
         $this->assertSame($expectedDebug, $configuration->isDebugEnabled(), 'Failed isDebugEnabled check');

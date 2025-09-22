@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\Locator;
+namespace Infection\TestFramework\NewCoverage\Locator;
 
 final class MemoizedLocator implements ReportLocator
 {

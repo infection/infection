@@ -33,7 +33,9 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\Locator;
+namespace Infection\TestFramework\NewCoverage\Locator;
+
+use Infection\TestFramework\NewCoverage\Locator\NoReportFound;
 
 interface ReportLocator
 {
