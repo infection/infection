@@ -42,6 +42,7 @@ use Generator;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -49,6 +50,7 @@ use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
+#[CoversClass(FilterBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
     public function test_it_can_build_the_command_without_extra_options(): void
