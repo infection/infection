@@ -65,60 +65,78 @@ final class FilterBuilder
         $filters = [];
 
         foreach ($tests as $testLocation) {
-            $testCaseString = $testLocation->getMethod();
-
-            $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
+            $test = $testLocation->getMethod();
+            $partsDelimitedByColons = explode('::', $test, self::MAX_EXPLODE_PARTS);
 
             if (count($partsDelimitedByColons) > 1) {
-                $methodNameWithDataProvider = self::getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
+                [$testCaseClassName, $rawTestMethod] = $partsDelimitedByColons;
 
-                $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
+                $testMethod = self::getTestMethod($rawTestMethod, $testFrameworkVersion);
+                $classNameWithoutNamespace = self::getShortClassName($testCaseClassName);
 
-                $parts = explode('\\', $testClassFullyQualifiedClassName);
-                $classNameWithoutNamespace = end($parts);
-
-                $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
+                $test = sprintf(
+                    '%s::%s',
+                    $classNameWithoutNamespace,
+                    $testMethod,
+                );
             }
 
-            if (array_key_exists($testCaseString, $usedTestCases)) {
+            if (array_key_exists($test, $usedTestCases)) {
                 continue;
             }
 
-            $usedTestCases[$testCaseString] = true;
+            $usedTestCases[$test] = true;
 
-            $filter = preg_quote($testCaseString, '/');
+            $filter = preg_quote($test, '/');
             $filters[] = $filter;
         }
 
         return $filters;
     }
 
-    private static function getMethodNameWithDataProvider(
+    private static function getTestMethod(
         string $methodNameWithDataProvider,
         string $testFrameworkVersion,
     ): string {
-        $methodNameWithDataProviderResult = $methodNameWithDataProvider;
-
         /*
          * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
          * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
          *
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
-        if (version_compare($testFrameworkVersion, '10', '>=')) {
-            $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
+        if (self::isPhpUnit10OrHigher($testFrameworkVersion)) {
+            $methodNameParts = self::splitMethodNameFromProviderKey($methodNameWithDataProvider);
 
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
 
-                if (!is_numeric($dataProviderKey)) {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
-                } else {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
-                }
+                return is_numeric($dataProviderKey)
+                    ? sprintf('%s with data set #%s', $methodName, $dataProviderKey)
+                    : sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
             }
         }
 
-        return $methodNameWithDataProviderResult;
+        return $methodNameWithDataProvider;
+    }
+
+    private static function getShortClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return end($parts);
+    }
+
+    /**
+     * @return array{string, string}
+     */
+    private static function splitMethodNameFromProviderKey(string $testMethod): array
+    {
+        // @phpstan-ignore return.type
+        return explode('#', $testMethod, self::MAX_EXPLODE_PARTS);
+    }
+
+    private static function isPhpUnit10OrHigher(string $testFrameworkVersion): bool
+    {
+        return version_compare($testFrameworkVersion, '10', '>=');
     }
 }
