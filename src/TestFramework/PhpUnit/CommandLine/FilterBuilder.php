@@ -137,6 +137,12 @@ final class FilterBuilder
 
     private static function isPhpUnit10OrHigher(string $testFrameworkVersion): bool
     {
-        return version_compare($testFrameworkVersion, '10', '>=');
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '10', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
     }
 }
