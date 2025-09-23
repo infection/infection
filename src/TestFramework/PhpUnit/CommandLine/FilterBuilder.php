@@ -105,7 +105,7 @@ final class FilterBuilder
          *
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
-        if (version_compare($testFrameworkVersion, '10', '>=')) {
+        if (self::isPhpUnit10OrHigher($testFrameworkVersion)) {
             $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
 
             if (count($methodNameParts) > 1) {
@@ -120,5 +120,16 @@ final class FilterBuilder
         }
 
         return $methodNameWithDataProviderResult;
+    }
+
+    private static function isPhpUnit10OrHigher(string $testFrameworkVersion): bool
+    {
+        static $versions = [];
+
+        if (!array_key_exists($testFrameworkVersion, $versions)) {
+            $versions[$testFrameworkVersion] = version_compare($testFrameworkVersion, '10', '>=');
+        }
+
+        return $versions[$testFrameworkVersion];
     }
 }
