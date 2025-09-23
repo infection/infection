@@ -71,13 +71,13 @@ final class FilterBuilder
             if (count($partsDelimitedByColons) > 1) {
                 [$testCaseClassName, $rawTestMethod] = $partsDelimitedByColons;
 
-                $testMethod = self::getTestMethodWithProviderKey($rawTestMethod, $testFrameworkVersion);
+                $testMethodWithProviderKey = self::getTestMethodWithProviderKey($rawTestMethod, $testFrameworkVersion);
                 $shortClassName = self::getShortClassName($testCaseClassName);
 
                 $test = sprintf(
                     '%s::%s',
                     $shortClassName,
-                    $testMethod,
+                    $testMethodWithProviderKey,
                 );
             }
 
