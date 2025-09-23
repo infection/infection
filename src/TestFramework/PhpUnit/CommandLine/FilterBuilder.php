@@ -71,12 +71,12 @@ final class FilterBuilder
             if (count($partsDelimitedByColons) > 1) {
                 [$testCaseClassName, $rawTestMethod] = $partsDelimitedByColons;
 
-                $testMethod = self::getTestMethod($rawTestMethod, $testFrameworkVersion);
-                $classNameWithoutNamespace = self::getShortClassName($testCaseClassName);
+                $testMethod = self::getTestMethodWithProviderKey($rawTestMethod, $testFrameworkVersion);
+                $shortClassName = self::getShortClassName($testCaseClassName);
 
                 $test = sprintf(
                     '%s::%s',
-                    $classNameWithoutNamespace,
+                    $shortClassName,
                     $testMethod,
                 );
             }
@@ -94,7 +94,7 @@ final class FilterBuilder
         return $filters;
     }
 
-    private static function getTestMethod(
+    private static function getTestMethodWithProviderKey(
         string $methodNameWithDataProvider,
         string $testFrameworkVersion,
     ): string {
