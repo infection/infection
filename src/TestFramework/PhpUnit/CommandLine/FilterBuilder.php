@@ -61,7 +61,7 @@ final class FilterBuilder
         array $tests,
         string $testFrameworkVersion,
     ): array {
-        $usedTestCases = [];
+        $usedTests = [];
         $filters = [];
 
         foreach ($tests as $testLocation) {
@@ -81,11 +81,11 @@ final class FilterBuilder
                 );
             }
 
-            if (array_key_exists($test, $usedTestCases)) {
+            if (array_key_exists($test, $usedTests)) {
                 continue;
             }
 
-            $usedTestCases[$test] = true;
+            $usedTests[$test] = true;
 
             $filter = preg_quote($test, '/');
             $filters[] = $filter;
