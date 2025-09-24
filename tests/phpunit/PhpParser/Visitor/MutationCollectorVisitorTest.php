@@ -37,13 +37,13 @@ namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\PhpParser\Visitor\MutagenesisVisitor;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
-#[CoversClass(MutationCollectorVisitor::class)]
+#[CoversClass(MutagenesisVisitor::class)]
 final class MutationCollectorVisitorTest extends BaseVisitorTestCase
 {
     private const CODE = <<<'PHP'
@@ -71,7 +71,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutagenesisVisitor($nodeMutationGeneratorMock);
 
         $this->traverse(
             self::parseCode(self::CODE),
@@ -87,7 +87,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
                 // generator can produce _more_ mutations, we only call it as many times as we need
                 // it, not as many times it can create mutations
             ],
-            iterator_to_array($visitor->getMutations(), false),
+            iterator_to_array($visitor->getPotentialMutations(), false),
         );
     }
 
@@ -110,7 +110,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
             )
         ;
 
-        $visitor = new MutationCollectorVisitor($nodeMutationGeneratorMock);
+        $visitor = new MutagenesisVisitor($nodeMutationGeneratorMock);
 
         $this->traverse(
             self::parseCode(self::CODE),
@@ -124,7 +124,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
                 $mutation1,
                 $mutation2,
             ],
-            iterator_to_array($visitor->getMutations(), false),
+            iterator_to_array($visitor->getPotentialMutations(), false),
         );
 
         $this->traverse(
@@ -137,7 +137,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
                 $mutation3,
                 $mutation4,
             ],
-            iterator_to_array($visitor->getMutations(), false),
+            iterator_to_array($visitor->getPotentialMutations(), false),
         );
     }
 }
