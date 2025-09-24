@@ -1,0 +1,315 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Telemetry\Reporter;
+
+use Infection\Console\IO;
+use Infection\Resource\Memory\MemoryFormatter;
+use Infection\Resource\Time\TimeFormatter;
+use Infection\Telemetry\Metric\Time\DurationFormatter;
+use Infection\Telemetry\Tracing\RootScopes;
+use Infection\Telemetry\Tracing\Span;
+use Infection\Telemetry\Tracing\Trace;
+use InvalidArgumentException;
+use Symfony\Component\Console\Output\OutputInterface;
+use function array_filter;
+use function array_map;
+use function array_values;
+use function count;
+use function in_array;
+use function memory_get_peak_usage;
+use function sprintf;
+use function str_repeat;
+
+final class ConsoleReporter
+{
+    private BoxDrawer $boxDrawer;
+
+    /**
+     * @var positive-int|0
+     */
+    private int $filteredCount = 0;
+
+    /**
+     * @var array{positive-int, bool}|null
+     */
+    private array|null $lastFiltered = [];
+
+    public function __construct(
+        private readonly DurationFormatter $durationFormatter,
+        private readonly MemoryFormatter   $memoryFormatter,
+        private readonly IO                $io,
+    ) {
+    }
+
+    /**
+     * @param positive-int $maxDepth
+     * @param list<RootScopes> $rootScopes
+     * @param int<0, 100> $minTimeThreshold
+     */
+    public function report(
+        Trace $trace,
+        int   $maxDepth,
+        array  $rootScopes,
+        int $minTimeThreshold,
+        string|null $spanId,
+    ): void
+    {
+        $this->boxDrawer = new BoxDrawer();
+        $this->resetLastFiltered();
+
+        $this->io->newLine();
+        $this->io->writeln(
+            sprintf('Trace ID: <comment>%s</comment>', $trace->id),
+        );
+        $this->io->newLine();
+
+        $filteredTrace = self::filterSpans(
+            $trace,
+            $rootScopes,
+            $spanId,
+        );
+
+        $spansCount = count($filteredTrace->spans);
+
+        foreach ($filteredTrace->spans as $index => $span) {
+            $this->printSpan(
+                $span,
+                $maxDepth,
+                parent: $filteredTrace,
+                minTimeThreshold: $minTimeThreshold,
+                isLast: $index === $spansCount - 1,
+            );
+        }
+    }
+
+    /**
+     * @param list<RootScopes> $rootScopes
+     */
+    private static function filterSpans(
+        Trace $trace,
+        array $rootScopes,
+        string|null $spanId,
+    ): Trace
+    {
+        $rootScopeValues = array_map(
+            static fn (RootScopes $scope) => $scope->value,
+            $rootScopes,
+        );
+
+        $filter = static fn (Span $span) => in_array($span->scope, $rootScopeValues, true);
+
+        $filteredSpans = array_filter(
+            $trace->spans,
+            $filter,
+        );
+
+        if (null !== $spanId) {
+            $filteredSpans = [self::findSpanById($spanId, $filteredSpans)];
+        }
+
+        return $trace->withSpans(
+            array_values($filteredSpans),
+        );
+    }
+
+    private static function findSpanById(string $id, array $spans): Span
+    {
+        $span = self::findSpanByIdRecursively($id, $spans);
+
+        if (null === $span) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Not span with the ID "%s" was found.',
+                    $id,
+                ),
+            );
+        }
+
+        return $span;
+    }
+
+    /**
+     * @param Span[] $spans
+     */
+    private static function findSpanByIdRecursively(string $id, array $spans): Span|null
+    {
+        if (count($spans) === 0) {
+            return null;
+        }
+
+        foreach ($spans as $span) {
+            if ($span->id === $id) {
+                return $span;
+            }
+
+            $result = self::findSpanByIdRecursively($id, $span->children);
+
+            if (null !== $result) {
+                return $result;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param positive-int $maxDepth
+     * @param int<0,100> $minTimeThreshold
+     */
+    private function printSpan(
+        Span $span,
+        int $maxDepth,
+        Trace|Span $parent,
+        int $minTimeThreshold,
+        int $depth = 0,
+        bool $isLast = false,
+    ): void
+    {
+        $childrenCount = count($span->children);
+        $displayChildren = $childrenCount === 0 || $depth < $maxDepth;
+
+        $durationPercentage = $span->getDurationPercentage(
+            $parent->getDuration(),
+        );
+
+        if ($durationPercentage < $minTimeThreshold) {
+            if ($this->filteredCount > 0) {
+                [$lastFilteredDepth, $lastFilteredIsLast] = $this->lastFiltered;
+
+                if ($lastFilteredDepth !== $depth) {
+                    $this->printPreviouslyFilteredSpans(
+                        $this->filteredCount,
+                        $lastFilteredDepth,
+                        $lastFilteredIsLast,
+                    );
+                }
+            }
+
+            $this->filteredCount++;
+            $this->lastFiltered = [$depth, $isLast];
+
+            return;
+        } else {
+            if ($this->filteredCount > 0) {
+                [$lastFilteredDepth, $lastFilteredIsLast] = $this->lastFiltered;
+
+                $this->printPreviouslyFilteredSpans(
+                    $this->filteredCount,
+                    $lastFilteredDepth,
+                    $lastFilteredIsLast,
+                );
+            }
+        }
+
+        self::printSpanLabel(
+            $span,
+            $depth,
+            $isLast,
+            $displayChildren,
+            $childrenCount,
+            $durationPercentage,
+        );
+
+        if (!$displayChildren) {
+            return;
+        }
+
+        foreach ($span->children as $index => $child) {
+            $this->printSpan(
+                $child,
+                $maxDepth,
+                parent: $span,
+                minTimeThreshold: $minTimeThreshold,
+                depth: $depth + 1,
+                isLast: $index === $childrenCount - 1,
+            );
+        }
+    }
+
+    /**
+     * @param positive-int $childrenCount
+     */
+    private function printSpanLabel(
+        Span $span,
+        int $depth,
+        bool $isLast,
+        bool $displayChildren,
+        int $childrenCount,
+        int $durationPercentage,
+    ): void
+    {
+        $this->io->writeln(
+            sprintf(
+                '%s %s - %s (%s%%), peak %s, Δ%s%s',
+                $this->boxDrawer->draw($depth, $isLast),
+                $span->id,
+                $this->durationFormatter->toHumanReadableString(
+                    $span->getDuration(),
+                ),
+                $durationPercentage,
+                $this->memoryFormatter->toHumanReadableString(
+                    $span->end->peakMemoryUsage,
+                ),
+                $this->memoryFormatter->toHumanReadableString(
+                    $span->getMemoryUsage(),
+                ),
+                $displayChildren
+                    ? ''
+                    : self::getHiddenChildrenLabel($childrenCount),
+            ),
+            OutputInterface::VERBOSITY_NORMAL
+        );
+    }
+
+    /**
+     * @param positive-int $count
+     */
+    private static function getHiddenChildrenLabel(int $count): string
+    {
+        return sprintf(
+            ' [+%d %s]',
+            $count,
+            self::getChildrenText($count),
+        );
+    }
+
+    /**
+     * @param positive-int $count
+     */
+    private static function getChildrenText(int $count): string
+    {
+        return $count > 1 ? 'children' : 'child';
+    }
+
+    private function resetLastFiltered(): void
+    {
+        $this->filteredCount = 0;
+        $this->lastFiltered = null;
+    }
+
+    /**
+     * @param positive-int|0 $filteredCount
+     * @param positive-int|0 $lastFilteredDepth
+     * @param bool $lastFilteredIsLast
+     */
+    public function printPreviouslyFilteredSpans(
+        int $filteredCount,
+        int $lastFilteredDepth,
+        mixed $lastFilteredIsLast,
+    ): void
+    {
+        $this->io->writeln(
+            sprintf(
+                '%s filtered%s',
+                $this->boxDrawer->draw($lastFilteredDepth, $lastFilteredIsLast),
+                $filteredCount === 1
+                    ? ''
+                    : ' (x' . $filteredCount. ')',
+            ),
+        );
+
+        $this->resetLastFiltered();
+    }
+}

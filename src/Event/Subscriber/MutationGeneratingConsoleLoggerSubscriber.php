@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\FileParsingWasFinished;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -61,7 +61,7 @@ final readonly class MutationGeneratingConsoleLoggerSubscriber implements EventS
         $this->progressBar->start($event->getMutableFilesCount());
     }
 
-    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    public function onMutableFileWasProcessed(FileParsingWasFinished $event): void
     {
         $this->progressBar->advance();
     }

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
+use Infection\Event\FileParsingWasFinished;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
 use Infection\IterableCounter;
@@ -95,8 +95,6 @@ class MutationGenerator
                 $this->mutators,
                 $nodeIgnorers,
             );
-
-            $this->eventDispatcher->dispatch(new MutableFileWasProcessed());
         }
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
