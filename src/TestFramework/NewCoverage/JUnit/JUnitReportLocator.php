@@ -74,7 +74,9 @@ final readonly class JUnitReportLocator implements ReportLocator
         return new self(
             $filesystem,
             $coverageDirPath,
-            Path::canonicalize($defaultJUnitPath),
+            null === $defaultJUnitPath
+                ? self::createPHPUnitDefaultJUnitPath($coverageDirPath)
+                : Path::canonicalize($defaultJUnitPath),
         );
     }
 

@@ -24,6 +24,7 @@ final class TraceAssertion
     {
         return [
             'sourceFileInfo' => $trace->getSourceFileInfo(),
+            'realPath' => $trace->getRealPath(),
             'relativePathname' => $trace->getRelativePathname(),
             'hasTests' => $trace->hasTests(),
             'tests' => $trace->getTests(),

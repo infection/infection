@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\TestLocations;
+use Symfony\Component\Finder\SplFileInfo;
 use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\Trace;
@@ -43,7 +45,7 @@ use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
-use SplFileInfo;
+use function Later\lazy;
 
 /**
  * @internal
@@ -70,9 +72,8 @@ final class PHPUnitCoverageTracer
         $testLocations = $this->createTestLocations($reportFileInfo);
 
         return new LazyTrace(
-            // TODO: SplFileInfo compatibility issue
-            new SplFileInfo($fileInfo->sourcePathname),
-            $testLocations,
+            $fileInfo,
+            static fn () => $testLocations,
         );
     }
 

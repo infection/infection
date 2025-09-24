@@ -35,27 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use Closure;
+use DomainException;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\XmlReport\TestLocator;
-use Later\Interfaces\Deferred;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 
-final class LazyTrace implements Trace
+final readonly class SyntheticTrace implements Trace
 {
-    private string $realPath;
-    private TestLocations|null $testLocations;
-    private TestLocator|null $testLocator;
-
-    /**
-     * @param Closure():TestLocations|null     $lazyTestLocations
-     */
     public function __construct(
-        public readonly SplFileInfo $sourceFileInfo,
-        private readonly Closure $lazyTestLocations,
+        public SplFileInfo $sourceFileInfo,
+        public string $realPath,
+        public string $relativePathname,
+        public bool $hasTest,
+        public ?TestLocations $tests,
     ) {
     }
 
@@ -66,50 +59,28 @@ final class LazyTrace implements Trace
 
     public function getRealPath(): string
     {
-        if (!isset($this->realPath)) {
-            $realPath = $this->sourceFileInfo->getRealPath();
-            Assert::string($realPath);
-
-            $this->realPath = $realPath;
-        }
-
         return $this->realPath;
     }
 
     public function getRelativePathname(): string
     {
-        return $this->sourceFileInfo->getRelativePathname();
+        return $this->relativePathname;
     }
 
     public function hasTests(): bool
     {
-        return $this->getTestLocator()->hasTests();
+        return $this->hasTest;
     }
 
     public function getTests(): ?TestLocations
     {
-        if (!isset($this->testLocations)) {
-            $this->testLocations = ($this->lazyTestLocations)();
-        }
-
-        return $this->testLocations;
+        return $this->tests;
     }
 
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
-    {
-        return $this->getTestLocator()?->getAllTestsForMutation($lineRange, $isOnFunctionSignature) ?? [];
-    }
-
-    private function getTestLocator(): ?TestLocator
-    {
-        if (!isset($this->testLocator)) {
-            $testLocations = $this->getTests();
-
-            $this->testLocator = null === $testLocations
-                ? null
-                : new TestLocator($testLocations);
-        }
-
-        return $this->testLocator;
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        throw new DomainException('Not implemented.');
     }
 }
