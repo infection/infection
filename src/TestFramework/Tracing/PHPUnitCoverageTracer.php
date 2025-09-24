@@ -45,6 +45,7 @@ use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
+use function explode;
 use function Later\lazy;
 
 /**
@@ -66,7 +67,7 @@ final class PHPUnitCoverageTracer
         $reportFileInfo = $report->findSourceFileInfo($fileInfo->getPathname());
 
         if ($reportFileInfo === null) {
-            return new EmptyTrace();
+            return new EmptyTrace($fileInfo);
         }
 
         $testLocations = $this->createTestLocations($reportFileInfo);
@@ -84,11 +85,14 @@ final class PHPUnitCoverageTracer
         $lines = [];
 
         foreach ($coverage as $item) {
-            foreach ($item->coveredBy as $coveredBy) {
+            foreach ($item->coveredBy as $test) {
+                $testCaseClassName = explode('::', $test, 2)[0];
+                $executionTime = $this->getReport()->getTestInfo($testCaseClassName);
+
                 $lines[$item->lineNumber][] = new TestLocation(
-                    $coveredBy,
+                    $test,
                     null,   // TODO
-                    null,   // TODO
+                    $executionTime,
                 );
             }
         }
@@ -104,7 +108,7 @@ final class PHPUnitCoverageTracer
         // TODO: maybe there is more to it here... We get the path from here
         // but it is a bit unclear why/what.
         // The report gives the exact coveredBy -> we should get the timing for that
-        $executionTime = $this->getReport()->getTestSuiteExecutionTime(
+        $executionTime = $this->getReport()->getTestInfo(
             $coverage->testCaseClassName,
         );
 

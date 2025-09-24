@@ -64,7 +64,7 @@ final class JUnitReportTest extends TestCase
         $actual = [];
 
         foreach (array_keys($expected) as $testCaseClassName) {
-            $actual[$testCaseClassName] = $report->getTestSuiteExecutionTime($testCaseClassName);
+            $actual[$testCaseClassName] = $report->getTestInfo($testCaseClassName);
         }
 
         $this->assertSame($expected, $actual);

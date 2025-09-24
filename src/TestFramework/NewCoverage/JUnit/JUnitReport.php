@@ -72,15 +72,14 @@ final class JUnitReport
         $this->coverageDirPathname = dirname($pathname);
     }
 
-    // TODO: might have to revisit the name for other reports?
     /**
-     * @param class-string<TestCase> $testCaseClassName FQCN
+     * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
      */
-    public function getTestSuiteExecutionTime(string $testCaseClassName): float
+    public function getTestInfo(string $test): TestInfo
     {
-        return array_key_exists($testCaseClassName, $this->indexedExecutionTimes)
-            ? $this->indexedExecutionTimes[$testCaseClassName]
-            : $this->lookup($testCaseClassName);
+        return array_key_exists($test, $this->indexedExecutionTimes)
+            ? $this->indexedExecutionTimes[$test]
+            : $this->lookup($test);
     }
 
     private function lookup(string $testCaseClassName): float

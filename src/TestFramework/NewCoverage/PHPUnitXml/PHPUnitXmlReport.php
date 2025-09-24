@@ -40,6 +40,7 @@ namespace Infection\TestFramework\NewCoverage\PHPUnitXml;
 
 use Closure;
 use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
+use Infection\TestFramework\NewCoverage\JUnit\TestInfo;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
@@ -94,11 +95,11 @@ final class PHPUnitXmlReport
     }
 
     /**
-     * @param class-string<TestCase> $testCaseClassName FQCN
+     * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
      */
-    public function getTestSuiteExecutionTime(string $testCaseClassName): float
+    public function getTestInfo(string $test): TestInfo
     {
-        return $this->getJUnitReport()->getTestSuiteExecutionTime($testCaseClassName);
+        return $this->getJUnitReport()->getTestInfo($test);
     }
 
     /**

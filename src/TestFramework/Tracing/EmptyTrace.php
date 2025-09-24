@@ -35,16 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use Closure;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
 
 /**
  * This trace is meant for source files which have no test whatsoever.
  */
 final class EmptyTrace implements Trace
 {
+    private string $realPath;
+
     public function __construct(
         public readonly SplFileInfo $sourceFileInfo,
     ) {
@@ -52,33 +57,38 @@ final class EmptyTrace implements Trace
 
     public function getSourceFileInfo(): SplFileInfo
     {
-        // TODO: Implement getSourceFileInfo() method.
+        return $this->sourceFileInfo;
     }
 
     public function getRealPath(): string
     {
-        // TODO: Implement getRealPath() method.
+        if (!isset($this->realPath)) {
+            $realPath = $this->sourceFileInfo->getRealPath();
+            Assert::string($realPath);
+
+            $this->realPath = $realPath;
+        }
+
+        return $this->realPath;
     }
 
     public function getRelativePathname(): string
     {
-        // TODO: Implement getRelativePathname() method.
+        return $this->sourceFileInfo->getRelativePathname();
     }
 
     public function hasTests(): bool
     {
-        // TODO: Implement hasTests() method.
+        return false;
     }
 
     public function getTests(): ?TestLocations
     {
-        // TODO: Implement getTests() method.
+        return null;
     }
 
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        // TODO: Implement getAllTestsForMutation() method.
+    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
+    {
+        return [];
     }
 }
