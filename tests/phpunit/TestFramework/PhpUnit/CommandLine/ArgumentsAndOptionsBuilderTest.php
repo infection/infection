@@ -479,7 +479,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     /**
      * @template T
      *
-     * @param Closure(positive-int):T $createItem
+     * @param Closure(int<0,max>):T $createItem
      * @param positive-int $count
      *
      * @return list<T>

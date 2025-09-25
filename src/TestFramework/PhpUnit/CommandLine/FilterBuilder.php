@@ -56,10 +56,16 @@ final class FilterBuilder
     // The real limit is likely higher, but it is better to be safe than sorry.
     private const PCRE_LIMIT = 30_000;
 
+    private const DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
+
+    private const DROP_TEST_CASE_OPTIMIZATION_LEVEL = 2;
+
+    private const BAILOUT_OPTIMIZATION_LEVEL = 3;
+
     /**
      * @param non-empty-array<TestLocation> $tests
      *
-     * @return non-empty-array<string>
+     * @return list<string>
      */
     public static function createFilters(
         array $tests,
@@ -70,7 +76,7 @@ final class FilterBuilder
         $filters = [];
         $totalFilterLength = 0;
 
-        if ($optimizationLevel === 3) {
+        if ($optimizationLevel === self::BAILOUT_OPTIMIZATION_LEVEL) {
             // We have no further optimisation strategy at this point, so we
             // simply give up and do not apply any filter.
             return [];
@@ -83,14 +89,15 @@ final class FilterBuilder
             if (count($partsDelimitedByColons) > 1) {
                 [$testCaseClassName, $rawTestMethod] = $partsDelimitedByColons;
 
-                $testMethod = self::getTestMethod($rawTestMethod, $testFrameworkVersion, $optimizationLevel);
-                $testCaseShortClassName = self::getShortClassName($testCaseClassName);
+                // This may or not have the provider key.
+                $testMethod = self::getMethod($rawTestMethod, $testFrameworkVersion, $optimizationLevel);
+                $shortClassName = self::getShortClassName($testCaseClassName);
 
-                $test = $optimizationLevel >= 2
+                $test = $optimizationLevel >= self::DROP_TEST_CASE_OPTIMIZATION_LEVEL
                     ? $testMethod
                     : sprintf(
                         '%s::%s',
-                        $testCaseShortClassName,
+                        $shortClassName,
                         $testMethod,
                     );
             }
@@ -118,14 +125,21 @@ final class FilterBuilder
         return $filters;
     }
 
-    private static function getTestMethod(
-        string $methodNameWithDataProvider,
+    /**
+     * @param string $rawTestMethod either the method name or the method name with data provider
+     *                              key
+     *
+     * @return string a normalized form of the method name with the data provider key or the method
+     *                name alone depending on the optimization level
+     */
+    private static function getMethod(
+        string $rawTestMethod,
         string $testFrameworkVersion,
         int $optimizationLevel,
     ): string {
-        if ($optimizationLevel === 1) {
+        if ($optimizationLevel >= self::DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL) {
             // Drop the data provider key when there is one.
-            [$testMethod] = self::splitMethodNameFromProviderKey($methodNameWithDataProvider, $testFrameworkVersion);
+            [$testMethod] = self::splitMethodNameFromProviderKey($rawTestMethod, $testFrameworkVersion);
 
             return $testMethod;
         }
@@ -137,7 +151,7 @@ final class FilterBuilder
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
         if (self::isPhpUnit10OrHigher($testFrameworkVersion)) {
-            $methodNameParts = self::splitMethodNameFromProviderKey($methodNameWithDataProvider, $testFrameworkVersion);
+            $methodNameParts = self::splitMethodNameFromProviderKey($rawTestMethod, $testFrameworkVersion);
 
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
@@ -148,7 +162,7 @@ final class FilterBuilder
             }
         }
 
-        return $methodNameWithDataProvider;
+        return $rawTestMethod;
     }
 
     private static function getShortClassName(string $className): string
@@ -167,6 +181,7 @@ final class FilterBuilder
         string $testMethod,
         string $testFrameworkVersion,
     ): array {
+        // @phpstan-ignore return.type
         return self::isPhpUnit10OrHigher($testFrameworkVersion)
             ? explode('#', $testMethod, self::MAX_EXPLODE_PARTS)
             : explode(' with data set ', $testMethod, self::MAX_EXPLODE_PARTS);
