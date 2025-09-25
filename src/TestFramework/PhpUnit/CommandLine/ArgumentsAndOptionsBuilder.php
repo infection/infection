@@ -96,11 +96,15 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
-            $options[] = '--filter';
-            $options[] = $this->createFilterString(
+            $filter = $this->createFilterString(
                 $tests,
                 $testFrameworkVersion,
             );
+
+            if ($filter !== null) {
+                $options[] = '--filter';
+                $options[] = $filter;
+            }
         }
 
         return $options;
@@ -142,13 +146,17 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
     private function createFilterString(
         array $tests,
         string $testFrameworkVersion,
-    ): string {
-        return sprintf(
-            '/%s/',
-            implode(
-                '|',
-                FilterBuilder::createFilters($tests, $testFrameworkVersion),
-            ),
-        );
+    ): ?string {
+        $filters = FilterBuilder::createFilters($tests, $testFrameworkVersion);
+
+        return count($filters) === 0
+            ? null
+            : sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    $filters,
+                ),
+            );
     }
 }
