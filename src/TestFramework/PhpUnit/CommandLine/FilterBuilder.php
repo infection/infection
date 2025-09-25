@@ -66,12 +66,13 @@ final class FilterBuilder
         string $testFrameworkVersion,
         int $optimizationLevel = 0,
     ): array {
-        $usedTestCases = [];
+        $usedTests = [];
         $filters = [];
         $totalFilterLength = 0;
-        $attemptsCount = 0;
 
         if ($optimizationLevel === 3) {
+            // We have no further optimisation strategy at this point, so we
+            // simply give up and do not apply any filter.
             return [];
         }
 
@@ -94,11 +95,11 @@ final class FilterBuilder
                     );
             }
 
-            if (array_key_exists($test, $usedTestCases)) {
+            if (array_key_exists($test, $usedTests)) {
                 continue;
             }
 
-            $usedTestCases[$test] = true;
+            $usedTests[$test] = true;
 
             $filter = preg_quote($test, '/');
             $totalFilterLength += strlen($filter);
@@ -115,16 +116,6 @@ final class FilterBuilder
         }
 
         return $filters;
-    }
-
-    /**
-     * @param class-string $className
-     */
-    private static function getShortClassName(string $className): string
-    {
-        $parts = explode('\\', $className);
-
-        return end($parts);
     }
 
     private static function getTestMethod(
@@ -160,6 +151,18 @@ final class FilterBuilder
         return $methodNameWithDataProvider;
     }
 
+    private static function getShortClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return end($parts);
+    }
+
+    /**
+     * @psalm-suppress InvalidReturnType, InvalidReturnStatement
+     *
+     * @return array{string, string}
+     */
     private static function splitMethodNameFromProviderKey(
         string $testMethod,
         string $testFrameworkVersion,

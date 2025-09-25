@@ -50,7 +50,7 @@ use function sprintf;
 /**
  * @internal
  */
-final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
+final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
     /**
      * @param list<SplFileInfo> $filteredSourceFilesToMutate
@@ -95,7 +95,6 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
-        // $this->executeOnlyCoveringTestCases = true;
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
             $filter = $this->createFilterString(
                 $tests,
