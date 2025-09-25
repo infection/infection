@@ -61,44 +61,43 @@ final class FilterBuilder
         array $tests,
         string $testFrameworkVersion,
     ): array {
-        $usedTestCases = [];
+        $usedTests = [];
         $filters = [];
 
         foreach ($tests as $testLocation) {
-            $testCaseString = $testLocation->getMethod();
-
-            $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
+            $test = $testLocation->getMethod();
+            $partsDelimitedByColons = explode('::', $test, self::MAX_EXPLODE_PARTS);
 
             if (count($partsDelimitedByColons) > 1) {
-                $methodNameWithDataProvider = self::getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
+                [$testCaseClassName, $rawTestMethod] = $partsDelimitedByColons;
 
-                $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
+                $testMethodWithProviderKey = self::getTestMethodWithProviderKey($rawTestMethod, $testFrameworkVersion);
+                $shortClassName = self::getShortClassName($testCaseClassName);
 
-                $parts = explode('\\', $testClassFullyQualifiedClassName);
-                $classNameWithoutNamespace = end($parts);
-
-                $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
+                $test = sprintf(
+                    '%s::%s',
+                    $shortClassName,
+                    $testMethodWithProviderKey,
+                );
             }
 
-            if (array_key_exists($testCaseString, $usedTestCases)) {
+            if (array_key_exists($test, $usedTests)) {
                 continue;
             }
 
-            $usedTestCases[$testCaseString] = true;
+            $usedTests[$test] = true;
 
-            $filter = preg_quote($testCaseString, '/');
+            $filter = preg_quote($test, '/');
             $filters[] = $filter;
         }
 
         return $filters;
     }
 
-    private static function getMethodNameWithDataProvider(
+    private static function getTestMethodWithProviderKey(
         string $methodNameWithDataProvider,
         string $testFrameworkVersion,
     ): string {
-        $methodNameWithDataProviderResult = $methodNameWithDataProvider;
-
         /*
          * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
          * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
@@ -106,20 +105,36 @@ final class FilterBuilder
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
         if (self::isPhpUnit10OrHigher($testFrameworkVersion)) {
-            $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
+            $methodNameParts = self::splitMethodNameFromProviderKey($methodNameWithDataProvider);
 
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
 
-                if (!is_numeric($dataProviderKey)) {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
-                } else {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
-                }
+                return is_numeric($dataProviderKey)
+                    ? sprintf('%s with data set #%s', $methodName, $dataProviderKey)
+                    : sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
             }
         }
 
-        return $methodNameWithDataProviderResult;
+        return $methodNameWithDataProvider;
+    }
+
+    private static function getShortClassName(string $className): string
+    {
+        $parts = explode('\\', $className);
+
+        return end($parts);
+    }
+
+    /**
+     * @psalm-suppress InvalidReturnType, InvalidReturnStatement
+     *
+     * @return array{string, string}
+     */
+    private static function splitMethodNameFromProviderKey(string $testMethod): array
+    {
+        // @phpstan-ignore return.type
+        return explode('#', $testMethod, self::MAX_EXPLODE_PARTS);
     }
 
     private static function isPhpUnit10OrHigher(string $testFrameworkVersion): bool
