@@ -67,11 +67,9 @@ final class PHPUnitCoverageTracer
             return new EmptyTrace($fileInfo);
         }
 
-        $testLocations = $this->createTestLocations($reportFileInfo);
-
         return new LazyTrace(
             $fileInfo,
-            static fn () => $testLocations,
+            fn () => $this->createTestLocations($reportFileInfo),
         );
     }
 
@@ -97,22 +95,6 @@ final class PHPUnitCoverageTracer
         return new TestLocations(
             $lines,
             [],
-        );
-    }
-
-    private function createTestLocation(LineCoverage $coverage): TestLocation
-    {
-        // TODO: maybe there is more to it here... We get the path from here
-        // but it is a bit unclear why/what.
-        // The report gives the exact coveredBy -> we should get the timing for that
-        $executionTime = $this->getReport()->getTestInfo(
-            $coverage->testCaseClassName,
-        );
-
-        return new TestLocation(
-            $coverage->getMethod(), // TODO: review naming
-            $executionTime->path,
-            $executionTime->time,
         );
     }
 

@@ -45,6 +45,7 @@ final readonly class UncoveredTraceProvider implements TraceProvider
     public function __construct(
         private BufferedSourceFileFilter $bufferedFilter,
     ) {
+        $x= '';
     }
 
     /**
