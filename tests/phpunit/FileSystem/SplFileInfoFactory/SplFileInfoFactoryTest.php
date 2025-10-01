@@ -35,23 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\SplFileInfoFactory;
 
+use function current;
+use function dirname;
 use Infection\FileSystem\SplFileInfoFactory;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as SymfonyFinderSplFileInfo;
-use function current;
-use function iterator_to_array;
 
 #[CoversClass(SplFileInfoFactory::class)]
 #[Group('integration')]
 final class SplFileInfoFactoryTest extends TestCase
 {
-    const FIXTURE_DIR = __DIR__.'/Fixtures';
+    public const FIXTURE_DIR = __DIR__ . '/Fixtures';
 
     #[DataProvider('fromPathProvider')]
     public function test_it_can_create_a_file_info_from_a_path(
@@ -71,17 +71,17 @@ final class SplFileInfoFactoryTest extends TestCase
     public static function fromPathProvider(): iterable
     {
         yield 'file with same directory as base path' => [
-            self::FIXTURE_DIR. '/test_file.php',
+            self::FIXTURE_DIR . '/test_file.php',
             self::FIXTURE_DIR,
             new SymfonyFinderSplFileInfo(
-                Path::canonicalize(self::FIXTURE_DIR. '/test_file.php'),
+                Path::canonicalize(self::FIXTURE_DIR . '/test_file.php'),
                 '',
                 'test_file.php',
             ),
         ];
 
         yield 'file with same directory as base path (from Finder)' => [
-            self::FIXTURE_DIR. '/test_file.php',
+            self::FIXTURE_DIR . '/test_file.php',
             self::FIXTURE_DIR,
             Finder::create()
                 ->files()
@@ -90,39 +90,39 @@ final class SplFileInfoFactoryTest extends TestCase
         ];
 
         yield 'file in subdirectory relative to base path' => [
-            self::FIXTURE_DIR. '/sub/nested_file.php',
+            self::FIXTURE_DIR . '/sub/nested_file.php',
             self::FIXTURE_DIR,
             new SymfonyFinderSplFileInfo(
-                Path::canonicalize(self::FIXTURE_DIR. '/sub/nested_file.php'),
+                Path::canonicalize(self::FIXTURE_DIR . '/sub/nested_file.php'),
                 'sub',
                 'sub/nested_file.php',
             ),
         ];
 
         yield 'deeply nested file relative to base path' => [
-            self::FIXTURE_DIR. '/deep/nested/structure/deep_file.php',
-            self::FIXTURE_DIR. '/deep',
+            self::FIXTURE_DIR . '/deep/nested/structure/deep_file.php',
+            self::FIXTURE_DIR . '/deep',
             new SymfonyFinderSplFileInfo(
-                Path::canonicalize(self::FIXTURE_DIR. '/deep/nested/structure/deep_file.php'),
+                Path::canonicalize(self::FIXTURE_DIR . '/deep/nested/structure/deep_file.php'),
                 'nested/structure',
                 'nested/structure/deep_file.php',
             ),
         ];
 
         yield 'deeply nested file relative to base path (from Finder)' => [
-            self::FIXTURE_DIR. '/deep/nested/structure/deep_file.php',
-            self::FIXTURE_DIR. '/deep',
+            self::FIXTURE_DIR . '/deep/nested/structure/deep_file.php',
+            self::FIXTURE_DIR . '/deep',
             Finder::create()
                 ->files()
                 ->path('nested/structure/deep_file.php')
-                ->in(self::FIXTURE_DIR. '/deep'),
+                ->in(self::FIXTURE_DIR . '/deep'),
         ];
 
         yield 'file with parent directory as base path' => [
-            self::FIXTURE_DIR. '/sub/nested_file.php',
+            self::FIXTURE_DIR . '/sub/nested_file.php',
             dirname(self::FIXTURE_DIR),
             new SymfonyFinderSplFileInfo(
-                Path::canonicalize(self::FIXTURE_DIR. '/sub/nested_file.php'),
+                Path::canonicalize(self::FIXTURE_DIR . '/sub/nested_file.php'),
                 'Fixtures/sub',
                 'Fixtures/sub/nested_file.php',
             ),
@@ -132,8 +132,7 @@ final class SplFileInfoFactoryTest extends TestCase
     private static function assertSplFileInfoStateIs(
         SymfonyFinderSplFileInfo $expected,
         SymfonyFinderSplFileInfo $actual,
-    ): void
-    {
+    ): void {
         self::assertSame(
             self::collectSplFileInfoState($expected),
             self::collectSplFileInfoState($actual),

@@ -82,7 +82,7 @@ final class JUnitReport
             : $this->lookup($test);
     }
 
-    private function lookup(string $testCaseClassName): float
+    private function lookup(string $testCaseClassName): TestInfo
     {
         $nodes = $this->findNode($testCaseClassName);
 
@@ -97,11 +97,14 @@ final class JUnitReport
         $node = $nodes->item(0);
         Assert::isInstanceOf($node, DOMElement::class);
 
-        $executionTime = (float) $node->getAttribute('time');
+        $testInfo = new TestInfo(
+            location: $node->getAttribute('file'),
+            executionTime: (float) $node->getAttribute('time'),
+        );
 
-        $this->indexedExecutionTimes[$testCaseClassName] = $executionTime;
+        $this->indexedExecutionTimes[$testCaseClassName] = $testInfo;
 
-        return $executionTime;
+        return $testInfo;
     }
 
     private function findNode(string $testCaseClassName): DOMNodeList

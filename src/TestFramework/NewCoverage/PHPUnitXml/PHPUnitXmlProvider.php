@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\NewCoverage\PHPUnitXml;
 
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
 use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
 
 final class PHPUnitXmlProvider
 {

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use Symfony\Component\Filesystem\Path;
 use function array_map;
 use const DIRECTORY_SEPARATOR;
 use function explode;
@@ -47,6 +46,7 @@ use function strrpos;
 use function substr;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
 // TODO: review some of those helpers
@@ -57,6 +57,7 @@ use function sys_get_temp_dir;
 function normalizePath(string $value): string
 {
     return Path::normalize($value);
+
     return str_replace(DIRECTORY_SEPARATOR, '/', $value);
 }
 

@@ -40,18 +40,19 @@ use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
-use Later\Interfaces\Deferred;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 final class LazyTrace implements Trace
 {
     private string $realPath;
-    private TestLocations|null $testLocations;
-    private TestLocator|null $testLocator;
+
+    private ?TestLocations $testLocations;
+
+    private ?TestLocator $testLocator;
 
     /**
-     * @param Closure():TestLocations|null     $lazyTestLocations
+     * @param Closure():TestLocations|null $lazyTestLocations
      */
     public function __construct(
         public readonly SplFileInfo $sourceFileInfo,
@@ -105,7 +106,7 @@ final class LazyTrace implements Trace
         if (!isset($this->testLocator)) {
             $testLocations = $this->getTests();
 
-            $this->testLocator = null === $testLocations
+            $this->testLocator = $testLocations === null
                 ? null
                 : new TestLocator($testLocations);
         }

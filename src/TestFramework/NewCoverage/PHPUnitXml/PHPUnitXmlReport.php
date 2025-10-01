@@ -45,7 +45,6 @@ use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
-use PHPUnit\Framework\TestCase;
 
 final class PHPUnitXmlReport
 {

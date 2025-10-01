@@ -35,23 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\NewCoverage\PHPUnitXml\Index;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\NewCoverage\Locator\NoReportFound;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
-use Symfony\Component\Filesystem\Path;
-use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use function Safe\chdir;
-use function Safe\realpath;
-use function Safe\touch;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(IndexReportLocator::class)]
@@ -88,7 +82,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
 
         $actual = $this->locator->locate();
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     // OSX is not case-sensitive
@@ -100,7 +94,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
 
         $actual = $this->locator->locate();
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('indexPathsProvider')]
@@ -112,7 +106,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
 
         $actual = $this->locator->locate();
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function indexPathsProvider(): iterable

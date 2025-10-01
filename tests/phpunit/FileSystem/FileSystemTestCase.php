@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use Infection\FileSystem\Filesystem;
 use function getenv;
+use Infection\FileSystem\Filesystem;
 use function Infection\Tests\make_tmp_dir;
 use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;

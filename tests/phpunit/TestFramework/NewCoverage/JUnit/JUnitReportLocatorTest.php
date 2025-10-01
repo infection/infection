@@ -35,23 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\NewCoverage\JUnit;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\TestFramework\NewCoverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\NewCoverage\Locator\NoReportFound;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
-use Symfony\Component\Filesystem\Path;
-use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use function Safe\chdir;
-use function Safe\realpath;
-use function Safe\touch;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(JUnitReportLocator::class)]
@@ -87,9 +81,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $expected = Path::normalize($this->tmp . '/junit.xml');
 
-        self::assertSame($expected, $this->locator->locate());
+        $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
-        self::assertSame($expected, $this->locator->locate());
+        $this->assertSame($expected, $this->locator->locate());
     }
 
     // OSX is not case-sensitive
@@ -102,7 +96,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $actual = $this->locator->locate();
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('jUnitPathsProvider')]
@@ -113,7 +107,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $actual = $this->locator->locate();
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_cannot_locate_the_junit_file_if_the_result_is_ambiguous(): void
@@ -161,7 +155,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
             new NoReportFound(
                 sprintf(
                     'Could not find a JUnit report in "%s": the directory does not exist or is not readable.',
-                    Path::canonicalize($this->tmp . '/unknown-dir',),
+                    Path::canonicalize($this->tmp . '/unknown-dir'),
                 ),
             ),
         );

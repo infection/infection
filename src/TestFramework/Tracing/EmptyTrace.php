@@ -35,11 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use Closure;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 

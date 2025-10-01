@@ -35,18 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\NewCoverage\PHPUnitXml\Index;
 
+use function count;
+use function current;
+use function implode;
 use Infection\FileSystem\Filesystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\NewCoverage\Locator\NoReportFound;
 use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
-use function count;
-use function current;
-use function implode;
 use function Pipeline\take;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
 
 /**
  * TODO: heavily copied from IndexXmlCoverageLocator
@@ -75,7 +74,7 @@ final readonly class IndexReportLocator implements ReportLocator
         return new self(
             $filesystem,
             Path::canonicalize($coverageDirPath),
-            null === $defaultCoverageXmlIndexPath
+            $defaultCoverageXmlIndexPath === null
                 ? self::createPHPUnitDefaultCoverageXmlIndexPath($coverageDirPath)
                 : Path::canonicalize($defaultCoverageXmlIndexPath),
         );

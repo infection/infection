@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function is_dir;
+use function is_file;
+use function is_readable;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use function is_dir;
-use function is_file;
-use function is_readable;
 
 final class Filesystem extends SymfonyFilesystem
 {

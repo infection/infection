@@ -35,18 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\TestLocations;
-use Symfony\Component\Finder\SplFileInfo;
-use function array_map;
+use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
-use function explode;
-use function Later\lazy;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
@@ -87,12 +84,12 @@ final class PHPUnitCoverageTracer
         foreach ($coverage as $item) {
             foreach ($item->coveredBy as $test) {
                 $testCaseClassName = explode('::', $test, 2)[0];
-                $executionTime = $this->getReport()->getTestInfo($testCaseClassName);
+                $testInfo = $this->getReport()->getTestInfo($testCaseClassName);
 
                 $lines[$item->lineNumber][] = new TestLocation(
                     $test,
-                    null,   // TODO
-                    $executionTime,
+                    $testInfo->location,
+                    $testInfo->executionTime,
                 );
             }
         }

@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace newSrc\TestFramework\Coverage\JUnit;
 
+use function count;
+use function current;
 use DomainException;
+use function implode;
 use Infection\FileSystem\Filesystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\NewCoverage\Locator\NoReportFound;
 use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
-use function count;
-use function current;
-use function implode;
 use function iter\map;
 use function iter\toArray;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * TODO: heavily copied from IndexXmlCoverageLocator
