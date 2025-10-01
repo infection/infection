@@ -44,8 +44,8 @@ final readonly class UncoveredTraceProvider implements TraceProvider
 {
     public function __construct(
         private BufferedSourceFileFilter $bufferedFilter,
+        private bool $onlyCovered,
     ) {
-        $x= '';
     }
 
     /**
@@ -53,8 +53,12 @@ final readonly class UncoveredTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
+        if ($this->onlyCovered) {
+            yield from [];
+        } else {
+            foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
+                yield new ProxyTrace($splFileInfo, null);
+            }
         }
     }
 }

@@ -38,12 +38,12 @@ namespace Infection\Tests\TestFramework\Coverage;
 use function array_merge;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\Coverage\UnionTraceProvider;
+use Infection\TestFramework\Coverage\TraceProviderRegistry;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(UnionTraceProvider::class)]
+#[CoversClass(TraceProviderRegistry::class)]
 final class UnionTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void
@@ -63,7 +63,7 @@ final class UnionTraceProviderTest extends TestCase
             ->method('provideTraces')
         ;
 
-        $provider = new UnionTraceProvider($coveredTraceProvider, $uncoveredTraceProvider, true);
+        $provider = new TraceProviderRegistry($coveredTraceProvider, $uncoveredTraceProvider, true);
 
         /** @var array<Trace> $traces */
         $traces = iterator_to_array($provider->provideTraces(), false);
@@ -88,7 +88,7 @@ final class UnionTraceProviderTest extends TestCase
             ->willReturn($canary)
         ;
 
-        $provider = new UnionTraceProvider($coveredTraceProvider, $uncoveredTraceProvider, false);
+        $provider = new TraceProviderRegistry($coveredTraceProvider, $uncoveredTraceProvider, false);
 
         /** @var array<Trace> $traces */
         $traces = iterator_to_array($provider->provideTraces(), false);

@@ -43,12 +43,12 @@ use Webmozart\Assert\Assert;
 
 /**
  * We need to remove traces that are not in the list of source files,
- * which could have files that were been directly specified. All the
+ * which could have files that had been directly specified. All the
  * while later we may need a list of files that in the list but were
  * not covered.
  *
- * On the other hand we don't need to filter traces all over again as
- * we're checking them against pre-filtered list of files.
+ * On the other hand, we don't need to filter traces all over again as
+ * we're checking them against a pre-filtered list of files.
  *
  * @internal
  * @final

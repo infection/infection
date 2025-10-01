@@ -36,18 +36,19 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 /**
- * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
- * original source files in order to ensure all the files are included.
- *
  * @internal
  */
-final readonly class UnionTraceProvider implements TraceProvider
+final readonly class TraceProviderRegistry implements TraceProvider
 {
+    /**
+     * @var list<TraceProvider>
+     */
+    private array $providers;
+
     public function __construct(
-        private TraceProvider $coveredTraceProvider,
-        private TraceProvider $uncoveredTraceProvider,
-        private bool $onlyCovered,
+        TraceProvider ...$providers,
     ) {
+        $this->providers = $providers;
     }
 
     /**
@@ -55,10 +56,8 @@ final readonly class UnionTraceProvider implements TraceProvider
      */
     public function provideTraces(): iterable
     {
-        yield from $this->coveredTraceProvider->provideTraces();
-
-        if ($this->onlyCovered === false) {
-            yield from $this->uncoveredTraceProvider->provideTraces();
+        foreach ($this->providers as $provider) {
+            yield from $provider->provideTraces();
         }
     }
 }

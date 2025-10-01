@@ -133,8 +133,8 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\TraceProviderRegistry;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
-use Infection\TestFramework\Coverage\UnionTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
@@ -146,6 +146,7 @@ use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\Tracing\PHPUnitCoverageTraceProvider;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -244,14 +245,17 @@ final class Container extends DIContainer
                 $container->getConfiguration()->isForGitDiffLines(),
             ),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
-                $container->getPhpUnitXmlCoverageTraceProvider(),
+                $container->get(PHPUnitCoverageTraceProvider::class),
                 $container->getJUnitTestExecutionInfoAdder(),
                 $container->getBufferedSourceFileFilter(),
             ),
-            UnionTraceProvider::class => static fn (self $container): UnionTraceProvider => new UnionTraceProvider(
+            UncoveredTraceProvider::class => static fn (self $container): UncoveredTraceProvider => new UncoveredTraceProvider(
+                $container->get(BufferedSourceFileFilter::class),
+                $container->getConfiguration()->mutateOnlyCoveredCode(),
+            ),
+            TraceProviderRegistry::class => static fn (self $container): TraceProviderRegistry => new TraceProviderRegistry(
                 $container->getCoveredTraceProvider(),
                 $container->getUncoveredTraceProvider(),
-                $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
                 $container->getSourceFileFilter(),
@@ -703,9 +707,9 @@ final class Container extends DIContainer
         return $this->get(Filesystem::class);
     }
 
-    public function getUnionTraceProvider(): UnionTraceProvider
+    public function getUnionTraceProvider(): TraceProviderRegistry
     {
-        return $this->get(UnionTraceProvider::class);
+        return $this->get(TraceProviderRegistry::class);
     }
 
     public function getSourceFileFilter(): SourceFileFilter

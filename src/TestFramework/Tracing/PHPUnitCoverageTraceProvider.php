@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use Infection\FileSystem\SplFileInfoFactory;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
@@ -58,7 +59,13 @@ final class PHPUnitCoverageTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         foreach ($this->getReport()->getSourceFileInfos() as $sourceFileInfo) {
-            yield $this->tracer->trace($sourceFileInfo);
+            yield $this->tracer->trace(
+                SplFileInfoFactory::fromPath(
+                    $sourceFileInfo->sourcePathname,
+                    // TODO: do we need the base path?
+                    '',
+                ),
+            );
         }
     }
 
