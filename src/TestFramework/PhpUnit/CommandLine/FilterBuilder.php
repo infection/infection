@@ -43,6 +43,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use function is_numeric;
 use function preg_quote;
 use function sprintf;
+use function strlen;
 use function version_compare;
 
 /**
@@ -51,6 +52,9 @@ use function version_compare;
 final class FilterBuilder
 {
     private const MAX_EXPLODE_PARTS = 2;
+
+    // The real limit is likely higher, but it is better to be safe than sorry.
+    private const PCRE_LIMIT = 30_000;
 
     /**
      * @param non-empty-array<TestLocation> $tests
@@ -63,6 +67,7 @@ final class FilterBuilder
     ): array {
         $usedTests = [];
         $filters = [];
+        $totalFilterLength = 0;
 
         foreach ($tests as $testLocation) {
             $test = $testLocation->getMethod();
@@ -88,6 +93,12 @@ final class FilterBuilder
             $usedTests[$test] = true;
 
             $filter = preg_quote($test, '/');
+            $totalFilterLength += strlen($filter);
+
+            if ($totalFilterLength > self::PCRE_LIMIT) {
+                return [];
+            }
+
             $filters[] = $filter;
         }
 
