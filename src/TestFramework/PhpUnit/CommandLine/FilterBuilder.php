@@ -126,10 +126,10 @@ final class FilterBuilder
     }
 
     /**
-     * @param string $rawTestMethod either the method name or the method name with data provider
+     * @param string $rawTestMethod Either the method name or the method name with data provider
      *                              key
      *
-     * @return string a normalized form of the method name with the data provider key or the method
+     * @return string A normalized form of the method name with the data provider key or the method
      *                name alone depending on the optimization level
      */
     private static function getMethod(
