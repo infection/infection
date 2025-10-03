@@ -72,6 +72,11 @@ final class EngineTest extends TestCase
             ->method('getName')
             ->willReturn('foo')
         ;
+        $adapter
+            ->expects($this->once())
+            ->method('getInitialTestsFailRecommendations')
+            ->willReturn('Run tests to see what failed')
+        ;
 
         $coverageChecker = $this->createMock(CoverageChecker::class);
         $coverageChecker->expects($this->never())->method($this->anything());
@@ -90,6 +95,24 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('getCommandLine')
             ->willReturn('/tmp/bar')
+        ;
+
+        $process
+            ->expects($this->once())
+            ->method('getExitCode')
+            ->willReturn(1)
+        ;
+
+        $process
+            ->expects($this->atLeastOnce())
+            ->method('getOutput')
+            ->willReturn('')
+        ;
+
+        $process
+            ->expects($this->atLeastOnce())
+            ->method('getErrorOutput')
+            ->willReturn('')
         ;
 
         $initialTestsRunner = $this->createMock(InitialTestsRunner::class);
