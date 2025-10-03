@@ -39,12 +39,14 @@ use function array_map;
 use function array_merge;
 use Closure;
 use Generator;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(ArgumentsAndOptionsBuilder::class)]
@@ -336,7 +338,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\Service1Test::test_something' . $index,
-                1000,
+                10_000,
             ),
             $phpunit9,
             null,
@@ -346,20 +348,20 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case with data set "#' . $index . '"',
-                1000,
+                10_000,
             ),
             $phpunit9,
-            null,
+            '/ServiceTest\:\:test_case/',
         ];
 
         yield 'too many tests; all from data providers (>=PHPUnit10)' => [
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case##' . $index,
-                1000,
+                10_000,
             ),
             $phpunit10,
-            null,
+            '/ServiceTest\:\:test_case/',
         ];
 
         yield 'too many tests; mixed data providers and regular tests (<=PHPUnit9)' => [
@@ -375,7 +377,19 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 ),
             ),
             $phpunit9,
-            null,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    [
+                        ...self::createArray(
+                            static fn (int $index) => 'ServiceTest\:\:test_regular' . $index,
+                            500,
+                        ),
+                        'ServiceTest\:\:test_provider',
+                    ],
+                ),
+            ),
         ];
 
         yield 'too many tests; multiple test cases with mixed methods' => [
@@ -404,20 +418,61 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_case with data set "Special >@&\\::' . $index . '"',
-                1000,
+                10_000,
             ),
             $phpunit9,
-            null,
+            '/ServiceTest\:\:test_case/',
         ];
 
         yield 'too many tests; with very long test names' => [
             true,
             self::createArray(
                 static fn (int $index) => 'App\ServiceTest::test_this_is_a_very_long_test_method_name_that_might_cause_issues_with_command_line_length_limits_' . $index,
-                1000,
+                10_000,
             ),
             $phpunit9,
             null,
+        ];
+
+        yield 'too many tests; all from same method with different data sets (<=PHPUnit9)' => [
+            true,
+            self::createArray(
+                static fn (int $index) => 'App\ServiceTest::test_case with data set "dataset_' . $index . '"',
+                10_000,
+            ),
+            $phpunit9,
+            '/ServiceTest\:\:test_case/',
+        ];
+
+        yield 'too many tests; with multiple duplicate test cases of data providers' => [
+            true,
+            array_merge(
+                self::createArray(
+                    static fn (int $index) => 'App\ServiceTest::test_something_1' . $index,
+                    500,
+                ),
+                self::createArray(
+                    static fn (int $index) => 'App\ServiceTest::test_something_else_2' . $index,
+                    500,
+                ),
+            ),
+            $phpunit9,
+            sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    array_merge(
+                        self::createArray(
+                            static fn (int $index) => 'test_something_1' . $index,
+                            500,
+                        ),
+                        self::createArray(
+                            static fn (int $index) => 'test_something_else_2' . $index,
+                            500,
+                        ),
+                    ),
+                ),
+            ),
         ];
     }
 

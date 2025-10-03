@@ -56,6 +56,12 @@ final class FilterBuilder
     // The real limit is likely higher, but it is better to be safe than sorry.
     private const PCRE_LIMIT = 30_000;
 
+    private const DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
+
+    private const DROP_TEST_CASE_OPTIMIZATION_LEVEL = 2;
+
+    private const BAILOUT_OPTIMIZATION_LEVEL = 3;
+
     /**
      * @param non-empty-array<TestLocation> $tests
      *
@@ -64,10 +70,17 @@ final class FilterBuilder
     public static function createFilters(
         array $tests,
         string $testFrameworkVersion,
+        int $optimizationLevel = 0,
     ): array {
         $usedTests = [];
         $filters = [];
         $totalFilterLength = 0;
+
+        if ($optimizationLevel === self::BAILOUT_OPTIMIZATION_LEVEL) {
+            // We have no further optimisation strategy at this point, so we
+            // simply give up and do not apply any filter.
+            return [];
+        }
 
         foreach ($tests as $testLocation) {
             $test = $testLocation->getMethod();
@@ -76,14 +89,17 @@ final class FilterBuilder
             if (count($partsDelimitedByColons) > 1) {
                 [$testCaseClassName, $rawTestMethod] = $partsDelimitedByColons;
 
-                $testMethodWithProviderKey = self::getTestMethodWithProviderKey($rawTestMethod, $testFrameworkVersion);
+                // This may or not have the provider key.
+                $testMethod = self::getMethod($rawTestMethod, $testFrameworkVersion, $optimizationLevel);
                 $shortClassName = self::getShortClassName($testCaseClassName);
 
-                $test = sprintf(
-                    '%s::%s',
-                    $shortClassName,
-                    $testMethodWithProviderKey,
-                );
+                $test = $optimizationLevel >= self::DROP_TEST_CASE_OPTIMIZATION_LEVEL
+                    ? $testMethod
+                    : sprintf(
+                        '%s::%s',
+                        $shortClassName,
+                        $testMethod,
+                    );
             }
 
             if (array_key_exists($test, $usedTests)) {
@@ -96,7 +112,11 @@ final class FilterBuilder
             $totalFilterLength += strlen($filter);
 
             if ($totalFilterLength > self::PCRE_LIMIT) {
-                return [];
+                return self::createFilters(
+                    $tests,
+                    $testFrameworkVersion,
+                    $optimizationLevel + 1,
+                );
             }
 
             $filters[] = $filter;
@@ -105,10 +125,25 @@ final class FilterBuilder
         return $filters;
     }
 
-    private static function getTestMethodWithProviderKey(
-        string $methodNameWithDataProvider,
+    /**
+     * @param string $rawTestMethod Either the method name or the method name with data provider
+     *                              key
+     *
+     * @return string A normalized form of the method name with the data provider key or the method
+     *                name alone depending on the optimization level
+     */
+    private static function getMethod(
+        string $rawTestMethod,
         string $testFrameworkVersion,
+        int $optimizationLevel,
     ): string {
+        if ($optimizationLevel >= self::DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL) {
+            // Drop the data provider key when there is one.
+            [$testMethod] = self::splitMethodNameFromProviderKey($rawTestMethod, $testFrameworkVersion);
+
+            return $testMethod;
+        }
+
         /*
          * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
          * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
@@ -116,7 +151,7 @@ final class FilterBuilder
          * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
          */
         if (self::isPhpUnit10OrHigher($testFrameworkVersion)) {
-            $methodNameParts = self::splitMethodNameFromProviderKey($methodNameWithDataProvider);
+            $methodNameParts = self::splitMethodNameFromProviderKey($rawTestMethod, $testFrameworkVersion);
 
             if (count($methodNameParts) > 1) {
                 [$methodName, $dataProviderKey] = $methodNameParts;
@@ -127,7 +162,7 @@ final class FilterBuilder
             }
         }
 
-        return $methodNameWithDataProvider;
+        return $rawTestMethod;
     }
 
     private static function getShortClassName(string $className): string
@@ -142,10 +177,14 @@ final class FilterBuilder
      *
      * @return array{string, string}
      */
-    private static function splitMethodNameFromProviderKey(string $testMethod): array
-    {
+    private static function splitMethodNameFromProviderKey(
+        string $testMethod,
+        string $testFrameworkVersion,
+    ): array {
         // @phpstan-ignore return.type
-        return explode('#', $testMethod, self::MAX_EXPLODE_PARTS);
+        return self::isPhpUnit10OrHigher($testFrameworkVersion)
+            ? explode('#', $testMethod, self::MAX_EXPLODE_PARTS)
+            : explode(' with data set ', $testMethod, self::MAX_EXPLODE_PARTS);
     }
 
     private static function isPhpUnit10OrHigher(string $testFrameworkVersion): bool
