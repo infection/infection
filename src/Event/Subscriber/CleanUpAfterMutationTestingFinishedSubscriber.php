@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationAnalysisWasFinished;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -52,7 +52,7 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements Ev
     ) {
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function onMutationTestingWasFinished(MutationAnalysisWasFinished $event): void
     {
         $finder = Finder::create()
             ->in($this->tmpDir)
