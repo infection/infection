@@ -341,7 +341,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES,
                 null,
                 InputOption::VALUE_NONE,
-                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit / Pest it uses <comment>"--filter"</comment> option',
+                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit, it uses <comment>"--filter"</comment> option',
             )
             ->addOption(
                 self::OPTION_MIN_MSI,
