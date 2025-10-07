@@ -56,6 +56,8 @@ final class FilterBuilder
     // The real limit is likely higher, but it is better to be safe than sorry.
     private const PCRE_LIMIT = 30_000;
 
+    private const NO_OPTIMIZATION_LEVEL = 0;
+
     private const DROP_DATA_PROVIDER_KEY_OPTIMIZATION_LEVEL = 1;
 
     private const DROP_TEST_CASE_OPTIMIZATION_LEVEL = 2;
@@ -70,7 +72,7 @@ final class FilterBuilder
     public static function createFilters(
         array $tests,
         string $testFrameworkVersion,
-        int $optimizationLevel = 0,
+        int $optimizationLevel = self::NO_OPTIMIZATION_LEVEL,
     ): array {
         $usedTests = [];
         $filters = [];
