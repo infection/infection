@@ -139,16 +139,14 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        if (version_compare($version, '7.2', '<')) {
-            return;
-        }
-
         if (version_compare($version, '10.5.48', '>=')) {
             if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
                 $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
             }
-        } elseif ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
-            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+        } elseif (version_compare($version, '7.2', '>=')) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
         }
     }
 
