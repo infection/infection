@@ -37,6 +37,7 @@ namespace Infection\PhpParser;
 
 use PhpParser\Node\Stmt;
 use PhpParser\Parser;
+use PhpParser\Token;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
@@ -68,5 +69,15 @@ class FileParser
 
             throw UnparsableFile::fromInvalidFile($filePath, $throwable);
         }
+    }
+
+    /**
+     * Return tokens for the last parse.
+     *
+     * @return Token[]
+     */
+    public function getTokens(): array
+    {
+        return $this->parser->getTokens();
     }
 }
