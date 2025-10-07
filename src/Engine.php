@@ -89,8 +89,18 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $this->runInitialTestSuite();
+        $initialTestSuiteOutput = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
+
+        /*
+         * Limit the memory used for the mutation processes based on the memory
+         * used for the initial test run.
+         * This is done AFTER static analysis to avoid restricting PHPStan's memory.
+         */
+        if ($initialTestSuiteOutput !== null) {
+            $this->memoryLimiter->limitMemory($initialTestSuiteOutput, $this->adapter);
+        }
+
         $this->runMutationAnalysis();
 
         try {
@@ -105,13 +115,13 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): void
+    private function runInitialTestSuite(): ?string
     {
         if ($this->config->shouldSkipInitialTests()) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
 
-            return;
+            return null;
         }
 
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
@@ -129,11 +139,7 @@ final readonly class Engine
             $initialTestSuiteProcess->getOutput(),
         );
 
-        /*
-         * Limit the memory used for the mutation processes based on the memory
-         * used for the initial test run.
-         */
-        $this->memoryLimiter->limitMemory($initialTestSuiteProcess->getOutput(), $this->adapter);
+        return $initialTestSuiteProcess->getOutput();
     }
 
     /**

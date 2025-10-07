@@ -39,6 +39,7 @@ use Exception;
 use function implode;
 use function sprintf;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -47,12 +48,15 @@ final class InitialStaticAnalysisRunFailed extends Exception
 {
     public static function fromProcessAndAdapter(Process $initialTestSuiteProcess, string $staticAnalysisTool): self
     {
+        $exitCode = $initialTestSuiteProcess->getExitCode();
+        Assert::notNull($exitCode);
+
         $lines = [
             'Project static analysis must be in a passing state before running Infection.',
             sprintf(
                 '%s reported an exit code of %d.',
                 $staticAnalysisTool,
-                $initialTestSuiteProcess->getExitCode(),
+                $exitCode,
             ),
             sprintf(
                 'Refer to the %s\'s output below:',
