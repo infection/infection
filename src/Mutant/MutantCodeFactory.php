@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\PrettyPrinterAbstract;
 
 /**
@@ -56,7 +56,7 @@ class MutantCodeFactory
     {
         $traverser = new NodeTraverser();
 
-        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new CloningVisitor());
         $traverser->addVisitor(new MutatorVisitor($mutation));
 
         $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
