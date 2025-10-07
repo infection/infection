@@ -359,7 +359,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('limitMemory')
             ->with('test output', $adapter)
-            ->willReturnCallback(function () use (&$callOrder): void {
+            ->willReturnCallback(static function () use (&$callOrder): void {
                 $callOrder[] = 'limitMemory';
             })
         ;
@@ -369,7 +369,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('generate')
             ->with(false, [])
-            ->willReturnCallback(function () use (&$callOrder) {
+            ->willReturnCallback(static function () use (&$callOrder) {
                 $callOrder[] = 'generate';
 
                 return [];
