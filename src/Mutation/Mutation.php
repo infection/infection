@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use PhpParser\Token;
 use function array_flip;
 use function array_intersect_key;
 use function implode;
@@ -79,6 +80,8 @@ class Mutation
         private readonly MutatedNode $mutatedNode,
         private readonly int $mutationByMutatorIndex,
         private readonly array $tests,
+        private readonly array $oldTokens = [],
+        private readonly string $originalFileContent,
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
@@ -106,6 +109,14 @@ class Mutation
     public function getMutatorName(): string
     {
         return $this->mutatorName;
+    }
+
+    /**
+     * @return list<Token[]>
+     */
+    public function getOldTokens(): array
+    {
+        return $this->oldTokens;
     }
 
     public function getMutatorClass(): string
@@ -192,5 +203,10 @@ class Mutation
         }
 
         return md5(implode('_', $hashKeys));
+    }
+
+    public function getOriginalFileContent(): string
+    {
+        return $this->originalFileContent;
     }
 }

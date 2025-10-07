@@ -81,6 +81,8 @@ class NodeMutationGenerator
         private readonly ?string $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly FilesDiffChangedLines $filesDiffChangedLines,
+        private readonly array $oldTokens = [],
+        private readonly string $originalFileContent = '',
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -150,6 +152,8 @@ class NodeMutationGenerator
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests,
+                $this->oldTokens,
+                $this->originalFileContent
             );
 
             ++$mutationByMutatorIndex;

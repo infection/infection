@@ -71,7 +71,7 @@ class MutantFactory
         );
 
         $mutatedCode = lazy($this->createMutatedCode($mutation));
-        $originalPrettyPrintedFile = lazy($this->getOriginalPrettyPrintedFile($mutation->getOriginalFilePath(), $mutation->getOriginalFileAst()));
+        $originalPrettyPrintedFile = lazy((fn () => yield $mutation->getOriginalFileContent())());
 
         return new Mutant(
             $mutantFilePath,
