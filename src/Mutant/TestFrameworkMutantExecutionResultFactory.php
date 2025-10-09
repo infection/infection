@@ -79,9 +79,7 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $this->configuration->isDryRun()
-                ? 0.0
-                : $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $this->retrieveProcessTime($mutantProcess, $process),
         );
     }
 
@@ -134,5 +132,14 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
         }
 
         return DetectionStatus::KILLED_BY_TESTS;
+    }
+
+    private function retrieveProcessTime(MutantProcess $mutantProcess, Process $process): float
+    {
+        if ($this->configuration->isDryRun()) {
+            return 0.0;
+        }
+
+        return $mutantProcess->getFinishedAt() - $process->getStartTime();
     }
 }
