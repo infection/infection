@@ -518,6 +518,7 @@ final class Container extends DIContainer
                     $container->getConfiguration()->getProcessTimeout(),
                     $container->getMutantExecutionResultFactory(),
                     $mutantProcessKillerFactories,
+                    $container->getConfiguration(),
                 );
             },
             MutationGenerator::class => static function (self $container): MutationGenerator {

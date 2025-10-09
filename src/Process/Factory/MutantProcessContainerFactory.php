@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Process\Factory;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
+use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use function min;
@@ -61,6 +63,7 @@ class MutantProcessContainerFactory
          * @var list<LazyMutantProcessFactory>
          */
         private readonly array $lazyMutantProcessCreators,
+        private readonly Configuration $configuration,
     ) {
     }
 
@@ -79,6 +82,10 @@ class MutantProcessContainerFactory
             ),
             timeout: $timeout,
         );
+
+        if ($this->configuration->isDryRun()) {
+            $process = new DryRunProcess($process);
+        }
 
         return new MutantProcessContainer(
             new MutantProcess(
