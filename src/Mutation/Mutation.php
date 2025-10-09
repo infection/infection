@@ -81,7 +81,7 @@ class Mutation
         private readonly int $mutationByMutatorIndex,
         private readonly array $tests,
         private readonly array $oldTokens = [],
-        private readonly string $originalFileContent,
+        private readonly string $originalFileContent = '',
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
