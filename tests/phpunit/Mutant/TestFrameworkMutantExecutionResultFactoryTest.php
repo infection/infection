@@ -583,4 +583,168 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
             $originalStartingLine,
         );
     }
+
+    public function test_it_returns_zero_runtime_for_dry_run_mode(): void
+    {
+        $configurationMock = $this->createMock(Configuration::class);
+        $configurationMock
+            ->method('isDryRun')
+            ->willReturn(true)
+        ;
+
+        $resultFactory = new TestFrameworkMutantExecutionResultFactory(
+            $this->testFrameworkAdapterMock,
+            $configurationMock,
+        );
+
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->method('getCommandLine')
+            ->willReturn('bin/phpunit')
+        ;
+        $processMock
+            ->expects($this->never())
+            ->method('isTerminated')
+        ;
+        $processMock
+            ->expects($this->never())
+            ->method('getOutput')
+        ;
+        $processMock
+            ->expects($this->never())
+            ->method('getStartTime')
+        ;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            MutantBuilder::build(
+                '/path/to/mutant',
+                new Mutation(
+                    'path/to/Foo.php',
+                    [],
+                    For_::class,
+                    MutatorName::getName(For_::class),
+                    [
+                        'startLine' => 10,
+                        'endLine' => 15,
+                        'startTokenPos' => 0,
+                        'endTokenPos' => 8,
+                        'startFilePos' => 2,
+                        'endFilePos' => 4,
+                    ],
+                    'Unknown',
+                    MutatedNode::wrap(new Nop()),
+                    0,
+                    [
+                        new TestLocation(
+                            'FooTest::test_it_can_instantiate',
+                            '/path/to/acme/FooTest.php',
+                            0.01,
+                        ),
+                    ],
+                ),
+                'dryRun#0',
+                <<<'DIFF'
+                    --- Original
+                    +++ New
+                    @@ @@
+
+                    - echo 'original';
+                    + echo 'dryRun#0';
+
+                    DIFF,
+                '<?php $a = 1;',
+            ),
+            $resultFactory,
+        );
+
+        $result = $resultFactory->createFromProcess($mutantProcess);
+
+        $this->assertSame(DetectionStatus::ESCAPED, $result->getDetectionStatus());
+        $this->assertSame('', $result->getProcessOutput());
+        $this->assertSame(0.0, $result->getProcessRuntime());
+    }
+
+    public function test_it_calculates_process_runtime_correctly(): void
+    {
+        $startTime = microtime(true) - 0.5; // Started 0.5 seconds ago
+
+        $processMock = $this->createMock(Process::class);
+        $processMock
+            ->method('getCommandLine')
+            ->willReturn('bin/phpunit')
+        ;
+        $processMock
+            ->method('isTerminated')
+            ->willReturn(true)
+        ;
+        $processMock
+            ->method('getOutput')
+            ->willReturn('Tests passed!')
+        ;
+        $processMock
+            ->method('getStartTime')
+            ->willReturn($startTime)
+        ;
+        $processMock
+            ->method('getExitCode')
+            ->willReturn(0)
+        ;
+
+        $this->testFrameworkAdapterMock
+            ->method('testsPass')
+            ->willReturn(true)
+        ;
+
+        $mutantProcess = new MutantProcess(
+            $processMock,
+            MutantBuilder::build(
+                '/path/to/mutant',
+                new Mutation(
+                    'path/to/Foo.php',
+                    [],
+                    For_::class,
+                    MutatorName::getName(For_::class),
+                    [
+                        'startLine' => 10,
+                        'endLine' => 15,
+                        'startTokenPos' => 0,
+                        'endTokenPos' => 8,
+                        'startFilePos' => 2,
+                        'endFilePos' => 4,
+                    ],
+                    'Unknown',
+                    MutatedNode::wrap(new Nop()),
+                    0,
+                    [
+                        new TestLocation(
+                            'FooTest::test_it_can_instantiate',
+                            '/path/to/acme/FooTest.php',
+                            0.01,
+                        ),
+                    ],
+                ),
+                'runtime#0',
+                <<<'DIFF'
+                    --- Original
+                    +++ New
+                    @@ @@
+
+                    - echo 'original';
+                    + echo 'runtime#0';
+
+                    DIFF,
+                '<?php $a = 1;',
+            ),
+            $this->resultFactory,
+        );
+        $mutantProcess->markAsFinished();
+
+        $result = $this->resultFactory->createFromProcess($mutantProcess);
+
+        // Runtime should be finishedAt - startTime (subtraction, not addition)
+        // We started 0.5 seconds ago, so runtime should be around 0.5 seconds
+        $this->assertGreaterThan(0.4, $result->getProcessRuntime());
+        $this->assertLessThan(1.0, $result->getProcessRuntime());
+    }
 }
