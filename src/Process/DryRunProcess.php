@@ -48,14 +48,21 @@ use Symfony\Component\Process\Process;
  */
 final class DryRunProcess extends Process
 {
+    /**
+     * Output that TestFrameworkAdapter::testsPass() recognizes as passing tests.
+     * The pattern "OK (" triggers testsPass() to return true, causing ESCAPED status.
+     */
+    public const PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
+
     private readonly string $commandLine;
 
+    /**
+     * Creates a minimal Process with a dummy command and stores the real command line from the actual process.
+     */
     public function __construct(Process $realProcess)
     {
-        // Create a minimal Process with dummy command
         parent::__construct(['true']);
 
-        // Store the real command line from the actual process
         $this->commandLine = $realProcess->getCommandLine();
     }
 
@@ -76,11 +83,7 @@ final class DryRunProcess extends Process
 
     public function getOutput(): string
     {
-        // Returns output that TestFrameworkAdapter::testsPass() recognizes as passing tests.
-        // The pattern "OK (" triggers testsPass() to return true. Combined with exit code 0,
-        // this causes mutants to be marked as ESCAPED, which is correct for dry-run mode where
-        // tests are not actually executed.
-        return 'OK (0 tests, 0 assertions)';
+        return self::PASSING_TEST_OUTPUT;
     }
 
     public function getStartTime(): float
