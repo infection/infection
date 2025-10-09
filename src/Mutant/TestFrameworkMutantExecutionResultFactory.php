@@ -37,6 +37,7 @@ namespace Infection\Mutant;
 
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
 use Infection\Process\MutantProcess;
 use function sprintf;
 use Symfony\Component\Process\Process;
@@ -52,6 +53,7 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
 
     public function __construct(
         private readonly TestFrameworkAdapter $testFrameworkAdapter,
+        private readonly Configuration $configuration,
     ) {
     }
 
@@ -77,12 +79,18 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
             $mutant->getPrettyPrintedOriginalCode(),
             $mutant->getMutatedCode(),
             $mutant->getTests(),
-            $mutantProcess->getFinishedAt() - $process->getStartTime(),
+            $this->configuration->isDryRun()
+                ? 0.0
+                : $mutantProcess->getFinishedAt() - $process->getStartTime(),
         );
     }
 
     private function retrieveProcessOutput(Process $process): string
     {
+        if ($this->configuration->isDryRun()) {
+            return '';
+        }
+
         Assert::true(
             $process->isTerminated(),
             sprintf(
@@ -96,6 +104,10 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
 
     private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
     {
+        if ($this->configuration->isDryRun()) {
+            return DetectionStatus::ESCAPED;
+        }
+
         if (!$mutantProcess->getMutant()->isCoveredByTest()) {
             return DetectionStatus::NOT_COVERED;
         }

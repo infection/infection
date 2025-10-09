@@ -37,6 +37,7 @@ namespace Infection\Tests\Mutant;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
@@ -61,6 +62,11 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     private $testFrameworkAdapterMock;
 
     /**
+     * @var Configuration|MockObject
+     */
+    private $configurationMock;
+
+    /**
      * @var TestFrameworkMutantExecutionResultFactory
      */
     private $resultFactory;
@@ -68,8 +74,16 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     protected function setUp(): void
     {
         $this->testFrameworkAdapterMock = $this->createMock(TestFrameworkAdapter::class);
+        $this->configurationMock = $this->createMock(Configuration::class);
+        $this->configurationMock
+            ->method('isDryRun')
+            ->willReturn(false)
+        ;
 
-        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory($this->testFrameworkAdapterMock);
+        $this->resultFactory = new TestFrameworkMutantExecutionResultFactory(
+            $this->testFrameworkAdapterMock,
+            $this->configurationMock,
+        );
     }
 
     public function test_it_can_create_a_result_from_a_non_covered_mutant_process(): void
