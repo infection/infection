@@ -669,7 +669,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
     public function test_it_calculates_process_runtime_correctly(): void
     {
         // Note: Using microtime(true) because MutantProcess::markAsFinished() calls microtime(true)
-        // internally to set finishedAt. Alternative would be to use reflection to set finishedAt
+        // internally to set finishedAt. Alternative would be to use injected DuoClock to set finishedAt
         // directly with fixed predetermined times for more deterministic testing.
         $startTime = microtime(true) - 0.5; // Started 0.5 seconds ago
 
