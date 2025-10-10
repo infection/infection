@@ -43,20 +43,10 @@ use Symfony\Component\Process\Process;
 #[CoversClass(DryRunProcess::class)]
 final class DryRunProcessTest extends TestCase
 {
-    public function test_it_returns_real_command_line_not_empty_parent_command(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit', '--filter', 'SomeTest']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
-        // Verify we return the real command line, not an empty string from parent's []
-        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
-        $this->assertNotEmpty($dryRunProcess->getCommandLine());
-    }
-
     public function test_it_presents_process_as_expected(): void
     {
         $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
+        $dryRunProcess = DryRunProcess::fromProcess($realProcess);
 
         $this->assertTrue($dryRunProcess->isTerminated());
         $this->assertTrue($dryRunProcess->isStarted());
@@ -64,5 +54,6 @@ final class DryRunProcessTest extends TestCase
         $this->assertSame(0.0, $dryRunProcess->getStartTime());
         $this->assertSame(0, $dryRunProcess->getExitCode());
         $this->assertSame(Process::STATUS_TERMINATED, $dryRunProcess->getStatus());
+        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
     }
 }

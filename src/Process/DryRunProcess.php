@@ -42,9 +42,9 @@ use Symfony\Component\Process\Process;
  *
  * Wraps a real Process to simulate a terminated process for dry-run mode.
  *
- * The real process is constructed normally (ensuring command-line construction
- * is exercised) but never started. This wrapper presents it as already terminated
- * with passing test output, causing all mutants to be marked as ESCAPED.
+ * The real process is constructed normally but never started. This wrapper
+ * presents it as already terminated with passing test output, causing
+ * all mutants to be marked as ESCAPED.
  */
 final class DryRunProcess extends Process
 {
@@ -54,21 +54,9 @@ final class DryRunProcess extends Process
      */
     public const PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
 
-    private readonly string $commandLine;
-
-    /**
-     * Creates a minimal Process without a command (never started) and stores the real command line.
-     */
-    public function __construct(Process $realProcess)
+    public static function fromProcess(Process $process): self
     {
-        parent::__construct([]);
-
-        $this->commandLine = $realProcess->getCommandLine();
-    }
-
-    public function getCommandLine(): string
-    {
-        return $this->commandLine;
+        return self::fromShellCommandline($process->getCommandLine());
     }
 
     public function isTerminated(): bool

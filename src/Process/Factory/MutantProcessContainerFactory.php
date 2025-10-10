@@ -84,7 +84,7 @@ class MutantProcessContainerFactory
         );
 
         if ($this->configuration->isDryRun()) {
-            $process = new DryRunProcess($process);
+            $process = DryRunProcess::fromProcess($process);
         }
 
         return new MutantProcessContainer(
