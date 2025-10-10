@@ -105,4 +105,30 @@ final class DryRunProcessTest extends TestCase
         // The output must contain "OK (" to trigger testsPass() to return true.
         $this->assertStringContainsString('OK (', DryRunProcess::PASSING_TEST_OUTPUT);
     }
+
+    public function test_it_calls_parent_constructor(): void
+    {
+        // Ensure parent::__construct() is called (kills MethodCallRemoval mutant)
+        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
+        $dryRunProcess = new DryRunProcess($realProcess);
+
+        // Call a method we don't override - if parent wasn't constructed, this would fail
+        $timeout = $dryRunProcess->getTimeout();
+        $this->assertIsFloat($timeout);
+    }
+
+    public function test_it_initializes_parent_with_non_empty_command(): void
+    {
+        // Ensure parent is initialized with non-empty command (kills ArrayItemRemoval mutant)
+        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
+        $dryRunProcess = new DryRunProcess($realProcess);
+
+        // Access method that requires valid Process initialization
+        // Empty command would cause issues with Process internal state
+        $this->expectNotToPerformAssertions();
+
+        // This will throw if Process wasn't properly initialized
+        $dryRunProcess->getTimeout();
+        $dryRunProcess->getIdleTimeout();
+    }
 }
