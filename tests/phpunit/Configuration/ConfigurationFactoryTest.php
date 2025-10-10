@@ -153,6 +153,7 @@ final class ConfigurationFactoryTest extends TestCase
         ?bool $inputUseGitHubAnnotationsLogger = true,
         ?string $inputGitlabLogFilePath = null,
         ?string $inputHtmlLogFilePath = null,
+        ?string $inputTextLogFilePath = null,
         bool $inputUseNoopMutators = false,
         int $inputMsiPrecision = 2,
         int $expectedTimeout = 10,
@@ -226,6 +227,7 @@ final class ConfigurationFactoryTest extends TestCase
                 $inputUseGitHubAnnotationsLogger,
                 $inputGitlabLogFilePath,
                 $inputHtmlLogFilePath,
+                $inputTextLogFilePath,
                 $inputUseNoopMutators,
                 $inputExecuteOnlyCoveringTestCases,
                 $mapSourceClassToTest,
@@ -335,6 +337,7 @@ final class ConfigurationFactoryTest extends TestCase
                 false,
                 null,
                 null,
+                null,
                 false,
                 false,
                 null,
@@ -383,6 +386,42 @@ final class ConfigurationFactoryTest extends TestCase
         );
 
         yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
+            null,
+            null,
+            null,
+        );
+
+        yield 'null text file log path with existing path from config file' => self::createValueForTextLogFilePath(
+            '/from-config.text',
+            null,
+            '/from-config.text',
+        );
+
+        yield 'absolute text file log path' => self::createValueForTextLogFilePath(
+            '/path/to/from-config.text',
+            null,
+            '/path/to/from-config.text',
+        );
+
+        yield 'relative text file log path' => self::createValueForTextLogFilePath(
+            'relative/path/to/from-config.text',
+            null,
+            '/path/to/relative/path/to/from-config.text',
+        );
+
+        yield 'override text file log path from CLI option with existing path from config file' => self::createValueForTextLogFilePath(
+            '/from-config.text',
+            '/from-cli.text',
+            '/from-cli.text',
+        );
+
+        yield 'set text file log path from CLI option when config file has no setting' => self::createValueForTextLogFilePath(
+            null,
+            '/from-cli.text',
+            '/from-cli.text',
+        );
+
+        yield 'null text file log path in config and CLI' => self::createValueForTextLogFilePath(
             null,
             null,
             null,
@@ -1645,6 +1684,61 @@ final class ConfigurationFactoryTest extends TestCase
                 new Logs(
                     null,
                     $htmlFileLogPathInConfig,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    null,
+                    null,
+                ),
+                '',
+                new PhpUnit(null, null),
+                new PhpStan(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            ),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function createValueForTextLogFilePath(?string $textFileLogPathInConfig, ?string $textFileLogPathFromCliOption, ?string $expectedTextFileLogPath): array
+    {
+        $expectedLogs = new Logs(
+            $expectedTextFileLogPath,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            true,
+            null,
+            null,
+        );
+
+        return [
+            'inputTextLogFilePath' => $textFileLogPathFromCliOption,
+            'expectedLogs' => $expectedLogs,
+            'schema' => new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source([], []),
+                new Logs(
+                    $textFileLogPathInConfig,
+                    null,
                     null,
                     null,
                     null,
