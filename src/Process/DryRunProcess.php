@@ -91,7 +91,7 @@ final class DryRunProcess extends Process
         return 0.0;
     }
 
-    public function getExitCode(): ?int
+    public function getExitCode(): int
     {
         return 0;
     }
