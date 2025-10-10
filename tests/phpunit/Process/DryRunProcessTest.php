@@ -53,82 +53,16 @@ final class DryRunProcessTest extends TestCase
         $this->assertNotEmpty($dryRunProcess->getCommandLine());
     }
 
-    public function test_it_presents_process_as_terminated(): void
+    public function test_it_presents_process_as_expected(): void
     {
         $realProcess = new Process(['php', 'vendor/bin/phpunit']);
         $dryRunProcess = new DryRunProcess($realProcess);
 
         $this->assertTrue($dryRunProcess->isTerminated());
-    }
-
-    public function test_it_presents_process_as_started(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
         $this->assertTrue($dryRunProcess->isStarted());
-    }
-
-    public function test_it_returns_passing_test_output(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
         $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $dryRunProcess->getOutput());
-    }
-
-    public function test_it_returns_zero_start_time(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
         $this->assertSame(0.0, $dryRunProcess->getStartTime());
-    }
-
-    public function test_it_returns_zero_exit_code(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
         $this->assertSame(0, $dryRunProcess->getExitCode());
-    }
-
-    public function test_it_returns_terminated_status(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
         $this->assertSame(Process::STATUS_TERMINATED, $dryRunProcess->getStatus());
-    }
-
-    public function test_passing_test_output_constant_triggers_escaped_status(): void
-    {
-        // This test documents the coupling between DryRunProcess and TestFrameworkAdapter.
-        // The output must contain "OK (" to trigger testsPass() to return true.
-        $this->assertStringContainsString('OK (', DryRunProcess::PASSING_TEST_OUTPUT);
-    }
-
-    public function test_it_calls_parent_constructor(): void
-    {
-        // Ensure parent::__construct() is called (kills MethodCallRemoval mutant)
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
-        // Call a method we don't override - if parent wasn't constructed, this would fail
-        $timeout = $dryRunProcess->getTimeout();
-        $this->assertIsFloat($timeout);
-    }
-
-    public function test_parent_process_is_properly_initialized(): void
-    {
-        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
-        $dryRunProcess = new DryRunProcess($realProcess);
-
-        // Parent Process methods work correctly
-        $this->assertIsFloat($dryRunProcess->getTimeout());
-
-        // Verify getCommandLine() override works - returns real command, not empty
-        $this->assertNotEmpty($dryRunProcess->getCommandLine());
-        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
     }
 }

@@ -61,8 +61,6 @@ final class DryRunProcess extends Process
      */
     public function __construct(Process $realProcess)
     {
-        // Initialize parent with empty command - the process is never started,
-        // and we override getCommandLine() to return the real command.
         parent::__construct([]);
 
         $this->commandLine = $realProcess->getCommandLine();
