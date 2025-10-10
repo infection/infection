@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Fri Oct 10 20:27:22 UTC 2025" phpunit="11.5.41" coverage="11.0.11">
+    <runtime name="PHP" version="8.3.19" url="https://www.php.net/"/>
+    <driver name="xdebug" version="3.4.2"/>
+  </build>
+  <project source="/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/src">
+    <tests>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_sets_initial_value" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_initial_counter_is_zero" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts" size="unknown" status="success"/>
+      <test name="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario" size="unknown" status="success"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="67" comments="31" code="36" executable="6" executed="6" percent="100.00"/>
+        <methods count="4" tested="4" percent="100.00"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="1" tested="1" percent="100.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <file name="DemoCounterService.php" href="DemoCounterService.php.xml">
+        <totals>
+          <lines total="67" comments="31" code="36" executable="6" executed="6" percent="100.00"/>
+          <methods count="4" tested="4" percent="100.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="1" percent="100.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>
