@@ -43,12 +43,14 @@ use Symfony\Component\Process\Process;
 #[CoversClass(DryRunProcess::class)]
 final class DryRunProcessTest extends TestCase
 {
-    public function test_it_stores_command_line_from_real_process(): void
+    public function test_it_returns_real_command_line_not_empty_parent_command(): void
     {
         $realProcess = new Process(['php', 'vendor/bin/phpunit', '--filter', 'SomeTest']);
         $dryRunProcess = new DryRunProcess($realProcess);
 
+        // Verify we return the real command line, not an empty string from parent's []
         $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
+        $this->assertNotEmpty($dryRunProcess->getCommandLine());
     }
 
     public function test_it_presents_process_as_terminated(): void
@@ -117,18 +119,16 @@ final class DryRunProcessTest extends TestCase
         $this->assertIsFloat($timeout);
     }
 
-    public function test_it_initializes_parent_with_non_empty_command(): void
+    public function test_parent_process_is_properly_initialized(): void
     {
-        // Ensure parent is initialized with non-empty command (kills ArrayItemRemoval mutant)
         $realProcess = new Process(['php', 'vendor/bin/phpunit']);
         $dryRunProcess = new DryRunProcess($realProcess);
 
-        // Access method that requires valid Process initialization
-        // Empty command would cause issues with Process internal state
-        $this->expectNotToPerformAssertions();
+        // Parent Process methods work correctly
+        $this->assertIsFloat($dryRunProcess->getTimeout());
 
-        // This will throw if Process wasn't properly initialized
-        $dryRunProcess->getTimeout();
-        $dryRunProcess->getIdleTimeout();
+        // Verify getCommandLine() override works - returns real command, not empty
+        $this->assertNotEmpty($dryRunProcess->getCommandLine());
+        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
     }
 }

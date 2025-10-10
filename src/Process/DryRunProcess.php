@@ -57,11 +57,13 @@ final class DryRunProcess extends Process
     private readonly string $commandLine;
 
     /**
-     * Creates a minimal Process with a dummy command and stores the real command line from the actual process.
+     * Creates a minimal Process without a command (never started) and stores the real command line.
      */
     public function __construct(Process $realProcess)
     {
-        parent::__construct(['true']);
+        // Initialize parent with empty command - the process is never started,
+        // and we override getCommandLine() to return the real command.
+        parent::__construct([]);
 
         $this->commandLine = $realProcess->getCommandLine();
     }
