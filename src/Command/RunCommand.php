@@ -396,7 +396,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_DRY_RUN,
                 null,
                 InputOption::VALUE_NONE,
-                'Runs mutation testing and does not run killer processes..',
+                'Runs mutation testing and does not run killer processes.',
             )
         ;
     }
