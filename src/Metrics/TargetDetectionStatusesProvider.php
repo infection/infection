@@ -83,6 +83,10 @@ class TargetDetectionStatusesProvider
             yield DetectionStatus::ESCAPED;
         }
 
+        if (!$this->onlyCoveredMode) {
+            yield DetectionStatus::NOT_COVERED;
+        }
+
         $strykerConfig = $this->logConfig->getStrykerConfig();
         $isStrykerFullReportEnabled = $strykerConfig !== null && $strykerConfig->isForFullReport();
 
