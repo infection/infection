@@ -122,6 +122,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                 MutatedNode::wrap(new Nop()),
                 0,
                 [],
+                [],
+                '',
             ),
         ])();
 
@@ -173,6 +175,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                 MutatedNode::wrap([new Nop(), new Nop()]),
                 0,
                 [],
+                [],
+                '',
             ),
         ])();
 
@@ -226,6 +230,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                 MutatedNode::wrap(new Nop()),
                 0,
                 [],
+                [],
+                '',
             ),
         ])();
 
@@ -282,6 +288,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                     MutatedNode::wrap(new Nop()),
                     0,
                     [],
+                    [],
+                    '',
                 ),
             ];
         })();

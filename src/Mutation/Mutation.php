@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use PhpParser\Token;
 use function array_flip;
 use function array_intersect_key;
 use function implode;
@@ -45,6 +44,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
+use PhpParser\Token;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -69,6 +69,7 @@ class Mutation
      * @param Node[] $originalFileAst
      * @param array<string|int|float> $attributes
      * @param TestLocation[] $tests
+     * @param Token[] $originalFileTokens
      */
     public function __construct(
         private readonly string $originalFilePath,
@@ -80,8 +81,8 @@ class Mutation
         private readonly MutatedNode $mutatedNode,
         private readonly int $mutationByMutatorIndex,
         private readonly array $tests,
-        private readonly array $oldTokens = [],
-        private readonly string $originalFileContent = '',
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
@@ -112,11 +113,11 @@ class Mutation
     }
 
     /**
-     * @return list<Token[]>
+     * @return Token[]
      */
-    public function getOldTokens(): array
+    public function getOriginalFileTokens(): array
     {
-        return $this->oldTokens;
+        return $this->originalFileTokens;
     }
 
     public function getMutatorClass(): string
@@ -190,6 +191,11 @@ class Mutation
         return $this->hash ??= $this->createHash();
     }
 
+    public function getOriginalFileContent(): string
+    {
+        return $this->originalFileContent;
+    }
+
     private function createHash(): string
     {
         $hashKeys = [
@@ -203,10 +209,5 @@ class Mutation
         }
 
         return md5(implode('_', $hashKeys));
-    }
-
-    public function getOriginalFileContent(): string
-    {
-        return $this->originalFileContent;
     }
 }

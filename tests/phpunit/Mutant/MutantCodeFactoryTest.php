@@ -42,6 +42,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
+use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -49,6 +50,14 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MutantCodeFactory::class)]
 final class MutantCodeFactoryTest extends TestCase
 {
+    private const PHP_CODE = <<<'PHP'
+        <?php
+
+        namespace Acme;
+
+        echo 15;
+        PHP;
+
     private MutantCodeFactory $codeFactory;
 
     protected function setUp(): void
@@ -81,6 +90,10 @@ final class MutantCodeFactoryTest extends TestCase
 
     public static function mutationProvider(): iterable
     {
+        $parser = (new ParserFactory())->createForHostVersion();
+        $parser->parse(self::PHP_CODE);
+        $originalTokens = $parser->getTokens();
+
         yield [
             new Mutation(
                 '/path/to/acme/Foo.php',
@@ -156,14 +169,10 @@ final class MutantCodeFactoryTest extends TestCase
                 ),
                 0,
                 [],
+                $originalTokens,
+                self::PHP_CODE,
             ),
-            <<<'PHP'
-                <?php
-
-                namespace Acme;
-
-                echo 15;
-                PHP,
+            self::PHP_CODE,
         ];
     }
 }

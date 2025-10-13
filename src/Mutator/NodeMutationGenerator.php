@@ -45,6 +45,7 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use PhpParser\Node;
+use PhpParser\Token;
 use Throwable;
 use Traversable;
 use Webmozart\Assert\Assert;
@@ -70,6 +71,7 @@ class NodeMutationGenerator
     /**
      * @param Mutator<Node>[] $mutators
      * @param Node[] $fileNodes
+     * @param Token[] $originalFileTokens
      */
     public function __construct(
         array $mutators,
@@ -81,8 +83,8 @@ class NodeMutationGenerator
         private readonly ?string $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly array $oldTokens = [],
-        private readonly string $originalFileContent = '',
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -152,8 +154,8 @@ class NodeMutationGenerator
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
                 $tests,
-                $this->oldTokens,
-                $this->originalFileContent
+                $this->originalFileTokens,
+                $this->originalFileContent,
             );
 
             ++$mutationByMutatorIndex;

@@ -58,12 +58,16 @@ class MutantCodeFactory
 
         $traverser->addVisitor(new CloningVisitor());
 
-        $newStmts = $traverser->traverse($mutation->getOriginalFileAst());
+        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
         $traverser->addVisitor(new MutatorVisitor($mutation));
 
-        $mutatedStatements = $traverser->traverse($newStmts);
+        $mutatedStatements = $traverser->traverse($newStatements);
 
-        return $this->printer->printFormatPreserving($mutatedStatements, $newStmts, $mutation->getOldTokens());
+        return $this->printer->printFormatPreserving(
+            $mutatedStatements,
+            $newStatements,
+            $mutation->getOriginalFileTokens(),
+        );
     }
 }

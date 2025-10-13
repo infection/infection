@@ -298,7 +298,6 @@ final class Container extends DIContainer
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->getTmpDir(),
                 $container->getDiffer(),
-                $container->getPrinter(),
                 $container->getMutantCodeFactory(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
@@ -1043,11 +1042,6 @@ final class Container extends DIContainer
     private function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
-    }
-
-    private function getPrinter(): PrettyPrinterAbstract
-    {
-        return $this->get(PrettyPrinterAbstract::class);
     }
 
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator

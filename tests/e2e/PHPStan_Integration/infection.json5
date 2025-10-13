@@ -9,7 +9,6 @@
         ]
     },
     "logs": {
-        gitlab: "gitlab.json",
         "summary": "infection.log"
     },
     "tmpDir": "."

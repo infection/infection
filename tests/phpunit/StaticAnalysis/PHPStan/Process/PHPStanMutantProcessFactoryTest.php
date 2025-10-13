@@ -81,6 +81,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -176,6 +178,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -272,6 +276,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'

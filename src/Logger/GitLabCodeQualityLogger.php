@@ -66,8 +66,6 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
         $lines = [];
 
         foreach ($this->resultsCollector->getEscapedExecutionResults() as $escapedExecutionResult) {
-            $originalCode = $escapedExecutionResult->getOriginalCode();
-
             $lines[] = [
                 'type' => 'issue',
                 'fingerprint' => $escapedExecutionResult->getMutantHash(),
@@ -81,14 +79,6 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
                     'lines' => [
                         'begin' => $escapedExecutionResult->getOriginalStartingLine(),
                     ],
-                    'start' => [
-                        'line' => $escapedExecutionResult->getOriginalStartingLine(),
-                        'column' => $escapedExecutionResult->getOriginalStartingColumn($originalCode),
-                    ],
-                    'end' => [
-                        'line' => $escapedExecutionResult->getOriginalEndingLine(),
-                        'column' => $escapedExecutionResult->getOriginalEndingColumn($originalCode),
-                    ]
                 ],
                 'severity' => 'major',
             ];
