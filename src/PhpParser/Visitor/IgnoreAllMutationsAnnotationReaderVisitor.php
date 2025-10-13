@@ -62,7 +62,7 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
         foreach ($node->getComments() as $comment) {
             if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
                 $this->changingIgnorer->startIgnoring();
-                $this->ignoredNodes->attach($node);
+                $this->ignoredNodes->offsetSet($node);
             }
         }
 
@@ -71,8 +71,8 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 
     public function leaveNode(Node $node): ?Node
     {
-        if ($this->ignoredNodes->contains($node)) {
-            $this->ignoredNodes->detach($node);
+        if ($this->ignoredNodes->offsetExists($node)) {
+            $this->ignoredNodes->offsetUnset($node);
             $this->changingIgnorer->stopIgnoring();
         }
 
