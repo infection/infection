@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function array_diff_key;
+use function array_flip;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -102,7 +104,7 @@ final class CatchBlockRemoval implements Mutator
 
             unset($catches[$i]);
 
-            yield new Node\Stmt\TryCatch($node->stmts, $catches, $node->finally, $node->getAttributes());
+            yield new Node\Stmt\TryCatch($node->stmts, $catches, $node->finally, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
         }
     }
 

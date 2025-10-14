@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -74,7 +76,7 @@ final class IntegerNegation implements Mutator
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes()),
+            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), array_diff_key($node->getAttributes(), array_flip(['origNode']))),
         );
     }
 

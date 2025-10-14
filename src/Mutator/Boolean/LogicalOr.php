@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_diff_key;
+use function array_flip;
 use function array_intersect;
 use function in_array;
 use Infection\Mutator\Definition;
@@ -81,7 +83,7 @@ final class LogicalOr implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\BooleanAnd($node->left, $node->right, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

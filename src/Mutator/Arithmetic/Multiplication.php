@@ -41,6 +41,8 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use function array_diff_key;
+use function array_flip;
 use function is_string;
 use PhpParser\Node;
 
@@ -76,7 +78,7 @@ final class Multiplication implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Div($node->left, $node->right, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

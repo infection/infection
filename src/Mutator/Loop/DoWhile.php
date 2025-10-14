@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -97,7 +99,7 @@ final class DoWhile implements Mutator
         yield new Node\Stmt\Do_(
             new Node\Expr\ConstFetch(new Node\Name('false')),
             $node->stmts,
-            $node->getAttributes(),
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
         );
     }
 

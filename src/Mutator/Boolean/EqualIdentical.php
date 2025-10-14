@@ -41,6 +41,8 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -75,7 +77,7 @@ final class EqualIdentical extends AbstractIdenticalComparison
      */
     public function mutate(Node $node): iterable
     {
-        yield new Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
+        yield new Expr\BinaryOp\Identical($node->left, $node->right, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

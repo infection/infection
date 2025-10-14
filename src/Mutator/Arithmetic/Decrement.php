@@ -41,6 +41,8 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -76,12 +78,12 @@ final class Decrement implements Mutator
     public function mutate(Node $node): iterable
     {
         if ($node instanceof Node\Expr\PreDec) {
-            yield new Node\Expr\PreInc($node->var, $node->getAttributes());
+            yield new Node\Expr\PreInc($node->var, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
 
             return;
         }
 
-        yield new Node\Expr\PostInc($node->var, $node->getAttributes());
+        yield new Node\Expr\PostInc($node->var, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

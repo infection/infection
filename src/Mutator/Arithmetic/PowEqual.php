@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -75,7 +77,7 @@ final class PowEqual implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

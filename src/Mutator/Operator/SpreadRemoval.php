@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -87,7 +89,7 @@ final class SpreadRemoval implements Mutator
             $node->value,
             null,
             false,
-            $node->getAttributes(),
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
             false,
         );
     }

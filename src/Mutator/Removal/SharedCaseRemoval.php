@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -102,7 +104,7 @@ final class SharedCaseRemoval implements Mutator
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes(),
+                    array_diff_key($node->getAttributes(), array_flip(['origNode'])),
                 );
 
                 continue;
@@ -116,13 +118,13 @@ final class SharedCaseRemoval implements Mutator
                 $cases[$i - 1] = new Node\Stmt\Case_(
                     $lastCase->cond,
                     $case->stmts,
-                    $lastCase->getAttributes(),
+                    array_diff_key($lastCase->getAttributes(), array_flip(['origNode'])),
                 );
 
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes(),
+                    array_diff_key($node->getAttributes(), array_flip(['origNode'])),
                 );
             }
         }

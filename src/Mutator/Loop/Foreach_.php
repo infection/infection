@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -98,7 +100,7 @@ final class Foreach_ implements Mutator
                 'byRef' => $node->byRef,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes(),
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
         );
     }
 

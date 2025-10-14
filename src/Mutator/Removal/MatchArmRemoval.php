@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function array_diff_key;
+use function array_flip;
 use function array_values;
 use function count;
 use Infection\Mutator\Definition;
@@ -125,9 +127,9 @@ final class MatchArmRemoval implements Mutator
 
                     unset($conds[$j]);
 
-                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, $node->getAttributes());
+                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
 
-                    yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
+                    yield new Node\Expr\Match_($node->cond, $arms, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
                 }
 
                 continue;
@@ -135,7 +137,7 @@ final class MatchArmRemoval implements Mutator
 
             unset($arms[$i]);
 
-            yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
+            yield new Node\Expr\Match_($node->cond, $arms, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
         }
     }
 }

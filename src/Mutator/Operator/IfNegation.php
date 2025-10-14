@@ -41,6 +41,8 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\SimpleExpression;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -82,7 +84,7 @@ final class IfNegation implements Mutator
                 'else' => $node->else,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes(),
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
         );
     }
 

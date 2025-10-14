@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -84,6 +86,6 @@ final class Ternary implements Mutator
             $if = $node->cond;
         }
 
-        yield new Node\Expr\Ternary($node->cond, $node->else, $if, $node->getAttributes());
+        yield new Node\Expr\Ternary($node->cond, $node->else, $if, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 }

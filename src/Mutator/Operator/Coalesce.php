@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -81,11 +83,11 @@ final class Coalesce implements Mutator
         $right = $node->right;
 
         if ($right instanceof Node\Expr\BinaryOp\Coalesce) {
-            $left = new Node\Expr\BinaryOp\Coalesce($node->left, $right->right, $right->getAttributes());
+            $left = new Node\Expr\BinaryOp\Coalesce($node->left, $right->right, array_diff_key($right->getAttributes(), array_flip(['origNode'])));
             $right = $right->left;
         }
 
-        yield new Node\Expr\BinaryOp\Coalesce($right, $left, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Coalesce($right, $left, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

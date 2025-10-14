@@ -39,6 +39,8 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -113,7 +115,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
             return new $binaryOpExprClass(
                 $this->negateSubExpression($binaryOpNode->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($binaryOpNode->right, $negateExpressionAtIndex, $currentExpressionIndex),
-                $node->getAttributes(),
+                array_diff_key($node->getAttributes(), array_flip(['origNode'])),
             );
         }
 

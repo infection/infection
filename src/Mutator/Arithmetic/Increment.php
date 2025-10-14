@@ -76,12 +76,12 @@ final class Increment implements Mutator
     public function mutate(Node $node): iterable
     {
         if ($node instanceof Node\Expr\PreInc) {
-            yield new Node\Expr\PreDec($node->var, $node->getAttributes());
+            yield new Node\Expr\PreDec($node->var, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
 
             return;
         }
 
-        yield new Node\Expr\PostDec($node->var, $node->getAttributes());
+        yield new Node\Expr\PostDec($node->var, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

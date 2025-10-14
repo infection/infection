@@ -40,6 +40,8 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -73,7 +75,7 @@ final class NullSafeMethodCall implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\MethodCall($node->var, $node->name, $node->args, $node->getAttributes());
+        yield new Node\Expr\MethodCall($node->var, $node->name, $node->args, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
     }
 
     public function canMutate(Node $node): bool

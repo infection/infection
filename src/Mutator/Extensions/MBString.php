@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Extensions;
 
+use function array_diff_key;
 use function array_fill_keys;
+use function array_flip;
 use function array_intersect_key;
 use function array_key_exists;
 use function array_slice;
@@ -253,9 +255,9 @@ final class MBString implements ConfigurableMutator
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(
-            new Node\Name($newFuncName, $node->name->getAttributes()),
+            new Node\Name($newFuncName, array_diff_key($node->name->getAttributes(), array_flip(['origNode']))),
             $args,
-            $node->getAttributes(),
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
         );
     }
 }

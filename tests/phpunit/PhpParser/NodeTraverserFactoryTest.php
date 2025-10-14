@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
+use PhpParser\NodeVisitor\CloningVisitor;
 use function array_map;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
@@ -73,6 +74,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $this->assertSame(
             [
+                CloningVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
@@ -100,6 +102,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $this->assertSame(
             [
+                CloningVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
@@ -114,7 +117,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $actualNodeIgnorers = array_map(
             get_class(...),
-            $nodeIgnorersReflection->getValue($visitors[1]),
+            $nodeIgnorersReflection->getValue($visitors[2]),
         );
 
         $this->assertSame(

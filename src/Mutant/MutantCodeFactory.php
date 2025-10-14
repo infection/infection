@@ -66,7 +66,7 @@ class MutantCodeFactory
 
         return $this->printer->printFormatPreserving(
             $mutatedStatements,
-            $newStatements,
+            $mutation->getOriginalFileAst(),
             $mutation->getOriginalFileTokens(),
         );
     }

@@ -87,7 +87,7 @@ class FileMutationGenerator
 
         $sourceFile = $trace->getSourceFileInfo();
         $initialStatements = $this->parser->parse($sourceFile);
-        $oldTokens = $this->parser->getTokens();
+        $originalFileTokens = $this->parser->getTokens();
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
@@ -104,7 +104,7 @@ class FileMutationGenerator
                 $this->gitDiffBase,
                 $this->lineRangeCalculator,
                 $this->filesDiffChangedLines,
-                $oldTokens,
+                $originalFileTokens,
                 $sourceFile->getContents(),
             ),
         );

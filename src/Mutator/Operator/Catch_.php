@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
+use function array_diff_key;
+use function array_flip;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
@@ -86,7 +88,7 @@ final class Catch_ implements Mutator
 
             unset($types[$i]);
 
-            yield new Node\Stmt\Catch_($types, $node->var, $node->stmts, $node->getAttributes());
+            yield new Node\Stmt\Catch_($types, $node->var, $node->stmts, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
         }
     }
 }

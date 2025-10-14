@@ -41,6 +41,8 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\SimpleExpression;
 use PhpParser\Node;
+use function array_diff_key;
+use function array_flip;
 
 /**
  * @internal
@@ -79,7 +81,7 @@ final class ElseIfNegation implements Mutator
         yield new Node\Stmt\ElseIf_(
             new Node\Expr\BooleanNot($node->cond),
             $node->stmts,
-            $node->getAttributes(),
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
         );
     }
 
