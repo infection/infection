@@ -51,54 +51,54 @@ use Webmozart\Assert\Assert;
 #[CoversClass(MutantCodeFactory::class)]
 final class MutantCodeFactoryTest extends TestCase
 {
-    private const PHP_TO_BE_MUTATED_CODE = <<<'PHP'
-        <?php
+    private const PHP_TO_BE_MUTATED_CODE = <<<'PHP_WRAP'
+    <?php
+    
+    $a = PHP_INT_MAX - 33;
+    PHP_WRAP;
 
-        $a = PHP_INT_MAX - 33;
-        PHP;
+    private const PHP_UNTOUCHED_CODE = <<<'PHP_WRAP'
+    <?php
 
-    private const PHP_UNTOUCHED_CODE = <<<'PHP'
-        <?php
+    namespace PHPStan_Integration;
 
-        namespace PHPStan_Integration;
-
-        class SourceClass
+    class SourceClass
+    {
+        /**
+         * @template T
+         * @param array<T> $values
+         * @return list<T>
+         */
+        public function makeAList(array $values): array
         {
-            /**
-             * @template T
-             * @param array<T> $values
-             * @return list<T>
-             */
-            public function makeAList(array $values): array
-            {
-                // some code to generate more mutations
+            // some code to generate more mutations
 
-                $strings = [
-                '1'];
+            $strings = [
+            '1'];
 
-                $ints = array_map(function ($value): int {
-                    return (int) $value;
-                }, $strings);
+            $ints = array_map(function ($value): int {
+                return (int) $value;
+            }, $strings);
 
-                $nonEmptyArray = ['1'];
+            $nonEmptyArray = ['1'];
 
-                $nonEmptyArrayFromMethod = $this->returnNonEmptyArray();
+            $nonEmptyArrayFromMethod = $this->returnNonEmptyArray();
 
-                $inlineNonEmpty = ['1'];
+            $inlineNonEmpty = ['1'];
 
-                return array_values($values);
-            }
-
-            /**
-             * @return non-empty-array<int, string>
-             */
-            private function returnNonEmptyArray(): array
-            {
-                return ['test'];
-            }
+            return array_values($values);
         }
 
-        PHP;
+        /**
+         * @return non-empty-array<int, string>
+         */
+        private function returnNonEmptyArray(): array
+        {
+            return ['test'];
+        }
+    }
+
+    PHP_WRAP;
 
     private MutantCodeFactory $codeFactory;
 
@@ -219,11 +219,11 @@ final class MutantCodeFactoryTest extends TestCase
                 $originalTokens,
                 self::PHP_TO_BE_MUTATED_CODE,
             ),
-            <<<'PHP'
-                <?php
+            <<<'PHP_WRAP'
+            <?php
 
-                $a = PHP_INT_MAX - 32;
-                PHP,
+            $a = PHP_INT_MAX - 32;
+            PHP_WRAP,
         ];
     }
 }
