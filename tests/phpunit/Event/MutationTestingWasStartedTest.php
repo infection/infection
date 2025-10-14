@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\MutationAnalysisWasStarted;
 use Infection\Process\Runner\ProcessRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingWasStarted::class)]
+#[CoversClass(MutationAnalysisWasStarted::class)]
 final class MutationTestingWasStartedTest extends TestCase
 {
     public function test_it_exposes_its_mutation_count_and_process_runner(): void
@@ -48,7 +48,7 @@ final class MutationTestingWasStartedTest extends TestCase
         $count = 5;
         $processRunner = $this->createMock(ProcessRunner::class);
 
-        $event = new MutationTestingWasStarted($count, $processRunner);
+        $event = new MutationAnalysisWasStarted($count, $processRunner);
 
         $this->assertSame($count, $event->getMutationCount());
         $this->assertSame($processRunner, $event->getProcessRunner());
