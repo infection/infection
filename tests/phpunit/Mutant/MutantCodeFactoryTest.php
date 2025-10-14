@@ -46,6 +46,7 @@ use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
 #[CoversClass(MutantCodeFactory::class)]
 final class MutantCodeFactoryTest extends TestCase
@@ -55,7 +56,6 @@ final class MutantCodeFactoryTest extends TestCase
 
         $a = PHP_INT_MAX - 33;
         PHP;
-
 
     private const PHP_UNTOUCHED_CODE = <<<'PHP'
         <?php
@@ -118,7 +118,7 @@ final class MutantCodeFactoryTest extends TestCase
     }
 
     #[DataProvider('mutationProvider')]
-    public function it_creates_the_mutant_code_without_altering_the_original_nodes(
+    public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation,
     ): void {
         $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
@@ -136,6 +136,8 @@ final class MutantCodeFactoryTest extends TestCase
 
         $originalStmts = $parser->parse(self::PHP_UNTOUCHED_CODE);
         $originalTokens = $parser->getTokens();
+
+        Assert::notNull($originalStmts);
 
         yield 'keeps pretty-printing' => [
             new Mutation(
@@ -178,6 +180,8 @@ final class MutantCodeFactoryTest extends TestCase
         $originalStmts = $parser->parse(self::PHP_TO_BE_MUTATED_CODE);
         $originalTokens = $parser->getTokens();
 
+        Assert::notNull($originalStmts);
+
         yield 'mutates + to -' => [
             new Mutation(
                 '/path/to/acme/Foo.php',
@@ -216,10 +220,10 @@ final class MutantCodeFactoryTest extends TestCase
                 self::PHP_TO_BE_MUTATED_CODE,
             ),
             <<<'PHP'
-            <?php
+                <?php
 
-            $a = PHP_INT_MAX - 32;
-            PHP,
+                $a = PHP_INT_MAX - 32;
+                PHP,
         ];
     }
 }

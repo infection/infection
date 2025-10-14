@@ -35,12 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
+use function array_diff_key;
+use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
-use function array_diff_key;
 
 /**
  * @internal
@@ -77,7 +78,7 @@ final class Plus implements Mutator
         yield new Node\Expr\BinaryOp\Minus(
             $node->left,
             $node->right,
-            array_diff_key($node->getAttributes(), array_flip(['origNode']))
+            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
         );
     }
 

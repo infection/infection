@@ -43,8 +43,6 @@ use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Reflection\Visibility;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
-use function array_diff_key;
-use function array_flip;
 
 /**
  * @internal

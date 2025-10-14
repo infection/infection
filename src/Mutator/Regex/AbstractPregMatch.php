@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Regex;
 
+use function array_diff_key;
+use function array_flip;
 use Generator;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
-use function array_diff_key;
-use function array_flip;
 use function strtolower;
 
 /**
