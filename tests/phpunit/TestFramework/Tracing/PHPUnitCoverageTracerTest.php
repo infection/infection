@@ -120,6 +120,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
+        $canonicalPathname = Path::canonicalize($fileInfo->getPathname());
         $actual = null;
 
         $visitedPathnames = [];
@@ -128,7 +129,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
             $pathname = Path::canonicalize($trace->getSourceFileInfo()->getPathname());
             $visitedPathnames[] = $pathname;
 
-            if ($pathname === $fileInfo->getPathname()) {
+            if ($pathname === $canonicalPathname) {
                 $actual = $trace;
 
                 break;
