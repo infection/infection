@@ -2,7 +2,7 @@
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
- * Copyright (c) 5217, Maks Rafalko
+ * Copyright (c) 2017, Maks Rafalko
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use function count;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\SourceFileFilter;
@@ -52,7 +54,6 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
-use Infection\TestFramework\Tracing\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -113,16 +114,22 @@ final class PHPUnitCoverageTracerTest extends TestCase
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
-        $actual = 'No Trace found.';
+        $actual = null;
+
+        $visitedPathnames = [];
 
         foreach ($this->provider->provideTraces() as $trace) {
-            if ($trace->getSourceFileInfo()->getPathname() === $fileInfo->getPathname()) {
+            $pathname = $trace->getSourceFileInfo()->getPathname();
+            $visitedPathnames[] = $pathname;
+
+            if ($pathname === $fileInfo->getPathname()) {
                 $actual = $trace;
 
                 break;
             }
         }
 
+        self::assertFoundMatchingTrace($visitedPathnames, $expected, $actual);
         TraceAssertion::assertEquals($expected, $actual);
     }
 
@@ -433,5 +440,33 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 ),
             ),
         ];
+    }
+
+    /**
+     * @phpstan-assert Trace $actual
+     *
+     * @param string[] $visitedPathnames
+     */
+    private function assertFoundMatchingTrace(
+        array $visitedPathnames,
+        Trace $expected,
+        ?Trace $actual,
+    ): void {
+        if ($actual !== null) {
+            return;
+        }
+
+        $this->fail(
+            sprintf(
+                'Expected to find a trace for the source file with the pathname "%s" but none found. %s',
+                $expected->getSourceFileInfo()->getPathname(),
+                count($visitedPathnames) > 0
+                    ? sprintf(
+                        'Found: "%s".',
+                        implode('", "', $visitedPathnames),
+                    )
+                    : 'No trace found.',
+            ),
+        );
     }
 }

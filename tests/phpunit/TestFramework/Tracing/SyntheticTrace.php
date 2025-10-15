@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing;
+namespace Infection\Tests\TestFramework\Tracing;
 
 use DomainException;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
@@ -41,6 +41,11 @@ use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * Represents a Trace state with any dynamic behaviour or laziness of any kind.
+ * This is mostly useful for testing purposes where we want to declare an
+ * expected Trace state.
+ */
 final readonly class SyntheticTrace implements Trace
 {
     public function __construct(
