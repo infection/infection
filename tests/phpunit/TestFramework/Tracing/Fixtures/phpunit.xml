@@ -30,12 +30,12 @@
     </source>
 
     <logging>
-        <junit outputFile="phpunit/junit.xml"/>
+        <junit outputFile="phpunit-coverage/junit.xml"/>
     </logging>
 
     <coverage>
         <report>
-            <xml outputDirectory="phpunit/xml"/>
+            <xml outputDirectory="phpunit-coverage/xml"/>
         </report>
     </coverage>
 

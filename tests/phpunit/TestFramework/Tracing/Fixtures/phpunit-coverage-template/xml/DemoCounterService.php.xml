@@ -17,69 +17,69 @@
     </class>
     <coverage>
       <line nr="46">
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
       </line>
       <line nr="47">
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
       </line>
       <line nr="49">
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
       </line>
       <line nr="54">
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_sets_initial_value"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_sets_initial_value"/>
       </line>
       <line nr="59">
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
       </line>
       <line nr="64">
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_initial_counter_is_zero"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
-        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_sets_initial_value"/>
         <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_initial_counter_is_zero"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
       </line>
     </coverage>
     <source>

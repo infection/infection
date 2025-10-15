@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use Symfony\Component\Process\Process;
 use function count;
+use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -67,12 +69,13 @@ use Symfony\Component\Finder\SplFileInfo;
 final class PHPUnitCoverageTracerTest extends TestCase
 {
     private const FIXTURE_DIR = __DIR__ . '/Fixtures';
+    private const COVERAGE_REPORT_DIR = self::FIXTURE_DIR . '/phpunit-coverage';
 
     private TraceProvider $provider;
 
     protected function setUp(): void
     {
-        $coveragePath = self::FIXTURE_DIR . '/phpunit';
+        $coveragePath = Path::canonicalize(self::COVERAGE_REPORT_DIR);
 
         $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
         $testFrameworkAdapterStub
@@ -107,6 +110,8 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     ->in(self::FIXTURE_DIR . '/src'),
             ),
         );
+
+        $this->copyReportFromTemplateIfMissing($coveragePath);
     }
 
     #[DataProvider('traceProvider')]
@@ -468,5 +473,22 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     : 'No trace found.',
             ),
         );
+    }
+
+    private function copyReportFromTemplateIfMissing(string $coveragePath): void
+    {
+        if (file_exists($coveragePath)) {
+            return;
+        }
+
+        $process = new Process(
+            command: [
+                'make',
+                'phpunit-coverage',
+            ],
+            cwd: self::FIXTURE_DIR,
+            timeout: 5,
+        );
+        $process->mustRun();
     }
 }
