@@ -134,6 +134,25 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         );
     }
 
+    public function test_it_provides_not_covered_when_with_uncovered_option_is_used(): void
+    {
+        $logs = $this->createMock(Logs::class);
+
+        $provider = new TargetDetectionStatusesProvider(
+            $logs,
+            logVerbosity: LogVerbosity::NORMAL,
+            onlyCoveredMode: false,
+            numberOfShownMutations: 0,
+        );
+
+        $this->assertProvides(
+            [
+                DetectionStatus::NOT_COVERED,
+            ],
+            $provider->get(),
+        );
+    }
+
     public function test_it_includes_escaped_when_requested(): void
     {
         $logs = $this->createMock(Logs::class);
