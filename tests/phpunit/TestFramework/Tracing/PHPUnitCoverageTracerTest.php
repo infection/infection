@@ -153,19 +153,11 @@ final class PHPUnitCoverageTracerTest extends TestCase
         $testLocations = [
             new TestLocation(
                 sprintf(
-                    '%s::test_set_step_with_default_resets_to_one',
+                    '%s::test_set_step_changes_increment_amount',
                     DemoCounterServiceTest::class,
                 ),
                 $testFilePath,
-                0.021691,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_multiple_counts_increment_correctly',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.021691,
+                0.022199,
             ),
             new TestLocation(
                 sprintf(
@@ -173,47 +165,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     DemoCounterServiceTest::class,
                 ),
                 $testFilePath,
-                0.021691,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_set_step_changes_increment_amount',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.021691,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_start_count_affects_subsequent_counts',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.021691,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_start_count_with_default_sets_to_zero',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.021691,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_zero_step_keeps_counter_unchanged',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.021691,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_negative_step_decreases_counter',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.021691,
+                0.022199,
             ),
             new TestLocation(
                 sprintf(
@@ -221,7 +173,31 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     DemoCounterServiceTest::class,
                 ),
                 $testFilePath,
-                0.021691,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_negative_step_decreases_counter',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_multiple_counts_increment_correctly',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_set_step_with_default_resets_to_one',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
             ),
             new TestLocation(
                 sprintf(
@@ -229,7 +205,31 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     DemoCounterServiceTest::class,
                 ),
                 $testFilePath,
-                0.021691,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_start_count_with_default_sets_to_zero',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_zero_step_keeps_counter_unchanged',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_start_count_affects_subsequent_counts',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
             ),
         ];
 
@@ -248,27 +248,11 @@ final class PHPUnitCoverageTracerTest extends TestCase
                         54 => [
                             new TestLocation(
                                 sprintf(
-                                    '%s::test_start_count_affects_subsequent_counts',
+                                    '%s::test_start_count_sets_initial_value',
                                     DemoCounterServiceTest::class,
                                 ),
                                 $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_with_default_sets_to_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
@@ -276,7 +260,107 @@ final class PHPUnitCoverageTracerTest extends TestCase
                                     DemoCounterServiceTest::class,
                                 ),
                                 $testFilePath,
-                                0.021691,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_with_default_sets_to_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_affects_subsequent_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                        ],
+                        59 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_changes_increment_amount',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_custom_step_with_multiple_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_with_default_resets_to_one',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                        ],
+                        64 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_changes_increment_amount',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_custom_step_with_multiple_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
@@ -284,131 +368,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                                     DemoCounterServiceTest::class,
                                 ),
                                 $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                        ],
-                        59 => [
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_with_default_resets_to_one',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_custom_step_with_multiple_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_changes_increment_amount',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                        ],
-                        64 => [
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_multiple_counts_increment_correctly',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_custom_step_with_multiple_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_changes_increment_amount',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_affects_subsequent_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_with_default_sets_to_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_initial_counter_is_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.021691,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
@@ -416,15 +376,31 @@ final class PHPUnitCoverageTracerTest extends TestCase
                                     DemoCounterServiceTest::class,
                                 ),
                                 $testFilePath,
-                                0.021691,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
-                                    '%s::test_start_count_sets_initial_value',
+                                    '%s::test_initial_counter_is_zero',
                                     DemoCounterServiceTest::class,
                                 ),
                                 $testFilePath,
-                                0.021691,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_multiple_counts_increment_correctly',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
@@ -432,7 +408,31 @@ final class PHPUnitCoverageTracerTest extends TestCase
                                     DemoCounterServiceTest::class,
                                 ),
                                 $testFilePath,
-                                0.021691,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_with_default_sets_to_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_affects_subsequent_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
                             ),
                         ],
                     ],
