@@ -50,6 +50,9 @@ final class TraceAssertion
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private static function collectState(Trace $trace): array
     {
         return [
