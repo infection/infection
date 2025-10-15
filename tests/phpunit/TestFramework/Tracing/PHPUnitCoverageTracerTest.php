@@ -125,7 +125,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
         $visitedPathnames = [];
 
         foreach ($this->provider->provideTraces() as $trace) {
-            $pathname = $trace->getSourceFileInfo()->getPathname();
+            $pathname = Path::canonicalize($trace->getSourceFileInfo()->getPathname());
             $visitedPathnames[] = $pathname;
 
             if ($pathname === $fileInfo->getPathname()) {
