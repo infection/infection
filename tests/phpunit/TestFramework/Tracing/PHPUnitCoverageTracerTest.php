@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
-use Symfony\Component\Process\Process;
 use function count;
 use function file_exists;
 use function implode;
@@ -64,11 +63,13 @@ use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Process\Process;
 
 #[CoversNothing]
 final class PHPUnitCoverageTracerTest extends TestCase
 {
     private const FIXTURE_DIR = __DIR__ . '/Fixtures';
+
     private const COVERAGE_REPORT_DIR = self::FIXTURE_DIR . '/phpunit-coverage';
 
     private TraceProvider $provider;
