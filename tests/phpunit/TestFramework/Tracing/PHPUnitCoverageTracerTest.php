@@ -240,7 +240,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
             $splFileInfo,
             new SyntheticTrace(
                 sourceFileInfo: $splFileInfo,
-                realPath: realpath($canonicalDemoCounterServicePathnam),
+                realPath: realpath($canonicalDemoCounterServicePathname),
                 relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
                 tests: new TestLocations(
