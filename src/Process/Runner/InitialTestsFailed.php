@@ -40,6 +40,7 @@ use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use function sprintf;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -52,13 +53,16 @@ final class InitialTestsFailed extends Exception
     ): self {
         $testFrameworkKey = $testFrameworkAdapter->getName();
 
+        $exitCode = $initialTestSuiteProcess->getExitCode();
+        Assert::notNull($exitCode);
+
         $lines = [
             'Project tests must be in a passing state before running Infection.',
             $testFrameworkAdapter->getInitialTestsFailRecommendations($initialTestSuiteProcess->getCommandLine()),
             sprintf(
                 '%s reported an exit code of %d.',
                 $testFrameworkKey,
-                $initialTestSuiteProcess->getExitCode(),
+                $exitCode,
             ),
             sprintf(
                 'Refer to the %s\'s output below:',

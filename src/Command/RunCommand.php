@@ -132,6 +132,8 @@ final class RunCommand extends BaseCommand
 
     private const OPTION_LOGGER_HTML = 'logger-html';
 
+    private const OPTION_LOGGER_TEXT = 'logger-text';
+
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
 
     private const OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
@@ -332,6 +334,12 @@ final class RunCommand extends BaseCommand
                 'Path to HTML report file, similar to PHPUnit HTML report.',
             )
             ->addOption(
+                self::OPTION_LOGGER_TEXT,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to text report file.',
+            )
+            ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
@@ -341,7 +349,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES,
                 null,
                 InputOption::VALUE_NONE,
-                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit / Pest it uses <comment>"--filter"</comment> option',
+                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit, it uses <comment>"--filter"</comment> option',
             )
             ->addOption(
                 self::OPTION_MIN_MSI,
@@ -396,7 +404,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_DRY_RUN,
                 null,
                 InputOption::VALUE_NONE,
-                'Will not apply the mutations',
+                'Runs mutation testing and does not run killer processes.',
             )
         ;
     }
@@ -464,6 +472,7 @@ final class RunCommand extends BaseCommand
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
+        $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
         $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
 
         /** @var string|null $minMsi */
@@ -490,18 +499,37 @@ final class RunCommand extends BaseCommand
         $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
 
         if ($isForGitDiffLines && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER) {
-            throw new InvalidArgumentException(sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_GIT_DIFF_LINES, self::OPTION_GIT_DIFF_FILTER));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
         }
 
         if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER && $isForGitDiffLines === Container::DEFAULT_GIT_DIFF_LINES) {
-            throw new InvalidArgumentException(sprintf('Cannot pass "--%s" without "--%s"', self::OPTION_GIT_DIFF_BASE, self::OPTION_GIT_DIFF_FILTER));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
+                    self::OPTION_GIT_DIFF_BASE,
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
         }
 
         $filter = trim((string) $input->getOption(self::OPTION_FILTER));
 
         if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
             throw new InvalidArgumentException(
-                sprintf('Cannot pass both "--%s" and "--%s" options: use none or only one of them', self::OPTION_FILTER, self::OPTION_GIT_DIFF_FILTER),
+                sprintf(
+                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
+                    self::OPTION_FILTER,
+                    self::OPTION_GIT_DIFF_FILTER,
+                    self::OPTION_FILTER,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
             );
         }
 
@@ -555,6 +583,7 @@ final class RunCommand extends BaseCommand
             $commandHelper->getUseGitHubLogger(),
             $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
+            $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             $commandHelper->getMapSourceClassToTest(),

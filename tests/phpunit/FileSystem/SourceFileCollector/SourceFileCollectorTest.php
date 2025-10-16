@@ -54,7 +54,6 @@ final class SourceFileCollectorTest extends TestCase
     /**
      * @param string[] $sourceDirectories
      * @param string[] $excludedFilesOrDirectories
-     * @param list<string> $expected
      */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(

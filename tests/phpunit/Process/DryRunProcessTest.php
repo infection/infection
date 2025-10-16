@@ -33,18 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\Process;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use Infection\Process\DryRunProcess;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
-/**
- * @internal
- */
-final class CloneVisitor extends NodeVisitorAbstract
+#[CoversClass(DryRunProcess::class)]
+final class DryRunProcessTest extends TestCase
 {
-    public function enterNode(Node $node): Node
+    public function test_it_presents_process_as_expected(): void
     {
-        return clone $node;
+        $realProcess = new Process(['php', 'vendor/bin/phpunit']);
+        $dryRunProcess = DryRunProcess::fromProcess($realProcess);
+
+        $this->assertTrue($dryRunProcess->isTerminated());
+        $this->assertTrue($dryRunProcess->isStarted());
+        $this->assertSame(DryRunProcess::PASSING_TEST_OUTPUT, $dryRunProcess->getOutput());
+        $this->assertSame(0.0, $dryRunProcess->getStartTime());
+        $this->assertSame(0, $dryRunProcess->getExitCode());
+        $this->assertSame(Process::STATUS_TERMINATED, $dryRunProcess->getStatus());
+        $this->assertSame($realProcess->getCommandLine(), $dryRunProcess->getCommandLine());
     }
 }

@@ -75,7 +75,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         array $filteredSourceFilesToMutate = [],
         ?string $mapSourceClassToTestStrategy = null,
     ): TestFrameworkAdapter {
-        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the Pest adapter');
+        Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
 

@@ -156,7 +156,15 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
     {
         $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
 
-        if (version_compare($this->getVersion(), '7.2', '>=')) {
+        if (self::supportsExecutionOrderDefectsRandom($this->getVersion())) {
+            $recommendations = sprintf(
+                "%s\n\n%s\n\n%s",
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
+                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
+                'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
+                parent::getInitialTestsFailRecommendations($commandLine),
+            );
+        } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
                 "%s\n\n%s\n\n%s",
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
@@ -167,6 +175,15 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         }
 
         return $recommendations;
+    }
+
+    public static function supportsExecutionOrderDefectsRandom(string $version): bool
+    {
+        return
+            version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
+            || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
+            || version_compare($version, '12.2.7', '>=')
+        ;
     }
 
     /**
