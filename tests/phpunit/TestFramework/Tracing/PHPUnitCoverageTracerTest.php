@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\Tracing;
 use function count;
 use function file_exists;
 use function implode;
-use function Safe\realpath;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\SourceFileFilter;
@@ -60,6 +59,7 @@ use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -240,7 +240,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
             $splFileInfo,
             new SyntheticTrace(
                 sourceFileInfo: $splFileInfo,
-                realPath: realpath($canonicalDemoCounterServicePathnam,
+                realPath: realpath($canonicalDemoCounterServicePathnam),
                 relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
                 tests: new TestLocations(
