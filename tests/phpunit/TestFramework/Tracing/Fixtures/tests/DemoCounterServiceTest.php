@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Fixtures;
+namespace Infection\Tests\TestFramework\Tracing\Fixtures\tests;
 
+use Infection\Tests\TestFramework\Tracing\Fixtures\src\DemoCounterService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

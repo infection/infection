@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Fixtures;
+namespace Infection\Tests\TestFramework\Tracing\Fixtures\src;
 
 final class DemoCounterService
 {

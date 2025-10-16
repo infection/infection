@@ -35,28 +35,33 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\Filesystem;
-use Infection\FileSystem\SplFileInfoFactory;
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\NewCoverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\Tracing\PHPUnitCoverageTracer;
 use Infection\TestFramework\Tracing\SyntheticTrace;
-use Infection\Tests\TestFramework\Tracing\Fixtures\DemoCounterServiceTest;
+use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(PHPUnitCoverageTracer::class)]
 final class PHPUnitCoverageTracerTest extends TestCase
 {
     private const FIXTURE_DIR = __DIR__ . '/Fixtures';
+
+    private const COVERAGE_REPORT_DIR = self::FIXTURE_DIR . '/phpunit-coverage';
 
     private PHPUnitCoverageTracer $tracer;
 
@@ -68,14 +73,16 @@ final class PHPUnitCoverageTracerTest extends TestCase
             new PHPUnitXmlProvider(
                 indexReportLocator: IndexReportLocator::create(
                     $filesystem,
-                    self::FIXTURE_DIR . '/phpunit',
+                    self::COVERAGE_REPORT_DIR,
                 ),
                 jUnitReportLocator: JUnitReportLocator::create(
                     $filesystem,
-                    self::FIXTURE_DIR . '/phpunit',
+                    self::COVERAGE_REPORT_DIR,
                 ),
             ),
         );
+
+        $this->copyReportFromTemplateIfMissing(self::COVERAGE_REPORT_DIR);
     }
 
     #[DataProvider('traceProvider')]
@@ -90,91 +97,96 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
     public static function traceProvider(): iterable
     {
-        $splFileInfo = SplFileInfoFactory::fromPath(
-            self::FIXTURE_DIR . '/DemoCounterService.php',
-            self::FIXTURE_DIR,
+        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
+
+        $splFileInfo = new SplFileInfo(
+            file: self::FIXTURE_DIR . '/src/DemoCounterService.php',
+            relativePath: '/',
+            relativePathname: $canonicalDemoCounterServicePathname,
         );
+
+        $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');
 
         $testLocations = [
             new TestLocation(
                 sprintf(
-                    '%s::test_set_step_with_default_resets_to_one',
+                    '%s::test_set_step_changes_increment_amount',
                     DemoCounterServiceTest::class,
                 ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_multiple_counts_increment_correctly',
-                    DemoCounterServiceTest::class,
-                ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
+                $testFilePath,
+                0.022199,
             ),
             new TestLocation(
                 sprintf(
                     '%s::test_custom_step_with_multiple_counts',
                     DemoCounterServiceTest::class,
                 ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_set_step_changes_increment_amount',
-                    DemoCounterServiceTest::class,
-                ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_start_count_affects_subsequent_counts',
-                    DemoCounterServiceTest::class,
-                ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_start_count_with_default_sets_to_zero',
-                    DemoCounterServiceTest::class,
-                ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_zero_step_keeps_counter_unchanged',
-                    DemoCounterServiceTest::class,
-                ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_negative_step_decreases_counter',
-                    DemoCounterServiceTest::class,
-                ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
+                $testFilePath,
+                0.022199,
             ),
             new TestLocation(
                 sprintf(
                     '%s::test_count_increments_by_step_and_returns_new_value',
                     DemoCounterServiceTest::class,
                 ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_negative_step_decreases_counter',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_multiple_counts_increment_correctly',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_set_step_with_default_resets_to_one',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
             ),
             new TestLocation(
                 sprintf(
                     '%s::test_complex_scenario',
                     DemoCounterServiceTest::class,
                 ),
-                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                0.036343,
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_start_count_with_default_sets_to_zero',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_zero_step_keeps_counter_unchanged',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_start_count_affects_subsequent_counts',
+                    DemoCounterServiceTest::class,
+                ),
+                $testFilePath,
+                0.022199,
             ),
         ];
 
@@ -182,208 +194,230 @@ final class PHPUnitCoverageTracerTest extends TestCase
             $splFileInfo,
             new SyntheticTrace(
                 sourceFileInfo: $splFileInfo,
-                realPath: Path::canonicalize(self::FIXTURE_DIR . '/DemoCounterService.php'),
-                relativePathname: 'DemoCounterService.php',
+                realPath: realpath($canonicalDemoCounterServicePathname),
+                relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
                 tests: new TestLocations(
                     [
-                        14 => $testLocations,
-                        15 => $testLocations,
-                        17 => $testLocations,
-                        22 => [
+                        46 => $testLocations,
+                        47 => $testLocations,
+                        49 => $testLocations,
+                        54 => [
                             new TestLocation(
                                 sprintf(
-                                    '%s::test_start_count_affects_subsequent_counts',
+                                    '%s::test_start_count_sets_initial_value',
                                     DemoCounterServiceTest::class,
                                 ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_with_default_sets_to_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
                                     '%s::test_negative_step_decreases_counter',
                                     DemoCounterServiceTest::class,
                                 ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_with_default_sets_to_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_affects_subsequent_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                        ],
+                        59 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_changes_increment_amount',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_custom_step_with_multiple_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_with_default_resets_to_one',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                        ],
+                        64 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_changes_increment_amount',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_custom_step_with_multiple_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
                                     '%s::test_start_count_sets_initial_value',
                                     DemoCounterServiceTest::class,
                                 ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                        ],
-                        27 => [
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_with_default_resets_to_one',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_custom_step_with_multiple_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_changes_increment_amount',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                        ],
-                        32 => [
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_multiple_counts_increment_correctly',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_custom_step_with_multiple_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_changes_increment_amount',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_affects_subsequent_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_with_default_sets_to_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_initial_counter_is_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
                                     '%s::test_count_increments_by_step_and_returns_new_value',
                                     DemoCounterServiceTest::class,
                                 ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
-                                    '%s::test_start_count_sets_initial_value',
+                                    '%s::test_initial_counter_is_zero',
                                     DemoCounterServiceTest::class,
                                 ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_multiple_counts_increment_correctly',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
                             ),
                             new TestLocation(
                                 sprintf(
                                     '%s::test_complex_scenario',
                                     DemoCounterServiceTest::class,
                                 ),
-                                '/Users/tfidry/Project/Humbug/infection/tests/phpunit/TestFramework/Tracing/Fixtures/DemoCounterServiceTest.php',
-                                0.036343,
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_with_default_sets_to_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_affects_subsequent_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                $testFilePath,
+                                0.022199,
                             ),
                         ],
                     ],
-                    [],
+                    [
+                        'count' => new SourceMethodLineRange(44, 50),
+                        'startCount' => new SourceMethodLineRange(52, 55),
+                        'setStep' => new SourceMethodLineRange(57, 60),
+                        'get' => new SourceMethodLineRange(62, 65),
+                    ],
                 ),
             ),
         ];
+    }
+
+    private function copyReportFromTemplateIfMissing(string $coveragePath): void
+    {
+        if (file_exists($coveragePath)) {
+            return;
+        }
+
+        $process = new Process(
+            command: [
+                'make',
+                'phpunit-coverage',
+            ],
+            cwd: self::FIXTURE_DIR,
+            timeout: 5,
+        );
+        $process->mustRun();
     }
 }

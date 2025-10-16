@@ -19,23 +19,23 @@
 
     <testsuites>
         <testsuite name="Demo Test Suite">
-            <file>DemoCounterServiceTest.php</file>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 
     <source>
         <include>
-            <file>DemoCounterService.php</file>
+            <directory>src</directory>
         </include>
     </source>
 
     <logging>
-        <junit outputFile="phpunit/junit.xml"/>
+        <junit outputFile="phpunit-coverage/junit.xml"/>
     </logging>
 
     <coverage>
         <report>
-            <xml outputDirectory="phpunit/xml"/>
+            <xml outputDirectory="phpunit-coverage/xml"/>
         </report>
     </coverage>
 
