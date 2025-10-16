@@ -279,7 +279,9 @@ final class Container extends DIContainer
                 IndexReportLocator::create(
                     $container->getFileSystem(),
                     $container->getConfiguration()->getCoverageDirPath(),
-                    IndexReportLocator::createPHPUnitDefaultCoverageXmlIndexPath($container->getConfiguration()->getCoverageDirPath()),
+                    IndexReportLocator::createPHPUnitDefaultCoverageXmlIndexPath(
+                        $container->getConfiguration()->getCoverageDirPath(),
+                    ),
                 ),
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
@@ -360,7 +362,7 @@ final class Container extends DIContainer
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
-            JUnitReportLocator::class => static fn (self $container): JUnitReportLocator => new JUnitReportLocator(
+            JUnitReportLocator::class => static fn (self $container): JUnitReportLocator => JUnitReportLocator::create(
                 $container->getConfiguration()->getCoverageDirPath(),
                 $container->getDefaultJUnitFilePath(),
             ),

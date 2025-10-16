@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
+use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
 use function array_map;
 use function count;
 use function current;
@@ -51,7 +52,7 @@ use Symfony\Component\Finder\SplFileInfo;
  * @internal
  * @final
  */
-class JUnitReportLocator
+class JUnitReportLocator implements ReportLocator
 {
     private readonly string $defaultJUnitPath;
 
@@ -62,6 +63,16 @@ class JUnitReportLocator
         string $defaultJUnitPath,
     ) {
         $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
+    }
+
+    public static function create(
+        string $coveragePath,
+        string $defaultJUnitPath,
+    ): self {
+        return new self(
+            $coveragePath,
+            Path::canonicalize($defaultJUnitPath),
+        );
     }
 
     /**

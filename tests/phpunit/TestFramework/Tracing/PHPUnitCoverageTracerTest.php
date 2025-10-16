@@ -76,8 +76,8 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     self::COVERAGE_REPORT_DIR,
                 ),
                 jUnitReportLocator: JUnitReportLocator::create(
-                    $filesystem,
                     self::COVERAGE_REPORT_DIR,
+                    self::COVERAGE_REPORT_DIR.'/junit.xml',
                 ),
             ),
         );
