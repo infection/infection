@@ -42,6 +42,7 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
+use Infection\Process\DryRunProcess;
 use Infection\Process\MutantProcess;
 use Infection\Testing\MutatorName;
 use PhpParser\Node\Stmt\Nop;
@@ -321,7 +322,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         ;
         $processMock
             ->method('getOutput')
-            ->willReturn('Tests passed!')
+            ->willReturn(DryRunProcess::PASSING_TEST_OUTPUT)
         ;
         $processMock
             ->expects($this->exactly(2))
@@ -332,7 +333,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         $this->testFrameworkAdapterMock
             ->expects($this->once())
             ->method('testsPass')
-            ->with('Tests passed!')
+            ->with(DryRunProcess::PASSING_TEST_OUTPUT)
             ->willReturn(true)
         ;
 
@@ -382,7 +383,7 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
         $this->assertResultStateIs(
             $this->resultFactory->createFromProcess($mutantProcess),
             $processCommandLine,
-            'Tests passed!',
+            DryRunProcess::PASSING_TEST_OUTPUT,
             DetectionStatus::ESCAPED,
             $mutantDiff,
             $mutatorName,

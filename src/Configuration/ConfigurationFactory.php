@@ -118,6 +118,7 @@ class ConfigurationFactory
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
+        ?string $textLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
@@ -156,7 +157,7 @@ class ConfigurationFactory
             ),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
+            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -373,7 +374,7 @@ class ConfigurationFactory
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
 
-    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -389,6 +390,10 @@ class ConfigurationFactory
 
         if ($htmlLogFilePath !== null) {
             $logs->setHtmlLogFilePath($htmlLogFilePath);
+        }
+
+        if ($textLogFilePath !== null) {
+            $logs->setTextLogFilePath($textLogFilePath);
         }
 
         return new Logs(

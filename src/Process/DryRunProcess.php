@@ -33,59 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem\Finder;
+namespace Infection\Process;
 
-use Infection\FileSystem\Finder\Exception\FinderException;
-use function Safe\getcwd;
-use function Safe\realpath;
-use function sprintf;
-use function str_contains;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 /**
  * @internal
+ *
+ * Wraps a real Process to simulate a terminated process for dry-run mode.
+ *
+ * The real process is constructed normally but never started. This wrapper
+ * presents it as already terminated with passing test output, causing
+ * all mutants to be marked as ESCAPED.
  */
-final readonly class ConcreteComposerExecutableFinder implements ComposerExecutableFinder
+final class DryRunProcess extends Process
 {
-    public function find(): string
+    /**
+     * Output that TestFrameworkAdapter::testsPass() recognizes as passing tests.
+     * The pattern "OK (" triggers testsPass() to return true, causing ESCAPED status.
+     */
+    public const PASSING_TEST_OUTPUT = 'OK (0 tests, 0 assertions)';
+
+    public static function fromProcess(Process $process): self
     {
-        $probable = ['composer', 'composer.phar'];
-        $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
-
-        foreach ($probable as $name) {
-            $path = $finder->find($name, null, $immediatePaths);
-
-            if ($path !== null) {
-                if (!str_contains($path, '.phar')) {
-                    return $path;
-                }
-
-                return $this->makeExecutable($path);
-            }
-        }
-
-        /**
-         * Check for options without execute permissions and prefix the PHP
-         * executable instead.
-         */
-        $nonExecutableFinder = new NonExecutableFinder();
-        $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
-
-        if ($path !== null) {
-            return $this->makeExecutable($path);
-        }
-
-        throw FinderException::composerNotFound();
+        return self::fromShellCommandline($process->getCommandLine());
     }
 
-    private function makeExecutable(string $path): string
+    public function isTerminated(): bool
     {
-        return sprintf(
-            '%s %s',
-            (new PhpExecutableFinder())->find() ?: 'php',
-            $path,
-        );
+        return true;
+    }
+
+    public function isStarted(): bool
+    {
+        return true;
+    }
+
+    public function getOutput(): string
+    {
+        return self::PASSING_TEST_OUTPUT;
+    }
+
+    public function getStartTime(): float
+    {
+        return 0.0;
+    }
+
+    public function getExitCode(): int
+    {
+        return 0;
+    }
+
+    public function getStatus(): string
+    {
+        return Process::STATUS_TERMINATED;
     }
 }

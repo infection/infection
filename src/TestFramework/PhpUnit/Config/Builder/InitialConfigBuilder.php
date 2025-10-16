@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use DOMDocument;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\XML\SafeDOMXPath;
@@ -139,12 +140,14 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        if (version_compare($version, '7.2', '<')) {
-            return;
-        }
-
-        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
-            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+        if (PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version)) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
+        } elseif (version_compare($version, '7.2', '>=')) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
         }
     }
 

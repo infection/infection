@@ -949,7 +949,9 @@ final class XmlConfigurationManipulatorTest extends TestCase
             XML_WRAP
         );
 
-        $this->assertTrue($configManipulator->validate('/path/to/phpunit.xml', $xPath));
+        $configManipulator->validate('/path/to/phpunit.xml', $xPath);
+
+        $this->addToAssertionCount(1);
     }
 
     public function test_it_removes_default_test_suite(): void

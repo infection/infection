@@ -132,6 +132,8 @@ final class RunCommand extends BaseCommand
 
     private const OPTION_LOGGER_HTML = 'logger-html';
 
+    private const OPTION_LOGGER_TEXT = 'logger-text';
+
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
 
     private const OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
@@ -332,6 +334,12 @@ final class RunCommand extends BaseCommand
                 'Path to HTML report file, similar to PHPUnit HTML report.',
             )
             ->addOption(
+                self::OPTION_LOGGER_TEXT,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to text report file.',
+            )
+            ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
@@ -341,7 +349,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES,
                 null,
                 InputOption::VALUE_NONE,
-                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit / Pest it uses <comment>"--filter"</comment> option',
+                'Execute only those test cases that cover mutated line, not the whole file with covering test cases. Can dramatically speed up Mutation Testing for slow test suites. For PHPUnit, it uses <comment>"--filter"</comment> option',
             )
             ->addOption(
                 self::OPTION_MIN_MSI,
@@ -396,7 +404,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_DRY_RUN,
                 null,
                 InputOption::VALUE_NONE,
-                'Will not apply the mutations',
+                'Runs mutation testing and does not run killer processes.',
             )
         ;
     }
@@ -464,6 +472,7 @@ final class RunCommand extends BaseCommand
         $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
+        $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
         $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
 
         /** @var string|null $minMsi */
@@ -574,6 +583,7 @@ final class RunCommand extends BaseCommand
             $commandHelper->getUseGitHubLogger(),
             $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
+            $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
             (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             $commandHelper->getMapSourceClassToTest(),

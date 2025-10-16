@@ -37,6 +37,7 @@ namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Configuration\Configuration;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
@@ -125,11 +126,18 @@ final class MutantProcessContainerFactoryTest extends TestCase
             ->willReturn($executionResultMock)
         ;
 
+        $configurationMock = $this->createMock(Configuration::class);
+        $configurationMock
+            ->method('isDryRun')
+            ->willReturn(false)
+        ;
+
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
             $processFactoryTimeout,
             $resultFactoryMock,
             [],
+            $configurationMock,
         );
 
         $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);
