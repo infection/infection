@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Tracing;
 use function count;
 use function file_exists;
 use function implode;
+use function Safe\realpath;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\SourceFileFilter;
@@ -239,7 +240,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
             $splFileInfo,
             new SyntheticTrace(
                 sourceFileInfo: $splFileInfo,
-                realPath: $canonicalDemoCounterServicePathname,
+                realPath: realpath($canonicalDemoCounterServicePathnam,
                 relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
                 tests: new TestLocations(
