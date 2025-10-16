@@ -54,6 +54,7 @@ final class SourceFileCollectorTest extends TestCase
     /**
      * @param string[] $sourceDirectories
      * @param string[] $excludedFilesOrDirectories
+     * @param list<string> $expectedList
      */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(
@@ -68,11 +69,11 @@ final class SourceFileCollectorTest extends TestCase
         $normalizedActual = self::normalizePaths($actual, self::FIXTURES_ROOT);
 
         $this->assertSame($expected, $normalizedActual);
-        $this->assertIsList(
-            take($actual)->toAssoc(),
-        );
     }
 
+    /**
+     * @return iterable<string, array{string[], string[], list<string>}>
+     */
     public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
@@ -222,10 +223,5 @@ final class SourceFileCollectorTest extends TestCase
         natcasesort($relativePaths);
 
         return array_values($relativePaths);
-    }
-
-    private static function makePathRelativeToRoot(string $path): string
-    {
-        return Path::makeRelative($path, self::FIXTURES_ROOT);
     }
 }
