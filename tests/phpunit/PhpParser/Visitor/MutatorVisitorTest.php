@@ -68,7 +68,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
             [new MutatorVisitor($mutation)],
         );
 
-        $output = SingletonContainer::getPrinter()->prettyPrintFile($nodes);
+        $output = SingletonContainer::getPrinter()->print($nodes, $mutation);
 
         $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
     }
