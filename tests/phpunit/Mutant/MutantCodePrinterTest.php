@@ -90,9 +90,9 @@ final class MutantCodePrinterTest extends TestCase
         $mutation = new Mutation(
             '/path/to/acme/Foo.php',
             $statements,
-            Plus::class,
-            MutatorName::getName(Plus::class),
-            [
+            mutatorClass: Plus::class,
+            mutatorName: MutatorName::getName(Plus::class),
+            attributes: [
                 'startLine' => 5,
                 'startTokenPos' => 9,
                 'startFilePos' => 29,
@@ -101,8 +101,8 @@ final class MutantCodePrinterTest extends TestCase
                 'endFilePos' => 30,
                 'kind' => 10,
             ],
-            Node\Scalar\Int_::class,
-            MutatedNode::wrap(
+            mutatedNodeClass: Node\Scalar\Int_::class,
+            mutatedNode: MutatedNode::wrap(
                 new Node\Scalar\Int_(
                     15,
                     [
@@ -116,8 +116,8 @@ final class MutantCodePrinterTest extends TestCase
                     ],
                 ),
             ),
-            0,
-            [],
+            mutationByMutatorIndex: 0,
+            tests: [],
         );
 
         yield 'basic namespace with echo' => [
