@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Testing;
 
 use Infection\Container;
-use Infection\Mutant\MutatedCodePrinter;
+use Infection\Mutant\MutantCodePrinter;
 use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
 use PhpParser\NodeDumper;
 use PhpParser\PrettyPrinter\Standard;
@@ -54,7 +54,7 @@ final class SingletonContainer
 
     private static ?NodeDumper $dumper = null;
 
-    private static ?MutatedCodePrinter $printer = null;
+    private static ?MutantCodePrinter $printer = null;
 
     private static ?PHPDocParser $phpDocParser = null;
 
@@ -68,9 +68,9 @@ final class SingletonContainer
         return self::$dumper ??= new NodeDumper();
     }
 
-    public static function getPrinter(): MutatedCodePrinter
+    public static function getPrinter(): MutantCodePrinter
     {
-        return self::$printer ??= new MutatedCodePrinter(new Standard());
+        return self::$printer ??= new MutantCodePrinter(new Standard());
     }
 
     public static function getPHPDocParser(): PHPDocParser

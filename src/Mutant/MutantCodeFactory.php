@@ -47,7 +47,7 @@ use PhpParser\NodeVisitor\CloningVisitor;
 class MutantCodeFactory
 {
     public function __construct(
-        private readonly MutatedCodePrinter $mutatedCodePrinter,
+        private readonly MutantCodePrinter $mutatedCodePrinter,
     ) {
     }
 

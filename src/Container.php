@@ -94,8 +94,8 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutant\MutatedCodePrinter;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
@@ -305,7 +305,7 @@ final class Container extends DIContainer
             MutantCodeFactory::class => static fn (self $container): MutantCodeFactory => new MutantCodeFactory(
                 $container->getMutatedCodePrinter(),
             ),
-            MutatedCodePrinter::class => static fn (self $container): MutatedCodePrinter => new MutatedCodePrinter(
+            MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
                 $container->getPrinter(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
@@ -1017,9 +1017,9 @@ final class Container extends DIContainer
         return $this->get(MinMsiChecker::class);
     }
 
-    private function getMutatedCodePrinter(): MutatedCodePrinter
+    private function getMutatedCodePrinter(): MutantCodePrinter
     {
-        return $this->get(MutatedCodePrinter::class);
+        return $this->get(MutantCodePrinter::class);
     }
 
     private function getStopwatch(): Stopwatch

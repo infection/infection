@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\Mutant\MutatedCodePrinter;
+use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
@@ -48,14 +48,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Webmozart\Assert\Assert;
 
-#[CoversClass(MutatedCodePrinter::class)]
-final class MutatedCodePrinterTest extends TestCase
+#[CoversClass(MutantCodePrinter::class)]
+final class MutantCodePrinterTest extends TestCase
 {
-    private MutatedCodePrinter $printer;
+    private MutantCodePrinter $printer;
 
     protected function setUp(): void
     {
-        $this->printer = new MutatedCodePrinter(new Standard());
+        $this->printer = new MutantCodePrinter(new Standard());
     }
 
     /**
