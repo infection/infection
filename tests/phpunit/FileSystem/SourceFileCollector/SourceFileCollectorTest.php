@@ -47,7 +47,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/Fixtures';
+    private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
     /**
      * @param string[] $sourceDirectories
@@ -55,9 +55,15 @@ final class SourceFileCollectorTest extends TestCase
      * @param list<string> $expectedList
      */
     #[DataProvider('sourceFilesProvider')]
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expectedList): void
-    {
-        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
+    public function test_it_can_collect_files(
+        array $sourceDirectories,
+        array $excludedFilesOrDirectories,
+        array $expectedList,
+    ): void {
+        $files = (new SourceFileCollector())->collectFiles(
+            $sourceDirectories,
+            $excludedFilesOrDirectories,
+        );
 
         self::assertIsEqualCanonicalizing(
             $expectedList,
@@ -77,7 +83,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, no excludes' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             [],
             [
                 'case0/a.php',
@@ -87,7 +93,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'multiple directories, no filter, no excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [self::FIXTURES_ROOT . '/case0', self::FIXTURES_ROOT . '/case1'],
             [],
             [
                 'case0/a.php',
@@ -99,7 +105,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, one excludes' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -108,8 +114,8 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, absolute path excludes' => [
-            [self::FIXTURES . '/case0'],
-            [self::FIXTURES . '/sub-dir'],
+            [self::FIXTURES_ROOT . '/case0'],
+            [self::FIXTURES_ROOT . '/sub-dir'],
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -118,7 +124,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, relative path excludes relative to source root' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             ['case0/sub-dir'],
             [
                 'case0/a.php',
@@ -128,7 +134,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'multiple directories, no filter, one common excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [self::FIXTURES_ROOT . '/case0', self::FIXTURES_ROOT . '/case1'],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -138,7 +144,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'exclude file by its name' => [
-            [self::FIXTURES . '/case1'],
+            [self::FIXTURES_ROOT . '/case1'],
             ['a.php'],
             [
                 'case1/sub-dir/b.php',
@@ -146,7 +152,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, one common excludes and one file exclude' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             [
                 'sub-dir',
                 'a.php',
@@ -165,7 +171,7 @@ final class SourceFileCollectorTest extends TestCase
         array $expectedList,
         array $actual,
     ): void {
-        $root = self::FIXTURES;
+        $root = self::FIXTURES_ROOT;
 
         $normalizedExpected = self::createExpected($expectedList, $root);
         $normalizedActual = self::normalizePaths($actual, $root);
