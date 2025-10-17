@@ -33,36 +33,4 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
-
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
-
-/**
- * @internal
- * @final
- */
-class MutantCodeFactory
-{
-    public function __construct(
-        private readonly MutantCodePrinter $mutatedCodePrinter,
-    ) {
-    }
-
-    public function createCode(Mutation $mutation): string
-    {
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new CloningVisitor());
-
-        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
-
-        $traverser->addVisitor(new MutatorVisitor($mutation));
-
-        $mutatedStatements = $traverser->traverse($newStatements);
-
-        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
-    }
-}
+echo 'test';

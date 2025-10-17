@@ -33,36 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\TestFramework\Tracing\Fixtures\src;
 
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
-
-/**
- * @internal
- * @final
- */
-class MutantCodeFactory
+final class DemoCounterService
 {
-    public function __construct(
-        private readonly MutantCodePrinter $mutatedCodePrinter,
-    ) {
+    private int $counter = 0;
+
+    private int $step = 1;
+
+    public function count(): int
+    {
+        $count = $this->counter + $this->step;
+        $this->counter = $count;
+
+        return $count;
     }
 
-    public function createCode(Mutation $mutation): string
+    public function startCount(int $start = 0): void
     {
-        $traverser = new NodeTraverser();
+        $this->counter = $start;
+    }
 
-        $traverser->addVisitor(new CloningVisitor());
+    public function setStep(int $step = 1): void
+    {
+        $this->step = $step;
+    }
 
-        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
-
-        $traverser->addVisitor(new MutatorVisitor($mutation));
-
-        $mutatedStatements = $traverser->traverse($newStatements);
-
-        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
+    public function get(): int
+    {
+        return $this->counter;
     }
 }

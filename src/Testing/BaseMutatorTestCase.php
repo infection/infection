@@ -151,7 +151,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = SingletonContainer::getPrinter()->print($mutatedStatements, $mutation);
 
             $traverser->removeVisitor($mutatorVisitor);
         }

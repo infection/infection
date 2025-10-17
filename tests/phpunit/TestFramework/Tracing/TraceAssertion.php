@@ -33,36 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\TestFramework\Tracing;
 
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
+use Infection\TestFramework\Coverage\Trace;
+use PHPUnit\Framework\Assert;
 
-/**
- * @internal
- * @final
- */
-class MutantCodeFactory
+final class TraceAssertion
 {
-    public function __construct(
-        private readonly MutantCodePrinter $mutatedCodePrinter,
-    ) {
+    public static function assertEquals(
+        Trace $expected,
+        Trace $actual,
+    ): void {
+        Assert::assertEquals(
+            self::collectState($expected),
+            self::collectState($actual),
+        );
     }
 
-    public function createCode(Mutation $mutation): string
+    /**
+     * @return array<string, mixed>
+     */
+    private static function collectState(Trace $trace): array
     {
-        $traverser = new NodeTraverser();
-
-        $traverser->addVisitor(new CloningVisitor());
-
-        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
-
-        $traverser->addVisitor(new MutatorVisitor($mutation));
-
-        $mutatedStatements = $traverser->traverse($newStatements);
-
-        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
+        return [
+            'sourceFileInfo' => $trace->getSourceFileInfo(),
+            'realPath' => $trace->getRealPath(),
+            'relativePathname' => $trace->getRelativePathname(),
+            'hasTests' => $trace->hasTests(),
+            'tests' => $trace->getTests(),
+        ];
     }
 }

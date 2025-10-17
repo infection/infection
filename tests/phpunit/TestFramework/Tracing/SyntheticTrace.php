@@ -33,36 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutant;
+namespace Infection\Tests\TestFramework\Tracing;
 
-use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\MutatorVisitor;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
+use DomainException;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\Trace;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @internal
- * @final
+ * Represents a Trace state with any dynamic behaviour or laziness of any kind.
+ * This is mostly useful for testing purposes where we want to declare an
+ * expected Trace state.
  */
-class MutantCodeFactory
+final readonly class SyntheticTrace implements Trace
 {
     public function __construct(
-        private readonly MutantCodePrinter $mutatedCodePrinter,
+        public SplFileInfo $sourceFileInfo,
+        public string $realPath,
+        public string $relativePathname,
+        public bool $hasTest,
+        public ?TestLocations $tests,
     ) {
     }
 
-    public function createCode(Mutation $mutation): string
+    public function getSourceFileInfo(): SplFileInfo
     {
-        $traverser = new NodeTraverser();
+        return $this->sourceFileInfo;
+    }
 
-        $traverser->addVisitor(new CloningVisitor());
+    public function getRealPath(): string
+    {
+        return $this->realPath;
+    }
 
-        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
+    public function getRelativePathname(): string
+    {
+        return $this->relativePathname;
+    }
 
-        $traverser->addVisitor(new MutatorVisitor($mutation));
+    public function hasTests(): bool
+    {
+        return $this->hasTest;
+    }
 
-        $mutatedStatements = $traverser->traverse($newStatements);
+    public function getTests(): ?TestLocations
+    {
+        return $this->tests;
+    }
 
-        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        throw new DomainException('Not implemented.');
     }
 }
