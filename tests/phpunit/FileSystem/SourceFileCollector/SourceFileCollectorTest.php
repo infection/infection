@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
 use Infection\FileSystem\SourceFileCollector;
-use function iterator_to_array;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 
@@ -67,7 +67,7 @@ final class SourceFileCollectorTest extends TestCase
 
         self::assertIsEqualCanonicalizing(
             $expectedList,
-            iterator_to_array($files),
+            take($files)->toAssoc(),
         );
     }
 
