@@ -55,6 +55,10 @@ class MutantCodePrinter
      */
     public function print(array $mutatedStatements, Mutation $mutation): string
     {
-        return $this->printer->prettyPrintFile($mutatedStatements);
+        return $this->printer->printFormatPreserving(
+            $mutatedStatements,
+            $mutation->getOriginalFileAst(),
+            $mutation->getOriginalFileTokens(),
+        );
     }
 }

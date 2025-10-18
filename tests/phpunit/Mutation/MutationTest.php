@@ -43,6 +43,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\Testing\MutatorName;
 use function md5;
 use PhpParser\Node;
+use PhpParser\Token;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -55,6 +56,7 @@ final class MutationTest extends TestCase
      * @param array<string|int|float> $attributes
      * @param array<string|int|float> $expectedAttributes
      * @param TestLocation[] $tests
+     * @param Token[] $originalFileTokens
      */
     #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
@@ -68,6 +70,8 @@ final class MutationTest extends TestCase
         int $mutationByMutatorIndex,
         array $tests,
         float $timeToTest,
+        array $originalFileTokens,
+        string $originalFileContent,
         array $expectedAttributes,
         int $expectedOriginalStartingLine,
         bool $expectedCoveredByTests,
@@ -83,6 +87,8 @@ final class MutationTest extends TestCase
             $mutatedNode,
             $mutationByMutatorIndex,
             $tests,
+            $originalFileTokens,
+            $originalFileContent,
         );
 
         $this->assertSame($originalFilePath, $mutation->getOriginalFilePath());
@@ -95,6 +101,8 @@ final class MutationTest extends TestCase
         $this->assertSame($mutatedNode, $mutation->getMutatedNode());
         $this->assertSame($tests, $mutation->getAllTests());
         $this->assertSame($timeToTest, $mutation->getNominalTestExecutionTime());
+        $this->assertSame($originalFileTokens, $mutation->getOriginalFileTokens());
+        $this->assertSame($originalFileContent, $mutation->getOriginalFileContent());
         $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
         $this->assertSame($expectedHash, $mutation->getHash());
     }
@@ -120,6 +128,8 @@ final class MutationTest extends TestCase
             'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             'mutationByMutatorIndex' => -1,
             'tests' => [],
+            'originalFileTokens' => [],
+            'originalFileContent' => '',
             'timeToTest' => 0.0,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
@@ -146,6 +156,8 @@ final class MutationTest extends TestCase
                     0.01,
                 ),
             ],
+            'originalFileTokens' => [],
+            'originalFileContent' => '',
             'timeToTest' => 0.01,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
@@ -172,6 +184,8 @@ final class MutationTest extends TestCase
                     0.01,
                 ),
             ],
+            'originalFileTokens' => [],
+            'originalFileContent' => '',
             'timeToTest' => 0.01,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
@@ -203,6 +217,8 @@ final class MutationTest extends TestCase
                     1.1,
                 ),
             ],
+            'originalFileTokens' => [],
+            'originalFileContent' => '',
             'timeToTest' => 1.1,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
@@ -223,6 +239,8 @@ final class MutationTest extends TestCase
             'mutatedNode' => MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             'mutationByMutatorIndex' => 0,
             'tests' => [],
+            'originalFileTokens' => [],
+            'originalFileContent' => '',
             'timeToTest' => 0.0,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,
@@ -257,6 +275,8 @@ final class MutationTest extends TestCase
                     0.02,
                 ),
             ],
+            'originalFileTokens' => [],
+            'originalFileContent' => '',
             'timeToTest' => 0.03,
             'expectedAttributes' => $nominalAttributes,
             'expectedOriginalStartingLine' => $originalStartingLine,

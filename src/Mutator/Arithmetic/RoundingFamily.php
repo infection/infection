@@ -41,6 +41,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -95,7 +96,7 @@ final class RoundingFamily implements Mutator
             yield new Node\Expr\FuncCall(
                 new Node\Name($functionName),
                 [$node->args[0]],
-                $node->getAttributes(),
+                NodeAttributes::getAllExceptOriginalNode($node),
             );
         }
     }

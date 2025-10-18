@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -84,6 +85,6 @@ final class Ternary implements Mutator
             $if = $node->cond;
         }
 
-        yield new Node\Expr\Ternary($node->cond, $node->else, $if, $node->getAttributes());
+        yield new Node\Expr\Ternary($node->cond, $node->else, $if, NodeAttributes::getAllExceptOriginalNode($node));
     }
 }

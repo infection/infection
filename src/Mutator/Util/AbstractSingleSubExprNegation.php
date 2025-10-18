@@ -110,6 +110,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
 
             $binaryOpExprClass = $this->getSupportedBinaryOpExprClass();
 
+            // Keep origNode to preserve formatting of unchanged parts
             return new $binaryOpExprClass(
                 $this->negateSubExpression($binaryOpNode->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($binaryOpNode->right, $negateExpressionAtIndex, $currentExpressionIndex),
@@ -121,7 +122,14 @@ abstract class AbstractSingleSubExprNegation implements Mutator
             if ($currentExpressionIndex === $negateExpressionAtIndex) {
                 ++$currentExpressionIndex;
 
-                return new Node\Expr\BooleanNot($node);
+                // Clone the node to remove the origNode from the wrapped expression
+                // This ensures the format-preserving printer adds parentheses correctly
+                $wrappedNode = clone $node;
+                $wrappedAttrs = $wrappedNode->getAttributes();
+                unset($wrappedAttrs['origNode']);
+                $wrappedNode->setAttributes($wrappedAttrs);
+
+                return new Node\Expr\BooleanNot($wrappedNode);
             }
 
             ++$currentExpressionIndex;

@@ -344,5 +344,55 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 PHP
             ,
         ];
+
+        yield 'It preserves formatting for non-modified code' => [
+            <<<'PHP'
+                <?php
+
+                class TestFormatPreserving {
+                    // some comment
+                    public function test(): bool { // and comment here
+                        return 1
+
+                          || 2;
+                    }
+                }
+
+                $var = a() && b();
+                PHP
+            ,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
+
+                              || 2;
+                        }
+                    }
+
+                    $var = !a() && b();
+                    PHP
+                ,
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
+
+                              || 2;
+                        }
+                    }
+
+                    $var = a() && !b();
+                    PHP
+                ,
+            ],
+        ];
     }
 }

@@ -70,6 +70,37 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
             ],
         ];
 
+        yield 'It preserves formatting for non-modified code' => [
+            <<<'PHP'
+                <?php
+
+                class TestFormatPreserving {
+                    public function test(): bool {
+                        return 1
+                          || 2;
+                    }
+                }
+
+                $var = a() && b();
+                PHP
+            ,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        public function test(): bool {
+                            return 1
+                              || 2;
+                        }
+                    }
+
+                    $var = !(a() && b());
+                    PHP
+                ,
+            ],
+        ];
+
         yield 'It mutates and with more expressions' => [
             <<<'PHP'
                 <?php

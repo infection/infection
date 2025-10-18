@@ -306,6 +306,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
         yield 'It does mutate the elements that are not unpacked' => [
             <<<'PHP'
                 <?php
+
                 $first = [1, 2, 3, 4, 5];
                 $other = [[6, 7], [8]];
 
@@ -318,6 +319,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
 
                     $first = [1, 2, 3, 4, 5];
                     $other = [[6, 7], [8]];
+
                     $result = $first;
                     PHP,
             ],

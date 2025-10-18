@@ -142,6 +142,8 @@ final class MutantExecutionResultTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             $mutatedCode,
             $mutantDiff = <<<'DIFF'

@@ -55,7 +55,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             $c = 3;
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -83,7 +83,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             $d = 4;
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -118,7 +118,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             // Comment that becomes a Nop
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -150,7 +150,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             $c = 3;
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -192,7 +192,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             }
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -229,7 +229,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             $d = 4;
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -268,7 +268,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             $b = 2;
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -299,7 +299,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             }
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 
@@ -327,7 +327,7 @@ final class NextConnectingVisitorTest extends BaseVisitorTestCase
             }
             PHP;
 
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse($nodes, [new NextConnectingVisitor()]);
 

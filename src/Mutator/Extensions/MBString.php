@@ -49,6 +49,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -253,9 +254,9 @@ final class MBString implements ConfigurableMutator
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(
-            new Node\Name($newFuncName, $node->name->getAttributes()),
+            new Node\Name($newFuncName, NodeAttributes::getAllExceptOriginalNode($node->name)),
             $args,
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 }

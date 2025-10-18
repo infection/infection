@@ -837,6 +837,8 @@ final class MutationTestingRunnerTest extends TestCase
                     $time,
                 ),
             ] : [],
+            [],
+            '',
         );
     }
 }

@@ -385,6 +385,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 }
                 doFoo() === doFoo();
                 doFoo() === doFoo();
+
                 PHP,
         ];
 

@@ -131,6 +131,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
+
                 $class->{$property};
                 PHP,
         ];

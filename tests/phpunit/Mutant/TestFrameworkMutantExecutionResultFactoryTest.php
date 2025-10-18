@@ -117,6 +117,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                     MutatedNode::wrap(new Nop()),
                     0,
                     [],
+                    [],
+                    '',
                 ),
                 'notCovered#0',
                 $mutantDiff = <<<'DIFF'
@@ -195,6 +197,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'timedOut#0',
                 $mutantDiff = <<<'DIFF'
@@ -279,6 +283,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'errored#0',
                 $mutantDiff = <<<'DIFF'
@@ -364,6 +370,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'escaped#0',
                 $mutantDiff = <<<'DIFF'
@@ -449,6 +457,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'
@@ -543,6 +553,8 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'

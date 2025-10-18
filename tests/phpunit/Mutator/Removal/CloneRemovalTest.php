@@ -98,7 +98,7 @@ final class CloneRemovalTest extends BaseMutatorTestCase
                 <?php
 
                 $datetime = new DateTime();
-                $clonedClass = $datetime->format('Y');
+                $clonedClass = ($datetime)->format('Y');
                 PHP
             ,
         ];

@@ -501,8 +501,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if ($nodes->someProperty === -1) {
-                }
+                if ($nodes->someProperty === -1) {}
                 PHP,
         ];
 
@@ -515,8 +514,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (-1 === $nodes->someProperty) {
-                }
+                if (-1 === $nodes->someProperty) {}
                 PHP,
         ];
 
@@ -529,8 +527,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if ($nodes->someMethod() === -1) {
-                }
+                if ($nodes->someMethod() === -1) {}
                 PHP,
         ];
 
@@ -543,8 +540,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (-1 === $nodes->someMethod()) {
-                }
+                if (-1 === $nodes->someMethod()) {}
                 PHP,
         ];
 

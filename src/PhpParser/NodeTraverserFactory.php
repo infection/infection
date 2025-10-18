@@ -67,7 +67,7 @@ class NodeTraverserFactory
         $nodeIgnorers[] = new InterfaceIgnorer();
         $nodeIgnorers[] = new AbstractMethodIgnorer();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
 
         $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
@@ -75,6 +75,8 @@ class NodeTraverserFactory
             null,
             [
                 'preserveOriginalNames' => true,
+                // must be `false` for pretty-printing to work properly
+                // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
                 'replaceNodes' => false,
             ]),
         );

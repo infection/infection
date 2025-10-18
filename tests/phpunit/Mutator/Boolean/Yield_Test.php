@@ -67,7 +67,7 @@ final class Yield_Test extends BaseMutatorTestCase
                 <?php
 
                 $a = function () {
-                    yield $a > $b;
+                    (yield $a > $b);
                 };
                 PHP)(),
         ];

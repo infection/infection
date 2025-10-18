@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -87,14 +88,14 @@ final class SpreadOneItem implements Mutator
             new Node\Expr\ArrayDimFetch(
                 new Node\Expr\Array_(
                     [$node],
-                    $node->getAttributes() + ['kind' => Node\Expr\Array_::KIND_SHORT],
+                    NodeAttributes::getAllExceptOriginalNode($node) + ['kind' => Node\Expr\Array_::KIND_SHORT],
                 ),
                 new Node\Scalar\LNumber(0),
-                $node->value->getAttributes(),
+                NodeAttributes::getAllExceptOriginalNode($node->value),
             ),
             null,
             false,
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
             false,
         );
     }

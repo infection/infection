@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -97,7 +98,7 @@ final class For_ implements Mutator
                 'loop' => $node->loop,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 

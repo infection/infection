@@ -88,6 +88,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_MutatesWithoutTypehint;
 
                 use stdClass;
+
                 class Test
                 {
                     function test()
@@ -96,6 +97,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
+
                 PHP,
         ];
 
@@ -111,11 +113,12 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_ContainsAnotherFunctionAndNullAllowed;
 
                 use stdClass;
+
                 class Test
                 {
                     function test()
                     {
-                        \$a = function (\$element): ?stdClass {
+                        \$a = function (\$element) : ?stdClass {
                             return \$element;
                         };
                         new stdClass();
@@ -139,6 +142,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_ReturnTypehintFqcnAllowsNull;
 
                 use stdClass;
+
                 class Test
                 {
                     function test(): ?stdClass
@@ -159,6 +163,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_ScalarReturnTypehintsAllowsNull;
 
                 use stdClass;
+
                 class Test
                 {
                     function test(): ?int

@@ -90,7 +90,7 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 
     private function parseAndTraverse(string $code): void
     {
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse(
             $nodes,

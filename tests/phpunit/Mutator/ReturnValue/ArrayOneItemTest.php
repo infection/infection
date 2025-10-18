@@ -87,9 +87,11 @@ final class ArrayOneItemTest extends BaseMutatorTestCase
                     public function getCollection(): array
                     {
                         $collection = [1, 2, 3];
+
                         return count($collection) > 1 ? array_slice($collection, 0, 1, true) : $collection;
                     }
                 }
+
                 PHP;
         }
 

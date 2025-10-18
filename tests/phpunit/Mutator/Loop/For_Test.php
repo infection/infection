@@ -68,6 +68,7 @@ final class For_Test extends BaseMutatorTestCase
                 <?php
 
                 $array = [1, 2];
+
                 for ($i = 0; false; $i++) {
                 }
                 PHP

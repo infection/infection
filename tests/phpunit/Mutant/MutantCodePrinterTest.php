@@ -84,6 +84,7 @@ final class MutantCodePrinterTest extends TestCase
             echo 15;
             PHP;
         $statements = $parser->parse($code);
+        $originalFileTokens = $parser->getTokens();
 
         Assert::notNull($statements);
 
@@ -118,6 +119,8 @@ final class MutantCodePrinterTest extends TestCase
             ),
             mutationByMutatorIndex: 0,
             tests: [],
+            originalFileTokens: $originalFileTokens,
+            originalFileContent: $code,
         );
 
         yield 'basic namespace with echo' => [

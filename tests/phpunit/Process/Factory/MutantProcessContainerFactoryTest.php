@@ -83,6 +83,8 @@ final class MutantProcessContainerFactoryTest extends TestCase
                         $testLocationExecutionTime,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             $mutantDiff = <<<'DIFF'
