@@ -41,6 +41,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
+use function array_diff_key;
 
 /**
  * @internal
@@ -76,7 +77,16 @@ final class LogicalOrNegation implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BooleanNot($node);
+        // Clone the node to remove the origNode from the wrapped expression
+        $wrappedNode = clone $node;
+        $wrappedAttrs = $wrappedNode->getAttributes();
+        unset($wrappedAttrs['origNode']);
+        $wrappedNode->setAttributes($wrappedAttrs);
+
+        yield new Node\Expr\BooleanNot(
+            $wrappedNode,
+//            array_diff_key($node->getAttributes(), array_flip(['origNode']))
+        );
     }
 
     public function canMutate(Node $node): bool

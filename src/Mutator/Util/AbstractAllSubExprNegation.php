@@ -120,7 +120,18 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return $node;
         }
 
-        return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
+        if ($node instanceof Node\Expr\BooleanNot) {
+            return $node->expr;
+        }
+
+        // Clone the node to remove the origNode from the wrapped expression
+        // This ensures the format-preserving printer adds parentheses correctly
+        $wrappedNode = clone $node;
+        $wrappedAttrs = $wrappedNode->getAttributes();
+        unset($wrappedAttrs['origNode']);
+        $wrappedNode->setAttributes($wrappedAttrs);
+
+        return new Node\Expr\BooleanNot($wrappedNode);
     }
 
     /**

@@ -76,7 +76,13 @@ final class LogicalAndNegation implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BooleanNot($node);
+        // Clone the node to remove the origNode from the wrapped expression
+        $wrappedNode = clone $node;
+        $wrappedAttrs = $wrappedNode->getAttributes();
+        unset($wrappedAttrs['origNode']);
+        $wrappedNode->setAttributes($wrappedAttrs);
+
+        yield new Node\Expr\BooleanNot($wrappedNode);
     }
 
     public function canMutate(Node $node): bool
