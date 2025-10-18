@@ -176,6 +176,7 @@ final class MultiplicationTest extends BaseMutatorTestCase
                     public function mul(int $a, int $b): int
                     {
                         $c = $a / $b;
+
                         return 1;
                     }
                 };

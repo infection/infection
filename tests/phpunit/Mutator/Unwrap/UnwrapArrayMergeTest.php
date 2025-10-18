@@ -318,6 +318,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
 
                     $first = [1, 2, 3, 4, 5];
                     $other = [[6, 7], [8]];
+
                     $result = $first;
                     PHP,
             ],
