@@ -37,6 +37,7 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
@@ -152,7 +153,13 @@ class ConfigurationFactory
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
             $this->sourceFileCollector->collectFiles(
-                $schema->getSource()->getDirectories(),
+                array_map(
+                    static fn (string $directory) => Path::join(
+                        dirname($schema->getFile()),
+                        $directory,
+                    ),
+                    $schema->getSource()->getDirectories(),
+                ),
                 $schema->getSource()->getExcludes(),
             ),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
