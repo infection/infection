@@ -37,80 +37,43 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
+use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
+use const PHP_INT_MAX;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $container = Container::create()->withValues(
-    new NullLogger(),
-    new NullOutput(),
-    Container::DEFAULT_CONFIG_FILE,
-    Container::DEFAULT_MUTATORS_INPUT,
-    Container::DEFAULT_SHOW_MUTATIONS,
-    Container::DEFAULT_LOG_VERBOSITY,
-    Container::DEFAULT_DEBUG,
-    Container::DEFAULT_WITH_UNCOVERED,
-    Container::DEFAULT_FORMATTER_NAME,
-    Container::DEFAULT_NO_PROGRESS,
-    Container::DEFAULT_FORCE_PROGRESS,
-    __DIR__ . '/coverage',
-    Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-    Container::DEFAULT_SKIP_INITIAL_TESTS,
-    Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-    Container::DEFAULT_MIN_MSI,
-    Container::DEFAULT_MIN_COVERED_MSI,
-    Container::DEFAULT_MSI_PRECISION,
-    Container::DEFAULT_TEST_FRAMEWORK,
-    Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-    Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-    Container::DEFAULT_FILTER,
-    Container::DEFAULT_THREAD_COUNT,
-    Container::DEFAULT_DRY_RUN,
-    Container::DEFAULT_GIT_DIFF_FILTER,
-    Container::DEFAULT_GIT_DIFF_LINES,
-    Container::DEFAULT_GIT_DIFF_BASE,
-    Container::DEFAULT_USE_GITHUB_LOGGER,
-    Container::DEFAULT_GITLAB_LOGGER_PATH,
-    Container::DEFAULT_HTML_LOGGER_PATH,
-    Container::DEFAULT_TEXT_LOGGER_PATH,
-    true,
-    Container::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
-    Container::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
-    Container::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
-    Container::DEFAULT_STATIC_ANALYSIS_TOOL,
+    logger: new NullLogger(),
+    output: new NullOutput(),
+    configFile: __DIR__.'/cpu-core-counter/infection.json5',
+    existingCoveragePath: __DIR__ . '/coverage',
+    useNoopMutators: true,
 );
 
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
+// Instantiating the service may be expensive, and it is not what we are interested
+// in profiling here.
+// For instance, at the time of writing, instantiating this services instantiates
+// the TestFrameworkAdapter, which launches a process to add the vendor bin to
+// the paths, which turns out to be extremely expensive compared to the trace
+// generation.
+$traceProvider = $container->getUnionTraceProvider();
 
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
-    }
-
-    $i = 0;
+return static function () use ($traceProvider): int {
+    $traces = $traceProvider->provideTraces();
+    $traceCount = 0;
 
     foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
-            return;
-        }
-
-        yield $trace;
-    }
-};
-
-return static function (int $maxCount) use ($generateTraces): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-
-    foreach ($traces as $_) {
+        /** @var Trace $trace */
+        // Load any potential lazy-state
+        $trace->getSourceFileInfo();
+        $trace->getTests();
         // Iterate over the generator: do not use iterator_to_array which is less GC friendly
+
+        $traceCount++;
     }
+
+    return $traceCount;
 };

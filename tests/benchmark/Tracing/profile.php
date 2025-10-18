@@ -36,37 +36,67 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Infection\Benchmark\BlackfireInstrumentor;
+use LogicException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Webmozart\Assert\Assert;
+use function sprintf;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-const MAX_TRACE_COUNT_ARG = 'max-trace-count';
+const SAMPLE_SIZE = 'sample-size';
+const DEBUG_OPT = 'debug';
 
 $input = new ArgvInput(
     null,
     new InputDefinition([
-        new InputArgument(
-            MAX_TRACE_COUNT_ARG,
-            InputArgument::OPTIONAL,
-            'Maximum number of traces retrieved. Use -1 for no maximum',
-            50,
+        new InputOption(
+            SAMPLE_SIZE,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Number of samples to aggregate for the profiling.',
+            10,
+        ),
+        new InputOption(
+            DEBUG_OPT,
+            null,
+            InputOption::VALUE_NONE,
+            'To use to execute the code without actually profiling.',
         ),
     ]),
 );
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
-$provideTraces = require __DIR__ . '/provide-traces-closure.php';
-/** @var int $maxTraceCount */
-$maxTraceCount = (int) $input->getArgument(MAX_TRACE_COUNT_ARG);
+$sampleSize = (int) $input->getOption(SAMPLE_SIZE);
+Assert::natural($sampleSize);
 
-BlackfireInstrumentor::profile(
-    static function () use ($provideTraces, $maxTraceCount): void {
-        $provideTraces($maxTraceCount);
-    },
-    $io,
+$debug = $input->getOption(DEBUG_OPT);
+
+$main = static fn () => require __DIR__ . '/provide-traces-closure.php';
+
+if ($debug) {
+    $count = 0;
+
+    for ($i = 0; $i < $sampleSize; $i++) {
+        $profile = $main();
+        $count += $profile();
+    }
+} else {
+    $count = BlackfireInstrumentor::profile($main, $sampleSize, $io);
+}
+
+if ($count === 0) {
+    throw new LogicException('Something went wrong, no traces were actually generated.');
+}
+
+$output->writeln(
+    sprintf(
+        '%d traces generated.',
+        $count,
+    ),
 );

@@ -54,30 +54,60 @@ final class BlackfireInstrumentor
     }
 
     /**
-     * @param Closure(): void $main
+     * @template T
+     *
+     * @param Closure(): (Closure(): T) $main
+     * @param positive-int $sampleSize
      */
-    public static function profile(Closure $main, SymfonyStyle $io): void
+    public static function profile(Closure $main, int $sampleSize, SymfonyStyle $io): mixed
     {
         self::check($io);
 
         $probe = BlackfireProbe::getMainInstance();
+        $result = null;
 
-        $probe->enable();
+        for ($i = 0; $i < $sampleSize; $i++) {
+            $result += self::profileSample($main, $probe, $io);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @template T
+     *
+     * @param Closure(): (Closure(): T) $main
+     * @param positive-int $sampleSize
+     */
+    private static function profileSample(
+        Closure $main,
+        BlackfireProbe $probe,
+        SymfonyStyle $io,
+    ): mixed
+    {
+        $profile = $main();
+
+        $enabled = $probe->enable();
+        Assert::notFalse($enabled);
 
         try {
-            $main();
+            $result = $profile();
 
             $probe->disable();
         } catch (Throwable $throwable) {
             $probe->discard();
 
-            $io->warning(sprintf(
-                'An error occurred. The profile has been discarded please check the error first: "%s"',
-                $throwable->getMessage(),
-            ));
+            $io->warning(
+                sprintf(
+                    'An error occurred. The profile has been discarded please check the error first: "%s"',
+                    $throwable->getMessage(),
+                ),
+            );
 
             throw $throwable;
         }
+
+        return $result;
     }
 
     private static function check(SymfonyStyle $io): void
