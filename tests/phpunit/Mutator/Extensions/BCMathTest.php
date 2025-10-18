@@ -82,19 +82,19 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         yield "It converts $bcFunc to $expression expression" => [
             "<?php \\$bcFunc('3', \$b);",
-            "<?php\n\n(string) ('3' $op \$b);",
+            "<?php (string) ('3' $op \$b);",
         ];
 
         $ranmizelyCasedFunction = self::randomizeCase($bcFunc);
 
         yield "It converts correctly when $bcFunc is wrongly capitalized" => [
             "<?php \\{$ranmizelyCasedFunction}(func(), \$b->test());",
-            "<?php\n\n(string) (func() $op \$b->test());",
+            "<?php (string) (func() $op \$b->test());",
         ];
 
         yield "It converts $bcFunc with scale to $expression expression" => [
             "<?php $bcFunc(CONSTANT, \$b, 2);",
-            "<?php\n\n(string) (CONSTANT $op \$b);",
+            "<?php (string) (CONSTANT $op \$b);",
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply($bcFunc);
@@ -104,17 +104,17 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         yield 'It converts bcpow to power expression' => [
             '<?php \\bcpow(5, $b);',
-            "<?php\n\n(string) 5 ** \$b;",
+            "<?php (string) 5 ** \$b;",
         ];
 
         yield 'It converts correctly when bcpow is wrongly capitalized' => [
             '<?php \\bCpOw(5, $b);',
-            "<?php\n\n(string) 5 ** \$b;",
+            "<?php (string) 5 ** \$b;",
         ];
 
         yield 'It converts bcpow with scale to power expression' => [
             '<?php bcpow($a, $b, 2);',
-            "<?php\n\n(string) \$a ** \$b;",
+            "<?php (string) \$a ** \$b;",
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcpow');
@@ -124,17 +124,17 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         yield 'It converts bcsqrt to sqrt call' => [
             '<?php \\bcsqrt(2);',
-            "<?php\n\n(string) \sqrt(2);",
+            "<?php (string) \sqrt(2);",
         ];
 
         yield 'It converts correctly when bcsqrt is wrongly capitalized' => [
             '<?php \\BCsqRt($a);',
-            "<?php\n\n(string) \sqrt(\$a);",
+            "<?php (string) \sqrt(\$a);",
         ];
 
         yield 'It converts bcsqrt with scale to sqrt call' => [
             '<?php bcsqrt($a, 2);',
-            "<?php\n\n(string) \sqrt(\$a);",
+            "<?php (string) \sqrt(\$a);",
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcsqrt', 1);
@@ -144,17 +144,17 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         yield 'It converts bcpowmod to power modulo expression' => [
             '<?php \\bcpowmod($a, $b, $mod);',
-            "<?php\n\n(string) (\pow(\$a, \$b) % \$mod);",
+            "<?php (string) (\pow(\$a, \$b) % \$mod);",
         ];
 
         yield 'It converts correctly when bcpowmod is wrongly capitalized' => [
             '<?php \\BcPowMod($a, $b, $mod);',
-            "<?php\n\n(string) (\pow(\$a, \$b) % \$mod);",
+            "<?php (string) (\pow(\$a, \$b) % \$mod);",
         ];
 
         yield 'It converts bcpowmod with scale to power modulo expression' => [
             '<?php bcpowmod($a, $b, 2);',
-            "<?php\n\n(string) (\pow(\$a, \$b) % 2);",
+            "<?php (string) (\pow(\$a, \$b) % 2);",
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcpowmod', 3);
@@ -164,17 +164,17 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         yield 'It converts bccomp to spaceship expression' => [
             '<?php \\bccomp(\'3\', $b);',
-            "<?php\n\n'3' <=> \$b;",
+            "<?php '3' <=> \$b;",
         ];
 
         yield 'It converts correctly when bccomp is wrongly capitalized' => [
             '<?php \\bCCoMp(func(), $b->test());',
-            "<?php\n\nfunc() <=> \$b->test();",
+            "<?php func() <=> \$b->test();",
         ];
 
         yield 'It converts bccomp with scale to spaceship expression' => [
             '<?php bccomp(CONSTANT, $b, 2);',
-            "<?php\n\nCONSTANT <=> \$b;",
+            "<?php CONSTANT <=> \$b;",
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bccomp', 2);

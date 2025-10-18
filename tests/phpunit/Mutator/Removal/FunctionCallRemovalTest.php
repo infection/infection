@@ -65,6 +65,7 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
+
                 $a = 3;
                 PHP
             ,
@@ -80,6 +81,7 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
             ,
             <<<'PHP'
                 <?php
+
 
                 $a = 3;
                 PHP
@@ -102,6 +104,7 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
                 $start = true;
 
                 $end = true;
+
                 PHP
             ,
         ];
@@ -122,6 +125,7 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
                 $start = true;
 
                 $end = true;
+
                 PHP
             ,
         ];

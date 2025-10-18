@@ -1056,6 +1056,11 @@ final class Container extends DIContainer
         return $this->get(ConfigurationFactory::class);
     }
 
+    private function getPrinter(): PrettyPrinterAbstract
+    {
+        return $this->get(PrettyPrinterAbstract::class);
+    }
+
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
     {
         return $this->get(TestFrameworkConfigLocator::class);
