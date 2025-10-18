@@ -236,13 +236,14 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not remove attributes' => [
-            <<<'PHP'
+            <<<'PHP_WRAP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
 
                 class Test
                 {
+                    // incorrect formatting due to https://github.com/nikic/PHP-Parser/issues/1117
                     #[SomeAttribute1]
                     #[SomeAttribute2]
                     protected function &foo(int $param, $test = 1): bool
@@ -251,23 +252,23 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP,
-            <<<'PHP'
+                PHP_WRAP,
+            <<<'PHP_WRAP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
 
                 class Test
                 {
+                    // incorrect formatting due to https://github.com/nikic/PHP-Parser/issues/1117
                     #[SomeAttribute1]
-                    #[SomeAttribute2]
-                    private function &foo(int $param, $test = 1): bool
+                    #[SomeAttribute2]private function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;
                     }
                 }
-                PHP
+                PHP_WRAP
             ,
         ];
     }

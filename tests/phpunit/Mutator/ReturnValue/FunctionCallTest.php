@@ -41,7 +41,6 @@ use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use function count;
 
 #[Group('integration')]
 #[CoversClass(FunctionCall::class)]
