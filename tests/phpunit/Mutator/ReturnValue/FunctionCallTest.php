@@ -41,6 +41,7 @@ use Infection\Tests\Mutator\MutatorFixturesProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function count;
 
 #[Group('integration')]
 #[CoversClass(FunctionCall::class)]
@@ -80,6 +81,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
+
                 PHP,
         ];
 
@@ -150,7 +152,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
         $code = MutatorFixturesProvider::getFixtureFileContent(self::class, 'fc-contains-another-func-and-null-allowed.php');
         $mutations = $this->mutate($code);
 
-        $expectedMutatedCode = <<<"PHP"
+        $expectedMutatedCode = <<<'PHP'
             <?php
 
             namespace FunctionCall_ContainsAnotherFunctionAndNullAllowed;
@@ -159,8 +161,8 @@ final class FunctionCallTest extends BaseMutatorTestCase
             {
                 function test()
                 {
-                    \$a = function (\$element): ?int {
-                        return \$element;
+                    $a = function ($element) : ?int {
+                        return $element;
                     };
                     count([]);
                     return null;

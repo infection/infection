@@ -66,7 +66,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    private function foo(int $param, $test = 1): bool
+                    private function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
@@ -101,7 +101,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 abstract class Test
                 {
-                    private function foo(int $param, $test = 1): bool
+                    private function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
@@ -120,7 +120,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    private static function foo(int $param, $test = 1): bool
+                    private static function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
@@ -143,15 +143,12 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class SameParent
                 {
-                    private function foo()
-                    {
-                    }
+                    private function foo() {}
                 }
+
                 class Child extends SameParent
                 {
-                    protected function foo()
-                    {
-                    }
+                    protected function foo() {}
                 }
                 PHP
             ,
@@ -166,18 +163,17 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 class SameGrandParent
                 {
-                    private function foo()
-                    {
-                    }
+                    private function foo() {}
                 }
+
                 class SameParent extends SameGrandParent
                 {
+
                 }
+
                 class Child extends SameParent
                 {
-                    protected function foo()
-                    {
-                    }
+                    protected function foo() {}
                 }
                 PHP
             ,
@@ -192,7 +188,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
                 abstract class ProtectedNonSameAbstract
                 {
-                    abstract protected function foo();
+                    protected abstract function foo();
                 }
                 class Child extends ProtectedNonSameAbstract
                 {
@@ -203,6 +199,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                     {
                     }
                 }
+
                 PHP,
         ];
 
