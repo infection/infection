@@ -363,10 +363,12 @@ class ConfigurationFactory
         $source = $schema->getSource();
         $schemaDirname = dirname($schema->getFile());
 
-        $mapToAbsolutePath = static fn (string $path) => Path::join(
-            $schemaDirname,
-            $path,
-        );
+        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+            ? $path
+            : Path::join(
+                $schemaDirname,
+                $path,
+            );
 
         return $this->sourceFileCollector->collectFiles(
             // We need to make the source file paths absolute, otherwise the
