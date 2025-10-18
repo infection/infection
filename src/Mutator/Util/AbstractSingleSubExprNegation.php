@@ -124,6 +124,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
 
                 // Clone the node to remove the origNode from the wrapped expression
                 // This ensures the format-preserving printer adds parentheses correctly
+                // see bug https://github.com/nikic/PHP-Parser/issues/1119
                 $wrappedNode = clone $node;
                 $wrappedAttrs = $wrappedNode->getAttributes();
                 unset($wrappedAttrs['origNode']);

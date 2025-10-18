@@ -77,6 +77,7 @@ final class LogicalAndNegation implements Mutator
     public function mutate(Node $node): iterable
     {
         // Clone the node to remove the origNode from the wrapped expression
+        // see bug https://github.com/nikic/PHP-Parser/issues/1119
         $wrappedNode = clone $node;
         $wrappedAttrs = $wrappedNode->getAttributes();
         unset($wrappedAttrs['origNode']);
