@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -89,14 +88,14 @@ final class SpreadOneItem implements Mutator
             new Node\Expr\ArrayDimFetch(
                 new Node\Expr\Array_(
                     [$node],
-                    array_diff_key($node->getAttributes(), array_flip(['origNode'])) + ['kind' => Node\Expr\Array_::KIND_SHORT],
+                    NodeAttributes::getAllExceptOriginalNode($node) + ['kind' => Node\Expr\Array_::KIND_SHORT],
                 ),
                 new Node\Scalar\LNumber(0),
-                array_diff_key($node->value->getAttributes(), array_flip(['origNode'])),
+                NodeAttributes::getAllExceptOriginalNode($node->value),
             ),
             null,
             false,
-            array_diff_key($node->getAttributes(), array_flip(['origNode'])),
+            NodeAttributes::getAllExceptOriginalNode($node),
             false,
         );
     }

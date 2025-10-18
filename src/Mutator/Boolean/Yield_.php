@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -86,7 +85,7 @@ final class Yield_ implements Mutator
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        yield new Node\Expr\Yield_(new Node\Expr\BinaryOp\Greater($key, $value, array_diff_key($node->getAttributes(), array_flip(['origNode']))));
+        yield new Node\Expr\Yield_(new Node\Expr\BinaryOp\Greater($key, $value, NodeAttributes::getAllExceptOriginalNode($node)));
     }
 
     public function canMutate(Node $node): bool

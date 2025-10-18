@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Unwrap;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -95,7 +94,7 @@ final class UnwrapFinally implements Mutator
         }
 
         yield [
-            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, array_diff_key($node->getAttributes(), array_flip(['origNode']))),
+            new Node\Stmt\TryCatch($node->stmts, $node->catches, null, NodeAttributes::getAllExceptOriginalNode($node)),
             ...($node->finally->stmts ?? []),
         ];
     }

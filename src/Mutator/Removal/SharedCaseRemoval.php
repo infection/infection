@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -104,7 +103,7 @@ final class SharedCaseRemoval implements Mutator
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    array_diff_key($node->getAttributes(), array_flip(['origNode'])),
+                    NodeAttributes::getAllExceptOriginalNode($node),
                 );
 
                 continue;
@@ -118,13 +117,13 @@ final class SharedCaseRemoval implements Mutator
                 $cases[$i - 1] = new Node\Stmt\Case_(
                     $lastCase->cond,
                     $case->stmts,
-                    array_diff_key($lastCase->getAttributes(), array_flip(['origNode'])),
+                    NodeAttributes::getAllExceptOriginalNode($lastCase),
                 );
 
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    array_diff_key($node->getAttributes(), array_flip(['origNode'])),
+                    NodeAttributes::getAllExceptOriginalNode($node),
                 );
             }
         }

@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Arithmetic;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -78,12 +77,12 @@ final class Increment implements Mutator
     public function mutate(Node $node): iterable
     {
         if ($node instanceof Node\Expr\PreInc) {
-            yield new Node\Expr\PreDec($node->var, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
+            yield new Node\Expr\PreDec($node->var, NodeAttributes::getAllExceptOriginalNode($node));
 
             return;
         }
 
-        yield new Node\Expr\PostDec($node->var, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
+        yield new Node\Expr\PostDec($node->var, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

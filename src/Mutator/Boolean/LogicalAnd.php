@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -72,7 +71,7 @@ final class LogicalAnd implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\BooleanOr($node->left, $node->right, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
+        yield new Node\Expr\BinaryOp\BooleanOr($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

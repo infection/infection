@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use function array_diff_key;
-use function array_flip;
 use function in_array;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -111,7 +110,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return new $supportedNodeClass(
                 $this->negateEverySubExpression($node->left),
                 $this->negateEverySubExpression($node->right),
-                array_diff_key($node->getAttributes(), array_flip(['origNode'])),
+                NodeAttributes::getAllExceptOriginalNode($node),
             );
         }
 

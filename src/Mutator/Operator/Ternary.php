@@ -35,12 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Operator;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -86,6 +85,6 @@ final class Ternary implements Mutator
             $if = $node->cond;
         }
 
-        yield new Node\Expr\Ternary($node->cond, $node->else, $if, array_diff_key($node->getAttributes(), array_flip(['origNode'])));
+        yield new Node\Expr\Ternary($node->cond, $node->else, $if, NodeAttributes::getAllExceptOriginalNode($node));
     }
 }

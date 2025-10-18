@@ -33,49 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Arithmetic;
+namespace Infection\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
-use Infection\Mutator\NodeAttributes;
+use function array_diff_key;
+use function array_flip;
 use PhpParser\Node;
 
 /**
  * @internal
- *
- * @implements Mutator<Node\Expr\BinaryOp\BooleanAnd>
  */
-final class BitwiseAnd implements Mutator
+final class NodeAttributes
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): Definition
-    {
-        return new Definition(
-            'Replaces a bitwise AND operator (`&`) with a bitwise OR operator (`|`).',
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-                - $a = $b & $c;
-                + $a = $b | $c;
-                DIFF,
-        );
-    }
-
     /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<Node\Expr\BinaryOp\BitwiseOr>
+     * @return array<string, mixed>
      */
-    public function mutate(Node $node): iterable
+    public static function getAllExceptOriginalNode(Node $node): array
     {
-        yield new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
-    }
-
-    public function canMutate(Node $node): bool
-    {
-        return $node instanceof Node\Expr\BinaryOp\BitwiseAnd;
+        return array_diff_key($node->getAttributes(), array_flip(['origNode']));
     }
 }
