@@ -103,14 +103,18 @@ $generateTraces = static function (?int $maxCount) use ($container): iterable {
     }
 };
 
-return static function (int $maxCount) use ($generateTraces): void {
+return static function (int $maxCount) use ($generateTraces): int {
     if ($maxCount < 0) {
         $maxCount = null;
     }
 
     $traces = $generateTraces($maxCount);
+    $count = 0;
 
     foreach ($traces as $_) {
+        ++$count;
         // Iterate over the generator: do not use iterator_to_array which is less GC friendly
     }
+
+    return $count;
 };

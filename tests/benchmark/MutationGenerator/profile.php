@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Benchmark\MutationGenerator;
 
 use Infection\Benchmark\BlackfireInstrumentor;
+use function is_int;
+use LogicException;
+use function sprintf;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -64,9 +67,20 @@ $generateMutations = require __DIR__ . '/generate-mutations-closure.php';
 /** @var int $maxMutationsCount */
 $maxMutationsCount = (int) $input->getArgument(MAX_MUTATIONS_COUNT_ARG);
 
-BlackfireInstrumentor::profile(
+$count = BlackfireInstrumentor::profile(
     static function () use ($generateMutations, $maxMutationsCount): void {
         $generateMutations($maxMutationsCount);
     },
     $io,
+);
+
+if (!is_int($count) || $count === 0) {
+    throw new LogicException('Something went wrong, no mutations were actually generated.');
+}
+
+$output->writeln(
+    sprintf(
+        '%d mutations generated.',
+        $count,
+    ),
 );
