@@ -104,17 +104,17 @@ final class BCMathTest extends BaseMutatorTestCase
     {
         yield 'It converts bcpow to power expression' => [
             '<?php \\bcpow(5, $b);',
-            "<?php (string) 5 ** \$b;",
+            '<?php (string) 5 ** $b;',
         ];
 
         yield 'It converts correctly when bcpow is wrongly capitalized' => [
             '<?php \\bCpOw(5, $b);',
-            "<?php (string) 5 ** \$b;",
+            '<?php (string) 5 ** $b;',
         ];
 
         yield 'It converts bcpow with scale to power expression' => [
             '<?php bcpow($a, $b, 2);',
-            "<?php (string) \$a ** \$b;",
+            '<?php (string) $a ** $b;',
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bcpow');
@@ -169,12 +169,12 @@ final class BCMathTest extends BaseMutatorTestCase
 
         yield 'It converts correctly when bccomp is wrongly capitalized' => [
             '<?php \\bCCoMp(func(), $b->test());',
-            "<?php func() <=> \$b->test();",
+            '<?php func() <=> $b->test();',
         ];
 
         yield 'It converts bccomp with scale to spaceship expression' => [
             '<?php bccomp(CONSTANT, $b, 2);',
-            "<?php CONSTANT <=> \$b;",
+            '<?php CONSTANT <=> $b;',
         ];
 
         yield from self::provideCasesWhereMutatorShouldNotApply('bccomp', 2);

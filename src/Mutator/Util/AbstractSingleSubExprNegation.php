@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Util;
 
-use function array_diff_key;
-use function array_flip;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;

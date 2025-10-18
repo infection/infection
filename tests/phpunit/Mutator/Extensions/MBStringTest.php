@@ -128,17 +128,17 @@ final class MBStringTest extends BaseMutatorTestCase
     {
         yield 'It converts mb_chr to chr' => [
             '<?php mb_chr(74);',
-            "<?php chr(74);",
+            '<?php chr(74);',
         ];
 
         yield 'It converts correctly when mb_chr is wrongly capitalized' => [
             '<?php mB_cHr(74);',
-            "<?php chr(74);",
+            '<?php chr(74);',
         ];
 
         yield 'It converts mb_chr with encoding to chr' => [
             "<?php mb_chr(74, 'utf-8');",
-            "<?php chr(74);",
+            '<?php chr(74);',
         ];
 
         yield 'It does not mutate mb_chr called via variable' => [

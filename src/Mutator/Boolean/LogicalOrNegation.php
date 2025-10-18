@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_diff_key;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use function array_diff_key;
 
 /**
  * @internal
@@ -85,7 +85,7 @@ final class LogicalOrNegation implements Mutator
 
         yield new Node\Expr\BooleanNot(
             $wrappedNode,
-//            array_diff_key($node->getAttributes(), array_flip(['origNode']))
+            //            array_diff_key($node->getAttributes(), array_flip(['origNode']))
         );
     }
 
