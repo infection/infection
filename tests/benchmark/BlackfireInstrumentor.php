@@ -54,9 +54,11 @@ final class BlackfireInstrumentor
     }
 
     /**
-     * @param Closure(): void $main
+     * @template T
+     *
+     * @param Closure(): T $main
      */
-    public static function profile(Closure $main, SymfonyStyle $io): void
+    public static function profile(Closure $main, SymfonyStyle $io): mixed
     {
         self::check($io);
 
@@ -65,7 +67,7 @@ final class BlackfireInstrumentor
         $probe->enable();
 
         try {
-            $main();
+            $result = $main();
 
             $probe->disable();
         } catch (Throwable $throwable) {
@@ -78,6 +80,8 @@ final class BlackfireInstrumentor
 
             throw $throwable;
         }
+
+        return $result;
     }
 
     private static function check(SymfonyStyle $io): void
