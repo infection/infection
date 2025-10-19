@@ -125,6 +125,9 @@ parameters:
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
         -
+            identifier: match.unhandled
+            path: ../src/Console/OutputFormatter/DotFormatter.php
+        -
             message: '#Anonymous function should return iterable.* but return statement is missing\.#'
             path: ../tests/benchmark/Tracing/provide-traces-closure.php
     level: 8
