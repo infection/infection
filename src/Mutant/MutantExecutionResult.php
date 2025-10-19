@@ -50,11 +50,10 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    private readonly string $detectionStatus;
-
     private readonly string $mutatorClass;
 
     /**
+     * @param DetectionStatus::* $detectionStatus
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $originalCode
      * @param Deferred<string> $mutatedCode
@@ -63,7 +62,7 @@ class MutantExecutionResult
     public function __construct(
         private readonly string $processCommandLine,
         private readonly string $processOutput,
-        string $detectionStatus,
+        private readonly string $detectionStatus,
         private readonly Deferred $mutantDiff,
         private readonly string $mutantHash,
         string $mutatorClass,
@@ -81,7 +80,6 @@ class MutantExecutionResult
         Assert::oneOf($detectionStatus, DetectionStatus::ALL);
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
-        $this->detectionStatus = $detectionStatus;
         $this->mutatorClass = $mutatorClass;
     }
 
@@ -110,6 +108,9 @@ class MutantExecutionResult
         return $this->processOutput;
     }
 
+    /**
+     * @return DetectionStatus::*
+     */
     public function getDetectionStatus(): string
     {
         return $this->detectionStatus;

@@ -35,159 +35,157 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console\OutputFormatter;
 
+use function array_flip;
+use function array_keys;
+use function implode;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use const PHP_EOL;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function str_replace;
+use function sprintf;
 use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 #[CoversClass(DotFormatter::class)]
 final class DotFormatterTest extends TestCase
 {
     private const ANY_PRIME_NUMBER = 127;
 
-    public function test_start_logs_initial_starting_text(): void
+    public function test_begins_by_displaying_a_legend(): void
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())->method('writeln')->with([
-            '',
-            '<killed>.</killed>: killed by tests, '
-            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
-            . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>U</uncovered>: uncovered',
-            '<with-error>E</with-error>: fatal error, '
-            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
-            . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped, '
-            . '<ignored>I</ignored>: ignored',
-            '',
-        ]);
-
+        $output = new BufferedOutput();
         $formatter = new DotFormatter($output);
+
+        $expected = implode(
+            "\n",
+            [
+                '',
+                implode(
+                    ', ',
+                    [
+                        '<killed>.</killed>: killed by tests',
+                        '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA',
+                        '<escaped>M</escaped>: escaped',
+                        '<uncovered>U</uncovered>: uncovered',
+                    ],
+                ),
+                implode(
+                    ', ',
+                    [
+                        '<with-error>E</with-error>: fatal error',
+                        '<with-syntax-error>X</with-syntax-error>: syntax error',
+                        '<timeout>T</timeout>: timed out',
+                        '<skipped>S</skipped>: skipped',
+                        '<ignored>I</ignored>: ignored',
+                    ],
+                ),
+                '',
+                '',
+            ],
+        );
+
         $formatter->start(10);
+
+        $actual = $output->fetch();
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_killed_logs_correctly_in_console(): void
-    {
-        $outputKilled = $this->getStartOutputFormatter();
-        $outputKilled
-            ->expects($this->once())
-            ->method('write')
-            ->with('<killed>.</killed>')
-        ;
+    /**
+     * @param DetectionStatus::* $detectionStatus
+     */
+    #[DataProvider('detectionStatusProvider')]
+    public function test_logs_mutations_detection_status(
+        string $detectionStatus,
+        string $expected,
+    ): void {
+        $output = new BufferedOutput();
+        $formatter = new DotFormatter($output);
 
-        $dot = new DotFormatter($outputKilled);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0],
+        // Clear the initial output: it is already tested and it would bloat the
+        // test to include it.
+        $formatter->start(10);
+        $output->fetch();
+
+        $formatter->advance(
+            $this->createMutantExecutionResultOfType($detectionStatus),
             10,
         );
+
+        $actual = $output->fetch();
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_escaped_logs_correctly_in_console(): void
+    public static function detectionStatusProvider(): iterable
     {
-        $outputEscaped = $this->getStartOutputFormatter();
-        $outputEscaped
-            ->expects($this->once())
-            ->method('write')
-            ->with('<escaped>M</escaped>')
-        ;
+        $detectionStatuses = array_flip(DetectionStatus::ALL);
 
-        $dot = new DotFormatter($outputEscaped);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::ESCAPED)[0],
-            10,
-        );
-    }
+        $getStatus = static function (string $detectionStatus) use (&$detectionStatuses): string {
+            unset($detectionStatuses[$detectionStatus]);
 
-    public function test_errored_logs_correctly_in_console(): void
-    {
-        $outputErrored = $this->getStartOutputFormatter();
-        $outputErrored
-            ->expects($this->once())
-            ->method('write')
-            ->with('<with-error>E</with-error>')
-        ;
+            return $detectionStatus;
+        };
 
-        $dot = new DotFormatter($outputErrored);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::ERROR)[0],
-            10,
-        );
-    }
+        yield 'killed by tests' => [
+            $getStatus(DetectionStatus::KILLED_BY_TESTS),
+            '<killed>.</killed>',
+        ];
 
-    public function test_timed_out_logs_correctly_in_console(): void
-    {
-        $outputTimedOut = $this->getStartOutputFormatter();
-        $outputTimedOut
-            ->expects($this->once())
-            ->method('write')
-            ->with('<timeout>T</timeout>')
-        ;
+        yield 'killed by SA' => [
+            $getStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            '<killed-by-static-analysis>A</killed-by-static-analysis>',
+        ];
 
-        $dot = new DotFormatter($outputTimedOut);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::TIMED_OUT)[0],
-            10,
-        );
-    }
+        yield 'escaped' => [
+            $getStatus(DetectionStatus::ESCAPED),
+            '<escaped>M</escaped>',
+        ];
 
-    public function test_not_covered_logs_correctly_in_console(): void
-    {
-        $outputNotCovered = $this->getStartOutputFormatter();
-        $outputNotCovered
-            ->expects($this->once())
-            ->method('write')
-            ->with('<uncovered>U</uncovered>')
-        ;
+        yield 'error' => [
+            $getStatus(DetectionStatus::ERROR),
+            '<with-error>E</with-error>',
+        ];
 
-        $dot = new DotFormatter($outputNotCovered);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::NOT_COVERED)[0],
-            10,
-        );
-    }
+        yield 'syntax error' => [
+            $getStatus(DetectionStatus::SYNTAX_ERROR),
+            '<with-syntax-error>X</with-syntax-error>',
+        ];
 
-    public function test_skipped_logs_correctly_in_console(): void
-    {
-        $outputSkipped = $this->getStartOutputFormatter();
-        $outputSkipped
-            ->expects($this->once())
-            ->method('write')
-            ->with('<skipped>S</skipped>')
-        ;
+        yield 'timeout' => [
+            $getStatus(DetectionStatus::TIMED_OUT),
+            '<timeout>T</timeout>',
+        ];
 
-        $dot = new DotFormatter($outputSkipped);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::SKIPPED)[0],
-            10,
-        );
-    }
+        yield 'uncovered' => [
+            $getStatus(DetectionStatus::NOT_COVERED),
+            '<uncovered>U</uncovered>',
+        ];
 
-    public function test_ignored_logs_correctly_in_console(): void
-    {
-        $outputIgnored = $this->getStartOutputFormatter();
-        $outputIgnored
-            ->expects($this->once())
-            ->method('write')
-            ->with('<ignored>I</ignored>')
-        ;
+        yield 'skipped' => [
+            $getStatus(DetectionStatus::SKIPPED),
+            '<skipped>S</skipped>',
+        ];
 
-        $dot = new DotFormatter($outputIgnored);
-        $dot->start(10);
-        $dot->advance(
-            $this->createMutantExecutionResultsOfType(DetectionStatus::IGNORED)[0],
-            10,
+        yield 'ignored' => [
+            $getStatus(DetectionStatus::IGNORED),
+            '<ignored>I</ignored>',
+        ];
+
+        Assert::count(
+            $detectionStatuses,
+            0,
+            sprintf(
+                'Expected all detection statuses to be tested. Missing a case for: "%s"',
+                implode(
+                    '", "',
+                    array_keys($detectionStatuses),
+                ),
+            ),
         );
     }
 
@@ -195,15 +193,18 @@ final class DotFormatterTest extends TestCase
     {
         $totalMutations = self::ANY_PRIME_NUMBER;
 
-        $buffer = new BufferedOutput();
-        $dot = new DotFormatter($buffer);
-        $dot->start($totalMutations);
+        $output = new BufferedOutput();
+        $formatter = new DotFormatter($output);
+        $formatter->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0], $totalMutations);
+            $formatter->advance(
+                $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
+                $totalMutations,
+            );
         }
 
-        $this->assertSame(str_replace("\n", PHP_EOL,
+        $expected = LineReturnNormalizer::normalize(
             <<<'TXT'
 
                 .: killed by tests, A: killed by SA, M: escaped, U: uncovered
@@ -213,27 +214,29 @@ final class DotFormatterTest extends TestCase
                 ..................................................   (100 / 127)
                 ...........................                          (127 / 127)
                 TXT,
-        ),
-            strip_tags($buffer->fetch()),
         );
+
+        $actual = strip_tags($output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_prints_current_number_of_pending_mutations(): void
     {
         $totalMutations = self::ANY_PRIME_NUMBER;
 
-        $buffer = new BufferedOutput();
-        $dot = new DotFormatter($buffer);
-        $dot->start(0);
+        $output = new BufferedOutput();
+        $formatter = new DotFormatter($output);
+        $formatter->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $dot->advance(
-                $this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0],
+            $formatter->advance(
+                $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 0,
             );
         }
 
-        $this->assertSame(str_replace("\n", PHP_EOL,
+        $expected = LineReturnNormalizer::normalize(
             <<<'TXT'
 
                 .: killed by tests, A: killed by SA, M: escaped, U: uncovered
@@ -243,47 +246,25 @@ final class DotFormatterTest extends TestCase
                 ..................................................   (  100)
                 ...........................
                 TXT,
-        ),
-            strip_tags($buffer->fetch()),
         );
+
+        $actual = strip_tags($output->fetch());
+
+        $this->assertSame($expected, $actual);
     }
 
-    private function createMutantExecutionResultsOfType(
-        string $detectionStatus,
-        int $count = 1,
-    ): array {
-        $executionResults = [];
-
-        for ($i = 0; $i < $count; ++$i) {
-            $executionResult = $this->createMock(MutantExecutionResult::class);
-            $executionResult
-                ->expects($this->once())
-                ->method('getDetectionStatus')
-                ->willReturn($detectionStatus)
-            ;
-            $executionResults[] = $executionResult;
-        }
-
-        return $executionResults;
-    }
-
-    private function getStartOutputFormatter()
+    /**
+     * @param DetectionStatus::* $detectionStatus
+     */
+    private function createMutantExecutionResultOfType(string $detectionStatus): MutantExecutionResult
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())->method('writeln')->with([
-            '',
-            '<killed>.</killed>: killed by tests, '
-            . '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA, '
-            . '<escaped>M</escaped>: escaped, '
-            . '<uncovered>U</uncovered>: uncovered',
-            '<with-error>E</with-error>: fatal error, '
-            . '<with-syntax-error>X</with-syntax-error>: syntax error, '
-            . '<timeout>T</timeout>: timed out, '
-            . '<skipped>S</skipped>: skipped, '
-            . '<ignored>I</ignored>: ignored',
-            '',
-        ]);
+        $executionResult = $this->createMock(MutantExecutionResult::class);
+        $executionResult
+            ->expects($this->once())
+            ->method('getDetectionStatus')
+            ->willReturn($detectionStatus)
+        ;
 
-        return $output;
+        return $executionResult;
     }
 }
