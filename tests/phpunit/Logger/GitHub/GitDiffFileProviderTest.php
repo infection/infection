@@ -71,16 +71,15 @@ final class GitDiffFileProviderTest extends TestCase
 
         $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
-            ->willReturnCallback(function (array $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
-                switch ($command) {
-                    case $expectedMergeBaseCommandLine:
-                        return '0ABCMERGE_BASE_342';
-                    case $expectedDiffCommandLine:
-                        return 'app/A.php' . PHP_EOL . 'my lib/B.php';
-                    default:
-                        $this->fail('Unexpected shell command: ' . implode(' ', $command));
-                }
-            });
+            ->willReturnCallback(
+                fn (array $command): string => match ($command) {
+                    $expectedMergeBaseCommandLine => '0ABCMERGE_BASE_342',
+                    $expectedDiffCommandLine => 'app/A.php' . PHP_EOL . 'my lib/B.php',
+                    default => $this->fail(
+                        'Unexpected shell command: ' . implode(' ', $command),
+                    ),
+                },
+            );
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
         $filter = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
@@ -130,16 +129,15 @@ final class GitDiffFileProviderTest extends TestCase
 
         $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
-            ->willReturnCallback(function (array $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine, $gitUnifiedOutput): string {
-                switch ($command) {
-                    case $expectedMergeBaseCommandLine:
-                        return '0ABCMERGE_BASE_342';
-                    case $expectedDiffCommandLine:
-                        return $gitUnifiedOutput;
-                    default:
-                        $this->fail('Unexpected shell command: ' . implode(' ', $command));
-                }
-            });
+            ->willReturnCallback(
+                fn (array $command): string => match ($command) {
+                    $expectedMergeBaseCommandLine => '0ABCMERGE_BASE_342',
+                    $expectedDiffCommandLine => $gitUnifiedOutput,
+                    default => $this->fail(
+                        'Unexpected shell command: ' . implode(' ', $command),
+                    ),
+                },
+            );
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
         $filter = $diffProvider->provideWithLines('master');
