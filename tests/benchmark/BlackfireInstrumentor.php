@@ -57,6 +57,8 @@ final class BlackfireInstrumentor
      * @template T
      *
      * @param Closure(): T $main
+     *
+     * @return T
      */
     public static function profile(Closure $main, SymfonyStyle $io): mixed
     {

@@ -124,10 +124,14 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
+        -
+            message: '#Anonymous function should return iterable.* but return statement is missing\.#'
+            path: ../tests/benchmark/Tracing/provide-traces-closure.php
     level: 8
     paths:
         - ../src
         - ../tests/phpunit
+        - ../tests/benchmark
         - ./PHPStan/
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
@@ -137,6 +141,9 @@ parameters:
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
+        - ../tests/benchmark/MutationGenerator/sources
+        - ../tests/benchmark/Tracing/coverage
+        - ../tests/benchmark/Tracing/sources
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false
