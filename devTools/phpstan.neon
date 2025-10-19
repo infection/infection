@@ -124,6 +124,9 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
+        -
+            identifier: match.unhandled
+            path: ../src/Console/OutputFormatter/DotFormatter.php
     level: 8
     paths:
         - ../src
