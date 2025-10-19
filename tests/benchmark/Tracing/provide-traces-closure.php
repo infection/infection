@@ -64,13 +64,16 @@ $generateTraces = static function (?int $maxCount) use ($container): iterable {
         ++$i;
 
         if ($i === $maxCount) {
-            return;
+            break;
         }
 
         yield $trace;
     }
 };
 
+/*
+ * @return positive-int|0
+ */
 return static function (int $maxCount) use ($generateTraces): int {
     if ($maxCount < 0) {
         $maxCount = null;
