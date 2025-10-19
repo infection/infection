@@ -110,7 +110,7 @@ final class DiffChangedLinesParserTest extends TestCase
     private function convertToArray(array $map): array
     {
         return array_map(
-            static fn (string $changedLinesRanges): array => array_map(
+            static fn (array $changedLinesRanges): array => array_map(
                 static fn (ChangedLinesRange $changedLinesRange): array => [
                     $changedLinesRange->getStartLine(),
                     $changedLinesRange->getEndLine(),
