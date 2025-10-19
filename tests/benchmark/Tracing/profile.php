@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Infection\Benchmark\BlackfireInstrumentor;
+use function is_int;
+use LogicException;
+use function sprintf;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -64,9 +67,18 @@ $provideTraces = require __DIR__ . '/provide-traces-closure.php';
 /** @var int $maxTraceCount */
 $maxTraceCount = (int) $input->getArgument(MAX_TRACE_COUNT_ARG);
 
-BlackfireInstrumentor::profile(
-    static function () use ($provideTraces, $maxTraceCount): void {
-        $provideTraces($maxTraceCount);
-    },
+$count = BlackfireInstrumentor::profile(
+    static fn () => $provideTraces($maxTraceCount),
     $io,
+);
+
+if (!is_int($count) || $count === 0) {
+    throw new LogicException('Something went wrong, no traces were actually generated.');
+}
+
+$output->writeln(
+    sprintf(
+        '%d traces generated.',
+        $count,
+    ),
 );
