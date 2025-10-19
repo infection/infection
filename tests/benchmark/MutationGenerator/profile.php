@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Benchmark\MutationGenerator;
 
 use Infection\Benchmark\InstrumentorFactory;
-use function is_int;
 use LogicException;
 use function sprintf;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -79,13 +78,11 @@ $debug = $input->getOption(DEBUG_OPT);
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static function () use ($generateMutations, $maxMutationsCount): void {
-        $generateMutations($maxMutationsCount);
-    },
+    static fn (): int => $generateMutations($maxMutationsCount),
     $io,
 );
 
-if (!is_int($count) || $count === 0) {
+if ($count === 0) {
     throw new LogicException('Something went wrong, no mutations were actually generated.');
 }
 

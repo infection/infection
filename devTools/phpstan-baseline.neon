@@ -391,12 +391,6 @@ parameters:
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Command\\MakeCustomMutatorCommandTest\:\:createContainer\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Command/MakeCustomMutatorCommandTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\Config\\ValueProvider\\BaseProviderTestCase\:\:\$stty has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
