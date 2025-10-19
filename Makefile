@@ -40,13 +40,12 @@ DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
-BENCHMARK_SOURCES=tests/benchmark/MutationGenerator/sources \
-				  tests/benchmark/Tracing/coverage \
-				  tests/benchmark/Tracing/sources
+BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
 TRACING_BENCHMARK_SOURCE_COVERAGE_DIR=tests/benchmark/Tracing/coverage
 TRACING_BENCHMARK_SOURCE_SUBMODULE=tests/benchmark/Tracing/cpu-core-counter
 TRACING_BENCHMARK_SOURCE_VENDOR=$(TRACING_BENCHMARK_SOURCE_SUBMODULE)/vendor
-TRACING_BENCHMARK_SOURCES=$(TRACING_BENCHMARK_SOURCE_COVERAGE_DIR) \
+TRACING_BENCHMARK_SOURCES=$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+							$(TRACING_BENCHMARK_SOURCE_COVERAGE_DIR) \
 							$(TRACING_BENCHMARK_SOURCE_VENDOR)
 
 E2E_PHPUNIT_GROUP=integration,e2e
@@ -119,25 +118,25 @@ validate:
 
 .PHONY: profile
 profile: 	 	## Runs Blackfire
-profile: vendor $(BENCHMARK_SOURCES)
+profile:
+	$(MAKE) profile_mutation_generator
+	$(MAKE) profile_tracing
+
+.PHONY: profile_mutation_generator
+profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative
 	blackfire run \
 		--samples=5 \
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
-	blackfire run \
-		--samples=5 \
-		--title="Tracing" \
-		--metadata="commit=$(COMMIT_HASH)" \
-		php tests/benchmark/Tracing/profile.php
 	composer dump
 
 .PHONY: profile_tracing
-profile_tracing: 	 	## Runs Blackfire
-profile_tracing: vendor $(TRACING_BENCHMARK_SOURCES)
+profile_tracing: vendor $(BENCHMARK_TRACING_SOURCES) $(BENCHMARK_TRACING_COVERAGE)
 	composer dump --classmap-authoritative
 	blackfire run \
+		--samples=5 \
 		--title="Tracing" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/Tracing/profile.php
@@ -269,7 +268,7 @@ $(DOCKER_FILE_IMAGE): devTools/Dockerfile
 	docker image inspect infection-php82 >> $(DOCKER_FILE_IMAGE)
 	touch -c $@
 
-tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
+$(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
@@ -289,6 +288,7 @@ $(TRACING_BENCHMARK_SOURCE_COVERAGE_DIR): $(TRACING_BENCHMARK_VENDOR) $(PHPUNIT)
 	touch -c $@
 
 clean:
+	#TODO
 	rm -fr tests/benchmark/MutationGenerator/sources
 	rm -fr tests/benchmark/Tracing/coverage
 	rm -fr tests/benchmark/Tracing/sources
