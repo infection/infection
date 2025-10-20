@@ -46,13 +46,18 @@ use JMS\Serializer\Annotation as Serializer;
 final class InfectionOptions
 {
     /**
+     * Default timeout in seconds (from ConfigurationFactory::DEFAULT_TIMEOUT)
+     */
+    private const DEFAULT_TIMEOUT = 10.0;
+
+    /**
      * @param array<string, mixed> $mutators
      */
     public function __construct(
         #[Serializer\Type(SourceOptions::class)]
         public SourceOptions $source,
         #[Serializer\Type('float')]
-        public ?float $timeout = 10.0,
+        public ?float $timeout = self::DEFAULT_TIMEOUT,
         #[Serializer\Type('scalar_or_object')]
         public int|string|null $threads = 1,
         #[Serializer\Type(LogsOptions::class)]

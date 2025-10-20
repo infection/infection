@@ -43,7 +43,6 @@ use Infection\Configuration\Options\OptionsConfigurationLoader;
 class SchemaConfigurationFileLoader
 {
     public function __construct(
-        private readonly SchemaValidator $schemaValidator,
         private readonly SchemaConfigurationFactory $factory,
         private readonly OptionsConfigurationLoader $optionsLoader,
     ) {

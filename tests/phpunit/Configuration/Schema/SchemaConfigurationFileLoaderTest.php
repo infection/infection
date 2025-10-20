@@ -39,13 +39,9 @@ use Infection\Configuration\Options\InfectionOptions;
 use Infection\Configuration\Options\OptionsConfigurationLoader;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
-use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
-use Infection\Configuration\Schema\SchemaValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -55,11 +51,6 @@ use function Safe\realpath;
 #[CoversClass(SchemaConfigurationFileLoader::class)]
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
-    /**
-     * @var SchemaValidator|MockObject
-     */
-    private $schemaValidatorStub;
-
     /**
      * @var SchemaConfigurationFactory|MockObject
      */
@@ -77,12 +68,10 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->schemaValidatorStub = $this->createMock(SchemaValidator::class);
         $this->configFactoryStub = $this->createMock(SchemaConfigurationFactory::class);
         $this->optionsLoaderStub = $this->createMock(OptionsConfigurationLoader::class);
 
         $this->loader = new SchemaConfigurationFileLoader(
-            $this->schemaValidatorStub,
             $this->configFactoryStub,
             $this->optionsLoaderStub,
         );
@@ -111,14 +100,5 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
         $actual = $this->loader->loadFile($path);
 
         $this->assertSame($expectedConfig, $actual);
-    }
-
-    private static function createRawConfigWithPathArgument(string $path): Constraint
-    {
-        return new Callback(static function (SchemaConfigurationFile $config) use ($path): bool {
-            self::assertSame($path, $config->getPath());
-
-            return true;
-        });
     }
 }

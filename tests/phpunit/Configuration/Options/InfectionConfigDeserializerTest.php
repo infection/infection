@@ -121,12 +121,15 @@ final class InfectionConfigDeserializerTest extends TestCase
         $this->assertSame(4, $options->threads);
         $this->assertSame(['src', 'lib'], $options->source->directories);
         $this->assertSame(['tests'], $options->source->excludes);
+        $this->assertNotNull($options->logs);
         $this->assertSame('infection.log', $options->logs->text);
         $this->assertSame('infection-report.html', $options->logs->html);
         $this->assertTrue($options->logs->github);
         $this->assertSame('/tmp/infection', $options->tmpDir);
+        $this->assertNotNull($options->phpUnit);
         $this->assertSame('.', $options->phpUnit->configDir);
         $this->assertSame('vendor/bin/phpunit', $options->phpUnit->customPath);
+        $this->assertNotNull($options->phpStan);
         $this->assertSame('.', $options->phpStan->configDir);
         $this->assertSame('vendor/bin/phpstan', $options->phpStan->customPath);
         $this->assertTrue($options->ignoreMsiWithNoMutations);

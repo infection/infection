@@ -63,6 +63,9 @@ use UnexpectedValueException;
  */
 final class ScalarOrObjectHandler implements SubscribingHandlerInterface
 {
+    /**
+     * @return array<array<string, int|string>>
+     */
     public static function getSubscribingMethods(): array
     {
         $formats = ['json'];
@@ -89,6 +92,11 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
         return $methods;
     }
 
+    /**
+     * @param array<string, mixed> $type
+     *
+     * @phpstan-ignore-next-line shipmonk.deadMethod (called dynamically by JMS)
+     */
     public function deserialize(
         DeserializationVisitorInterface $visitor,
         mixed $data,
@@ -100,7 +108,7 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
         }
 
         if (is_array($data)) {
-            if (empty($type['params'][0]['name'] ?? null)) {
+            if (!isset($type['params'][0]['name'])) {
                 return $data;
             }
 
@@ -114,6 +122,11 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $type
+     *
+     * @phpstan-ignore-next-line shipmonk.deadMethod (called dynamically by JMS)
+     */
     public function serialize(
         SerializationVisitorInterface $visitor,
         mixed $data,
@@ -124,7 +137,7 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
             return $data;
         }
 
-        if (empty($type['params'][0]['name'] ?? null)) {
+        if (!isset($type['params'][0]['name'])) {
             return $data;
         }
 
