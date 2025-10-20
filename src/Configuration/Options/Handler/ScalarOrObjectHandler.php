@@ -38,10 +38,7 @@ namespace Infection\Configuration\Options\Handler;
 
 use function get_debug_type;
 use function is_array;
-use function is_bool;
-use function is_int;
 use function is_scalar;
-use function is_string;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
@@ -53,24 +50,29 @@ use UnexpectedValueException;
 /**
  * Handles union types "scalar|object" for JMS Serializer.
  *
- * Supports custom type names:
- * - int_or_string: int|string (for threads: integer or "max")
- * - bool_or_object: bool|object (for mutator configs)
+ * Supports type names:
+ * - int_or_string: scalar|object (syntactic sugar)
+ * - bool_or_object<T>: scalar|object<T> (syntactic sugar)
+ * - scalar_or_object<T>: generic scalar or object of type T
+ *
+ * Scalar values (int, string, bool, float) pass through as-is.
+ * Arrays/objects deserialize to the specified generic type T.
+ *
+ * Type validation happens elsewhere:
+ * - Schema validation (before deserialization)
+ * - PHP typed properties (after deserialization)
  *
  * @internal
  */
 final class ScalarOrObjectHandler implements SubscribingHandlerInterface
 {
-    private const TYPE_INT_OR_STRING = 'int_or_string';
-
-    private const TYPE_BOOL_OR_OBJECT = 'bool_or_object';
-
     public static function getSubscribingMethods(): array
     {
         $formats = ['json'];
+        $types = ['int_or_string', 'bool_or_object', 'scalar_or_object'];
         $methods = [];
 
-        foreach ([self::TYPE_INT_OR_STRING, self::TYPE_BOOL_OR_OBJECT] as $type) {
+        foreach ($types as $type) {
             foreach ($formats as $format) {
                 $methods[] = [
                     'type' => $type,
@@ -96,17 +98,23 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
         array $type,
         Context $context,
     ): mixed {
-        $typeName = $type['name'];
-
-        if ($typeName === self::TYPE_INT_OR_STRING) {
-            return $this->deserializeIntOrString($data);
+        if (is_scalar($data)) {
+            return $data;
         }
 
-        if ($typeName === self::TYPE_BOOL_OR_OBJECT) {
-            return $this->deserializeBoolOrObject($visitor, $data, $type, $context);
+        if (is_array($data)) {
+            if (empty($type['params'][0]['name'] ?? null)) {
+                return $data;
+            }
+
+            $targetType = $type['params'][0];
+
+            return $context->getNavigator()->accept($data, $targetType);
         }
 
-        throw new UnexpectedValueException(sprintf('Unsupported type "%s".', $typeName));
+        throw new UnexpectedValueException(
+            sprintf('Expected scalar or array, got "%s".', get_debug_type($data)),
+        );
     }
 
     public function serialize(
@@ -115,70 +123,16 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
         array $type,
         Context $context,
     ): mixed {
-        $typeName = $type['name'];
-
-        if ($typeName === self::TYPE_INT_OR_STRING) {
+        if (is_scalar($data)) {
             return $data;
         }
 
-        if ($typeName === self::TYPE_BOOL_OR_OBJECT) {
-            if (is_scalar($data)) {
-                return $data;
-            }
-
-            if (empty($type['params'][0]['name'] ?? null)) {
-                throw new UnexpectedValueException(
-                    sprintf('%s<T> requires a generic type parameter.', $typeName),
-                );
-            }
-
-            $targetType = $type['params'][0];
-
-            return $context->getNavigator()->accept($data, $targetType);
-        }
-
-        throw new UnexpectedValueException(sprintf('Unsupported type "%s".', $typeName));
-    }
-
-    private function deserializeIntOrString(mixed $data): int|string
-    {
-        if (is_int($data)) {
+        if (empty($type['params'][0]['name'] ?? null)) {
             return $data;
         }
 
-        if (is_string($data)) {
-            return $data;
-        }
+        $targetType = $type['params'][0];
 
-        throw new UnexpectedValueException(
-            sprintf('Expected int or string, got "%s".', get_debug_type($data)),
-        );
-    }
-
-    private function deserializeBoolOrObject(
-        DeserializationVisitorInterface $visitor,
-        mixed $data,
-        array $type,
-        Context $context,
-    ): mixed {
-        if (is_bool($data)) {
-            return $data;
-        }
-
-        if (is_array($data)) {
-            if (empty($type['params'][0]['name'] ?? null)) {
-                throw new UnexpectedValueException(
-                    sprintf('%s<T> requires a generic type parameter.', self::TYPE_BOOL_OR_OBJECT),
-                );
-            }
-
-            $targetType = $type['params'][0];
-
-            return $context->getNavigator()->accept($data, $targetType);
-        }
-
-        throw new UnexpectedValueException(
-            sprintf('Expected bool or object, got "%s".', get_debug_type($data)),
-        );
+        return $context->getNavigator()->accept($data, $targetType);
     }
 }
