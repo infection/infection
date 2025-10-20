@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function array_flip;
-use function array_intersect_key;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutator\MutatorResolver;
@@ -55,7 +53,7 @@ class Mutation
 {
     private readonly string $mutatorClass;
 
-    /** @var array<string|int|float> */
+    /** @var array<value-of<MutationAttributeKeys>, string|int|float> */
     private readonly array $attributes;
 
     private readonly bool $coveredByTests;
@@ -66,7 +64,7 @@ class Mutation
 
     /**
      * @param Node[] $originalFileAst
-     * @param array<string|int|float> $attributes
+     * @param array<string, string|int|float> $attributes
      * @param TestLocation[] $tests
      */
     public function __construct(
@@ -82,11 +80,8 @@ class Mutation
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
-        foreach (MutationAttributeKeys::ALL as $key) {
-            Assert::keyExists($attributes, $key);
-        }
         $this->mutatorClass = $mutatorClass;
-        $this->attributes = array_intersect_key($attributes, array_flip(MutationAttributeKeys::ALL));
+        $this->attributes = MutationAttributeKeys::pluck($attributes);
         $this->coveredByTests = $tests !== [];
     }
 
@@ -123,22 +118,22 @@ class Mutation
 
     public function getOriginalStartingLine(): int
     {
-        return (int) $this->attributes['startLine'];
+        return (int) $this->attributes[MutationAttributeKeys::START_LINE->value];
     }
 
     public function getOriginalEndingLine(): int
     {
-        return (int) $this->attributes['endLine'];
+        return (int) $this->attributes[MutationAttributeKeys::END_LINE->value];
     }
 
     public function getOriginalStartFilePosition(): int
     {
-        return (int) $this->attributes['startFilePos'];
+        return (int) $this->attributes[MutationAttributeKeys::START_FILE_POSITION->value];
     }
 
     public function getOriginalEndFilePosition(): int
     {
-        return (int) $this->attributes['endFilePos'];
+        return (int) $this->attributes[MutationAttributeKeys::END_FILE_POSITION->value];
     }
 
     public function getMutatedNodeClass(): string

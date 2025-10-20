@@ -33,37 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Benchmark;
 
-use function array_filter;
-use function in_array;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Closure;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * @internal
- * @final
- */
-class FilteringResultsCollector implements Collector
+final class DummyInstrumentor implements Instrumentor
 {
-    /**
-     * @param DetectionStatus[] $targetDetectionStatuses
-     */
-    public function __construct(
-        private readonly Collector $targetCollector,
-        private readonly array $targetDetectionStatuses,
-    ) {
-    }
-
-    public function collect(MutantExecutionResult ...$executionResults): void
+    public function profile(Closure $main, SymfonyStyle $io): mixed
     {
-        $filteredExecutionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
-        );
-
-        if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
-        }
+        return $main();
     }
 }

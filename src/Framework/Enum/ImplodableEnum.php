@@ -33,37 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Framework\Enum;
 
-use function array_filter;
-use function in_array;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use function array_map;
+use BackedEnum;
+use function implode;
+use function sprintf;
 
 /**
  * @internal
- * @final
+ * @phpstan-require-implements BackedEnum<string>
  */
-class FilteringResultsCollector implements Collector
+trait ImplodableEnum
 {
-    /**
-     * @param DetectionStatus[] $targetDetectionStatuses
-     */
-    public function __construct(
-        private readonly Collector $targetCollector,
-        private readonly array $targetDetectionStatuses,
-    ) {
+    public static function implode(string $separator): string
+    {
+        return implode(
+            $separator,
+            array_map(
+                static fn (BackedEnum $enum) => $enum->value,
+                self::cases(),
+            ),
+        );
     }
 
-    public function collect(MutantExecutionResult ...$executionResults): void
+    public static function quotedCommaSeparatedList(): string
     {
-        $filteredExecutionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
+        return sprintf(
+            '"%s"',
+            self::implode('", "'),
         );
-
-        if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
-        }
     }
 }

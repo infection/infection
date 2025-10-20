@@ -33,37 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Benchmark;
 
-use function array_filter;
-use function in_array;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-
-/**
- * @internal
- * @final
- */
-class FilteringResultsCollector implements Collector
+final class InstrumentorFactory
 {
-    /**
-     * @param DetectionStatus[] $targetDetectionStatuses
-     */
-    public function __construct(
-        private readonly Collector $targetCollector,
-        private readonly array $targetDetectionStatuses,
-    ) {
-    }
-
-    public function collect(MutantExecutionResult ...$executionResults): void
+    public static function create(bool $debug): Instrumentor
     {
-        $filteredExecutionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
-        );
-
-        if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
-        }
+        return $debug
+            ? new DummyInstrumentor()
+            : new BlackfireInstrumentor();
     }
 }

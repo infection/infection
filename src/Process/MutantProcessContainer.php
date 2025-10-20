@@ -89,7 +89,7 @@ class MutantProcessContainer
         return $this->processes[$this->currentProcessIndex];
     }
 
-    private function getCurrentMutantProcessDetectionStatus(): string
+    private function getCurrentMutantProcessDetectionStatus(): DetectionStatus
     {
         return $this->getCurrent()->getMutantExecutionResult()->getDetectionStatus();
     }

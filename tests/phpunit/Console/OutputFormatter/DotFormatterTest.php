@@ -35,20 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console\OutputFormatter;
 
-use function array_flip;
-use function array_keys;
 use function implode;
 use Infection\Console\OutputFormatter\DotFormatter;
+use Infection\Framework\Enum\EnumBucket;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Webmozart\Assert\Assert;
 
 #[CoversClass(DotFormatter::class)]
 final class DotFormatterTest extends TestCase
@@ -95,12 +92,9 @@ final class DotFormatterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @param DetectionStatus::* $detectionStatus
-     */
     #[DataProvider('detectionStatusProvider')]
     public function test_logs_mutations_detection_status(
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         string $expected,
     ): void {
         $output = new BufferedOutput();
@@ -123,70 +117,54 @@ final class DotFormatterTest extends TestCase
 
     public static function detectionStatusProvider(): iterable
     {
-        $detectionStatuses = array_flip(DetectionStatus::ALL);
-
-        $getStatus = static function (string $detectionStatus) use (&$detectionStatuses): string {
-            unset($detectionStatuses[$detectionStatus]);
-
-            return $detectionStatus;
-        };
+        $bucket = EnumBucket::create(DetectionStatus::class);
 
         yield 'killed by tests' => [
-            $getStatus(DetectionStatus::KILLED_BY_TESTS),
+            $bucket->take(DetectionStatus::KILLED_BY_TESTS),
             '<killed>.</killed>',
         ];
 
         yield 'killed by SA' => [
-            $getStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            $bucket->take(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
             '<killed-by-static-analysis>A</killed-by-static-analysis>',
         ];
 
         yield 'escaped' => [
-            $getStatus(DetectionStatus::ESCAPED),
+            $bucket->take(DetectionStatus::ESCAPED),
             '<escaped>M</escaped>',
         ];
 
         yield 'error' => [
-            $getStatus(DetectionStatus::ERROR),
+            $bucket->take(DetectionStatus::ERROR),
             '<with-error>E</with-error>',
         ];
 
         yield 'syntax error' => [
-            $getStatus(DetectionStatus::SYNTAX_ERROR),
+            $bucket->take(DetectionStatus::SYNTAX_ERROR),
             '<with-syntax-error>X</with-syntax-error>',
         ];
 
         yield 'timeout' => [
-            $getStatus(DetectionStatus::TIMED_OUT),
+            $bucket->take(DetectionStatus::TIMED_OUT),
             '<timeout>T</timeout>',
         ];
 
         yield 'uncovered' => [
-            $getStatus(DetectionStatus::NOT_COVERED),
+            $bucket->take(DetectionStatus::NOT_COVERED),
             '<uncovered>U</uncovered>',
         ];
 
         yield 'skipped' => [
-            $getStatus(DetectionStatus::SKIPPED),
+            $bucket->take(DetectionStatus::SKIPPED),
             '<skipped>S</skipped>',
         ];
 
         yield 'ignored' => [
-            $getStatus(DetectionStatus::IGNORED),
+            $bucket->take(DetectionStatus::IGNORED),
             '<ignored>I</ignored>',
         ];
 
-        Assert::count(
-            $detectionStatuses,
-            0,
-            sprintf(
-                'Expected all detection statuses to be tested. Missing a case for: "%s"',
-                implode(
-                    '", "',
-                    array_keys($detectionStatuses),
-                ),
-            ),
-        );
+        $bucket->assertIsEmpty();
     }
 
     public function test_it_prints_total_number_of_mutations(): void
@@ -253,10 +231,7 @@ final class DotFormatterTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @param DetectionStatus::* $detectionStatus
-     */
-    private function createMutantExecutionResultOfType(string $detectionStatus): MutantExecutionResult
+    private function createMutantExecutionResultOfType(DetectionStatus $detectionStatus): MutantExecutionResult
     {
         $executionResult = $this->createMock(MutantExecutionResult::class);
         $executionResult

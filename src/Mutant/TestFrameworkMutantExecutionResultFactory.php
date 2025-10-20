@@ -94,10 +94,7 @@ class TestFrameworkMutantExecutionResultFactory implements MutantExecutionResult
         return $process->getOutput();
     }
 
-    /**
-     * @return DetectionStatus::*
-     */
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
+    private function retrieveDetectionStatus(MutantProcess $mutantProcess): DetectionStatus
     {
         if (!$mutantProcess->getMutant()->isCoveredByTest()) {
             return DetectionStatus::NOT_COVERED;
