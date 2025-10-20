@@ -47,6 +47,7 @@ use Infection\Testing\SourceTestClassNameScheme;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionProperty;
@@ -61,9 +62,7 @@ use function sprintf;
 #[CoversNothing]
 final class ProjectCodeTest extends TestCase
 {
-    /**
-     * @requires OSFAMILY Windows Cannot check if the file is executable on Windows
-     */
+    #[RequiresOperatingSystem('^(?!Windows).*$')]
     public function test_infection_bin_is_executable(): void
     {
         $infectionFile = __DIR__ . '/../../../../bin/infection';
