@@ -39,12 +39,12 @@ use function implode;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use function str_replace;
 
 #[CoversClass(GitDiffFileProvider::class)]
 final class GitDiffFileProviderTest extends TestCase
@@ -115,7 +115,7 @@ final class GitDiffFileProviderTest extends TestCase
             +        $strrev = \strrev($encryptedMessage);
 
             EOF;
-        $gitUnifiedOutput = str_replace("\n", PHP_EOL, $gitUnifiedOutput);
+        $gitUnifiedOutput = LineReturnNormalizer::normalize($gitUnifiedOutput);
 
         $expectedUnifiedReturn = <<<'EOF'
             diff --git a/tests/FooTest.php b/tests/FooTest.php
@@ -125,7 +125,7 @@ final class GitDiffFileProviderTest extends TestCase
             @@ -21 +31,4 @@ final class Bar
 
             EOF;
-        $expectedUnifiedReturn = str_replace("\n", PHP_EOL, $expectedUnifiedReturn);
+        $expectedUnifiedReturn = LineReturnNormalizer::normalize($expectedUnifiedReturn);
 
         $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
