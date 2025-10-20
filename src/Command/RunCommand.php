@@ -62,6 +62,7 @@ use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
 
@@ -268,10 +269,10 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
-                    'Name of the formatter to use ("%s")',
-                    implode('", "', FormatterName::ALL),
+                    'Name of the formatter to use (%s)',
+                    FormatterName::quotedCommaSeparatedList(),
                 ),
-                Container::DEFAULT_FORMATTER_NAME,
+                Container::DEFAULT_FORMATTER_NAME->value,
             )
             ->addOption(
                 self::OPTION_GIT_DIFF_FILTER,
@@ -546,8 +547,7 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            // TODO: add more type check like we do for the test frameworks
-            trim((string) $input->getOption(self::OPTION_FORMATTER)),
+            self::getFormatterName($input),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             $noProgress,
             $forceProgress,
@@ -691,5 +691,12 @@ final class RunCommand extends BaseCommand
         } elseif (extension_loaded('pcov')) {
             $consoleOutput->logRunningWithDebugger('PCOV');
         }
+    }
+
+    private static function getFormatterName(InputInterface $input): FormatterName
+    {
+        $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
+
+        return FormatterName::from($value);
     }
 }
