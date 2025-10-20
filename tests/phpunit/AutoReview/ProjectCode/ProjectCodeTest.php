@@ -241,7 +241,8 @@ final class ProjectCodeTest extends TestCase
             ),
             array_filter(
                 $properties,
-                static fn (ReflectionProperty $property): bool => $property->class === $className,
+                static fn (ReflectionProperty $property): bool => $property->class === $className
+                    && !$property->isReadOnly(),
             ),
         );
 
