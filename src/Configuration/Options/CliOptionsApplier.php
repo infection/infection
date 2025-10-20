@@ -54,6 +54,8 @@ final class CliOptionsApplier
         ?string $staticAnalysisToolOptions = null,
         ?int $threadCount = null,
         ?string $staticAnalysisTool = null,
+        ?bool $dryRun = null,
+        ?int $msiPrecision = null,
     ): void {
         if ($initialTestsPhpOptions !== null) {
             $options->initialTestsPhpOptions = $initialTestsPhpOptions;
@@ -89,6 +91,14 @@ final class CliOptionsApplier
 
         if ($staticAnalysisTool !== null) {
             $options->staticAnalysisTool = $staticAnalysisTool;
+        }
+
+        if ($dryRun !== null) {
+            $options->dryRun = $dryRun;
+        }
+
+        if ($msiPrecision !== null) {
+            $options->msiPrecision = $msiPrecision;
         }
     }
 }

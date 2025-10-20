@@ -42,6 +42,7 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ConfigurationInterface;
 use Infection\Configuration\Options\CliOptionsApplier;
 use Infection\Configuration\Options\InfectionOptions;
 use Infection\Configuration\Options\OptionsConfigurationLoader;
@@ -315,7 +316,7 @@ final class Container extends DIContainer
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
-            ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
+            ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfigurationInterface()->getThreadCount()),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
@@ -327,7 +328,7 @@ final class Container extends DIContainer
             ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
-            MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
+            MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfigurationInterface()->getMsiPrecision()),
             MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
                 $container->getFileSystem(),
                 (string) php_ini_loaded_file(),
@@ -642,6 +643,8 @@ final class Container extends DIContainer
                 $staticAnalysisToolOptions,
                 $threadCount,
                 $staticAnalysisTool,
+                $dryRun,
+                $msiPrecision,
             ): InfectionOptions {
                 // Load from file with defaults
                 $options = $container->getOptionsConfigurationLoader()->loadConfiguration(
@@ -665,10 +668,17 @@ final class Container extends DIContainer
                     $staticAnalysisToolOptions,
                     $threadCount,
                     $staticAnalysisTool,
+                    $dryRun,
+                    $msiPrecision,
                 );
 
                 return $options;
             },
+        );
+
+        $clone->offsetSet(
+            ConfigurationInterface::class,
+            static fn (self $container): ConfigurationInterface => $container->getInfectionOptions(),
         );
 
         $clone->offsetSet(
@@ -1114,6 +1124,11 @@ final class Container extends DIContainer
     private function getInfectionOptions(): InfectionOptions
     {
         return $this->get(InfectionOptions::class);
+    }
+
+    private function getConfigurationInterface(): ConfigurationInterface
+    {
+        return $this->get(ConfigurationInterface::class);
     }
 
     private function getPrinter(): PrettyPrinterAbstract

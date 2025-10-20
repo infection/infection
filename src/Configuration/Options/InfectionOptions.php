@@ -36,6 +36,8 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Options;
 
+use Infection\Configuration\ConfigurationInterface;
+use function is_int;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
@@ -43,7 +45,7 @@ use JMS\Serializer\Annotation as Serializer;
  *
  * @internal
  */
-final class InfectionOptions
+final class InfectionOptions implements ConfigurationInterface
 {
     /**
      * Default timeout in seconds (from ConfigurationFactory::DEFAULT_TIMEOUT)
@@ -88,6 +90,34 @@ final class InfectionOptions
         public ?string $initialTestsPhpOptions = null,
         #[Serializer\Type('string')]
         public ?string $testFrameworkOptions = null,
+        // CLI-only options (not in JSON schema)
+        public bool $dryRun = false,
+        public int $msiPrecision = 2,
     ) {
+    }
+
+    public function getProcessTimeout(): float
+    {
+        return $this->timeout ?? self::DEFAULT_TIMEOUT;
+    }
+
+    public function getThreadCount(): int
+    {
+        if (is_int($this->threads)) {
+            return $this->threads;
+        }
+
+        // Default when threads is null or "max" (max is resolved elsewhere)
+        return 1;
+    }
+
+    public function getMsiPrecision(): int
+    {
+        return $this->msiPrecision;
+    }
+
+    public function isDryRun(): bool
+    {
+        return $this->dryRun;
     }
 }
