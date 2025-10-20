@@ -185,6 +185,7 @@ final class EnumBucket
 
     /**
      * @phpstan-assert BackedEnum $value
+     * @psalm-assert BackedEnum $value
      */
     private function asserValueIsANativeEnum(mixed $value): void
     {
@@ -206,6 +207,7 @@ final class EnumBucket
 
     private function createEnumValueDoesNotExist(mixed $value): InvalidArgumentException
     {
+        /** @psalm-suppress InvalidArgument */
         return new InvalidArgumentException(
             sprintf(
                 'The enum "%s" does not have a case "%s". Known names are: "%s".',
@@ -224,6 +226,7 @@ final class EnumBucket
 
     private function createEnumValueNoLongerAvailable(mixed $value): OutOfBoundsException
     {
+        /** @psalm-suppress InvalidArgument */
         return new OutOfBoundsException(
             sprintf(
                 'The case "%s" is no longer available in the bucket. Available cases are: "%s".',
@@ -241,6 +244,7 @@ final class EnumBucket
 
     private function createBucketIsNotEmpty(): InvalidArgumentException
     {
+        /** @psalm-suppress InvalidArgument */
         return new InvalidArgumentException(
             sprintf(
                 'Expected the bucket to be empty. The following case(s) were found: "%s".',
@@ -256,6 +260,7 @@ final class EnumBucket
     }
 
     /**
+     * @psalm-suppress UndefinedDocblockClass
      * @param BackedEnum&T $enum
      */
     private static function describeCase(BackedEnum $enum): string

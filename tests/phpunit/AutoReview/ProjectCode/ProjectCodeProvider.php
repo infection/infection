@@ -62,7 +62,6 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
@@ -117,7 +116,6 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
-        DetectionStatus::class,
         DummyFileSystem::class,
         XdebugHandler::class,
         NullSubscriber::class,
