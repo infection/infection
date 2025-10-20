@@ -250,6 +250,7 @@ final class ProjectCodeProvider
                 $reflectionClass = new ReflectionClass($className);
 
                 return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isEnum()
                     && !in_array(
                         $className,
                         [
