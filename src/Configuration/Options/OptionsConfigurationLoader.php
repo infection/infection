@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,28 +34,61 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use ColinODell\Json5\SyntaxError;
+use Infection\Configuration\Schema\InvalidFile;
+use Infection\Configuration\Schema\SchemaConfigurationFile;
+use Infection\Configuration\Schema\SchemaValidator;
+use function is_file;
+use function is_readable;
+use function json5_decode;
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
+use function Safe\file_get_contents;
 
 /**
+ * Loads configuration from infection.json/json5 files into InfectionOptions.
+ *
+ * @internal
  * @final
  */
-class SchemaConfigurationFileLoader
+class OptionsConfigurationLoader
 {
     public function __construct(
         private readonly SchemaValidator $schemaValidator,
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
+        private readonly InfectionConfigDeserializer $deserializer,
     ) {
     }
 
-    public function loadFile(string $file): SchemaConfiguration
+    public function load(string $configFile): InfectionOptions
     {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
+        $rawConfigFile = new SchemaConfigurationFile($configFile);
 
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
+        // Validate against JSON schema
+        $this->schemaValidator->validate($rawConfigFile);
+
+        if (!is_file($configFile)) {
+            throw InvalidFile::createForFileNotFound($rawConfigFile);
+        }
+
+        if (!is_readable($configFile)) {
+            throw InvalidFile::createForFileNotReadable($rawConfigFile);
+        }
+
+        $contents = file_get_contents($configFile);
+
+        try {
+            // Decode JSON5 (also handles plain JSON)
+            $decoded = json5_decode($contents);
+
+            // Convert to pure JSON string for JMS Serializer
+            $jsonString = json_encode($decoded, JSON_THROW_ON_ERROR);
+
+            // Deserialize to InfectionOptions
+            return $this->deserializer->deserialize($jsonString);
+        } catch (SyntaxError $exception) {
+            throw InvalidFile::createForInvalidJson($rawConfigFile, $exception->getMessage(), $exception);
+        }
     }
 }

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use Infection\Configuration\Options\InfectionOptions;
+use Infection\Configuration\Options\OptionsConfigurationLoader;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
@@ -64,6 +66,11 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
     private $configFactoryStub;
 
     /**
+     * @var OptionsConfigurationLoader|MockObject
+     */
+    private $optionsLoaderStub;
+
+    /**
      * @var SchemaConfigurationFileLoader
      */
     private $loader;
@@ -72,29 +79,32 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
     {
         $this->schemaValidatorStub = $this->createMock(SchemaValidator::class);
         $this->configFactoryStub = $this->createMock(SchemaConfigurationFactory::class);
+        $this->optionsLoaderStub = $this->createMock(OptionsConfigurationLoader::class);
 
         $this->loader = new SchemaConfigurationFileLoader(
             $this->schemaValidatorStub,
             $this->configFactoryStub,
+            $this->optionsLoaderStub,
         );
     }
 
     public function test_it_create_a_configuration_from_a_file_path(): void
     {
         $path = realpath(__DIR__ . '/../../Fixtures/Configuration/file.json');
-        $decodedContents = (object) ['foo' => 'bar'];
+        $expectedOptions = (new ReflectionClass(InfectionOptions::class))->newInstanceWithoutConstructor();
         $expectedConfig = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
-        $this->schemaValidatorStub
+        $this->optionsLoaderStub
             ->expects($this->once())
-            ->method('validate')
-            ->with(self::createRawConfigWithPathArgument($path))
+            ->method('load')
+            ->with($path)
+            ->willReturn($expectedOptions)
         ;
 
         $this->configFactoryStub
             ->expects($this->once())
-            ->method('create')
-            ->with($path, $decodedContents)
+            ->method('createFromOptions')
+            ->with($path, $expectedOptions)
             ->willReturn($expectedConfig)
         ;
 

@@ -44,13 +44,9 @@ use JMS\Serializer\SerializerInterface;
 
 class SerializerBuilder implements Builder
 {
-    public function __construct(private readonly JMSSerializerBuilder $builder)
-    {
-    }
-
     public function build(): SerializerInterface
     {
-        return $this->builder
+        return JMSSerializerBuilder::create()
             ->setPropertyNamingStrategy(new IdenticalPropertyNamingStrategy())
             ->configureHandlers(static function (HandlerRegistryInterface $registry): void {
                 $registry->registerSubscribingHandler(new ScalarOrObjectHandler());

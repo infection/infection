@@ -39,7 +39,6 @@ namespace Infection\Tests\Configuration\Options;
 use Infection\Configuration\Options\InfectionConfigDeserializer;
 use Infection\Configuration\Options\InfectionOptions;
 use Infection\Configuration\Options\SerializerBuilder;
-use JMS\Serializer\SerializerBuilder as JMSSerializerBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +49,7 @@ final class InfectionConfigDeserializerTest extends TestCase
 
     protected function setUp(): void
     {
-        $builder = new SerializerBuilder(JMSSerializerBuilder::create());
+        $builder = new SerializerBuilder();
 
         $this->deserializer = new InfectionConfigDeserializer($builder->build());
     }
