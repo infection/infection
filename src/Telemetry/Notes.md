@@ -1,0 +1,1 @@
+- it is probably best to dump the trace somewhere and allow one to dump it in various formats

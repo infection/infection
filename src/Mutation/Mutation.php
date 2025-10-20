@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\TestFramework\Coverage\Trace;
 use function array_flip;
 use function array_intersect_key;
 use function implode;
@@ -79,6 +80,7 @@ class Mutation
         private readonly MutatedNode $mutatedNode,
         private readonly int $mutationByMutatorIndex,
         private readonly array $tests,
+        public readonly Trace $trace,   // Technically we only need the trace ID
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
