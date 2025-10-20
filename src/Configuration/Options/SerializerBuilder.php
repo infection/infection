@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -36,28 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Options;
 
+use DIContainer\Builder;
+use Infection\Configuration\Options\Handler\ScalarOrObjectHandler;
+use JMS\Serializer\Handler\HandlerRegistryInterface;
+use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
+use JMS\Serializer\SerializerBuilder as JMSSerializerBuilder;
 use JMS\Serializer\SerializerInterface;
-use RuntimeException;
 
-/**
- * Deserializes JSON configuration into InfectionOptions DTOs using JMS Serializer.
- *
- * @internal
- */
-final class InfectionConfigDeserializer
+class SerializerBuilder implements Builder
 {
-    public function __construct(private readonly SerializerInterface $serializer)
+    public function __construct(private readonly JMSSerializerBuilder $builder)
     {
     }
 
-    public function deserialize(string $json): InfectionOptions
+    public function build(): SerializerInterface
     {
-        $result = $this->serializer->deserialize($json, InfectionOptions::class, 'json');
-
-        if (!$result instanceof InfectionOptions) {
-            throw new RuntimeException('Failed to deserialize InfectionOptions');
-        }
-
-        return $result;
+        return $this->builder
+            ->setPropertyNamingStrategy(new IdenticalPropertyNamingStrategy())
+            ->configureHandlers(static function (HandlerRegistryInterface $registry): void {
+                $registry->registerSubscribingHandler(new ScalarOrObjectHandler());
+            })
+            ->build();
     }
 }

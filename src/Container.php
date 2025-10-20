@@ -42,6 +42,7 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\Options\SerializerBuilder;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
@@ -141,6 +142,7 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use JMS\Serializer\SerializerInterface;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -560,6 +562,7 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            SerializerInterface::class => SerializerBuilder::class,
         ]);
 
         return $container->withValues(
