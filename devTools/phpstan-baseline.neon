@@ -691,12 +691,6 @@ parameters:
 			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
 
 		-
-			message: '#^Parameter \#1 \$output of class Infection\\Console\\OutputFormatter\\FormatterFactory constructor expects Symfony\\Component\\Console\\Output\\OutputInterface, Infection\\Tests\\Fixtures\\Console\\FakeOutput given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Differ\\DiffChangedLinesParserTest\:\:convertToArray\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1160,18 +1154,6 @@ parameters:
 
 		-
 			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvidesExcluding\(\) has parameter \$excluding with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:getDetectionStatusesIndexExcluding\(\) has parameter \$excludeList with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:getDetectionStatusesIndexExcluding\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php

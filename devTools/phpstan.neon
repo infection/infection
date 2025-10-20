@@ -85,7 +85,7 @@ parameters:
                 - ../tests/*
         -
             message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
-            count: 12
+            count: 11
             path:  ../tests/*
         -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
@@ -124,9 +124,6 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
-        -
-            identifier: match.unhandled
-            path: ../src/Console/OutputFormatter/DotFormatter.php
         -
             message: '#Anonymous function should return iterable.* but return statement is missing\.#'
             path: ../tests/benchmark/Tracing/provide-traces-closure.php

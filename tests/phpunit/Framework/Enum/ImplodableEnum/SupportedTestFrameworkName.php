@@ -33,37 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Tests\Framework\Enum\ImplodableEnum;
 
-use function array_filter;
-use function in_array;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Framework\Enum\ImplodableEnum;
 
-/**
- * @internal
- * @final
- */
-class FilteringResultsCollector implements Collector
+enum SupportedTestFrameworkName: string
 {
-    /**
-     * @param DetectionStatus[] $targetDetectionStatuses
-     */
-    public function __construct(
-        private readonly Collector $targetCollector,
-        private readonly array $targetDetectionStatuses,
-    ) {
-    }
+    use ImplodableEnum;
 
-    public function collect(MutantExecutionResult ...$executionResults): void
-    {
-        $filteredExecutionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
-        );
-
-        if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
-        }
-    }
+    case PHPUNIT = 'PHPUnit';
+    case BEHAT = 'Behat';
+    case PHPSPEC = 'PHPSpec';
 }

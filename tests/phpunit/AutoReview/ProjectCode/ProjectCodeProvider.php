@@ -63,7 +63,6 @@ use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
-use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
@@ -120,7 +119,6 @@ final class ProjectCodeProvider
         AdapterInstaller::class,
         DetectionStatus::class,
         DummyFileSystem::class,
-        MutationAttributeKeys::class,
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,

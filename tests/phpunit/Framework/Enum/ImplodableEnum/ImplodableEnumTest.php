@@ -33,37 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\Metrics;
+namespace Infection\Tests\Framework\Enum\ImplodableEnum;
 
-use function array_filter;
-use function in_array;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Framework\Enum\ImplodableEnum;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class FilteringResultsCollector implements Collector
+#[CoversTrait(ImplodableEnum::class)]
+final class ImplodableEnumTest extends TestCase
 {
-    /**
-     * @param DetectionStatus[] $targetDetectionStatuses
-     */
-    public function __construct(
-        private readonly Collector $targetCollector,
-        private readonly array $targetDetectionStatuses,
-    ) {
+    #[DataProvider('separatorProvider')]
+    public function test_it_can_join_a_string_backed_enum_values(
+        string $separator,
+        string $expected,
+    ): void {
+        $actual = SupportedTestFrameworkName::implode($separator);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function collect(MutantExecutionResult ...$executionResults): void
+    public static function separatorProvider(): iterable
     {
-        $filteredExecutionResults = array_filter(
-            $executionResults,
-            fn (MutantExecutionResult $executionResult): bool => in_array($executionResult->getDetectionStatus(), $this->targetDetectionStatuses, true),
-        );
+        yield [
+            ', ',
+            'PHPUnit, Behat, PHPSpec',
+        ];
+    }
 
-        if ($filteredExecutionResults !== []) {
-            $this->targetCollector->collect(...$filteredExecutionResults);
-        }
+    public function test_it_can_join_a_string_backed_enum_into_a_quoted_comma_separated_list(): void
+    {
+        $expected = '"PHPUnit", "Behat", "PHPSpec"';
+        $actual = SupportedTestFrameworkName::quotedCommaSeparatedList();
+
+        $this->assertSame($expected, $actual);
     }
 }

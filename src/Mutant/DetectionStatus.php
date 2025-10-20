@@ -35,42 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\CannotBeInstantiated;
+use function array_udiff;
+use function array_values;
 
 /**
  * @internal
  */
-final class DetectionStatus
+enum DetectionStatus: string
 {
-    use CannotBeInstantiated;
+    case KILLED_BY_TESTS = 'killed by tests';
+    case KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
+    case ESCAPED = 'escaped';
+    case ERROR = 'error';
+    case TIMED_OUT = 'timed out';
+    case SKIPPED = 'skipped';
+    case SYNTAX_ERROR = 'syntax error';
+    case NOT_COVERED = 'not covered';
+    case IGNORED = 'ignored';
 
-    public const KILLED_BY_TESTS = 'killed by tests';
+    /**
+     * @return list<DetectionStatus>
+     */
+    public static function getCasesExcluding(DetectionStatus ...$excluded): array
+    {
+        return array_values(
+            array_udiff(
+                DetectionStatus::cases(),
+                $excluded,
+                static fn (DetectionStatus $left, DetectionStatus $right) => $left->value <=> $right->value,
+            ),
+        );
+    }
 
-    public const KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
+    /**
+     * @return array<key-of<self>, self>
+     */
+    public static function getIndexedCases(): array
+    {
+        $indexedCases = [];
 
-    public const ESCAPED = 'escaped';
+        foreach (self::cases() as $case) {
+            $indexedCases[$case->name] = $case;
+        }
 
-    public const ERROR = 'error';
-
-    public const TIMED_OUT = 'timed out';
-
-    public const SKIPPED = 'skipped';
-
-    public const SYNTAX_ERROR = 'syntax error';
-
-    public const NOT_COVERED = 'not covered';
-
-    public const IGNORED = 'ignored';
-
-    public const ALL = [
-        self::KILLED_BY_TESTS,
-        self::KILLED_BY_STATIC_ANALYSIS,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::SKIPPED,
-        self::SYNTAX_ERROR,
-        self::NOT_COVERED,
-        self::IGNORED,
-    ];
+        return $indexedCases;
+    }
 }

@@ -248,7 +248,7 @@ final class DotFormatterTest extends TestCase
     }
 
     private function createMutantExecutionResultsOfType(
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         int $count = 1,
     ): array {
         $executionResults = [];
