@@ -70,8 +70,10 @@ final class InfectionConfigDeserializerTest extends TestCase
         $this->assertInstanceOf(InfectionOptions::class, $options);
         $this->assertSame(['src'], $options->source->directories);
         $this->assertSame([], $options->source->excludes);
-        $this->assertNull($options->timeout);
-        $this->assertNull($options->threads);
+        $this->assertSame(10.0, $options->timeout);
+        $this->assertSame(1, $options->threads);
+        $this->assertSame(['@default' => true], $options->mutators);
+        $this->assertSame('phpunit', $options->testFramework);
     }
 
     public function test_deserialize_full_config(): void

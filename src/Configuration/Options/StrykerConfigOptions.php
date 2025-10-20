@@ -45,9 +45,9 @@ final class StrykerConfigOptions
 {
     public function __construct(
         #[Serializer\Type('string')]
-        public readonly ?string $badge = null,
+        public ?string $badge = null,
         #[Serializer\Type('string')]
-        public readonly ?string $report = null,
+        public ?string $report = null,
     ) {
     }
 }

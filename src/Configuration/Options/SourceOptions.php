@@ -49,9 +49,9 @@ final class SourceOptions
      */
     public function __construct(
         #[Serializer\Type('array<string>')]
-        public readonly array $directories,
+        public array $directories = [],
         #[Serializer\Type('array<string>')]
-        public readonly array $excludes = [],
+        public array $excludes = [],
     ) {
     }
 }

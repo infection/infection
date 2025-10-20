@@ -50,39 +50,39 @@ final class InfectionOptions
      */
     public function __construct(
         #[Serializer\Type(SourceOptions::class)]
-        public readonly SourceOptions $source,
+        public SourceOptions $source,
         #[Serializer\Type('float')]
-        public readonly ?float $timeout = null,
+        public ?float $timeout = 10.0,
         #[Serializer\Type('int_or_string')]
-        public readonly int|string|null $threads = null,
+        public int|string|null $threads = 1,
         #[Serializer\Type(LogsOptions::class)]
-        public readonly ?LogsOptions $logs = null,
+        public ?LogsOptions $logs = null,
         #[Serializer\Type('string')]
-        public readonly ?string $tmpDir = null,
+        public ?string $tmpDir = null,
         #[Serializer\Type(PhpUnitOptions::class)]
-        public readonly ?PhpUnitOptions $phpUnit = null,
+        public ?PhpUnitOptions $phpUnit = null,
         #[Serializer\Type(PhpStanOptions::class)]
-        public readonly ?PhpStanOptions $phpStan = null,
+        public ?PhpStanOptions $phpStan = null,
         #[Serializer\Type('bool')]
-        public readonly ?bool $ignoreMsiWithNoMutations = null,
+        public ?bool $ignoreMsiWithNoMutations = null,
         #[Serializer\Type('float')]
-        public readonly ?float $minMsi = null,
+        public ?float $minMsi = null,
         #[Serializer\Type('float')]
-        public readonly ?float $minCoveredMsi = null,
+        public ?float $minCoveredMsi = null,
         #[Serializer\Type('array')]
-        public readonly array $mutators = [],
+        public array $mutators = ['@default' => true],
         #[Serializer\Type('string')]
-        public readonly ?string $testFramework = null,
+        public ?string $testFramework = 'phpunit',
         #[Serializer\Type('string')]
-        public readonly ?string $staticAnalysisTool = null,
+        public ?string $staticAnalysisTool = null,
         #[Serializer\Type('string')]
-        public readonly ?string $staticAnalysisToolOptions = null,
+        public ?string $staticAnalysisToolOptions = null,
         #[Serializer\Type('string')]
-        public readonly ?string $bootstrap = null,
+        public ?string $bootstrap = null,
         #[Serializer\Type('string')]
-        public readonly ?string $initialTestsPhpOptions = null,
+        public ?string $initialTestsPhpOptions = null,
         #[Serializer\Type('string')]
-        public readonly ?string $testFrameworkOptions = null,
+        public ?string $testFrameworkOptions = null,
     ) {
     }
 }

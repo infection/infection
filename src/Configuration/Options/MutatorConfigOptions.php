@@ -53,11 +53,11 @@ final class MutatorConfigOptions
      */
     public function __construct(
         #[Serializer\Type('array<string>')]
-        public readonly array $ignore = [],
+        public array $ignore = [],
         #[Serializer\Type('array<string>')]
-        public readonly array $ignoreSourceCodeByRegex = [],
+        public array $ignoreSourceCodeByRegex = [],
         #[Serializer\Type('array')]
-        public readonly array $settings = [],
+        public array $settings = [],
     ) {
     }
 }

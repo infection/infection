@@ -45,25 +45,25 @@ final class LogsOptions
 {
     public function __construct(
         #[Serializer\Type('string')]
-        public readonly ?string $text = null,
+        public ?string $text = null,
         #[Serializer\Type('string')]
-        public readonly ?string $summary = null,
+        public ?string $summary = null,
         #[Serializer\Type('string')]
-        public readonly ?string $json = null,
+        public ?string $json = null,
         #[Serializer\Type('string')]
-        public readonly ?string $html = null,
+        public ?string $html = null,
         #[Serializer\Type('string')]
-        public readonly ?string $debug = null,
+        public ?string $debug = null,
         #[Serializer\Type('string')]
-        public readonly ?string $perMutator = null,
+        public ?string $perMutator = null,
         #[Serializer\Type(StrykerConfigOptions::class)]
-        public readonly ?StrykerConfigOptions $stryker = null,
+        public ?StrykerConfigOptions $stryker = null,
         #[Serializer\Type('bool')]
-        public readonly ?bool $github = null,
+        public ?bool $github = null,
         #[Serializer\Type('string')]
-        public readonly ?string $gitlab = null,
+        public ?string $gitlab = null,
         #[Serializer\Type('string')]
-        public readonly ?string $summaryJson = null,
+        public ?string $summaryJson = null,
     ) {
     }
 }

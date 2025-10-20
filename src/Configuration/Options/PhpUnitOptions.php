@@ -45,9 +45,9 @@ final class PhpUnitOptions
 {
     public function __construct(
         #[Serializer\Type('string')]
-        public readonly ?string $configDir = null,
+        public ?string $configDir = null,
         #[Serializer\Type('string')]
-        public readonly ?string $customPath = null,
+        public ?string $customPath = null,
     ) {
     }
 }
