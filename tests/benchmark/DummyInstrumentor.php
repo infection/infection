@@ -33,62 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Benchmark;
 
-use Infection\Benchmark\InstrumentorFactory;
-use LogicException;
-use function sprintf;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Closure;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-
-const MAX_MUTATIONS_COUNT_ARG = 'max-mutations-count';
-const DEBUG_OPT = 'debug';
-
-$input = new ArgvInput(
-    null,
-    new InputDefinition([
-        new InputArgument(
-            MAX_MUTATIONS_COUNT_ARG,
-            InputArgument::OPTIONAL,
-            'Maximum number of mutations retrieved. Use -1 for no maximum',
-            50,
-        ),
-        new InputOption(
-            DEBUG_OPT,
-            null,
-            InputOption::VALUE_NONE,
-            'To use to execute the code without actually profiling.',
-        ),
-    ]),
-);
-$output = new ConsoleOutput();
-$io = new SymfonyStyle($input, $output);
-
-$generateMutations = require __DIR__ . '/generate-mutations-closure.php';
-/** @var int $maxMutationsCount */
-$maxMutationsCount = (int) $input->getArgument(MAX_MUTATIONS_COUNT_ARG);
-$debug = $input->getOption(DEBUG_OPT);
-
-$instrumentor = InstrumentorFactory::create($debug);
-
-$count = $instrumentor->profile(
-    static fn (): int => $generateMutations($maxMutationsCount),
-    $io,
-);
-
-if ($count === 0) {
-    throw new LogicException('Something went wrong, no mutations were actually generated.');
+final class DummyInstrumentor implements Instrumentor
+{
+    public function profile(Closure $main, SymfonyStyle $io): mixed
+    {
+        return $main();
+    }
 }
-
-$output->writeln(
-    sprintf(
-        '%d mutations generated.',
-        $count,
-    ),
-);
