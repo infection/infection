@@ -53,7 +53,7 @@ final class InfectionOptions
         public SourceOptions $source,
         #[Serializer\Type('float')]
         public ?float $timeout = 10.0,
-        #[Serializer\Type('int_or_string')]
+        #[Serializer\Type('scalar_or_object')]
         public int|string|null $threads = 1,
         #[Serializer\Type(LogsOptions::class)]
         public ?LogsOptions $logs = null,

@@ -50,10 +50,7 @@ use UnexpectedValueException;
 /**
  * Handles union types "scalar|object" for JMS Serializer.
  *
- * Supports type names:
- * - int_or_string: scalar|object (syntactic sugar)
- * - bool_or_object<T>: scalar|object<T> (syntactic sugar)
- * - scalar_or_object<T>: generic scalar or object of type T
+ * Type: scalar_or_object<T>
  *
  * Scalar values (int, string, bool, float) pass through as-is.
  * Arrays/objects deserialize to the specified generic type T.
@@ -69,7 +66,7 @@ final class ScalarOrObjectHandler implements SubscribingHandlerInterface
     public static function getSubscribingMethods(): array
     {
         $formats = ['json'];
-        $types = ['int_or_string', 'bool_or_object', 'scalar_or_object'];
+        $types = ['scalar_or_object'];
         $methods = [];
 
         foreach ($types as $type) {
