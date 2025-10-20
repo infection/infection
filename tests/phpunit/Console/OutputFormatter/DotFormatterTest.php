@@ -57,32 +57,34 @@ final class DotFormatterTest extends TestCase
         $output = new BufferedOutput();
         $formatter = new DotFormatter($output);
 
-        $expected = implode(
-            "\n",
-            [
-                '',
-                implode(
-                    ', ',
-                    [
-                        '<killed>.</killed>: killed by tests',
-                        '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA',
-                        '<escaped>M</escaped>: escaped',
-                        '<uncovered>U</uncovered>: uncovered',
-                    ],
-                ),
-                implode(
-                    ', ',
-                    [
-                        '<with-error>E</with-error>: fatal error',
-                        '<with-syntax-error>X</with-syntax-error>: syntax error',
-                        '<timeout>T</timeout>: timed out',
-                        '<skipped>S</skipped>: skipped',
-                        '<ignored>I</ignored>: ignored',
-                    ],
-                ),
-                '',
-                '',
-            ],
+        $expected = LineReturnNormalizer::normalize(
+            implode(
+                "\n",
+                [
+                    '',
+                    implode(
+                        ', ',
+                        [
+                            '<killed>.</killed>: killed by tests',
+                            '<killed-by-static-analysis>A</killed-by-static-analysis>: killed by SA',
+                            '<escaped>M</escaped>: escaped',
+                            '<uncovered>U</uncovered>: uncovered',
+                        ],
+                    ),
+                    implode(
+                        ', ',
+                        [
+                            '<with-error>E</with-error>: fatal error',
+                            '<with-syntax-error>X</with-syntax-error>: syntax error',
+                            '<timeout>T</timeout>: timed out',
+                            '<skipped>S</skipped>: skipped',
+                            '<ignored>I</ignored>: ignored',
+                        ],
+                    ),
+                    '',
+                    '',
+                ],
+            ),
         );
 
         $formatter->start(10);
