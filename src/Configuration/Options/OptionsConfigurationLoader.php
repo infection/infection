@@ -55,10 +55,31 @@ use function Safe\file_get_contents;
  */
 class OptionsConfigurationLoader
 {
+    private ?string $loadedFilePath = null;
+
     public function __construct(
         private readonly SchemaValidator $schemaValidator,
         private readonly InfectionConfigDeserializer $deserializer,
     ) {
+    }
+
+    /**
+     * @param string[] $potentialPaths
+     */
+    public function loadConfiguration(array $potentialPaths): InfectionOptions
+    {
+        foreach ($potentialPaths as $path) {
+            if (is_file($path) && is_readable($path)) {
+                return $this->load($path);
+            }
+        }
+
+        throw InvalidFile::createForFileNotFound(new SchemaConfigurationFile($potentialPaths[0] ?? 'infection.json5'));
+    }
+
+    public function getLoadedFilePath(): ?string
+    {
+        return $this->loadedFilePath;
     }
 
     public function load(string $configFile): InfectionOptions
@@ -86,6 +107,8 @@ class OptionsConfigurationLoader
             $jsonString = json_encode($decoded, JSON_THROW_ON_ERROR);
 
             // Deserialize to InfectionOptions
+            $this->loadedFilePath = $configFile;
+
             return $this->deserializer->deserialize($jsonString);
         } catch (SyntaxError $exception) {
             throw InvalidFile::createForInvalidJson($rawConfigFile, $exception->getMessage(), $exception);
