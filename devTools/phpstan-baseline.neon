@@ -673,12 +673,6 @@ parameters:
 			path: ../tests/phpunit/Console/LogVerbosityTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Console\\OutputFormatter\\DotFormatterTest\:\:getStartOutputFormatter\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Console/OutputFormatter/DotFormatterTest.php
-
-		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
