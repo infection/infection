@@ -395,15 +395,7 @@ final class FileMutationGeneratorTest extends TestCase
         string $relativePathname,
         ?bool $hasTests = null,
     ): Trace {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock->method('__toString')->willReturn($file);
-        $splFileInfoMock->method('getFilename')->willReturn($file);
-        $splFileInfoMock->method('getRealPath')->willReturn($file);
-        $splFileInfoMock->method('getContents')->willReturn(
-            file_exists($file) ? file_get_contents($file) : 'content',
-        );
-        $splFileInfoMock->method('getRelativePath')->willReturn($relativePath);
-        $splFileInfoMock->method('getRelativePathname')->willReturn($relativePathname);
+        $splFileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
 
         $proxyTraceMock = $this->createMock(Trace::class);
         $proxyTraceMock
@@ -419,5 +411,20 @@ final class FileMutationGeneratorTest extends TestCase
         }
 
         return $proxyTraceMock;
+    }
+
+    private function createSplFileInfoMock(string $file, string $relativePath, string $relativePathname): SplFileInfo&MockObject
+    {
+        $splFileInfoMock = $this->createMock(SplFileInfo::class);
+        $splFileInfoMock->method('__toString')->willReturn($file);
+        $splFileInfoMock->method('getFilename')->willReturn($file);
+        $splFileInfoMock->method('getRealPath')->willReturn($file);
+        $splFileInfoMock->method('getContents')->willReturn(
+            file_exists($file) ? file_get_contents($file) : 'content',
+        );
+        $splFileInfoMock->method('getRelativePath')->willReturn($relativePath);
+        $splFileInfoMock->method('getRelativePathname')->willReturn($relativePathname);
+
+        return $splFileInfoMock;
     }
 }
