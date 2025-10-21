@@ -230,9 +230,8 @@ final class ArrayAllTest extends BaseMutatorTestCase
                         {
                             $this->numbers = $numbers;
                         }
-                        public bool $allPositive {
-                            get => true;
-                        }
+
+                        public bool $allPositive { get => true; }
                     };
                     PHP,
             ];

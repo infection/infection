@@ -38,6 +38,7 @@ namespace Infection\Mutator\Util;
 use function in_array;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -109,7 +110,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return new $supportedNodeClass(
                 $this->negateEverySubExpression($node->left),
                 $this->negateEverySubExpression($node->right),
-                $node->getAttributes(),
+                NodeAttributes::getAllExceptOriginalNode($node),
             );
         }
 
@@ -118,7 +119,17 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return $node;
         }
 
-        return $node instanceof Node\Expr\BooleanNot ? $node->expr : new Node\Expr\BooleanNot($node);
+        if ($node instanceof Node\Expr\BooleanNot) {
+            return $node->expr;
+        }
+
+        // Clone the node to remove the origNode from the wrapped expression
+        // This ensures the format-preserving printer adds parentheses correctly
+        // see bug https://github.com/nikic/PHP-Parser/issues/1119
+        $wrappedNode = clone $node;
+        $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
+
+        return new Node\Expr\BooleanNot($wrappedNode);
     }
 
     /**

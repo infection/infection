@@ -39,6 +39,7 @@ use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
+use PhpParser\Token;
 
 /**
  * @internal
@@ -50,6 +51,11 @@ final class SimpleMutation extends Mutation
          * @var Node[]
          */
         private readonly array $originalFileAst,
+        /**
+         * @var Token[]
+         */
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
         private readonly Mutator $mutator,
         private readonly MutatedNode $mutatedNode,
         private readonly array $attributes,
@@ -65,6 +71,19 @@ final class SimpleMutation extends Mutation
     public function getOriginalFileAst(): array
     {
         return $this->originalFileAst;
+    }
+
+    /**
+     * @return Token[]
+     */
+    public function getOriginalFileTokens(): array
+    {
+        return $this->originalFileTokens;
+    }
+
+    public function getOriginalFileContent(): string
+    {
+        return $this->originalFileContent;
     }
 
     public function getMutatedNode(): MutatedNode

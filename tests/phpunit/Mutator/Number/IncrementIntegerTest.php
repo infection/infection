@@ -318,8 +318,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (doFoo() != 2) {
-                }
+                if (doFoo() != 2) {}
                 PHP,
         ];
 
@@ -334,8 +333,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 $fn = 'doFoo';
-                if ($fn() != 2) {
-                }
+                if ($fn() != 2) {}
                 PHP,
         ];
     }

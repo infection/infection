@@ -299,7 +299,6 @@ final class Container extends DIContainer
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->getTmpDir(),
                 $container->getDiffer(),
-                $container->getPrinter(),
                 $container->getMutantCodeFactory(),
             ),
             MutantCodeFactory::class => static fn (self $container): MutantCodeFactory => new MutantCodeFactory(

@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\SimpleExpression;
 use PhpParser\Node;
 
@@ -82,7 +83,7 @@ final class IfNegation implements Mutator
                 'else' => $node->else,
                 'stmts' => $node->stmts,
             ],
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 
