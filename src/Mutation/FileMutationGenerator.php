@@ -86,8 +86,7 @@ class FileMutationGenerator
         }
 
         $sourceFile = $trace->getSourceFileInfo();
-        $initialStatements = $this->parser->parse($sourceFile);
-        $originalFileTokens = $this->parser->getTokens();
+        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
