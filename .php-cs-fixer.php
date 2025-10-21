@@ -150,6 +150,8 @@ return (new Config())
         'phpdoc_align' => [
             'align' => 'left',
         ],
+        // Allow inline Psalm suppress statements
+        'phpdoc_to_comment' => false,
         'php_unit_dedicate_assert' => true,
         'php_unit_method_casing' => [
             'case' => 'snake_case',

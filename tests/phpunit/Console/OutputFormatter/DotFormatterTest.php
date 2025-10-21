@@ -38,10 +38,9 @@ namespace Infection\Tests\Console\OutputFormatter;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use const PHP_EOL;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function str_replace;
 use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -203,7 +202,7 @@ final class DotFormatterTest extends TestCase
             $dot->advance($this->createMutantExecutionResultsOfType(DetectionStatus::KILLED_BY_TESTS)[0], $totalMutations);
         }
 
-        $this->assertSame(str_replace("\n", PHP_EOL,
+        $this->assertSame(LineReturnNormalizer::normalize(
             <<<'TXT'
 
                 .: killed by tests, A: killed by SA, M: escaped, U: uncovered
@@ -233,7 +232,7 @@ final class DotFormatterTest extends TestCase
             );
         }
 
-        $this->assertSame(str_replace("\n", PHP_EOL,
+        $this->assertSame(LineReturnNormalizer::normalize(
             <<<'TXT'
 
                 .: killed by tests, A: killed by SA, M: escaped, U: uncovered
@@ -249,7 +248,7 @@ final class DotFormatterTest extends TestCase
     }
 
     private function createMutantExecutionResultsOfType(
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         int $count = 1,
     ): array {
         $executionResults = [];

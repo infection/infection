@@ -47,26 +47,24 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class BlackfireInstrumentor
+final class BlackfireInstrumentor implements Instrumentor
 {
-    private function __construct()
-    {
-    }
-
     /**
      * @template T
      *
      * @param Closure(): (Closure(): T) $main
      * @param positive-int $sampleSize
+     *
+     * @return T
      */
-    public static function profile(Closure $main, int $sampleSize, SymfonyStyle $io): mixed
+    public function profile(Closure $main, int $sampleSize, SymfonyStyle $io): mixed
     {
         self::check($io);
 
         $probe = BlackfireProbe::getMainInstance();
         $result = null;
 
-        for ($i = 0; $i < $sampleSize; $i++) {
+        for ($i = 0; $i < $sampleSize; ++$i) {
             $result += self::profileSample($main, $probe, $io);
         }
 
@@ -77,14 +75,12 @@ final class BlackfireInstrumentor
      * @template T
      *
      * @param Closure(): (Closure(): T) $main
-     * @param positive-int $sampleSize
      */
     private static function profileSample(
         Closure $main,
         BlackfireProbe $probe,
         SymfonyStyle $io,
-    ): mixed
-    {
+    ): mixed {
         $profile = $main();
 
         $enabled = $probe->enable();

@@ -41,14 +41,13 @@ use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
-use const PHP_INT_MAX;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $container = Container::create()->withValues(
     logger: new NullLogger(),
     output: new NullOutput(),
-    configFile: __DIR__.'/cpu-core-counter/infection.json5',
+    configFile: __DIR__ . '/cpu-core-counter/infection.json5',
     existingCoveragePath: __DIR__ . '/coverage',
     useNoopMutators: true,
 );
@@ -72,7 +71,7 @@ return static function () use ($traceProvider): int {
         $trace->getTests();
         // Iterate over the generator: do not use iterator_to_array which is less GC friendly
 
-        $traceCount++;
+        ++$traceCount;
     }
 
     return $traceCount;

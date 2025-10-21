@@ -391,12 +391,6 @@ parameters:
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Command\\MakeCustomMutatorCommandTest\:\:createContainer\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Command/MakeCustomMutatorCommandTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\Config\\ValueProvider\\BaseProviderTestCase\:\:\$stty has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -692,12 +686,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
-
-		-
-			message: '#^Parameter \#1 \$output of class Infection\\Console\\OutputFormatter\\FormatterFactory constructor expects Symfony\\Component\\Console\\Output\\OutputInterface, Infection\\Tests\\Fixtures\\Console\\FakeOutput given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
@@ -1166,18 +1154,6 @@ parameters:
 
 		-
 			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvidesExcluding\(\) has parameter \$excluding with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:getDetectionStatusesIndexExcluding\(\) has parameter \$excludeList with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:getDetectionStatusesIndexExcluding\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php

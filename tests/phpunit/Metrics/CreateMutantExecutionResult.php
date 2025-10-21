@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\Collector;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Testing\MutatorName;
@@ -52,7 +53,7 @@ trait CreateMutantExecutionResult
      */
     private function addMutantExecutionResult(
         Collector $collector,
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         int $count = 1,
     ): array {
         $executionResults = [];
@@ -66,7 +67,7 @@ trait CreateMutantExecutionResult
         return $executionResults;
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
+    private function createMutantExecutionResult(DetectionStatus $detectionStatus): MutantExecutionResult
     {
         $id = $this->id;
         ++$this->id;
