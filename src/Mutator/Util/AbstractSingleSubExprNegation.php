@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
@@ -110,6 +111,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
 
             $binaryOpExprClass = $this->getSupportedBinaryOpExprClass();
 
+            // Keep origNode to preserve formatting of unchanged parts
             return new $binaryOpExprClass(
                 $this->negateSubExpression($binaryOpNode->left, $negateExpressionAtIndex, $currentExpressionIndex),
                 $this->negateSubExpression($binaryOpNode->right, $negateExpressionAtIndex, $currentExpressionIndex),
@@ -121,7 +123,13 @@ abstract class AbstractSingleSubExprNegation implements Mutator
             if ($currentExpressionIndex === $negateExpressionAtIndex) {
                 ++$currentExpressionIndex;
 
-                return new Node\Expr\BooleanNot($node);
+                // Clone the node to remove the origNode from the wrapped expression
+                // This ensures the format-preserving printer adds parentheses correctly
+                // see bug https://github.com/nikic/PHP-Parser/issues/1119
+                $wrappedNode = clone $node;
+                $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
+
+                return new Node\Expr\BooleanNot($wrappedNode);
             }
 
             ++$currentExpressionIndex;

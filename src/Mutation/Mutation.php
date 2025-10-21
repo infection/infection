@@ -42,6 +42,7 @@ use Infection\PhpParser\MutatedNode;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseTimeAdder;
 use function md5;
 use PhpParser\Node;
+use PhpParser\Token;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -66,6 +67,7 @@ class Mutation
      * @param Node[] $originalFileAst
      * @param array<string, string|int|float> $attributes
      * @param TestLocation[] $tests
+     * @param Token[] $originalFileTokens
      */
     public function __construct(
         private readonly string $originalFilePath,
@@ -77,6 +79,8 @@ class Mutation
         private readonly MutatedNode $mutatedNode,
         private readonly int $mutationByMutatorIndex,
         private readonly array $tests,
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
         Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
@@ -101,6 +105,14 @@ class Mutation
     public function getMutatorName(): string
     {
         return $this->mutatorName;
+    }
+
+    /**
+     * @return Token[]
+     */
+    public function getOriginalFileTokens(): array
+    {
+        return $this->originalFileTokens;
     }
 
     public function getMutatorClass(): string
@@ -172,6 +184,11 @@ class Mutation
     public function getHash(): string
     {
         return $this->hash ??= $this->createHash();
+    }
+
+    public function getOriginalFileContent(): string
+    {
+        return $this->originalFileContent;
     }
 
     private function createHash(): string
