@@ -274,8 +274,8 @@ $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sourc
 
 $(BENCHMARK_TRACING_VENDOR):
 	@echo "Preparing the Tracing benchmark sources"
-	git submodule update --init $(TRACING_BENCHMARK_SOURCE_SUBMODULE)
-	composer install --working-dir=$(TRACING_BENCHMARK_SOURCE_SUBMODULE)
+	git submodule update --init $(BENCHMARK_TRACING_SUBMODULE)
+	composer install --working-dir=$(BENCHMARK_TRACING_SUBMODULE)
 	touch -c $@
 
 $(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_VENDOR) $(PHPUNIT)
@@ -289,6 +289,7 @@ $(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_VENDOR) $(PHPUNIT)
 
 clean:
 	rm -fr tests/benchmark/MutationGenerator/sources
+	@rm -fr tests/benchmark/Tracing/sources
 	rm -fr $(BENCHMARK_TRACING_COVERAGE_DIR)
 	rm -fr $(BENCHMARK_TRACING_VENDOR)
 	git clean -f -X tests/e2e/
