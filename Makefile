@@ -44,9 +44,6 @@ BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
 BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
 BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/cpu-core-counter
 BENCHMARK_TRACING_VENDOR=$(BENCHMARK_TRACING_SUBMODULE)/vendor
-BENCHMARK_SOURCES=$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
-				  $(BENCHMARK_TRACING_COVERAGE_DIR) \
-				  $(BENCHMARK_TRACING_VENDOR)
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -183,7 +180,7 @@ test-e2e: test-e2e-phpunit
 
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
-test-e2e-phpunit: $(PHPUNIT) $(BENCHMARK_SOURCES) vendor
+test-e2e-phpunit: $(PHPUNIT) vendor
 	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 
 .PHONY: test-e2e-docker
