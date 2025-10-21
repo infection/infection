@@ -139,6 +139,12 @@ profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVER
 		php tests/benchmark/Tracing/profile.php
 	composer dump
 
+.PHONY: benchmark_tracing
+benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative
+	vendor/bin/phpbench run tests/Benchmark/Tracing
+	composer dump
+
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
