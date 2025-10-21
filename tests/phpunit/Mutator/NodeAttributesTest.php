@@ -36,67 +36,63 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\NodeAttributes;
+use PhpParser\Node;
 use PhpParser\Node\Scalar\Int_;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(NodeAttributes::class)]
 final class NodeAttributesTest extends TestCase
 {
-    public function test_it_returns_all_attributes_except_original_node(): void
-    {
-        $node = new Int_(42);
-        $node->setAttribute('startLine', 1);
-        $node->setAttribute('endLine', 1);
-        $node->setAttribute('startTokenPos', 5);
-        $node->setAttribute('endTokenPos', 10);
-        $node->setAttribute('origNode', new Int_(24));
-        $node->setAttribute('customAttribute', 'value');
+    /**
+     * @param array<string, mixed> $expected
+     */
+    #[DataProvider('nodeProvider')]
+    public function test_it_gets_all_attributes_except_the_original_node(
+        Node $node,
+        array $expected,
+    ): void {
+        $actual = NodeAttributes::getAllExceptOriginalNode($node);
 
-        $result = NodeAttributes::getAllExceptOriginalNode($node);
-
-        $this->assertArrayNotHasKey('origNode', $result);
-        $this->assertSame(1, $result['startLine']);
-        $this->assertSame(1, $result['endLine']);
-        $this->assertSame(5, $result['startTokenPos']);
-        $this->assertSame(10, $result['endTokenPos']);
-        $this->assertSame('value', $result['customAttribute']);
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_returns_empty_array_when_node_has_no_attributes(): void
+    public static function nodeProvider(): iterable
     {
-        $node = new Int_(42);
+        yield 'nominal' => (static function () {
+            $attributes = [
+                'startLine' => 1,
+                'endLine' => 2,
+                'startFilePos' => 3,
+                'endFilePos' => 4,
+                'customAttribute' => 'value',
+            ];
 
-        $result = NodeAttributes::getAllExceptOriginalNode($node);
+            $node = new Int_(42);
+            $node->setAttributes($attributes);
+            $node->setAttribute('origNode', $node);
 
-        $this->assertSame([], $result);
-    }
+            return [$node, $attributes];
+        })();
 
-    public function test_it_returns_all_attributes_when_original_node_is_not_present(): void
-    {
-        $node = new Int_(42);
-        $node->setAttribute('startLine', 1);
-        $node->setAttribute('endLine', 1);
+        yield 'no attributes' => [
+            new Int_(42),
+            [],
+        ];
 
-        $result = NodeAttributes::getAllExceptOriginalNode($node);
-
-        $this->assertArrayHasKey('startLine', $result);
-        $this->assertArrayHasKey('endLine', $result);
-        $this->assertArrayNotHasKey('origNode', $result);
-        $this->assertCount(2, $result);
-    }
-
-    public function test_it_only_removes_original_node_attribute(): void
-    {
-        $node = new Int_(42);
-        $node->setAttribute('origNode', new Int_(24));
-        $node->setAttribute('otherAttribute', 'should-remain');
-
-        $result = NodeAttributes::getAllExceptOriginalNode($node);
-
-        $this->assertArrayNotHasKey('origNode', $result);
-        $this->assertArrayHasKey('otherAttribute', $result);
-        $this->assertSame('should-remain', $result['otherAttribute']);
-        $this->assertCount(1, $result);
+        yield 'all attributes when original node is not present' => [
+            new Int_(
+                42,
+                [
+                    'startLine' => 1,
+                    'endLine' => 2,
+                ],
+            ),
+            [
+                'startLine' => 1,
+                'endLine' => 2,
+            ],
+        ];
     }
 }
