@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Util;
 
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\SimpleExpression;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
@@ -126,9 +127,7 @@ abstract class AbstractSingleSubExprNegation implements Mutator
                 // This ensures the format-preserving printer adds parentheses correctly
                 // see bug https://github.com/nikic/PHP-Parser/issues/1119
                 $wrappedNode = clone $node;
-                $wrappedAttrs = $wrappedNode->getAttributes();
-                unset($wrappedAttrs['origNode']);
-                $wrappedNode->setAttributes($wrappedAttrs);
+                $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
 
                 return new Node\Expr\BooleanNot($wrappedNode);
             }

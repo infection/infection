@@ -127,9 +127,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
         // This ensures the format-preserving printer adds parentheses correctly
         // see bug https://github.com/nikic/PHP-Parser/issues/1119
         $wrappedNode = clone $node;
-        $wrappedAttrs = $wrappedNode->getAttributes();
-        unset($wrappedAttrs['origNode']);
-        $wrappedNode->setAttributes($wrappedAttrs);
+        $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
 
         return new Node\Expr\BooleanNot($wrappedNode);
     }

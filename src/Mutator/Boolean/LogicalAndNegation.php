@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -79,9 +80,7 @@ final class LogicalAndNegation implements Mutator
         // Clone the node to remove the origNode from the wrapped expression
         // see bug https://github.com/nikic/PHP-Parser/issues/1119
         $wrappedNode = clone $node;
-        $wrappedAttrs = $wrappedNode->getAttributes();
-        unset($wrappedAttrs['origNode']);
-        $wrappedNode->setAttributes($wrappedAttrs);
+        $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
 
         yield new Node\Expr\BooleanNot($wrappedNode);
     }
