@@ -40,15 +40,14 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use const JSON_THROW_ON_ERROR;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\json_decode;
-use function str_replace;
 
 #[Group('integration')]
 #[CoversClass(GitLabCodeQualityLogger::class)]
@@ -97,7 +96,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'PregQuote',
                     'description' => 'Escaped Mutant for Mutator PregQuote',
-                    'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
+                    'content' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -112,7 +111,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
+                    'content' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -133,7 +132,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
+                    'content' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',

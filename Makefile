@@ -40,9 +40,12 @@ DOCKER_FILE_IMAGE=devTools/Dockerfile.json
 FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
-BENCHMARK_SOURCES=tests/benchmark/MutationGenerator/sources \
-				  tests/benchmark/Tracing/coverage \
-				  tests/benchmark/Tracing/sources
+BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
+BENCHMARK_TRACING_COVERAGE=tests/benchmark/Tracing/coverage
+BENCHMARK_TRACING_SOURCES=tests/benchmark/Tracing/sources
+BENCHMARK_SOURCES=$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+				  $(BENCHMARK_TRACING_COVERAGE) \
+				  $(BENCHMARK_TRACING_SOURCES)
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -114,13 +117,23 @@ validate:
 
 .PHONY: profile
 profile: 	 	## Runs Blackfire
-profile: vendor $(BENCHMARK_SOURCES)
+profile:
+	$(MAKE) profile_mutation_generator
+	$(MAKE) profile_tracing
+
+.PHONY: profile_mutation_generator
+profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative
 	blackfire run \
 		--samples=5 \
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
+	composer dump
+
+.PHONY: profile_tracing
+profile_tracing: vendor $(BENCHMARK_TRACING_SOURCES) $(BENCHMARK_TRACING_COVERAGE)
+	composer dump --classmap-authoritative
 	blackfire run \
 		--samples=5 \
 		--title="Tracing" \
@@ -254,16 +267,16 @@ $(DOCKER_FILE_IMAGE): devTools/Dockerfile
 	docker image inspect infection-php82 >> $(DOCKER_FILE_IMAGE)
 	touch -c $@
 
-tests/benchmark/MutationGenerator/sources: tests/benchmark/MutationGenerator/sources.tar.gz
+$(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-tests/benchmark/Tracing/coverage: tests/benchmark/Tracing/coverage.tar.gz
+$(BENCHMARK_TRACING_COVERAGE): tests/benchmark/Tracing/coverage.tar.gz
 	@echo "Untarring the coverage, this might take a while"
 	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
 	touch -c $@
 
-tests/benchmark/Tracing/sources: tests/benchmark/Tracing/sources.tar.gz
+$(BENCHMARK_TRACING_SOURCES): tests/benchmark/Tracing/sources.tar.gz
 	@echo "Untarring the sources, this might take a while"
 	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
 	touch -c $@

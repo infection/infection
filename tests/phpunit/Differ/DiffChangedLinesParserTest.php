@@ -109,15 +109,15 @@ final class DiffChangedLinesParserTest extends TestCase
      */
     private function convertToArray(array $map): array
     {
-        $convertedMap = [];
-
-        foreach ($map as $filePath => $changedLinesRanges) {
-            $convertedMap[$filePath] = array_map(
-                static fn (ChangedLinesRange $changedLinesRange): array => [$changedLinesRange->getStartLine(), $changedLinesRange->getEndLine()],
+        return array_map(
+            static fn (array $changedLinesRanges): array => array_map(
+                static fn (ChangedLinesRange $changedLinesRange): array => [
+                    $changedLinesRange->getStartLine(),
+                    $changedLinesRange->getEndLine(),
+                ],
                 $changedLinesRanges,
-            );
-        }
-
-        return $convertedMap;
+            ),
+            $map,
+        );
     }
 }

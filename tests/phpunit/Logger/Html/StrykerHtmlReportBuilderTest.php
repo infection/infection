@@ -451,7 +451,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
      * @param array<int, TestLocation> $testLocations
      */
     private static function createMutantExecutionResult(
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         string $diff,
         string $mutantHash,
         string $mutatorClassName,

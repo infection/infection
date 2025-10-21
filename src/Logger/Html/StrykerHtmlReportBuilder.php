@@ -80,15 +80,15 @@ use Webmozart\Assert\Assert;
 final readonly class StrykerHtmlReportBuilder
 {
     private const DETECTION_STATUS_MAP = [
-        DetectionStatus::KILLED_BY_TESTS => 'Killed',
-        DetectionStatus::KILLED_BY_STATIC_ANALYSIS => 'Killed',
-        DetectionStatus::ESCAPED => 'Survived',
-        DetectionStatus::ERROR => 'RuntimeError',
-        DetectionStatus::TIMED_OUT => 'Timeout',
-        DetectionStatus::NOT_COVERED => 'NoCoverage',
-        DetectionStatus::SYNTAX_ERROR => 'CompileError',
-        DetectionStatus::IGNORED => 'Ignored',
-        DetectionStatus::SKIPPED => 'Ignored',
+        DetectionStatus::KILLED_BY_TESTS->value => 'Killed',
+        DetectionStatus::KILLED_BY_STATIC_ANALYSIS->value => 'Killed',
+        DetectionStatus::ESCAPED->value => 'Survived',
+        DetectionStatus::ERROR->value => 'RuntimeError',
+        DetectionStatus::TIMED_OUT->value => 'Timeout',
+        DetectionStatus::NOT_COVERED->value => 'NoCoverage',
+        DetectionStatus::SYNTAX_ERROR->value => 'CompileError',
+        DetectionStatus::IGNORED->value => 'Ignored',
+        DetectionStatus::SKIPPED->value => 'Ignored',
     ];
 
     private const PLUS_LENGTH = 1;
@@ -258,7 +258,7 @@ final readonly class StrykerHtmlReportBuilder
                         'start' => ['line' => $result->getOriginalStartingLine(), 'column' => $startingColumn],
                         'end' => ['line' => $endingLine, 'column' => $endingColumn],
                     ],
-                    'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()],
+                    'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()->value],
                     'statusReason' => Str::convertToUtf8(Str::trimLineReturns($result->getProcessOutput())),
                     'coveredBy' => array_unique(array_map(
                         fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),
