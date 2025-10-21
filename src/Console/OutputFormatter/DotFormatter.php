@@ -77,44 +77,9 @@ final class DotFormatter extends AbstractOutputFormatter
     {
         parent::advance($executionResult, $mutationCount);
 
-        switch ($executionResult->getDetectionStatus()) {
-            case DetectionStatus::KILLED_BY_TESTS:
-                $this->output->write('<killed>.</killed>');
-
-                break;
-            case DetectionStatus::KILLED_BY_STATIC_ANALYSIS:
-                $this->output->write('<killed-by-static-analysis>A</killed-by-static-analysis>');
-
-                break;
-            case DetectionStatus::NOT_COVERED:
-                $this->output->write('<uncovered>U</uncovered>');
-
-                break;
-            case DetectionStatus::ESCAPED:
-                $this->output->write('<escaped>M</escaped>');
-
-                break;
-            case DetectionStatus::TIMED_OUT:
-                $this->output->write('<timeout>T</timeout>');
-
-                break;
-            case DetectionStatus::SKIPPED:
-                $this->output->write('<skipped>S</skipped>');
-
-                break;
-            case DetectionStatus::ERROR:
-                $this->output->write('<with-error>E</with-error>');
-
-                break;
-            case DetectionStatus::SYNTAX_ERROR:
-                $this->output->write('<with-syntax-error>X</with-syntax-error>');
-
-                break;
-            case DetectionStatus::IGNORED:
-                $this->output->write('<ignored>I</ignored>');
-
-                break;
-        }
+        $this->output->write(
+            self::getCharacter($executionResult),
+        );
 
         $remainder = $this->callsCount % self::DOTS_PER_ROW;
         $endOfRow = $remainder === 0;
@@ -138,5 +103,20 @@ final class DotFormatter extends AbstractOutputFormatter
                 $this->output->writeln('');
             }
         }
+    }
+
+    private static function getCharacter(MutantExecutionResult $executionResult): string
+    {
+        return match ($executionResult->getDetectionStatus()) {
+            DetectionStatus::KILLED_BY_TESTS => '<killed>.</killed>',
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS => '<killed-by-static-analysis>A</killed-by-static-analysis>',
+            DetectionStatus::NOT_COVERED => '<uncovered>U</uncovered>',
+            DetectionStatus::ESCAPED => '<escaped>M</escaped>',
+            DetectionStatus::TIMED_OUT => '<timeout>T</timeout>',
+            DetectionStatus::SKIPPED => '<skipped>S</skipped>',
+            DetectionStatus::ERROR => '<with-error>E</with-error>',
+            DetectionStatus::SYNTAX_ERROR => '<with-syntax-error>X</with-syntax-error>',
+            DetectionStatus::IGNORED => '<ignored>I</ignored>',
+        };
     }
 }

@@ -47,16 +47,16 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class BlackfireInstrumentor
+final class BlackfireInstrumentor implements Instrumentor
 {
-    private function __construct()
-    {
-    }
-
     /**
-     * @param Closure(): void $main
+     * @template T
+     *
+     * @param Closure(): T $main
+     *
+     * @return T
      */
-    public static function profile(Closure $main, SymfonyStyle $io): void
+    public function profile(Closure $main, SymfonyStyle $io): mixed
     {
         self::check($io);
 
@@ -65,7 +65,7 @@ final class BlackfireInstrumentor
         $probe->enable();
 
         try {
-            $main();
+            $result = $main();
 
             $probe->disable();
         } catch (Throwable $throwable) {
@@ -78,6 +78,8 @@ final class BlackfireInstrumentor
 
             throw $throwable;
         }
+
+        return $result;
     }
 
     private static function check(SymfonyStyle $io): void

@@ -139,12 +139,10 @@ final readonly class TestFrameworkConfigPathProvider
         $question->setAutocompleterValues($dirsInCurrentDir);
         $question->setValidator($this->getValidator($testFramework));
 
-        $testFrameworkConfigLocation = $this->questionHelper->ask(
+        return $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
             $question,
         );
-
-        return $testFrameworkConfigLocation;
     }
 }

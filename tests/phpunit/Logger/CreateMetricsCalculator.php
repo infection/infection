@@ -179,7 +179,7 @@ trait CreateMetricsCalculator
     private static function createMutantExecutionResult(
         int $i,
         string $mutatorClassName,
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         string $echoMutatedMessage,
     ): MutantExecutionResult {
         return new MutantExecutionResult(

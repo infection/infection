@@ -64,8 +64,8 @@ class MetricsCalculator implements Collector
     public function __construct(
         private readonly int $roundingPrecision,
     ) {
-        foreach (DetectionStatus::ALL as $status) {
-            $this->countByStatus[$status] = 0;
+        foreach (DetectionStatus::cases() as $status) {
+            $this->countByStatus[$status->value] = 0;
         }
 
         $this->testRuntimesVariance = new RunningVariance();
@@ -82,15 +82,15 @@ class MetricsCalculator implements Collector
         foreach ($executionResults as $executionResult) {
             $detectionStatus = $executionResult->getDetectionStatus();
 
-            if (!array_key_exists($detectionStatus, $this->countByStatus)) {
+            if (!array_key_exists($detectionStatus->value, $this->countByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
-                    $executionResult->getDetectionStatus(),
+                    $executionResult->getDetectionStatus()->value,
                 ));
             }
 
             ++$this->totalMutantsCount;
-            ++$this->countByStatus[$detectionStatus];
+            ++$this->countByStatus[$detectionStatus->value];
 
             if ($detectionStatus === DetectionStatus::KILLED_BY_TESTS) {
                 $this->testRuntimesVariance->observe($executionResult->getProcessRuntime());
@@ -109,47 +109,47 @@ class MetricsCalculator implements Collector
 
     public function getKilledByTestsCount(): int
     {
-        return $this->countByStatus[DetectionStatus::KILLED_BY_TESTS];
+        return $this->countByStatus[DetectionStatus::KILLED_BY_TESTS->value];
     }
 
     public function getKilledByStaticAnalysisCount(): int
     {
-        return $this->countByStatus[DetectionStatus::KILLED_BY_STATIC_ANALYSIS];
+        return $this->countByStatus[DetectionStatus::KILLED_BY_STATIC_ANALYSIS->value];
     }
 
     public function getErrorCount(): int
     {
-        return $this->countByStatus[DetectionStatus::ERROR];
+        return $this->countByStatus[DetectionStatus::ERROR->value];
     }
 
     public function getSyntaxErrorCount(): int
     {
-        return $this->countByStatus[DetectionStatus::SYNTAX_ERROR];
+        return $this->countByStatus[DetectionStatus::SYNTAX_ERROR->value];
     }
 
     public function getSkippedCount(): int
     {
-        return $this->countByStatus[DetectionStatus::SKIPPED];
+        return $this->countByStatus[DetectionStatus::SKIPPED->value];
     }
 
     public function getIgnoredCount(): int
     {
-        return $this->countByStatus[DetectionStatus::IGNORED];
+        return $this->countByStatus[DetectionStatus::IGNORED->value];
     }
 
     public function getEscapedCount(): int
     {
-        return $this->countByStatus[DetectionStatus::ESCAPED];
+        return $this->countByStatus[DetectionStatus::ESCAPED->value];
     }
 
     public function getTimedOutCount(): int
     {
-        return $this->countByStatus[DetectionStatus::TIMED_OUT];
+        return $this->countByStatus[DetectionStatus::TIMED_OUT->value];
     }
 
     public function getNotTestedCount(): int
     {
-        return $this->countByStatus[DetectionStatus::NOT_COVERED];
+        return $this->countByStatus[DetectionStatus::NOT_COVERED->value];
     }
 
     public function getTotalMutantsCount(): int

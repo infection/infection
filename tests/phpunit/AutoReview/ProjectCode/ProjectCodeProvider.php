@@ -59,11 +59,10 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileCollector;
+use Infection\Framework\Enum\EnumBucket;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
@@ -118,9 +117,7 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
-        DetectionStatus::class,
         DummyFileSystem::class,
-        MutationAttributeKeys::class,
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
@@ -146,6 +143,7 @@ final class ProjectCodeProvider
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
         SourceFileCollector::class,
+        EnumBucket::class,
     ];
 
     /**
@@ -254,6 +252,7 @@ final class ProjectCodeProvider
                 $reflectionClass = new ReflectionClass($className);
 
                 return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isEnum()
                     && !in_array(
                         $className,
                         [
