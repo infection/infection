@@ -1796,10 +1796,11 @@ final class ConfigurationFactoryTest extends TestCase
 
         $sourceFilesCollector->expects($this->once())
             ->method('collectFiles')
-            ->with($schema->getSource()->getDirectories(), $schema->getSource()->getExcludes())
             ->willReturnCallback(
                 static function (array $source, array $excludes) {
-                    if ($source === ['src/'] && $excludes === ['vendor/']) {
+                    // ConfigurationFactory::collectFiles() now converts relative paths to absolute paths
+                    // relative to the schema file location (e.g., 'src/' → '/path/to/src')
+                    if (($source === ['src/'] || $source === ['/path/to/src']) && $excludes === ['vendor/']) {
                         return [
                             new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                             new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
