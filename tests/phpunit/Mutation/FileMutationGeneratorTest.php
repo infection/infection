@@ -163,7 +163,7 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with('/path/to/file')
-            ->willReturn($initialStatements)
+            ->willReturn([$initialStatements, []])
         ;
 
         // Pre-traverser should be created and called first
@@ -214,14 +214,16 @@ final class FileMutationGeneratorTest extends TestCase
     ): void {
         $nodeIgnorers = [new FakeIgnorer()];
 
+        $initialStatements = [
+            new FakeNode(),
+            new FakeNode(),
+        ];
+
         $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
             ->with($expectedFilePath)
-            ->willReturn($initialStatements = [
-                new FakeNode(),
-                new FakeNode(),
-            ])
+            ->willReturn([$initialStatements, []])
         ;
 
         $preTraverserMock = $this->createMock(NodeTraverserInterface::class);

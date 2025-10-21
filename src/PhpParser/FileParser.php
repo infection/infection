@@ -55,12 +55,15 @@ class FileParser
     /**
      * @throws UnparsableFile
      *
-     * @return Stmt[]
+     * @return array{0:Stmt[], 1: Token[]}
      */
     public function parse(SplFileInfo $fileInfo): array
     {
         try {
-            return $this->parser->parse($fileInfo->getContents()) ?? [];
+            return [
+                $this->parser->parse($fileInfo->getContents()) ?? [],
+                $this->parser->getTokens(),
+            ];
         } catch (Throwable $throwable) {
             $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()
@@ -69,15 +72,5 @@ class FileParser
 
             throw UnparsableFile::fromInvalidFile($filePath, $throwable);
         }
-    }
-
-    /**
-     * Return tokens for the last parse.
-     *
-     * @return Token[]
-     */
-    public function getTokens(): array
-    {
-        return $this->parser->getTokens();
     }
 }
