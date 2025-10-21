@@ -63,13 +63,16 @@ use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
 use function Infection\Tests\normalizePath;
+use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
+use function var_export;
 
 #[Group('integration')]
 #[CoversClass(ConfigurationFactory::class)]
@@ -953,6 +956,40 @@ final class ConfigurationFactoryTest extends TestCase
             'expectedLogs' => Logs::createEmpty(),
         ];
 
+        yield 'with absolute source directory paths' => [
+            'schema' => new SchemaConfiguration(
+                '/path/to/infection.json',
+                null,
+                new Source(['/absolute/src/'], ['vendor/']),
+                Logs::createEmpty(),
+                '',
+                new PhpUnit(null, null),
+                new PhpStan(null, null),
+                null,
+                null,
+                null,
+                [],
+                null,
+                null,
+                null,
+                null,
+                null,
+                5,
+                null,
+            ),
+            'inputFilter' => 'src/Foo.php, src/Bar.php',
+            'inputGitDiffFilter' => null,
+            'inputUseGitHubAnnotationsLogger' => false,
+            'expectedSourceDirectories' => ['/absolute/src/'],
+            'expectedSourceFiles' => [
+                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+            ],
+            'expectedFilter' => 'src/Foo.php, src/Bar.php',
+            'expectedSourceFilesExcludes' => ['vendor/'],
+            'expectedLogs' => Logs::createEmpty(),
+        ];
+
         yield 'complete' => [
             'ciDetected' => false,
             'githubActionsDetected' => false,
@@ -1797,10 +1834,38 @@ final class ConfigurationFactoryTest extends TestCase
         $sourceFilesCollector->expects($this->once())
             ->method('collectFiles')
             ->willReturnCallback(
-                static function (array $source, array $excludes) {
-                    // ConfigurationFactory::collectFiles() now converts relative paths to absolute paths
+                static function (array $source, array $excludes) use ($schema) {
+                    $schemaSourceDirs = $schema->getSource()->getDirectories();
+
+                    // ConfigurationFactory::collectFiles() MUST convert relative paths to absolute paths
                     // relative to the schema file location (e.g., 'src/' → '/path/to/src')
-                    if (($source === ['src/'] || $source === ['/path/to/src']) && $excludes === ['vendor/']) {
+                    // Absolute paths should be passed through unchanged
+
+                    // For relative paths like ['src/'], expect transformation to ['/path/to/src']
+                    if ($schemaSourceDirs === ['src/']) {
+                        if ($source !== ['/path/to/src']) {
+                            throw new LogicException(
+                                sprintf(
+                                    'Expected source directories to be transformed to absolute paths. Expected: ["/path/to/src"], got: %s',
+                                    var_export($source, true),
+                                ),
+                            );
+                        }
+                    }
+
+                    // For absolute paths like ['/absolute/src/'], expect no transformation
+                    if ($schemaSourceDirs === ['/absolute/src/']) {
+                        if ($source !== ['/absolute/src/']) {
+                            throw new LogicException(
+                                sprintf(
+                                    'Expected absolute source directories to be passed through unchanged. Expected: ["/absolute/src/"], got: %s',
+                                    var_export($source, true),
+                                ),
+                            );
+                        }
+                    }
+
+                    if ($excludes === ['vendor/']) {
                         return [
                             new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                             new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
