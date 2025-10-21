@@ -126,6 +126,11 @@ final class DotFormatterTest extends TestCase
             '<killed>.</killed>',
         ];
 
+        yield 'killed by SA' => [
+            $bucket->take(DetectionStatus::KILLED_BY_STATIC_ANALYSIS),
+            '<killed-by-static-analysis>A</killed-by-static-analysis>',
+        ];
+
         yield 'escaped' => [
             $bucket->take(DetectionStatus::ESCAPED),
             '<escaped>M</escaped>',
@@ -134,6 +139,11 @@ final class DotFormatterTest extends TestCase
         yield 'error' => [
             $bucket->take(DetectionStatus::ERROR),
             '<with-error>E</with-error>',
+        ];
+
+        yield 'syntax error' => [
+            $bucket->take(DetectionStatus::SYNTAX_ERROR),
+            '<with-syntax-error>X</with-syntax-error>',
         ];
 
         yield 'timeout' => [
@@ -155,6 +165,8 @@ final class DotFormatterTest extends TestCase
             $bucket->take(DetectionStatus::IGNORED),
             '<ignored>I</ignored>',
         ];
+
+        $bucket->assertIsEmpty();
     }
 
     public function test_it_prints_total_number_of_mutations(): void
