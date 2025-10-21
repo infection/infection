@@ -133,6 +133,7 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 
 .PHONY: profile_tracing
 profile_tracing: vendor $(BENCHMARK_TRACING_SOURCES) $(BENCHMARK_TRACING_COVERAGE)
+	composer dump --classmap-authoritative
 	blackfire run \
 		--samples=5 \
 		--title="Tracing" \
