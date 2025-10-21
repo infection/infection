@@ -55,7 +55,7 @@ class FileParser
     /**
      * @throws UnparsableFile
      *
-     * @return array{0:Stmt[], 1: Token[]}
+     * @return array{Stmt[], Token[]}
      */
     public function parse(SplFileInfo $fileInfo): array
     {
