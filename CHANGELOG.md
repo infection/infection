@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.32.0]
+
+**Fixed:**
+
+* [BR BREAK!] The relative paths of the sources (`source.directories` in the infection configuration file) are no longer relative to the current working directory but instead to the location of the configuration file.
+
+
 ## [0.31.0](https://github.com/infection/infection/tree/0.31.0) (2025-07-28)
 
 **Changed:**
