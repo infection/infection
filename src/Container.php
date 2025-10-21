@@ -42,6 +42,11 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
+use Infection\Configuration\ConfigurationInterface;
+use Infection\Configuration\Options\CliOptionsApplier;
+use Infection\Configuration\Options\InfectionOptions;
+use Infection\Configuration\Options\OptionsConfigurationLoader;
+use Infection\Configuration\Options\SerializerBuilder;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
@@ -141,6 +146,7 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use JMS\Serializer\SerializerInterface;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -310,7 +316,7 @@ final class Container extends DIContainer
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
-            ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfiguration()->getThreadCount()),
+            ParallelProcessRunner::class => static fn (self $container): ParallelProcessRunner => new ParallelProcessRunner($container->getConfigurationInterface()->getThreadCount()),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->getPhpUnit()->getConfigDir(),
             ),
@@ -322,7 +328,7 @@ final class Container extends DIContainer
             ),
             Parser::class => static fn (): Parser => (new ParserFactory())->createForHostVersion(),
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
-            MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfiguration()->getMsiPrecision()),
+            MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator($container->getConfigurationInterface()->getMsiPrecision()),
             MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
                 $container->getFileSystem(),
                 (string) php_ini_loaded_file(),
@@ -560,6 +566,7 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            SerializerInterface::class => SerializerBuilder::class,
         ]);
 
         return $container->withValues(
@@ -624,14 +631,61 @@ final class Container extends DIContainer
         );
 
         $clone->offsetSet(
+            InfectionOptions::class,
+            static function (self $container) use (
+                $configFile,
+                $initialTestsPhpOptions,
+                $ignoreMsiWithNoMutations,
+                $minMsi,
+                $minCoveredMsi,
+                $testFramework,
+                $testFrameworkExtraOptions,
+                $staticAnalysisToolOptions,
+                $threadCount,
+                $staticAnalysisTool,
+                $dryRun,
+                $msiPrecision,
+            ): InfectionOptions {
+                // Load from file with defaults
+                $options = $container->getOptionsConfigurationLoader()->loadConfiguration(
+                    array_filter(
+                        [
+                            $configFile,
+                            ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                        ],
+                    ),
+                );
+
+                // Apply CLI overrides
+                $container->getCliOptionsApplier()->apply(
+                    $options,
+                    $initialTestsPhpOptions,
+                    $ignoreMsiWithNoMutations,
+                    $minMsi,
+                    $minCoveredMsi,
+                    $testFramework,
+                    $testFrameworkExtraOptions,
+                    $staticAnalysisToolOptions,
+                    $threadCount,
+                    $staticAnalysisTool,
+                    $dryRun,
+                    $msiPrecision,
+                );
+
+                return $options;
+            },
+        );
+
+        $clone->offsetSet(
+            ConfigurationInterface::class,
+            static fn (self $container): ConfigurationInterface => $container->getInfectionOptions(),
+        );
+
+        $clone->offsetSet(
             SchemaConfiguration::class,
-            static fn (self $container): SchemaConfiguration => $container->getSchemaConfigurationLoader()->loadConfiguration(
-                array_filter(
-                    [
-                        $configFile,
-                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
-                    ],
-                ),
+            static fn (self $container): SchemaConfiguration => $container->getSchemaConfigurationFactory()->createFromOptions(
+                $container->getOptionsConfigurationLoader()->getLoadedFilePath() ?? '',
+                $container->getInfectionOptions(),
             ),
         );
 
@@ -1055,6 +1109,26 @@ final class Container extends DIContainer
     private function getConfigurationFactory(): ConfigurationFactory
     {
         return $this->get(ConfigurationFactory::class);
+    }
+
+    private function getOptionsConfigurationLoader(): OptionsConfigurationLoader
+    {
+        return $this->get(OptionsConfigurationLoader::class);
+    }
+
+    private function getCliOptionsApplier(): CliOptionsApplier
+    {
+        return $this->get(CliOptionsApplier::class);
+    }
+
+    private function getInfectionOptions(): InfectionOptions
+    {
+        return $this->get(InfectionOptions::class);
+    }
+
+    private function getConfigurationInterface(): ConfigurationInterface
+    {
+        return $this->get(ConfigurationInterface::class);
     }
 
     private function getPrinter(): PrettyPrinterAbstract

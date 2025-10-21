@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,27 +34,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @final
+ * Represents the configuration for a single mutator.
+ * Can be a bool (enabled/disabled) or an object with detailed settings.
+ *
+ * @internal
  */
-class SchemaConfigurationFileLoader
+final class MutatorConfigOptions
 {
+    /**
+     * @param string[] $ignore
+     * @param string[] $ignoreSourceCodeByRegex
+     * @param array<string, mixed> $settings
+     */
     public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
+        #[Serializer\Type('array<string>')]
+        public array $ignore = [],
+        #[Serializer\Type('array<string>')]
+        public array $ignoreSourceCodeByRegex = [],
+        #[Serializer\Type('array')]
+        public array $settings = [],
     ) {
-    }
-
-    public function loadFile(string $file): SchemaConfiguration
-    {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
-
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
     }
 }

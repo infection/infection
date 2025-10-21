@@ -42,6 +42,13 @@ use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
+use Infection\Configuration\Options\InfectionOptions;
+use Infection\Configuration\Options\LogsOptions;
+use Infection\Configuration\Options\MutatorConfigOptions;
+use Infection\Configuration\Options\PhpStanOptions;
+use Infection\Configuration\Options\PhpUnitOptions;
+use Infection\Configuration\Options\SourceOptions;
+use Infection\Configuration\Options\StrykerConfigOptions;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
@@ -133,6 +140,14 @@ final class ProjectCodeProvider
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+        // Options Pattern DTOs - simple data objects tested through integration
+        InfectionOptions::class,
+        SourceOptions::class,
+        LogsOptions::class,
+        StrykerConfigOptions::class,
+        PhpUnitOptions::class,
+        PhpStanOptions::class,
+        MutatorConfigOptions::class,
     ];
 
     /**

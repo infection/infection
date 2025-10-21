@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,27 +34,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @final
+ * @internal
  */
-class SchemaConfigurationFileLoader
+final class LogsOptions
 {
     public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
+        #[Serializer\Type('string')]
+        public ?string $text = null,
+        #[Serializer\Type('string')]
+        public ?string $summary = null,
+        #[Serializer\Type('string')]
+        public ?string $json = null,
+        #[Serializer\Type('string')]
+        public ?string $html = null,
+        #[Serializer\Type('string')]
+        public ?string $debug = null,
+        #[Serializer\Type('string')]
+        public ?string $perMutator = null,
+        #[Serializer\Type(StrykerConfigOptions::class)]
+        public ?StrykerConfigOptions $stryker = null,
+        #[Serializer\Type('bool')]
+        public ?bool $github = null,
+        #[Serializer\Type('string')]
+        public ?string $gitlab = null,
+        #[Serializer\Type('string')]
+        public ?string $summaryJson = null,
     ) {
-    }
-
-    public function loadFile(string $file): SchemaConfiguration
-    {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
-
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
     }
 }

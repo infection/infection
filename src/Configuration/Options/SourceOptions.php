@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,27 +34,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @final
+ * @internal
  */
-class SchemaConfigurationFileLoader
+final class SourceOptions
 {
+    /**
+     * @param string[] $directories
+     * @param string[] $excludes
+     */
     public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
+        #[Serializer\Type('array<string>')]
+        public array $directories = [],
+        #[Serializer\Type('array<string>')]
+        public array $excludes = [],
     ) {
-    }
-
-    public function loadFile(string $file): SchemaConfiguration
-    {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
-
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
     }
 }

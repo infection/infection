@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,27 +34,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Tests\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use Infection\Configuration\Options\SerializerBuilder;
+use JMS\Serializer\SerializerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @final
- */
-class SchemaConfigurationFileLoader
+#[CoversClass(SerializerBuilder::class)]
+final class SerializerBuilderTest extends TestCase
 {
-    public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
-    ) {
+    public function test_it_builds_serializer_with_custom_handlers(): void
+    {
+        $builder = new SerializerBuilder();
+
+        $serializer = $builder->build();
+
+        $this->assertInstanceOf(SerializerInterface::class, $serializer);
     }
 
-    public function loadFile(string $file): SchemaConfiguration
+    public function test_built_serializer_can_deserialize_json(): void
     {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
+        $builder = new SerializerBuilder();
+        $serializer = $builder->build();
 
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
+        $json = '{"value": 42}';
+        $result = $serializer->deserialize($json, 'array', 'json');
+
+        $this->assertIsArray($result);
+        $this->assertSame(42, $result['value']);
     }
 }

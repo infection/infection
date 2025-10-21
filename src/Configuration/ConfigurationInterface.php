@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,27 +34,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
-
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+namespace Infection\Configuration;
 
 /**
- * @final
+ * Interface for accessing configuration options.
+ *
+ * Services should depend on this interface rather than concrete Configuration classes.
+ * This allows for gradual migration from Configuration to InfectionOptions.
+ *
+ * Methods are added incrementally as services are migrated - following YAGNI principle.
+ *
+ * @internal
  */
-class SchemaConfigurationFileLoader
+interface ConfigurationInterface
 {
-    public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
-    ) {
-    }
+    public function getProcessTimeout(): float;
 
-    public function loadFile(string $file): SchemaConfiguration
-    {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
+    public function getThreadCount(): int;
 
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
-    }
+    public function getMsiPrecision(): int;
+
+    public function isDryRun(): bool;
 }

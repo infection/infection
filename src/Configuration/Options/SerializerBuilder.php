@@ -33,27 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use DIContainer\Builder;
+use Infection\Configuration\Options\Handler\ScalarOrObjectHandler;
+use JMS\Serializer\Handler\HandlerRegistryInterface;
+use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
+use JMS\Serializer\SerializerBuilder as JMSSerializerBuilder;
+use JMS\Serializer\SerializerInterface;
 
 /**
- * @final
+ * @implements Builder<SerializerInterface>
  */
-class SchemaConfigurationFileLoader
+class SerializerBuilder implements Builder
 {
-    public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
-    ) {
-    }
-
-    public function loadFile(string $file): SchemaConfiguration
+    public function build(): SerializerInterface
     {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
-
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
+        return JMSSerializerBuilder::create()
+            ->setPropertyNamingStrategy(new IdenticalPropertyNamingStrategy())
+            ->configureHandlers(static function (HandlerRegistryInterface $registry): void {
+                $registry->registerSubscribingHandler(new ScalarOrObjectHandler());
+            })
+            ->build();
     }
 }

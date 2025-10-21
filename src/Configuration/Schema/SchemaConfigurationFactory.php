@@ -43,6 +43,12 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\Options\InfectionOptions;
+use Infection\Configuration\Options\LogsOptions;
+use Infection\Configuration\Options\PhpStanOptions;
+use Infection\Configuration\Options\PhpUnitOptions;
+use Infection\Configuration\Options\SourceOptions;
+use Infection\Configuration\Options\StrykerConfigOptions;
 use stdClass;
 use function trim;
 
@@ -51,6 +57,30 @@ use function trim;
  */
 class SchemaConfigurationFactory
 {
+    public function createFromOptions(string $path, InfectionOptions $options): SchemaConfiguration
+    {
+        return new SchemaConfiguration(
+            $path,
+            $options->timeout,
+            self::createSourceFromOptions($options->source),
+            self::createLogsFromOptions($options->logs),
+            $options->tmpDir,
+            self::createPhpUnitFromOptions($options->phpUnit),
+            self::createPhpStanFromOptions($options->phpStan),
+            $options->ignoreMsiWithNoMutations,
+            $options->minMsi,
+            $options->minCoveredMsi,
+            $options->mutators,
+            $options->testFramework,
+            $options->bootstrap,
+            $options->initialTestsPhpOptions,
+            $options->testFrameworkOptions,
+            $options->staticAnalysisToolOptions,
+            $options->threads,
+            $options->staticAnalysisTool,
+        );
+    }
+
     public function create(string $path, stdClass $rawConfig): SchemaConfiguration
     {
         return new SchemaConfiguration(
@@ -155,5 +185,87 @@ class SchemaConfigurationFactory
         $normalizedValue = trim($value);
 
         return $normalizedValue === '' ? null : $normalizedValue;
+    }
+
+    private static function createSourceFromOptions(SourceOptions $source): Source
+    {
+        return new Source(
+            $source->directories,
+            $source->excludes,
+        );
+    }
+
+    private static function createLogsFromOptions(?LogsOptions $logs): Logs
+    {
+        if ($logs === null) {
+            return new Logs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                null,
+                null,
+            );
+        }
+
+        return new Logs(
+            $logs->text,
+            $logs->html,
+            $logs->summary,
+            $logs->json,
+            $logs->gitlab,
+            $logs->debug,
+            $logs->perMutator,
+            $logs->github ?? false,
+            self::createStrykerConfigFromOptions($logs->stryker),
+            $logs->summaryJson,
+        );
+    }
+
+    private static function createStrykerConfigFromOptions(?StrykerConfigOptions $stryker): ?StrykerConfig
+    {
+        if ($stryker === null) {
+            return null;
+        }
+
+        $branch = $stryker->badge ?? $stryker->report;
+
+        if ($branch === null) {
+            return null;
+        }
+
+        if ($stryker->badge !== null) {
+            return StrykerConfig::forBadge($branch);
+        }
+
+        return StrykerConfig::forFullReport($branch);
+    }
+
+    private static function createPhpUnitFromOptions(?PhpUnitOptions $phpUnit): PhpUnit
+    {
+        if ($phpUnit === null) {
+            return new PhpUnit(null, null);
+        }
+
+        return new PhpUnit(
+            $phpUnit->configDir,
+            $phpUnit->customPath,
+        );
+    }
+
+    private static function createPhpStanFromOptions(?PhpStanOptions $phpStan): PhpStan
+    {
+        if ($phpStan === null) {
+            return new PhpStan(null, null);
+        }
+
+        return new PhpStan(
+            $phpStan->configDir,
+            $phpStan->customPath,
+        );
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,27 +34,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Options;
 
-use Infection\Configuration\Options\OptionsConfigurationLoader;
+use JMS\Serializer\SerializerInterface;
+use RuntimeException;
 
 /**
- * @final
+ * Deserializes JSON configuration into InfectionOptions DTOs using JMS Serializer.
+ *
+ * @internal
  */
-class SchemaConfigurationFileLoader
+final class InfectionConfigDeserializer
 {
-    public function __construct(
-        private readonly SchemaConfigurationFactory $factory,
-        private readonly OptionsConfigurationLoader $optionsLoader,
-    ) {
+    public function __construct(private readonly SerializerInterface $serializer)
+    {
     }
 
-    public function loadFile(string $file): SchemaConfiguration
+    public function deserialize(string $json): InfectionOptions
     {
-        // Load into InfectionOptions (with defaults)
-        $options = $this->optionsLoader->load($file);
+        $result = $this->serializer->deserialize($json, InfectionOptions::class, 'json');
 
-        // Convert to SchemaConfiguration (backwards compatible)
-        return $this->factory->createFromOptions($file, $options);
+        if (!$result instanceof InfectionOptions) {
+            throw new RuntimeException('Failed to deserialize InfectionOptions');
+        }
+
+        return $result;
     }
 }

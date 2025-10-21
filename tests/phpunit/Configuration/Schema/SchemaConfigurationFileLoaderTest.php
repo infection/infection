@@ -35,15 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Schema;
 
+use Infection\Configuration\Options\InfectionOptions;
+use Infection\Configuration\Options\OptionsConfigurationLoader;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
-use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
-use Infection\Configuration\Schema\SchemaValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Constraint\Callback;
-use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -54,14 +52,14 @@ use function Safe\realpath;
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
     /**
-     * @var SchemaValidator|MockObject
-     */
-    private $schemaValidatorStub;
-
-    /**
      * @var SchemaConfigurationFactory|MockObject
      */
     private $configFactoryStub;
+
+    /**
+     * @var OptionsConfigurationLoader|MockObject
+     */
+    private $optionsLoaderStub;
 
     /**
      * @var SchemaConfigurationFileLoader
@@ -70,45 +68,37 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->schemaValidatorStub = $this->createMock(SchemaValidator::class);
         $this->configFactoryStub = $this->createMock(SchemaConfigurationFactory::class);
+        $this->optionsLoaderStub = $this->createMock(OptionsConfigurationLoader::class);
 
         $this->loader = new SchemaConfigurationFileLoader(
-            $this->schemaValidatorStub,
             $this->configFactoryStub,
+            $this->optionsLoaderStub,
         );
     }
 
     public function test_it_create_a_configuration_from_a_file_path(): void
     {
         $path = realpath(__DIR__ . '/../../Fixtures/Configuration/file.json');
-        $decodedContents = (object) ['foo' => 'bar'];
+        $expectedOptions = (new ReflectionClass(InfectionOptions::class))->newInstanceWithoutConstructor();
         $expectedConfig = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 
-        $this->schemaValidatorStub
+        $this->optionsLoaderStub
             ->expects($this->once())
-            ->method('validate')
-            ->with(self::createRawConfigWithPathArgument($path))
+            ->method('load')
+            ->with($path)
+            ->willReturn($expectedOptions)
         ;
 
         $this->configFactoryStub
             ->expects($this->once())
-            ->method('create')
-            ->with($path, $decodedContents)
+            ->method('createFromOptions')
+            ->with($path, $expectedOptions)
             ->willReturn($expectedConfig)
         ;
 
         $actual = $this->loader->loadFile($path);
 
         $this->assertSame($expectedConfig, $actual);
-    }
-
-    private static function createRawConfigWithPathArgument(string $path): Constraint
-    {
-        return new Callback(static function (SchemaConfigurationFile $config) use ($path): bool {
-            self::assertSame($path, $config->getPath());
-
-            return true;
-        });
     }
 }
