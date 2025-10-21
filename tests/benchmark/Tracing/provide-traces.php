@@ -47,12 +47,12 @@ $input = new ArgvInput(
     null,
     new InputDefinition([
         new InputArgument(
-            MAX_TRACE_COUNT_ARG,
+            MAX_TRACE_COUNT_OPT,
             InputArgument::OPTIONAL,
-            'Maximum number of traces retrieved. Use -1 for no maximum',
+            'Maximum number of traces retrieved. Use 0 for no maximum',
             50,
         ),
     ]),
 );
 
-(require __DIR__ . '/provide-traces-closure.php')((int) $input->getArgument(MAX_TRACE_COUNT_ARG));
+(require __DIR__ . '/provide-traces-closure.php')((int) $input->getArgument(MAX_TRACE_COUNT_OPT));

@@ -37,6 +37,7 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
+use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
@@ -46,46 +47,32 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 $container = Container::create()->withValues(
     logger: new NullLogger(),
     output: new NullOutput(),
+    configFile: __DIR__ . '/cpu-core-counter/infection.json5',
     existingCoveragePath: __DIR__ . '/coverage',
     useNoopMutators: true,
 );
 
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
+// Instantiating the service may be expensive, and it is not what we are interested
+// in profiling here.
+// For instance, at the time of writing, instantiating this services instantiates
+// the TestFrameworkAdapter, which launches a process to add the vendor bin to
+// the paths, which turns out to be extremely expensive compared to the trace
+// generation.
+$traceProvider = $container->getUnionTraceProvider();
 
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
-    }
-
-    $i = 0;
+return static function () use ($traceProvider): int {
+    $traces = $traceProvider->provideTraces();
+    $traceCount = 0;
 
     foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
-            break;
-        }
-
-        yield $trace;
-    }
-};
-
-/*
- * @return positive-int|0
- */
-return static function (int $maxCount) use ($generateTraces): int {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-    $count = 0;
-
-    foreach ($traces as $_) {
-        ++$count;
+        /** @var Trace $trace */
+        // Load any potential lazy-state
+        $trace->getSourceFileInfo();
+        $trace->getTests();
         // Iterate over the generator: do not use iterator_to_array which is less GC friendly
+
+        ++$traceCount;
     }
 
-    return $count;
+    return $traceCount;
 };

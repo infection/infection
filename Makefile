@@ -41,11 +41,12 @@ FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
-BENCHMARK_TRACING_COVERAGE=tests/benchmark/Tracing/coverage
-BENCHMARK_TRACING_SOURCES=tests/benchmark/Tracing/sources
-BENCHMARK_SOURCES=$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
-				  $(BENCHMARK_TRACING_COVERAGE) \
-				  $(BENCHMARK_TRACING_SOURCES)
+TRACING_BENCHMARK_SOURCE_COVERAGE_DIR=tests/benchmark/Tracing/coverage
+TRACING_BENCHMARK_SOURCE_SUBMODULE=tests/benchmark/Tracing/cpu-core-counter
+TRACING_BENCHMARK_SOURCE_VENDOR=$(TRACING_BENCHMARK_SOURCE_SUBMODULE)/vendor
+TRACING_BENCHMARK_SOURCES=$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+							$(TRACING_BENCHMARK_SOURCE_COVERAGE_DIR) \
+							$(TRACING_BENCHMARK_SOURCE_VENDOR)
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -271,17 +272,23 @@ $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sourc
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-$(BENCHMARK_TRACING_COVERAGE): tests/benchmark/Tracing/coverage.tar.gz
-	@echo "Untarring the coverage, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
+$(TRACING_BENCHMARK_VENDOR):
+	@echo "Preparing the Tracing benchmark sources"
+	git submodule update --init $(TRACING_BENCHMARK_SOURCE_SUBMODULE)
+	composer install --working-dir=$(TRACING_BENCHMARK_SOURCE_SUBMODULE)
 	touch -c $@
 
-$(BENCHMARK_TRACING_SOURCES): tests/benchmark/Tracing/sources.tar.gz
-	@echo "Untarring the sources, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
+$(TRACING_BENCHMARK_SOURCE_COVERAGE_DIR): $(TRACING_BENCHMARK_VENDOR) $(PHPUNIT)
+	@echo "Generating coverage"
+	@rm -rf $(TRACING_BENCHMARK_SOURCE_COVERAGE_DIR) || true
+	cd $(TRACING_BENCHMARK_SOURCE_SUBMODULE); \
+		XDEBUG_MODE=coverage vendor/bin/phpunit \
+			--coverage-xml=../coverage/xml \
+			--log-junit=../coverage/junit.xml
 	touch -c $@
 
 clean:
+	#TODO
 	rm -fr tests/benchmark/MutationGenerator/sources
 	rm -fr tests/benchmark/Tracing/coverage
 	rm -fr tests/benchmark/Tracing/sources

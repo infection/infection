@@ -52,29 +52,53 @@ final class BlackfireInstrumentor implements Instrumentor
     /**
      * @template T
      *
-     * @param Closure(): T $main
+     * @param Closure(): (Closure(): T) $main
+     * @param positive-int $sampleSize
      *
      * @return T
      */
-    public function profile(Closure $main, SymfonyStyle $io): mixed
+    public function profile(Closure $main, int $sampleSize, SymfonyStyle $io): mixed
     {
         self::check($io);
 
         $probe = BlackfireProbe::getMainInstance();
+        $result = null;
 
-        $probe->enable();
+        for ($i = 0; $i < $sampleSize; ++$i) {
+            $result += self::profileSample($main, $probe, $io);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @template T
+     *
+     * @param Closure(): (Closure(): T) $main
+     */
+    private static function profileSample(
+        Closure $main,
+        BlackfireProbe $probe,
+        SymfonyStyle $io,
+    ): mixed {
+        $profile = $main();
+
+        $enabled = $probe->enable();
+        Assert::notFalse($enabled);
 
         try {
-            $result = $main();
+            $result = $profile();
 
             $probe->disable();
         } catch (Throwable $throwable) {
             $probe->discard();
 
-            $io->warning(sprintf(
-                'An error occurred. The profile has been discarded please check the error first: "%s"',
-                $throwable->getMessage(),
-            ));
+            $io->warning(
+                sprintf(
+                    'An error occurred. The profile has been discarded please check the error first: "%s"',
+                    $throwable->getMessage(),
+                ),
+            );
 
             throw $throwable;
         }

@@ -1,0 +1,3 @@
+[submodule "tests/benchmark/Tracing/cpu-core-counter"]
+	path = tests/benchmark/Tracing/cpu-core-counter
+	url = git@github.com:theofidry/cpu-core-counter.git
