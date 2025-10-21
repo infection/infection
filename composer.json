@@ -56,7 +56,7 @@
         "infection/include-interceptor": "^0.2.5",
         "infection/mutator": "^0.4",
         "justinrainbow/json-schema": "^6.0",
-        "nikic/php-parser": "^5.3",
+        "nikic/php-parser": "^5.6.2",
         "ondram/ci-detector": "^4.1.0",
         "sanmai/di-container": "^0.1.4",
         "sanmai/duoclock": "^0.1.0",
@@ -72,7 +72,8 @@
     },
     "conflict": {
         "antecedent/patchwork": "<2.1.25",
-        "dg/bypass-finals": "<1.4.1"
+        "dg/bypass-finals": "<1.4.1",
+        "rector/rector": "2.2.3"
     },
     "require-dev": {
         "ext-simplexml": "*",
