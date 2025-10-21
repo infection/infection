@@ -41,11 +41,12 @@ FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
-BENCHMARK_TRACING_COVERAGE=tests/benchmark/Tracing/coverage
-BENCHMARK_TRACING_SOURCES=tests/benchmark/Tracing/sources
+BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
+BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/cpu-core-counter
+BENCHMARK_TRACING_VENDOR=$(TRACING_BENCHMARK_SOURCE_SUBMODULE)/vendor
 BENCHMARK_SOURCES=$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
-				  $(BENCHMARK_TRACING_COVERAGE) \
-				  $(BENCHMARK_TRACING_SOURCES)
+				  $(BENCHMARK_TRACING_COVERAGE_DIR) \
+				  $(TRACING_BENCHMARK_SOURCE_VENDOR)
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -132,7 +133,7 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump
 
 .PHONY: profile_tracing
-profile_tracing: vendor $(BENCHMARK_TRACING_SOURCES) $(BENCHMARK_TRACING_COVERAGE)
+profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative
 	blackfire run \
 		--samples=5 \
@@ -271,18 +272,23 @@ $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sourc
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-$(BENCHMARK_TRACING_COVERAGE): tests/benchmark/Tracing/coverage.tar.gz
-	@echo "Untarring the coverage, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
+$(BENCHMARK_TRACING_VENDOR):
+	@echo "Preparing the Tracing benchmark sources"
+	git submodule update --init $(TRACING_BENCHMARK_SOURCE_SUBMODULE)
+	composer install --working-dir=$(TRACING_BENCHMARK_SOURCE_SUBMODULE)
 	touch -c $@
 
-$(BENCHMARK_TRACING_SOURCES): tests/benchmark/Tracing/sources.tar.gz
-	@echo "Untarring the sources, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
+$(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_VENDOR) $(PHPUNIT)
+	@echo "Generating coverage"
+	@rm -rf $(BENCHMARK_TRACING_COVERAGE_DIR) || true
+	cd $(BENCHMARK_TRACING_SUBMODULE); \
+		XDEBUG_MODE=coverage vendor/bin/phpunit \
+			--coverage-xml=../coverage/xml \
+			--log-junit=../coverage/junit.xml
 	touch -c $@
 
 clean:
 	rm -fr tests/benchmark/MutationGenerator/sources
-	rm -fr tests/benchmark/Tracing/coverage
-	rm -fr tests/benchmark/Tracing/sources
+	rm -fr $(BENCHMARK_TRACING_COVERAGE_DIR)
+	rm -fr $(BENCHMARK_TRACING_VENDOR)
 	git clean -f -X tests/e2e/
