@@ -33,49 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutator\Arithmetic;
+namespace Infection\Tests\Mutator;
 
-use Infection\Mutator\Definition;
-use Infection\Mutator\GetMutatorName;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
+use PhpParser\Node\Scalar\Int_;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @implements Mutator<Node\Expr\BinaryOp\BooleanAnd>
- */
-final class BitwiseAnd implements Mutator
+#[CoversClass(NodeAttributes::class)]
+final class NodeAttributesTest extends TestCase
 {
-    use GetMutatorName;
-
-    public static function getDefinition(): Definition
-    {
-        return new Definition(
-            'Replaces a bitwise AND operator (`&`) with a bitwise OR operator (`|`).',
-            MutatorCategory::ORTHOGONAL_REPLACEMENT,
-            null,
-            <<<'DIFF'
-                - $a = $b & $c;
-                + $a = $b | $c;
-                DIFF,
-        );
-    }
-
     /**
-     * @psalm-mutation-free
-     *
-     * @return iterable<Node\Expr\BinaryOp\BitwiseOr>
+     * @param array<string, mixed> $expected
      */
-    public function mutate(Node $node): iterable
-    {
-        yield new Node\Expr\BinaryOp\BitwiseOr($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
+    #[DataProvider('nodeProvider')]
+    public function test_it_gets_all_attributes_except_the_original_node(
+        Node $node,
+        array $expected,
+    ): void {
+        $actual = NodeAttributes::getAllExceptOriginalNode($node);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function canMutate(Node $node): bool
+    public static function nodeProvider(): iterable
     {
-        return $node instanceof Node\Expr\BinaryOp\BitwiseAnd;
+        yield 'nominal' => (static function () {
+            $attributes = [
+                'startLine' => 1,
+                'endLine' => 2,
+                'startFilePos' => 3,
+                'endFilePos' => 4,
+                'customAttribute' => 'value',
+            ];
+
+            $node = new Int_(42);
+            $node->setAttributes($attributes);
+            $node->setAttribute('origNode', $node);
+
+            return [$node, $attributes];
+        })();
+
+        yield 'no attributes' => [
+            new Int_(42),
+            [],
+        ];
+
+        yield 'all attributes when original node is not present' => [
+            new Int_(
+                42,
+                [
+                    'startLine' => 1,
+                    'endLine' => 2,
+                ],
+            ),
+            [
+                'startLine' => 1,
+                'endLine' => 2,
+            ],
+        ];
     }
 }

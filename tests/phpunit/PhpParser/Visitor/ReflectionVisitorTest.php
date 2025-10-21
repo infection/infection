@@ -69,7 +69,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
     #[DataProvider('isPartOfSignatureFlagProvider')]
     public function test_it_marks_nodes_which_are_part_of_the_function_signature(string $nodeClass, bool $expected): void
     {
-        $nodes = self::parseCode(
+        [$nodes] = self::parseCode(
             $this->getFileContent('Reflection/rv-part-of-signature-flag.php'),
         );
 
@@ -363,7 +363,7 @@ final class ReflectionVisitorTest extends BaseVisitorTestCase
 
     private function parseAndTraverse(string $code, ?NodeVisitor $nodeVisitor = null): void
     {
-        $nodes = self::parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse(
             $nodes,

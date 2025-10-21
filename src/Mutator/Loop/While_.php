@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -97,7 +98,7 @@ final class While_ implements Mutator
         yield new Node\Stmt\While_(
             new Node\Expr\ConstFetch(new Node\Name('false')),
             $node->stmts,
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 

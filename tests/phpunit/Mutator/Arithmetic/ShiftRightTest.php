@@ -88,10 +88,7 @@ final class ShiftRightTest extends BaseMutatorTestCase
         $mutations = $this->mutate($code);
 
         $expectedMutatedCode = <<<'PHP'
-            <?php
-
-            $a = 1;
-            $a << 2;
+            <?php $a = 1; $a << 2;
             PHP;
 
         $this->assertSame($expectedMutatedCode, $mutations[0]);
