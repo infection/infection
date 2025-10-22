@@ -72,8 +72,7 @@
     },
     "conflict": {
         "antecedent/patchwork": "<2.1.25",
-        "dg/bypass-finals": "<1.4.1",
-        "rector/rector": "2.2.3"
+        "dg/bypass-finals": "<1.4.1"
     },
     "require-dev": {
         "ext-simplexml": "*",
@@ -84,7 +83,7 @@
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-webmozart-assert": "^2.0",
         "phpunit/phpunit": "^11.5.27",
-        "rector/rector": "^2.0",
+        "rector/rector": "^2.2.4",
         "shipmonk/dead-code-detector": "^0.12.0",
         "shipmonk/name-collision-detector": "^2.1",
         "sidz/phpstan-rules": "^0.5.1",

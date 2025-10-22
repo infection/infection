@@ -148,7 +148,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
             $configPath,
             '--path=/a path/with spaces',
             array_map(
-                static fn (string $testCase): TestLocation => TestLocation::forTestMethod($testCase),
+                TestLocation::forTestMethod(...),
                 $testCases,
             ),
             $phpUnitVersion,
