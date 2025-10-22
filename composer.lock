@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d5e6df411f046e4dec0e2342a96f207",
+    "content-hash": "64aa79878c6cbdbca34c9ac7c53ceb8a",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -3424,16 +3424,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.2.2",
+            "version": "2.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "5b353f7457b9a0c63fc91ef340f5d119a40991ed"
+                "reference": "904f12f23858ef54ec5782b05cb2979b703cb185"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/5b353f7457b9a0c63fc91ef340f5d119a40991ed",
-                "reference": "5b353f7457b9a0c63fc91ef340f5d119a40991ed",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/904f12f23858ef54ec5782b05cb2979b703cb185",
+                "reference": "904f12f23858ef54ec5782b05cb2979b703cb185",
                 "shasum": ""
             },
             "require": {
@@ -3472,7 +3472,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.2.2"
+                "source": "https://github.com/rectorphp/rector/tree/2.2.4"
             },
             "funding": [
                 {
@@ -3480,7 +3480,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-09T19:50:20+00:00"
+            "time": "2025-10-22T07:50:23+00:00"
         },
         {
             "name": "sebastian/cli-parser",
