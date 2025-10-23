@@ -46,7 +46,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 $container = Container::create()->withValues(
     logger: new NullLogger(),
     output: new NullOutput(),
-    configFile: __DIR__ . '/cpu-core-counter/infection.json5',
+    configFile: __DIR__ . '/infection.json5',
     existingCoveragePath: __DIR__ . '/coverage',
     useNoopMutators: true,
 );
