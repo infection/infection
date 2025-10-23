@@ -42,8 +42,7 @@ COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
 BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
-BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/cpu-core-counter
-BENCHMARK_TRACING_VENDOR=$(BENCHMARK_TRACING_SUBMODULE)/vendor
+BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/benchmark-source
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -269,19 +268,19 @@ $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sourc
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-$(BENCHMARK_TRACING_VENDOR):
-	@echo "Preparing the Tracing benchmark sources"
-	git submodule update --init $(BENCHMARK_TRACING_SUBMODULE)
-	composer install --working-dir=$(BENCHMARK_TRACING_SUBMODULE)
-	touch -c $@
-
-$(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_VENDOR) $(PHPUNIT)
+$(BENCHMARK_TRACING_COVERAGE_DIR):
 	@echo "Generating coverage"
 	@rm -rf $(BENCHMARK_TRACING_COVERAGE_DIR) || true
-	cd $(BENCHMARK_TRACING_SUBMODULE); \
-		XDEBUG_MODE=coverage vendor/bin/phpunit \
-			--coverage-xml=../coverage/xml \
-			--log-junit=../coverage/junit.xml
+	cp -R $(BENCHMARK_TRACING_SUBMODULE)/dist/coverage $(BENCHMARK_TRACING_COVERAGE_DIR)
+	@# Correct the absolute paths found
+	PROJECT_ROOT=$$(pwd)/$(BENCHMARK_TRACING_SUBMODULE) \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-type f \
+			-exec sed -i.bak "s|/path/to/project|$${PROJECT_ROOT}|g" {} \; \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-name "*.bak" \
+			-type f \
+			-delete
 	touch -c $@
 
 clean:
