@@ -56,7 +56,7 @@ $generateTraces = static function (?int $maxCount) use ($container): iterable {
 
     if ($maxCount === null) {
         // Avoid extra limiting generator for a simpler case
-        return $traces;
+        return yield from $traces;
     }
 
     $i = 0;

@@ -9,6 +9,7 @@ use Infection\Benchmark\InstrumentorFactory;
 use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeClassMethods;
 use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Revs;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 use function extension_loaded;
@@ -16,19 +17,10 @@ use function extension_loaded;
 /**
  * To execute this test run `make benchmark_tracing`
  */
-#[BeforeClassMethods('ensureXdebugIsNotLoaded')]
 final class TracingBench
 {
     private Closure $main;
-    private int $result;
-
-    public static function ensureXdebugIsNotLoaded(): void
-    {
-//        Assert::false(
-//            extension_loaded('xdebug'),
-//            'Xdebug has been detected, this will mess up with the results.',
-//        );
-    }
+    private int $count;
 
     public function setUp(): void
     {
@@ -41,13 +33,13 @@ final class TracingBench
     #[AfterMethods('tearDown')]
     public function benchTracing(): void
     {
-        $this->result = ($this->main)();
+        $this->count = ($this->main)();
     }
 
     public function tearDown(): void
     {
         Assert::greaterThan(
-            $this->result,
+            $this->count,
             0,
             'No trace was generated.',
         );
