@@ -345,7 +345,6 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    // incorrect formatting due to https://github.com/nikic/PHP-Parser/issues/1117
                     #[SomeAttribute1]
                     #[SomeAttribute2]
                     public function &foo(int $param, $test = 1): bool
@@ -362,9 +361,9 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    // incorrect formatting due to https://github.com/nikic/PHP-Parser/issues/1117
                     #[SomeAttribute1]
-                    #[SomeAttribute2]protected function &foo(int $param, $test = 1): bool
+                    #[SomeAttribute2]
+                    protected function &foo(int $param, $test = 1): bool
                     {
                         echo 1;
                         return false;

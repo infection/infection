@@ -180,7 +180,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     private function createContainer(): Container
     {
         return MockedContainer::createWithServices([
-            Filesystem::class => fn () => $this->createFileSystemMock(),
+            Filesystem::class => $this->createFileSystemMock(...),
         ]);
     }
 }
