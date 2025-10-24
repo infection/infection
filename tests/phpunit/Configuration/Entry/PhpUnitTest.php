@@ -43,44 +43,54 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PhpUnit::class)]
 final class PhpUnitTest extends TestCase
 {
-    use PhpUnitAssertions;
-
-    #[DataProvider('valuesProvider')]
-    public function test_it_can_be_instantiated(
-        ?string $configDir,
-        ?string $executablePath,
+    #[DataProvider('basePathProvider')]
+    public function test_it_can_create_a_new_instance_with_absolute_paths(
+        PhpUnit $phpunit,
+        string $basePath,
+        PhpUnit $expected,
     ): void {
-        $phpUnit = new PhpUnit($configDir, $executablePath);
+        $originalPhpunit = clone $phpunit;
 
-        $this->assertPhpUnitStateIs($phpUnit, $configDir, $executablePath);
+        $actual = $phpunit->withAbsolutePaths($basePath);
+
+        $this->assertSame($expected, $actual);
+        // Sanity check
+        $this->assertSame($originalPhpunit, $phpunit);
     }
 
-    public function test_it_can_change_its_configuration_dir(): void
-    {
-        $phpUnit = new PhpUnit(
-            '/path/to/phpunit-config',
-            '/path/to/phpunit',
-        );
-
-        $phpUnit->withConfigDir('/path/to/another-phpunit-config');
-
-        $this->assertPhpUnitStateIs(
-            $phpUnit,
-            '/path/to/another-phpunit-config',
-            '/path/to/phpunit',
-        );
-    }
-
-    public static function valuesProvider(): iterable
+    public static function basePathProvider(): iterable
     {
         yield 'minimal' => [
-            null,
-            null,
+            new PhpUnit(null, null),
+            '/path/to/project',
+            new PhpUnit(
+                '/path/to/project',
+                null,
+            ),
         ];
 
-        yield 'complete' => [
-            '/path/to/phpunit-config',
-            '/path/to/phpunit',
+        yield 'both paths are relative' => [
+            new PhpUnit(
+                'devTools/phpunit',
+                'devTools/phpunit/bin/phpunit',
+            ),
+            '/path/to/project',
+            new PhpUnit(
+                '/path/to/project/devTools/phpunit',
+                'devTools/phpunit/bin/phpunit',
+            ),
+        ];
+
+        yield 'both paths are absolute' => [
+            new PhpUnit(
+                '/path/to/another-project/devTools/phpunit',
+                '/path/to/another-project/devTools/phpunit/bin/phpunit',
+            ),
+            '/path/to/project',
+            new PhpUnit(
+                '/path/to/another-project/devTools/phpunit',
+                '/path/to/another-project/devTools/phpunit/bin/phpunit',
+            ),
         ];
     }
 }
