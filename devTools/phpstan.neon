@@ -127,6 +127,11 @@ parameters:
         -
             message: '#Anonymous function should return iterable.* but return statement is missing\.#'
             path: ../tests/benchmark/Tracing/provide-traces-closure.php
+
+        # Test builders provide fluent API methods that may not be used immediately
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/phpunit/**/*Builder.php
     level: 8
     paths:
         - ../src
