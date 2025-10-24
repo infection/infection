@@ -44,7 +44,7 @@ trait SourceAssertions
         array $expectedDirectories,
         array $expectedExcludes,
     ): void {
-        $this->assertSame($expectedDirectories, $source->getDirectories());
-        $this->assertSame($expectedExcludes, $source->getExcludes());
+        $this->assertSame($expectedDirectories, $source->directories);
+        $this->assertSame($expectedExcludes, $source->excludes);
     }
 }

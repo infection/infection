@@ -91,23 +91,27 @@ final class SchemaConfigurationTest extends TestCase
             $staticAnalysisTool,
         );
 
-        $this->assertSame($path, $config->getFile(), 'Failed path check');
-        $this->assertSame($timeout, $config->getTimeout(), 'Failed timeout check');
-        $this->assertSame($source, $config->getSource(), 'Failed source check');
-        $this->assertSame($logs, $config->getLogs(), 'Failed logs check');
-        $this->assertSame($tmpDir, $config->getTmpDir(), 'Failed tmpDir check');
-        $this->assertSame($phpUnit, $config->getPhpUnit(), 'Failed phpUnit check');
-        $this->assertSame($phpStan, $config->getPhpStan(), 'Failed phpStan check');
-        $this->assertSame($ignoreMsiWithNoMutations, $config->getIgnoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
-        $this->assertSame($minMsi, $config->getMinMsi(), 'Failed minMsi check');
-        $this->assertSame($minCoveredMsi, $config->getMinCoveredMsi(), 'Failed minCoveredMsi check');
-        $this->assertSame($mutators, $config->getMutators(), 'Failed mutators check');
-        $this->assertSame($testFramework, $config->getTestFramework(), 'Failed testFramework check');
-        $this->assertSame($bootstrap, $config->getBootstrap(), 'Failed bootstrap check');
-        $this->assertSame($initialTestsPhpOptions, $config->getInitialTestsPhpOptions(), 'Failed initialTestsPhpOptions check');
-        $this->assertSame($testFrameworkExtraOptions, $config->getTestFrameworkExtraOptions(), 'Failed testFrameworkExtraOptions check');
-        $this->assertSame($threadCount, $config->getThreads(), 'Failed threadCount check');
-        $this->assertSame($staticAnalysisTool, $config->getStaticAnalysisTool(), 'Failed staticAnalysisTool check');
+        $this->assertSame($path, $config->file, 'Failed path check');
+        $this->assertSame($timeout, $config->timeout, 'Failed timeout check');
+        $this->assertSame($source, $config->source, 'Failed source check');
+        $this->assertSame($logs, $config->logs, 'Failed logs check');
+        $this->assertSame($tmpDir, $config->tmpDir, 'Failed tmpDir check');
+        $this->assertSame($phpUnit, $config->phpUnit, 'Failed phpUnit check');
+        $this->assertSame($phpStan, $config->phpStan, 'Failed phpStan check');
+        $this->assertSame($ignoreMsiWithNoMutations,
+            $config->ignoreMsiWithNoMutations, 'Failed ignoreMsiWithNoMutations check');
+        $this->assertSame($minMsi, $config->minMsi, 'Failed minMsi check');
+        $this->assertSame($minCoveredMsi, $config->minCoveredMsi, 'Failed minCoveredMsi check');
+        $this->assertSame($mutators, $config->mutators, 'Failed mutators check');
+        $this->assertSame($testFramework, $config->testFramework, 'Failed testFramework check');
+        $this->assertSame($bootstrap, $config->bootstrap, 'Failed bootstrap check');
+        $this->assertSame($initialTestsPhpOptions,
+            $config->initialTestsPhpOptions, 'Failed initialTestsPhpOptions check');
+        $this->assertSame($testFrameworkExtraOptions,
+            $config->testFrameworkExtraOptions, 'Failed testFrameworkExtraOptions check');
+        $this->assertSame($threadCount, $config->threads, 'Failed threadCount check');
+        $this->assertSame($staticAnalysisTool,
+            $config->staticAnalysisTool, 'Failed staticAnalysisTool check');
     }
 
     public static function valueProvider(): iterable
