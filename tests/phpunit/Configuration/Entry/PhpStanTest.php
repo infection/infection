@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -76,8 +75,8 @@ final class PhpStanTest extends TestCase
         ];
 
         yield 'complete' => [
-            '/path/to/phpunit-config-folder',
-            '/path/to/phpunit',
+            '/path/to/phpstan-config-folder',
+            '/path/to/phpstan',
         ];
     }
 }
