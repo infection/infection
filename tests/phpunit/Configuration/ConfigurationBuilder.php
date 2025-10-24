@@ -120,7 +120,9 @@ final class ConfigurationBuilder
             $configuration->getBootstrap(),
             $configuration->getInitialTestsPhpOptions(),
             $configuration->getTestFrameworkExtraOptions(),
-            $configuration->getStaticAnalysisToolOptions() === [] ? null : implode(' ', $configuration->getStaticAnalysisToolOptions()),
+            $configuration->getStaticAnalysisToolOptions() === []
+                ? null
+                : implode(' ', $configuration->getStaticAnalysisToolOptions()),
             $configuration->getCoveragePath(),
             $configuration->shouldSkipCoverage(),
             $configuration->shouldSkipInitialTests(),
@@ -216,7 +218,10 @@ final class ConfigurationBuilder
             phpUnit: new PhpUnit('config/phpunit', 'bin/phpunit'),
             phpStan: new PhpStan('config/phpstan', 'bin/phpstan'),
             mutators: [
-                'Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator()),
+                'Fake' => new IgnoreMutator(
+                    new IgnoreConfig([]),
+                    new FakeMutator(),
+                ),
             ],
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: 'bootstrap.php',
