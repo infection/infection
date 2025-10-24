@@ -75,6 +75,10 @@ parameters:
             identifier: shipmonk.deadMethod
             count: 1
             path: ../src/Mutant/MutantExecutionResult.php
+        # Test builders provide fluent API methods that may not be used immediately
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/phpunit/**/*Builder.php
 
         # tests
         - '#Dynamic call to static method PHPUnit\\Framework\\.*::.*#'

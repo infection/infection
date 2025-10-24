@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasFinished;
@@ -50,8 +49,10 @@ use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -61,12 +62,9 @@ final class EngineTest extends TestCase
 {
     public function test_initial_test_run_fails(): void
     {
-        $config = $this->createMock(Configuration::class);
-        $config
-            ->expects($this->once())
-            ->method('shouldSkipInitialTests')
-            ->willReturn(false)
-        ;
+        $config = ConfigurationBuilder::withMinimalTestData()
+            ->withSkipInitialTests(false)
+            ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);
         $adapter
@@ -167,12 +165,10 @@ final class EngineTest extends TestCase
 
     public function test_initial_test_run_succeeds(): void
     {
-        $config = $this->createMock(Configuration::class);
-        $config
-            ->expects($this->once())
-            ->method('shouldSkipInitialTests')
-            ->willReturn(false)
-        ;
+        $config = ConfigurationBuilder::withMinimalTestData()
+            ->withSkipInitialTests(false)
+            ->withWithUncovered(true)
+            ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);
         $adapter->expects($this->never())->method($this->anything());
@@ -286,17 +282,11 @@ final class EngineTest extends TestCase
 
     public function test_memory_limiter_is_applied_after_static_analysis_when_enabled(): void
     {
-        $config = $this->createMock(Configuration::class);
-        $config
-            ->expects($this->once())
-            ->method('shouldSkipInitialTests')
-            ->willReturn(false)
-        ;
-        $config
-            ->expects($this->once())
-            ->method('isStaticAnalysisEnabled')
-            ->willReturn(true)
-        ;
+        $config = ConfigurationBuilder::withMinimalTestData()
+            ->withSkipInitialTests(false)
+            ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
+            ->withWithUncovered(true)
+            ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);
 
@@ -436,12 +426,10 @@ final class EngineTest extends TestCase
 
     public function test_memory_limiter_is_not_applied_when_initial_tests_are_skipped(): void
     {
-        $config = $this->createMock(Configuration::class);
-        $config
-            ->expects($this->once())
-            ->method('shouldSkipInitialTests')
-            ->willReturn(true)
-        ;
+        $config = ConfigurationBuilder::withMinimalTestData()
+            ->withSkipInitialTests(true)
+            ->withWithUncovered(true)
+            ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);
 

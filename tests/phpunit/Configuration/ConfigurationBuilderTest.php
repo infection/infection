@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,32 +34,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\StaticAnalysis;
+namespace Infection\Tests\Configuration;
 
-use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
-use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
-use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\Tests\Configuration\ConfigurationBuilder;
-use InvalidArgumentException;
+use Infection\Configuration\Configuration;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(StaticAnalysisToolFactory::class)]
-final class StaticAnalysisToolFactoryTest extends TestCase
+#[CoversClass(ConfigurationBuilder::class)]
+final class ConfigurationBuilderTest extends TestCase
 {
-    public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
+    #[DataProvider('configurationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Configuration $configuration): void
     {
-        $factory = new StaticAnalysisToolFactory(
+        $actual = ConfigurationBuilder::from($configuration)->build();
+
+        $this->assertSame($configuration, $actual);
+    }
+
+    /**
+     * @return iterable<string, array{Configuration}>
+     */
+    public static function configurationProvider(): iterable
+    {
+        yield 'minimal test data' => [
             ConfigurationBuilder::withMinimalTestData()->build(),
-            '/project',
-            $this->createMock(StaticAnalysisToolExecutableFinder::class),
-            $this->createMock(StaticAnalysisConfigLocator::class),
-            [],
-        );
+        ];
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid name of static analysis tool "Fake SA Tool". Available names are: phpstan');
-
-        $factory->create('Fake SA Tool', 30);
+        yield 'complete test data' => [
+            ConfigurationBuilder::withCompleteTestData()->build(),
+        ];
     }
 }
