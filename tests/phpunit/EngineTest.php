@@ -61,7 +61,7 @@ final class EngineTest extends TestCase
 {
     public function test_initial_test_run_fails(): void
     {
-        $config = $this->createMock(Configuration::class);
+        $config = $this->createMock(p::class);
         $config
             ->expects($this->once())
             ->method('shouldSkipInitialTests')

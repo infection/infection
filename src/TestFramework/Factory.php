@@ -77,21 +77,30 @@ final readonly class Factory
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
+            $configuration1 = $this->infectionConfig;
+
+            $configuration2 = $this->infectionConfig;
+            $configuration3 = $this->infectionConfig;
+
+            $configuration4 = $this->infectionConfig;
+
+            $configuration5 = $this->infectionConfig;
+
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
+                    (string) $configuration3->phpUnit->getCustomPath(),
                 ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
-                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                (string) $configuration2->phpUnit->getConfigDir(),
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
+                $configuration1->sourceDirectories,
                 $skipCoverage,
-                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
+                $configuration5->executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
-                $this->infectionConfig->getMapSourceClassToTestStrategy(),
+                $configuration4->mapSourceClassToTestStrategy,
             );
         }
 
@@ -109,6 +118,8 @@ final readonly class Factory
             $availableTestFrameworks[] = $factory::getAdapterName();
 
             if ($adapterName === $factory::getAdapterName()) {
+                $configuration = $this->infectionConfig;
+
                 return $factory::create(
                     $this->testFrameworkFinder->find($factory::getExecutableName()),
                     $this->tmpDir,
@@ -116,7 +127,7 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $this->infectionConfig->getSourceDirectories(),
+                    $configuration->sourceDirectories,
                     $skipCoverage,
                 );
             }
@@ -140,8 +151,9 @@ final readonly class Factory
             return [];
         }
 
-        /** @var list<SplFileInfo> $files */
-        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
+        /** @var \Symfony\Component\Finder\SplFileInfo $files */
+        $configuration = $this->infectionConfig;
+        $files = iterator_to_array($this->sourceFileFilter->filter($configuration->sourceFiles));
 
         return $files;
     }

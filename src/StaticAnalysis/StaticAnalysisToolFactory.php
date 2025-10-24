@@ -65,14 +65,18 @@ final readonly class StaticAnalysisToolFactory
         if ($adapterName === StaticAnalysisToolTypes::PHPSTAN) {
             $phpStanConfigPath = $this->staticAnalysisConfigLocator->locate(StaticAnalysisToolTypes::PHPSTAN);
 
+            $configuration = $this->infectionConfig;
+
+            $configuration1 = $this->infectionConfig;
+
             return PHPStanAdapterFactory::create(
                 $phpStanConfigPath,
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
-                    (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
+                    (string) $configuration1->phpStan->getCustomPath(),
                 ),
                 $timeout,
-                $this->infectionConfig->getTmpDir(),
+                $configuration->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
             );
         }
