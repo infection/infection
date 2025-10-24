@@ -49,23 +49,23 @@ final class PhpStanTest extends TestCase
         ?string $configDir,
         ?string $executablePath,
     ): void {
-        $phpUnit = new PhpStan($configDir, $executablePath);
+        $phpStan = new PhpStan($configDir, $executablePath);
 
-        $this->assertSame($configDir, $phpUnit->getConfigDir());
-        $this->assertSame($executablePath, $phpUnit->getCustomPath());
+        $this->assertSame($configDir, $phpStan->getConfigDir());
+        $this->assertSame($executablePath, $phpStan->getCustomPath());
     }
 
     public function test_it_can_change_its_configuration_dir(): void
     {
-        $phpUnit = new PhpUnit(
+        $phpStan = new PhpStan(
             '/path/to/phpstan-config-folder',
             '/path/to/phpstan',
         );
 
-        $phpUnit->withConfigDir('/path/to/another-phpstan-config-folder');
+        $phpStan->withConfigDir('/path/to/another-phpstan-config-folder');
 
-        $this->assertSame('/path/to/another-phpstan-config-folder', $phpUnit->getConfigDir());
-        $this->assertSame('/path/to/phpstan', $phpUnit->getCustomPath());
+        $this->assertSame('/path/to/another-phpstan-config-folder', $phpStan->getConfigDir());
+        $this->assertSame('/path/to/phpstan', $phpStan->getCustomPath());
     }
 
     public static function valuesProvider(): iterable
