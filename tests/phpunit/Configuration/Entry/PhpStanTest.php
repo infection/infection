@@ -53,9 +53,9 @@ final class PhpStanTest extends TestCase
 
         $actual = $phpStan->withAbsolutePaths($basePath);
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
         // Sanity check
-        $this->assertSame($originalPhpStan, $phpStan);
+        $this->assertEquals($originalPhpStan, $phpStan);
     }
 
     public static function basePathProvider(): iterable

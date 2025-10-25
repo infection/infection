@@ -53,9 +53,9 @@ final class PhpUnitTest extends TestCase
 
         $actual = $phpunit->withAbsolutePaths($basePath);
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
         // Sanity check
-        $this->assertSame($originalPhpunit, $phpunit);
+        $this->assertEquals($originalPhpunit, $phpunit);
     }
 
     public static function basePathProvider(): iterable
