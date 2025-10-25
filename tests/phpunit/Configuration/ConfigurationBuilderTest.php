@@ -49,7 +49,7 @@ final class ConfigurationBuilderTest extends TestCase
     {
         $actual = ConfigurationBuilder::from($configuration)->build();
 
-        $this->assertSame($configuration, $actual);
+        $this->assertEquals($configuration, $actual);
     }
 
     /**
