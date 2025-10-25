@@ -1,13 +1,13 @@
 !/.tools/.gitkeep
 !/build/.gitkeep
 !/build/cache/.gitkeep
-/.direnv/
-/.envrc.local
 .phpunit.*
 /*.phar
 /.box_dump/
 /.ci/keys.asc
 /.composer/
+/.direnv/
+/.envrc.local
 /.idea
 /.php_cs.cache
 /.tools/
