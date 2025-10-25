@@ -1,6 +1,8 @@
 !/.tools/.gitkeep
 !/build/.gitkeep
 !/build/cache/.gitkeep
+/.direnv/
+/.envrc.local
 .phpunit.*
 /*.phar
 /.box_dump/
