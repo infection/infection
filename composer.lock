@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64aa79878c6cbdbca34c9ac7c53ceb8a",
+    "content-hash": "4f69309e017cb3c413a4bb48655c3277",
     "packages": [
         {
             "name": "colinodell/json5",
@@ -4814,6 +4814,56 @@
                 }
             ],
             "time": "2024-03-03T12:36:25+00:00"
+        },
+        {
+            "name": "webmozarts/strict-phpunit",
+            "version": "7.15.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webmozarts/strict-phpunit.git",
+                "reference": "2691151e75a64d2ffbe17fcfc38d410ab27a8241"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webmozarts/strict-phpunit/zipball/2691151e75a64d2ffbe17fcfc38d410ab27a8241",
+                "reference": "2691151e75a64d2ffbe17fcfc38d410ab27a8241",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "phpunit/phpunit": "^9.4.3 || ^10.3 || ^11.0 || ^12.0"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.28",
+                "infection/infection": "*"
+            },
+            "type": "library",
+            "extra": {
+                "symfony": {
+                    "require": "6.*.*"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webmozarts\\StrictPHPUnit\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bernhard.schussek@webmozarts.com"
+                }
+            ],
+            "description": "Enables type-safe comparisons of objects in PHPUnit",
+            "support": {
+                "issues": "https://github.com/webmozarts/strict-phpunit/issues",
+                "source": "https://github.com/webmozarts/strict-phpunit/tree/7.15.5"
+            },
+            "time": "2025-03-24T18:37:38+00:00"
         }
     ],
     "aliases": [],

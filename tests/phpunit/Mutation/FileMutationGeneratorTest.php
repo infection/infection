@@ -162,7 +162,9 @@ final class FileMutationGeneratorTest extends TestCase
         $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with('/path/to/file')
+            ->with($this->callback(
+                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === '/path/to/file',
+            ))
             ->willReturn([$initialStatements, []])
         ;
 
@@ -222,7 +224,9 @@ final class FileMutationGeneratorTest extends TestCase
         $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with($expectedFilePath)
+            ->with($this->callback(
+                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === $expectedFilePath,
+            ))
             ->willReturn([$initialStatements, []])
         ;
 

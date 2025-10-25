@@ -14,6 +14,10 @@
          cacheDirectory="./build/cache/phpunit-autoreview"
 >
 
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
+
     <testsuites>
         <testsuite name="Auto-Review Test Suite">
             <directory>tests/phpunit/AutoReview</directory>
