@@ -34,8 +34,8 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
-use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 
 return RectorConfig::configure()
@@ -47,11 +47,17 @@ return RectorConfig::configure()
     ->withRules([
         AddCoversClassAttributeRector::class,
     ])
+    ->withConfiguredRule(
+        ClassPropertyAssignToConstructorPromotionRector::class,
+        [
+            'inline_public' => false,
+            'rename_property' => true,
+            'allow_model_based_classes' => true,
+        ],
+    )
     ->withSkip([
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
         ],
-        ReadOnlyClassRector::class,
-        ReadOnlyPropertyRector::class,
     ]);

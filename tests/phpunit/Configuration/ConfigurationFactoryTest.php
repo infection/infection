@@ -1835,7 +1835,7 @@ final class ConfigurationFactoryTest extends TestCase
             ->method('collectFiles')
             ->willReturnCallback(
                 static function (array $source, array $excludes) use ($schema) {
-                    $schemaSourceDirs = $schema->getSource()->getDirectories();
+                    $schemaSourceDirs = $schema->source->directories;
 
                     // ConfigurationFactory::collectFiles() MUST convert relative paths to absolute paths
                     // relative to the schema file location (e.g., 'src/' → '/path/to/src')

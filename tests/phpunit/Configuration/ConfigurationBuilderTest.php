@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,18 +34,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Configuration;
 
-use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Configuration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-trait SourceAssertions
+#[CoversClass(ConfigurationBuilder::class)]
+final class ConfigurationBuilderTest extends TestCase
 {
-    private function assertSourceStateIs(
-        Source $source,
-        array $expectedDirectories,
-        array $expectedExcludes,
-    ): void {
-        $this->assertSame($expectedDirectories, $source->directories);
-        $this->assertSame($expectedExcludes, $source->excludes);
+    #[DataProvider('configurationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Configuration $configuration): void
+    {
+        $actual = ConfigurationBuilder::from($configuration)->build();
+
+        $this->assertEquals($configuration, $actual);
+    }
+
+    /**
+     * @return iterable<string, array{Configuration}>
+     */
+    public static function configurationProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            ConfigurationBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            ConfigurationBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

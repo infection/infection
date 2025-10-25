@@ -117,17 +117,21 @@ final readonly class Engine
 
     private function runInitialTestSuite(): ?string
     {
-        if ($this->config->shouldSkipInitialTests()) {
+        $configuration2 = $this->config;
+
+        if ($configuration2->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
 
             return null;
         }
 
+        $configuration = $this->config;
+        $configuration1 = $this->config;
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->config->getTestFrameworkExtraOptions(),
+            $configuration->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
-            $this->config->shouldSkipCoverage(),
+            $configuration1->skipCoverage,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
@@ -183,7 +187,9 @@ final readonly class Engine
      */
     private function getInitialTestsPhpOptionsArray(): array
     {
-        return explode(' ', (string) $this->config->getInitialTestsPhpOptions());
+        $configuration = $this->config;
+
+        return explode(' ', (string) $configuration->initialTestsPhpOptions);
     }
 
     private function runMutationAnalysis(): void
@@ -214,12 +220,16 @@ final readonly class Engine
     private function getFilteredExtraOptionsForMutant(): string
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
+            $configuration1 = $this->config;
+
             return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->getTestFrameworkExtraOptions(),
+                $configuration1->testFrameworkExtraOptions,
                 $this->adapter->getInitialRunOnlyOptions(),
             );
         }
 
-        return $this->config->getTestFrameworkExtraOptions();
+        $configuration = $this->config;
+
+        return $configuration->testFrameworkExtraOptions;
     }
 }

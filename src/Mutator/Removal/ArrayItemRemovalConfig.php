@@ -42,7 +42,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class ArrayItemRemovalConfig implements MutatorConfig
+final readonly class ArrayItemRemovalConfig implements MutatorConfig
 {
     private const REMOVE_VALUES = [
         'first',
@@ -50,9 +50,9 @@ final class ArrayItemRemovalConfig implements MutatorConfig
         'all',
     ];
 
-    private readonly string $remove;
+    private string $remove;
 
-    private readonly int $limit;
+    private int $limit;
 
     /**
      * @param array{remove: string|null, limit: int|null} $settings

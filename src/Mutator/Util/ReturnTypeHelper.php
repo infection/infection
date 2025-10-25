@@ -45,16 +45,16 @@ use PhpParser\Node\Name;
 /**
  * @internal
  */
-final class ReturnTypeHelper
+final readonly class ReturnTypeHelper
 {
     private const VOID = 'void';
 
     private const NULL = 'null';
 
-    private readonly Identifier|Name|ComplexType|null $returnType;
+    private Identifier|Name|ComplexType|null $returnType;
 
     public function __construct(
-        private readonly Node\Stmt\Return_ $node,
+        private Node\Stmt\Return_ $node,
     ) {
         // We do not expect to see a return statement outside a function-like node.
         $this->returnType = ReflectionVisitor::getFunctionScope($this->node)->getReturnType();

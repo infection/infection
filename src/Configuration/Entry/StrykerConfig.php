@@ -44,7 +44,7 @@ use function sprintf;
 /**
  * @internal
  */
-final class StrykerConfig
+final readonly class StrykerConfig
 {
     private string $branchMatch;
 
@@ -57,7 +57,7 @@ final class StrykerConfig
      */
     private function __construct(
         string $branch,
-        private readonly bool $isForFullReport,
+        private bool $isForFullReport,
     ) {
         if (preg_match('#^/.+/$#', $branch) === 0) {
             $this->branchMatch = '/^' . preg_quote($branch, '/') . '$/';

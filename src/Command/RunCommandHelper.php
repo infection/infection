@@ -50,10 +50,10 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class RunCommandHelper
+final readonly class RunCommandHelper
 {
     public function __construct(
-        private readonly InputInterface $input,
+        private InputInterface $input,
     ) {
     }
 

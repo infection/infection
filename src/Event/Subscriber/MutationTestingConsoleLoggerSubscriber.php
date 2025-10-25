@@ -247,7 +247,8 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     private function showGeneratedLogFiles(): void
     {
         /** @var FileLogger[] $fileLoggers */
-        $fileLoggers = iterator_to_array($this->getFileLoggers($this->mutationTestingResultsLogger->getLoggers()));
+        $federatedLogger = $this->mutationTestingResultsLogger;
+        $fileLoggers = iterator_to_array($this->getFileLoggers($federatedLogger->loggers));
 
         if ($fileLoggers !== []) {
             $this->output->writeln(['', 'Generated Reports:']);
@@ -276,7 +277,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         foreach ($allLoggers as $logger) {
             if ($logger instanceof FederatedLogger) {
-                yield from $this->getFileLoggers($logger->getLoggers());
+                yield from $this->getFileLoggers($logger->loggers);
             } elseif ($logger instanceof FileLogger && !str_starts_with($logger->getFilePath(), 'php://')) {
                 yield $logger;
             }

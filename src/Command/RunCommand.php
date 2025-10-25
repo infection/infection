@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function implode;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -596,7 +597,8 @@ final class RunCommand extends BaseCommand
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
         $installationDecider = $container->getAdapterInstallationDecider();
-        $configTestFramework = $container->getConfiguration()->getTestFramework();
+        $configuration = $container->getConfiguration();
+        $configTestFramework = $configuration->testFramework;
 
         $adapterName = trim((string) $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)) ?: $configTestFramework;
 
@@ -656,7 +658,7 @@ final class RunCommand extends BaseCommand
             $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
         }
 
-        $container->getFileSystem()->mkdir($config->getTmpDir());
+        $container->getFileSystem()->mkdir($config->tmpDir);
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
 

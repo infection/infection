@@ -40,12 +40,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class ChainSubscriberFactory
+final readonly class ChainSubscriberFactory
 {
     /**
      * @var SubscriberFactory[]
      */
-    private readonly array $factories;
+    private array $factories;
 
     public function __construct(SubscriberFactory ...$factories)
     {

@@ -43,12 +43,12 @@ use function Safe\getcwd;
  * Caches the project directory path.
  * @internal
  */
-final class ProjectDirProvider
+final readonly class ProjectDirProvider
 {
     /**
      * @var Deferred<non-empty-string>
      */
-    private readonly Deferred $projectDir;
+    private Deferred $projectDir;
 
     public function __construct()
     {
