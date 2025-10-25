@@ -403,181 +403,181 @@ parameters:
 			path: ../tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) has parameter \$expectedMutators with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) has parameter \$expectedMutators with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForCoveragePath\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForCoveragePath\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForGithubActionsDetected\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForGithubActionsDetected\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForGitlabLogger\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForGitlabLogger\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForHtmlLogFilePath\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForHtmlLogFilePath\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForIgnoreMsiWithNoMutations\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForIgnoreMsiWithNoMutations\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForIgnoreSourceCodeByRegex\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForIgnoreSourceCodeByRegex\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForInitialTestsPhpOptions\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForInitialTestsPhpOptions\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMinCoveredMsi\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForMinCoveredMsi\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMinMsi\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForMinMsi\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMutators\(\) has parameter \$configMutators with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForMutators\(\) has parameter \$configMutators with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMutators\(\) has parameter \$expectedMutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForMutators\(\) has parameter \$expectedMutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMutators\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForMutators\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForNoProgress\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForNoProgress\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForPhpUnitConfigDir\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForPhpUnitConfigDir\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisTool\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisTool\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisToolOptions\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisToolOptions\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFramework\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForTestFramework\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFrameworkExtraOptions\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForTestFrameworkExtraOptions\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFrameworkKey\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForTestFrameworkKey\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTimeout\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForTimeout\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTmpDir\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:createValueForTmpDir\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:getDefaultMutators\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:getDefaultMutators\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:test_it_can_create_a_configuration\(\) has parameter \$expectedIgnoreSourceCodeMutatorsMap with no value type specified in iterable type array\.$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:test_it_can_create_a_configuration\(\) has parameter \$expectedIgnoreSourceCodeMutatorsMap with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:test_it_can_create_a_configuration\(\) has parameter \$expectedMutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:test_it_can_create_a_configuration\(\) has parameter \$expectedMutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Parameter \#1 \$fileInfos of static method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:normalizePaths\(\) expects array\<Symfony\\Component\\Finder\\SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			message: '#^Parameter \#1 \$fileInfos of static method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:normalizePaths\(\) expects array\<Symfony\\Component\\Finder\\SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Parameter \#3 \$expectedSourceDirectories of method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects array\<string\>, array\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			message: '#^Parameter \#3 \$expectedSourceDirectories of method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects array\<string\>, array\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Parameter \#6 \$expectedSourceFilesExcludes of method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects array\<string\>, array\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			message: '#^Parameter \#6 \$expectedSourceFilesExcludes of method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects array\<string\>, array\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Parameter \#8 \$expectedLogVerbosity of method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects string, string\|null given\.$#'
+			message: '#^Parameter \#8 \$expectedLogVerbosity of method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:\$mutators with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			message: '#^Property Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:\$mutators with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php

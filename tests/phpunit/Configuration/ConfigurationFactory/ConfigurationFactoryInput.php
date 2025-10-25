@@ -1,0 +1,392 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Tests\Configuration\ConfigurationFactory;
+
+use Infection\Configuration\Schema\SchemaConfiguration;
+
+final class ConfigurationFactoryInput
+{
+    public function __construct(
+        private SchemaConfiguration $schema,
+        private ?string $existingCoveragePath,
+        private ?string $initialTestsPhpOptions,
+        private bool $skipInitialTests,
+        private string $logVerbosity,
+        private bool $debug,
+        private bool $withUncovered,
+        private bool $noProgress,
+        private ?bool $ignoreMsiWithNoMutations,
+        private ?float $minMsi,
+        private ?int $numberOfShownMutations,
+        private ?float $minCoveredMsi,
+        private int $msiPrecision,
+        private string $mutatorsInput,
+        private ?string $testFramework,
+        private ?string $testFrameworkExtraOptions,
+        private ?string $staticAnalysisToolOptions,
+        private string $filter,
+        private ?int $threadCount,
+        private bool $dryRun,
+        private ?string $gitDiffFilter,
+        private bool $isForGitDiffLines,
+        private ?string $gitDiffBase,
+        private ?bool $useGitHubLogger,
+        private ?string $gitlabLogFilePath,
+        private ?string $htmlLogFilePath,
+        private ?string $textLogFilePath,
+        private bool $useNoopMutators,
+        private bool $executeOnlyCoveringTestCases,
+        private ?string $mapSourceClassToTestStrategy,
+        private ?string $loggerProjectRootDirectory,
+        private ?string $staticAnalysisTool,
+        private ?string $mutantId,
+    ) {
+    }
+
+    public function withSchema(SchemaConfiguration $schema): self
+    {
+        $clone = clone $this;
+        $clone->schema = $schema;
+
+        return $clone;
+    }
+
+    public function withExistingCoveragePath(?string $existingCoveragePath): self
+    {
+        $clone = clone $this;
+        $clone->existingCoveragePath = $existingCoveragePath;
+
+        return $clone;
+    }
+
+    public function withInitialTestsPhpOptions(?string $initialTestsPhpOptions): self
+    {
+        $clone = clone $this;
+        $clone->initialTestsPhpOptions = $initialTestsPhpOptions;
+
+        return $clone;
+    }
+
+    public function withSkipInitialTests(bool $skipInitialTests): self
+    {
+        $clone = clone $this;
+        $clone->skipInitialTests = $skipInitialTests;
+
+        return $clone;
+    }
+
+    public function withLogVerbosity(string $logVerbosity): self
+    {
+        $clone = clone $this;
+        $clone->logVerbosity = $logVerbosity;
+
+        return $clone;
+    }
+
+    public function withDebug(bool $debug): self
+    {
+        $clone = clone $this;
+        $clone->debug = $debug;
+
+        return $clone;
+    }
+
+    public function withWithUncovered(bool $withUncovered): self
+    {
+        $clone = clone $this;
+        $clone->withUncovered = $withUncovered;
+
+        return $clone;
+    }
+
+    public function withNoProgress(bool $noProgress): self
+    {
+        $clone = clone $this;
+        $clone->noProgress = $noProgress;
+
+        return $clone;
+    }
+
+    public function withIgnoreMsiWithNoMutations(?bool $ignoreMsiWithNoMutations): self
+    {
+        $clone = clone $this;
+        $clone->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
+
+        return $clone;
+    }
+
+    public function withMinMsi(?float $minMsi): self
+    {
+        $clone = clone $this;
+        $clone->minMsi = $minMsi;
+
+        return $clone;
+    }
+
+    public function withNumberOfShownMutations(?int $numberOfShownMutations): self
+    {
+        $clone = clone $this;
+        $clone->numberOfShownMutations = $numberOfShownMutations;
+
+        return $clone;
+    }
+
+    public function withMinCoveredMsi(?float $minCoveredMsi): self
+    {
+        $clone = clone $this;
+        $clone->minCoveredMsi = $minCoveredMsi;
+
+        return $clone;
+    }
+
+    public function withMsiPrecision(int $msiPrecision): self
+    {
+        $clone = clone $this;
+        $clone->msiPrecision = $msiPrecision;
+
+        return $clone;
+    }
+
+    public function withMutatorsInput(string $mutatorsInput): self
+    {
+        $clone = clone $this;
+        $clone->mutatorsInput = $mutatorsInput;
+
+        return $clone;
+    }
+
+    public function withTestFramework(?string $testFramework): self
+    {
+        $clone = clone $this;
+        $clone->testFramework = $testFramework;
+
+        return $clone;
+    }
+
+    public function withTestFrameworkExtraOptions(?string $testFrameworkExtraOptions): self
+    {
+        $clone = clone $this;
+        $clone->testFrameworkExtraOptions = $testFrameworkExtraOptions;
+
+        return $clone;
+    }
+
+    public function withStaticAnalysisToolOptions(?string $staticAnalysisToolOptions): self
+    {
+        $clone = clone $this;
+        $clone->staticAnalysisToolOptions = $staticAnalysisToolOptions;
+
+        return $clone;
+    }
+
+    public function withFilter(string $filter): self
+    {
+        $clone = clone $this;
+        $clone->filter = $filter;
+
+        return $clone;
+    }
+
+    public function withThreadCount(?int $threadCount): self
+    {
+        $clone = clone $this;
+        $clone->threadCount = $threadCount;
+
+        return $clone;
+    }
+
+    public function withDryRun(bool $dryRun): self
+    {
+        $clone = clone $this;
+        $clone->dryRun = $dryRun;
+
+        return $clone;
+    }
+
+    public function withGitDiffFilter(?string $gitDiffFilter): self
+    {
+        $clone = clone $this;
+        $clone->gitDiffFilter = $gitDiffFilter;
+
+        return $clone;
+    }
+
+    public function withIsForGitDiffLines(bool $isForGitDiffLines): self
+    {
+        $clone = clone $this;
+        $clone->isForGitDiffLines = $isForGitDiffLines;
+
+        return $clone;
+    }
+
+    public function withGitDiffBase(?string $gitDiffBase): self
+    {
+        $clone = clone $this;
+        $clone->gitDiffBase = $gitDiffBase;
+
+        return $clone;
+    }
+
+    public function withUseGitHubLogger(?bool $useGitHubLogger): self
+    {
+        $clone = clone $this;
+        $clone->useGitHubLogger = $useGitHubLogger;
+
+        return $clone;
+    }
+
+    public function withGitlabLogFilePath(?string $gitlabLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->gitlabLogFilePath = $gitlabLogFilePath;
+
+        return $clone;
+    }
+
+    public function withHtmlLogFilePath(?string $htmlLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->htmlLogFilePath = $htmlLogFilePath;
+
+        return $clone;
+    }
+
+    public function withTextLogFilePath(?string $textLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->textLogFilePath = $textLogFilePath;
+
+        return $clone;
+    }
+
+    public function withUseNoopMutators(bool $useNoopMutators): self
+    {
+        $clone = clone $this;
+        $clone->useNoopMutators = $useNoopMutators;
+
+        return $clone;
+    }
+
+    public function withExecuteOnlyCoveringTestCases(bool $executeOnlyCoveringTestCases): self
+    {
+        $clone = clone $this;
+        $clone->executeOnlyCoveringTestCases = $executeOnlyCoveringTestCases;
+
+        return $clone;
+    }
+
+    public function withMapSourceClassToTestStrategy(?string $mapSourceClassToTestStrategy): self
+    {
+        $clone = clone $this;
+        $clone->mapSourceClassToTestStrategy = $mapSourceClassToTestStrategy;
+
+        return $clone;
+    }
+
+    public function withLoggerProjectRootDirectory(?string $loggerProjectRootDirectory): self
+    {
+        $clone = clone $this;
+        $clone->loggerProjectRootDirectory = $loggerProjectRootDirectory;
+
+        return $clone;
+    }
+
+    public function withStaticAnalysisTool(?string $staticAnalysisTool): self
+    {
+        $clone = clone $this;
+        $clone->staticAnalysisTool = $staticAnalysisTool;
+
+        return $clone;
+    }
+
+    public function withMutantId(?string $mutantId): self
+    {
+        $clone = clone $this;
+        $clone->mutantId = $mutantId;
+
+        return $clone;
+    }
+
+    public function getSchema(): SchemaConfiguration
+    {
+        return $this->schema;
+    }
+
+    /**
+     * @return array{
+     *     0: SchemaConfiguration,
+     *     1: string|null,
+     *     2: string|null,
+     *     3: bool,
+     *     4: string,
+     *     5: bool,
+     *     6: bool,
+     *     7: bool,
+     *     8: bool|null,
+     *     9: float|null,
+     *     10: int|null,
+     *     11: float|null,
+     *     12: int,
+     *     13: string,
+     *     14: string|null,
+     *     15: string|null,
+     *     16: string|null,
+     *     17: string,
+     *     18: int|null,
+     *     19: bool,
+     *     20: string|null,
+     *     21: bool,
+     *     22: string|null,
+     *     23: bool|null,
+     *     24: string|null,
+     *     25: string|null,
+     *     26: string|null,
+     *     27: bool,
+     *     28: bool,
+     *     29: string|null,
+     *     30: string|null,
+     *     31: string|null,
+     *     32: string|null
+     * }
+     */
+    public function build(): array
+    {
+        return [
+            $this->schema,
+            $this->existingCoveragePath,
+            $this->initialTestsPhpOptions,
+            $this->skipInitialTests,
+            $this->logVerbosity,
+            $this->debug,
+            $this->withUncovered,
+            $this->noProgress,
+            $this->ignoreMsiWithNoMutations,
+            $this->minMsi,
+            $this->numberOfShownMutations,
+            $this->minCoveredMsi,
+            $this->msiPrecision,
+            $this->mutatorsInput,
+            $this->testFramework,
+            $this->testFrameworkExtraOptions,
+            $this->staticAnalysisToolOptions,
+            $this->filter,
+            $this->threadCount,
+            $this->dryRun,
+            $this->gitDiffFilter,
+            $this->isForGitDiffLines,
+            $this->gitDiffBase,
+            $this->useGitHubLogger,
+            $this->gitlabLogFilePath,
+            $this->htmlLogFilePath,
+            $this->textLogFilePath,
+            $this->useNoopMutators,
+            $this->executeOnlyCoveringTestCases,
+            $this->mapSourceClassToTestStrategy,
+            $this->loggerProjectRootDirectory,
+            $this->staticAnalysisTool,
+            $this->mutantId,
+        ];
+    }
+}

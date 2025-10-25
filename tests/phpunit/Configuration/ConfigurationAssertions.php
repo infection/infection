@@ -106,18 +106,9 @@ trait ConfigurationAssertions
         );
         $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter(), 'Failed sourceFilesFilter check');
         $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes(), 'Failed sourceFilesExcludes check');
-        $this->assertLogsStateIs(
+        $this->assertEquals(
+            $expectedLogs,
             $configuration->getLogs(),
-            $expectedLogs->getTextLogFilePath(),
-            $expectedLogs->getHtmlLogFilePath(),
-            $expectedLogs->getSummaryLogFilePath(),
-            $expectedLogs->getJsonLogFilePath(),
-            $expectedLogs->getGitlabLogFilePath(),
-            $expectedLogs->getDebugLogFilePath(),
-            $expectedLogs->getPerMutatorFilePath(),
-            $expectedLogs->getUseGitHubAnnotationsLogger(),
-            $expectedLogs->getStrykerConfig(),
-            $expectedLogs->getSummaryJsonLogFilePath(),
         );
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity(), 'Failed logVerbosity check');
         $this->assertSame($expectedTmpDir, $configuration->getTmpDir(), 'Failed tmpDir check');

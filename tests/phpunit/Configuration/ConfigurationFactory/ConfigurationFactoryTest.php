@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration;
+namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
@@ -60,17 +61,21 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
+use Infection\Tests\Configuration\ConfigurationAssertions;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Configuration\Entry\LogsBuilder;
+use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
-use function Infection\Tests\normalizePath;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
+use function Infection\Tests\normalizePath;
+use function sprintf;
 use function sys_get_temp_dir;
 use function var_export;
 
@@ -98,271 +103,226 @@ final class ConfigurationFactoryTest extends TestCase
      */
     #[DataProvider('valueProvider')]
     public function test_it_can_create_a_configuration(
-        bool $ciDetected = false,
-        bool $githubActionsDetected = false,
-        SchemaConfiguration $schema = new SchemaConfiguration(
-            '/path/to/infection.json',
-            null,
-            new Source([], []),
-            new Logs(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                null,
-                null,
-            ),
-            '',
-            new PhpUnit(null, null),
-            new PhpStan(null, null),
-            null,
-            null,
-            null,
-            [],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-        ),
-        ?string $inputExistingCoveragePath = null,
-        ?string $inputInitialTestsPhpOptions = null,
-        bool $skipInitialTests = false,
-        string $inputLogVerbosity = LogVerbosity::NONE,
-        bool $inputDebug = false,
-        bool $inputWithUncovered = false,
-        bool $inputNoProgress = false,
-        ?bool $inputIgnoreMsiWithNoMutations = false,
-        ?float $inputMinMsi = null,
-        ?int $inputNumberOfShownMutations = 0,
-        ?float $inputMinCoveredMsi = null,
-        string $inputMutators = '',
-        ?string $inputStaticAnalysisTool = null,
-        ?string $inputTestFramework = null,
-        ?string $inputTestFrameworkExtraOptions = null,
-        ?string $inputStaticAnalysisToolOptions = null,
-        string $inputFilter = '',
-        int $inputThreadsCount = 1,
-        bool $inputDryRun = false,
-        ?string $inputGitDiffFilter = 'AM',
-        bool $inputIsForGitDiffLines = false,
-        string $inputGitDiffBase = 'master',
-        ?bool $inputUseGitHubAnnotationsLogger = true,
-        ?string $inputGitlabLogFilePath = null,
-        ?string $inputHtmlLogFilePath = null,
-        ?string $inputTextLogFilePath = null,
-        bool $inputUseNoopMutators = false,
-        int $inputMsiPrecision = 2,
-        int $expectedTimeout = 10,
-        array $expectedSourceDirectories = [],
-        array $expectedSourceFiles = [],
-        string $expectedFilter = 'src/a.php,src/b.php',
-        array $expectedSourceFilesExcludes = [],
-        ?Logs $expectedLogs = null,
-        ?string $expectedLogVerbosity = LogVerbosity::NONE,
-        ?string $expectedTmpDir = null,
-        PhpUnit $expectedPhpUnit = new PhpUnit('/path/to', null),
-        PhpStan $expectedPhpStan = new PhpStan('/path/to', null),
-        ?array $expectedMutators = null,
-        string $expectedTestFramework = TestFrameworkTypes::PHPUNIT,
-        ?string $expectedBootstrap = null,
-        ?string $expectedInitialTestsPhpOptions = null,
-        bool $expectedSkipInitialTests = false,
-        string $expectedTestFrameworkExtraOptions = '',
-        ?string $expectedStaticAnalysisToolOptions = null,
-        ?string $expectedCoveragePath = null,
-        bool $expectedSkipCoverage = false,
-        bool $expectedDebug = false,
-        bool $expectedWithUncovered = false,
-        bool $expectedNoProgress = false,
-        bool $expectedIgnoreMsiWithNoMutations = false,
-        ?float $expectedMinMsi = null,
-        ?int $expectedNumberOfShownMutations = 0,
-        ?float $expectedMinCoveredMsi = null,
-        array $expectedIgnoreSourceCodeMutatorsMap = [],
-        bool $inputExecuteOnlyCoveringTestCases = true,
-        ?string $mapSourceClassToTest = MapSourceClassToTestStrategy::SIMPLE,
-        ?string $loggerProjectRootDirectory = null,
-        ?string $expectedStaticAnalysisTool = null,
-        ?string $mutantId = null,
+        ConfigurationFactoryScenario $scenario,
     ): void {
-        $expectedTmpDir ??= sys_get_temp_dir() . '/infection';
-        $expectedCoveragePath ??= sys_get_temp_dir() . '/infection';
-        $expectedMutators ??= self::getDefaultMutators();
-
-        if ($expectedLogs === null) {
-            $expectedLogs = Logs::createEmpty();
-            $expectedLogs->setUseGitHubAnnotationsLogger(true);
-        }
-
-        $config = $this
-            ->createConfigurationFactory($ciDetected, $githubActionsDetected, $schema)
-            ->create(
-                $schema,
-                $inputExistingCoveragePath,
-                $inputInitialTestsPhpOptions,
-                $skipInitialTests,
-                $inputLogVerbosity,
-                $inputDebug,
-                $inputWithUncovered,
-                $inputNoProgress,
-                $inputIgnoreMsiWithNoMutations,
-                $inputMinMsi,
-                $inputNumberOfShownMutations,
-                $inputMinCoveredMsi,
-                $inputMsiPrecision,
-                $inputMutators,
-                $inputTestFramework,
-                $inputTestFrameworkExtraOptions,
-                $inputStaticAnalysisToolOptions,
-                $inputFilter,
-                $inputThreadsCount,
-                $inputDryRun,
-                $inputGitDiffFilter,
-                $inputIsForGitDiffLines,
-                $inputGitDiffBase,
-                $inputUseGitHubAnnotationsLogger,
-                $inputGitlabLogFilePath,
-                $inputHtmlLogFilePath,
-                $inputTextLogFilePath,
-                $inputUseNoopMutators,
-                $inputExecuteOnlyCoveringTestCases,
-                $mapSourceClassToTest,
-                $loggerProjectRootDirectory,
-                $inputStaticAnalysisTool,
-                $mutantId,
+        $actual = $this
+            ->createConfigurationFactory(
+                $scenario->ciDetected,
+                $scenario->githubActionsDetected,
+                $scenario->input->getSchema(),
             )
+            ->create(...$scenario->input->build())
         ;
 
-        $this->assertConfigurationStateIs(
-            $config,
-            $expectedTimeout,
-            $expectedSourceDirectories,
-            $expectedSourceFiles,
-            $expectedFilter,
-            $expectedSourceFilesExcludes,
-            $expectedLogs,
-            $expectedLogVerbosity,
-            normalizePath($expectedTmpDir),
-            $expectedPhpUnit,
-            $expectedPhpStan,
-            $expectedMutators,
-            $expectedTestFramework,
-            $expectedBootstrap,
-            $expectedInitialTestsPhpOptions,
-            $expectedTestFrameworkExtraOptions,
-            $expectedStaticAnalysisToolOptions,
-            normalizePath($expectedCoveragePath),
-            $expectedSkipCoverage,
-            $expectedSkipInitialTests,
-            $expectedDebug,
-            $expectedWithUncovered,
-            $expectedNoProgress,
-            $expectedIgnoreMsiWithNoMutations,
-            $expectedMinMsi,
-            $expectedNumberOfShownMutations,
-            $expectedMinCoveredMsi,
-            $inputMsiPrecision,
-            $inputThreadsCount,
-            $inputDryRun,
-            $expectedIgnoreSourceCodeMutatorsMap,
-            $inputExecuteOnlyCoveringTestCases,
-            $inputIsForGitDiffLines,
-            $inputGitDiffBase,
-            $mapSourceClassToTest,
-            $loggerProjectRootDirectory,
-            $expectedStaticAnalysisTool,
-            $mutantId,
-        );
+        $this->assertEquals($scenario->expected, $actual);
     }
 
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
     {
         $schema = new SchemaConfiguration(
-            '/path/to/infection.json',
-            null,
-            new Source([], []),
-            Logs::createEmpty(),
-            '',
-            new PhpUnit(null, null),
-            new PhpStan(null, null),
-            null,
-            null,
-            null,
-            [],
-            TestFrameworkTypes::PHPUNIT,
-            null,
-            null,
-            null,
-            null,
-            null,
-            StaticAnalysisToolTypes::PHPSTAN,
+            file: '/path/to/infection.json',
+            timeout: null,
+            source: new Source([], []),
+            logs: Logs::createEmpty(),
+            tmpDir: '',
+            phpUnit: new PhpUnit(null, null),
+            phpStan: new PhpStan(null, null),
+            ignoreMsiWithNoMutations: null,
+            minMsi: null,
+            minCoveredMsi: null,
+            mutators: [],
+            testFramework: TestFrameworkTypes::PHPUNIT,
+            bootstrap: null,
+            initialTestsPhpOptions: null,
+            testFrameworkExtraOptions: null,
+            staticAnalysisToolOptions: null,
+            threads: null,
+            staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
         );
 
         $this->expectExceptionMessage('Expected one of: "phpstan". Got: "non-supported-static-analysis-tool"');
 
         $this
             ->createConfigurationFactory(
-                false,
-                false,
-                $schema,
+                ciDetected: false,
+                githubActionsDetected: false,
+                schema: $schema,
             )
             ->create(
-                $schema,
-                null,
-                null,
-                false,
-                'none',
-                false,
-                false,
-                false,
-                false,
-                null,
-                0,
-                null,
-                2,
-                '',
-                TestFrameworkTypes::PHPUNIT,
-                null,
-                null,
-                '',
-                0,
-                false,
-                null,
-                false,
-                'master',
-                false,
-                null,
-                null,
-                null,
-                false,
-                false,
-                null,
-                null,
-                'non-supported-static-analysis-tool',
-                null,
+                schema: $schema,
+                existingCoveragePath: null,
+                initialTestsPhpOptions: null,
+                skipInitialTests: false,
+                logVerbosity: 'none',
+                debug: false,
+                withUncovered: false,
+                noProgress: false,
+                ignoreMsiWithNoMutations: false,
+                minMsi: null,
+                numberOfShownMutations: 0,
+                minCoveredMsi: null,
+                msiPrecision: 2,
+                mutatorsInput: '',
+                testFramework: TestFrameworkTypes::PHPUNIT,
+                testFrameworkExtraOptions: null,
+                staticAnalysisToolOptions: null,
+                filter: '',
+                threadCount: 0,
+                dryRun: false,
+                gitDiffFilter: null,
+                isForGitDiffLines: false,
+                gitDiffBase: 'master',
+                useGitHubLogger: false,
+                gitlabLogFilePath: null,
+                htmlLogFilePath: null,
+                textLogFilePath: null,
+                useNoopMutators: false,
+                executeOnlyCoveringTestCases: false,
+                mapSourceClassToTestStrategy: null,
+                loggerProjectRootDirectory: null,
+                staticAnalysisTool: 'non-supported-static-analysis-tool',
+                mutantId: null,
             )
         ;
     }
 
     public static function valueProvider(): iterable
     {
-        $expectedLogs = Logs::createEmpty();
-        $expectedLogs->setUseGitHubAnnotationsLogger(true);
+        $defaultLogsBuilder = LogsBuilder::withMinimalTestData()
+            ->withUseGitHubAnnotationsLogger(true);
+        $defaultLogs = $defaultLogsBuilder->build();
 
-        yield 'minimal' => [];
-
-        yield 'null html file log path with existing path from config file' => self::createValueForHtmlLogFilePath(
-            '/from-config.html',
-            null,
-            '/from-config.html',
+        $defaultSchema = new SchemaConfiguration(
+            file: '/path/to/infection.json',
+            timeout: null,
+            source: new Source([], []),
+            logs: Logs::createEmpty(),
+            tmpDir: '',
+            phpUnit: new PhpUnit(null, null),
+            phpStan: new PhpStan(null, null),
+            ignoreMsiWithNoMutations: null,
+            minMsi: null,
+            minCoveredMsi: null,
+            mutators: [],
+            testFramework: null,
+            bootstrap: null,
+            initialTestsPhpOptions: null,
+            testFrameworkExtraOptions: null,
+            staticAnalysisToolOptions: null,
+            threads: null,
+            staticAnalysisTool: null,
         );
+        $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
+
+        $defaultInput = new ConfigurationFactoryInput(
+            $defaultSchema,
+            existingCoveragePath: null,
+            initialTestsPhpOptions: null,
+            skipInitialTests: false,
+            logVerbosity: LogVerbosity::NONE,
+            debug: false,
+            withUncovered: false,
+            noProgress: false,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            numberOfShownMutations: 0,
+            minCoveredMsi: null,
+            msiPrecision: 2,
+            mutatorsInput: '',
+            testFramework: null,
+            testFrameworkExtraOptions: null,
+            staticAnalysisToolOptions: null,
+            filter: '',
+            threadCount: 1,
+            dryRun: false,
+            gitDiffFilter: 'AM',
+            isForGitDiffLines: false,
+            gitDiffBase: 'master',
+            useGitHubLogger: true,
+            gitlabLogFilePath: null,
+            htmlLogFilePath: null,
+            textLogFilePath: null,
+            useNoopMutators: false,
+            executeOnlyCoveringTestCases: true,
+            mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
+            loggerProjectRootDirectory: null,
+            staticAnalysisTool: null,
+            mutantId: null,
+        );
+
+        $defaultConfiguration = new Configuration(
+            timeout: 10,
+            sourceDirectories: [],
+            sourceFiles: [],
+            sourceFilesFilter: 'src/a.php,src/b.php',
+            sourceFilesExcludes: [],
+            logs: $defaultLogs,
+            logVerbosity: LogVerbosity::NONE,
+            tmpDir: sys_get_temp_dir() . '/infection',
+            phpUnit: new phpUnit('/path/to', null),
+            phpStan: new phpStan('/path/to', null),
+            mutators: self::getDefaultMutators(),
+            testFramework: TestFrameworkTypes::PHPUNIT,
+            bootstrap: null,
+            initialTestsPhpOptions: null,
+            testFrameworkExtraOptions: '',
+            staticAnalysisToolOptions: null,
+            coveragePath: sys_get_temp_dir() . '/infection',
+            skipCoverage: false,
+            skipInitialTests: false,
+            debug: false,
+            withUncovered: false,
+            noProgress: false,
+            ignoreMsiWithNoMutations: false,
+            minMsi: null,
+            numberOfShownMutations: 0,
+            minCoveredMsi: null,
+            msiPrecision: 2,
+            threadCount: 1,
+            dryRun: false,
+            ignoreSourceCodeMutatorsMap: [],
+            executeOnlyCoveringTestCases: true,
+            isForGitDiffLines: false,
+            gitDiffBase: 'master',
+            mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
+            loggerProjectRootDirectory: null,
+            staticAnalysisTool: null,
+            mutantId: null,
+        );
+        $defaultConfigurationBuilder = ConfigurationBuilder::from($defaultConfiguration);
+
+        $defaultScenario = ConfigurationFactoryScenario::create(
+            ciDetected: false,
+            githubActionsDetected: false,
+            input: $defaultInput,
+            expected: $defaultConfiguration,
+        );
+
+        yield 'minimal' => [$defaultScenario];
+
+        yield 'null html file log path with existing path from config file' => [
+            $defaultScenario
+            ->withInput(
+                $defaultInput->withSchema(
+                    $defaultSchemaBuilder
+                    ->withLogs(
+                        $defaultLogsBuilder
+                        ->withHtmlLogFilePath('/from-config.html')
+                        ->build(),
+                    )
+                    ->build(),
+                ),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withLogs(
+                        $defaultLogsBuilder
+                            ->withHtmlLogFilePath('/from-config.html')
+                            ->build(),
+                    )
+                ->build(),
+            ),
+        ];
 
         yield 'absolute html file log path' => self::createValueForHtmlLogFilePath(
             '/path/to/from-config.html',
