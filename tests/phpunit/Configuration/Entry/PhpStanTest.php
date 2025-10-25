@@ -43,40 +43,54 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PhpStan::class)]
 final class PhpStanTest extends TestCase
 {
-    #[DataProvider('valuesProvider')]
-    public function test_it_can_be_instantiated(
-        ?string $configDir,
-        ?string $executablePath,
+    #[DataProvider('basePathProvider')]
+    public function test_it_can_create_a_new_instance_with_absolute_paths(
+        PhpStan $phpStan,
+        string $basePath,
+        PhpStan $expected,
     ): void {
-        $phpStan = new PhpStan($configDir, $executablePath);
+        $originalPhpStan = clone $phpStan;
 
-        $this->assertSame($configDir, $phpStan->getConfigDir());
-        $this->assertSame($executablePath, $phpStan->getCustomPath());
+        $actual = $phpStan->withAbsolutePaths($basePath);
+
+        $this->assertEquals($expected, $actual);
+        // Sanity check
+        $this->assertEquals($originalPhpStan, $phpStan);
     }
 
-    public function test_it_can_change_its_configuration_dir(): void
-    {
-        $phpStan = new PhpStan(
-            '/path/to/phpstan-config-folder',
-            '/path/to/phpstan',
-        );
-
-        $phpStan->withConfigDir('/path/to/another-phpstan-config-folder');
-
-        $this->assertSame('/path/to/another-phpstan-config-folder', $phpStan->getConfigDir());
-        $this->assertSame('/path/to/phpstan', $phpStan->getCustomPath());
-    }
-
-    public static function valuesProvider(): iterable
+    public static function basePathProvider(): iterable
     {
         yield 'minimal' => [
-            null,
-            null,
+            new PhpStan(null, null),
+            '/path/to/project',
+            new PhpStan(
+                '/path/to/project',
+                null,
+            ),
         ];
 
-        yield 'complete' => [
-            '/path/to/phpstan-config-folder',
-            '/path/to/phpstan',
+        yield 'both paths are relative' => [
+            new PhpStan(
+                'devTools/phpstan',
+                'devTools/phpstan/bin/phpstan',
+            ),
+            '/path/to/project',
+            new PhpStan(
+                '/path/to/project/devTools/phpstan',
+                'devTools/phpstan/bin/phpstan',
+            ),
+        ];
+
+        yield 'both paths are absolute' => [
+            new PhpStan(
+                '/path/to/another-project/devTools/phpstan',
+                '/path/to/another-project/devTools/phpstan/bin/phpstan',
+            ),
+            '/path/to/project',
+            new PhpStan(
+                '/path/to/another-project/devTools/phpstan',
+                '/path/to/another-project/devTools/phpstan/bin/phpstan',
+            ),
         ];
     }
 }
