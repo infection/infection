@@ -35,31 +35,43 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use Infection\Tests\Mutation\MutationAssertions;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-implements TestCase
+ */
 trait MutantAssertions
 {
-    /**
-     * @param TestLocation[] $expectedTests
-     */
+    use MutationAssertions;
+
+    public function assertMutantEquals(
+        Mutant $expected,
+        Mutant $actual,
+    ): void {
+        $this->assertSame($expected->getFilePath(), $actual->getFilePath());
+        $this->assertSame($expected->getMutation(), $actual->getMutation());
+        $this->assertSame($expected->getMutatedCode()->get(), $actual->getMutatedCode()->get());
+        $this->assertSame($expected->getDiff()->get(), $actual->getDiff()->get());
+        $this->assertSame($expected->isCoveredByTest(), $actual->isCoveredByTest());
+        $this->assertEquals($expected->getTests(), $actual->getTests());
+        $this->assertSame($expected->getPrettyPrintedOriginalCode()->get(), $actual->getPrettyPrintedOriginalCode()->get());
+    }
+
     public function assertMutantStateIs(
         Mutant $mutant,
         string $expectedFilePath,
         Mutation $expectedMutation,
         string $expectedMutatedCode,
         string $expectedDiff,
-        bool $expectedCoveredByTests,
-        array $expectedTests,
-        string $originalCode,
+        string $expectedPrettyPrintedOriginalCode,
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertSame($expectedMutation, $mutant->getMutation());
+        $this->assertMutationEquals($expectedMutation, $mutant->getMutation());
         $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
         $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedCoveredByTests, $mutant->isCoveredByTest());
-        $this->assertSame($expectedTests, $mutant->getTests());
-        $this->assertSame($originalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
     }
 }

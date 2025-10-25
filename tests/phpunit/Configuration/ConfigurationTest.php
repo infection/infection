@@ -36,20 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\StrykerConfig;
-use Infection\Mutator\IgnoreConfig;
-use Infection\Mutator\IgnoreMutator;
-use Infection\Mutator\Mutator;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\MapSourceClassToTestStrategy;
-use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(Configuration::class)]
 final class ConfigurationTest extends TestCase
@@ -61,11 +50,10 @@ final class ConfigurationTest extends TestCase
     public function test_it_can_provide_the_static_analysis_tool_options(
         Configuration $configuration,
         array $expected,
-    ): void
-    {
+    ): void {
         $actual = $configuration->getStaticAnalysisToolOptions();
 
-        self::assertSame($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public static function staticAnalysisToolOptionsProvider(): iterable
@@ -86,7 +74,7 @@ final class ConfigurationTest extends TestCase
 
         yield 'fake blank string option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions("{u+020}")
+            ->withStaticAnalysisToolOptions('{u+020}')
             ->build(),
             ['--{u+020}'],
         ];

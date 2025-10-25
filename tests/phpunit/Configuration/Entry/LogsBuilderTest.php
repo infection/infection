@@ -48,7 +48,7 @@ final class LogsBuilderTest extends TestCase
     {
         $actual = LogsBuilder::from($logs)->build();
 
-        self::assertEquals($logs, $actual);
+        $this->assertEquals($logs, $actual);
     }
 
     public static function logsProvider(): iterable

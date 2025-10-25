@@ -61,7 +61,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\Configuration\ConfigurationAssertions;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
@@ -73,9 +72,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
-use function Infection\Tests\normalizePath;
 use function sprintf;
+use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use function var_export;
 
@@ -83,8 +81,6 @@ use function var_export;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
-    use ConfigurationAssertions;
-
     /**
      * @var array<string, Mutator>|null
      */
@@ -95,12 +91,6 @@ final class ConfigurationFactoryTest extends TestCase
         self::$mutators = null;
     }
 
-    /**
-     * @param SplFileInfo[] $expectedSourceDirectories
-     * @param SplFileInfo[] $expectedSourceFilesExcludes
-     * @param SplFileInfo[] $expectedSourceFiles
-     * @param Mutator[] $expectedMutators
-     */
     #[DataProvider('valueProvider')]
     public function test_it_can_create_a_configuration(
         ConfigurationFactoryScenario $scenario,
@@ -259,8 +249,8 @@ final class ConfigurationFactoryTest extends TestCase
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
             tmpDir: sys_get_temp_dir() . '/infection',
-            phpUnit: new phpUnit('/path/to', null),
-            phpStan: new phpStan('/path/to', null),
+            phpUnit: new PhpUnit('/path/to', null),
+            phpStan: new PhpStan('/path/to', null),
             mutators: self::getDefaultMutators(),
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: null,
@@ -324,1261 +314,1620 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'absolute html file log path' => self::createValueForHtmlLogFilePath(
-            '/path/to/from-config.html',
-            null,
-            '/path/to/from-config.html',
-        );
-
-        yield 'relative html file log path' => self::createValueForHtmlLogFilePath(
-            'relative/path/to/from-config.html',
-            null,
-            '/path/to/relative/path/to/from-config.html',
-        );
-
-        yield 'override html file log path from CLI option with existing path from config file' => self::createValueForHtmlLogFilePath(
-            '/from-config.html',
-            '/from-cli.html',
-            '/from-cli.html',
-        );
-
-        yield 'set html file log path from CLI option when config file has no setting' => self::createValueForHtmlLogFilePath(
-            null,
-            '/from-cli.html',
-            '/from-cli.html',
-        );
-
-        yield 'null html file log path in config and CLI' => self::createValueForHtmlLogFilePath(
-            null,
-            null,
-            null,
-        );
-
-        yield 'null text file log path with existing path from config file' => self::createValueForTextLogFilePath(
-            '/from-config.text',
-            null,
-            '/from-config.text',
-        );
-
-        yield 'absolute text file log path' => self::createValueForTextLogFilePath(
-            '/path/to/from-config.text',
-            null,
-            '/path/to/from-config.text',
-        );
-
-        yield 'relative text file log path' => self::createValueForTextLogFilePath(
-            'relative/path/to/from-config.text',
-            null,
-            '/path/to/relative/path/to/from-config.text',
-        );
-
-        yield 'override text file log path from CLI option with existing path from config file' => self::createValueForTextLogFilePath(
-            '/from-config.text',
-            '/from-cli.text',
-            '/from-cli.text',
-        );
-
-        yield 'set text file log path from CLI option when config file has no setting' => self::createValueForTextLogFilePath(
-            null,
-            '/from-cli.text',
-            '/from-cli.text',
-        );
-
-        yield 'null text file log path in config and CLI' => self::createValueForTextLogFilePath(
-            null,
-            null,
-            null,
-        );
-
-        yield 'null timeout' => self::createValueForTimeout(
-            null,
-            10,
-        );
-
-        yield 'config timeout' => self::createValueForTimeout(
-            20,
-            20,
-        );
-
-        yield 'null tmp dir' => self::createValueForTmpDir(
-            null,
-            sys_get_temp_dir() . '/infection',
-        );
-
-        yield 'empty tmp dir' => self::createValueForTmpDir(
-            '',
-            sys_get_temp_dir() . '/infection',
-        );
-
-        yield 'relative tmp dir path' => self::createValueForTmpDir(
-            'relative/path/to/tmp',
-            '/path/to/relative/path/to/tmp/infection',
-        );
-
-        yield 'absolute tmp dir path' => self::createValueForTmpDir(
-            '/absolute/path/to/tmp',
-            '/absolute/path/to/tmp/infection',
-        );
-
-        yield 'no existing base path for code coverage' => self::createValueForCoveragePath(
-            null,
-            false,
-            sys_get_temp_dir() . '/infection',
-        );
-
-        yield 'absolute base path for code coverage' => self::createValueForCoveragePath(
-            '/path/to/coverage',
-            true,
-            '/path/to/coverage',
-        );
-
-        yield 'relative base path for code coverage' => self::createValueForCoveragePath(
-            'relative/path/to/coverage',
-            true,
-            '/path/to/relative/path/to/coverage',
-        );
-
-        yield 'no PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
-            'relative/path/to/phpunit/config',
-            '/path/to/relative/path/to/phpunit/config',
-        );
-
-        yield 'relative PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
-            'relative/path/to/phpunit/config',
-            '/path/to/relative/path/to/phpunit/config',
-        );
-
-        yield 'absolute PHPUnit config dir' => self::createValueForPhpUnitConfigDir(
-            '/path/to/phpunit/config',
-            '/path/to/phpunit/config',
-        );
-
-        yield 'progress in non-CI environment' => self::createValueForNoProgress(
-            false,
-            false,
-            false,
-        );
-
-        yield 'progress in CI environment' => self::createValueForNoProgress(
-            true,
-            false,
-            true,
-        );
-
-        yield 'no progress in non-CI environment' => self::createValueForNoProgress(
-            false,
-            true,
-            true,
-        );
-
-        yield 'no progress in CI environment' => self::createValueForNoProgress(
-            true,
-            true,
-            true,
-        );
-
-        yield 'Github Actions annotation disabled, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
-            false,
-            false,
-            false,
-        );
-
-        yield 'Github Actions annotation disabled, not logged in Github Actions environment' => self::createValueForGithubActionsDetected(
-            false,
-            true,
-            false,
-        );
-
-        yield 'Github Actions annotation not provided, not logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
-            null,
-            false,
-            false,
-        );
-
-        yield 'Github Actions annotation not provided, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
-            null,
-            true,
-            true,
-        );
-
-        yield 'Github Actions annotation enabled, logged in non-Github Actions environment' => self::createValueForGithubActionsDetected(
-            true,
-            false,
-            true,
-        );
-
-        yield 'Github Actions annotation enabled, logged in Github Actions environment' => self::createValueForGithubActionsDetected(
-            true,
-            true,
-            true,
-        );
-
-        yield 'null GitLab file log path with existing path from config file' => self::createValueForGitlabLogger(
-            '/from-config.json',
-            null,
-            '/from-config.json',
-        );
-
-        yield 'absolute GitLab file log path' => self::createValueForGitlabLogger(
-            '/path/to/from-config.json',
-            null,
-            '/path/to/from-config.json',
-        );
-
-        yield 'relative GitLab file log path' => self::createValueForGitlabLogger(
-            'relative/path/to/from-config.json',
-            null,
-            '/path/to/relative/path/to/from-config.json',
-        );
-
-        yield 'override GitLab file log path from CLI option with existing path from config file' => self::createValueForGitlabLogger(
-            '/from-config.json',
-            '/from-cli.json',
-            '/from-cli.json',
-        );
-
-        yield 'set GitLab file log path from CLI option when config file has no setting' => self::createValueForGitlabLogger(
-            null,
-            '/from-cli.json',
-            '/from-cli.json',
-        );
-
-        yield 'null GitLab file log path in config and CLI' => self::createValueForGitlabLogger(
-            null,
-            null,
-            null,
-        );
-
-        yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
-            null,
-            true,
-            true,
-        );
-
-        yield 'ignoreMsiWithNoMutations not specified in schema and false in input' => self::createValueForIgnoreMsiWithNoMutations(
-            null,
-            false,
-            false,
-        );
-
-        yield 'ignoreMsiWithNoMutations true in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
-            true,
-            null,
-            true,
-        );
-
-        yield 'ignoreMsiWithNoMutations false in schema and not specified in input' => self::createValueForIgnoreMsiWithNoMutations(
-            false,
-            null,
-            false,
-        );
-
-        yield 'ignoreMsiWithNoMutations true in schema and false in input' => self::createValueForIgnoreMsiWithNoMutations(
-            true,
-            false,
-            false,
-        );
-
-        yield 'ignoreMsiWithNoMutations false in schema and true in input' => self::createValueForIgnoreMsiWithNoMutations(
-            false,
-            true,
-            true,
-        );
-
-        yield 'minMsi not specified in schema and not specified in input' => self::createValueForMinMsi(
-            null,
-            null,
-            null,
-        );
-
-        yield 'minMsi specified in schema and not specified in input' => self::createValueForMinMsi(
-            33.3,
-            null,
-            33.3,
-        );
-
-        yield 'minMsi not specified in schema and specified in input' => self::createValueForMinMsi(
-            null,
-            21.2,
-            21.2,
-        );
-
-        yield 'minMsi specified in schema and specified in input' => self::createValueForMinMsi(
-            33.3,
-            21.2,
-            21.2,
-        );
-
-        yield 'minCoveredMsi not specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
-            null,
-            null,
-            null,
-        );
-
-        yield 'minCoveredMsi specified in schema and not specified in input' => self::createValueForMinCoveredMsi(
-            33.3,
-            null,
-            33.3,
-        );
-
-        yield 'minCoveredMsi not specified in schema and specified in input' => self::createValueForMinCoveredMsi(
-            null,
-            21.2,
-            21.2,
-        );
-
-        yield 'minCoveredMsi specified in schema and specified in input' => self::createValueForMinCoveredMsi(
-            33.3,
-            21.2,
-            21.2,
-        );
-
-        yield 'no static analysis tool' => self::createValueForStaticAnalysisTool(
-            null,
-            null,
-            null,
-        );
-
-        yield 'static analysis tool from config' => self::createValueForStaticAnalysisTool(
-            'phpstan',
-            null,
-            'phpstan',
-        );
-
-        yield 'static analysis tool from input' => self::createValueForStaticAnalysisTool(
-            null,
-            'phpstan',
-            'phpstan',
-        );
-
-        yield 'static analysis tool from config & input' => self::createValueForStaticAnalysisTool(
-            'phpstan',
-            'phpstan',
-            'phpstan',
-        );
-
-        yield 'no test framework' => self::createValueForTestFramework(
-            null,
-            null,
-            'phpunit',
-            '',
-        );
-
-        yield 'test framework from config' => self::createValueForTestFramework(
-            'phpspec',
-            null,
-            'phpspec',
-            '',
-        );
-
-        yield 'test framework from input' => self::createValueForTestFramework(
-            null,
-            'phpspec',
-            'phpspec',
-            '',
-        );
-
-        yield 'test framework from config & input' => self::createValueForTestFramework(
-            'phpunit',
-            'phpspec',
-            'phpspec',
-            '',
-        );
-
-        yield 'test no test PHP options' => self::createValueForInitialTestsPhpOptions(
-            null,
-            null,
-            null,
-        );
-
-        yield 'test test PHP options from config' => self::createValueForInitialTestsPhpOptions(
-            '-d zend_extension=xdebug.so',
-            null,
-            '-d zend_extension=xdebug.so',
-        );
-
-        yield 'test test PHP options from input' => self::createValueForInitialTestsPhpOptions(
-            null,
-            '-d zend_extension=xdebug.so',
-            '-d zend_extension=xdebug.so',
-        );
-
-        yield 'test test PHP options from config & input' => self::createValueForInitialTestsPhpOptions(
-            '-d zend_extension=another_xdebug.so',
-            '-d zend_extension=xdebug.so',
-            '-d zend_extension=xdebug.so',
-        );
-
-        yield 'test no framework PHP options' => self::createValueForTestFrameworkExtraOptions(
-            'phpunit',
-            null,
-            null,
-            '',
-        );
-
-        yield 'test framework PHP options from config' => self::createValueForTestFrameworkExtraOptions(
-            'phpunit',
-            '--debug',
-            null,
-            '--debug',
-        );
-
-        yield 'test framework PHP options from input' => self::createValueForTestFrameworkExtraOptions(
-            'phpunit',
-            null,
-            '--debug',
-            '--debug',
-        );
-
-        yield 'test framework PHP options from config & input' => self::createValueForTestFrameworkExtraOptions(
-            'phpunit',
-            '--stop-on-failure',
-            '--debug',
-            '--debug',
-        );
-
-        yield 'test framework PHP options from config with phpspec framework' => self::createValueForTestFrameworkExtraOptions(
-            'phpspec',
-            '--debug',
-            null,
-            '--debug',
-        );
-
-        yield 'test no static analysis tool options' => self::createValueForStaticAnalysisToolOptions(
-            null,
-            null,
-            null,
-        );
-
-        yield 'test static analysis tool options from config' => self::createValueForStaticAnalysisToolOptions(
-            '--memory-limit=-1',
-            null,
-            '--memory-limit=-1',
-        );
-
-        yield 'test static analysis tool options from input' => self::createValueForStaticAnalysisToolOptions(
-            null,
-            '--memory-limit=-1',
-            '--memory-limit=-1',
-        );
-
-        yield 'test static analysis tool options from config & input' => self::createValueForStaticAnalysisToolOptions(
-            '--level=max',
-            '--memory-limit=-1',
-            '--memory-limit=-1',
-        );
-
-        yield 'PHPUnit test framework' => self::createValueForTestFrameworkKey(
-            'phpunit',
-            '--debug',
-            '--debug',
-        );
-
-        yield 'phpSpec test framework' => self::createValueForTestFrameworkKey(
-            'phpspec',
-            '--debug',
-            '--debug',
-        );
-
-        yield 'codeception test framework' => self::createValueForTestFrameworkKey(
-            'codeception',
-            '--debug',
-            '--debug',
-        );
-
-        yield 'no mutator' => self::createValueForMutators(
-            [],
-            '',
-            false,
-            self::getDefaultMutators(),
-        );
-
-        yield 'mutators from config' => self::createValueForMutators(
-            [
-                '@default' => false,
-                'MethodCallRemoval' => (object) [
-                    'ignore' => [
-                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                    ],
-                ],
-            ],
-            '',
-            false,
-            [
-                'MethodCallRemoval' => new IgnoreMutator(
-                    new IgnoreConfig([
-                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                    ]),
-                    new MethodCallRemoval(),
-                ),
-            ],
-        );
-
-        yield 'noop mutators from config' => self::createValueForMutators(
-            [
-                '@default' => false,
-                'MethodCallRemoval' => (object) [
-                    'ignore' => [
-                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                    ],
-                ],
-            ],
-            '',
-            true,
-            [
-                'MethodCallRemoval' => new NoopMutator(new IgnoreMutator(
-                    new IgnoreConfig([
-                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                    ]),
-                    new MethodCallRemoval(),
-                )),
-            ],
-        );
-
-        yield 'ignore source code by regex' => self::createValueForIgnoreSourceCodeByRegex(
-            [
-                '@default' => false,
-                'MethodCallRemoval' => (object) [
-                    'ignoreSourceCodeByRegex' => ['Assert::.*'],
-                ],
-            ],
-            ['MethodCallRemoval' => ['Assert::.*']],
-        );
-
-        yield 'ignore source code by regex with duplicates' => self::createValueForIgnoreSourceCodeByRegex(
-            [
-                '@default' => false,
-                'MethodCallRemoval' => (object) [
-                    'ignoreSourceCodeByRegex' => [
-                        'Assert::.*',
-                        'Assert::.*',
-                        'Test::.*',
-                        'Test::.*',
-                    ],
-                ],
-            ],
-            ['MethodCallRemoval' => ['Assert::.*', 'Test::.*']],
-        );
-
-        yield 'mutators from config & input' => self::createValueForMutators(
-            [
-                '@default' => true,
-                'global-ignoreSourceCodeByRegex' => ['Assert::.*'],
-                'MethodCallRemoval' => (object) [
-                    'ignore' => [
-                        'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
-                    ],
-                ],
-            ],
-            'AssignmentEqual,EqualIdentical',
-            false,
-            [
-                'AssignmentEqual' => new AssignmentEqual(),
-                'EqualIdentical' => new EqualIdentical(),
-            ],
-            [
-                'AssignmentEqual' => ['Assert::.*'],
-                'EqualIdentical' => ['Assert::.*'],
-            ],
-        );
-
-        yield 'with source files' => [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
+        yield 'absolute html file log path' => [
+            self::createValueForHtmlLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/path/to/from-config.html',
                 null,
-                new Source(['src/'], ['vendor/']),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
+                '/path/to/from-config.html',
+            ),
+        ];
+
+        yield 'relative html file log path' => [
+            self::createValueForHtmlLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                'relative/path/to/from-config.html',
+                null,
+                '/path/to/relative/path/to/from-config.html',
+            ),
+        ];
+
+        yield 'override html file log path from CLI option with existing path from config file' => [
+            self::createValueForHtmlLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/from-config.html',
+                '/from-cli.html',
+                '/from-cli.html',
+            ),
+        ];
+
+        yield 'set html file log path from CLI option when config file has no setting' => [
+            self::createValueForHtmlLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                '/from-cli.html',
+                '/from-cli.html',
+            ),
+        ];
+
+        yield 'null html file log path in config and CLI' => [
+            self::createValueForHtmlLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
                 null,
                 null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                5,
                 null,
             ),
-            'inputFilter' => 'src/Foo.php, src/Bar.php',
-            'inputGitDiffFilter' => null,
-            'inputUseGitHubAnnotationsLogger' => false,
-            'expectedSourceDirectories' => ['src/'],
-            'expectedSourceFiles' => [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ],
-            'expectedFilter' => 'src/Foo.php, src/Bar.php',
-            'expectedSourceFilesExcludes' => ['vendor/'],
-            'expectedLogs' => Logs::createEmpty(),
+        ];
+
+        yield 'null text file log path with existing path from config file' => [
+            self::createValueForTextLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/from-config.text',
+                null,
+                '/from-config.text',
+            ),
+        ];
+
+        yield 'absolute text file log path' => [
+            self::createValueForTextLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/path/to/from-config.text',
+                null,
+                '/path/to/from-config.text',
+            ),
+        ];
+
+        yield 'relative text file log path' => [
+            self::createValueForTextLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                'relative/path/to/from-config.text',
+                null,
+                '/path/to/relative/path/to/from-config.text',
+            ),
+        ];
+
+        yield 'override text file log path from CLI option with existing path from config file' => [
+            self::createValueForTextLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/from-config.text',
+                '/from-cli.text',
+                '/from-cli.text',
+            ),
+        ];
+
+        yield 'set text file log path from CLI option when config file has no setting' => [
+            self::createValueForTextLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                '/from-cli.text',
+                '/from-cli.text',
+            ),
+        ];
+
+        yield 'null text file log path in config and CLI' => [
+            self::createValueForTextLogFilePath(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'null timeout' => [
+            self::createValueForTimeout(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                10,
+            ),
+        ];
+
+        yield 'config timeout' => [
+            self::createValueForTimeout(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                20,
+                20,
+            ),
+        ];
+
+        yield 'null tmp dir' => [
+            self::createValueForTmpDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                sys_get_temp_dir() . '/infection',
+            ),
+        ];
+
+        yield 'empty tmp dir' => [
+            self::createValueForTmpDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '',
+                sys_get_temp_dir() . '/infection',
+            ),
+        ];
+
+        yield 'relative tmp dir path' => [
+            self::createValueForTmpDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'relative/path/to/tmp',
+                '/path/to/relative/path/to/tmp/infection',
+            ),
+        ];
+
+        yield 'absolute tmp dir path' => [
+            self::createValueForTmpDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '/absolute/path/to/tmp',
+                '/absolute/path/to/tmp/infection',
+            ),
+        ];
+
+        yield 'no existing base path for code coverage' => [
+            self::createValueForCoveragePath(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                null,
+                false,
+                sys_get_temp_dir() . '/infection',
+            ),
+        ];
+
+        yield 'absolute base path for code coverage' => [
+            self::createValueForCoveragePath(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                '/path/to/coverage',
+                true,
+                '/path/to/coverage',
+            ),
+        ];
+
+        yield 'relative base path for code coverage' => [
+            self::createValueForCoveragePath(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                'relative/path/to/coverage',
+                true,
+                '/path/to/relative/path/to/coverage',
+            ),
+        ];
+
+        yield 'no PHPUnit config dir' => [
+            self::createValueForPhpUnitConfigDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'relative/path/to/phpunit/config',
+                '/path/to/relative/path/to/phpunit/config',
+            ),
+        ];
+
+        yield 'relative PHPUnit config dir' => [
+            self::createValueForPhpUnitConfigDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'relative/path/to/phpunit/config',
+                '/path/to/relative/path/to/phpunit/config',
+            ),
+        ];
+
+        yield 'absolute PHPUnit config dir' => [
+            self::createValueForPhpUnitConfigDir(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '/path/to/phpunit/config',
+                '/path/to/phpunit/config',
+            ),
+        ];
+
+        yield 'progress in non-CI environment' => [
+            self::createValueForNoProgress(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                false,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'progress in CI environment' => [
+            self::createValueForNoProgress(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                true,
+                false,
+                true,
+            ),
+        ];
+
+        yield 'no progress in non-CI environment' => [
+            self::createValueForNoProgress(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                false,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'no progress in CI environment' => [
+            self::createValueForNoProgress(
+                $defaultScenario,
+                $defaultConfigurationBuilder,
+                true,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'Github Actions annotation disabled, not logged in non-Github Actions environment' => [
+            self::createValueForGithubActionsDetected(
+                $defaultScenario,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                false,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'Github Actions annotation disabled, not logged in Github Actions environment' => [
+            self::createValueForGithubActionsDetected(
+                $defaultScenario,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                false,
+                true,
+                false,
+            ),
+        ];
+
+        yield 'Github Actions annotation not provided, not logged in non-Github Actions environment' => [
+            self::createValueForGithubActionsDetected(
+                $defaultScenario,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'Github Actions annotation not provided, logged in Github Actions environment' => [
+            self::createValueForGithubActionsDetected(
+                $defaultScenario,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'Github Actions annotation enabled, logged in non-Github Actions environment' => [
+            self::createValueForGithubActionsDetected(
+                $defaultScenario,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                true,
+                false,
+                true,
+            ),
+        ];
+
+        yield 'Github Actions annotation enabled, logged in Github Actions environment' => [
+            self::createValueForGithubActionsDetected(
+                $defaultScenario,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                true,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'null GitLab file log path with existing path from config file' => [
+            self::createValueForGitlabLogger(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/from-config.json',
+                null,
+                '/from-config.json',
+            ),
+        ];
+
+        yield 'absolute GitLab file log path' => [
+            self::createValueForGitlabLogger(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/path/to/from-config.json',
+                null,
+                '/path/to/from-config.json',
+            ),
+        ];
+
+        yield 'relative GitLab file log path' => [
+            self::createValueForGitlabLogger(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                'relative/path/to/from-config.json',
+                null,
+                '/path/to/relative/path/to/from-config.json',
+            ),
+        ];
+
+        yield 'override GitLab file log path from CLI option with existing path from config file' => [
+            self::createValueForGitlabLogger(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                '/from-config.json',
+                '/from-cli.json',
+                '/from-cli.json',
+            ),
+        ];
+
+        yield 'set GitLab file log path from CLI option when config file has no setting' => [
+            self::createValueForGitlabLogger(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                '/from-cli.json',
+                '/from-cli.json',
+            ),
+        ];
+
+        yield 'null GitLab file log path in config and CLI' => [
+            self::createValueForGitlabLogger(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultLogsBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => [
+            self::createValueForIgnoreMsiWithNoMutations(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'ignoreMsiWithNoMutations not specified in schema and false in input' => [
+            self::createValueForIgnoreMsiWithNoMutations(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'ignoreMsiWithNoMutations true in schema and not specified in input' => [
+            self::createValueForIgnoreMsiWithNoMutations(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                true,
+                null,
+                true,
+            ),
+        ];
+
+        yield 'ignoreMsiWithNoMutations false in schema and not specified in input' => [
+            self::createValueForIgnoreMsiWithNoMutations(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                false,
+                null,
+                false,
+            ),
+        ];
+
+        yield 'ignoreMsiWithNoMutations true in schema and false in input' => [
+            self::createValueForIgnoreMsiWithNoMutations(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                true,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'ignoreMsiWithNoMutations false in schema and true in input' => [
+            self::createValueForIgnoreMsiWithNoMutations(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                false,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'minMsi not specified in schema and not specified in input' => [
+            self::createValueForMinMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'minMsi specified in schema and not specified in input' => [
+            self::createValueForMinMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                33.3,
+                null,
+                33.3,
+            ),
+        ];
+
+        yield 'minMsi not specified in schema and specified in input' => [
+            self::createValueForMinMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                21.2,
+                21.2,
+            ),
+        ];
+
+        yield 'minMsi specified in schema and specified in input' => [
+            self::createValueForMinMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                33.3,
+                21.2,
+                21.2,
+            ),
+        ];
+
+        yield 'minCoveredMsi not specified in schema and not specified in input' => [
+            self::createValueForMinCoveredMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'minCoveredMsi specified in schema and not specified in input' => [
+            self::createValueForMinCoveredMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                33.3,
+                null,
+                33.3,
+            ),
+        ];
+
+        yield 'minCoveredMsi not specified in schema and specified in input' => [
+            self::createValueForMinCoveredMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                21.2,
+                21.2,
+            ),
+        ];
+
+        yield 'minCoveredMsi specified in schema and specified in input' => [
+            self::createValueForMinCoveredMsi(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                33.3,
+                21.2,
+                21.2,
+            ),
+        ];
+
+        yield 'no static analysis tool' => [
+            self::createValueForStaticAnalysisTool(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'static analysis tool from config' => [
+            self::createValueForStaticAnalysisTool(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpstan',
+                null,
+                'phpstan',
+            ),
+        ];
+
+        yield 'static analysis tool from input' => [
+            self::createValueForStaticAnalysisTool(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                'phpstan',
+                'phpstan',
+            ),
+        ];
+
+        yield 'static analysis tool from config & input' => [
+            self::createValueForStaticAnalysisTool(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpstan',
+                'phpstan',
+                'phpstan',
+            ),
+        ];
+
+        yield 'no test framework' => [
+            self::createValueForTestFramework(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                'phpunit',
+                '',
+            ),
+        ];
+
+        yield 'test framework from config' => [
+            self::createValueForTestFramework(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpspec',
+                null,
+                'phpspec',
+                '',
+            ),
+        ];
+
+        yield 'test framework from input' => [
+            self::createValueForTestFramework(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                'phpspec',
+                'phpspec',
+                '',
+            ),
+        ];
+
+        yield 'test framework from config & input' => [
+            self::createValueForTestFramework(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpunit',
+                'phpspec',
+                'phpspec',
+                '',
+            ),
+        ];
+
+        yield 'test no test PHP options' => [
+            self::createValueForInitialTestsPhpOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'test test PHP options from config' => [
+            self::createValueForInitialTestsPhpOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '-d zend_extension=xdebug.so',
+                null,
+                '-d zend_extension=xdebug.so',
+            ),
+        ];
+
+        yield 'test test PHP options from input' => [
+            self::createValueForInitialTestsPhpOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                '-d zend_extension=xdebug.so',
+                '-d zend_extension=xdebug.so',
+            ),
+        ];
+
+        yield 'test test PHP options from config & input' => [
+            self::createValueForInitialTestsPhpOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '-d zend_extension=another_xdebug.so',
+                '-d zend_extension=xdebug.so',
+                '-d zend_extension=xdebug.so',
+            ),
+        ];
+
+        yield 'test no framework PHP options' => [
+            self::createValueForTestFrameworkExtraOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpunit',
+                null,
+                null,
+                '',
+            ),
+        ];
+
+        yield 'test framework PHP options from config' => [
+            self::createValueForTestFrameworkExtraOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpunit',
+                '--debug',
+                null,
+                '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from input' => [
+            self::createValueForTestFrameworkExtraOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpunit',
+                null,
+                '--debug',
+                '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from config & input' => [
+            self::createValueForTestFrameworkExtraOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpunit',
+                '--stop-on-failure',
+                '--debug',
+                '--debug',
+            ),
+        ];
+
+        yield 'test framework PHP options from config with phpspec framework' => [
+            self::createValueForTestFrameworkExtraOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpspec',
+                '--debug',
+                null,
+                '--debug',
+            ),
+        ];
+
+        yield 'test no static analysis tool options' => [
+            self::createValueForStaticAnalysisToolOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'test static analysis tool options from config' => [
+            self::createValueForStaticAnalysisToolOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '--memory-limit=-1',
+                null,
+                '--memory-limit=-1',
+            ),
+        ];
+
+        yield 'test static analysis tool options from input' => [
+            self::createValueForStaticAnalysisToolOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                null,
+                '--memory-limit=-1',
+                '--memory-limit=-1',
+            ),
+        ];
+
+        yield 'test static analysis tool options from config & input' => [
+            self::createValueForStaticAnalysisToolOptions(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                '--level=max',
+                '--memory-limit=-1',
+                '--memory-limit=-1',
+            ),
+        ];
+
+        yield 'PHPUnit test framework' => [
+            self::createValueForTestFrameworkKey(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpunit',
+                '--debug',
+                '--debug',
+            ),
+        ];
+
+        yield 'phpSpec test framework' => [
+            self::createValueForTestFrameworkKey(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'phpspec',
+                '--debug',
+                '--debug',
+            ),
+        ];
+
+        yield 'codeception test framework' => [
+            self::createValueForTestFrameworkKey(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                'codeception',
+                '--debug',
+                '--debug',
+            ),
+        ];
+
+        yield 'no mutator' => [
+            self::createValueForMutators(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                [],
+                '',
+                false,
+                self::getDefaultMutators(),
+            ),
+        ];
+
+        yield 'mutators from config' => [
+            self::createValueForMutators(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                [
+                    '@default' => false,
+                    'MethodCallRemoval' => (object) [
+                        'ignore' => [
+                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                        ],
+                    ],
+                ],
+                '',
+                false,
+                [
+                    'MethodCallRemoval' => new IgnoreMutator(
+                        new IgnoreConfig([
+                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                        ]),
+                        new MethodCallRemoval(),
+                    ),
+                ],
+            ),
+        ];
+
+        yield 'noop mutators from config' => [
+            self::createValueForMutators(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                [
+                    '@default' => false,
+                    'MethodCallRemoval' => (object) [
+                        'ignore' => [
+                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                        ],
+                    ],
+                ],
+                '',
+                true,
+                [
+                    'MethodCallRemoval' => new NoopMutator(new IgnoreMutator(
+                        new IgnoreConfig([
+                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                        ]),
+                        new MethodCallRemoval(),
+                    )),
+                ],
+            ),
+        ];
+
+        yield 'ignore source code by regex' => [
+            self::createValueForIgnoreSourceCodeByRegex(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                [
+                    '@default' => false,
+                    'MethodCallRemoval' => (object) [
+                        'ignoreSourceCodeByRegex' => ['Assert::.*'],
+                    ],
+                ],
+                ['MethodCallRemoval' => ['Assert::.*']],
+            ),
+        ];
+
+        yield 'ignore source code by regex with duplicates' => [
+            self::createValueForIgnoreSourceCodeByRegex(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                [
+                    '@default' => false,
+                    'MethodCallRemoval' => (object) [
+                        'ignoreSourceCodeByRegex' => [
+                            'Assert::.*',
+                            'Assert::.*',
+                            'Test::.*',
+                            'Test::.*',
+                        ],
+                    ],
+                ],
+                ['MethodCallRemoval' => ['Assert::.*', 'Test::.*']],
+            ),
+        ];
+
+        yield 'mutators from config & input' => [
+            self::createValueForMutators(
+                $defaultScenario,
+                $defaultSchemaBuilder,
+                $defaultConfigurationBuilder,
+                [
+                    '@default' => true,
+                    'global-ignoreSourceCodeByRegex' => ['Assert::.*'],
+                    'MethodCallRemoval' => (object) [
+                        'ignore' => [
+                            'Infection\FileSystem\Finder\SourceFilesFinder::__construct::63',
+                        ],
+                    ],
+                ],
+                'AssignmentEqual,EqualIdentical',
+                false,
+                [
+                    'AssignmentEqual' => new AssignmentEqual(),
+                    'EqualIdentical' => new EqualIdentical(),
+                ],
+                [
+                    'AssignmentEqual' => ['Assert::.*'],
+                    'EqualIdentical' => ['Assert::.*'],
+                ],
+            ),
+        ];
+
+        yield 'with source files' => [
+            $defaultScenario
+                ->withInput(
+                    $defaultInput
+                        ->withSchema(
+                            $defaultSchemaBuilder
+                                ->withSource(new Source(['src/'], ['vendor/']))
+                                ->withLogs(Logs::createEmpty())
+                                ->withThreads(5)
+                                ->build(),
+                        )
+                        ->withFilter('src/Foo.php, src/Bar.php')
+                        ->withGitDiffFilter(null)
+                        ->withUseGitHubLogger(false),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('src/')
+                        ->withSourceFiles([
+                            new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                            new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+                        ])
+                        ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                        ->withSourceFilesExcludes('vendor/')
+                        ->withLogs(Logs::createEmpty())
+                        ->build(),
+                ),
         ];
 
         yield 'with absolute source directory paths' => [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source(['/absolute/src/'], ['vendor/']),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                5,
-                null,
-            ),
-            'inputFilter' => 'src/Foo.php, src/Bar.php',
-            'inputGitDiffFilter' => null,
-            'inputUseGitHubAnnotationsLogger' => false,
-            'expectedSourceDirectories' => ['/absolute/src/'],
-            'expectedSourceFiles' => [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ],
-            'expectedFilter' => 'src/Foo.php, src/Bar.php',
-            'expectedSourceFilesExcludes' => ['vendor/'],
-            'expectedLogs' => Logs::createEmpty(),
+            $defaultScenario
+                ->withInput(
+                    $defaultInput
+                        ->withSchema(
+                            $defaultSchemaBuilder
+                                ->withSource(new Source(['/absolute/src/'], ['vendor/']))
+                                ->withLogs(Logs::createEmpty())
+                                ->withThreads(5)
+                                ->build(),
+                        )
+                        ->withFilter('src/Foo.php, src/Bar.php')
+                        ->withGitDiffFilter(null)
+                        ->withUseGitHubLogger(false),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories('/absolute/src/')
+                        ->withSourceFiles([
+                            new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                            new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+                        ])
+                        ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                        ->withSourceFilesExcludes('vendor/')
+                        ->withLogs(Logs::createEmpty())
+                        ->build(),
+                ),
         ];
 
         yield 'complete' => [
-            'ciDetected' => false,
-            'githubActionsDetected' => false,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                10,
-                new Source(['src/'], ['vendor/']),
-                new Logs(
-                    '/text.log',
-                    '/report.html',
-                    '/summary.log',
-                    '/json.log',
-                    '/gitlab.log',
-                    '/debug.log',
-                    '/mutator.log',
-                    true,
-                    StrykerConfig::forFullReport('master'),
-                    '/summary.json',
+            ConfigurationFactoryScenario::create(
+                ciDetected: false,
+                githubActionsDetected: false,
+                input: new ConfigurationFactoryInput(
+                    schema: SchemaConfigurationBuilder::withMinimalTestData()
+                        ->withTimeout(10.0)
+                        ->withSource(new Source(['src/'], ['vendor/']))
+                        ->withLogs(
+                            LogsBuilder::withCompleteTestData()
+                                ->withTextLogFilePath('/text.log')
+                                ->withHtmlLogFilePath('/report.html')
+                                ->withSummaryLogFilePath('/summary.log')
+                                ->withJsonLogFilePath('/json.log')
+                                ->withGitlabLogFilePath('/gitlab.log')
+                                ->withDebugLogFilePath('/debug.log')
+                                ->withPerMutatorFilePath('/mutator.log')
+                                ->withUseGitHubAnnotationsLogger(true)
+                                ->withStrykerConfig(StrykerConfig::forFullReport('master'))
+                                ->withSummaryJsonLogFilePath('/summary.json')
+                                ->build(),
+                        )
+                        ->withTmpDir('config/tmp')
+                        ->withPhpUnit(new PhpUnit('config/phpunit-dir', 'config/phpunit'))
+                        ->withPhpStan(new PhpStan('config/phpstan-dir', 'bin/phpstan'))
+                        ->withMutators(['@default' => true])
+                        ->withTestFramework('phpunit')
+                        ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                        ->withInitialTestsPhpOptions('-d zend_extension=wrong_xdebug.so')
+                        ->withTestFrameworkExtraOptions('--debug')
+                        ->withStaticAnalysisToolOptions('--memory-limit=-1')
+                        ->withThreads('max')
+                        ->withStaticAnalysisTool('phpstan')
+                        ->build(),
+                    existingCoveragePath: 'dist/coverage',
+                    initialTestsPhpOptions: '-d zend_extension=xdebug.so',
+                    skipInitialTests: false,
+                    logVerbosity: LogVerbosity::NONE,
+                    debug: true,
+                    withUncovered: true,
+                    noProgress: true,
+                    ignoreMsiWithNoMutations: true,
+                    minMsi: 72.3,
+                    numberOfShownMutations: 20,
+                    minCoveredMsi: 81.5,
+                    msiPrecision: 2,
+                    mutatorsInput: 'TrueValue',
+                    testFramework: 'phpspec',
+                    testFrameworkExtraOptions: '--stop-on-failure',
+                    staticAnalysisToolOptions: null,
+                    filter: 'src/Foo.php, src/Bar.php',
+                    threadCount: 4,
+                    dryRun: true,
+                    gitDiffFilter: null,
+                    isForGitDiffLines: false,
+                    gitDiffBase: 'master',
+                    useGitHubLogger: false,
+                    gitlabLogFilePath: null,
+                    htmlLogFilePath: null,
+                    textLogFilePath: null,
+                    useNoopMutators: false,
+                    executeOnlyCoveringTestCases: false,
+                    mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
+                    loggerProjectRootDirectory: null,
+                    staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
+                    mutantId: 'h4sh',
                 ),
-                'config/tmp',
-                new PhpUnit(
-                    'config/phpunit-dir',
-                    'config/phpunit',
-                ),
-                new PhpStan('config/phpstan-dir', 'bin/phpstan'),
-                null,
-                null,
-                null,
-                ['@default' => true],
-                'phpunit',
-                __DIR__ . '/../Fixtures/Files/bootstrap/bootstrap.php',
-                '-d zend_extension=wrong_xdebug.so',
-                '--debug',
-                '--memory-limit=-1',
-                'max',
-                'phpstan',
+                expected: ConfigurationBuilder::withMinimalTestData()
+                    ->withTimeout(10)
+                    ->withSourceDirectories('src/')
+                    ->withSourceFiles([
+                        new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
+                        new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
+                    ])
+                    ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                    ->withSourceFilesExcludes('vendor/')
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withTextLogFilePath('/text.log')
+                            ->withHtmlLogFilePath('/report.html')
+                            ->withSummaryLogFilePath('/summary.log')
+                            ->withJsonLogFilePath('/json.log')
+                            ->withGitlabLogFilePath('/gitlab.log')
+                            ->withDebugLogFilePath('/debug.log')
+                            ->withPerMutatorFilePath('/mutator.log')
+                            ->withUseGitHubAnnotationsLogger(true)
+                            ->withStrykerConfig(StrykerConfig::forFullReport('master'))
+                            ->withSummaryJsonLogFilePath('/summary.json')
+                            ->build(),
+                    )
+                    ->withLogVerbosity(LogVerbosity::NONE)
+                    ->withTmpDir('/path/to/config/tmp/infection')
+                    ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', 'config/phpunit'))
+                    ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', 'bin/phpstan'))
+                    ->withMutators([
+                        'TrueValue' => new TrueValue(new TrueValueConfig([])),
+                    ])
+                    ->withTestFramework('phpspec')
+                    ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                    ->withInitialTestsPhpOptions('-d zend_extension=xdebug.so')
+                    ->withSkipInitialTests(false)
+                    ->withTestFrameworkExtraOptions('--stop-on-failure')
+                    ->withStaticAnalysisToolOptions('--memory-limit=-1')
+                    ->withCoveragePath('/path/to/dist/coverage')
+                    ->withSkipCoverage(true)
+                    ->withDebug(true)
+                    ->withWithUncovered(true)
+                    ->withNoProgress(true)
+                    ->withIgnoreMsiWithNoMutations(true)
+                    ->withMinMsi(72.3)
+                    ->withNumberOfShownMutations(20)
+                    ->withMinCoveredMsi(81.5)
+                    ->withMsiPrecision(2)
+                    ->withThreadCount(4)
+                    ->withDryRun(true)
+                    ->withIgnoreSourceCodeMutatorsMap([])
+                    ->withExecuteOnlyCoveringTestCases(false)
+                    ->withIsForGitDiffLines(false)
+                    ->withGitDiffBase('master')
+                    ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
+                    ->withLoggerProjectRootDirectory(null)
+                    ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
+                    ->withMutantId('h4sh')
+                    ->build(),
             ),
-            'inputExistingCoveragePath' => 'dist/coverage',
-            'inputInitialTestsPhpOptions' => '-d zend_extension=xdebug.so',
-            'skipInitialTests' => false,
-            'inputLogVerbosity' => 'none',
-            'inputDebug' => true,
-            'inputWithUncovered' => true,
-            'inputNoProgress' => true,
-            'inputIgnoreMsiWithNoMutations' => true,
-            'inputMinMsi' => 72.3,
-            'inputNumberOfShownMutations' => 20,
-            'inputMinCoveredMsi' => 81.5,
-            'inputMutators' => 'TrueValue',
-            'inputStaticAnalysisTool' => StaticAnalysisToolTypes::PHPSTAN,
-            'inputTestFramework' => 'phpspec',
-            'inputTestFrameworkExtraOptions' => '--stop-on-failure',
-            'inputFilter' => 'src/Foo.php, src/Bar.php',
-            'inputThreadsCount' => 4,
-            'inputDryRun' => true,
-            'inputGitDiffFilter' => null,
-            'inputIsForGitDiffLines' => false,
-            'inputGitDiffBase' => 'master',
-            'inputUseGitHubAnnotationsLogger' => false,
-            'inputGitlabLogFilePath' => null,
-            'inputHtmlLogFilePath' => null,
-            'inputUseNoopMutators' => false,
-            'inputMsiPrecision' => 2,
-            'expectedTimeout' => 10,
-            'expectedSourceDirectories' => ['src/'],
-            'expectedSourceFiles' => [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ],
-            'expectedFilter' => 'src/Foo.php, src/Bar.php',
-            'expectedSourceFilesExcludes' => ['vendor/'],
-            'expectedLogs' => new Logs(
-                '/text.log',
-                '/report.html',
-                '/summary.log',
-                '/json.log',
-                '/gitlab.log',
-                '/debug.log',
-                '/mutator.log',
-                true,
-                StrykerConfig::forFullReport('master'),
-                '/summary.json',
-            ),
-            'expectedLogVerbosity' => 'none',
-            'expectedTmpDir' => '/path/to/config/tmp/infection',
-            'expectedPhpUnit' => new PhpUnit(
-                '/path/to/config/phpunit-dir',
-                'config/phpunit',
-            ),
-            'expectedPhpStan' => new PhpStan('/path/to/config/phpstan-dir', 'bin/phpstan'),
-            'expectedMutators' => (static fn (): array => [
-                'TrueValue' => new TrueValue(new TrueValueConfig([])),
-            ])(),
-            'expectedTestFramework' => 'phpspec',
-            'expectedBootstrap' => __DIR__ . '/../Fixtures/Files/bootstrap/bootstrap.php',
-            'expectedInitialTestsPhpOptions' => '-d zend_extension=xdebug.so',
-            'expectedSkipInitialTests' => false,
-            'expectedTestFrameworkExtraOptions' => '--stop-on-failure',
-            'expectedStaticAnalysisToolOptions' => '--memory-limit=-1',
-            'expectedCoveragePath' => '/path/to/dist/coverage',
-            'expectedSkipCoverage' => true,
-            'expectedDebug' => true,
-            'expectedWithUncovered' => true,
-            'expectedNoProgress' => true,
-            'expectedIgnoreMsiWithNoMutations' => true,
-            'expectedMinMsi' => 72.3,
-            'expectedNumberOfShownMutations' => 20,
-            'expectedMinCoveredMsi' => 81.5,
-            'expectedIgnoreSourceCodeMutatorsMap' => [],
-            'inputExecuteOnlyCoveringTestCases' => false,
-            'mapSourceClassToTest' => MapSourceClassToTestStrategy::SIMPLE,
-            'loggerProjectRootDirectory' => null,
-            'expectedStaticAnalysisTool' => StaticAnalysisToolTypes::PHPSTAN,
-            'mutantId' => 'h4sh', // $mutantId
         ];
 
         yield 'custom mutator with bootstrap file' => [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false,
-                    null,
-                    null,
+            $defaultScenario
+                ->withInput(
+                    $defaultInput
+                        ->withSchema(
+                            $defaultSchemaBuilder
+                                ->withSource(new Source([], []))
+                                ->withLogs(LogsBuilder::withMinimalTestData()->build())
+                                ->withTmpDir('')
+                                ->withMutators(['@default' => false, 'CustomMutator' => true])
+                                ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                                ->build(),
+                        )
+                        ->withUseGitHubLogger(false),
+                )
+                ->withExpected(
+                    $defaultConfigurationBuilder
+                        ->withSourceDirectories()
+                        ->withSourceFiles([])
+                        ->withSourceFilesExcludes()
+                        ->withLogs(Logs::createEmpty())
+                        ->withMutators([
+                            'CustomMutator' => new CustomMutator(),
+                        ])
+                        ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                        ->build(),
                 ),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                ['@default' => false, 'CustomMutator' => true],
-                null,
-                __DIR__ . '/../Fixtures/Files/bootstrap/bootstrap.php',
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-            'expectedMutators' => (static fn (): array => [
-                'CustomMutator' => new CustomMutator(),
-            ])(),
-            'expectedBootstrap' => __DIR__ . '/../Fixtures/Files/bootstrap/bootstrap.php',
         ];
     }
 
     private static function createValueForTimeout(
-        ?int $schemaTimeout,
-        int $expectedTimeout,
-    ): array {
-        return [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                $schemaTimeout,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-            'expectedTimeout' => $expectedTimeout,
-        ];
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
+        ?float $schemaTimeout,
+        float $expectedTimeout,
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withTimeout($schemaTimeout)
+                            ->build(),
+                    ),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withTimeout($expectedTimeout)
+                    ->build(),
+            );
     }
 
     private static function createValueForTmpDir(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $configTmpDir,
         ?string $expectedTmpDir,
-    ): array {
-        return [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                $configTmpDir,
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-            'expectedTmpDir' => $expectedTmpDir,
-            'expectedCoveragePath' => $expectedTmpDir,
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withTmpDir($configTmpDir)
+                            ->build(),
+                    ),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withTmpDir($expectedTmpDir)
+                    ->withCoveragePath($expectedTmpDir)
+                    ->build(),
+            );
     }
 
     private static function createValueForCoveragePath(
+        ConfigurationFactoryScenario $defaultScenario,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $existingCoveragePath,
         bool $expectedSkipCoverage,
         string $expectedCoveragePath,
-    ): array {
-        return [
-            'inputExistingCoveragePath' => $existingCoveragePath,
-            'expectedCoveragePath' => $expectedCoveragePath,
-            'expectedSkipCoverage' => $expectedSkipCoverage,
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withExistingCoveragePath($existingCoveragePath),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withCoveragePath($expectedCoveragePath)
+                    ->withSkipCoverage($expectedSkipCoverage)
+                    ->build(),
+            );
     }
 
     private static function createValueForPhpUnitConfigDir(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $phpUnitConfigDir,
         ?string $expectedPhpUnitConfigDir,
-    ): array {
-        return [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit($phpUnitConfigDir, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-            'expectedPhpUnit' => new PhpUnit($expectedPhpUnitConfigDir, null),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withPhpUnit(new PhpUnit($phpUnitConfigDir, null))
+                            ->build(),
+                    ),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withPhpUnit(new PhpUnit($expectedPhpUnitConfigDir, null))
+                    ->build(),
+            );
     }
 
     private static function createValueForNoProgress(
+        ConfigurationFactoryScenario $defaultScenario,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         bool $ciDetected,
         bool $noProgress,
         bool $expectedNoProgress,
-    ): array {
-        return [
-            'ciDetected' => $ciDetected,
-            'inputNoProgress' => $noProgress,
-            'expectedNoProgress' => $expectedNoProgress,
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withCiDetected($ciDetected)
+            ->withInput(
+                $defaultScenario->input
+                    ->withNoProgress($noProgress),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withNoProgress($expectedNoProgress)
+                    ->build(),
+            );
     }
 
     private static function createValueForGithubActionsDetected(
+        ConfigurationFactoryScenario $defaultScenario,
+        LogsBuilder $defaultLogsBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?bool $inputUseGitHubAnnotationsLogger,
         bool $githubActionsDetected,
         bool $useGitHubAnnotationsLogger,
-    ): array {
-        $expectedLogs = new Logs(
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $useGitHubAnnotationsLogger,
-            null,
-            null,
-        );
-
-        return [
-            'githubActionsDetected' => $githubActionsDetected,
-            'inputUseGitHubAnnotationsLogger' => $inputUseGitHubAnnotationsLogger,
-            'expectedLogs' => $expectedLogs,
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withGithubActionsDetected($githubActionsDetected)
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        SchemaConfigurationBuilder::from($defaultScenario->input->getSchema())
+                            ->withLogs(Logs::createEmpty())
+                            ->build(),
+                    )
+                    ->withUseGitHubLogger($inputUseGitHubAnnotationsLogger),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withLogs(
+                        $defaultLogsBuilder
+                            ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)
+                            ->build(),
+                    )
+                    ->build(),
+            );
     }
 
     private static function createValueForGitlabLogger(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        LogsBuilder $defaultLogsBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $gitlabFileLogPathInConfig,
         ?string $gitlabFileLogPathFromCliOption,
         ?string $expectedGitlabFileLogPath,
-    ): array {
-        $expectedLogs = new Logs(
-            null,
-            null,
-            null,
-            null,
-            $expectedGitlabFileLogPath,
-            null,
-            null,
-            true,
-            null,
-            null,
-        );
-
-        return [
-            'inputGitlabLogFilePath' => $gitlabFileLogPathFromCliOption,
-            'expectedLogs' => $expectedLogs,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                new Logs(
-                    null,
-                    null,
-                    null,
-                    null,
-                    $gitlabFileLogPathInConfig,
-                    null,
-                    null,
-                    false,
-                    null,
-                    null,
-                ),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withLogs(
+                                LogsBuilder::withMinimalTestData()
+                                    ->withGitlabLogFilePath($gitlabFileLogPathInConfig)
+                                    ->build(),
+                            )
+                            ->build(),
+                    )
+                    ->withGitlabLogFilePath($gitlabFileLogPathFromCliOption),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withLogs(
+                        $defaultLogsBuilder
+                            ->withGitlabLogFilePath($expectedGitlabFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            );
     }
 
     private static function createValueForIgnoreMsiWithNoMutations(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?bool $ignoreMsiWithNoMutationsFromSchemaConfiguration,
         ?bool $ignoreMsiWithNoMutationsFromInput,
         ?bool $expectedIgnoreMsiWithNoMutations,
-    ): array {
-        return [
-            'inputIgnoreMsiWithNoMutations' => $ignoreMsiWithNoMutationsFromInput,
-            'expectedIgnoreMsiWithNoMutations' => $expectedIgnoreMsiWithNoMutations,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit('/path/to', null),
-                new PhpStan('/path/to', null),
-                $ignoreMsiWithNoMutationsFromSchemaConfiguration,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withPhpUnit(new PhpUnit('/path/to', null))
+                            ->withPhpStan(new PhpStan('/path/to', null))
+                            ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromSchemaConfiguration)
+                            ->build(),
+                    )
+                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromInput),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withIgnoreMsiWithNoMutations($expectedIgnoreMsiWithNoMutations)
+                    ->build(),
+            );
     }
 
     private static function createValueForMinMsi(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?float $minMsiFromSchemaConfiguration,
         ?float $minMsiFromInput,
         ?float $expectedMinMsi,
-    ): array {
-        return [
-            'inputMinMsi' => $minMsiFromInput,
-            'expectedMinMsi' => $expectedMinMsi,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit('/path/to', null),
-                new PhpStan('/path/to', null),
-                null,
-                $minMsiFromSchemaConfiguration,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withPhpUnit(new PhpUnit('/path/to', null))
+                            ->withPhpStan(new PhpStan('/path/to', null))
+                            ->withMinMsi($minMsiFromSchemaConfiguration)
+                            ->build(),
+                    )
+                    ->withMinMsi($minMsiFromInput),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinMsi($expectedMinMsi)
+                    ->build(),
+            );
     }
 
     private static function createValueForMinCoveredMsi(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?float $minCoveredMsiFromSchemaConfiguration,
         ?float $minCoveredMsiFromInput,
         ?float $expectedMinCoveredMsi,
-    ): array {
-        return [
-            'inputMinCoveredMsi' => $minCoveredMsiFromInput,
-            'expectedMinCoveredMsi' => $expectedMinCoveredMsi,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit('/path/to', null),
-                new PhpStan('/path/to', null),
-                null,
-                null,
-                $minCoveredMsiFromSchemaConfiguration,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withPhpUnit(new PhpUnit('/path/to', null))
+                            ->withPhpStan(new PhpStan('/path/to', null))
+                            ->withMinCoveredMsi($minCoveredMsiFromSchemaConfiguration)
+                            ->build(),
+                    )
+                    ->withMinCoveredMsi($minCoveredMsiFromInput),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinCoveredMsi($expectedMinCoveredMsi)
+                    ->build(),
+            );
     }
 
     private static function createValueForTestFramework(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $configTestFramework,
         ?string $inputTestFramework,
         string $expectedTestFramework,
         string $expectedTestFrameworkExtraOptions,
-    ): array {
-        return [
-            'inputTestFramework' => $inputTestFramework,
-            'expectedTestFramework' => $expectedTestFramework,
-            'expectedTestFrameworkExtraOptions' => $expectedTestFrameworkExtraOptions,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                $configTestFramework,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withTestFramework($configTestFramework)
+                            ->build(),
+                    )
+                    ->withTestFramework($inputTestFramework),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withTestFramework($expectedTestFramework)
+                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
+                    ->build(),
+            );
     }
 
     private static function createValueForStaticAnalysisTool(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $configStaticAnalysisTool,
         ?string $inputStaticAnalysisTool,
         ?string $expectedStaticAnalysisTool,
-    ): array {
-        return [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                TestFrameworkTypes::PHPUNIT,
-                null,
-                null,
-                null,
-                null,
-                null,
-                $configStaticAnalysisTool,
-            ),
-            'inputStaticAnalysisTool' => $inputStaticAnalysisTool,
-            'expectedStaticAnalysisTool' => $expectedStaticAnalysisTool,
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withTestFramework(TestFrameworkTypes::PHPUNIT)
+                            ->withStaticAnalysisTool($configStaticAnalysisTool)
+                            ->build(),
+                    )
+                    ->withStaticAnalysisTool($inputStaticAnalysisTool),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withStaticAnalysisTool($expectedStaticAnalysisTool)
+                    ->build(),
+            );
     }
 
     private static function createValueForInitialTestsPhpOptions(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $configInitialTestsPhpOptions,
         ?string $inputInitialTestsPhpOptions,
         ?string $expectedInitialTestPhpOptions,
-    ): array {
-        return [
-            'inputInitialTestsPhpOptions' => $inputInitialTestsPhpOptions,
-            'expectedInitialTestsPhpOptions' => $expectedInitialTestPhpOptions,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                $configInitialTestsPhpOptions,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withInitialTestsPhpOptions($configInitialTestsPhpOptions)
+                            ->build(),
+                    )
+                    ->withInitialTestsPhpOptions($inputInitialTestsPhpOptions),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withInitialTestsPhpOptions($expectedInitialTestPhpOptions)
+                    ->build(),
+            );
     }
 
     private static function createValueForTestFrameworkExtraOptions(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         string $configTestFramework,
         ?string $configTestFrameworkExtraOptions,
         ?string $inputTestFrameworkExtraOptions,
         string $expectedTestFrameworkExtraOptions,
-    ): array {
-        return [
-            'inputTestFrameworkExtraOptions' => $inputTestFrameworkExtraOptions,
-            'expectedTestFramework' => $configTestFramework,
-            'expectedTestFrameworkExtraOptions' => $expectedTestFrameworkExtraOptions,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                $configTestFramework,
-                null,
-                null,
-                $configTestFrameworkExtraOptions,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withTestFramework($configTestFramework)
+                            ->withTestFrameworkExtraOptions($configTestFrameworkExtraOptions)
+                            ->build(),
+                    )
+                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withTestFramework($configTestFramework)
+                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
+                    ->build(),
+            );
     }
 
     private static function createValueForStaticAnalysisToolOptions(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         ?string $configStaticAnalysisToolOptions,
         ?string $inputStaticAnalysisToolOptions,
         ?string $expectedStaticAnalysisToolOptions,
-    ): array {
-        return [
-            'inputStaticAnalysisToolOptions' => $inputStaticAnalysisToolOptions,
-            'expectedStaticAnalysisToolOptions' => $expectedStaticAnalysisToolOptions,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                $configStaticAnalysisToolOptions,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withStaticAnalysisToolOptions($configStaticAnalysisToolOptions)
+                            ->build(),
+                    )
+                    ->withStaticAnalysisToolOptions($inputStaticAnalysisToolOptions),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withStaticAnalysisToolOptions($expectedStaticAnalysisToolOptions)
+                    ->build(),
+            );
     }
 
     private static function createValueForTestFrameworkKey(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         string $configTestFramework,
         string $inputTestFrameworkExtraOptions,
         string $expectedTestFrameworkExtraOptions,
-    ): array {
-        return [
-            'inputTestFrameworkExtraOptions' => $inputTestFrameworkExtraOptions,
-            'expectedTestFramework' => $configTestFramework,
-            'expectedTestFrameworkExtraOptions' => $expectedTestFrameworkExtraOptions,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                $configTestFramework,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withTestFramework($configTestFramework)
+                            ->build(),
+                    )
+                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withTestFramework($configTestFramework)
+                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
+                    ->build(),
+            );
     }
 
     /**
@@ -1586,38 +1935,32 @@ final class ConfigurationFactoryTest extends TestCase
      * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     private static function createValueForMutators(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         array $configMutators,
         string $inputMutators,
         bool $useNoopMutators,
         array $expectedMutators,
         array $expectedIgnoreSourceCodeMutatorsMap = [],
-    ): array {
-        return [
-            'inputMutators' => $inputMutators,
-            'inputUseNoopMutators' => $useNoopMutators,
-            'expectedMutators' => $expectedMutators,
-            'expectedIgnoreSourceCodeMutatorsMap' => $expectedIgnoreSourceCodeMutatorsMap,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                null,
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                $configMutators,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withMutators($configMutators)
+                            ->build(),
+                    )
+                    ->withMutatorsInput($inputMutators)
+                    ->withUseNoopMutators($useNoopMutators),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withMutators($expectedMutators)
+                    ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
+                    ->build(),
+            );
     }
 
     /**
@@ -1625,142 +1968,97 @@ final class ConfigurationFactoryTest extends TestCase
      * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     private static function createValueForIgnoreSourceCodeByRegex(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
         array $configMutators,
         array $expectedIgnoreSourceCodeMutatorsMap,
-    ): array {
-        return [
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                Logs::createEmpty(),
-                null,
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                $configMutators,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-            'expectedIgnoreSourceCodeMutatorsMap' => $expectedIgnoreSourceCodeMutatorsMap,
-            'expectedMutators' => [
-                'MethodCallRemoval' => new MethodCallRemoval(),
-            ],
-        ];
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withMutators($configMutators)
+                            ->build(),
+                    ),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withMutators([
+                        'MethodCallRemoval' => new MethodCallRemoval(),
+                    ])
+                    ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
+                    ->build(),
+            );
     }
 
-    private static function createValueForHtmlLogFilePath(?string $htmlFileLogPathInConfig, ?string $htmlFileLogPathFromCliOption, ?string $expectedHtmlFileLogPath): array
-    {
-        $expectedLogs = new Logs(
-            null,
-            $expectedHtmlFileLogPath,
-            null,
-            null,
-            null,
-            null,
-            null,
-            true,
-            null,
-            null,
-        );
-
-        return [
-            'inputHtmlLogFilePath' => $htmlFileLogPathFromCliOption,
-            'expectedLogs' => $expectedLogs,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                new Logs(
-                    null,
-                    $htmlFileLogPathInConfig,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false,
-                    null,
-                    null,
-                ),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    private static function createValueForHtmlLogFilePath(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        LogsBuilder $defaultLogsBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
+        ?string $htmlFileLogPathInConfig,
+        ?string $htmlFileLogPathFromCliOption,
+        ?string $expectedHtmlFileLogPath,
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withLogs(
+                                LogsBuilder::withMinimalTestData()
+                                    ->withHtmlLogFilePath($htmlFileLogPathInConfig)
+                                    ->build(),
+                            )
+                            ->build(),
+                    )
+                    ->withHtmlLogFilePath($htmlFileLogPathFromCliOption),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withLogs(
+                        $defaultLogsBuilder
+                            ->withHtmlLogFilePath($expectedHtmlFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            );
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function createValueForTextLogFilePath(?string $textFileLogPathInConfig, ?string $textFileLogPathFromCliOption, ?string $expectedTextFileLogPath): array
-    {
-        $expectedLogs = new Logs(
-            $expectedTextFileLogPath,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            true,
-            null,
-            null,
-        );
-
-        return [
-            'inputTextLogFilePath' => $textFileLogPathFromCliOption,
-            'expectedLogs' => $expectedLogs,
-            'schema' => new SchemaConfiguration(
-                '/path/to/infection.json',
-                null,
-                new Source([], []),
-                new Logs(
-                    $textFileLogPathInConfig,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    false,
-                    null,
-                    null,
-                ),
-                '',
-                new PhpUnit(null, null),
-                new PhpStan(null, null),
-                null,
-                null,
-                null,
-                [],
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-            ),
-        ];
+    private static function createValueForTextLogFilePath(
+        ConfigurationFactoryScenario $defaultScenario,
+        SchemaConfigurationBuilder $defaultSchemaBuilder,
+        LogsBuilder $defaultLogsBuilder,
+        ConfigurationBuilder $defaultConfigurationBuilder,
+        ?string $textFileLogPathInConfig,
+        ?string $textFileLogPathFromCliOption,
+        ?string $expectedTextFileLogPath,
+    ): ConfigurationFactoryScenario {
+        return $defaultScenario
+            ->withInput(
+                $defaultScenario->input
+                    ->withSchema(
+                        $defaultSchemaBuilder
+                            ->withLogs(
+                                LogsBuilder::withMinimalTestData()
+                                    ->withTextLogFilePath($textFileLogPathInConfig)
+                                    ->build(),
+                            )
+                            ->build(),
+                    )
+                    ->withTextLogFilePath($textFileLogPathFromCliOption),
+            )
+            ->withExpected(
+                $defaultConfigurationBuilder
+                    ->withLogs(
+                        $defaultLogsBuilder
+                            ->withTextLogFilePath($expectedTextFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            );
     }
 
     /**

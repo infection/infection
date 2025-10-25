@@ -48,7 +48,7 @@ final class SchemaConfigurationBuilderTest extends TestCase
     {
         $actual = SchemaConfigurationBuilder::from($configuration)->build();
 
-        self::assertEquals($configuration, $actual);
+        $this->assertEquals($configuration, $actual);
     }
 
     public static function configurationProvider(): iterable
