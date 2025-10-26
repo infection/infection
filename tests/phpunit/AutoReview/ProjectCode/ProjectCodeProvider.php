@@ -81,7 +81,6 @@ use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUn
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
-use Infection\Testing\SimpleMutation;
 use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Testing\SourceTestClassNameScheme;
@@ -128,7 +127,6 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutatorName::class,
         BaseMutatorTestCase::class,
-        SimpleMutation::class,
         StringNormalizer::class,
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
