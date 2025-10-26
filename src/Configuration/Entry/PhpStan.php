@@ -51,12 +51,17 @@ final class PhpStan
     public function withAbsolutePaths(string $basePath): self
     {
         $configDir = $this->configDir;
+        $customPath = $this->customPath;
 
         $newConfigDir = $configDir === null
             ? $basePath
             : self::makeAbsolute($configDir, $basePath);
 
-        return new self($newConfigDir, $this->customPath);
+        $newCustomPath = $customPath === null
+            ? null
+            : self::makeAbsolute($customPath, $basePath);
+
+        return new self($newConfigDir, $newCustomPath);
     }
 
     public function getConfigDir(): ?string
