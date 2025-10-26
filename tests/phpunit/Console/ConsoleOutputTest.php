@@ -124,23 +124,6 @@ final class ConsoleOutputTest extends TestCase
         );
     }
 
-    public function test_log_not_in_control_of_exit_codes(): void
-    {
-        $this->consoleOutput->logNotInControlOfExitCodes();
-
-        $this->assertSame(
-            <<<'TXT'
-
-                 [WARNING] Infection cannot control exit codes and unable to relaunch itself.
-                           It is your responsibility to disable xdebug/phpdbg unless needed.
-
-
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
-        );
-    }
-
     public function test_log_min_msi_can_get_increased_notice_for_msi(): void
     {
         $this->consoleOutput->logMinMsiCanGetIncreasedNotice(
