@@ -1077,9 +1077,9 @@ final class ConfigurationFactoryTest extends TestCase
             'expectedTmpDir' => '/path/to/config/tmp/infection',
             'expectedPhpUnit' => new PhpUnit(
                 '/path/to/config/phpunit-dir',
-                'config/phpunit',
+                '/path/to/config/phpunit',
             ),
-            'expectedPhpStan' => new PhpStan('/path/to/config/phpstan-dir', 'bin/phpstan'),
+            'expectedPhpStan' => new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'),
             'expectedMutators' => (static fn (): array => [
                 'TrueValue' => new TrueValue(new TrueValueConfig([])),
             ])(),
