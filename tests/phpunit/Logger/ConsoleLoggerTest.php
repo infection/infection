@@ -93,7 +93,7 @@ final class ConsoleLoggerTest extends TestCase
     public function test_the_log_level_is_added_to_the_message(
         string $logLevel,
         string $message,
-        string $expectedMessage
+        string $expectedMessage,
     ): void {
         $output = new BufferedOutput(OutputInterface::VERBOSITY_DEBUG);
 
