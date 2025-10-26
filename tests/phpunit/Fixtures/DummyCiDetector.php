@@ -6,21 +6,20 @@ namespace Infection\Tests\Fixtures;
 
 use Infection\Tests\UnsupportedMethod;
 use OndraM\CiDetector\Ci\CiInterface;
-use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\Ci\GitHubActions;
+use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Env;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
 
-final class DummyCiDetector extends CiDetector
+final readonly class DummyCiDetector implements CiDetectorInterface
 {
-    private $ciDetected;
-
-    public function __construct(bool $ciDetected)
+    public function __construct(private bool $ciDetected, private bool $githubActionsDetected = false)
     {
-        $this->ciDetected = $ciDetected;
     }
 
-    public static function fromEnvironment(Env $environment): CiDetector
+    public static function fromEnvironment(Env $environment): CiDetectorInterface
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function isCiDetected(): bool
@@ -30,6 +29,10 @@ final class DummyCiDetector extends CiDetector
 
     public function detect(): CiInterface
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        if ($this->githubActionsDetected) {
+            return new GitHubActions(new Env());
+        }
+
+        throw new CiNotDetectedException('No CI server detected in current environment');
     }
 }

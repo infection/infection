@@ -35,25 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\DryProcessRunner;
-use Infection\Tests\Fixtures\Process\FakeProcessBearer;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(DryProcessRunner::class)]
 final class DryProcessRunnerTest extends TestCase
 {
     public function test_it_can_iterate_over_the_processes(): void
     {
         $called = false;
 
-        $processes = (static function () use (&$called) {
-            yield new FakeProcessBearer();
+        $processes = (function () use (&$called): iterable {
+            yield $this->createMock(MutantProcessContainer::class);
 
             $called = true;
 
-            yield new FakeProcessBearer();
+            yield $this->createMock(MutantProcessContainer::class);
         })();
 
-        (new DryProcessRunner())->run($processes);
+        foreach ((new DryProcessRunner())->run($processes) as $item) {
+            // just trigger a generator
+        }
 
         $this->assertTrue($called);
     }

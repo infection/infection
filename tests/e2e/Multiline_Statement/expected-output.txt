@@ -46,8 +46,14 @@ Mutator: Multiplication
 Line 22
 
 
+Killed by Static Analysis mutants:
+==================================
+
 Errors mutants:
 ===============
+
+Syntax Errors mutants:
+======================
 
 Escaped mutants:
 ================
@@ -58,5 +64,5 @@ Timed Out mutants:
 Skipped mutants:
 ================
 
-Not Covered mutants:
-====================
+Ignored mutants:
+================

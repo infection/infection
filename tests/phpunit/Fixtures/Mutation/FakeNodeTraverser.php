@@ -12,16 +12,16 @@ final class FakeNodeTraverser implements NodeTraverserInterface
 {
     public function addVisitor(NodeVisitor $visitor)
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function removeVisitor(NodeVisitor $visitor)
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function traverse(array $nodes): array
     {
-        throw UnsupportedMethod::method(__CLASS__, __FUNCTION__);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

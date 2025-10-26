@@ -37,13 +37,14 @@ namespace Infection\Tests\Logger\Http;
 
 use Infection\Logger\Http\Response;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Response::class)]
 final class ResponseTest extends TestCase
 {
-    /**
-     * @dataProvider valueProvider
-     */
+    #[DataProvider('valueProvider')]
     public function test_it_can_be_instantiated(int $statusCode, string $body): void
     {
         $response = new Response($statusCode, $body);
@@ -61,12 +62,12 @@ final class ResponseTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             $this->assertSame(
                 'Expected an HTTP status code. Got "102"',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): iterable
     {
         yield 'empty' => [200, ''];
 

@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,19 +51,19 @@ final class Ternary implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
-TXT
+                Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $x = true ? true : false;
-+ $x = true ? false : true;
-DIFF
+                - $x = true ? true : false;
+                + $x = true ? false : true;
+                DIFF,
         );
     }
 
@@ -84,6 +85,6 @@ DIFF
             $if = $node->cond;
         }
 
-        yield new Node\Expr\Ternary($node->cond, $node->else, $if, $node->getAttributes());
+        yield new Node\Expr\Ternary($node->cond, $node->else, $if, NodeAttributes::getAllExceptOriginalNode($node));
     }
 }

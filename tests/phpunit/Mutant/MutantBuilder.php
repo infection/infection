@@ -37,17 +37,22 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use InvalidArgumentException;
 use function Later\now;
 
 final class MutantBuilder
 {
     public static function build(
-        string $mutantFilePath,
-        Mutation $mutation,
-        string $mutatedCode,
-        string $diff,
-        string $prettyPrintedOriginalCode
+        string $mutantFilePath = '/path/to/mutant',
+        ?Mutation $mutation = null,
+        string $mutatedCode = 'mutated code',
+        string $diff = 'diff',
+        string $prettyPrintedOriginalCode = '<?php $a = 1;',
     ): Mutant {
+        if ($mutation === null) {
+            throw new InvalidArgumentException('Mutation cannot be null');
+        }
+
         return new Mutant($mutantFilePath, $mutation, now($mutatedCode), now($diff), now($prettyPrintedOriginalCode));
     }
 }

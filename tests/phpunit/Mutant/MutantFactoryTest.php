@@ -42,13 +42,14 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use PhpParser\Node;
-use PhpParser\PrettyPrinterAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 
+#[CoversClass(MutantFactory::class)]
 final class MutantFactoryTest extends TestCase
 {
     use MutantAssertions;
@@ -57,11 +58,6 @@ final class MutantFactoryTest extends TestCase
      * @var MutantCodeFactory|MockObject
      */
     private $codeFactoryMock;
-
-    /**
-     * @var PrettyPrinterAbstract|MockObject
-     */
-    private $printerMock;
 
     /**
      * @var Differ|MockObject
@@ -79,37 +75,34 @@ final class MutantFactoryTest extends TestCase
 
         $this->codeFactoryMock = $this->createMock(MutantCodeFactory::class);
 
-        $this->printerMock = $this->createMock(PrettyPrinterAbstract::class);
-
         $this->differMock = $this->createMock(Differ::class);
 
         $this->mutantFactory = new MutantFactory(
             '/path/to/tmp',
             $this->differMock,
-            $this->printerMock,
-            $this->codeFactoryMock
+            $this->codeFactoryMock,
         );
     }
 
     public function test_it_creates_a_mutant_instance_from_the_given_mutation(): void
     {
         $mutation = self::createMutation(
-            $originalNodes = [new Node\Stmt\Namespace_(
+            [new Node\Stmt\Namespace_(
                 new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)]
+                [new Node\Scalar\LNumber(0)],
             )],
             $tests = [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
-                    0.01
+                    0.01,
                 ),
-            ]
+            ],
         );
 
         $expectedMutantFilePath = sprintf(
             '/path/to/tmp/mutant.%s.infection.php',
-            $mutation->getHash()
+            $mutation->getHash(),
         );
 
         $this->codeFactoryMock
@@ -117,14 +110,6 @@ final class MutantFactoryTest extends TestCase
             ->method('createCode')
             ->with($mutation)
             ->willReturn('mutated code')
-        ;
-
-        $originalCode = 'original code';
-        $this->printerMock
-            ->expects($this->once())
-            ->method('prettyPrintFile')
-            ->with($originalNodes)
-            ->willReturn($originalCode)
         ;
 
         $this->differMock
@@ -144,23 +129,16 @@ final class MutantFactoryTest extends TestCase
             'code diff',
             true,
             $tests,
-            $originalCode
+            'original code',
         );
     }
 
     public function test_it_printing_the_original_file_is_memoized(): void
     {
         $mutation = self::createMutation(
-            $originalNodes = [new Node\Stmt\Nop()],
-            []
+            [new Node\Stmt\Nop()],
+            [],
         );
-
-        $this->printerMock
-            ->expects($this->once())
-            ->method('prettyPrintFile')
-            ->with($originalNodes)
-            ->willReturn('original code')
-        ;
 
         $this->differMock
             ->expects($this->atLeastOnce())
@@ -184,6 +162,7 @@ final class MutantFactoryTest extends TestCase
         return new Mutation(
             '/path/to/acme/Foo.php',
             $originalNodes,
+            Plus::class,
             MutatorName::getName(Plus::class),
             [
                 'startLine' => 3,
@@ -196,7 +175,9 @@ final class MutantFactoryTest extends TestCase
             Node\Scalar\LNumber::class,
             MutatedNode::wrap(new Node\Scalar\LNumber(1)),
             0,
-            $tests
+            $tests,
+            [],
+            'original code',
         );
     }
 }

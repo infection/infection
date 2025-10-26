@@ -38,8 +38,10 @@ namespace Infection\Tests\TestFramework\Coverage;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TestLocations::class)]
 final class TestLocationsTest extends TestCase
 {
     public function test_it_has_default_values(): void
@@ -58,7 +60,7 @@ final class TestLocationsTest extends TestCase
                     new TestLocation(
                         '\A\B\C::test_it_works',
                         '/path/to/A/B/C.php',
-                        0.34325
+                        0.34325,
                     ),
                 ],
             ],
@@ -92,7 +94,7 @@ final class TestLocationsTest extends TestCase
                     ],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$testLocations])
+            TestLocationsNormalizer::normalize([$testLocations]),
         );
     }
 
@@ -104,7 +106,7 @@ final class TestLocationsTest extends TestCase
                     new TestLocation(
                         '\A\B\C::test_it_works',
                         '/path/to/A/B/C.php',
-                        0.34325
+                        0.34325,
                     ),
                 ],
             ],
@@ -144,7 +146,7 @@ final class TestLocationsTest extends TestCase
                     ],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$testLocations])
+            TestLocationsNormalizer::normalize([$testLocations]),
         );
 
         foreach ($testLocations->getTestsLocationsBySourceLine() as &$testsLocations) {
@@ -172,7 +174,7 @@ final class TestLocationsTest extends TestCase
                     ],
                 ],
             ],
-            TestLocationsNormalizer::normalize([$testLocations])
+            TestLocationsNormalizer::normalize([$testLocations]),
         );
     }
 }

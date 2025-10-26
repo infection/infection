@@ -36,8 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Resource\Time;
 
 use Infection\Resource\Time\TimeFormatter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TimeFormatter::class)]
 final class TimeFormatterTest extends TestCase
 {
     /**
@@ -50,9 +53,7 @@ final class TimeFormatterTest extends TestCase
         $this->timeFormatter = new TimeFormatter();
     }
 
-    /**
-     * @dataProvider timeProvider
-     */
+    #[DataProvider('timeProvider')]
     public function test_it_converts_time_to_human_readable_time(float $seconds, string $expectedString): void
     {
         $timeString = $this->timeFormatter->toHumanReadableString($seconds);
@@ -60,7 +61,7 @@ final class TimeFormatterTest extends TestCase
         $this->assertSame($expectedString, $timeString);
     }
 
-    public function timeProvider(): iterable
+    public static function timeProvider(): iterable
     {
         foreach (self::secondsProvider() as $i => $set) {
             yield 'seconds#' . $i => $set;

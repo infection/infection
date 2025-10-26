@@ -35,52 +35,63 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\ConditionalNegotiation\NotIdentical;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(NotIdentical::class)]
 final class NotIdenticalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates strict comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 !== 1;
-PHP
+                1 !== 1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1 === 1;
-PHP
+                1 === 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate not strict comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 != 1;
-PHP
+                1 != 1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate normal comparison' => [
             <<<'PHP'
-<?php
+                <?php
 
-1 === 1;
-PHP
+                1 === 1;
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate inside ternary to prevent overlap with TernaryMutator' => [
+            <<<'PHP'
+                <?php
+                $x !== false ? 'yes' : 'no';
+                PHP
             ,
         ];
     }

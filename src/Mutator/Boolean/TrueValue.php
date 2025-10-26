@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Boolean;
 
+use function array_flip;
 use function array_key_exists;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
@@ -43,7 +44,6 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
-use function Safe\array_flip;
 
 /**
  * @internal
@@ -58,23 +58,23 @@ final class TrueValue implements ConfigurableMutator
     /**
      * @var array<string, int>
      */
-    private array $allowedFunctions;
+    private readonly array $allowedFunctions;
 
     public function __construct(TrueValueConfig $config)
     {
         $this->allowedFunctions = array_flip($config->getAllowedFunctions());
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces a boolean literal (`true`) with its opposite value (`false`). ',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = true;
-+ $a = false;
-DIFF
+                - $a = true;
+                + $a = false;
+                DIFF,
         );
     }
 
@@ -99,7 +99,29 @@ DIFF
         }
 
         $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Expr\Match_) {
+            return false;
+        }
+
+        if ($parentNode instanceof Node\Stmt\Switch_) {
+            return false;
+        }
+
         $grandParentNode = $parentNode !== null ? ParentConnector::findParent($parentNode) : null;
+
+        if ($grandParentNode instanceof Node\Expr\Ternary) {
+            return false;
+        }
+
+        if (
+            $parentNode instanceof Node\Expr\BinaryOp\Equal
+            || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
+            || $parentNode instanceof Node\Expr\BinaryOp\Identical
+            || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
+        ) {
+            return false;
+        }
 
         if (!$grandParentNode instanceof Node\Expr\FuncCall || !$grandParentNode->name instanceof Node\Name) {
             return true;

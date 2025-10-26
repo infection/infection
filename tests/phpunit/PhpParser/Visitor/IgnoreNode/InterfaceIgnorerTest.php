@@ -37,12 +37,13 @@ namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
 
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(InterfaceIgnorer::class)]
 final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
 {
-    /**
-     * @dataProvider provideIgnoreCases
-     */
+    #[DataProvider('provideIgnoreCases')]
     public function test_it_ignores_the_correct_nodes(string $code, int $count): void
     {
         $spy = $this->createSpy();
@@ -52,33 +53,33 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
         $this->assertSame($count, $spy->nodeCounter);
     }
 
-    public function provideIgnoreCases(): iterable
+    public static function provideIgnoreCases(): iterable
     {
         yield 'interfaces are ignored' => [
             <<<'PHP'
-<?php
+                <?php
 
-interface Bar
-{
-    public function nope(Bar $ignored): void;
-}
-PHP
+                interface Bar
+                {
+                    public function nope(Bar $ignored): void;
+                }
+                PHP
             ,
             0,
         ];
 
         yield 'classes arent ignored' => [
             <<<'PHP'
-<?php
+                <?php
 
-class Bar
-{
-    public function nope(Bar $counted)
-    {
-        $counted = true;
-    }
-}
-PHP
+                class Bar
+                {
+                    public function nope(Bar $counted)
+                    {
+                        $counted = true;
+                    }
+                }
+                PHP
             ,
             2,
         ];

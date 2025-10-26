@@ -38,31 +38,26 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function array_key_exists;
 use function array_sum;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use function Safe\substr;
 use function strpos;
+use function substr;
 
 /**
  * @internal
  */
-final class JUnitTestCaseTimeAdder
+final readonly class JUnitTestCaseTimeAdder
 {
-    /**
-     * @var TestLocation[]
-     */
-    private array $tests;
-
     /**
      * @param TestLocation[] $tests
      */
-    public function __construct(array $tests)
-    {
-        $this->tests = $tests;
+    public function __construct(
+        private array $tests,
+    ) {
     }
 
     public function getTotalTestTime(): float
     {
         return array_sum(
-            $this->uniqueTestLocations()
+            $this->uniqueTestLocations(),
         );
     }
 

@@ -42,8 +42,9 @@ use Infection\Reflection\ClassReflection;
 use Infection\Reflection\CoreClassReflection;
 use Infection\Reflection\NullReflection;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use ReflectionException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -51,10 +52,16 @@ use Webmozart\Assert\Assert;
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
 {
+    public const STRICT_TYPES_KEY = 'isStrictTypes';
+
     public const REFLECTION_CLASS_KEY = 'reflectionClass';
+
     public const IS_INSIDE_FUNCTION_KEY = 'isInsideFunction';
+
     public const IS_ON_FUNCTION_SIGNATURE = 'isOnFunctionSignature';
+
     public const FUNCTION_SCOPE_KEY = 'functionScope';
+
     public const FUNCTION_NAME = 'functionName';
 
     /** @var array<int, Node> */
@@ -67,17 +74,30 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     private ?string $methodName = null;
 
+    private bool $isDeclareStrictTypes = false;
+
     public function beforeTraverse(array $nodes): ?array
     {
         $this->functionScopeStack = [];
         $this->classScopeStack = [];
         $this->methodName = null;
+        $this->isDeclareStrictTypes = false;
 
         return null;
     }
 
     public function enterNode(Node $node)
     {
+        if ($node instanceof Node\DeclareItem) {
+            if ($node->key->name === 'strict_types') {
+                $this->isDeclareStrictTypes = $node->value instanceof Node\Scalar\Int_ && $node->value->value === 1;
+            }
+        }
+
+        if ($node instanceof Node\Stmt\Function_) {
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
+        }
+
         if ($node instanceof Node\Stmt\ClassLike) {
             $this->classScopeStack[] = $this->getClassReflectionForNode($node);
         }
@@ -96,7 +116,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         if ($isInsideFunction) {
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
         } elseif ($node instanceof Node\Stmt\Function_) {
-            return NodeTraverser::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+            return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
         if ($this->isPartOfFunctionSignature($node)) {
@@ -105,9 +125,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         if ($this->isFunctionLikeNode($node)) {
             $this->functionScopeStack[] = $node;
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
         } elseif ($isInsideFunction) {
+            $node->setAttribute(self::STRICT_TYPES_KEY, $this->isDeclareStrictTypes);
             $node->setAttribute(self::FUNCTION_SCOPE_KEY, $this->functionScopeStack[count($this->functionScopeStack) - 1]);
             $node->setAttribute(self::REFLECTION_CLASS_KEY, $this->classScopeStack[count($this->classScopeStack) - 1]);
             $node->setAttribute(self::FUNCTION_NAME, $this->methodName);
@@ -129,19 +151,54 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    public static function findReflectionClass(Node $node): ?ClassReflection
+    {
+        $reflection = $node->getAttribute(self::REFLECTION_CLASS_KEY);
+        Assert::nullOrIsInstanceOf($reflection, ClassReflection::class);
+
+        return $reflection;
+    }
+
+    public static function findFunctionScope(Node $node): ?Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::nullOrIsInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
+    public static function getFunctionScope(Node $node): Node\FunctionLike
+    {
+        $functionScope = $node->getAttribute(self::FUNCTION_SCOPE_KEY);
+        Assert::isInstanceOf($functionScope, Node\FunctionLike::class);
+
+        return $functionScope;
+    }
+
+    public static function isStrictTypesEnabled(Node\FunctionLike $node): ?bool
+    {
+        return $node->getAttribute(self::STRICT_TYPES_KEY);
+    }
+
+    /**
+     * Loop on all parents of the node until one is a Node\Param or a function-like, which means it is part of a
+     * signature.
+     */
     private function isPartOfFunctionSignature(Node $node): bool
     {
         if ($this->isFunctionLikeNode($node)) {
             return true;
         }
 
-        $parent = ParentConnector::findParent($node);
-
-        if ($parent === null) {
-            return false;
+        if ($node instanceof Node\Param) {
+            return true;
         }
 
-        return $parent instanceof Node\Param || $node instanceof Node\Param;
+        do {
+            $node = ParentConnector::findParent($node);
+        } while ($node !== null && !$node instanceof Node\Param);
+
+        return $node !== null;
     }
 
     /**
@@ -155,7 +212,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return false;
         }
 
-        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY)) {
+        if ($parent->getAttribute(self::IS_INSIDE_FUNCTION_KEY) !== null) {
             return true;
         }
 
@@ -184,7 +241,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         $fqn = FullyQualifiedClassNameManipulator::getFqcn($node);
 
         if ($fqn !== null) {
-            return CoreClassReflection::fromClassName($fqn->toString());
+            try {
+                return CoreClassReflection::fromClassName($fqn->toString());
+            } catch (ReflectionException) {
+                // Fallback to the workaround
+            }
         }
 
         // TODO: check against interfaces

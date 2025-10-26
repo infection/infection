@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use DomainException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -48,7 +48,7 @@ final class UnsupportedMethod extends DomainException
         return new self(sprintf(
             'Did not expect "%s::%s()" to be called',
             $class,
-            $method
+            $method,
         ));
     }
 }

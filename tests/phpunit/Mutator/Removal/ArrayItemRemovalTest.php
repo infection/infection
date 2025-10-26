@@ -35,22 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Removal\ArrayItemRemoval;
+use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorFixturesProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('integration')]
+#[CoversClass(ArrayItemRemoval::class)]
 final class ArrayItemRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      * @param mixed[] $settings
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
     {
-        $this->doTest($input, $expected, $settings);
+        $this->assertMutatesInput($input, $expected, $settings);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It does not mutate empty arrays' => [
             '<?php $a = [];',
@@ -58,21 +64,21 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
 
         yield 'It removes only first item by default' => [
             '<?php $a = [1, 2, 3];',
-            "<?php\n\n\$a = [2, 3];",
+            '<?php $a = [2, 3];',
         ];
 
         yield 'It removes only last item when set to do so' => [
             '<?php $a = [1, 2, 3];',
-            "<?php\n\n\$a = [1, 2];",
+            '<?php $a = [1, 2];',
             ['remove' => 'last'],
         ];
 
         yield 'It removes every item on by one when set to `all`' => [
             '<?php $a = [1, 2, 3];',
             [
-                "<?php\n\n\$a = [2, 3];",
-                "<?php\n\n\$a = [1, 3];",
-                "<?php\n\n\$a = [1, 2];",
+                '<?php $a = [2, 3];',
+                '<?php $a = [1, 3];',
+                '<?php $a = [1, 2];',
             ],
             ['remove' => 'all'],
         ];
@@ -80,8 +86,8 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         yield 'It obeys limit when mutating arrays in `all` mode' => [
             '<?php $a = [1, 2, 3];',
             [
-                "<?php\n\n\$a = [2, 3];",
-                "<?php\n\n\$a = [1, 3];",
+                '<?php $a = [2, 3];',
+                '<?php $a = [1, 3];',
             ],
             ['remove' => 'all', 'limit' => 2],
         ];
@@ -89,8 +95,8 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         yield 'It mutates arrays having required items count when removing `all` items' => [
             '<?php $a = [1, 2];',
             [
-                "<?php\n\n\$a = [2];",
-                "<?php\n\n\$a = [1];",
+                '<?php $a = [2];',
+                '<?php $a = [1];',
             ],
             ['remove' => 'all', 'limit' => 2],
         ];
@@ -98,7 +104,7 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
         yield 'It mutates correctly for limit value (1)' => [
             '<?php $a = [1];',
             [
-                "<?php\n\n\$a = [];",
+                '<?php $a = [];',
             ],
             ['remove' => 'all', 'limit' => 1],
         ];
@@ -111,8 +117,58 @@ final class ArrayItemRemovalTest extends BaseMutatorTestCase
             '<?php [$a] = [];',
         ];
 
+        yield 'It does not mutate array assignment to prevent runtime warning' => [
+            '<?php [$a, $b] = [$c, $d];',
+        ];
+
+        yield 'It mutates array assignment with more elements on the right side' => [
+            '<?php [$a, $b] = [$c, $d, $e];',
+            '<?php [$a, $b] = [$d, $e];',
+        ];
+
         yield 'It does not mutate lists with any number of elements' => [
             '<?php [$a, $b] = [];',
+        ];
+
+        yield 'It does not mutate arrays as an attribute argument' => [
+            MutatorFixturesProvider::getFixtureFileContent(self::class, 'does-not-mutate-array-in-attribute.php'),
+        ];
+
+        yield 'It does not mutate destructured array values in foreach loops' => [
+            '<?php foreach ($items as [, $value]) {}',
+        ];
+
+        yield 'It does not mutate in_array to prevent overlap with IfNegation' => [
+            '<?php if (in_array($a, [$b])) {}',
+        ];
+
+        yield 'It does not mutate array_key_exists to prevent overlap with IfNegation' => [
+            '<?php if (array_key_exists($a, [$b])) {}',
+        ];
+
+        yield 'It mutates array_search which does not return bool, therefore not overlaps with IfNegation' => [
+            '<?php if (array_search($a, [$b])) {}',
+            '<?php if (array_search($a, [])) {}',
+        ];
+
+        yield 'It mutates arg of a userland function' => [
+            '<?php if (doFoo($a, [$b])) {}',
+            '<?php if (doFoo($a, [])) {}',
+        ];
+
+        yield 'It mutates arg of a dynamic function call' => [
+            <<<'PHP'
+                <?php
+
+                $fn = "doFoo";
+                if ($fn($a, [$b])) {}
+                PHP,
+            <<<'PHP'
+                <?php
+
+                $fn = "doFoo";
+                if ($fn($a, [])) {}
+                PHP,
         ];
     }
 }

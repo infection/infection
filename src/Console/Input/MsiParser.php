@@ -41,7 +41,7 @@ use Infection\CannotBeInstantiated;
 use function max;
 use const PHP_ROUND_HALF_UP;
 use function round;
-use function Safe\sprintf;
+use function sprintf;
 use function strlen;
 use function trim;
 use Webmozart\Assert\Assert;
@@ -52,7 +52,10 @@ use Webmozart\Assert\Assert;
 final class MsiParser
 {
     use CannotBeInstantiated;
+
     public const DEFAULT_PRECISION = 2;
+
+    private const EXPLODE_PARTS = 2;
 
     public static function detectPrecision(?string ...$values): int
     {
@@ -67,14 +70,14 @@ final class MsiParser
 
             $valueParts = explode('.', $value);
 
-            if (count($valueParts) !== 2) {
+            if (count($valueParts) !== self::EXPLODE_PARTS) {
                 continue;
             }
 
             $precisions[] = strlen($valueParts[1]);
         }
 
-        return (int) max($precisions);
+        return max($precisions);
     }
 
     public static function parse(?string $value, int $precision, string $optionName): ?float
@@ -87,7 +90,7 @@ final class MsiParser
 
         Assert::numeric(
             $value,
-            sprintf('Expected %s to be a float. Got "%s"', $optionName, $value)
+            sprintf('Expected %s to be a float. Got "%s"', $optionName, $value),
         );
 
         $roundedValue = round((float) $value, $precision, PHP_ROUND_HALF_UP);
@@ -96,7 +99,7 @@ final class MsiParser
             $roundedValue,
             0,
             100,
-            sprintf('Expected %s to be an element of [0;100]. Got %%s', $optionName)
+            sprintf('Expected %s to be an element of [0;100]. Got %%s', $optionName),
         );
 
         return $roundedValue;

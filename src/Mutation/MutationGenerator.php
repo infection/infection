@@ -45,6 +45,7 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,30 +54,21 @@ use Webmozart\Assert\Assert;
  */
 class MutationGenerator
 {
-    private TraceProvider $traceProvider;
-    /** @var Mutator<\PhpParser\Node>[] */
-    private array $mutators;
-    private EventDispatcher $eventDispatcher;
-    private FileMutationGenerator $fileMutationGenerator;
-    private bool $runConcurrently;
+    /** @var Mutator<Node>[] */
+    private readonly array $mutators;
 
     /**
-     * @param Mutator<\PhpParser\Node>[] $mutators
+     * @param Mutator<Node>[] $mutators
      */
     public function __construct(
-        TraceProvider $traceProvider,
+        private readonly TraceProvider $traceProvider,
         array $mutators,
-        EventDispatcher $eventDispatcher,
-        FileMutationGenerator $fileMutationGenerator,
-        bool $runConcurrently
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly FileMutationGenerator $fileMutationGenerator,
+        private readonly bool $runConcurrently,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
-
-        $this->traceProvider = $traceProvider;
         $this->mutators = $mutators;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileMutationGenerator = $fileMutationGenerator;
-        $this->runConcurrently = $runConcurrently;
     }
 
     /**
@@ -101,7 +93,7 @@ class MutationGenerator
                 $trace,
                 $onlyCovered,
                 $this->mutators,
-                $nodeIgnorers
+                $nodeIgnorers,
             );
 
             $this->eventDispatcher->dispatch(new MutableFileWasProcessed());

@@ -32,6 +32,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+declare(strict_types=1);
+
 // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
 use Infection\Console\Application;
@@ -46,6 +48,15 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
 
 // Infection autoloading
 (static function (): void {
+    $autoload = $GLOBALS['_composer_autoload_path'] ?? '';
+
+    if ($autoload && \file_exists($autoload)) {
+        // Is installed via Composer
+        include_once $autoload;
+
+        return;
+    }
+
     if (\file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
         // Is installed via Composer
         include_once $autoload;
@@ -63,11 +74,11 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
     \fwrite(
         \STDERR,
         <<<'ERROR'
-You need to set up the project dependencies using Composer:
-    $ composer install
-You can learn all about Composer on https://getcomposer.org/.
+            You need to set up the project dependencies using Composer:
+                $ composer install
+            You can learn all about Composer on https://getcomposer.org/.
 
-ERROR
+            ERROR,
     );
 
     throw new RuntimeException('Unable to find the Composer autoloader.');

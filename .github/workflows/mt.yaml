@@ -1,68 +1,104 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
+# This build is to test the whole execute the PHPUnit tests & collect the coverage
+# report and run infection.
+# We are not interested in:
+# - Running it on different systems (e.g. Windows, which was disabled because too slow)
+# - Min/maxing the PHP version used: it can be any supported version
+# - Using different dependencies than the locked ones
+# - Using different code coverages
+# All of those variants may be interesting but are better tested in more scoped
+# tests like in ci.yaml.
 name: Mutation Testing
 
 on:
-  pull_request:
   push:
     branches:
       - main
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
-  MIN_MSI: 68.00
-  MIN_COVERED_MSI: 80.00
+  MIN_MSI: 77.0
+  MIN_COVERED_MSI: 86.00
 
 jobs:
   tests:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
-    strategy:
-      matrix:
-        operating-system: [ubuntu-latest, windows-latest]
-        php-version: ['7.4']
-        dependencies: ['']
-        coverage-driver: [pcov]
-
-    name: Mutation testing on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }}, using ${{ matrix.coverage-driver }}
+    name: Infection complete run on Infection
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
-          coverage: ${{ matrix.coverage-driver }}
-          tools: composer:v2
+          # Any supported PHP version is fine
+          php-version: '8.2'
+          coverage: pcov
+          tools: composer
+        env:
+          # This is necessary when installing a tool with a specific version
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-${{ matrix.dependencies }}
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}-
             composer-${{ runner.os }}-${{ matrix.php-version }}-
             composer-${{ runner.os }}-
             composer-
 
       - name: Install dependencies
-        run: |
-          composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies }}
+        # Run the locked dependencies: we are not interested in testing different
+        # variations here so having a stable set is better.
+        run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Collect coverage report
         run: |
-          php vendor/phpunit/phpunit/phpunit --stop-on-failure --coverage-xml=build/logs/coverage-xml --log-junit=build/logs/junit.xml
+          php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            --coverage-xml=build/logs/coverage-xml \
+            --log-junit=build/logs/junit.xml
 
-      - name: Run Infection
+      - name: Run Infection on the full codebase
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
         run: |
-          php bin/infection -j2 --skip-initial-tests --min-msi=$MIN_MSI --min-covered-msi=$MIN_COVERED_MSI --coverage=build/logs --log-verbosity=none --no-interaction --no-progress
+          php bin/infection \
+            --skip-initial-tests \
+            --min-msi=$MIN_MSI \
+            --min-covered-msi=$MIN_COVERED_MSI \
+            --coverage=build/logs \
+            --log-verbosity=none \
+            --no-interaction \
+            --no-progress
+
+  # This is a meta job to avoid to have to constantly change the protection rules
+  # whenever we touch the matrix.
+  tests-status:
+      name: Mutation Testing Status
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
+      needs: tests
+      if: always()
+      steps:
+          - name: Successful run
+            if: ${{ !(contains(needs.*.result, 'failure')) }}
+            run: exit 0
+
+          - name: Failing run
+            if: ${{ contains(needs.*.result, 'failure') }}
+            run: exit 1

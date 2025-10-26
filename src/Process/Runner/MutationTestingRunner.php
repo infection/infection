@@ -46,7 +46,8 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
-use Infection\Process\Factory\MutantProcessFactory;
+use Infection\Process\Factory\MutantProcessContainerFactory;
+use Infection\Process\MutantProcessContainer;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -56,40 +57,21 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MutationTestingRunner
 {
-    private MutantProcessFactory $processFactory;
-    private MutantFactory $mutantFactory;
-    private ProcessRunner $processRunner;
-    private EventDispatcher $eventDispatcher;
-    private Filesystem $fileSystem;
-    private DiffSourceCodeMatcher $diffSourceCodeMatcher;
-    private bool $runConcurrently;
-    private float $timeout;
-    /** @var array<string, array<int, string>> */
-    private array $ignoreSourceCodeMutatorsMap;
-
     /**
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        MutantProcessFactory $processFactory,
-        MutantFactory $mutantFactory,
-        ProcessRunner $processRunner,
-        EventDispatcher $eventDispatcher,
-        Filesystem $fileSystem,
-        DiffSourceCodeMatcher $diffSourceCodeMatcher,
-        bool $runConcurrently,
-        float $timeout,
-        array $ignoreSourceCodeMutatorsMap
+        private readonly MutantProcessContainerFactory $processFactory,
+        private readonly MutantFactory $mutantFactory,
+        private readonly ProcessRunner $processRunner,
+        private readonly EventDispatcher $eventDispatcher,
+        private readonly Filesystem $fileSystem,
+        private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
+        private readonly bool $runConcurrently,
+        private readonly float $timeout,
+        private readonly array $ignoreSourceCodeMutatorsMap,
+        private readonly ?string $mutantId = null,
     ) {
-        $this->processFactory = $processFactory;
-        $this->mutantFactory = $mutantFactory;
-        $this->processRunner = $processRunner;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->fileSystem = $fileSystem;
-        $this->diffSourceCodeMatcher = $diffSourceCodeMatcher;
-        $this->runConcurrently = $runConcurrently;
-        $this->timeout = $timeout;
-        $this->ignoreSourceCodeMutatorsMap = $ignoreSourceCodeMutatorsMap;
     }
 
     /**
@@ -98,62 +80,100 @@ class MutationTestingRunner
     public function run(iterable $mutations, string $testFrameworkExtraOptions): void
     {
         $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
-        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants));
+        $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
-        $processes = take($mutations)
-            ->cast(function (Mutation $mutation): Mutant {
-                return $this->mutantFactory->create($mutation);
-            })
-            ->filter(function (Mutant $mutant) {
-                // It's a proxy call to Mutation, can be done one stage up
-                if ($mutant->isCoveredByTest()) {
-                    return true;
-                }
-
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromNonCoveredMutant($mutant)
-                ));
-
-                return false;
-            })
-            ->filter(function (Mutant $mutant) {
-                $mutatorName = $mutant->getMutation()->getMutatorName();
-
-                if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
-                    return true;
-                }
-
-                foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
-                    if ($this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            })
-            ->filter(function (Mutant $mutant) {
-                // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
-                if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
-                    return true;
-                }
-
-                $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
-                    MutantExecutionResult::createFromTimeSkippedMutant($mutant)
-                ));
-
-                return false;
-            })
-            ->cast(function (Mutant $mutant) use ($testFrameworkExtraOptions): ProcessBearer {
-                $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
-
-                $process = $this->processFactory->createProcessForMutant($mutant, $testFrameworkExtraOptions);
-
-                return $process;
-            })
+        $processContainers = take($mutations)
+            ->stream()
+            ->filter($this->ignoredByMutantId(...))
+            ->cast($this->mutationToMutant(...))
+            ->filter($this->ignoredByRegex(...))
+            ->filter($this->uncoveredByTest(...))
+            ->filter($this->takingTooLong(...))
+            ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
-        $this->processRunner->run($processes);
+        take($this->processRunner->run($processContainers))
+            ->cast(self::containerToFinishedEvent(...))
+            ->each($this->eventDispatcher->dispatch(...))
+        ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
+    }
+
+    private function mutationToMutant(Mutation $mutation): Mutant
+    {
+        return $this->mutantFactory->create($mutation);
+    }
+
+    private function ignoredByMutantId(Mutation $mutation): bool
+    {
+        if ($this->mutantId === null) {
+            return true;
+        }
+
+        return $mutation->getHash() === $this->mutantId;
+    }
+
+    private function ignoredByRegex(Mutant $mutant): bool
+    {
+        $mutatorName = $mutant->getMutation()->getMutatorName();
+
+        if (!array_key_exists($mutatorName, $this->ignoreSourceCodeMutatorsMap)) {
+            return true;
+        }
+
+        foreach ($this->ignoreSourceCodeMutatorsMap[$mutatorName] as $sourceCodeRegex) {
+            if (!$this->diffSourceCodeMatcher->matches($mutant->getDiff()->get(), $sourceCodeRegex)) {
+                continue;
+            }
+
+            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+                MutantExecutionResult::createFromIgnoredMutant($mutant),
+            ));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function uncoveredByTest(Mutant $mutant): bool
+    {
+        // It's a proxy call to Mutation, can be done one stage up
+        if ($mutant->isCoveredByTest()) {
+            return true;
+        }
+
+        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+            MutantExecutionResult::createFromNonCoveredMutant($mutant),
+        ));
+
+        return false;
+    }
+
+    private function takingTooLong(Mutant $mutant): bool
+    {
+        // TODO refactor this comparison into a dedicated comparer to make it possible to swap strategies
+        if ($mutant->getMutation()->getNominalTestExecutionTime() < $this->timeout) {
+            return true;
+        }
+
+        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+            MutantExecutionResult::createFromTimeSkippedMutant($mutant),
+        ));
+
+        return false;
+    }
+
+    private function mutantToContainer(Mutant $mutant, string $testFrameworkExtraOptions): MutantProcessContainer
+    {
+        $this->fileSystem->dumpFile($mutant->getFilePath(), $mutant->getMutatedCode()->get());
+
+        return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
+    }
+
+    private static function containerToFinishedEvent(MutantProcessContainer $container): MutantProcessWasFinished
+    {
+        return new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult());
     }
 }

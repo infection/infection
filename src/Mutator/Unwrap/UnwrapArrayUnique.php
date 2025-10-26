@@ -41,31 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayUnique extends AbstractUnwrapMutator
+final class UnwrapArrayUnique extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_unique` function call with its array operand. For example:
+                Replaces an `array_unique` function call with its array operand. For example:
 
-```php
-$x = array_unique(['a', 'a', 'b']);
-```
+                ```php
+                $x = array_unique(['a', 'a', 'b']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['a', 'a', 'b'];
-```
-TXT
+                ```php
+                $x = ['a', 'a', 'b'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_unique(['a', 'a', 'b']);
-+ $x = ['a', 'a', 'b'];
-DIFF
+                - $x = array_unique(['a', 'a', 'b']);
+                + $x = ['a', 'a', 'b'];
+                DIFF,
         );
     }
 

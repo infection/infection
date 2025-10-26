@@ -35,46 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Metrics\Collector;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(MutationTestingResultsCollectorSubscriber::class)]
 final class MutationTestingResultsCollectorSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
-
-    /**
-     * @var OutputFormatter|MockObject
-     */
-    private $outputFormatter;
-
-    /**
-     * @var MetricsCalculator|MockObject
-     */
-    private $metricsCalculator;
-
-    /**
-     * @var ResultsCollector|MockObject
-     */
-    private $resultsCollector;
-
-    /**
-     * @var DiffColorizer|MockObject
-     */
-    private $diffColorizer;
-
     public function test_it_reacts_on_mutation_process_finished(): void
     {
         $collectorA = $this->createMock(Collector::class);
@@ -92,13 +63,13 @@ final class MutationTestingResultsCollectorSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriber(
             $collectorA,
-            $collectorB
+            $collectorB,
         ));
 
         $dispatcher->dispatch(
             new MutantProcessWasFinished(
-                $this->createMock(MutantExecutionResult::class)
-            )
+                $this->createMock(MutantExecutionResult::class),
+            ),
         );
     }
 }

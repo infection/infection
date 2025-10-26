@@ -38,16 +38,16 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\FileLogger;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
-use const PHP_EOL;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
-use function str_replace;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(FileLogger::class)]
 final class FileLoggerTest extends FileSystemTestCase
 {
     private const LOG_FILE_PATH = '/path/to/text.log';
@@ -64,6 +64,8 @@ final class FileLoggerTest extends FileSystemTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->fileSystemMock = $this->createMock(Filesystem::class);
         $this->logger = new DummyLogger();
     }
@@ -71,11 +73,11 @@ final class FileLoggerTest extends FileSystemTestCase
     public function test_it_logs_the_correct_lines_with_no_mutations(): void
     {
         $expectedContent = <<<'TXT'
-foo
-bar
-TXT;
+            foo
+            bar
+            TXT;
 
-        $expectedContent = str_replace("\n", PHP_EOL, $expectedContent);
+        $expectedContent = LineReturnNormalizer::normalize($expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())
@@ -87,7 +89,7 @@ TXT;
             self::LOG_FILE_PATH,
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger(['foo', 'bar']),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -101,7 +103,7 @@ TXT;
             'php://stdout',
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger([]),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -115,7 +117,7 @@ TXT;
             'php://memory',
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger(['foo', 'bar']),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -128,7 +130,7 @@ TXT;
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 
@@ -144,7 +146,7 @@ TXT;
             self::LOG_FILE_PATH,
             $this->fileSystemMock,
             new DummyLineMutationTestingResultsLogger([]),
-            $this->logger
+            $this->logger,
         );
 
         $debugFileLogger->log();
@@ -157,7 +159,7 @@ TXT;
                     [],
                 ],
             ],
-            $this->logger->getLogs()
+            $this->logger->getLogs(),
         );
     }
 }

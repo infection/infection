@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,19 +51,19 @@ final class AssignCoalesce implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
-TXT
+                Replaces the null coalescing assignment operator (`??=`) with a plain assignment (`=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $this->request->data['comments']['user_id'] ??= 'value';
-+ $this->request->data['comments']['user_id'] = 'value';
-DIFF
+                - $this->request->data['comments']['user_id'] ??= 'value';
+                + $this->request->data['comments']['user_id'] = 'value';
+                DIFF,
         );
     }
 
@@ -73,7 +74,7 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\Assign($node->var, $node->expr, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

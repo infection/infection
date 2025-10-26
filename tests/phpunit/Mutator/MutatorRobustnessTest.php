@@ -39,19 +39,20 @@ use function array_values;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\NullMutationVisitor;
-use Infection\Tests\SingletonContainer;
+use function ksort;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function Safe\ksort;
-use function Safe\sprintf;
 use const SORT_STRING;
+use function sprintf;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
-/**
- * @coversNothing
- */
+#[CoversNothing]
 final class MutatorRobustnessTest extends TestCase
 {
     /**
@@ -62,9 +63,8 @@ final class MutatorRobustnessTest extends TestCase
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care
      * whether or not the code is actually mutated, only if it does not error.
-     *
-     * @dataProvider mutatorWithCodeCaseProvider
      */
+    #[DataProvider('mutatorWithCodeCaseProvider')]
     public function test_the_mutator_does_not_crash_during_parsing(string $fileName, string $code, Mutator $mutator): void
     {
         try {
@@ -73,19 +73,19 @@ final class MutatorRobustnessTest extends TestCase
             $this->addToAssertionCount(1);
         } catch (Throwable $throwable) {
             $this->fail(sprintf(
-               'The mutator "%s" could not parse the file "%s": %s.',
-               $mutator->getName(),
-               $fileName,
-               $throwable->getMessage()
+                'The mutator "%s" could not parse the file "%s": %s.',
+                $mutator->getName(),
+                $fileName,
+                $throwable->getMessage(),
             ));
         }
     }
 
-    public function mutatorWithCodeCaseProvider(): iterable
+    public static function mutatorWithCodeCaseProvider(): iterable
     {
         $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
 
-        foreach ($this->provideCodeSamples() as [$fileName, $fileContents]) {
+        foreach (self::provideCodeSamples() as [$fileName, $fileContents]) {
             foreach (ProfileList::ALL_MUTATORS as $mutatorClassName) {
                 $title = sprintf('[%s] %s', $mutatorClassName, $fileName);
 
@@ -98,7 +98,7 @@ final class MutatorRobustnessTest extends TestCase
         }
     }
 
-    private function provideCodeSamples(): iterable
+    private static function provideCodeSamples(): iterable
     {
         if (self::$files !== null) {
             yield from self::$files;

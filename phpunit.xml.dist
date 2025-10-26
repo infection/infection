@@ -3,16 +3,23 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
-         executionOrder="random"
+         executionOrder="defects,random"
          failOnWarning="true"
          failOnRisky="true"
-         verbose="true"
+         requireCoverageMetadata="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         cacheDirectory="./build/cache/phpunit"
 >
 
     <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0" />
         <env name="COLUMNS" value="100" force="true" />
     </php>
+
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
 
     <testsuites>
         <testsuite name="Infection Test Suite">
@@ -23,21 +30,16 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
+    <source>
         <include>
             <directory>src</directory>
         </include>
-    </coverage>
+    </source>
 
     <groups>
         <exclude>
             <group>e2e</group>
         </exclude>
     </groups>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
-        <listener class="Symfony\Bridge\PhpUnit\CoverageListener" />
-    </listeners>
 
 </phpunit>

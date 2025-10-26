@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,19 +51,19 @@ final class FloatNegation implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a float value with its negated value. For example will replace `-33.4` with `33.4`.
-TXT
+                Replaces a float value with its negated value. For example will replace `-33.4` with `33.4`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = -33.4;
-+ $a = 33.4;
-DIFF
+                - $a = -33.4;
+                + $a = 33.4;
+                DIFF,
         );
     }
 
@@ -74,7 +75,7 @@ DIFF
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), $node->getAttributes())
+            new Node\Scalar\DNumber(-1 * $this->getFloatValueOfNode($node), NodeAttributes::getAllExceptOriginalNode($node)),
         );
     }
 

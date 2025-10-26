@@ -37,16 +37,88 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_map;
 use function array_merge;
+use function count;
 use function explode;
+use function implode;
+use function in_array;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
+use SplFileInfo;
+use function sprintf;
 
 /**
  * @internal
  */
-final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
+final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    public function build(string $configPath, string $extraOptions): array
+    /**
+     * @param list<SplFileInfo> $filteredSourceFilesToMutate
+     */
+    public function __construct(
+        private bool $executeOnlyCoveringTestCases,
+        private array $filteredSourceFilesToMutate,
+        private ?string $mapSourceClassToTestStrategy,
+    ) {
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
+    {
+        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
+
+        if ($this->filteredSourceFilesToMutate !== []
+            && $this->mapSourceClassToTestStrategy !== null
+            && !in_array('--filter', $options, true)
+        ) {
+            $options[] = '--filter';
+
+            $options[] = implode(
+                '|',
+                array_map(
+                    $this->mapSourceClassToTestClass(...),
+                    $this->filteredSourceFilesToMutate,
+                ),
+            );
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param TestLocation[] $tests
+     * @return list<string>
+     */
+    public function buildForMutant(string $configPath, string $extraOptions, array $tests, string $testFrameworkVersion): array
+    {
+        $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
+
+        if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
+            $filter = $this->createFilterString(
+                $tests,
+                $testFrameworkVersion,
+            );
+
+            if ($filter !== null) {
+                $options[] = '--filter';
+                $options[] = $filter;
+            }
+        }
+
+        return $options;
+    }
+
+    private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
+    {
+        return sprintf('%sTest', $sourceFile->getBasename('.' . $sourceFile->getExtension()));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function prepareArgumentsAndOptions(string $configPath, string $extraOptions): array
     {
         $options = [
             '--configuration',
@@ -56,12 +128,35 @@ final class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptions
         if ($extraOptions !== '') {
             $options = array_merge(
                 $options,
-                array_map(static function ($option): string {
-                    return '--' . $option;
-                }, explode(' --', ltrim($extraOptions, '-')))
+                array_map(
+                    static fn ($option): string => '--' . $option,
+                    explode(' --', ltrim($extraOptions, '-')),
+                ),
             );
         }
 
         return $options;
+    }
+
+    /**
+     * @param non-empty-array<TestLocation> $tests
+     *
+     * @return non-empty-string
+     */
+    private function createFilterString(
+        array $tests,
+        string $testFrameworkVersion,
+    ): ?string {
+        $filters = FilterBuilder::createFilters($tests, $testFrameworkVersion);
+
+        return count($filters) === 0
+            ? null
+            : sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    $filters,
+                ),
+            );
     }
 }

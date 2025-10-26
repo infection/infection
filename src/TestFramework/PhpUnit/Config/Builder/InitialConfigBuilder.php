@@ -37,11 +37,12 @@ namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
 use DOMDocument;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\file_put_contents;
-use function Safe\sprintf;
+use function sprintf;
 use function version_compare;
 use Webmozart\Assert\Assert;
 
@@ -50,33 +51,25 @@ use Webmozart\Assert\Assert;
  */
 class InitialConfigBuilder implements ConfigBuilder
 {
-    private string $tmpDir;
-    private string $originalXmlConfigContent;
-    private XmlConfigurationManipulator $configManipulator;
-    private XmlConfigurationVersionProvider $versionProvider;
-    /** @var string[] */
-    private array $srcDirs;
+    private readonly string $originalXmlConfigContent;
 
     /**
      * @param string[] $srcDirs
+     * @param list<string> $filteredSourceFilesToMutate
      */
     public function __construct(
-        string $tmpDir,
+        private readonly string $tmpDir,
         string $originalXmlConfigContent,
-        XmlConfigurationManipulator $configManipulator,
-        XmlConfigurationVersionProvider $versionProvider,
-        array $srcDirs
+        private readonly XmlConfigurationManipulator $configManipulator,
+        private readonly XmlConfigurationVersionProvider $versionProvider,
+        private readonly array $srcDirs,
+        private readonly array $filteredSourceFilesToMutate,
     ) {
         Assert::notEmpty(
             $originalXmlConfigContent,
-            'The original XML config content cannot be an empty string'
+            'The original XML config content cannot be an empty string',
         );
-
-        $this->tmpDir = $tmpDir;
         $this->originalXmlConfigContent = $originalXmlConfigContent;
-        $this->configManipulator = $configManipulator;
-        $this->versionProvider = $versionProvider;
-        $this->srcDirs = $srcDirs;
     }
 
     public function build(string $version): string
@@ -96,9 +89,9 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $this->addCoverageNodes($version, $xPath);
         $this->addRandomTestsOrderAttributesIfNotSet($version, $xPath);
-        $this->addFailOnAttributesIfNotSet($version, $xPath);
+        $this->configManipulator->addFailOnAttributesIfNotSet($version, $xPath);
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
-        $this->configManipulator->setStopOnFailure($xPath);
+        $this->configManipulator->setStopOnFailureOrDefect($version, $xPath);
         $this->configManipulator->deactivateColours($xPath);
         $this->configManipulator->deactivateResultCaching($xPath);
         $this->configManipulator->deactivateStderrRedirection($xPath);
@@ -117,54 +110,52 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addCoverageNodes(string $version, SafeDOMXPath $xPath): void
     {
+        if (version_compare($version, '10.1', '>=')) {
+            $this->configManipulator->addOrUpdateSourceIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
+
+            return;
+        }
+
         if (version_compare($version, '10', '>=')) {
-            $this->configManipulator->addCoverageIncludeNodesUnlessTheyExist($xPath, $this->srcDirs);
+            $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
             return;
         }
 
         if (version_compare($version, '9.3', '<')) {
-            $this->configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, $this->srcDirs);
+            $this->configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
             return;
         }
 
         // For versions between 9.3 and 10.0, fallback to version provider
         if (version_compare($this->versionProvider->provide($xPath), '9.3', '>=')) {
-            $this->configManipulator->addCoverageIncludeNodesUnlessTheyExist($xPath, $this->srcDirs);
+            $this->configManipulator->addOrUpdateCoverageIncludeNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
 
             return;
         }
 
-        $this->configManipulator->addLegacyCoverageWhitelistNodesUnlessTheyExist($xPath, $this->srcDirs);
+        $this->configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, $this->srcDirs, $this->filteredSourceFilesToMutate);
     }
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        if (version_compare($version, '7.2', '<')) {
-            return;
+        if (PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version)) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
+        } elseif (version_compare($version, '7.2', '>=')) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
         }
-
-        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
-            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
-        }
-    }
-
-    private function addFailOnAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
-    {
-        if (version_compare($version, '5.2', '<')) {
-            return;
-        }
-
-        $this->addAttributeIfNotSet('failOnRisky', 'true', $xPath);
-        $this->addAttributeIfNotSet('failOnWarning', 'true', $xPath);
     }
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
         $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
 
-        if (!$nodeList->length) {
+        if ($nodeList->length === 0) {
             $node = $xPath->query('/phpunit')[0];
             $node->setAttribute($attribute, $value);
 

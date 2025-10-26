@@ -36,33 +36,27 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 
 /**
  * @internal
  */
 final class TestLocations
 {
-    /** @var array<int, array<int, TestLocation>> */
-    private array $byLine;
-    /** @var array<string, SourceMethodLineRange> */
-    private array $byMethod;
-
     /**
-     * @param array<int, array<int, TestLocation>> $testLocationsBySourceLine
-     * @param array<string, SourceMethodLineRange> $sourceMethodLineRangeByMethod
+     * @param array<int, array<int, TestLocation>> $byLine
+     * @param array<string, SourceMethodLineRange> $byMethod
      */
     public function __construct(
-        array $testLocationsBySourceLine = [],
-        array $sourceMethodLineRangeByMethod = []
+        private array $byLine = [],
+        private readonly array $byMethod = [],
     ) {
-        $this->byLine = $testLocationsBySourceLine;
-        $this->byMethod = $sourceMethodLineRangeByMethod;
     }
 
     /**
      * This method needs to be able to return a reference for performance reasons.
      *
-     * @see \Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder
+     * @see JUnitTestExecutionInfoAdder
      *
      * @return array<int, array<int, TestLocation>>
      */

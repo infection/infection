@@ -35,44 +35,24 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use function implode;
-use LogicException;
-use function Safe\sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class FormatterFactory
+final readonly class FormatterFactory
 {
-    private OutputInterface $output;
-
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
+    public function __construct(
+        private OutputInterface $output,
+    ) {
     }
 
-    public function create(string $formatterName): OutputFormatter
+    public function create(FormatterName $formatterName): OutputFormatter
     {
-        Assert::oneOf(
-            $formatterName,
-            FormatterName::ALL,
-            sprintf(
-                'Unknown formatter %%s. The known formatters are: "%s"',
-                implode('", "', FormatterName::ALL)
-            )
-        );
-
-        switch ($formatterName) {
-            case FormatterName::PROGRESS:
-                return new ProgressFormatter(new ProgressBar($this->output));
-
-            case FormatterName::DOT:
-                return new DotFormatter($this->output);
-        }
-
-        throw new LogicException('Unreachable statement');
+        return match ($formatterName) {
+            FormatterName::PROGRESS => new ProgressFormatter(new ProgressBar($this->output)),
+            FormatterName::DOT => new DotFormatter($this->output),
+        };
     }
 }

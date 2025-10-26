@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Environment;
 
 use Infection\Environment\BuildContext;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(BuildContext::class)]
 final class BuildContextTest extends TestCase
 {
     public function test_constructor_sets_values(): void
@@ -47,7 +49,7 @@ final class BuildContextTest extends TestCase
 
         $buildContext = new BuildContext(
             $repositorySlug,
-            $branch
+            $branch,
         );
 
         $this->assertSame($repositorySlug, $buildContext->repositorySlug());

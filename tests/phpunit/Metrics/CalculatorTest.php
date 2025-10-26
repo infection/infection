@@ -39,15 +39,16 @@ use function array_sum;
 use Infection\Metrics\Calculator;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Tests\Logger\CreateMetricsCalculator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Calculator::class)]
 final class CalculatorTest extends TestCase
 {
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_can_calculate_the_scores(
         int $roundingPrecision,
         int $killedCount,
@@ -57,7 +58,7 @@ final class CalculatorTest extends TestCase
         int $notTestedCount,
         float $expectedMsi,
         float $expectedCoverageRate,
-        float $expectedCoveredMsi
+        float $expectedCoveredMsi,
     ): void {
         $calculator = new Calculator(
             $roundingPrecision,
@@ -71,7 +72,7 @@ final class CalculatorTest extends TestCase
                 $escapedCount,
                 $timedOutCount,
                 $notTestedCount,
-            ])
+            ]),
         );
 
         $this->assertSame($expectedMsi, $calculator->getMutationScoreIndicator());
@@ -84,14 +85,12 @@ final class CalculatorTest extends TestCase
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    /**
-     * @dataProvider metricsCalculatorProvider
-     */
+    #[DataProvider('metricsCalculatorProvider')]
     public function test_it_can_be_created_from_a_metrics_calculator(
         MetricsCalculator $metricsCalculator,
         float $expectedMsi,
         float $expectedCoverageRate,
-        float $expectedCoveredMsi
+        float $expectedCoveredMsi,
     ): void {
         $calculator = Calculator::fromMetrics($metricsCalculator);
 
@@ -100,7 +99,7 @@ final class CalculatorTest extends TestCase
         $this->assertSame($expectedCoveredMsi, $calculator->getCoveredCodeMutationScoreIndicator());
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'empty' => [
             2,
@@ -163,7 +162,7 @@ final class CalculatorTest extends TestCase
         ];
     }
 
-    public function metricsCalculatorProvider(): iterable
+    public static function metricsCalculatorProvider(): iterable
     {
         yield 'empty' => [
             new MetricsCalculator(2),
@@ -173,10 +172,10 @@ final class CalculatorTest extends TestCase
         ];
 
         yield 'nominal' => [
-            $this->createCompleteMetricsCalculator(),
-            60.,
-            80.0,
-            75.0,
+            self::createCompleteMetricsCalculator(),
+            69.23, // 15 total mutations; 2 skipped; 9 of 13 are killed => 69.23%
+            84.62, // 15 total mutations; 2 skipped & 2 not covered; => 11 of 13 => 83.33%
+            81.82, // 15 total mutations; 2 skipped & 2 not covered; 9 of 11 are killed => 80%
         ];
     }
 }

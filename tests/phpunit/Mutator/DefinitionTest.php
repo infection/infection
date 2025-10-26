@@ -35,20 +35,191 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use function array_diff_key;
+use function array_fill_keys;
+use function array_flip;
 use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\ProfileList;
+use Infection\Testing\SingletonContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
+#[CoversClass(Definition::class)]
 final class DefinitionTest extends TestCase
 {
-    /**
-     * @dataProvider valuesProvider
-     */
+    // TODO: address those
+    private const MUTATORS_WITHOUT_REMEDIES = [
+        'Assignment',
+        'AssignmentEqual',
+        'BitwiseAnd',
+        'BitwiseNot',
+        'BitwiseOr',
+        'BitwiseXor',
+        'Decrement',
+        'DivEqual',
+        'Division',
+        'Exponentiation',
+        'Increment',
+        'Minus',
+        'MinusEqual',
+        'ModEqual',
+        'Modulus',
+        'MulEqual',
+        'Multiplication',
+        'Plus',
+        'PlusEqual',
+        'PowEqual',
+        'RoundingFamily',
+        'ShiftLeft',
+        'ShiftRight',
+        'ArrayItem',
+        'EqualIdentical',
+        'FalseValue',
+        'InstanceOf_',
+        'LogicalAnd',
+        'LogicalAndAllSubExprNegation',
+        'LogicalAndNegation',
+        'LogicalAndSingleSubExprNegation',
+        'LogicalLowerAnd',
+        'LogicalLowerOr',
+        'LogicalNot',
+        'LogicalOr',
+        'LogicalOrAllSubExprNegation',
+        'LogicalOrNegation',
+        'LogicalOrSingleSubExprNegation',
+        'NotEqualNotIdentical',
+        'NotIdenticalNotEqual',
+        'TrueValue',
+        'Yield_',
+        'GreaterThan',
+        'GreaterThanOrEqualTo',
+        'LessThan',
+        'LessThanOrEqualTo',
+        'Equal',
+        'GreaterThanNegotiation',
+        'GreaterThanOrEqualToNegotiation',
+        'Identical',
+        'LessThanNegotiation',
+        'LessThanOrEqualToNegotiation',
+        'NotEqual',
+        'NotIdentical',
+        'ProtectedVisibility',
+        'PublicVisibility',
+        'DecrementInteger',
+        'IncrementInteger',
+        'OneZeroFloat',
+        'AssignCoalesce',
+        'Break_',
+        'Coalesce',
+        'Concat',
+        'Continue_',
+        'ElseIfNegation',
+        'Finally_',
+        'IfNegation',
+        'NullSafeMethodCall',
+        'NullSafePropertyCall',
+        'SpreadAssignment',
+        'SpreadOneItem',
+        'SpreadRemoval',
+        'Ternary',
+        'Throw_',
+        'Catch_',
+        'PregMatchMatches',
+        'PregMatchRemoveCaret',
+        'PregMatchRemoveDollar',
+        'PregMatchRemoveFlags',
+        'PregQuote',
+        'ArrayItemRemoval',
+        'CatchBlockRemoval',
+        'CloneRemoval',
+        'ConcatOperandRemoval',
+        'FunctionCallRemoval',
+        'MatchArmRemoval',
+        'MethodCallRemoval',
+        'SharedCaseRemoval',
+        'ReturnRemoval',
+        'ArrayOneItem',
+        'FloatNegation',
+        'FunctionCall',
+        'IntegerNegation',
+        'NewObject',
+        'This',
+        'YieldValue',
+        'Spaceship',
+        'DoWhile',
+        'Foreach_',
+        'For_',
+        'While_',
+        'CastArray',
+        'CastBool',
+        'CastFloat',
+        'CastInt',
+        'CastObject',
+        'CastString',
+        'UnwrapArrayChangeKeyCase',
+        'UnwrapArrayChunk',
+        'UnwrapArrayColumn',
+        'UnwrapArrayCombine',
+        'UnwrapArrayDiff',
+        'UnwrapArrayDiffAssoc',
+        'UnwrapArrayDiffKey',
+        'UnwrapArrayDiffUassoc',
+        'UnwrapArrayDiffUkey',
+        'UnwrapArrayFilter',
+        'UnwrapArrayFlip',
+        'UnwrapArrayIntersect',
+        'UnwrapArrayIntersectAssoc',
+        'UnwrapArrayIntersectKey',
+        'UnwrapArrayIntersectUassoc',
+        'UnwrapArrayIntersectUkey',
+        'UnwrapArrayKeys',
+        'UnwrapArrayMerge',
+        'UnwrapArrayMergeRecursive',
+        'UnwrapArrayPad',
+        'UnwrapArrayReduce',
+        'UnwrapArrayReplace',
+        'UnwrapArrayReplaceRecursive',
+        'UnwrapArrayReverse',
+        'UnwrapArraySlice',
+        'UnwrapArraySplice',
+        'UnwrapArrayUdiff',
+        'UnwrapArrayUdiffAssoc',
+        'UnwrapArrayUdiffUassoc',
+        'UnwrapArrayUintersect',
+        'UnwrapArrayUintersectAssoc',
+        'UnwrapArrayUintersectUassoc',
+        'UnwrapArrayUnique',
+        'UnwrapArrayValues',
+        'UnwrapLcFirst',
+        'UnwrapLtrim',
+        'UnwrapRtrim',
+        'UnwrapStrIreplace',
+        'UnwrapStrRepeat',
+        'UnwrapStrReplace',
+        'UnwrapStrRev',
+        'UnwrapStrShuffle',
+        'UnwrapStrToLower',
+        'UnwrapStrToUpper',
+        'UnwrapSubstr',
+        'UnwrapTrim',
+        'UnwrapUcFirst',
+        'UnwrapUcWords',
+        'UnwrapFinally',
+        'BCMath',
+        'MBString',
+        'SyntaxError',
+    ];
+
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $description,
         string $category,
         ?string $remedies,
-        ?string $diff
+        ?string $diff,
     ): void {
         $definition = new Definition($description, $category, $remedies, $diff);
 
@@ -58,7 +229,7 @@ final class DefinitionTest extends TestCase
         $this->assertSame($diff, $definition->getDiff());
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -73,5 +244,41 @@ final class DefinitionTest extends TestCase
             'This text is for providing guidelines on how to kill the mutant.',
             'The diff',
         ];
+    }
+
+    #[DataProvider('mutatorsProvider')]
+    public function test_it_must_define_remedies(Mutator $mutator): void
+    {
+        $this->assertNotNull(
+            $mutator::getDefinition()->getRemedies(),
+            sprintf(
+                'Definition of [%s] must provide remedies.',
+                $mutator->getName(),
+            ),
+        );
+    }
+
+    public static function mutatorsProvider(): iterable
+    {
+        $mutatorFactory = SingletonContainer::getContainer()->getMutatorFactory();
+
+        $mutators = $mutatorFactory->create(
+            array_fill_keys(
+                ProfileList::ALL_MUTATORS,
+                [],
+            ),
+            false,
+        );
+
+        $checkedMutators = array_diff_key(
+            $mutators,
+            array_flip(self::MUTATORS_WITHOUT_REMEDIES),
+        );
+
+        foreach ($checkedMutators as $name => $mutator) {
+            self::assertInstanceOf(Mutator::class, $mutator);
+
+            yield $name => [$mutator];
+        }
     }
 }

@@ -35,35 +35,167 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Cast\CastString;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastString::class)]
 final class CastStringTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to string' => [
             <<<'PHP'
-<?php
+                <?php
 
-(string) 1.0;
-PHP
+                (string) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
+        ];
+
+        yield 'It removes casting to string in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((string) random_int()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (random_int()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to string in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (string) random_int();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return random_int();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to string in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (string) random_int();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to string in return of string-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsString(): string
+                {
+                    return (string) random_int();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsString(): string
+                {
+                    return random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to string in return of string-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsString(): string {
+                    return (string) random_int();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to string in nested return of string-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsString(): string {
+                    if (true) {
+                        return (string) random_int();
+                    }
+                    return "x";
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to string in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    trim((string) 5);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    trim(5);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to string in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    trim((string) 5);
+                }
+                PHP,
         ];
     }
 }

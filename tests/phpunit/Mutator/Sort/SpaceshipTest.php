@@ -35,8 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Sort;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Sort\Spaceship;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Spaceship::class)]
 final class SpaceshipTest extends BaseMutatorTestCase
 {
     public function test_get_name(): void
@@ -45,110 +49,109 @@ final class SpaceshipTest extends BaseMutatorTestCase
     }
 
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It swaps spaceship operators' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a <=> $b;
-PHP
+                $a <=> $b;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$b <=> $a;
-PHP
+                $b <=> $a;
+                PHP
             ,
         ];
 
         yield 'It does not swap operators when result is identical zero on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-($a <=> $b) === 0;
-PHP
+                ($a <=> $b) === 0;
+                PHP,
         ];
 
         yield 'It does not swap operators when result is identical zero on the left side' => [
             <<<'PHP'
-<?php
+                <?php
 
-0 === ($a <=> $b);
-PHP
+                0 === ($a <=> $b);
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-($a <=> $b) == 0;
-PHP
+                ($a <=> $b) == 0;
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero as string on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-($a <=> $b) == '0';
-PHP
+                ($a <=> $b) == '0';
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero on the left side' => [
             <<<'PHP'
-<?php
+                <?php
 
-0 == ($a <=> $b);
-PHP
+                0 == ($a <=> $b);
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero as string on the left side' => [
             <<<'PHP'
-<?php
+                <?php
 
-'0' == ($a <=> $b);
-PHP
+                '0' == ($a <=> $b);
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-($a <=> $b) == 0.0;
-PHP
+                ($a <=> $b) == 0.0;
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format as string on the right side' => [
             <<<'PHP'
-<?php
+                <?php
 
-($a <=> $b) == '0.0';
-PHP
+                ($a <=> $b) == '0.0';
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format on the left side' => [
             <<<'PHP'
-<?php
+                <?php
 
-0.0 == ($a <=> $b);
-PHP
+                0.0 == ($a <=> $b);
+                PHP,
         ];
 
         yield 'It does not swap operators when result is equal to zero in float format as string on the left side' => [
             <<<'PHP'
-<?php
+                <?php
 
-'0.0' == ($a <=> $b);
-PHP
+                '0.0' == ($a <=> $b);
+                PHP,
         ];
     }
 }

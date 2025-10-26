@@ -36,11 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration;
 
 use function array_map;
+use function explode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
+use function ltrim;
 use Symfony\Component\Finder\SplFileInfo;
 
 trait ConfigurationAssertions
@@ -65,73 +68,101 @@ trait ConfigurationAssertions
         string $expectedLogVerbosity,
         string $expectedTmpDir,
         PhpUnit $expectedPhpUnit,
+        PhpStan $expectedPhpStan,
         array $expectedMutators,
         string $expectedTestFramework,
         ?string $expectedBootstrap,
         ?string $expectedInitialTestsPhpOptions,
         string $expectedTestFrameworkExtraOptions,
+        ?string $expectedStaticAnalysisToolOptions,
         string $expectedCoveragePath,
         bool $expectedSkipCoverage,
         bool $expectedSkipInitialTests,
         bool $expectedDebug,
-        bool $expectedOnlyCovered,
+        bool $expectedWithUncovered,
         bool $expectedNoProgress,
         bool $expectedIgnoreMsiWithNoMutations,
         ?float $expectedMinMsi,
-        bool $expectedShowMutations,
+        ?int $expectedNumberOfShownMutations,
         ?float $expectedMinCoveredMsi,
         int $expectedMsiPrecision,
         int $expectedThreadCount,
         bool $expectedDryRyn,
-        array $expectedIgnoreSourceCodeMutatorsMap
+        array $expectedIgnoreSourceCodeMutatorsMap,
+        bool $expectedExecuteOnlyCoveringTestCases,
+        bool $expectedIsForGitDiffLines,
+        ?string $expectedGitDiffBase,
+        ?string $expectedMapSourceClassToTest,
+        ?string $expectedLoggerProjectRootDirectory,
+        ?string $expectedStaticAnalysisTool,
+        ?string $expectedMutantId,
     ): void {
-        $this->assertSame($expectedTimeout, $configuration->getProcessTimeout());
-        $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories());
+        $this->assertSame($expectedTimeout, $configuration->getProcessTimeout(), 'Failed timeout check');
+        $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories(), 'Failed sourceDirectories check');
         $this->assertSame(
             self::normalizePaths($expectedSourceFiles),
-            self::normalizePaths($configuration->getSourceFiles())
+            self::normalizePaths($configuration->getSourceFiles()),
+            'Failed sourceFiles check',
         );
-        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter());
-        $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes());
+        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter(), 'Failed sourceFilesFilter check');
+        $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes(), 'Failed sourceFilesExcludes check');
         $this->assertLogsStateIs(
             $configuration->getLogs(),
             $expectedLogs->getTextLogFilePath(),
+            $expectedLogs->getHtmlLogFilePath(),
             $expectedLogs->getSummaryLogFilePath(),
             $expectedLogs->getJsonLogFilePath(),
+            $expectedLogs->getGitlabLogFilePath(),
             $expectedLogs->getDebugLogFilePath(),
             $expectedLogs->getPerMutatorFilePath(),
             $expectedLogs->getUseGitHubAnnotationsLogger(),
-            $expectedLogs->getBadge()
+            $expectedLogs->getStrykerConfig(),
+            $expectedLogs->getSummaryJsonLogFilePath(),
         );
-        $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity());
-        $this->assertSame($expectedTmpDir, $configuration->getTmpDir());
+        $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity(), 'Failed logVerbosity check');
+        $this->assertSame($expectedTmpDir, $configuration->getTmpDir(), 'Failed tmpDir check');
         $this->assertPhpUnitStateIs(
             $configuration->getPhpUnit(),
             $expectedPhpUnit->getConfigDir(),
-            $expectedPhpUnit->getCustomPath()
+            $expectedPhpUnit->getCustomPath(),
         );
-        $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10.);
-        $this->assertSame($expectedTestFramework, $configuration->getTestFramework());
-        $this->assertSame($expectedBootstrap, $configuration->getBootstrap());
-        $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions());
+        $this->assertSame($expectedPhpStan->getConfigDir(), $configuration->getPhpStan()->getConfigDir(), 'Failed PHPStan config dir check');
+        $this->assertSame($expectedPhpStan->getCustomPath(), $configuration->getPhpStan()->getCustomPath(), 'Failed PHPStan custom path check');
+        $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10., 'Failed mutators check');
+        $this->assertSame($expectedTestFramework, $configuration->getTestFramework(), 'Failed testFramework check');
+        $this->assertSame($expectedBootstrap, $configuration->getBootstrap(), 'Failed bootstrap check');
+        $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions(), 'Failed initialTestsPhpOptions check');
         $this->assertSame(
             $expectedTestFrameworkExtraOptions,
-            $configuration->getTestFrameworkExtraOptions()
+            $configuration->getTestFrameworkExtraOptions(),
+            'Failed testFrameworkExtraOptions check',
         );
-        $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath());
-        $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage());
-        $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests());
-        $this->assertSame($expectedDebug, $configuration->isDebugEnabled());
-        $this->assertSame($expectedOnlyCovered, $configuration->mutateOnlyCoveredCode());
-        $this->assertSame($expectedNoProgress, $configuration->noProgress());
-        $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations());
-        $this->assertSame($expectedMinMsi, $configuration->getMinMsi());
-        $this->assertSame($expectedShowMutations, $configuration->showMutations());
-        $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi());
-        $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision());
-        $this->assertSame($expectedThreadCount, $configuration->getThreadCount());
-        $this->assertSame($expectedDryRyn, $configuration->isDryRun());
-        $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap());
+        $this->assertSame(
+            $this->parseStaticAnalysisToolOptionsForAssertion($expectedStaticAnalysisToolOptions),
+            $configuration->getStaticAnalysisToolOptions(),
+            'Failed staticAnalysisToolOptions check',
+        );
+        $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath(), 'Failed coveragePath check');
+        $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage(), 'Failed skipCoverage check');
+        $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests(), 'Failed skipInitialTests check');
+        $this->assertSame($expectedDebug, $configuration->isDebugEnabled(), 'Failed isDebugEnabled check');
+        $this->assertSame($expectedWithUncovered, !$configuration->mutateOnlyCoveredCode(), 'Failed onlyCoveredCode check');
+        $this->assertSame($expectedNoProgress, $configuration->noProgress(), 'Failed noProgress check');
+        $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
+        $this->assertSame($expectedMinMsi, $configuration->getMinMsi(), 'Failed minMsi check');
+        $this->assertSame($expectedNumberOfShownMutations, $configuration->getNumberOfShownMutations(), 'Failed numberOfShownMutations check');
+        $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi(), 'Failed minCoveredMsi check');
+        $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision(), 'Failed msiPrecision check');
+        $this->assertSame($expectedThreadCount, $configuration->getThreadCount(), 'Failed threadsCount check');
+        $this->assertSame($expectedDryRyn, $configuration->isDryRun(), 'Failed dryRun check');
+        $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap(), 'Failed ignoreSourceCodeMutatorsMap check');
+        $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases(), 'Failed executeOnlyCoveringTestCases check');
+        $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines(), 'Failed isForGitDiffLines check');
+        $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase(), 'Failed gitDiffBase check');
+        $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy(), 'Failed mapSourceClassToTestStrategy check');
+        $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->getLoggerProjectRootDirectory(), 'Failed loggerProjectRootDirectory check');
+        $this->assertSame($expectedStaticAnalysisTool, $configuration->getStaticAnalysisTool(), 'Failed staticAnalysisTool check');
+        $this->assertSame($expectedMutantId, $configuration->getMutantId(), 'Failed mutantId check');
     }
 
     /**
@@ -142,10 +173,23 @@ trait ConfigurationAssertions
     private static function normalizePaths(array $fileInfos): array
     {
         return array_map(
-            static function (SplFileInfo $fileInfo): string {
-                return $fileInfo->getPathname();
-            },
-            $fileInfos
+            static fn (SplFileInfo $fileInfo): string => $fileInfo->getPathname(),
+            $fileInfos,
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseStaticAnalysisToolOptionsForAssertion(?string $extraOptions): array
+    {
+        if ($extraOptions === null || $extraOptions === '') {
+            return [];
+        }
+
+        return array_map(
+            static fn ($option): string => '--' . $option,
+            explode(' --', ltrim($extraOptions, '-')),
         );
     }
 }

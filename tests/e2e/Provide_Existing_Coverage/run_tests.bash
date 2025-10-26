@@ -2,13 +2,14 @@
 
 set -e pipefail
 
-readonly INFECTION="../../../bin/infection --coverage=infection-coverage"
+readonly INFECTION="../../../bin/infection --coverage=infection-coverage --with-uncovered"
 readonly PHPUNIT="vendor/bin/phpunit  --coverage-xml=infection-coverage/coverage-xml --log-junit=infection-coverage/junit.xml"
 
 if [ "$DRIVER" = "phpdbg" ]
 then
     phpdbg -qrr $PHPUNIT
 else
+    export XDEBUG_MODE=coverage
     php $PHPUNIT
 fi
 

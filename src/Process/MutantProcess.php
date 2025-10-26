@@ -35,28 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use Closure;
 use Infection\Mutant\Mutant;
-use Infection\Process\Runner\ProcessBearer;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutant\MutantExecutionResultFactory;
+use function microtime;
 use Symfony\Component\Process\Process;
 
 /**
  * @internal
  * @final
  */
-class MutantProcess implements ProcessBearer
+class MutantProcess
 {
-    private Process $process;
-    private Mutant $mutant;
-    private Closure $callback;
-
     private bool $timedOut = false;
 
-    public function __construct(Process $process, Mutant $mutant)
-    {
-        $this->process = $process;
-        $this->mutant = $mutant;
-        $this->callback = static function (): void {};
+    private float $finishedAt = 0.0;
+
+    public function __construct(
+        private readonly Process $process,
+        private readonly Mutant $mutant,
+        private readonly MutantExecutionResultFactory $mutantExecutionResultFactory,
+    ) {
     }
 
     public function getProcess(): Process
@@ -79,16 +78,19 @@ class MutantProcess implements ProcessBearer
         return $this->timedOut;
     }
 
-    /**
-     * @param Closure(): void $callback
-     */
-    public function registerTerminateProcessClosure(Closure $callback): void
+    public function markAsFinished(): void
     {
-        $this->callback = $callback;
+        $this->finishedAt = microtime(true);
     }
 
-    public function terminateProcess(): void
+    public function getFinishedAt(): float
     {
-        ($this->callback)();
+        return $this->finishedAt;
+    }
+
+    public function getMutantExecutionResult(): MutantExecutionResult
+    {
+        // todo [phpstan-integration] cache it
+        return $this->mutantExecutionResultFactory->createFromProcess($this);
     }
 }

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use function array_flip;
 use function array_key_exists;
 use const FNM_NOESCAPE;
 use function fnmatch;
-use function Safe\array_flip;
 
 /**
  * @internal
@@ -46,20 +46,17 @@ use function Safe\array_flip;
  */
 class IgnoreConfig
 {
-    /** @var string[] */
-    private array $patterns;
     /** @var array<string, int> */
     private array $hashtable = [];
 
     /**
-     * @param string[] $ignored
+     * @param string[] $patterns
      */
-    public function __construct(array $ignored)
-    {
-        $this->patterns = $ignored;
-
-        if ($ignored !== []) {
-            $this->hashtable = array_flip($ignored);
+    public function __construct(
+        private readonly array $patterns,
+    ) {
+        if ($patterns !== []) {
+            $this->hashtable = array_flip($patterns);
         }
     }
 

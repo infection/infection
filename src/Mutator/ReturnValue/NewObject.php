@@ -47,48 +47,48 @@ use PhpParser\Node;
  */
 final class NewObject extends AbstractValueToNullReturnValue
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
-to preserve potential side effects. Example:
+                Replaces a newly instantiated object with `null` instead. The instantiation statement is kept in order
+                to preserve potential side effects. Example:
 
-```php
-class X {
-    function foo(): ?stdClass
-    {
-        return new stdClass();
-    }
-}
-```
+                ```php
+                class X {
+                    function foo(): ?stdClass
+                    {
+                        return new stdClass();
+                    }
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-class X {
-    function foo(): ?stdClass
-    {
-        new stdClass();
-        return null;
-    }
-}
-```
+                ```php
+                class X {
+                    function foo(): ?stdClass
+                    {
+                        new stdClass();
+                        return null;
+                    }
+                }
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-class X {
-    function foo(): ?stdClass
-    {
--        return new stdClass();
-+        new stdClass();
-+        return null;
-    }
-}
-DIFF
+                class X {
+                    function foo(): ?stdClass
+                    {
+                -        return new stdClass();
+                +        new stdClass();
+                +        return null;
+                    }
+                }
+                DIFF,
         );
     }
 
@@ -105,7 +105,7 @@ DIFF
         yield [
             new Node\Stmt\Expression($expr),
             new Node\Stmt\Return_(
-                new Node\Expr\ConstFetch(new Node\Name('null'))
+                new Node\Expr\ConstFetch(new Node\Name('null')),
             ),
         ];
     }

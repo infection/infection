@@ -1,0 +1,31 @@
+{
+    "$schema": "./resources/schema.json",
+    "timeout": 25,
+    "threads": "max",
+    "source": {
+        "directories": [
+            "src"
+        ],
+        excludes: [
+            "FileSystem/DummyFileSystem.php",
+            "FileSystem/DummySymfony5FileSystem.php",
+            "FileSystem/DummySymfony6FileSystem.php",
+            "CustomMutator/templates/__Name__.php",
+            "CustomMutator/templates/__Name__Test.php"
+        ]
+    },
+    "logs": {
+        "stryker": {
+            "report": "master"
+        }
+    },
+    "phpStan": {
+        "configDir": "devTools"
+    },
+    "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            "Assert::.*"
+        ],
+        "@default": true,
+    }
+}

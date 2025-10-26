@@ -37,8 +37,10 @@ namespace Infection\Tests\PhpParser;
 
 use Exception;
 use Infection\PhpParser\UnparsableFile;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(UnparsableFile::class)]
 final class UnparsableFileTest extends TestCase
 {
     public function test_it_can_create_a_user_friendly_error_for_a_given_file(): void
@@ -49,7 +51,7 @@ final class UnparsableFileTest extends TestCase
 
         $this->assertSame(
             'Could not parse the file "/path/to/file". Check if it is a valid PHP file',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertSame($previous, $exception->getPrevious());

@@ -38,7 +38,7 @@ namespace Infection\Console;
 use function implode;
 use Infection\Logger\ConsoleLogger;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -48,18 +48,16 @@ class ConsoleOutput
 {
     private const MIN_MSI_CAN_GET_INCREASED_NOTICE = 'The %s is %s%% percentage points over the required %s. Consider increasing the required %s percentage the next time you run Infection.';
 
-    private ConsoleLogger $logger;
-
-    public function __construct(ConsoleLogger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private readonly ConsoleLogger $logger,
+    ) {
     }
 
     public function logVerbosityDeprecationNotice(string $valueToUse): void
     {
         $this->logger->notice(
             'Numeric versions of log-verbosity have been deprecated, please use, ' . $valueToUse . ' to keep the same result',
-            ['block' => true]
+            ['block' => true],
         );
     }
 
@@ -67,7 +65,7 @@ class ConsoleOutput
     {
         $this->logger->notice(
             'Running infection with an unknown log-verbosity option, falling back to ' . $default . ' option',
-            ['block' => true]
+            ['block' => true],
         );
     }
 
@@ -82,9 +80,9 @@ class ConsoleOutput
                 $typeString,
                 $msiDifference,
                 $typeString,
-                $typeString
+                $typeString,
             ),
-            ['block' => true]
+            ['block' => true],
         );
     }
 
@@ -99,18 +97,18 @@ class ConsoleOutput
                 $typeString,
                 $msiDifference,
                 $typeString,
-                $typeString
+                $typeString,
             ),
-            ['block' => true]
+            ['block' => true],
         );
     }
 
     public function logNotInControlOfExitCodes(): void
     {
         $this->logger->warning(
-            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL .
-            'It is your responsibility to disable xdebug/phpdbg unless needed.',
-            ['block' => true]
+            'Infection cannot control exit codes and unable to relaunch itself.' . PHP_EOL
+            . 'It is your responsibility to disable xdebug/phpdbg unless needed.',
+            ['block' => true],
         );
     }
 
@@ -122,7 +120,7 @@ class ConsoleOutput
                 'Skipping the initial test run can be very dangerous.',
                 'It is your responsibility to ensure the tests are in a passing state to begin.',
                 'If this is not done then mutations may report as caught when they are not.',
-            ]
+            ],
         ));
     }
 }

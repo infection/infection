@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,25 +51,25 @@ final class ArrayItem implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
-(`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
-For example `[foo() => $b->bar]`.
-TXT
+                Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
+                (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
+                For example `[$this->foo() => $b->bar]`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
-This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
-- completely disregarding the actual values of the array. The array content should either be
-checked or the impure calls should be made outside of the scope of the array.
-TXT,
+                This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)
+                - completely disregarding the actual values of the array. The array content should either be
+                checked or the impure calls should be made outside of the scope of the array.
+                TXT,
             <<<'DIFF'
-- $a = [$key => $value];
-+ $a = [$key > $value]
-DIFF
+                - $a = [$key => $value];
+                + $a = [$key > $value]
+                DIFF,
         );
     }
 
@@ -84,23 +85,43 @@ DIFF
         /** @var Node\Expr $value */
         $value = $node->value;
 
-        yield new Node\Expr\BinaryOp\Greater($key, $value, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Greater($key, $value, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\ArrayItem && $node->key !== null && (
-            $this->isNodeWithSideEffects($node->value) || $this->isNodeWithSideEffects($node->key)
-        );
+        if (!$node instanceof Node\Expr\ArrayItem) {
+            return false;
+        }
+
+        if ($node->key === null) {
+            return false;
+        }
+
+        return $this->isNodeWithSideEffects($node->key) || $this->isNodeWithSideEffects($node->value);
     }
 
+    /**
+     * Split into branches for coverage purposes.
+     */
     private function isNodeWithSideEffects(Node $node): bool
     {
-        return
-            // __get() can have side-effects
-            $node instanceof Node\Expr\PropertyFetch ||
-            // these clearly can have side-effects
-            $node instanceof Node\Expr\MethodCall ||
-            $node instanceof Node\Expr\FuncCall;
+        // __get() can have side effects
+        if (
+            $node instanceof Node\Expr\PropertyFetch
+            || $node instanceof Node\Expr\NullsafePropertyFetch
+        ) {
+            return true;
+        }
+
+        // these clearly can have side effects
+        if (
+            $node instanceof Node\Expr\MethodCall
+            || $node instanceof Node\Expr\NullsafeMethodCall
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }

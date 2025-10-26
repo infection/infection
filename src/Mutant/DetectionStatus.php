@@ -35,28 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\CannotBeInstantiated;
+use function array_udiff;
+use function array_values;
 
 /**
  * @internal
  */
-final class DetectionStatus
+enum DetectionStatus: string
 {
-    use CannotBeInstantiated;
+    case KILLED_BY_TESTS = 'killed by tests';
+    case KILLED_BY_STATIC_ANALYSIS = 'killed by SA';
+    case ESCAPED = 'escaped';
+    case ERROR = 'error';
+    case TIMED_OUT = 'timed out';
+    case SKIPPED = 'skipped';
+    case SYNTAX_ERROR = 'syntax error';
+    case NOT_COVERED = 'not covered';
+    case IGNORED = 'ignored';
 
-    public const KILLED = 'killed';
-    public const ESCAPED = 'escaped';
-    public const ERROR = 'error';
-    public const TIMED_OUT = 'timed out';
-    public const SKIPPED = 'skipped';
-    public const NOT_COVERED = 'not covered';
+    /**
+     * @return list<DetectionStatus>
+     */
+    public static function getCasesExcluding(DetectionStatus ...$excluded): array
+    {
+        return array_values(
+            array_udiff(
+                DetectionStatus::cases(),
+                $excluded,
+                static fn (DetectionStatus $left, DetectionStatus $right) => $left->value <=> $right->value,
+            ),
+        );
+    }
 
-    public const ALL = [
-        self::KILLED,
-        self::ESCAPED,
-        self::ERROR,
-        self::TIMED_OUT,
-        self::SKIPPED,
-        self::NOT_COVERED,
-    ];
+    /**
+     * @return array<key-of<self>, self>
+     */
+    public static function getIndexedCases(): array
+    {
+        $indexedCases = [];
+
+        foreach (self::cases() as $case) {
+            $indexedCases[$case->name] = $case;
+        }
+
+        return $indexedCases;
+    }
 }

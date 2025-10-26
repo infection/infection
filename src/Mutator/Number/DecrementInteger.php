@@ -40,8 +40,10 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
-use const PHP_INT_MIN;
+use function is_string;
+use const PHP_INT_MAX;
 use PhpParser\Node;
+use function stripos;
 
 /**
  * @internal
@@ -52,25 +54,34 @@ final class DecrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    private const COUNT_NAMES = [
+    public const NON_NEGATIVE_INT_RETURNING_FUNCTIONS = [
         'count',
+        'iterator_count',
         'grapheme_strlen',
         'iconv_strlen',
         'mb_strlen',
         'sizeof',
         'strlen',
+        'strpos',
+        'stripos',
+        'strrpos',
+        'mb_strpos',
+        'mb_stripos',
+        'mb_strrpos',
+        'preg_match',
+        'preg_match_all',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Decrements an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = 20;
-+ $a = 19;
-DIFF
+                - $a = 20;
+                + $a = 19;
+                DIFF,
         );
     }
 
@@ -85,7 +96,15 @@ DIFF
 
         $value = $node->value - 1;
 
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to add to it instead of substracting.
+         */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
+            // PHP Parser reads negative number as a pair of minus sign and a positive int,
+            // but positive part of PHP_INT_MIN leads to an overflow into float. To work
+            // around this we have to cast the result value back to int after adding one.
             $value = $node->value + 1;
         }
 
@@ -98,14 +117,21 @@ DIFF
             return false;
         }
 
-        if ($node->value === PHP_INT_MIN) {
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment PHP_INT_MAX as part of a negative number, leads to parser bugs.
+        if ($node->value === PHP_INT_MAX && $parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
 
         if (
             $node->value === 1
-            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
         ) {
+            return false;
+        }
+
+        if ($parentNode instanceof Node\Expr\Assign && $this->isCountOrLengthExpression($parentNode->var)) {
             return false;
         }
 
@@ -140,8 +166,8 @@ DIFF
         if ($parentNode->left instanceof Node\Expr\FuncCall && $parentNode->left->name instanceof Node\Name
             && in_array(
                 $parentNode->left->name->toLowerString(),
-                self::COUNT_NAMES,
-                true
+                self::NON_NEGATIVE_INT_RETURNING_FUNCTIONS,
+                true,
             )
         ) {
             return false;
@@ -150,14 +176,52 @@ DIFF
         if ($parentNode->right instanceof Node\Expr\FuncCall && $parentNode->right->name instanceof Node\Name
             && in_array(
                 $parentNode->right->name->toLowerString(),
-                self::COUNT_NAMES,
-                true
+                self::NON_NEGATIVE_INT_RETURNING_FUNCTIONS,
+                true,
             )
         ) {
             return false;
         }
 
+        if ($this->isCountOrLengthExpression($parentNode->left)) {
+            return false;
+        }
+
+        if ($this->isCountOrLengthExpression($parentNode->right)) {
+            return false;
+        }
+
         return true;
+    }
+
+    private function isCountOrLengthExpression(Node\Expr $expr): bool
+    {
+        foreach (['count', 'length', 'numberof'] as $magicNeedle) {
+            if (
+                $expr instanceof Node\Expr\Variable && is_string($expr->name)
+                && stripos($expr->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\PropertyFetch || $expr instanceof Node\Expr\NullsafePropertyFetch)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+
+            if (
+                ($expr instanceof Node\Expr\MethodCall || $expr instanceof Node\Expr\NullsafeMethodCall)
+                && $expr->name instanceof Node\Identifier
+                && stripos($expr->name->name, $magicNeedle) !== false
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function isArrayZeroIndexAccess(Node\Scalar\LNumber $node): bool

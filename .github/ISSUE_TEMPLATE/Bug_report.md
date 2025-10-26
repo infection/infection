@@ -22,10 +22,18 @@ labels: Bug, Not Confirmed
 
 - Please include any options you use when running Infection
 
-- For general support, please use the Twitter @infection_php or Gitter channel https://gitter.im/infection/Lobby.
+- For general support, please use the Twitter @infection_php or Discord `#infection` channel https://discord.gg/ZUmyHTJ
 -->
 
 <!-- Please past your phpunit.xml[.dist] if no Github link to the repo provided -->
+<details>
+ <summary>infection.json5</summary>
+
+ ```json5
+  %infection.json5 content%
+ ```
+</details>
+
 <details>
  <summary>phpunit.xml</summary>
 

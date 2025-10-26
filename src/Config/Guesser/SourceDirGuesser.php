@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Config\Guesser;
 
+use function array_walk_recursive;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use function is_array;
 use function is_string;
 use LogicException;
-use function Safe\array_walk_recursive;
 use stdClass;
 use function trim;
 
@@ -49,11 +49,9 @@ use function trim;
  */
 class SourceDirGuesser
 {
-    private stdClass $composerJsonContent;
-
-    public function __construct(stdClass $composerJsonContent)
-    {
-        $this->composerJsonContent = $composerJsonContent;
+    public function __construct(
+        private readonly stdClass $composerJsonContent,
+    ) {
     }
 
     /**
@@ -117,14 +115,14 @@ class SourceDirGuesser
      * @param string[]|string $path
      * @param string[] $dirs
      */
-    private function parsePath($path, array &$dirs): void
+    private function parsePath(array|string $path, array &$dirs): void
     {
         if (is_array($path)) {
             array_walk_recursive(
                 $path,
                 function ($el) use (&$dirs): void {
                     $this->parsePath($el, $dirs);
-                }
+                },
             );
         }
 

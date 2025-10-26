@@ -39,6 +39,10 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
+use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use function is_string;
 use PhpParser\Node;
 
 /**
@@ -50,19 +54,19 @@ final class Multiplication implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
-TXT
+                Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b * $c;
-+ $a = $b / $c;
-DIFF
+                - $a = $b * $c;
+                + $a = $b / $c;
+                DIFF,
         );
     }
 
@@ -73,7 +77,7 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Div($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
@@ -94,7 +98,25 @@ DIFF
             return false;
         }
 
-        return true;
+        $functionScope = ReflectionVisitor::findFunctionScope($node);
+
+        if (!$functionScope instanceof Node\Stmt\ClassMethod) {
+            return true;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Stmt\Return_) {
+            return true;
+        }
+
+        $returnType = $functionScope->getReturnType();
+
+        if ($returnType instanceof Node\Identifier) {
+            $returnType = $returnType->name;
+        }
+
+        return !(is_string($returnType) && $returnType === 'int');
     }
 
     private function isNumericOne(Node $node): bool

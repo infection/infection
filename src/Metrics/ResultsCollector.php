@@ -39,7 +39,7 @@ use function array_key_exists;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use InvalidArgumentException;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -52,12 +52,12 @@ class ResultsCollector implements Collector
      */
     private array $resultsByStatus = [];
 
-    private SortableMutantExecutionResults $allExecutionResults;
+    private readonly SortableMutantExecutionResults $allExecutionResults;
 
     public function __construct()
     {
-        foreach (DetectionStatus::ALL as $status) {
-            $this->resultsByStatus[$status] = new SortableMutantExecutionResults();
+        foreach (DetectionStatus::cases() as $status) {
+            $this->resultsByStatus[$status->value] = new SortableMutantExecutionResults();
         }
 
         $this->allExecutionResults = new SortableMutantExecutionResults();
@@ -70,19 +70,19 @@ class ResultsCollector implements Collector
 
             $detectionStatus = $executionResult->getDetectionStatus();
 
-            if (!array_key_exists($detectionStatus, $this->resultsByStatus)) {
+            if (!array_key_exists($detectionStatus->value, $this->resultsByStatus)) {
                 throw new InvalidArgumentException(sprintf(
                     'Unknown execution result process result code "%s"',
-                    $executionResult->getDetectionStatus()
+                    $detectionStatus->value,
                 ));
             }
 
-            $this->resultsByStatus[$detectionStatus]->add($executionResult);
+            $this->resultsByStatus[$detectionStatus->value]->add($executionResult);
         }
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getAllExecutionResults(): array
     {
@@ -90,15 +90,23 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getKilledExecutionResults(): array
     {
-        return $this->getResultListForStatus(DetectionStatus::KILLED)->getSortedExecutionResults();
+        return $this->getResultListForStatus(DetectionStatus::KILLED_BY_TESTS)->getSortedExecutionResults();
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
+     */
+    public function getKilledByStaticAnalysisExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::KILLED_BY_STATIC_ANALYSIS)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return list<MutantExecutionResult>
      */
     public function getErrorExecutionResults(): array
     {
@@ -106,7 +114,15 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
+     */
+    public function getSyntaxErrorExecutionResults(): array
+    {
+        return $this->getResultListForStatus(DetectionStatus::SYNTAX_ERROR)->getSortedExecutionResults();
+    }
+
+    /**
+     * @return list<MutantExecutionResult>
      */
     public function getSkippedExecutionResults(): array
     {
@@ -114,7 +130,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getEscapedExecutionResults(): array
     {
@@ -122,7 +138,7 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getTimedOutExecutionResults(): array
     {
@@ -130,15 +146,23 @@ class ResultsCollector implements Collector
     }
 
     /**
-     * @return MutantExecutionResult[]
+     * @return list<MutantExecutionResult>
      */
     public function getNotCoveredExecutionResults(): array
     {
         return $this->getResultListForStatus(DetectionStatus::NOT_COVERED)->getSortedExecutionResults();
     }
 
-    private function getResultListForStatus(string $detectionStatus): SortableMutantExecutionResults
+    /**
+     * @return list<MutantExecutionResult>
+     */
+    public function getIgnoredExecutionResults(): array
     {
-        return $this->resultsByStatus[$detectionStatus];
+        return $this->getResultListForStatus(DetectionStatus::IGNORED)->getSortedExecutionResults();
+    }
+
+    private function getResultListForStatus(DetectionStatus $detectionStatus): SortableMutantExecutionResults
+    {
+        return $this->resultsByStatus[$detectionStatus->value];
     }
 }

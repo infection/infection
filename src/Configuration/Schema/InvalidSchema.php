@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function implode;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use UnexpectedValueException;
 use Webmozart\Assert\Assert;
 
@@ -62,7 +62,7 @@ final class InvalidSchema extends UnexpectedValueException
             $config->getPath(),
             $errors === []
                 ? '.'
-                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors)
+                : ':' . PHP_EOL . ' - ' . implode(PHP_EOL . ' - ', $errors),
         ));
     }
 }

@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,22 +51,22 @@ final class SharedCaseRemoval implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes `case`s from `switch`.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-switch ($x) {
--   case 1:
-    case 2:
-        fooBar();
-        break;
-    default:
-        baz();
-}
-DIFF
+                switch ($x) {
+                -   case 1:
+                    case 2:
+                        fooBar();
+                        break;
+                    default:
+                        baz();
+                }
+                DIFF,
         );
     }
 
@@ -102,7 +103,7 @@ DIFF
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes()
+                    NodeAttributes::getAllExceptOriginalNode($node),
                 );
 
                 continue;
@@ -116,13 +117,13 @@ DIFF
                 $cases[$i - 1] = new Node\Stmt\Case_(
                     $lastCase->cond,
                     $case->stmts,
-                    $lastCase->getAttributes()
+                    NodeAttributes::getAllExceptOriginalNode($lastCase),
                 );
 
                 yield new Node\Stmt\Switch_(
                     $node->cond,
                     $cases,
-                    $node->getAttributes()
+                    NodeAttributes::getAllExceptOriginalNode($node),
                 );
             }
         }

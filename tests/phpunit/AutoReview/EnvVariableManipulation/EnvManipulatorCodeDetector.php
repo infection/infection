@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
 use Infection\CannotBeInstantiated;
-use function Safe\sprintf;
-use function strpos;
+use function sprintf;
+use function str_contains;
 
 final class EnvManipulatorCodeDetector
 {
@@ -56,7 +56,7 @@ final class EnvManipulatorCodeDetector
     public static function codeManipulatesEnvVariables(string $code): bool
     {
         foreach (self::getStatements() as $statement) {
-            if (strpos($code, $statement) !== false) {
+            if (str_contains($code, $statement)) {
                 return true;
             }
         }

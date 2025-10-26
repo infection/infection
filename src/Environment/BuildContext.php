@@ -38,15 +38,12 @@ namespace Infection\Environment;
 /**
  * @internal
  */
-final class BuildContext
+final readonly class BuildContext
 {
-    private string $repositorySlug;
-    private string $branch;
-
-    public function __construct(string $repositorySlug, string $branch)
-    {
-        $this->repositorySlug = $repositorySlug;
-        $this->branch = $branch;
+    public function __construct(
+        private string $repositorySlug,
+        private string $branch,
+    ) {
     }
 
     public function repositorySlug(): string

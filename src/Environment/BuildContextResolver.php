@@ -42,20 +42,18 @@ use function trim;
 /**
  * @internal
  */
-final class BuildContextResolver
+final readonly class BuildContextResolver
 {
-    private CiDetector $ciDetector;
-
-    public function __construct(CiDetector $ciDetector)
-    {
-        $this->ciDetector = $ciDetector;
+    public function __construct(
+        private CiDetector $ciDetector,
+    ) {
     }
 
     public function resolve(): BuildContext
     {
         try {
             $ci = $this->ciDetector->detect();
-        } catch (CiNotDetectedException $exception) {
+        } catch (CiNotDetectedException) {
             throw new CouldNotResolveBuildContext('The current process is not executed in a CI build');
         }
 
@@ -71,13 +69,13 @@ final class BuildContextResolver
             throw new CouldNotResolveBuildContext('The repository name could not be determined for the current process');
         }
 
-        if (trim($ci->getGitBranch()) === '') {
+        if (trim($ci->getBranch()) === '') {
             throw new CouldNotResolveBuildContext('The branch name could not be determined for the current process');
         }
 
         return new BuildContext(
             $ci->getRepositoryName(),
-            $ci->getGitBranch()
+            $ci->getBranch(),
         );
     }
 }

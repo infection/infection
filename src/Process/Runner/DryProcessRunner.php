@@ -40,11 +40,15 @@ namespace Infection\Process\Runner;
  */
 final class DryProcessRunner implements ProcessRunner
 {
-    public function run(iterable $processes): void
+    public function run(iterable $processContainers): iterable
     {
-        foreach ($processes as $process) {
-            // Do nothing: we just want to make sure we trigger the iterable
-            // not even trigger the callback process
+        foreach ($processContainers as $processContainer) {
+            yield $processContainer;
         }
+    }
+
+    public function stop(): void
+    {
+        // not applicable for DryRunner
     }
 }

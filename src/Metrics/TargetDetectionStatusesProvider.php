@@ -41,7 +41,6 @@ use Infection\Console\LogVerbosity;
 use Infection\Logger\TextFileLogger;
 use Infection\Mutant\DetectionStatus;
 use function iterator_to_array;
-use function Safe\array_flip;
 
 /**
  * @internal
@@ -49,21 +48,12 @@ use function Safe\array_flip;
  */
 class TargetDetectionStatusesProvider
 {
-    private Logs $logConfig;
-    private string $logVerbosity;
-    private bool $onlyCoveredMode;
-    private bool $showMutations;
-
     public function __construct(
-        Logs $logConfig,
-        string $logVerbosity,
-        bool $onlyCoveredMode,
-        bool $showMutations
+        private readonly Logs $logConfig,
+        private readonly string $logVerbosity,
+        private readonly bool $onlyCoveredMode,
+        private readonly ?int $numberOfShownMutations,
     ) {
-        $this->logConfig = $logConfig;
-        $this->logVerbosity = $logVerbosity;
-        $this->onlyCoveredMode = $onlyCoveredMode;
-        $this->showMutations = $showMutations;
     }
 
     /**
@@ -71,11 +61,11 @@ class TargetDetectionStatusesProvider
      *
      * @see TextFileLogger
      *
-     * @return array<string, mixed>
+     * @return array<key-of<DetectionStatus>, DetectionStatus>
      */
     public function get(): array
     {
-        return array_flip(iterator_to_array($this->findRequired(), false));
+        return iterator_to_array($this->findRequired());
     }
 
     /**
@@ -84,12 +74,26 @@ class TargetDetectionStatusesProvider
      * @see https://github.com/infection/infection/pull/1430#pullrequestreview-535715334
      * @deprecated
      *
-     * @return Generator<string>
+     * @return Generator<string, DetectionStatus>
      */
     private function findRequired(): Generator
     {
-        if ($this->showMutations) {
-            yield DetectionStatus::ESCAPED;
+        if ($this->numberOfShownMutations !== 0) {
+            yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
+        }
+
+        if (!$this->onlyCoveredMode) {
+            yield DetectionStatus::NOT_COVERED->name => DetectionStatus::NOT_COVERED;
+        }
+
+        $strykerConfig = $this->logConfig->getStrykerConfig();
+        $isStrykerFullReportEnabled = $strykerConfig !== null && $strykerConfig->isForFullReport();
+
+        // Stryker HTML report needs all mutation results.
+        if ($isStrykerFullReportEnabled) {
+            yield from DetectionStatus::getIndexedCases();
+
+            return;
         }
 
         // This one stops all file logging.
@@ -99,54 +103,77 @@ class TargetDetectionStatusesProvider
 
         // This one requires them all.
         if ($this->logConfig->getDebugLogFilePath() !== null) {
-            yield from DetectionStatus::ALL;
+            yield from DetectionStatus::getIndexedCases();
 
             return;
         }
 
         // Per mutator logger needs all mutation results to make a summary.
         if ($this->logConfig->getPerMutatorFilePath() !== null) {
-            yield from DetectionStatus::ALL;
+            yield from DetectionStatus::getIndexedCases();
+
+            return;
+        }
+
+        // HTML logger needs all mutation results to make a summary.
+        if ($this->logConfig->getHtmlLogFilePath() !== null) {
+            yield from DetectionStatus::getIndexedCases();
 
             return;
         }
 
         if ($this->logConfig->getUseGitHubAnnotationsLogger()) {
-            yield DetectionStatus::ESCAPED;
+            yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
+        }
+
+        if ($this->logConfig->getGitlabLogFilePath() !== null) {
+            yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
         }
 
         // Follows the logic in JsonLogger
         if ($this->logConfig->getJsonLogFilePath() !== null) {
-            yield DetectionStatus::KILLED;
+            yield DetectionStatus::KILLED_BY_TESTS->name => DetectionStatus::KILLED_BY_TESTS;
 
-            yield DetectionStatus::ESCAPED;
+            yield DetectionStatus::KILLED_BY_STATIC_ANALYSIS->name => DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
 
-            yield DetectionStatus::ERROR;
+            yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
 
-            yield DetectionStatus::TIMED_OUT;
+            yield DetectionStatus::ERROR->name => DetectionStatus::ERROR;
+
+            yield DetectionStatus::SYNTAX_ERROR->name => DetectionStatus::SYNTAX_ERROR;
+
+            yield DetectionStatus::TIMED_OUT->name => DetectionStatus::TIMED_OUT;
 
             if (!$this->onlyCoveredMode) {
-                yield DetectionStatus::NOT_COVERED;
+                yield DetectionStatus::NOT_COVERED->name => DetectionStatus::NOT_COVERED;
             }
+
+            yield DetectionStatus::IGNORED->name => DetectionStatus::IGNORED;
         }
 
         // Follows the logic in TextFileLogger
         if ($this->logConfig->getTextLogFilePath() !== null) {
-            yield DetectionStatus::ESCAPED;
+            yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
 
-            yield DetectionStatus::TIMED_OUT;
+            yield DetectionStatus::TIMED_OUT->name => DetectionStatus::TIMED_OUT;
 
-            yield DetectionStatus::SKIPPED;
+            yield DetectionStatus::SKIPPED->name => DetectionStatus::SKIPPED;
+
+            yield DetectionStatus::SYNTAX_ERROR->name => DetectionStatus::SYNTAX_ERROR;
 
             if ($this->logVerbosity === LogVerbosity::DEBUG) {
-                yield DetectionStatus::KILLED;
+                yield DetectionStatus::KILLED_BY_TESTS->name => DetectionStatus::KILLED_BY_TESTS;
 
-                yield DetectionStatus::ERROR;
+                yield DetectionStatus::KILLED_BY_STATIC_ANALYSIS->name => DetectionStatus::KILLED_BY_STATIC_ANALYSIS;
+
+                yield DetectionStatus::ERROR->name => DetectionStatus::ERROR;
             }
 
             if (!$this->onlyCoveredMode) {
-                yield DetectionStatus::NOT_COVERED;
+                yield DetectionStatus::NOT_COVERED->name => DetectionStatus::NOT_COVERED;
             }
+
+            yield DetectionStatus::IGNORED->name => DetectionStatus::IGNORED;
         }
     }
 }

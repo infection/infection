@@ -42,9 +42,11 @@ use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(InitialTestsConsoleLoggerSubscriber::class)]
 final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_initial_test_suite_run(): void
@@ -69,12 +71,12 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
         $output->expects($this->once())
             ->method('writeln')
             ->with([
-            '',
-            'Running initial test suite...',
-            '',
-            'PHPUnit version: unknown',
-            '',
-        ]);
+                '',
+                'Running initial test suite...',
+                '',
+                'PHPUnit version: unknown',
+                '',
+            ]);
         $output->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
 

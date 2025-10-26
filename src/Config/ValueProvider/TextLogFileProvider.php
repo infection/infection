@@ -43,15 +43,12 @@ use Symfony\Component\Console\Question\Question;
 /**
  * @internal
  */
-final class TextLogFileProvider
+final readonly class TextLogFileProvider
 {
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper)
-    {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
+    public function __construct(
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+    ) {
     }
 
     /**
@@ -71,7 +68,7 @@ final class TextLogFileProvider
 
         $questionText = $this->consoleHelper->getQuestion(
             'Where do you want to store the text log file?',
-            ''
+            '',
         );
 
         $question = new Question($questionText, '');
@@ -80,7 +77,7 @@ final class TextLogFileProvider
         $answer = $this->questionHelper->ask(
             $io->getInput(),
             $io->getOutput(),
-            $question
+            $question,
         );
 
         return $answer === '' ? null : $answer;

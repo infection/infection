@@ -1,0 +1,14 @@
+name: 'Require tests if source code is changed'
+
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: infection/tests-checker-action@v1.0.3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

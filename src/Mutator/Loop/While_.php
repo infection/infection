@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,40 +51,40 @@ final class While_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces the iterable being iterated over with a `while` expression with false, preventing
-any iteration within the block to be executed. For example:
+                Replaces the iterable being iterated over with a `while` expression with false, preventing
+                any iteration within the block to be executed. For example:
 
-```php`
+                ```php`
 
-$condition = true;
-while ($condition) {
-    // ...
-}
-```
+                $condition = true;
+                while ($condition) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
+                ```php
 
-$condition = true;
-while (false) {
-    // ...
-}
-```
-TXT
+                $condition = true;
+                while (false) {
+                    // ...
+                }
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- while ($condition) {
-+ while (false) {
-      // ...
-}
-DIFF
+                - while ($condition) {
+                + while (false) {
+                      // ...
+                }
+                DIFF,
         );
     }
 
@@ -97,7 +98,7 @@ DIFF
         yield new Node\Stmt\While_(
             new Node\Expr\ConstFetch(new Node\Name('false')),
             $node->stmts,
-            $node->getAttributes()
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 

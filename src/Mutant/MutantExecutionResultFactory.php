@@ -35,78 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Process\MutantProcess;
-use function Safe\sprintf;
-use Symfony\Component\Process\Process;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class MutantExecutionResultFactory
+interface MutantExecutionResultFactory
 {
-    private TestFrameworkAdapter $testFrameworkAdapter;
-
-    public function __construct(TestFrameworkAdapter $testFrameworkAdapter)
-    {
-        $this->testFrameworkAdapter = $testFrameworkAdapter;
-    }
-
-    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult
-    {
-        $process = $mutantProcess->getProcess();
-        $mutant = $mutantProcess->getMutant();
-        $mutation = $mutant->getMutation();
-
-        return new MutantExecutionResult(
-            $process->getCommandLine(),
-            $this->retrieveProcessOutput($process),
-            $this->retrieveDetectionStatus($mutantProcess),
-            $mutant->getDiff(),
-            $mutation->getMutatorName(),
-            $mutation->getOriginalFilePath(),
-            $mutation->getOriginalStartingLine(),
-            $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode()
-        );
-    }
-
-    private function retrieveProcessOutput(Process $process): string
-    {
-        Assert::true(
-            $process->isTerminated(),
-            sprintf(
-                'Cannot retrieve a non-terminated process output. Got "%s"',
-                $process->getStatus()
-            )
-        );
-
-        return $process->getOutput();
-    }
-
-    private function retrieveDetectionStatus(MutantProcess $mutantProcess): string
-    {
-        if (!$mutantProcess->getMutant()->isCoveredByTest()) {
-            return DetectionStatus::NOT_COVERED;
-        }
-
-        if ($mutantProcess->isTimedOut()) {
-            return DetectionStatus::TIMED_OUT;
-        }
-
-        $process = $mutantProcess->getProcess();
-
-        if ($process->getExitCode() > 100) {
-            // See \Symfony\Component\Process\Process::$exitCodes
-            return DetectionStatus::ERROR;
-        }
-
-        if ($this->testFrameworkAdapter->testsPass($this->retrieveProcessOutput($process))) {
-            return DetectionStatus::ESCAPED;
-        }
-
-        return DetectionStatus::KILLED;
-    }
+    public function createFromProcess(MutantProcess $mutantProcess): MutantExecutionResult;
 }

@@ -39,7 +39,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use SplObjectStorage;
-use function strpos;
+use function str_contains;
 
 /**
  * @internal
@@ -48,28 +48,21 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 {
     private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
 
-    private ChangingIgnorer $changingIgnorer;
-
-    /**
-     * @var SplObjectStorage<object, mixed>
-     */
-    private SplObjectStorage $ignoredNodes;
-
     /**
      * @param SplObjectStorage<object, mixed> $ignoredNodes
      */
-    public function __construct(ChangingIgnorer $changingIgnorer, SplObjectStorage $ignoredNodes)
-    {
-        $this->changingIgnorer = $changingIgnorer;
-        $this->ignoredNodes = $ignoredNodes;
+    public function __construct(
+        private readonly ChangingIgnorer $changingIgnorer,
+        private readonly SplObjectStorage $ignoredNodes,
+    ) {
     }
 
     public function enterNode(Node $node): ?Node
     {
         foreach ($node->getComments() as $comment) {
-            if (strpos($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION) !== false) {
+            if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
                 $this->changingIgnorer->startIgnoring();
-                $this->ignoredNodes->attach($node);
+                $this->ignoredNodes->offsetSet($node);
             }
         }
 
@@ -78,8 +71,8 @@ final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstrac
 
     public function leaveNode(Node $node): ?Node
     {
-        if ($this->ignoredNodes->contains($node)) {
-            $this->ignoredNodes->detach($node);
+        if ($this->ignoredNodes->offsetExists($node)) {
+            $this->ignoredNodes->offsetUnset($node);
             $this->changingIgnorer->stopIgnoring();
         }
 

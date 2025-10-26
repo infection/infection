@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutator\Removal;
 
 use function count;
+use function in_array;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
@@ -44,71 +45,68 @@ use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ParentConnector;
 use function min;
 use PhpParser\Node;
-use PhpParser\Node\Expr\ArrayItem;
+use PhpParser\Node\ArrayItem;
 use function range;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
  *
  * @implements ConfigurableMutator<Node\Expr\Array_>
  */
-final class ArrayItemRemoval implements ConfigurableMutator
+final readonly class ArrayItemRemoval implements ConfigurableMutator
 {
     use GetConfigClassName;
     use GetMutatorName;
 
-    private ArrayItemRemovalConfig $config;
-
-    public function __construct(ArrayItemRemovalConfig $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        private ArrayItemRemovalConfig $config,
+    ) {
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes an element of an array literal. For example:
+                Removes an element of an array literal. For example:
 
-```php
-$x = [0, 1, 2];
-```
+                ```php
+                $x = [0, 1, 2];
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = [1, 2];
-```
+                ```php
+                $x = [1, 2];
+                ```
 
-And:
+                And:
 
-```php
-$x = [0, 2];
-```
+                ```php
+                $x = [0, 2];
+                ```
 
-And:
+                And:
 
-```php
-$x = [0, 1];
-```
+                ```php
+                $x = [0, 1];
+                ```
 
-Which elements it removes or how many elements it will attempt to remove will depend on its
-configuration.
+                Which elements it removes or how many elements it will attempt to remove will depend on its
+                configuration.
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = [0, 1, 2];
-# Mutation 1
-+ $x = [1, 2];
-# Mutation 2
-+ $x = [0, 2];
-# Mutation 3
-+ $x = [0, 1];
-DIFF
+                - $x = [0, 1, 2];
+                # Mutation 1
+                + $x = [1, 2];
+                # Mutation 2
+                + $x = [0, 2];
+                # Mutation 3
+                + $x = [0, 1];
+                DIFF,
         );
     }
 
@@ -117,12 +115,10 @@ DIFF
      *
      * @return iterable<Node\Expr\Array_>
      */
-    public function mutate(Node $arrayNode): iterable
+    public function mutate(Node $node): iterable
     {
-        Assert::allNotNull($arrayNode->items);
-
-        foreach ($this->getItemsIndexes($arrayNode->items) as $indexToRemove) {
-            $newArrayNode = clone $arrayNode;
+        foreach ($this->getItemsIndexes($node->items) as $indexToRemove) {
+            $newArrayNode = clone $node;
             unset($newArrayNode->items[$indexToRemove]);
 
             yield $newArrayNode;
@@ -141,8 +137,33 @@ DIFF
 
         $parent = ParentConnector::findParent($node);
 
-        // Arrays to the left of an assignments are not arrays but lists.
-        if ($parent instanceof Node\Expr\Assign && $parent->var === $node) {
+        if ($parent instanceof Node\Expr\Assign) {
+            if (
+                $parent->var instanceof Node\Expr\List_
+                && count($parent->var->items) >= count($node->items)
+            ) {
+                return false;
+            }
+        }
+
+        if ($parent instanceof Node\Arg) {
+            $grandParent = ParentConnector::findParent($parent);
+
+            if ($grandParent instanceof Node\Attribute) {
+                return false;
+            }
+
+            if (
+                $grandParent instanceof Node\Expr\FuncCall
+                && $grandParent->name instanceof Node\Name
+                && in_array($grandParent->name->toString(), ['in_array', 'array_key_exists'], true)
+            ) {
+                return false;
+            }
+        }
+
+        // Don't mutate destructured values in foreach loops
+        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
             return false;
         }
 
@@ -152,25 +173,20 @@ DIFF
     /**
      * @psalm-mutation-free
      *
-     * @param ArrayItem[] $items
+     * @param array<array-key, ArrayItem|null> $items
      *
      * @return int[]
      */
     private function getItemsIndexes(array $items): array
     {
-        switch ($this->config->getRemove()) {
-            case 'first':
-                return [0];
-
-            case 'last':
-                return [count($items) - 1];
-
-            default:
-                return range(
-                    0,
-                    min(count($items),
-                        $this->config->getLimit()) - 1
-                );
-        }
+        return match ($this->config->getRemove()) {
+            'first' => [0],
+            'last' => [count($items) - 1],
+            default => range(
+                0,
+                min(count($items),
+                    $this->config->getLimit()) - 1,
+            ),
+        };
     }
 }

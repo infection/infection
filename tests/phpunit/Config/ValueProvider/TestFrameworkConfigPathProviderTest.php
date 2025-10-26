@@ -40,14 +40,15 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\TestFrameworkConfigPathProvider;
 use Infection\Console\IO;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\realpath;
 use Symfony\Component\Console\Input\StringInput;
 
-/**
- * @group integration
- */
-final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
+#[Group('integration')]
+#[CoversClass(TestFrameworkConfigPathProvider::class)]
+final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
 {
     /**
      * @var TestFrameworkConfigPathProvider
@@ -71,7 +72,7 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $this->provider = new TestFrameworkConfigPathProvider(
             $this->locatorMock,
             $this->consoleMock,
-            $this->getQuestionHelper()
+            $this->getQuestionHelper(),
         );
     }
 
@@ -84,10 +85,10 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $result = $this->provider->get(
             new IO(
                 new StringInput(''),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             [],
-            'phpunit'
+            'phpunit',
         );
 
         $this->assertNull($result);
@@ -103,12 +104,10 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $this->locatorMock
             ->expects($this->exactly(3))
             ->method('locate')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    $this->throwException(new Exception()),
-                    ''
-                )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                $this->throwException(new Exception()),
+                '',
             );
 
         $inputPhpUnitPath = realpath(__DIR__ . '/../../Fixtures/Files/phpunit');
@@ -116,10 +115,10 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $path = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("{$inputPhpUnitPath}\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             [],
-            'phpunit'
+            'phpunit',
         );
 
         $this->assertSame($inputPhpUnitPath, $path);
@@ -131,11 +130,9 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $this->locatorMock
             ->expects($this->exactly(2))
             ->method('locate')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    ''
-                )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                '',
             );
 
         $this->consoleMock
@@ -145,7 +142,7 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $path = $this->provider->get(
             IO::createNull(),
             [],
-            'phpunit'
+            'phpunit',
         );
 
         $this->assertSame('.', $path);
@@ -160,21 +157,19 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTest
         $this->locatorMock
             ->expects($this->exactly(3))
             ->method('locate')
-            ->will(
-                $this->onConsecutiveCalls(
-                    $this->throwException(new Exception()),
-                    $this->throwException(new Exception()),
-                    ''
-                )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new Exception()),
+                $this->throwException(new Exception()),
+                '',
             );
 
         $path = $this->provider->get(
             new IO(
                 $this->createStreamableInput($this->getInputStream("abc\n")),
-                $this->createStreamOutput()
+                $this->createStreamOutput(),
             ),
             [],
-            'phpunit'
+            'phpunit',
         );
 
         $this->assertSame('.', $path); // fallbacks to default value

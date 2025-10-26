@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,23 +51,23 @@ final class Coalesce implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Swaps the coalesce operator (`??`) operands,
-e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
-TXT
+                Swaps the coalesce operator (`??`) operands,
+                e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $d = $a ?? $b ?? $c;
-# Mutation 1
-+ $d = $b ?? $a ?? $c;
-# Mutation 2
-+ $d = $a ?? $c ?? $b;
-DIFF
+                - $d = $a ?? $b ?? $c;
+                # Mutation 1
+                + $d = $b ?? $a ?? $c;
+                # Mutation 2
+                + $d = $a ?? $c ?? $b;
+                DIFF,
         );
     }
 
@@ -81,17 +82,18 @@ DIFF
         $right = $node->right;
 
         if ($right instanceof Node\Expr\BinaryOp\Coalesce) {
-            $left = new Node\Expr\BinaryOp\Coalesce($node->left, $right->right, $right->getAttributes());
+            $left = new Node\Expr\BinaryOp\Coalesce($node->left, $right->right, NodeAttributes::getAllExceptOriginalNode($right));
             $right = $right->left;
         }
 
-        yield new Node\Expr\BinaryOp\Coalesce($right, $left, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Coalesce($right, $left, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
     {
         return $node instanceof Node\Expr\BinaryOp\Coalesce
             && !$node->left instanceof Node\Expr\ConstFetch
-            && !$node->left instanceof Node\Expr\ClassConstFetch;
+            && !$node->left instanceof Node\Expr\ClassConstFetch
+            && !($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toLowerString() === 'null');
     }
 }

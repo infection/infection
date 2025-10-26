@@ -35,259 +35,262 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapArrayIntersectKey;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArrayIntersectKey::class)]
 final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
-PHP
+                $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                    $a = ['foo' => 'bar'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['bar' => 'baz'];
-PHP
+                    $a = ['bar' => 'baz'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_key(\Class_With_Const::Const, ['bar' => 'baz']);
-PHP
+                $a = array_intersect_key(\Class_With_Const::Const, ['bar' => 'baz']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                    $a = \Class_With_Const::Const;
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['bar' => 'baz'];
-PHP
+                    $a = ['bar' => 'baz'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_intersect_key' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
-PHP
+                $a = \array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                    $a = ['foo' => 'bar'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['bar' => 'baz'];
-PHP
+                    $a = ['bar' => 'baz'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if (array_intersect_key($a, ['bar' => 'baz']) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if (array_intersect_key($a, ['bar' => 'baz']) === $a) {
+                    return true;
+                }
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                    $a = ['foo' => 'bar'];
+                    if ($a === $a) {
+                        return true;
+                    }
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-if (['bar' => 'baz'] === $a) {
-    return true;
-}
-PHP
+                    $a = ['foo' => 'bar'];
+                    if (['bar' => 'baz'] === $a) {
+                        return true;
+                    }
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when array_intersect_key is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRrAy_InTeRsEcT_kEy(['foo' => 'bar'], ['bar' => 'baz']);
-PHP
+                $a = aRrAy_InTeRsEcT_kEy(['foo' => 'bar'], ['bar' => 'baz']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                    $a = ['foo' => 'bar'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['bar' => 'baz'];
-PHP
+                    $a = ['bar' => 'baz'];
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when array_intersect_key uses functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_key($foo->bar(), $foo->baz());
-PHP
+                $a = array_intersect_key($foo->bar(), $foo->baz());
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->bar();
-PHP
+                    $a = $foo->bar();
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = $foo->baz();
-PHP
+                    $a = $foo->baz();
+                    PHP
                 ,
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']));
-PHP
+                $a = array_map('strtolower', array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']));
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                    $a = array_map('strtolower', ['foo' => 'bar']);
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = array_map('strtolower', ['bar' => 'baz']);
-PHP
+                    $a = array_map('strtolower', ['bar' => 'baz']);
+                    PHP,
             ],
         ];
 
         yield 'It mutates correctly when only one parameter is present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_key(['foo' => 'bar']);
-PHP
+                $a = array_intersect_key(['foo' => 'bar']);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz'], ['E', 'F']);
-PHP
+                $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz'], ['E', 'F']);
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                    $a = ['foo' => 'bar'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['bar' => 'baz'];
-PHP
+                    $a = ['bar' => 'baz'];
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = ['E', 'F'];
-PHP
+                    $a = ['E', 'F'];
+                    PHP,
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['A', 'B', 'C']);
-PHP
+                $a = array_map('strtolower', ['A', 'B', 'C']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_intersect_key' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_intersect_key($array, $array1, $array2)
-{
-}
-PHP
+                function array_intersect_key($array, $array1, $array2)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not break when provided with a variable function name' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_intersect_key';
+                $a = 'array_intersect_key';
 
-$b = $a([1,2,3], [3,4,5]);
-PHP
+                $b = $a([1,2,3], [3,4,5]);
+                PHP
             ,
         ];
     }

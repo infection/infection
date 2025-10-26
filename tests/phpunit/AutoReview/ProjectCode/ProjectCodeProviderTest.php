@@ -37,18 +37,16 @@ namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function class_exists;
 use function interface_exists;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
+use function sprintf;
 use function trait_exists;
 
-/**
- * @covers \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider
- */
+#[CoversClass(ProjectCodeProvider::class)]
 final class ProjectCodeProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesProvider')]
     public function test_source_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -61,28 +59,24 @@ final class ProjectCodeProviderTest extends TestCase
                 . ' problematic file is not a class file declaration, add it to the list of '
                 . 'excluded files in %s::provideSourceClasses().',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::concreteSourceClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
     public function test_concrete_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className, true),
             sprintf(
                 'Expected "%s" to be a class.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonTestedConcreteClassesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'nonTestedConcreteClassesProvider')]
     public function test_non_tested_concrete_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -91,28 +85,24 @@ final class ProjectCodeProviderTest extends TestCase
                 'The class "%s" no longer exists. Please remove it from the list of non tested '
                 . 'classes in %s::NON_TESTED_CONCRETE_CLASSES.',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::sourceClassesToCheckForPublicPropertiesProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'sourceClassesToCheckForPublicPropertiesProvider')]
     public function test_source_classes_to_check_for_public_properties_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className, true) || trait_exists($className, true),
             sprintf(
                 'Expected "%s" to be either a class or a trait.',
-                $className
-            )
+                $className,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::classesTestProvider
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'classesTestProvider')]
     public function test_test_classes_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -125,14 +115,12 @@ final class ProjectCodeProviderTest extends TestCase
                 . ' problematic file is not a class file declaration, add it to the list of '
                 . 'excluded files in %s::provideTestClasses().',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider::nonFinalExtensionClasses
-     */
+    #[DataProviderExternal(ProjectCodeProvider::class, 'nonFinalExtensionClasses')]
     public function test_non_final_extension_classes_provider_is_valid(string $className): void
     {
         $this->assertTrue(
@@ -144,8 +132,8 @@ final class ProjectCodeProviderTest extends TestCase
                 . ' interface or trait. Please check for typos in the class name. If the '
                 . ' class no longer exists, remove it from %s::NON_FINAL_EXTENSION_CLASSES.',
                 $className,
-                ProjectCodeProvider::class
-            )
+                ProjectCodeProvider::class,
+            ),
         );
     }
 }

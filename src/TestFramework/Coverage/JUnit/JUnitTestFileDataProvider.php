@@ -40,7 +40,7 @@ use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
-use function Safe\sprintf;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,13 +48,11 @@ use Webmozart\Assert\Assert;
  */
 final class JUnitTestFileDataProvider implements TestFileDataProvider
 {
-    private JUnitReportLocator $jUnitLocator;
-
     private ?SafeDOMXPath $xPath = null;
 
-    public function __construct(JUnitReportLocator $jUnitLocator)
-    {
-        $this->jUnitLocator = $jUnitLocator;
+    public function __construct(
+        private readonly JUnitReportLocator $jUnitLocator,
+    ) {
     }
 
     /**
@@ -64,7 +62,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     {
         $xPath = $this->getXPath();
 
-        /** @var DOMNodeList<DOMElement> $nodes */
+        /** @var DOMNodeList<DOMElement>|null $nodes */
         $nodes = null;
 
         foreach (self::testCaseMapGenerator($fullyQualifiedClassName) as $queryString => $placeholder) {
@@ -80,7 +78,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
         if ($nodes->length === 0) {
             throw TestFileNameNotFoundException::notFoundFromFQN(
                 $fullyQualifiedClassName,
-                $this->jUnitLocator->locate()
+                $this->jUnitLocator->locate(),
             );
         }
 
@@ -88,7 +86,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
         return new TestFileTimeData(
             $nodes[0]->getAttribute('file'),
-            (float) $nodes[0]->getAttribute('time')
+            (float) $nodes[0]->getAttribute('time'),
         );
     }
 
@@ -112,7 +110,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     private function getXPath(): SafeDOMXPath
     {
-        return $this->xPath ?? $this->xPath = self::createXPath($this->jUnitLocator->locate());
+        return $this->xPath ??= self::createXPath($this->jUnitLocator->locate());
     }
 
     private static function createXPath(string $jUnitPath): SafeDOMXPath

@@ -44,27 +44,28 @@ use function Safe\preg_match;
 final class XmlConfigurationVersionProvider
 {
     private const LAST_LEGACY_VERSION = '9.2';
+
     private const NEXT_MAINSTREAM_VERSION = '9.3';
 
     public function provide(SafeDOMXPath $xPath): string
     {
         // <coverage>
-        if ($xPath->query('/phpunit/coverage')->length) {
+        if ($xPath->query('/phpunit/coverage')->length > 0) {
             return self::NEXT_MAINSTREAM_VERSION;
         }
 
         // <logging><log type="*">
-        if ($xPath->query('/phpunit/logging/log')->length) {
+        if ($xPath->query('/phpunit/logging/log')->length > 0) {
             return self::LAST_LEGACY_VERSION;
         }
 
         // <logging><*> where <*> isn't <log>
-        if ($xPath->query('/phpunit/logging/*[name(.) != "log"]')->length) {
+        if ($xPath->query('/phpunit/logging/*[name(.) != "log"]')->length > 0) {
             return self::NEXT_MAINSTREAM_VERSION;
         }
 
         // <filter><whitelist>
-        if ($xPath->query('/phpunit/filter')->length) {
+        if ($xPath->query('/phpunit/filter')->length > 0) {
             return self::LAST_LEGACY_VERSION;
         }
 
@@ -72,7 +73,7 @@ final class XmlConfigurationVersionProvider
             'disableCodeCoverageIgnore', // <phpunit disableCodeCoverageIgnore="true">
             'ignoreDeprecatedCodeUnitsFromCodeCoverage', // <phpunit ignoreDeprecatedCodeUnitsFromCodeCoverage="true">
         ] as $legacyAttribute) {
-            if ($xPath->query("/phpunit[@{$legacyAttribute}]")->length) {
+            if ($xPath->query("/phpunit[@{$legacyAttribute}]")->length > 0) {
                 return self::LAST_LEGACY_VERSION;
             }
         }
@@ -93,7 +94,7 @@ final class XmlConfigurationVersionProvider
          */
         $match = [];
 
-        if (preg_match('#(\d+\.\d)(/phpunit)?\.xsd$#', $schemaUri, $match)) {
+        if (preg_match('#(\d+\.\d)(/phpunit)?\.xsd$#', $schemaUri, $match) === 1) {
             return $match[1];
         }
 

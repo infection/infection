@@ -41,31 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayReverse extends AbstractUnwrapMutator
+final class UnwrapArrayReverse extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_reverse` function call with its first operand. For example:
+                Replaces an `array_reverse` function call with its first operand. For example:
 
-```php
-$x = array_reverse(['foo', 'bar', 'baz'], 1);
-```
+                ```php
+                $x = array_reverse(['foo', 'bar', 'baz'], 1);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_reverse(['foo', 'bar', 'baz'], 1);
-+ $x = ['foo', 'bar', 'baz'];
-DIFF
+                - $x = array_reverse(['foo', 'bar', 'baz'], 1);
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 

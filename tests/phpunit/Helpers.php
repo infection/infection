@@ -41,9 +41,9 @@ use function explode;
 use function implode;
 use function random_int;
 use function Safe\realpath;
-use function Safe\substr;
 use function str_replace;
 use function strrpos;
+use function substr;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
@@ -67,8 +67,8 @@ function normalize_trailing_spaces(string $value): string
         "\n",
         array_map(
             'rtrim',
-            explode("\n", normalizeLineReturn($value))
-        )
+            explode("\n", normalizeLineReturn($value)),
+        ),
     );
 }
 
@@ -115,7 +115,7 @@ function make_tmp_dir(string $namespace, string $className): string
             $filesystem->mkdir($tmpDir, 0777);
 
             $result = true;
-        } catch (IOException $exception) {
+        } catch (IOException) {
             ++$attempts;
         }
     } while ($result === false && $attempts <= 10);

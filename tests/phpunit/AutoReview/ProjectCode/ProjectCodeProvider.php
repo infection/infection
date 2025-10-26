@@ -36,12 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\AutoReview\ProjectCode;
 
 use function array_filter;
-use function array_map;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
-use Infection\Command\RunCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -52,36 +50,51 @@ use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\FileSystem\SourceFileCollector;
+use Infection\Framework\Enum\EnumBucket;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutation\MutationAttributeKeys;
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\Process\OriginalPhpProcess;
+use Infection\Process\Runner\IndexedMutantProcessContainer;
+use Infection\Process\ShellCommandLineExecutor;
+use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
+use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\TestFrameworkTypes;
+use Infection\Testing\BaseMutatorTestCase;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SimpleMutation;
+use Infection\Testing\SimpleMutationsCollectorVisitor;
+use Infection\Testing\SingletonContainer;
+use Infection\Testing\SourceTestClassNameScheme;
+use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
 use function ltrim;
+use function Pipeline\take;
 use ReflectionClass;
-use function Safe\sort;
-use function Safe\sprintf;
+use function sort;
 use const SORT_STRING;
+use function sprintf;
 use function str_replace;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -96,24 +109,41 @@ final class ProjectCodeProvider
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
         ConfigureCommand::class,
-        RunCommand::class,
         Application::class,
         ProgressFormatter::class,
-        OriginalPhpProcess::class,
-        ComposerExecutableFinder::class,
+        ConcreteComposerExecutableFinder::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
-        TestFrameworkTypes::class,
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
-        DetectionStatus::class,
         DummyFileSystem::class,
-        MutationAttributeKeys::class,
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
-        GitDiffFileProvider::class,
+        ShellCommandLineExecutor::class,
+        CpuCoresCountProvider::class,
+        DispatchPcntlSignalSubscriber::class,
+        StopInfectionOnSigintSignalSubscriber::class,
+        MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MutatorName::class,
+        BaseMutatorTestCase::class,
+        SimpleMutation::class,
+        StringNormalizer::class,
+        SourceTestClassNameScheme::class,
+        SimpleMutationsCollectorVisitor::class,
+        SingletonContainer::class,
+    ];
+
+    /**
+     * This array contains all classes that have tests but for which the test case
+     * does not follow the pattern "Acme\Service\Foo" -> "Acme\Tests\FooTest".
+     * For example, test cases that are in a child directory.
+     */
+    public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+        FilterBuilder::class,
+        SourceFileCollector::class,
+        EnumBucket::class,
     ];
 
     /**
@@ -138,6 +168,10 @@ final class ProjectCodeProvider
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
+        Mutator::class,
+        Definition::class,
+        MutatorCategory::class,
+        BaseMutatorTestCase::class,
     ];
 
     /**
@@ -166,24 +200,18 @@ final class ProjectCodeProvider
         $finder = Finder::create()
             ->files()
             ->name('*.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
+            ->notName('__Name__.php')
+            ->notName('__Name__Test.php')
             ->in(__DIR__ . '/../../../../src')
         ;
 
-        $classes = array_map(
-            static function (SplFileInfo $file) {
-                return sprintf(
-                    '%s\\%s%s%s',
-                    'Infection',
-                    str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
-                    $file->getRelativePath() ? '\\' : '',
-                    $file->getBasename('.' . $file->getExtension())
-                );
-            },
-            iterator_to_array($finder, false)
-        );
-        sort($classes, SORT_STRING);
+        self::$sourceClasses = take($finder)
+            ->cast(self::castSplFileInfoToFQCN(...))
+            ->toList();
 
-        self::$sourceClasses = $classes;
+        sort(self::$sourceClasses, SORT_STRING);
 
         yield from self::$sourceClasses;
     }
@@ -191,7 +219,7 @@ final class ProjectCodeProvider
     public static function sourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideSourceClasses()
+            self::provideSourceClasses(),
         );
     }
 
@@ -199,14 +227,14 @@ final class ProjectCodeProvider
     {
         yield from ConcreteClassReflector::filterByConcreteClasses(iterator_to_array(
             self::provideSourceClasses(),
-            true
+            true,
         ));
     }
 
     public static function concreteSourceClassesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideConcreteSourceClasses()
+            self::provideConcreteSourceClasses(),
         );
     }
 
@@ -224,18 +252,21 @@ final class ProjectCodeProvider
                 $reflectionClass = new ReflectionClass($className);
 
                 return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isEnum()
                     && !in_array(
                         $className,
                         [
+                            // having public properties on DTO is for performance reasons
                             TestLocations::class,
                             SourceMethodLineRange::class,
                             NodeLineRangeData::class,
                             TestFileTimeData::class,
+                            IndexedMutantProcessContainer::class,
                         ],
-                        true
+                        true,
                     )
                 ;
-            }
+            },
         );
 
         yield from self::$sourceClassesToCheckForPublicProperties;
@@ -244,7 +275,7 @@ final class ProjectCodeProvider
     public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideSourceClassesToCheckForPublicProperties()
+            self::provideSourceClassesToCheckForPublicProperties(),
         );
     }
 
@@ -261,7 +292,8 @@ final class ProjectCodeProvider
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
             ->notName('Helpers.php')
-            ->notPath('xdebug-filter.php')
+            ->notName('DummySymfony5FileSystem.php')
+            ->notName('DummySymfony6FileSystem.php')
             ->exclude([
                 'autoloaded',
                 'benchmark',
@@ -270,24 +302,11 @@ final class ProjectCodeProvider
             ])
         ;
 
-        $classes = array_map(
-            static function (SplFileInfo $file) {
-                $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
-                $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+        self::$testClasses = take($finder)
+            ->cast(self::castTestSplFileInfoToFQCN(...))
+            ->toList();
 
-                return sprintf(
-                    'Infection\\Tests\\%s%s%s',
-                    $fqcnPart,
-                    $file->getRelativePath() === 'phpunit' ? '' : '\\',
-                    $file->getBasename('.' . $file->getExtension())
-                );
-            },
-            iterator_to_array($finder, false)
-        );
-
-        sort($classes, SORT_STRING);
-
-        self::$testClasses = $classes;
+        sort(self::$testClasses, SORT_STRING);
 
         yield from self::$testClasses;
     }
@@ -297,21 +316,46 @@ final class ProjectCodeProvider
     public static function classesTestProvider(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::provideTestClasses()
+            self::provideTestClasses(),
         );
     }
 
     public static function nonTestedConcreteClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
-            self::NON_TESTED_CONCRETE_CLASSES
-        );
+        yield from generator_to_phpunit_data_provider([
+            ...self::NON_TESTED_CONCRETE_CLASSES,
+            ...self::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION,
+        ]);
     }
 
     public static function nonFinalExtensionClasses(): iterable
     {
         yield from generator_to_phpunit_data_provider(
-            self::NON_FINAL_EXTENSION_CLASSES
+            self::NON_FINAL_EXTENSION_CLASSES,
+        );
+    }
+
+    private static function castSplFileInfoToFQCN(SplFileInfo $file): string
+    {
+        return sprintf(
+            '%s\\%s%s%s',
+            'Infection',
+            str_replace(DIRECTORY_SEPARATOR, '\\', $file->getRelativePath()),
+            $file->getRelativePath() !== '' ? '\\' : '',
+            $file->getBasename('.' . $file->getExtension()),
+        );
+    }
+
+    private static function castTestSplFileInfoToFQCN(SplFileInfo $file): string
+    {
+        $fqcnPart = ltrim(str_replace('phpunit', '', $file->getRelativePath()), DIRECTORY_SEPARATOR);
+        $fqcnPart = str_replace(DIRECTORY_SEPARATOR, '\\', $fqcnPart);
+
+        return sprintf(
+            'Infection\\Tests\\%s%s%s',
+            $fqcnPart,
+            $file->getRelativePath() === 'phpunit' ? '' : '\\',
+            $file->getBasename('.' . $file->getExtension()),
         );
     }
 }

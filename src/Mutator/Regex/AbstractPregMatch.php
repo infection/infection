@@ -38,6 +38,7 @@ namespace Infection\Mutator\Regex;
 use Generator;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use function strtolower;
@@ -56,18 +57,20 @@ abstract class AbstractPregMatch implements Mutator
      *
      * @psalm-mutation-free
      *
-     * @return iterable<Node\Expr\FuncCall>
+     * @return iterable<FuncCall>
      */
     public function mutate(Node $node): iterable
     {
-        $arguments = $node->args;
-        $firstArgument = $arguments[0];
-        $originalRegex = $this->pullOutRegex($firstArgument);
+        if ($node->args[0] instanceof Node\VariadicPlaceholder) {
+            return [];
+        }
+
+        $originalRegex = $this->pullOutRegex($node->args[0]);
 
         foreach ($this->mutateRegex($originalRegex) as $mutatedRegex) {
-            $newArgument = $this->getNewRegexArgument($mutatedRegex, $firstArgument);
+            $newArgument = $this->getNewRegexArgument($mutatedRegex, $node->args[0]);
 
-            yield new FuncCall($node->name, [$newArgument] + $arguments, $node->getAttributes());
+            yield new FuncCall($node->name, [$newArgument] + $node->args, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 
@@ -76,6 +79,7 @@ abstract class AbstractPregMatch implements Mutator
         return $node instanceof FuncCall
             && $node->name instanceof Node\Name
             && strtolower((string) $node->name) === 'preg_match'
+            && $node->args[0] instanceof Node\Arg
             && $node->args[0]->value instanceof Node\Scalar\String_
             && $this->isProperRegexToMutate($this->pullOutRegex($node->args[0]));
     }
@@ -106,8 +110,8 @@ abstract class AbstractPregMatch implements Mutator
     private function getNewRegexArgument(string $regex, Node\Arg $argument): Node\Arg
     {
         return new Node\Arg(
-            new Node\Scalar\String_($regex, $argument->value->getAttributes()),
-            $argument->byRef, $argument->unpack, $argument->getAttributes()
+            new Node\Scalar\String_($regex, NodeAttributes::getAllExceptOriginalNode($argument->value)),
+            $argument->byRef, $argument->unpack, NodeAttributes::getAllExceptOriginalNode($argument),
         );
     }
 }

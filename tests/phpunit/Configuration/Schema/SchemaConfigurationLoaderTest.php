@@ -39,10 +39,13 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\FileSystem\Locator\Locator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
+#[CoversClass(SchemaConfigurationLoader::class)]
 final class SchemaConfigurationLoaderTest extends TestCase
 {
     /**
@@ -67,19 +70,18 @@ final class SchemaConfigurationLoaderTest extends TestCase
 
         $this->loader = new SchemaConfigurationLoader(
             $this->locatorStub,
-            $this->configFileLoaderStub
+            $this->configFileLoaderStub,
         );
     }
 
     /**
-     * @dataProvider configurationPathsProvider
-     *
      * @param string[] $potentialPaths
      */
+    #[DataProvider('configurationPathsProvider')]
     public function test_it_loads_the_located_file(
         array $potentialPaths,
         string $expectedPath,
-        SchemaConfiguration $expectedConfig
+        SchemaConfiguration $expectedConfig,
     ): void {
         $this->locatorStub
             ->expects($this->once())
@@ -100,7 +102,7 @@ final class SchemaConfigurationLoaderTest extends TestCase
         $this->assertSame($expectedConfig, $actualConfig);
     }
 
-    public function configurationPathsProvider(): iterable
+    public static function configurationPathsProvider(): iterable
     {
         $config = (new ReflectionClass(SchemaConfiguration::class))->newInstanceWithoutConstructor();
 

@@ -50,7 +50,7 @@ use function Safe\getcwd;
 use function Safe\preg_match;
 use function Safe\putenv;
 use function Safe\realpath;
-use function Safe\substr;
+use function substr;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use function trim;
@@ -61,10 +61,17 @@ use Webmozart\Assert\Assert;
  */
 class TestFrameworkFinder
 {
+    private const BAT_EXTENSION_LENGTH = 4;
+
     /**
      * @var array<string, string>
      */
     private array $cachedPath = [];
+
+    public function __construct(
+        private readonly ComposerExecutableFinder $executableFinder,
+    ) {
+    }
 
     public function find(string $testFrameworkName, string $customPath = ''): string
     {
@@ -77,7 +84,7 @@ class TestFrameworkFinder
 
             Assert::string($this->cachedPath[$testFrameworkName]);
 
-            if (substr($this->cachedPath[$testFrameworkName], -4) === '.bat') {
+            if (substr($this->cachedPath[$testFrameworkName], -self::BAT_EXTENSION_LENGTH) === '.bat') {
                 $this->cachedPath[$testFrameworkName] = $this->findFromBatchFile($this->cachedPath[$testFrameworkName]);
             }
         }
@@ -87,7 +94,7 @@ class TestFrameworkFinder
 
     private function shouldUseCustomPath(string $testFrameworkName, string $customPath): bool
     {
-        if (!$customPath) {
+        if ($customPath === '') {
             return false;
         }
 
@@ -111,7 +118,7 @@ class TestFrameworkFinder
 
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             $candidate = getcwd() . '/vendor/bin';
 
             if (file_exists($candidate)) {
@@ -120,14 +127,14 @@ class TestFrameworkFinder
         }
 
         if ($vendorPath !== null) {
-            $pathName = getenv('PATH') ? 'PATH' : 'Path';
+            $pathName = getenv('PATH') !== false ? 'PATH' : 'Path';
             putenv($pathName . '=' . $vendorPath . PATH_SEPARATOR . getenv($pathName));
         }
     }
 
     private function findComposer(): string
     {
-        return (new ComposerExecutableFinder())->find();
+        return $this->executableFinder->find();
     }
 
     private function findTestFramework(string $testFrameworkName, string $customPath): string
@@ -159,7 +166,9 @@ class TestFrameworkFinder
         $extraDirs = [$cwd, $cwd . '/bin'];
 
         foreach ($candidates as $name) {
-            if ($path = $finder->find($name, null, $extraDirs)) {
+            $path = $finder->find($name, null, $extraDirs);
+
+            if ($path !== null) {
                 return $path;
             }
         }
@@ -183,7 +192,7 @@ class TestFrameworkFinder
          *   SET BIN_TARGET=%~dp0/../path
          *   php %~dp0/path %*
          */
-        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match)) {
+        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 

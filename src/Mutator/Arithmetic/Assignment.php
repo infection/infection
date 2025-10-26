@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,20 +51,20 @@ final class Assignment implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
-assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
-TXT
+                Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
+                assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $a += $b;
-+ $a = $b;
-DIFF
+                - $a += $b;
+                + $a = $b;
+                DIFF,
         );
     }
 
@@ -74,11 +75,15 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\Assign(
+            $node->var,
+            $node->expr,
+            NodeAttributes::getAllExceptOriginalNode($node),
+        );
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp;
+        return $node instanceof Node\Expr\AssignOp && !$node instanceof Node\Expr\AssignOp\Coalesce;
     }
 }

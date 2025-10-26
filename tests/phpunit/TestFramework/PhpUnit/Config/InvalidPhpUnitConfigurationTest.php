@@ -37,8 +37,10 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(InvalidPhpUnitConfiguration::class)]
 final class InvalidPhpUnitConfigurationTest extends TestCase
 {
     public function test_for_root_node(): void
@@ -47,7 +49,7 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
 
         $this->assertSame(
             'The file "/path/to/phpunit.xml" is not a valid PHPUnit configuration file',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -55,16 +57,16 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
     {
         $exception = InvalidPhpUnitConfiguration::byXsdSchema(
             '/path/to/phpunit.xml',
-            '<lib-xml-errors>'
+            '<lib-xml-errors>',
         );
 
         $this->assertSame(
             <<<'TXT'
-The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
-<lib-xml-errors>
-TXT
+                The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
+                <lib-xml-errors>
+                TXT
             ,
-            normalizeLineReturn($exception->getMessage())
+            normalizeLineReturn($exception->getMessage()),
         );
     }
 }

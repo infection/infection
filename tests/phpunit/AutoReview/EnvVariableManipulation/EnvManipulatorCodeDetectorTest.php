@@ -35,16 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\EnvVariableManipulation;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\Tests\AutoReview\EnvVariableManipulation\EnvManipulatorCodeDetector
- */
+#[CoversClass(EnvManipulatorCodeDetector::class)]
 final class EnvManipulatorCodeDetectorTest extends TestCase
 {
-    /**
-     * @dataProvider codeProvider
-     */
+    #[DataProvider('codeProvider')]
     public function test_it_can_detect_environment_variable_manipulations(string $code, bool $expected): void
     {
         $actual = EnvManipulatorCodeDetector::codeManipulatesEnvVariables($code);
@@ -52,7 +50,7 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): iterable
+    public static function codeProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -61,75 +59,75 @@ final class EnvManipulatorCodeDetectorTest extends TestCase
 
         yield 'putenv core function' => [
             <<<'PHP'
-<?php
-putenv("FOO=BAR");
-PHP
+                <?php
+                putenv("FOO=BAR");
+                PHP
             ,
             false,   // Cannot detect this case since this is not a FQ call
         ];
 
         yield 'putenv core function FQ call' => [
             <<<'PHP'
-<?php
-\putenv("FOO=BAR");
-PHP
+                <?php
+                \putenv("FOO=BAR");
+                PHP
             ,
             true,
         ];
 
         yield 'putenv core function imported' => [
             <<<'PHP'
-<?php
-use function putenv;
-PHP
+                <?php
+                use function putenv;
+                PHP
             ,
             true,
         ];
 
         yield 'putenv Safe function' => [
             <<<'PHP'
-<?php
-Safe\putenv('FOO=BAR');
-PHP
+                <?php
+                Safe\putenv('FOO=BAR');
+                PHP
             ,
             true,
         ];
 
         yield 'putenv Safe function FQ call' => [
             <<<'PHP'
-<?php
-\Safe\putenv('FOO=BAR');
-PHP
+                <?php
+                \Safe\putenv('FOO=BAR');
+                PHP
             ,
             true,
         ];
 
         yield 'putenv Safe function imported' => [
             <<<'PHP'
-<?php
-use function Safe\putenv;
-PHP
+                <?php
+                use function Safe\putenv;
+                PHP
             ,
             true,
         ];
 
         yield 'readonly env function' => [
             <<<'PHP'
-<?php
-getenv('FOO');
-PHP
+                <?php
+                getenv('FOO');
+                PHP
             ,
             false,
         ];
 
         yield 'Statement containing a word match of a FS function' => [
             <<<'PHP'
-<?php
+                <?php
 
-/**
- * putenv
- */
-PHP
+                /**
+                 * putenv
+                 */
+                PHP
             ,
             false,
         ];

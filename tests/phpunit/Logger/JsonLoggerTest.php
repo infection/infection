@@ -41,35 +41,34 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use const JSON_THROW_ON_ERROR;
-use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\json_decode;
-use function str_replace;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(JsonLogger::class)]
 final class JsonLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         bool $onlyCovered,
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
-        array $expectedContents
+        array $expectedContents,
     ): void {
         $logger = new JsonLogger($metricsCalculator, $resultsCollector, $onlyCovered);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations; only covered' => [
             true,
@@ -79,10 +78,13 @@ final class JsonLoggerTest extends TestCase
                 'stats' => [
                     'totalMutantsCount' => 0,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
+                    'ignoredCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
                     'mutationCodeCoverage' => 0,
@@ -91,27 +93,33 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
+                'syntaxErrors' => [],
                 'uncovered' => [],
+                'ignored' => [],
             ],
         ];
 
         yield 'all mutations; only covered' => [
             true,
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             [
                 'stats' => [
-                    'totalMutantsCount' => 12,
+                    'totalMutantsCount' => 17,
                     'killedCount' => 2,
+                    'killedByStaticAnalysisCount' => 1,
                     'notCoveredCount' => 2,
                     'escapedCount' => 2,
                     'errorCount' => 2,
+                    'syntaxErrorCount' => 2,
                     'skippedCount' => 2,
+                    'ignoredCount' => 2,
                     'timeOutCount' => 2,
-                    'msi' => 60,
-                    'mutationCodeCoverage' => 80,
-                    'coveredCodeMsi' => 75,
+                    'msi' => 69.23,
+                    'mutationCodeCoverage' => 84.62,
+                    'coveredCodeMsi' => 81.82,
                 ],
                 'escaped' => [
                     [
@@ -122,7 +130,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -133,7 +141,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -146,7 +154,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#1';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -157,7 +165,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#0';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -170,7 +178,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#1';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -181,7 +189,20 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#0';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
+                'killedByStaticAnalysis' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'PregQuote',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 9,
+                        ],
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed by SA#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -194,7 +215,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#1';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -205,26 +226,77 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#0';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
+                'syntaxErrors' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'PregQuote',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 9,
+                        ],
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#1';"),
+                        'processOutput' => 'process output',
+                    ],
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
                 'uncovered' => [],
+                'ignored' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'PregQuote',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 9,
+                        ],
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#1';"),
+                        'processOutput' => 'process output',
+                    ],
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
             ],
         ];
 
         yield 'uncovered mutations' => [
             false,
-            $this->createUncoveredMetricsCalculator(),
-            $this->createUncoveredResultsCollector(),
+            self::createUncoveredMetricsCalculator(),
+            self::createUncoveredResultsCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 1,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 1,
                     'escapedCount' => 0,
                     'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
+                    'ignoredCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
                     'mutationCodeCoverage' => 0,
@@ -233,7 +305,9 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
+                'syntaxErrors' => [],
                 'uncovered' => [
                     [
                         'mutator' => [
@@ -243,7 +317,51 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'uncovered#0';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'uncovered#0';"),
+                        'processOutput' => 'process output',
+                    ],
+                ],
+                'ignored' => [],
+            ],
+        ];
+
+        yield 'Ignored mutations' => [
+            true,
+            self::createIgnoredMetricsCalculator(),
+            self::createIgnoredResultsCollector(),
+            [
+                'stats' => [
+                    'totalMutantsCount' => 1,
+                    'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
+                    'notCoveredCount' => 0,
+                    'escapedCount' => 0,
+                    'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
+                    'skippedCount' => 0,
+                    'ignoredCount' => 1,
+                    'timeOutCount' => 0,
+                    'msi' => 0,
+                    'mutationCodeCoverage' => 0,
+                    'coveredCodeMsi' => 0,
+                ],
+                'escaped' => [],
+                'timeouted' => [],
+                'killed' => [],
+                'killedByStaticAnalysis' => [],
+                'errored' => [],
+                'syntaxErrors' => [],
+                'uncovered' => [],
+                'ignored' => [
+                    [
+                        'mutator' => [
+                            'mutatorName' => 'For_',
+                            'originalSourceCode' => '<?php $a = 1;',
+                            'mutatedSourceCode' => '<?php $a = 2;',
+                            'originalFilePath' => 'foo/bar',
+                            'originalStartLine' => 10,
+                        ],
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -253,15 +371,18 @@ final class JsonLoggerTest extends TestCase
         yield 'Non UTF-8 characters' => [
             false,
             new MetricsCalculator(2),
-            $this->createNonUtf8CharactersCollector(),
+            self::createNonUtf8CharactersCollector(),
             [
                 'stats' => [
                     'totalMutantsCount' => 0,
                     'killedCount' => 0,
+                    'killedByStaticAnalysisCount' => 0,
                     'notCoveredCount' => 0,
                     'escapedCount' => 0,
                     'errorCount' => 0,
+                    'syntaxErrorCount' => 0,
                     'skippedCount' => 0,
+                    'ignoredCount' => 0,
                     'timeOutCount' => 0,
                     'msi' => 0,
                     'mutationCodeCoverage' => 0,
@@ -270,7 +391,9 @@ final class JsonLoggerTest extends TestCase
                 'escaped' => [],
                 'timeouted' => [],
                 'killed' => [],
+                'killedByStaticAnalysis' => [],
                 'errored' => [],
+                'syntaxErrors' => [],
                 'uncovered' => [
                     [
                         'mutator' => [
@@ -280,10 +403,11 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
+                        'diff' => LineReturnNormalizer::normalize("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
                         'processOutput' => 'process output',
                     ],
                 ],
+                'ignored' => [],
             ],
         ];
     }
@@ -293,46 +417,76 @@ final class JsonLoggerTest extends TestCase
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));
     }
 
-    private function createUncoveredMetricsCalculator(): MetricsCalculator
+    private static function createUncoveredMetricsCalculator(): MetricsCalculator
     {
         $collector = new MetricsCalculator(2);
 
-        $this->initUncoveredCollector($collector);
+        self::initUncoveredCollector($collector);
 
         return $collector;
     }
 
-    private function createUncoveredResultsCollector(): ResultsCollector
+    private static function createUncoveredResultsCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
-        $this->initUncoveredCollector($collector);
+        self::initUncoveredCollector($collector);
 
         return $collector;
     }
 
-    private function initUncoveredCollector(Collector $collector): void
+    private static function initUncoveredCollector(Collector $collector): void
     {
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                'uncovered#0'
+                'uncovered#0',
             ),
         );
     }
 
-    private function createNonUtf8CharactersCollector(): ResultsCollector
+    private static function createIgnoredMetricsCalculator(): MetricsCalculator
+    {
+        $collector = new MetricsCalculator(2);
+
+        self::initIgnoredCollector($collector);
+
+        return $collector;
+    }
+
+    private static function createIgnoredResultsCollector(): ResultsCollector
+    {
+        $collector = new ResultsCollector();
+
+        self::initIgnoredCollector($collector);
+
+        return $collector;
+    }
+
+    private static function initIgnoredCollector(Collector $collector): void
+    {
+        $collector->collect(
+            self::createMutantExecutionResult(
+                0,
+                For_::class,
+                DetectionStatus::IGNORED,
+                'ignored#0',
+            ),
+        );
+    }
+
+    private static function createNonUtf8CharactersCollector(): ResultsCollector
     {
         $collector = new ResultsCollector();
 
         $collector->collect(
-            $this->createMutantExecutionResult(
+            self::createMutantExecutionResult(
                 0,
                 For_::class,
                 DetectionStatus::NOT_COVERED,
-                base64_decode('abc') // produces non UTF-8 character
+                base64_decode('abc', true), // produces non UTF-8 character
             ),
         );
 

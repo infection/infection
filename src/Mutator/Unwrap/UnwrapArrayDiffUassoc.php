@@ -41,32 +41,32 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayDiffUassoc extends AbstractUnwrapMutator
+final class UnwrapArrayDiffUassoc extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_diff_uassoc` function call with its first operand. For example:
+                Replaces an `array_diff_uassoc` function call with its first operand. For example:
 
-```php
-$x = array_diff_uassoc($array1, $array2, $keyCompareFunc);
-```
+                ```php
+                $x = array_diff_uassoc($array1, $array2, $keyCompareFunc);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $array1;
-```
+                ```php
+                $x = $array1;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_diff_uassoc($array1, $array2, $keyCompareFunc);
-+ $x = $array1;
-DIFF
+                - $x = array_diff_uassoc($array1, $array2, $keyCompareFunc);
+                + $x = $array1;
+                DIFF,
         );
     }
 

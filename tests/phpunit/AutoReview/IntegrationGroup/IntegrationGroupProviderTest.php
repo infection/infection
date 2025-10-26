@@ -37,38 +37,36 @@ namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function class_exists;
 use Infection\Tests\Console\E2ETest;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use function Safe\sprintf;
+use function sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider
- */
+#[CoversClass(IntegrationGroupProvider::class)]
 final class IntegrationGroupProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\IntegrationGroup\IntegrationGroupProvider::ioTestCaseTupleProvider
-     */
+    #[DataProviderExternal(IntegrationGroupProvider::class, 'ioTestCaseTupleProvider')]
     public function test_io_test_case_classes_provider_is_valid(string $testCaseClassName, string $fileWithIoOperations): void
     {
         $this->assertTrue(
             class_exists($testCaseClassName, true),
-            sprintf('Expected "%s" to be a class.', $testCaseClassName)
+            sprintf('Expected "%s" to be a class.', $testCaseClassName),
         );
 
         $testCaseReflection = new ReflectionClass($testCaseClassName);
 
         $this->assertInstanceOf(
             TestCase::class,
-            $testCaseReflection->newInstanceWithoutConstructor()
+            $testCaseReflection->newInstanceWithoutConstructor(),
         );
 
         $this->assertFalse(
             $testCaseReflection->isAbstract(),
             sprintf(
                 'Expected "%s" to be an actual test case, not a base (abstract) one.',
-                $testCaseClassName
-            )
+                $testCaseClassName,
+            ),
         );
 
         $this->assertFileExists($fileWithIoOperations);

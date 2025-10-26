@@ -39,7 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
-use const PHP_VERSION_ID;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -51,19 +51,19 @@ final class NullSafePropertyCall implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces the nullsafe property call operator (`?->`) with (`->`).
-TXT
+                Replaces the nullsafe property call operator (`?->`) with (`->`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $object?->property;
-+ $object->property;
-DIFF
+                - $object?->property;
+                + $object->property;
+                DIFF,
         );
     }
 
@@ -74,12 +74,11 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\PropertyFetch($node->var, $node->name, $node->getAttributes());
+        yield new Node\Expr\PropertyFetch($node->var, $node->name, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
     {
-        return PHP_VERSION_ID >= 80000
-            && $node instanceof Node\Expr\NullsafePropertyFetch;
+        return $node instanceof Node\Expr\NullsafePropertyFetch;
     }
 }

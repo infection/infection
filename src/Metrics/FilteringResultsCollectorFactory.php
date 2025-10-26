@@ -41,13 +41,11 @@ use Infection\Mutant\DetectionStatus;
 /**
  * @internal
  */
-final class FilteringResultsCollectorFactory
+final readonly class FilteringResultsCollectorFactory
 {
-    private TargetDetectionStatusesProvider $statusesProvider;
-
-    public function __construct(TargetDetectionStatusesProvider $statusesProvider)
-    {
-        $this->statusesProvider = $statusesProvider;
+    public function __construct(
+        private TargetDetectionStatusesProvider $statusesProvider,
+    ) {
     }
 
     public function create(Collector $targetCollector): ?Collector
@@ -59,7 +57,7 @@ final class FilteringResultsCollectorFactory
             return null;
         }
 
-        if (count($targetDetectionStatuses) === count(DetectionStatus::ALL)) {
+        if (count($targetDetectionStatuses) === count(DetectionStatus::cases())) {
             // No need to filter anything at all.
             return $targetCollector;
         }

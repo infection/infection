@@ -50,11 +50,9 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
      */
     private array $mutationChunks = [];
 
-    private NodeMutationGenerator $mutationGenerator;
-
-    public function __construct(NodeMutationGenerator $mutationGenerator)
-    {
-        $this->mutationGenerator = $mutationGenerator;
+    public function __construct(
+        private readonly NodeMutationGenerator $mutationGenerator,
+    ) {
     }
 
     public function beforeTraverse(array $nodes): ?array

@@ -36,9 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\Collector;
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
-use Infection\Tests\Mutator\MutatorName;
+use Infection\Testing\MutatorName;
 use function Later\now;
 use const PHP_EOL;
 use function str_replace;
@@ -52,8 +53,8 @@ trait CreateMutantExecutionResult
      */
     private function addMutantExecutionResult(
         Collector $collector,
-        string $detectionStatus,
-        int $count = 1
+        DetectionStatus $detectionStatus,
+        int $count = 1,
     ): array {
         $executionResults = [];
 
@@ -66,7 +67,7 @@ trait CreateMutantExecutionResult
         return $executionResults;
     }
 
-    private function createMutantExecutionResult(string $detectionStatus): MutantExecutionResult
+    private function createMutantExecutionResult(DetectionStatus $detectionStatus): MutantExecutionResult
     {
         $id = $this->id;
         ++$this->id;
@@ -79,20 +80,27 @@ trait CreateMutantExecutionResult
                 "\n",
                 PHP_EOL,
                 <<<DIFF
---- Original
-+++ New
-@@ @@
+                    --- Original
+                    +++ New
+                    @@ @@
 
-- echo 'original';
-+ echo 'mutated';
+                    - echo 'original';
+                    + echo 'mutated';
 
-DIFF
-                )),
+                    DIFF,
+            )),
+            'a1b2c3',
+            For_::class,
             MutatorName::getName(For_::class),
             'foo/bar',
             $id,
+            10 + $id,
+            $id,
+            10 + $id,
             now('<?php $a = 1;'),
-            now('<?php $a = 1;')
+            now('<?php $a = 1;'),
+            [],
+            0.0,
         );
     }
 }

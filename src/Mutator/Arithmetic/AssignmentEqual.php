@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,19 +51,19 @@ final class AssignmentEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
-TXT
+                Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- if ($a === self::VALUE);
-+ if ($a = self::VALUE);
-DIFF
+                - if ($a === self::VALUE);
+                + if ($a = self::VALUE);
+                DIFF,
         );
     }
 
@@ -73,7 +74,7 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\Assign($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\Assign($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

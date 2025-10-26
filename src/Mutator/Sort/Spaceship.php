@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use function is_numeric;
 use PhpParser\Node;
 
@@ -51,19 +52,19 @@ final class Spaceship implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
-TXT
+                Swaps the spaceship operator (`<=>`) operands, e.g. replaces `$a <=> $b` with `$b <=> $a`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = $b <=> $c;
-+ $a = $c <=> $b;
-DIFF
+                - $a = $b <=> $c;
+                + $a = $c <=> $b;
+                DIFF,
         );
     }
 
@@ -92,7 +93,7 @@ DIFF
 
     private function isCompareWithZero(Node\Expr\BinaryOp\Spaceship $node): bool
     {
-        $parentAttribute = $node->getAttribute('parent');
+        $parentAttribute = ParentConnector::findParent($node);
 
         if ($parentAttribute instanceof Node\Expr\BinaryOp\Identical) {
             return $this->isIntegerScalarEqualToZero($parentAttribute);

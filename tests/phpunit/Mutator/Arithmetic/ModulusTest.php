@@ -35,44 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\Modulus;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Modulus::class)]
 final class ModulusTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal mod' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 % 3;
-PHP
+                $a = 10 % 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 * 3;
-PHP
+                $a = 10 * 3;
+                PHP
             ,
         ];
 
         yield 'It does not mutate mod equals' => [
             <<<'PHP'
-    <?php
+                    <?php
 
-    $a = 1;
-    $a %= 2;
-PHP
+                    $a = 1;
+                    $a %= 2;
+                PHP
             ,
         ];
     }

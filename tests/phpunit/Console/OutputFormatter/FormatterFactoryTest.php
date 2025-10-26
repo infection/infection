@@ -35,27 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console\OutputFormatter;
 
-use function array_keys;
-use function implode;
 use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\Tests\Fixtures\Console\FakeOutput;
-use InvalidArgumentException;
+use Infection\Framework\Enum\EnumBucket;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
 
+#[CoversClass(FormatterFactory::class)]
 final class FormatterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider formatterProvider
-     */
+    #[DataProvider('formatterProvider')]
     public function test_it_can_create_all_known_factories(
-        string $formatterName,
-        string $expectedFormatterClassName
+        FormatterName $formatterName,
+        string $expectedFormatterClassName,
     ): void {
         $outputMock = $this->createMock(OutputInterface::class);
         $outputMock
@@ -68,35 +64,20 @@ final class FormatterFactoryTest extends TestCase
         $this->assertInstanceOf($expectedFormatterClassName, $formatter);
     }
 
-    public function test_it_provides_a_friendly_error_message_when_an_unknown_formatter_is_given(): void
-    {
-        $factory = new FormatterFactory(new FakeOutput());
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown formatter "unknown". The known formatters are: "dot", "progress"');
-
-        $factory->create('unknown');
-    }
-
     public static function formatterProvider(): iterable
     {
-        $map = [
-            FormatterName::DOT => DotFormatter::class,
-            FormatterName::PROGRESS => ProgressFormatter::class,
+        $bucket = EnumBucket::create(FormatterName::class);
+
+        yield [
+            $bucket->take(FormatterName::DOT),
+            DotFormatter::class,
         ];
 
-        Assert::same(
-            FormatterName::ALL,
-            array_keys($map),
-            sprintf(
-                'Expected the given map to contain all the known formatters "%s". Got "%s"',
-                implode('", "', FormatterName::ALL),
-                implode('", "', array_keys($map))
-            )
-        );
+        yield [
+            $bucket->take(FormatterName::PROGRESS),
+            ProgressFormatter::class,
+        ];
 
-        foreach ($map as $formatterName => $formatterClassName) {
-            yield [$formatterName, $formatterClassName];
-        }
+        $bucket->assertIsEmpty();
     }
 }

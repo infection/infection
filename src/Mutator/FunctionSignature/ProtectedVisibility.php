@@ -40,9 +40,9 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Reflection\ClassReflection;
 use Infection\Reflection\Visibility;
 use PhpParser\Node;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,16 +53,16 @@ final class ProtectedVisibility implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Replaces the `protected` method visibility keyword with `private`.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- protected function foo() {
-+ private function foo() {
-DIFF
+                - protected function foo() {
+                + private function foo() {
+                DIFF,
         );
     }
 
@@ -82,8 +82,9 @@ DIFF
                 'params' => $node->getParams(),
                 'returnType' => $node->getReturnType(),
                 'stmts' => $node->getStmts(),
+                'attrGroups' => $node->getAttrGroups(),
             ],
-            $node->getAttributes()
+            $node->getAttributes(),
         );
     }
 
@@ -93,7 +94,9 @@ DIFF
             return false;
         }
 
-        if ($node->isFinal()) {
+        $class = ReflectionVisitor::findReflectionClass($node);
+
+        if ($node->isFinal() || $class !== null && $class->isFinal()) {
             return false;
         }
 
@@ -110,8 +113,8 @@ DIFF
 
     private function hasSameProtectedParentMethod(Node\Stmt\ClassMethod $node): bool
     {
-        /** @var ClassReflection $reflection */
-        $reflection = $node->getAttribute(ReflectionVisitor::REFLECTION_CLASS_KEY);
+        $reflection = ReflectionVisitor::findReflectionClass($node);
+        Assert::notNull($reflection);
 
         return $reflection->hasParentMethodWithVisibility($node->name->name, Visibility::asProtected());
     }

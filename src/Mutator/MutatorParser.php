@@ -41,7 +41,7 @@ use function array_map;
 use function array_search;
 use function array_values;
 use function explode;
-use function Safe\sprintf;
+use function sprintf;
 use UnexpectedValueException;
 
 /**
@@ -62,7 +62,7 @@ final class MutatorParser
 
         $parsedMutators = array_filter(array_map(
             'trim',
-            explode(',', $unparsedMutators)
+            explode(',', $unparsedMutators),
         ));
 
         foreach ($parsedMutators as $index => $profileOrMutator) {
@@ -77,12 +77,16 @@ final class MutatorParser
             $mutatorShortName = array_search(
                 $profileOrMutator,
                 ProfileList::ALL_MUTATORS,
-                true
+                true,
             );
 
             if ($mutatorShortName !== false) {
                 $parsedMutators[$index] = $mutatorShortName;
 
+                continue;
+            }
+
+            if (MutatorResolver::isValidMutator($profileOrMutator)) {
                 continue;
             }
 
@@ -92,8 +96,8 @@ final class MutatorParser
                     . 'the list of available mutants and profiles.',
                     $profileOrMutator,
                     'https://infection.github.io/guide/mutators.html',
-                    'https://infection.github.io/guide/profiles.html'
-                )
+                    'https://infection.github.io/guide/profiles.html',
+                ),
             );
         }
 

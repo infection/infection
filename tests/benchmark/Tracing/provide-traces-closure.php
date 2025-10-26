@@ -44,32 +44,10 @@ use Symfony\Component\Console\Output\NullOutput;
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $container = Container::create()->withValues(
-    new NullLogger(),
-    new NullOutput(),
-    Container::DEFAULT_CONFIG_FILE,
-    Container::DEFAULT_MUTATORS_INPUT,
-    Container::DEFAULT_SHOW_MUTATIONS,
-    Container::DEFAULT_LOG_VERBOSITY,
-    Container::DEFAULT_DEBUG,
-    Container::DEFAULT_ONLY_COVERED,
-    Container::DEFAULT_FORMATTER_NAME,
-    Container::DEFAULT_NO_PROGRESS,
-    Container::DEFAULT_FORCE_PROGRESS,
-    __DIR__ . '/coverage',
-    Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-    Container::DEFAULT_SKIP_INITIAL_TESTS,
-    Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-    Container::DEFAULT_MIN_MSI,
-    Container::DEFAULT_MIN_COVERED_MSI,
-    Container::DEFAULT_MSI_PRECISION,
-    Container::DEFAULT_TEST_FRAMEWORK,
-    Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-    Container::DEFAULT_FILTER,
-    Container::DEFAULT_THREAD_COUNT,
-    Container::DEFAULT_DRY_RUN,
-    Container::DEFAULT_GIT_DIFF_FILTER,
-    Container::DEFAULT_GIT_DIFF_BASE,
-    Container::DEFAULT_USE_GITHUB_LOGGER
+    logger: new NullLogger(),
+    output: new NullOutput(),
+    existingCoveragePath: __DIR__ . '/coverage',
+    useNoopMutators: true,
 );
 
 $generateTraces = static function (?int $maxCount) use ($container): iterable {
@@ -86,21 +64,28 @@ $generateTraces = static function (?int $maxCount) use ($container): iterable {
         ++$i;
 
         if ($i === $maxCount) {
-            return;
+            break;
         }
 
         yield $trace;
     }
 };
 
-return static function (int $maxCount) use ($generateTraces): void {
+/*
+ * @return positive-int|0
+ */
+return static function (int $maxCount) use ($generateTraces): int {
     if ($maxCount < 0) {
         $maxCount = null;
     }
 
     $traces = $generateTraces($maxCount);
+    $count = 0;
 
     foreach ($traces as $_) {
+        ++$count;
         // Iterate over the generator: do not use iterator_to_array which is less GC friendly
     }
+
+    return $count;
 };

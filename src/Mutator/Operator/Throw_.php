@@ -39,41 +39,42 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
  * @internal
  *
- * @implements Mutator<Node\Stmt\Throw_>
+ * @implements Mutator<Node\Expr\Throw_>
  */
 final class Throw_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes a throw statement (`throw`). For example:
+                Removes a throw statement (`throw`). For example:
 
-```php
-throw new Exception();
-```
+                ```php
+                throw new Exception();
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-new Exception();
-```
+                ```php
+                new Exception();
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- throw new Exception();
-+ new Exception();
-DIFF
+                - throw new Exception();
+                + new Exception();
+                DIFF,
         );
     }
 
@@ -82,15 +83,33 @@ DIFF
      *
      * Replaces "throw new Exception();" with "new Exception();"
      *
-     * @return iterable<Node\Stmt\Expression>
+     * @return iterable<Node\Stmt\Expression|Node\Expr>
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Stmt\Expression($node->expr);
+        yield $node->expr;
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Stmt\Throw_;
+        if (!$node instanceof Node\Expr\Throw_) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\MatchArm && $parentNode->conds === null) {
+            return false;
+        }
+
+        if ($parentNode instanceof Node\Stmt\Expression) {
+            $grandParent = ParentConnector::findParent($parentNode);
+
+            if ($grandParent instanceof Node\Stmt\Case_ && $grandParent->cond === null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

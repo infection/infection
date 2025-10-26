@@ -38,8 +38,10 @@ namespace Infection\Tests\Metrics;
 use function array_merge;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ResultsCollector::class)]
 final class ResultsCollectorTest extends TestCase
 {
     use CreateMutantExecutionResult;
@@ -62,28 +64,28 @@ final class ResultsCollectorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $collector,
-            DetectionStatus::KILLED,
-            7
+            DetectionStatus::KILLED_BY_TESTS,
+            7,
         );
         $expectedErrorResults = $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::ERROR,
-            2
+            2,
         );
         $expectedEscapedResults = $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::ESCAPED,
-            2
+            2,
         );
         $expectedTimedOutResults = $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::TIMED_OUT,
-            2
+            2,
         );
         $expectedNotCoveredResults = $this->addMutantExecutionResult(
             $collector,
             DetectionStatus::NOT_COVERED,
-            1
+            1,
         );
 
         $this->assertSame($expectedKilledResults, $collector->getKilledExecutionResults());
@@ -97,9 +99,9 @@ final class ResultsCollectorTest extends TestCase
                 $expectedErrorResults,
                 $expectedEscapedResults,
                 $expectedTimedOutResults,
-                $expectedNotCoveredResults
+                $expectedNotCoveredResults,
             ),
-            $collector->getAllExecutionResults()
+            $collector->getAllExecutionResults(),
         );
     }
 
@@ -111,8 +113,8 @@ final class ResultsCollectorTest extends TestCase
 
         $expectedKilledResults = $this->addMutantExecutionResult(
             $collector,
-            DetectionStatus::KILLED,
-            1
+            DetectionStatus::KILLED_BY_TESTS,
+            1,
         );
 
         $this->assertSame($expectedKilledResults, $collector->getKilledExecutionResults());

@@ -40,7 +40,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 
@@ -50,20 +50,13 @@ use function strlen;
  *
  * @internal
  */
-final class DebugFileLogger implements LineMutationTestingResultsLogger
+final readonly class DebugFileLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-    private bool $onlyCoveredMode;
-
     public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        bool $onlyCoveredMode
+        private MetricsCalculator $metricsCalculator,
+        private ResultsCollector $resultsCollector,
+        private bool $onlyCoveredMode,
     ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->onlyCoveredMode = $onlyCoveredMode;
     }
 
     public function getLogLines(): array
@@ -77,34 +70,49 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getKilledExecutionResults(),
             'Killed',
-            $separateSections
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getKilledByStaticAnalysisExecutionResults(),
+            'Killed by Static Analysis',
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getErrorExecutionResults(),
             'Errors',
-            $separateSections
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getSyntaxErrorExecutionResults(),
+            'Syntax Errors',
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
-            $separateSections
+            $separateSections,
         );
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
-            $separateSections
+            $separateSections,
+        );
+        $logs[] = $this->getResultsLine(
+            $this->resultsCollector->getIgnoredExecutionResults(),
+            'Ignored',
+            $separateSections,
         );
 
         if (!$this->onlyCoveredMode) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
-                $separateSections
+                $separateSections,
             );
         }
 
@@ -121,7 +129,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
     private function getResultsLine(
         array $executionResults,
         string $headlinePrefix,
-        bool &$separateSections
+        bool &$separateSections,
     ): string {
         $lines = [];
 
@@ -158,7 +166,7 @@ final class DebugFileLogger implements LineMutationTestingResultsLogger
                 $headline,
                 str_repeat('=', strlen($headline)),
                 '',
-            ]
+            ],
         );
     }
 }

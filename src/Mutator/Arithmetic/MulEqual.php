@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,19 +51,19 @@ final class MulEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a multiplication assignment operator (`*=`) with a division assignment operator (`/=`).
-TXT
+                Replaces a multiplication assignment operator (`*=`) with a division assignment operator (`/=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a *= $b;
-+ $a /= $b;
-DIFF
+                - $a *= $b;
+                + $a /= $b;
+                DIFF,
         );
     }
 
@@ -73,11 +74,32 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Div($node->var, $node->expr, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\AssignOp\Mul;
+        if (!$node instanceof Node\Expr\AssignOp\Mul) {
+            return false;
+        }
+
+        if ($this->isNumericOne($node->expr)) {
+            return false;
+        }
+
+        if ($node->expr instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->expr->expr)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function isNumericOne(Node $node): bool
+    {
+        if ($node instanceof Node\Scalar\LNumber && $node->value === 1) {
+            return true;
+        }
+
+        return $node instanceof Node\Scalar\DNumber && $node->value === 1.0;
     }
 }

@@ -43,13 +43,11 @@ use Infection\Metrics\MetricsCalculator;
  *
  * @internal
  */
-final class SummaryFileLogger implements LineMutationTestingResultsLogger
+final readonly class SummaryFileLogger implements LineMutationTestingResultsLogger
 {
-    private MetricsCalculator $metricsCalculator;
-
-    public function __construct(MetricsCalculator $metricsCalculator)
-    {
-        $this->metricsCalculator = $metricsCalculator;
+    public function __construct(
+        private MetricsCalculator $metricsCalculator,
+    ) {
     }
 
     public function getLogLines(): array
@@ -57,11 +55,14 @@ final class SummaryFileLogger implements LineMutationTestingResultsLogger
         return [
             'Total: ' . $this->metricsCalculator->getTotalMutantsCount(),
             '',
-            'Killed: ' . $this->metricsCalculator->getKilledCount(),
+            'Killed by Test Framework: ' . $this->metricsCalculator->getKilledByTestsCount(),
+            'Killed by Static Analysis: ' . $this->metricsCalculator->getKilledByStaticAnalysisCount(),
             'Errored: ' . $this->metricsCalculator->getErrorCount(),
+            'Syntax Errors: ' . $this->metricsCalculator->getSyntaxErrorCount(),
             'Escaped: ' . $this->metricsCalculator->getEscapedCount(),
             'Timed Out: ' . $this->metricsCalculator->getTimedOutCount(),
             'Skipped: ' . $this->metricsCalculator->getSkippedCount(),
+            'Ignored: ' . $this->metricsCalculator->getIgnoredCount(),
             'Not Covered: ' . $this->metricsCalculator->getNotTestedCount(),
             '',
         ];

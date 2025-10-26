@@ -64,15 +64,15 @@ final class FunctionCallRemoval implements Mutator
         'socket_close',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Removes the function call.',
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- fooBar();
-DIFF
+                - fooBar();
+                DIFF,
         );
     }
 
@@ -104,6 +104,6 @@ DIFF
             return true;
         }
 
-        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions);
+        return !in_array($name->toLowerString(), $this->doNotRemoveFunctions, true);
     }
 }

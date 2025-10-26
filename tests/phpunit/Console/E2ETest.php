@@ -46,40 +46,49 @@ use function getenv;
 use function implode;
 use Infection\Command\ConfigureCommand;
 use Infection\Console\Application;
-use Infection\FileSystem\Finder\ComposerExecutableFinder;
+use Infection\Console\E2E;
+use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\SingletonContainer;
+use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use function is_readable;
-use const PHP_EOL;
 use const PHP_OS;
 use const PHP_SAPI;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Large;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use function Safe\chdir;
 use function Safe\copy;
 use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\ini_get;
-use function Safe\sprintf;
-use function str_replace;
-use function strpos;
+use function sprintf;
+use function str_contains;
+use function str_starts_with;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
-/**
- * @group e2e
- * @group integration
- */
+#[Group('e2e')]
+#[Group('integration')]
+#[Large]
+#[CoversNothing]
 final class E2ETest extends TestCase
 {
     /**
      * This group must be excluded from E2E testing to avoid endless recursive testing loop situation.
      */
     private const EXCLUDED_GROUP = 'integration';
+
     private const MAX_FAILING_COMPOSER_INSTALL = 5;
+
     private const EXPECT_ERROR = 1;
+
     private const EXPECT_SUCCESS = 0;
 
     /**
@@ -105,9 +114,10 @@ final class E2ETest extends TestCase
         }
 
         // Without overcommit this test fails with `proc_open(): fork failed - Cannot allocate memory`
-        if (strpos(PHP_OS, 'Linux') === 0 &&
-            is_readable('/proc/sys/vm/overcommit_memory') &&
-            (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2) {
+        if (str_starts_with(PHP_OS, 'Linux')
+            && is_readable('/proc/sys/vm/overcommit_memory')
+            && (int) file_get_contents('/proc/sys/vm/overcommit_memory') === 2
+        ) {
             $this->markTestSkipped('This test needs copious amounts of virtual memory. It will fail unless it is allowed to overcommit memory.');
         }
 
@@ -118,7 +128,7 @@ final class E2ETest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->previousLoader) {
+        if ($this->previousLoader instanceof ClassLoader) {
             $this->previousLoader->unregister();
         }
 
@@ -131,8 +141,6 @@ final class E2ETest extends TestCase
      * To be run with:
      *
      * php -dmemory_limit=128M vendor/bin/phpunit --group=large
-     *
-     * @large
      */
     public function test_it_runs_on_itself(): void
     {
@@ -145,7 +153,7 @@ final class E2ETest extends TestCase
         }
 
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
-            '--test-framework-options="--exclude-group=' . self::EXCLUDED_GROUP . '"',
+            '--test-framework-options=--exclude-group=' . self::EXCLUDED_GROUP,
         ]);
 
         $this->assertMatchesRegularExpression('/\d+ mutations were generated/', $output);
@@ -161,16 +169,14 @@ final class E2ETest extends TestCase
         $this->assertStringContainsString(ConfigureCommand::NONINTERACTIVE_MODE_ERROR, $output);
     }
 
-    /**
-     * @dataProvider e2eTestSuiteDataProvider
-     * @runInSeparateProcess
-     */
+    #[DataProvider('e2eTestSuiteDataProvider')]
+    #[RunInSeparateProcess]
     public function test_it_runs_an_e2e_test_with_success(string $fullPath): void
     {
         $this->runOnE2EFixture($fullPath);
     }
 
-    public function e2eTestSuiteDataProvider(): iterable
+    public static function e2eTestSuiteDataProvider(): iterable
     {
         $directories = Finder::create()
             ->depth('== 0')
@@ -206,7 +212,7 @@ final class E2ETest extends TestCase
         }
 
         $expected = file_get_contents('expected-output.txt');
-        $expected = str_replace("\n", PHP_EOL, $expected);
+        $expected = LineReturnNormalizer::normalize($expected);
 
         $this->assertStringEqualsFile('infection.log', $expected, sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
@@ -226,7 +232,7 @@ final class E2ETest extends TestCase
 
             try {
                 $process = new Process([
-                    (new ComposerExecutableFinder())->find(),
+                    (new ConcreteComposerExecutableFinder())->find(),
                     'install',
                 ]);
                 $process->setTimeout(300);
@@ -275,12 +281,12 @@ final class E2ETest extends TestCase
 
         // $vendorDir is normally defined inside autoload_psr4.php, but PHPStan
         // can't see there, so have to both tell it so, and verify that too
-        $vendorDir = $vendorDir ?? null;
+        $vendorDir ??= null;
         $this->assertNotEmpty($vendorDir, 'Unexpected autoload_psr4.php found: please confirm that all dependencies are installed correctly for this fixture.');
 
         foreach ($map as $namespace => $paths) {
             foreach ($paths as $path) {
-                if (strpos($path, $vendorDir) !== false) {
+                if (str_contains((string) $path, (string) $vendorDir)) {
                     // Skip known dependency from autoloading
                     continue 2;
                 }
@@ -293,7 +299,7 @@ final class E2ETest extends TestCase
 
         foreach ($mapPsr0 as $namespace => $paths) {
             foreach ($paths as $path) {
-                if (strpos($path, $vendorDir) !== false) {
+                if (str_contains((string) $path, (string) $vendorDir)) {
                     // Skip known dependency from autoloading
                     continue 2;
                 }
@@ -331,6 +337,10 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
         }
 
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test can be unstable on Windows');
+        }
+
         /*
          * @see https://github.com/sebastianbergmann/php-code-coverage/blob/7743bbcfff2a907e9ee4a25be13d0f8ec5e73800/src/Driver/PHPDBG.php#L24
          */
@@ -344,6 +354,7 @@ final class E2ETest extends TestCase
             'run',
             '--verbose',
             '--no-interaction',
+            '--logger-github=false',
         ], $argvExtra));
 
         $output = new BufferedOutput();
@@ -359,12 +370,12 @@ final class E2ETest extends TestCase
             $expectedExitCode,
             $exitCode,
             <<<EOF
-Unexpected exit code. Command output was:
----
-$outputText
---- end of output
+                Unexpected exit code. Command output was:
+                ---
+                $outputText
+                --- end of output
 
-EOF
+                EOF,
         );
 
         return $outputText;

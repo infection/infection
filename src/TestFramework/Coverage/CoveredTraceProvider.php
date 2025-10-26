@@ -37,33 +37,19 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
-use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 
 /**
  * Filters traces and augments them with timing data from JUnit report.
  *
  * @internal
  */
-final class CoveredTraceProvider implements TraceProvider
+final readonly class CoveredTraceProvider implements TraceProvider
 {
-    private TraceProvider $primaryTraceProvider;
-
-    private JUnitTestExecutionInfoAdder $testFileDataAdder;
-
-    private FileFilter $bufferedFilter;
-
-    /**
-     * @param PhpUnitXmlCoverageTraceProvider|TraceProvider $primaryTraceProvider
-     * @param BufferedSourceFileFilter|FileFilter $bufferedFilter
-     */
     public function __construct(
-        TraceProvider $primaryTraceProvider,
-        JUnitTestExecutionInfoAdder $testFileDataAdder,
-        FileFilter $bufferedFilter
+        private TraceProvider $primaryTraceProvider,
+        private JUnitTestExecutionInfoAdder $testFileDataAdder,
+        private FileFilter $bufferedFilter,
     ) {
-        $this->primaryTraceProvider = $primaryTraceProvider;
-        $this->testFileDataAdder = $testFileDataAdder;
-        $this->bufferedFilter = $bufferedFilter;
     }
 
     /**
@@ -73,7 +59,7 @@ final class CoveredTraceProvider implements TraceProvider
     {
         /** @var iterable<Trace> $filteredTraces */
         $filteredTraces = $this->bufferedFilter->filter(
-            $this->primaryTraceProvider->provideTraces()
+            $this->primaryTraceProvider->provideTraces(),
         );
 
         /*
@@ -82,7 +68,7 @@ final class CoveredTraceProvider implements TraceProvider
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
         return $this->testFileDataAdder->addTestExecutionInfo(
-            $filteredTraces
+            $filteredTraces,
         );
     }
 }

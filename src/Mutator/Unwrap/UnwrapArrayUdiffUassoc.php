@@ -41,31 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayUdiffUassoc extends AbstractUnwrapMutator
+final class UnwrapArrayUdiffUassoc extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_udiff_uassoc` function call with its first operand. For example:
+                Replaces an `array_udiff_uassoc` function call with its first operand. For example:
 
-```php
-$x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
-```
+                ```php
+                $x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo => 'bar'];
-```
-TXT
+                ```php
+                $x = ['foo => 'bar'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
-+ $x = ['foo => 'bar'];
-DIFF
+                - $x = array_udiff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $value_compare_func, $key_compare_func);
+                + $x = ['foo => 'bar'];
+                DIFF,
         );
     }
 

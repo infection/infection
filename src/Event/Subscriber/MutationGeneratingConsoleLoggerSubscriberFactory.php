@@ -40,13 +40,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements SubscriberFactory
 {
-    private bool $skipProgressBar;
-
-    public function __construct(bool $skipProgressBar)
-    {
-        $this->skipProgressBar = $skipProgressBar;
+    public function __construct(
+        private bool $skipProgressBar,
+    ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber

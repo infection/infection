@@ -35,9 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Mutant;
 
-use function array_keys;
-use Infection\Mutator\ProfileList;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Mutator\MutatorResolver;
 use Later\Interfaces\Deferred;
+use RuntimeException;
+use function sprintf;
+use function strlen;
+use function strrpos;
 use Webmozart\Assert\Assert;
 
 /**
@@ -46,56 +50,35 @@ use Webmozart\Assert\Assert;
  */
 class MutantExecutionResult
 {
-    private string $processCommandLine;
-    private string $processOutput;
-    private string $detectionStatus;
-
-    /**
-     * @var Deferred<string>
-     */
-    private Deferred $mutantDiff;
-    private string $mutatorName;
-    private string $originalFilePath;
-    private int $originalStartingLine;
-
-    /**
-     * @var Deferred<string>
-     */
-    private Deferred $originalCode;
-
-    /**
-     * @var Deferred<string>
-     */
-    private Deferred $mutatedCode;
+    private readonly string $mutatorClass;
 
     /**
      * @param Deferred<string> $mutantDiff
      * @param Deferred<string> $originalCode
      * @param Deferred<string> $mutatedCode
+     * @param TestLocation[] $tests
      */
     public function __construct(
-        string $processCommandLine,
-        string $processOutput,
-        string $detectionStatus,
-        Deferred $mutantDiff,
-        string $mutatorName,
-        string $originalFilePath,
-        int $originalStartingLine,
-        Deferred $originalCode,
-        Deferred $mutatedCode
+        private readonly string $processCommandLine,
+        private readonly string $processOutput,
+        private readonly DetectionStatus $detectionStatus,
+        private readonly Deferred $mutantDiff,
+        private readonly string $mutantHash,
+        string $mutatorClass,
+        private readonly string $mutatorName,
+        private readonly string $originalFilePath,
+        private readonly int $originalStartingLine,
+        private readonly int $originalEndingLine,
+        private readonly int $originalStartFilePosition,
+        private readonly int $originalEndFilePosition,
+        private readonly Deferred $originalCode,
+        private readonly Deferred $mutatedCode,
+        private readonly array $tests,
+        private readonly float $processRuntime,
     ) {
-        Assert::oneOf($detectionStatus, DetectionStatus::ALL);
-        Assert::oneOf($mutatorName, array_keys(ProfileList::ALL_MUTATORS));
+        Assert::true(MutatorResolver::isValidMutator($mutatorClass), sprintf('Unknown mutator "%s"', $mutatorClass));
 
-        $this->processCommandLine = $processCommandLine;
-        $this->processOutput = $processOutput;
-        $this->detectionStatus = $detectionStatus;
-        $this->mutantDiff = $mutantDiff;
-        $this->mutatorName = $mutatorName;
-        $this->originalFilePath = $originalFilePath;
-        $this->originalStartingLine = $originalStartingLine;
-        $this->originalCode = $originalCode;
-        $this->mutatedCode = $mutatedCode;
+        $this->mutatorClass = $mutatorClass;
     }
 
     public static function createFromNonCoveredMutant(Mutant $mutant): self
@@ -108,6 +91,11 @@ class MutantExecutionResult
         return self::createFromMutant($mutant, DetectionStatus::SKIPPED);
     }
 
+    public static function createFromIgnoredMutant(Mutant $mutant): self
+    {
+        return self::createFromMutant($mutant, DetectionStatus::IGNORED);
+    }
+
     public function getProcessCommandLine(): string
     {
         return $this->processCommandLine;
@@ -118,7 +106,7 @@ class MutantExecutionResult
         return $this->processOutput;
     }
 
-    public function getDetectionStatus(): string
+    public function getDetectionStatus(): DetectionStatus
     {
         return $this->detectionStatus;
     }
@@ -126,6 +114,16 @@ class MutantExecutionResult
     public function getMutantDiff(): string
     {
         return $this->mutantDiff->get();
+    }
+
+    public function getMutantHash(): string
+    {
+        return $this->mutantHash;
+    }
+
+    public function getMutatorClass(): string
+    {
+        return $this->mutatorClass;
     }
 
     public function getMutatorName(): string
@@ -143,6 +141,21 @@ class MutantExecutionResult
         return $this->originalStartingLine;
     }
 
+    public function getOriginalEndingLine(): int
+    {
+        return $this->originalEndingLine;
+    }
+
+    public function getOriginalStartingColumn(string $originalCode): int
+    {
+        return $this->toColumn($originalCode, $this->originalStartFilePosition);
+    }
+
+    public function getOriginalEndingColumn(string $originalCode): int
+    {
+        return $this->toColumn($originalCode, $this->originalEndFilePosition);
+    }
+
     public function getOriginalCode(): string
     {
         return $this->originalCode->get();
@@ -153,7 +166,38 @@ class MutantExecutionResult
         return $this->mutatedCode->get();
     }
 
-    private static function createFromMutant(Mutant $mutant, string $detectionStatus): self
+    /**
+     * @return TestLocation[]
+     */
+    public function getTests(): array
+    {
+        return $this->tests;
+    }
+
+    public function getProcessRuntime(): float
+    {
+        return $this->processRuntime;
+    }
+
+    /**
+     * Adopted from https://github.com/nikic/PHP-Parser/blob/4abdcde5f16269959a834e4e58ea0ba0938ab133/lib/PhpParser/Error.php#L155
+     */
+    private function toColumn(string $code, int $position): int
+    {
+        if ($position > strlen($code)) {
+            throw new RuntimeException('Invalid position information');
+        }
+
+        $lineStartPos = strrpos($code, "\n", $position - strlen($code));
+
+        if ($lineStartPos === false) {
+            $lineStartPos = -1;
+        }
+
+        return $position - $lineStartPos;
+    }
+
+    private static function createFromMutant(Mutant $mutant, DetectionStatus $detectionStatus): self
     {
         $mutation = $mutant->getMutation();
 
@@ -162,11 +206,18 @@ class MutantExecutionResult
             '',
             $detectionStatus,
             $mutant->getDiff(),
+            $mutant->getMutation()->getHash(),
+            $mutant->getMutation()->getMutatorClass(),
             $mutant->getMutation()->getMutatorName(),
             $mutation->getOriginalFilePath(),
             $mutation->getOriginalStartingLine(),
+            $mutation->getOriginalEndingLine(),
+            $mutation->getOriginalStartFilePosition(),
+            $mutation->getOriginalEndFilePosition(),
             $mutant->getPrettyPrintedOriginalCode(),
-            $mutant->getMutatedCode()
+            $mutant->getMutatedCode(),
+            $mutant->getTests(),
+            0.0,
         );
     }
 }

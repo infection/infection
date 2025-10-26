@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,21 +51,21 @@ final class LessThan implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a less-than operator (`<`) with the less-than-or-equal-to operator (`<=`).
-TXT
+                Replaces a less-than operator (`<`) with the less-than-or-equal-to operator (`<=`).
+                TXT
             ,
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
-This mutator shifts the compared values highlighting an untested boundary.
-TXT,
+                This mutator shifts the compared values highlighting an untested boundary.
+                TXT,
             <<<'DIFF'
-- $a = $b < $c;
-+ $a = $b <= $c;
-DIFF
+                - $a = $b < $c;
+                + $a = $b <= $c;
+                DIFF,
         );
     }
 
@@ -75,7 +76,7 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\SmallerOrEqual($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\SmallerOrEqual($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

@@ -37,7 +37,6 @@ namespace Infection\Logger;
 
 use DateTime;
 use DateTimeInterface;
-use function get_class;
 use function gettype;
 use Infection\Console\IO;
 use function is_object;
@@ -45,8 +44,8 @@ use function is_scalar;
 use function method_exists;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
-use function Safe\sprintf;
-use function strpos;
+use function sprintf;
+use function str_contains;
 use function strtr;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
@@ -57,6 +56,7 @@ use Webmozart\Assert\Assert;
 final class ConsoleLogger extends AbstractLogger
 {
     private const INFO = 'info';
+
     private const ERROR = 'error';
 
     private const VERBOSITY_LEVEL_MAP = [
@@ -87,11 +87,9 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::NOTICE => 'note',
     ];
 
-    private IO $io;
-
-    public function __construct(IO $io)
-    {
-        $this->io = $io;
+    public function __construct(
+        private readonly IO $io,
+    ) {
     }
 
     /**
@@ -104,7 +102,7 @@ final class ConsoleLogger extends AbstractLogger
         Assert::keyExists(
             self::VERBOSITY_LEVEL_MAP,
             $level,
-            'The log level %s does not exist'
+            'The log level %s does not exist',
         );
 
         $output = $this->io->getOutput();
@@ -141,7 +139,7 @@ final class ConsoleLogger extends AbstractLogger
         Assert::keyExists(
             self::IO_MAP,
             $level,
-            'The log level "%s" does not exist for the IO mapping'
+            'The log level "%s" does not exist for the IO mapping',
         );
 
         $this->io->{self::IO_MAP[$level]}($interpolatedMessage);
@@ -156,7 +154,7 @@ final class ConsoleLogger extends AbstractLogger
      */
     private function interpolate(string $message, array $context): string
     {
-        if (strpos($message, '{') === false) {
+        if (!str_contains($message, '{')) {
             return $message;
         }
 
@@ -171,7 +169,7 @@ final class ConsoleLogger extends AbstractLogger
             } elseif ($val instanceof DateTimeInterface) {
                 $replacements["{{$key}}"] = $val->format(DateTime::RFC3339);
             } elseif (is_object($val)) {
-                $replacements["{{$key}}"] = '[object ' . get_class($val) . ']';
+                $replacements["{{$key}}"] = '[object ' . $val::class . ']';
             } else {
                 $replacements["{{$key}}"] = '[' . gettype($val) . ']';
             }

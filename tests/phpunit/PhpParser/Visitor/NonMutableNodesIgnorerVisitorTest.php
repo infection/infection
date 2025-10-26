@@ -38,14 +38,19 @@ namespace Infection\Tests\PhpParser\Visitor;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use PhpParser\Node;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group integration
- */
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
+#[Group('integration')]
+#[CoversClass(NonMutableNodesIgnorerVisitor::class)]
+final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
 {
-    private $spyVisitor;
+    /**
+     * @var NodeVisitor&object{nodesVisitedCount: int}
+     */
+    private NodeVisitor $spyVisitor;
 
     protected function setUp(): void
     {
@@ -55,51 +60,49 @@ final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTest
     public function test_it_does_not_traverse_after_ignore(): void
     {
         $this->parseAndTraverse(<<<'PHP'
-<?php
+            <?php
 
-class Foo
-{
-    public function bar(): void
-    {
-    }
-}
-PHP
+            class Foo
+            {
+                public function bar(): void
+                {
+                }
+            }
+            PHP
         );
-        $this->assertSame(0, $this->spyVisitor->getNumberOfNodesVisited());
+        $this->assertSame(0, $this->spyVisitor->nodesVisitedCount);
     }
 
-    private function getSpyVisitor()
+    /**
+     * @return NodeVisitor&object{nodesVisitedCount: int}
+     */
+    private function getSpyVisitor(): NodeVisitor
     {
-        return new class() extends NodeVisitorAbstract {
-            private $nodesVisitedCount = 0;
+        return new class extends NodeVisitorAbstract {
+            public int $nodesVisitedCount = 0;
 
             public function leaveNode(Node $node): void
             {
                 ++$this->nodesVisitedCount;
-            }
-
-            public function getNumberOfNodesVisited(): int
-            {
-                return $this->nodesVisitedCount;
             }
         };
     }
 
     private function parseAndTraverse(string $code): void
     {
-        $nodes = $this->parseCode($code);
+        [$nodes] = self::parseCode($code);
 
         $this->traverse(
             $nodes,
             [
-                new NonMutableNodesIgnorerVisitor([new class() implements NodeIgnorer {
+                new NonMutableNodesIgnorerVisitor([new class implements NodeIgnorer {
                     public function ignores(Node $node): bool
                     {
                         return true;
                     }
                 }]),
                 $this->spyVisitor,
-            ]
+            ],
         );
     }
 }

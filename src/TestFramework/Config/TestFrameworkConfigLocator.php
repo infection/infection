@@ -38,12 +38,12 @@ namespace Infection\TestFramework\Config;
 use function file_exists;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use function Safe\realpath;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
  */
-final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
+final readonly class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInterface
 {
     private const DEFAULT_EXTENSIONS = [
         'xml',
@@ -54,26 +54,24 @@ final class TestFrameworkConfigLocator implements TestFrameworkConfigLocatorInte
         'dist.yml',
     ];
 
-    private string $configDir;
-
-    public function __construct(string $configDir)
-    {
-        $this->configDir = $configDir;
+    public function __construct(
+        private string $configDir,
+    ) {
     }
 
-    public function locate(string $testFrameworkName, ?string $customDir = null): string
+    public function locate(string $cliTool, ?string $customDir = null): string
     {
         $dir = $customDir ?: $this->configDir;
         $triedFiles = [];
 
         foreach (self::DEFAULT_EXTENSIONS as $extension) {
-            $conf = sprintf('%s/%s.%s', $dir, $testFrameworkName, $extension);
+            $conf = sprintf('%s/%s.%s', $dir, $cliTool, $extension);
 
             if (file_exists($conf)) {
                 return realpath($conf);
             }
 
-            $triedFiles[] = sprintf('%s.%s', $testFrameworkName, $extension);
+            $triedFiles[] = sprintf('%s.%s', $cliTool, $extension);
         }
 
         throw FileOrDirectoryNotFound::multipleFilesDoNotExist($dir, $triedFiles);

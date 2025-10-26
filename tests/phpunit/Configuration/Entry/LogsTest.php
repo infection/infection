@@ -35,45 +35,55 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\StrykerConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Logs::class)]
 final class LogsTest extends TestCase
 {
     use LogsAssertions;
 
-    /**
-     * @dataProvider valuesProvider
-     */
+    #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         ?string $textLogFilePath,
+        ?string $htmlLogFilePath,
         ?string $summaryLogFilePath,
         ?string $jsonLogFilePath,
+        ?string $gitlabLogFilePath,
         ?string $debugLogFilePath,
         ?string $perMutatorFilePath,
         bool $useGitHubAnnotationsLogger,
-        ?Badge $badge
+        ?StrykerConfig $strykerConfig,
+        ?string $summaryJsonLogFilePath,
     ): void {
         $logs = new Logs(
             $textLogFilePath,
+            $htmlLogFilePath,
             $summaryLogFilePath,
             $jsonLogFilePath,
+            $gitlabLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
-            $badge
+            $strykerConfig,
+            $summaryJsonLogFilePath,
         );
 
         $this->assertLogsStateIs(
             $logs,
             $textLogFilePath,
+            $htmlLogFilePath,
             $summaryLogFilePath,
             $jsonLogFilePath,
+            $gitlabLogFilePath,
             $debugLogFilePath,
             $perMutatorFilePath,
             $useGitHubAnnotationsLogger,
-            $badge
+            $strykerConfig,
+            $summaryJsonLogFilePath,
         );
     }
 
@@ -88,12 +98,15 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
+            null,
             false,
-            null
+            null,
+            null,
         );
     }
 
-    public function valuesProvider(): iterable
+    public static function valuesProvider(): iterable
     {
         yield 'minimal' => [
             null,
@@ -101,18 +114,24 @@ final class LogsTest extends TestCase
             null,
             null,
             null,
+            null,
+            null,
             false,
+            null,
             null,
         ];
 
         yield 'complete' => [
             'text.log',
+            'report.html',
             'summary.log',
             'json.log',
+            'gitlab.log',
             'debug.log',
             'perMutator.log',
             true,
-            new Badge('master'),
+            StrykerConfig::forBadge('master'),
+            'summary.json',
         ];
     }
 }

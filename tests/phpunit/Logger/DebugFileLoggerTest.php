@@ -38,183 +38,247 @@ namespace Infection\Tests\Logger;
 use Infection\Logger\DebugFileLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(DebugFileLogger::class)]
 final class DebugFileLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
     use LineLoggerAssertions;
 
-    /**
-     * @dataProvider metricsProvider
-     */
+    #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
         ResultsCollector $resultsCollector,
         bool $onlyCoveredMode,
-        string $expectedContents
+        string $expectedContents,
     ): void {
         $logger = new DebugFileLogger($metricsCalculator, $resultsCollector, $onlyCoveredMode);
 
         $this->assertLoggedContentIs($expectedContents, $logger);
     }
 
-    public function metricsProvider(): iterable
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
             new ResultsCollector(),
             false,
             <<<'TXT'
-Total: 0
+                Total: 0
 
-Killed mutants:
-===============
+                Killed mutants:
+                ===============
 
-Errors mutants:
-===============
+                Killed by Static Analysis mutants:
+                ==================================
 
-Escaped mutants:
-================
+                Errors mutants:
+                ===============
 
-Timed Out mutants:
-==================
+                Syntax Errors mutants:
+                ======================
 
-Skipped mutants:
-================
+                Escaped mutants:
+                ================
 
-Not Covered mutants:
-====================
+                Timed Out mutants:
+                ==================
 
-TXT
+                Skipped mutants:
+                ================
+
+                Ignored mutants:
+                ================
+
+                Not Covered mutants:
+                ====================
+
+                TXT,
         ];
 
         yield 'all mutations' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             false,
             <<<'TXT'
-Total: 12
+                Total: 17
 
-Killed mutants:
-===============
+                Killed mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Errors mutants:
-===============
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Escaped mutants:
-================
+                Killed by Static Analysis mutants:
+                ==================================
 
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: PregQuote
+                Line 9
 
 
-Timed Out mutants:
-==================
+                Errors mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Skipped mutants:
-================
-
-Mutator: For_
-Line 10
-
-Mutator: PregQuote
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Not Covered mutants:
-====================
+                Syntax Errors mutants:
+                ======================
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
-TXT
+
+                Escaped mutants:
+                ================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Timed Out mutants:
+                ==================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Skipped mutants:
+                ================
+
+                Mutator: For_
+                Line 10
+
+                Mutator: PregQuote
+                Line 10
+
+
+                Ignored mutants:
+                ================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Not Covered mutants:
+                ====================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+                TXT,
         ];
 
         yield 'all mutations only covered' => [
-            $this->createCompleteMetricsCalculator(),
-            $this->createCompleteResultsCollector(),
+            self::createCompleteMetricsCalculator(),
+            self::createCompleteResultsCollector(),
             true,
             <<<'TXT'
-Total: 12
+                Total: 17
 
-Killed mutants:
-===============
+                Killed mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
-
-
-Errors mutants:
-===============
-
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Escaped mutants:
-================
+                Killed by Static Analysis mutants:
+                ==================================
 
-Mutator: PregQuote
-Line 9
-
-Mutator: For_
-Line 10
+                Mutator: PregQuote
+                Line 9
 
 
-Timed Out mutants:
-==================
+                Errors mutants:
+                ===============
 
-Mutator: PregQuote
-Line 9
+                Mutator: PregQuote
+                Line 9
 
-Mutator: For_
-Line 10
+                Mutator: For_
+                Line 10
 
 
-Skipped mutants:
-================
+                Syntax Errors mutants:
+                ======================
 
-Mutator: For_
-Line 10
+                Mutator: PregQuote
+                Line 9
 
-Mutator: PregQuote
-Line 10
+                Mutator: For_
+                Line 10
 
-TXT
+
+                Escaped mutants:
+                ================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Timed Out mutants:
+                ==================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+
+                Skipped mutants:
+                ================
+
+                Mutator: For_
+                Line 10
+
+                Mutator: PregQuote
+                Line 10
+
+
+                Ignored mutants:
+                ================
+
+                Mutator: PregQuote
+                Line 9
+
+                Mutator: For_
+                Line 10
+
+                TXT,
         ];
     }
 }

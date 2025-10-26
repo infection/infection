@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use RuntimeException;
-use function Safe\sprintf;
+use function sprintf;
 use Throwable;
 
 /**
@@ -49,10 +49,10 @@ final class UnparsableFile extends RuntimeException
         return new self(
             sprintf(
                 'Could not parse the file "%s". Check if it is a valid PHP file',
-                $filePath
+                $filePath,
             ),
             0,
-            $original
+            $original,
         );
     }
 }

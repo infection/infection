@@ -35,49 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\ReturnValue;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\ReturnValue\YieldValue;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(YieldValue::class)]
 final class YieldValueTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with key and value to a yield with a value only' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $a => $b);
-};
-PHP
-            ,
-            <<<'PHP'
-<?php
+                $a = function () {
+                    (yield $a => $b);
+                };
+                PHP,
+            (static fn () => <<<'PHP'
+                <?php
 
-$a = function () {
-    (yield $b);
-};
-PHP
-            ,
+                $a = function () {
+                    (yield $b);
+                };
+                PHP)(),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = function () {
-    (yield $b);
-};
-PHP
+                $a = function () {
+                    (yield $b);
+                };
+                PHP
             ,
         ];
     }

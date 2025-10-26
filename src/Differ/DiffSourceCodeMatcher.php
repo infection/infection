@@ -36,15 +36,16 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use function Safe\preg_match;
-use function strpos;
+use function str_contains;
 
 /**
  * @internal
+ * @final
  */
-final class DiffSourceCodeMatcher
+class DiffSourceCodeMatcher
 {
     private const POSSIBLE_DELIMITERS = [
-            '#', '%', ':', ';', '=', '?', '@', '^', '~',
+        '#', '%', ':', ';', '=', '?', '@', '^', '~',
     ];
 
     public function matches(string $diff, string $sourceCodeRegex): bool
@@ -60,7 +61,7 @@ final class DiffSourceCodeMatcher
     private function findDelimiter(string $sourceCodeRegex): string
     {
         foreach (self::POSSIBLE_DELIMITERS as $possibleDelimiter) {
-            if (strpos($sourceCodeRegex, $possibleDelimiter) === false) {
+            if (!str_contains($sourceCodeRegex, $possibleDelimiter)) {
                 return $possibleDelimiter;
             }
         }

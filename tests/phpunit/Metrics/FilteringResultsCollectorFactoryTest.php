@@ -40,9 +40,10 @@ use Infection\Metrics\FilteringResultsCollector;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function Safe\array_flip;
 
+#[CoversClass(FilteringResultsCollectorFactory::class)]
 final class FilteringResultsCollectorFactoryTest extends TestCase
 {
     use CreateMutantExecutionResult;
@@ -53,7 +54,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
         $statusesProvider
             ->expects($this->once())
             ->method('get')
-            ->willReturn(array_flip(DetectionStatus::ALL));
+            ->willReturn(DetectionStatus::cases());
 
         $factory = new FilteringResultsCollectorFactory($statusesProvider);
 
@@ -89,7 +90,7 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
             ->expects($this->once())
             ->method('get')
             ->willReturn([
-                DetectionStatus::ESCAPED => true,
+                DetectionStatus::ESCAPED,
             ])
         ;
 
@@ -108,12 +109,12 @@ final class FilteringResultsCollectorFactoryTest extends TestCase
 
         $this->addMutantExecutionResult(
             $filteringCollector,
-            DetectionStatus::ESCAPED
+            DetectionStatus::ESCAPED,
         );
 
         $this->addMutantExecutionResult(
             $filteringCollector,
-            DetectionStatus::KILLED
+            DetectionStatus::KILLED_BY_TESTS,
         );
     }
 }

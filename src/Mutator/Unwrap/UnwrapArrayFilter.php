@@ -41,32 +41,32 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayFilter extends AbstractUnwrapMutator
+final class UnwrapArrayFilter extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_filter` function call with its first operand. For example:
+                Replaces an `array_filter` function call with its first operand. For example:
 
-```php
-$x = array_filter($array, $callback);
-```
+                ```php
+                $x = array_filter($array, $callback);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = $array;
-```
+                ```php
+                $x = $array;
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_filter($array, $callback);
-+ $x = $array;
-DIFF
+                - $x = array_filter($array, $callback);
+                + $x = $array;
+                DIFF,
         );
     }
 

@@ -40,13 +40,10 @@ namespace Infection\Configuration\Schema;
  */
 class SchemaConfigurationFileLoader
 {
-    private SchemaValidator $schemaValidator;
-    private SchemaConfigurationFactory $factory;
-
-    public function __construct(SchemaValidator $schemaValidator, SchemaConfigurationFactory $factory)
-    {
-        $this->schemaValidator = $schemaValidator;
-        $this->factory = $factory;
+    public function __construct(
+        private readonly SchemaValidator $schemaValidator,
+        private readonly SchemaConfigurationFactory $factory,
+    ) {
     }
 
     public function loadFile(string $file): SchemaConfiguration
@@ -57,7 +54,7 @@ class SchemaConfigurationFileLoader
 
         return $this->factory->create(
             $rawConfig->getPath(),
-            $rawConfig->getDecodedContents()
+            $rawConfig->getDecodedContents(),
         );
     }
 }

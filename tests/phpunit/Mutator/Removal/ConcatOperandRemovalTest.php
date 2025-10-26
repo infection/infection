@@ -35,136 +35,137 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Removal;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Removal\ConcatOperandRemoval;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(ConcatOperandRemoval::class)]
 final class ConcatOperandRemovalTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'Removes both operands' => [
             <<<'PHP'
-<?php
-'foo' . 'bar';
-PHP
+                <?php
+                'foo' . 'bar';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
-
-'bar';
-PHP
+                    <?php
+                    'bar';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
-
-'foo';
-PHP
+                    <?php
+                    'foo';
+                    PHP
                 ,
             ],
         ];
 
         yield 'Removes each part of a 3-string concatenation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'a';
-$b = 'b';
-$a . $b . 'c';
-PHP
+                $a = 'a';
+                $b = 'b';
+                $a . $b . 'c';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$b . 'c';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $b . 'c';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$a . 'c';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $a . 'c';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$a . $b;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $a . $b;
+                    PHP
                 ,
             ],
         ];
 
         yield 'Removes each part of multiple concatenations' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . 'c' . $d . 'e';
-PHP
+                $a = 'a';
+                $b = 'b';
+                $d = 'd';
+                $a . $b . 'c' . $d . 'e';
+                PHP
             ,
             [
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$b . 'c' . $d . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $b . 'c' . $d . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . 'c' . $d . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . 'c' . $d . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . $d . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . $d . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . 'c' . 'e';
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . 'c' . 'e';
+                    PHP
                 ,
                 <<<'PHP'
-<?php
+                    <?php
 
-$a = 'a';
-$b = 'b';
-$d = 'd';
-$a . $b . 'c' . $d;
-PHP
+                    $a = 'a';
+                    $b = 'b';
+                    $d = 'd';
+                    $a . $b . 'c' . $d;
+                    PHP
                 ,
             ],
         ];

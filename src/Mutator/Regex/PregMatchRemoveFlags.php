@@ -49,40 +49,40 @@ final class PregMatchRemoveFlags extends AbstractPregMatch
 {
     public const ANALYSE_REGEX = '/^([^\w\s\\\\])(.*)([^\w\s\\\\])([gmixXsuUAJD]*)$/';
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Removes one by one flags ("gmixXsuUAJD") in a Regular Expression in `preg_match()` function. For example:
+                Removes one by one flags ("gmixXsuUAJD") in a Regular Expression in `preg_match()` function. For example:
 
-```php
-preg_match('/^test$/ig', $string);
-```
+                ```php
+                preg_match('/^test$/ig', $string);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-preg_match('/^test/i', $string);
-```
+                ```php
+                preg_match('/^test/i', $string);
+                ```
 
-and
+                and
 
-```php
-preg_match('/^test/g', $string);
-```
+                ```php
+                preg_match('/^test/g', $string);
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             'In order to kill this Mutant, write tests that cover every single flag used in a Regular Expression',
             <<<'DIFF'
-- preg_match('/^test$/ig', $string);
-# Mutation 1
-+ preg_match('/^test$/i', $string);
-# Mutation 2
-+ preg_match('/^test$/g', $string);
+                - preg_match('/^test$/ig', $string);
+                # Mutation 1
+                + preg_match('/^test$/i', $string);
+                # Mutation 2
+                + preg_match('/^test$/g', $string);
 
-DIFF
+                DIFF,
         );
     }
 

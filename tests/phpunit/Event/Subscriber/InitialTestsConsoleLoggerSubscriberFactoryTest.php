@@ -40,10 +40,13 @@ use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
 use Infection\Tests\Fixtures\Console\FakeOutput;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[CoversClass(InitialTestsConsoleLoggerSubscriberFactory::class)]
 final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     /**
@@ -60,15 +63,13 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         ;
     }
 
-    /**
-     * @dataProvider debugProvider
-     */
+    #[DataProvider('debugProvider')]
     public function test_it_creates_a_ci_subscriber_if_skips_the_progress_bar(bool $debug): void
     {
         $factory = new InitialTestsConsoleLoggerSubscriberFactory(
             true,
             $this->testFrameworkAdapterMock,
-            $debug
+            $debug,
         );
 
         $subscriber = $factory->create(new FakeOutput());
@@ -76,15 +77,13 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(CiInitialTestsConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    /**
-     * @dataProvider debugProvider
-     */
+    #[DataProvider('debugProvider')]
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(bool $debug): void
     {
         $factory = new InitialTestsConsoleLoggerSubscriberFactory(
             false,
             $this->testFrameworkAdapterMock,
-            $debug
+            $debug,
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
@@ -98,7 +97,7 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
         $this->assertInstanceOf(InitialTestsConsoleLoggerSubscriber::class, $subscriber);
     }
 
-    public function debugProvider(): iterable
+    public static function debugProvider(): iterable
     {
         yield 'debug enabled' => [true];
 

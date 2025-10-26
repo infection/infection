@@ -38,29 +38,27 @@ namespace Infection\Tests\AutoReview\Event;
 use function class_exists;
 use function in_array;
 use Infection\Event\Subscriber\EventSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\TestCase;
 use function Safe\class_implements;
-use function Safe\sprintf;
+use function sprintf;
 
-/**
- * @covers \Infection\Tests\AutoReview\Event\SubscriberProvider
- */
+#[CoversClass(SubscriberProvider::class)]
 final class SubscriberProviderTest extends TestCase
 {
-    /**
-     * @dataProvider \Infection\Tests\AutoReview\Event\SubscriberProvider::subscriberClassesProvider
-     */
+    #[DataProviderExternal(SubscriberProvider::class, 'subscriberClassesProvider')]
     public function test_subscriber_class_provider_is_valid(string $className): void
     {
         $this->assertTrue(
             class_exists($className, true)
             && in_array(EventSubscriber::class, class_implements($className), true),
             sprintf(
-                'The "%s" class was expected to be an event subscriber, but it is not a ' .
-                '"%s".',
+                'The "%s" class was expected to be an event subscriber, but it is not a '
+                . '"%s".',
                 $className,
-                EventSubscriber::class
-            )
+                EventSubscriber::class,
+            ),
         );
     }
 }

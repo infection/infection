@@ -39,11 +39,14 @@ use DomainException;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
+use Infection\Testing\MutatorName;
 use function iterator_to_array;
 use PhpParser\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(NoopMutator::class)]
 final class NoopMutatorTest extends TestCase
 {
     /**
@@ -71,7 +74,7 @@ final class NoopMutatorTest extends TestCase
         } catch (DomainException $exception) {
             $this->assertSame(
                 'The class "Infection\Mutator\NoopMutator" does not have a definition',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }
@@ -123,7 +126,7 @@ final class NoopMutatorTest extends TestCase
 
         $this->assertSame(
             MutatorName::getName(Plus::class),
-            $ignoreMutator->getName()
+            $ignoreMutator->getName(),
         );
     }
 }

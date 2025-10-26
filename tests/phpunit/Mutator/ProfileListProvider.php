@@ -44,16 +44,18 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\ProfileList;
+use Infection\Mutator\SyntaxError;
+use function ksort;
 use ReflectionClass;
-use function Safe\ksort;
 use function Safe\realpath;
-use function Safe\sprintf;
-use function Safe\substr;
 use const SORT_STRING;
+use function sprintf;
+use function str_ends_with;
 use function str_replace;
+use function substr;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
 
 final class ProfileListProvider
 {
@@ -98,7 +100,7 @@ final class ProfileListProvider
             $shortClassName = substr($file->getFilename(), 0, -4);
             $className = self::getMutatorClassNameFromPath($file->getPathname());
 
-            if (in_array($className, [IgnoreMutator::class, NoopMutator::class], true)) {
+            if (in_array($className, [IgnoreMutator::class, NoopMutator::class, SyntaxError::class], true)) {
                 continue;
             }
 
@@ -136,10 +138,8 @@ final class ProfileListProvider
 
         self::$profileConstants = array_filter(
             $profileListReflection->getConstants(),
-            static function (string $constantName): bool {
-                return substr($constantName, -8) === '_PROFILE';
-            },
-            ARRAY_FILTER_USE_KEY
+            static fn (string $constantName): bool => str_ends_with($constantName, '_PROFILE'),
+            ARRAY_FILTER_USE_KEY,
         );
 
         return self::$profileConstants;
@@ -160,12 +160,12 @@ final class ProfileListProvider
         $cleanedRelativePath = substr(
             Path::makeRelative($path, __DIR__ . '/../../../src'),
             0,
-            -4
+            -4,
         );
 
         return sprintf(
             'Infection\%s',
-            str_replace('/', '\\', $cleanedRelativePath)
+            str_replace('/', '\\', $cleanedRelativePath),
         );
     }
 }

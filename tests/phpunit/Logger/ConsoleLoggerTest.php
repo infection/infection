@@ -41,6 +41,9 @@ use Infection\Logger\ConsoleLogger;
 use function Infection\Tests\normalize_trailing_spaces;
 use InvalidArgumentException;
 use const PHP_EOL;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Safe\DateTime;
@@ -50,9 +53,8 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @group integration
- */
+#[Group('integration')]
+#[CoversClass(ConsoleLogger::class)]
 final class ConsoleLoggerTest extends TestCase
 {
     public function test_it_throws_a_friendly_error_on_invalid_log_level(): void
@@ -65,13 +67,11 @@ final class ConsoleLoggerTest extends TestCase
         $logger->log('unknownLogLevel', 'foo bar');
     }
 
-    /**
-     * @dataProvider outputMappingProvider
-     */
+    #[DataProvider('outputMappingProvider')]
     public function test_the_logs_the_message_if_is_the_right_log_verbosity(
         string $logLevel,
         int $outputVerbosity,
-        bool $outputsMessage
+        bool $outputsMessage,
     ): void {
         $output = new BufferedOutput($outputVerbosity);
 
@@ -118,18 +118,16 @@ final class ConsoleLoggerTest extends TestCase
                 'foo' => 'oof',
                 'bar' => 'rab',
                 'baz' => 'zab',
-            ]
+            ],
         );
 
         $this->assertSame(
             '[error] oof rab baz' . PHP_EOL,
-            $output->fetch()
+            $output->fetch(),
         );
     }
 
-    /**
-     * @dataProvider valueToCastProvider
-     */
+    #[DataProvider('valueToCastProvider')]
     public function test_it_casts_the_context_values_into_strings($value, string $expected): void
     {
         $output = new BufferedOutput();
@@ -139,12 +137,12 @@ final class ConsoleLoggerTest extends TestCase
         $logger->log(
             LogLevel::ERROR,
             '{value}',
-            ['value' => $value]
+            ['value' => $value],
         );
 
         $this->assertSame(
             '[error] ' . $expected . PHP_EOL,
-            $output->fetch()
+            $output->fetch(),
         );
     }
 
@@ -159,36 +157,36 @@ final class ConsoleLoggerTest extends TestCase
         $this->assertSame(
             <<<'TXT'
 
- ! [NOTE] message
+                 ! [NOTE] message
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($output->fetch())
+            normalize_trailing_spaces($output->fetch()),
         );
 
         $logger->log(LogLevel::WARNING, 'message', ['block' => true]);
 
         $this->assertSame(
             <<<'TXT'
- [WARNING] message
+                 [WARNING] message
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($output->fetch())
+            normalize_trailing_spaces($output->fetch()),
         );
 
         $logger->log(LogLevel::ERROR, 'message', ['block' => true]);
 
         $this->assertSame(
             <<<'TXT'
- [ERROR] message
+                 [ERROR] message
 
 
-TXT
+                TXT
             ,
-            normalize_trailing_spaces($output->fetch())
+            normalize_trailing_spaces($output->fetch()),
         );
     }
 
@@ -209,7 +207,7 @@ TXT
         yield 'datetime' => [
             UnsafeDateTimeImmutable::createFromFormat(
                 DateTime::ATOM,
-                '2020-04-26T07:32:25+00:00'
+                '2020-04-26T07:32:25+00:00',
             ),
             '2020-04-26T07:32:25+00:00',
         ];

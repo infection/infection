@@ -35,60 +35,138 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Boolean;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Boolean\FalseValue;
+use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(FalseValue::class)]
 final class FalseValueTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return false;
-PHP
+                return false;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return true;
-PHP
+                return true;
+                PHP
             ,
         ];
 
         yield 'It does not mutate the string false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return 'false';
-PHP
+                return 'false';
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate switch(false) to true' => [
+            <<<'PHP'
+                <?php
+
+                switch (false) {}
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate match(false) to true to prevent overlap with MatchArmRemoval' => [
+            <<<'PHP'
+                <?php
+
+                match(false) {
+                    $count > 0 && $count <= 10 => 'small',
+                    $count <= 50 => 'medium',
+                    $count > 50 => 'huge',
+                };
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in ternary condition to prevent overlap with TernaryMutator' => [
+            <<<'PHP'
+                <?php
+
+                $x == false ? 'yes' : 'no';
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with equal' => [
+            <<<'PHP'
+                <?php
+
+                if ($x == false) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with not-equal' => [
+            <<<'PHP'
+                <?php
+
+                if ($x != false) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with identical' => [
+            <<<'PHP'
+                <?php
+
+                if ($x === false) {
+                } else {
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It does not mutate in conditions to prevent overlap with not-identical' => [
+            <<<'PHP'
+                <?php
+
+                if ($x !== false) {
+                } else {
+                }
+                PHP
             ,
         ];
 
         yield 'It mutates all caps false to true' => [
             <<<'PHP'
-<?php
+                <?php
 
-return FALSE;
-PHP
+                return FALSE;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-return true;
-PHP
+                return true;
+                PHP
             ,
         ];
     }

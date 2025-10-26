@@ -51,23 +51,23 @@ final class Continue_ implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a continue statement (`continue`) with its counterpart break statement (`break`).
-TXT
+                Replaces a continue statement (`continue`) with its counterpart break statement (`break`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-foreach ($collection as $item) {
-    if ($condition) {
--       continue;
-+       break;
-    }
-}
-DIFF
+                foreach ($collection as $item) {
+                    if ($condition) {
+                -       continue;
+                +       break;
+                    }
+                }
+                DIFF,
         );
     }
 

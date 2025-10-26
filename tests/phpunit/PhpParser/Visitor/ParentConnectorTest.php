@@ -38,8 +38,10 @@ namespace Infection\Tests\PhpParser\Visitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use InvalidArgumentException;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ParentConnector::class)]
 final class ParentConnectorTest extends TestCase
 {
     public function test_it_can_provide_the_node_parent(): void

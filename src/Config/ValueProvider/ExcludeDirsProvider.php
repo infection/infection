@@ -47,8 +47,8 @@ use Infection\Console\IO;
 use Infection\FileSystem\Locator\Locator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use function Safe\glob;
+use function str_contains;
 use function str_replace;
-use function strpos;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
@@ -56,19 +56,15 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @internal
  */
-final class ExcludeDirsProvider
+final readonly class ExcludeDirsProvider
 {
     public const EXCLUDED_ROOT_DIRS = ['vendor', 'tests', 'test'];
 
-    private ConsoleHelper $consoleHelper;
-    private QuestionHelper $questionHelper;
-    private Filesystem $filesystem;
-
-    public function __construct(ConsoleHelper $consoleHelper, QuestionHelper $questionHelper, Filesystem $filesystem)
-    {
-        $this->consoleHelper = $consoleHelper;
-        $this->questionHelper = $questionHelper;
-        $this->filesystem = $filesystem;
+    public function __construct(
+        private ConsoleHelper $consoleHelper,
+        private QuestionHelper $questionHelper,
+        private Filesystem $filesystem,
+    ) {
     }
 
     /**
@@ -92,7 +88,7 @@ final class ExcludeDirsProvider
         $autocompleteValues = [];
         $questionText = $this->consoleHelper->getQuestion(
             'Any directories to exclude from within your source directories?',
-            ''
+            '',
         );
         $excludedDirs = [];
 
@@ -108,10 +104,8 @@ final class ExcludeDirsProvider
             $globDirs = glob($sourceDirs[0] . '/*', GLOB_ONLYDIR);
 
             $autocompleteValues = array_map(
-                static function (string $dir) use ($sourceDirs) {
-                    return str_replace($sourceDirs[0] . '/', '', $dir);
-                },
-                $globDirs
+                static fn (string $dir): string => str_replace($sourceDirs[0] . '/', '', $dir),
+                $globDirs,
             );
         }
 
@@ -119,6 +113,7 @@ final class ExcludeDirsProvider
         $question->setAutocompleterValues($autocompleteValues);
         $question->setValidator($this->getValidator(new RootsFileOrDirectoryLocator($sourceDirs, $this->filesystem)));
 
+        // @phpstan-ignore while.condNotBoolean (prevent timed-out mutant)
         while ($dir = $this->questionHelper->ask($io->getInput(), $io->getOutput(), $question)) {
             $excludedDirs[] = $dir;
         }
@@ -132,7 +127,7 @@ final class ExcludeDirsProvider
     private function getValidator(Locator $locator): Closure
     {
         return static function ($answer) use ($locator) {
-            if (!$answer || strpos($answer, '*') !== false) {
+            if (!$answer || str_contains($answer, '*')) {
                 return $answer;
             }
 

@@ -41,6 +41,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -58,22 +59,22 @@ final class RoundingFamily implements Mutator
         'round',
     ];
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
-TXT
+                Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = floor($b);
-# Mutation 1
-+ $a = ceil($b);
-# Mutation 2
-+ $a = round($b);
-DIFF
+                - $a = floor($b);
+                # Mutation 1
+                + $a = ceil($b);
+                # Mutation 2
+                + $a = round($b);
+                DIFF,
         );
     }
 
@@ -95,7 +96,7 @@ DIFF
             yield new Node\Expr\FuncCall(
                 new Node\Name($functionName),
                 [$node->args[0]],
-                $node->getAttributes()
+                NodeAttributes::getAllExceptOriginalNode($node),
             );
         }
     }
@@ -106,8 +107,8 @@ DIFF
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
-            !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
+        if (!$node->name instanceof Node\Name
+            || !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
         ) {
             return false;
         }

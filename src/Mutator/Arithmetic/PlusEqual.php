@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -50,19 +51,19 @@ final class PlusEqual implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an addition assignment operator (`+=`) with a subtraction assignment operator (`-=`).
-TXT
+                Replaces an addition assignment operator (`+=`) with a subtraction assignment operator (`-=`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a += $b;
-+ $a -= $b;
-DIFF
+                - $a += $b;
+                + $a -= $b;
+                DIFF,
         );
     }
 
@@ -75,7 +76,7 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\AssignOp\Minus($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\AssignOp\Minus($node->var, $node->expr, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

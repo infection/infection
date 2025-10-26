@@ -39,148 +39,150 @@ use function array_map;
 use function explode;
 use function implode;
 use Infection\Differ\Differ;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
+#[CoversClass(Differ::class)]
 final class DifferTest extends TestCase
 {
-    /**
-     * @dataProvider diffProvider
-     */
+    #[DataProvider('diffProvider')]
     public function test_it_shows_the_diff_between_two_sources_but_limiting_the_displayed_lines(
         string $sourceA,
         string $sourceB,
-        string $expectedDiff
+        string $expectedDiff,
     ): void {
-        $actualDiff = (new Differ(new BaseDiffer()))->diff($sourceA, $sourceB);
+        $actualDiff = (new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder())))->diff($sourceA, $sourceB);
 
         $this->assertSame($expectedDiff, self::normalizeString($actualDiff));
     }
 
-    public function diffProvider(): iterable
+    public static function diffProvider(): iterable
     {
         yield 'empty' => [
             '',
             '',
             <<<'PHP'
---- Original
-+++ New
+                --- Original
+                +++ New
 
-PHP
+                PHP,
         ];
 
         yield 'nominal' => [
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 10;
-}
+                public function echo(): void
+                {
+                    echo 10;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 15;
-}
+                public function echo(): void
+                {
+                    echo 15;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
---- Original
-+++ New
-@@ @@
+                --- Original
+                +++ New
+                @@ @@
 
- public function echo(): void
- {
--    echo 10;
-+    echo 15;
- }
+                 public function echo(): void
+                 {
+                -    echo 10;
+                +    echo 15;
+                 }
 
-PHP
+                PHP,
         ];
 
         yield 'no change' => [
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 10;
-}
+                public function echo(): void
+                {
+                    echo 10;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
 
-public function echo(): void
-{
-    echo 10;
-}
+                public function echo(): void
+                {
+                    echo 10;
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
---- Original
-+++ New
+                --- Original
+                +++ New
 
-PHP
+                PHP,
         ];
 
         yield 'line excess' => [
             <<<'PHP'
-0
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-PHP
+                0
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+                8
+                9
+                10
+                11
+                12
+                13
+                14
+                15
+                PHP
             ,
             <<<'PHP'
-0
-1
-2
-3
-4
-5
-(6)
-7
-8
-9
-10
-11
-12
-13
-14
-15
-PHP
+                0
+                1
+                2
+                3
+                4
+                5
+                (6)
+                7
+                8
+                9
+                10
+                11
+                12
+                13
+                14
+                15
+                PHP
             ,
             <<<'PHP'
---- Original
-+++ New
-@@ @@
- 3
- 4
- 5
--6
-+(6)
- 7
- 8
- 9
+                --- Original
+                +++ New
+                @@ @@
+                 3
+                 4
+                 5
+                -6
+                +(6)
+                 7
+                 8
+                 9
 
-PHP
+                PHP,
         ];
     }
 
@@ -188,7 +190,7 @@ PHP
     {
         return implode(
             "\n",
-            array_map('rtrim', explode("\n", $string))
+            array_map('rtrim', explode("\n", $string)),
         );
     }
 }

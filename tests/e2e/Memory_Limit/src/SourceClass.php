@@ -8,9 +8,11 @@ class SourceClass
     {
         $result = [];
 
+        $condition = false;
+
         do {
             $result[] = new \SplFixedArray(1<<22);
-        } while (false);
+        } while ($condition);
 
         return count($result);
     }

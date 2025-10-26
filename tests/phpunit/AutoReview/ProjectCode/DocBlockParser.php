@@ -42,8 +42,8 @@ use function current;
 use function end;
 use function explode;
 use function implode;
-use function Safe\substr;
 use function strlen;
+use function substr;
 use function trim;
 
 final class DocBlockParser
@@ -59,7 +59,7 @@ final class DocBlockParser
         /** @var string[] $lines */
         $lines = array_map(
             'trim',
-            explode("\n", $docblock)
+            explode("\n", $docblock),
         );
 
         /** @var string $firstLine */
@@ -87,8 +87,8 @@ final class DocBlockParser
         return implode(
             "\n",
             array_filter(
-                array_map('trim', $lines)
-            )
+                array_map('trim', $lines),
+            ),
         );
     }
 }

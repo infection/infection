@@ -37,7 +37,7 @@ namespace Infection\Mutator;
 
 use DomainException;
 use PhpParser\Node;
-use function Safe\sprintf;
+use function sprintf;
 
 /**
  * @internal
@@ -45,24 +45,21 @@ use function Safe\sprintf;
  * @template TNode of Node
  * @implements Mutator<TNode>
  */
-final class NoopMutator implements Mutator
+final readonly class NoopMutator implements Mutator
 {
-    /** @var Mutator<TNode> */
-    private Mutator $mutator;
-
     /**
      * @param Mutator<TNode> $mutator
      */
-    public function __construct(Mutator $mutator)
-    {
-        $this->mutator = $mutator;
+    public function __construct(
+        private Mutator $mutator,
+    ) {
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         throw new DomainException(sprintf(
             'The class "%s" does not have a definition',
-            self::class
+            self::class,
         ));
     }
 

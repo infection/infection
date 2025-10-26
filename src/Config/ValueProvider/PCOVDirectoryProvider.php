@@ -46,13 +46,13 @@ use function Safe\ini_get;
  */
 class PCOVDirectoryProvider
 {
-    private ?string $phpConfiguredPcovDirectory;
+    private ?string $phpConfiguredPcovDirectory = null;
 
     public function __construct(?string $iniValue = null)
     {
         try {
             $this->phpConfiguredPcovDirectory = $iniValue ?? ini_get('pcov.directory');
-        } catch (InfoException $e) {
+        } catch (InfoException) {
             // Probably not using PCOV
             $this->phpConfiguredPcovDirectory = null;
         }

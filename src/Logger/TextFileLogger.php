@@ -42,65 +42,87 @@ use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Str;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use function str_repeat;
 use function strlen;
 
 /**
  * @internal
  */
-final class TextFileLogger implements LineMutationTestingResultsLogger
+final readonly class TextFileLogger implements LineMutationTestingResultsLogger
 {
-    private ResultsCollector $resultsCollector;
-    private bool $debugVerbosity;
-    private bool $onlyCoveredMode;
-    private bool $debugMode;
-
     public function __construct(
-        ResultsCollector $resultsCollector,
-        bool $debugVerbosity,
-        bool $onlyCoveredMode,
-        bool $debugMode
+        private ResultsCollector $resultsCollector,
+        private bool $debugVerbosity,
+        private bool $onlyCoveredMode,
+        private bool $debugMode,
     ) {
-        $this->resultsCollector = $resultsCollector;
-        $this->debugVerbosity = $debugVerbosity;
-        $this->onlyCoveredMode = $onlyCoveredMode;
-        $this->debugMode = $debugMode;
     }
 
     public function getLogLines(): array
     {
         $separateSections = false;
 
+        $logs = [];
+
+        $notes = [];
+
+        if (!$this->debugVerbosity) {
+            $notes[] = 'Note: Pass `--log-verbosity=all` to log information about killed and errored mutants.';
+        }
+
+        if (!$this->debugMode) {
+            $notes[] = 'Note: Pass `--debug` to log test-framework output.';
+        }
+
+        if ($notes !== []) {
+            foreach ($notes as $note) {
+                $logs[] = $note;
+            }
+            $logs[] = '';
+        }
+
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getEscapedExecutionResults(),
             'Escaped',
-            $separateSections
+            $separateSections,
         );
 
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getTimedOutExecutionResults(),
             'Timed Out',
-            $separateSections
+            $separateSections,
         );
 
         $logs[] = $this->getResultsLine(
             $this->resultsCollector->getSkippedExecutionResults(),
             'Skipped',
-            $separateSections
+            $separateSections,
         );
 
         if ($this->debugVerbosity) {
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getKilledExecutionResults(),
-                'Killed',
-                $separateSections
+                'Killed by Test Framework',
+                $separateSections,
+            );
+
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getKilledByStaticAnalysisExecutionResults(),
+                'Killed by Static Analysis',
+                $separateSections,
             );
 
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getErrorExecutionResults(),
                 'Errors',
-                $separateSections
+                $separateSections,
+            );
+
+            $logs[] = $this->getResultsLine(
+                $this->resultsCollector->getSyntaxErrorExecutionResults(),
+                'Syntax Errors',
+                $separateSections,
             );
         }
 
@@ -108,7 +130,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
             $logs[] = $this->getResultsLine(
                 $this->resultsCollector->getNotCoveredExecutionResults(),
                 'Not Covered',
-                $separateSections
+                $separateSections,
             );
         }
 
@@ -125,7 +147,7 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
     private function getResultsLine(
         array $executionResults,
         string $headlinePrefix,
-        bool &$separateSections
+        bool &$separateSections,
     ): string {
         $lines = [];
 
@@ -177,18 +199,19 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
                 $headline,
                 str_repeat('=', strlen($headline)),
                 '',
-            ]
+            ],
         );
     }
 
     private static function getMutatorLine(int $index, MutantExecutionResult $mutantProcess): string
     {
         return sprintf(
-            '%d) %s:%d    [M] %s',
+            '%d) %s:%d    [M] %s [ID] %s',
             $index + 1,
             $mutantProcess->getOriginalFilePath(),
             $mutantProcess->getOriginalStartingLine(),
-            $mutantProcess->getMutatorName()
+            $mutantProcess->getMutatorName(),
+            $mutantProcess->getMutantHash(),
         );
     }
 
@@ -197,11 +220,9 @@ final class TextFileLogger implements LineMutationTestingResultsLogger
         return implode(
             PHP_EOL,
             array_map(
-                static function (string $line): string {
-                    return '  ' . $line;
-                },
-                explode(PHP_EOL, Str::trimLineReturns($value))
-            )
+                static fn (string $line): string => '  ' . $line,
+                explode(PHP_EOL, Str::trimLineReturns($value)),
+            ),
         );
     }
 }

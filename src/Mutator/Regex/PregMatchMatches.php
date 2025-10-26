@@ -51,34 +51,36 @@ final class PregMatchMatches implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    private const MIN_ARGS_TO_MUTATE = 3;
+
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a `preg_match` search results with an empty result. For example:
+                Replaces a `preg_match` search results with an empty result. For example:
 
-```php
-if (preg_match('/pattern/', $subject, $matches, $flags)) {
-    // ...
-}
-```
+                ```php
+                if (preg_match('/pattern/', $subject, $matches, $flags)) {
+                    // ...
+                }
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-if ((int) $matches = []) {
-    // ...
-}
-```
+                ```php
+                if ((int) $matches = []) {
+                    // ...
+                }
+                ```
 
-TXT
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- preg_match('/pattern/', $subject, $matches, $flags);
-+ (int) $matches = [];
-DIFF
+                - preg_match('/pattern/', $subject, $matches, $flags);
+                + (int) $matches = [];
+                DIFF,
         );
     }
 
@@ -89,6 +91,10 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
+        if ($node->args[2] instanceof Node\VariadicPlaceholder) {
+            return [];
+        }
+
         yield new Node\Expr\Cast\Int_(new Node\Expr\Assign($node->args[2]->value, new Node\Expr\Array_()));
     }
 
@@ -98,11 +104,11 @@ DIFF
             return false;
         }
 
-        if (!$node->name instanceof Node\Name ||
-            $node->name->toLowerString() !== 'preg_match') {
+        if (!$node->name instanceof Node\Name
+            || $node->name->toLowerString() !== 'preg_match') {
             return false;
         }
 
-        return count($node->args) >= 3;
+        return count($node->args) >= self::MIN_ARGS_TO_MUTATE;
     }
 }

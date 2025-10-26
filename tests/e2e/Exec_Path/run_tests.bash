@@ -7,7 +7,7 @@ tputx () {
 }
 
 run () {
-    local INFECTION=${1}
+    local INFECTION="${1} --with-uncovered"
     local PHPARGS=${2}
 
     if [ "$DRIVER" = "phpdbg" ]
@@ -35,6 +35,7 @@ if [ "$DRIVER" = "phpdbg" ]
 then
     PATH=$PATH:bin phpdbg -qrr vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
 else
+    export XDEBUG_MODE=coverage
     PATH=$PATH:bin php vendor/bin/phpunit --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml
 fi
 

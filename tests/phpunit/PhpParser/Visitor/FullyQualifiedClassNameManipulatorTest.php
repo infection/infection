@@ -36,91 +36,26 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\FullyQualifiedClassNameManipulator;
-use InvalidArgumentException;
-use PhpParser\Node;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt\Nop;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FullyQualifiedClassNameManipulator::class)]
 final class FullyQualifiedClassNameManipulatorTest extends TestCase
 {
-    /**
-     * @dataProvider hasFqcnProvider
-     */
-    public function test_it_can_determine_if_the_given_node_has_a_fqcn_attribute(
-        Node $node,
-        bool $expected
-    ): void {
-        $this->assertSame($expected, FullyQualifiedClassNameManipulator::hasFqcn($node));
-    }
-
     public function test_it_can_provide_the_node_fqcn(): void
     {
         $fqcn = new FullyQualified('Acme\Foo');
-        $node = new Nop(['fullyQualifiedClassName' => $fqcn]);
+        $node = new Nop(['resolvedName' => $fqcn]);
 
         $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
     }
 
     public function test_it_can_provide_the_node_fqcn_for_an_anonymous_class(): void
     {
-        $node = new Nop(['fullyQualifiedClassName' => null]);
+        $node = new Nop(['resolvedName' => null]);
 
         $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public function test_it_cannot_provide_the_node_fqcn_if_has_not_be_set_yet(): void
-    {
-        $node = new Nop();
-
-        $this->expectException(InvalidArgumentException::class);
-
-        // We are not interested in a more helpful message here since it would be the result of
-        // a misconfiguration on our part rather than a user one. Plus this would require some
-        // extra processing on a part which is quite a hot path.
-
-        FullyQualifiedClassNameManipulator::getFqcn($node);
-    }
-
-    public function test_it_can_set_a_node_fqcn(): void
-    {
-        $fqcn = new FullyQualified('Acme\Foo');
-        $node = new Nop();
-
-        FullyQualifiedClassNameManipulator::setFqcn($node, $fqcn);
-
-        $this->assertSame($fqcn, FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public function test_it_can_set_a_node_fqcn_for_an_anonymous_class(): void
-    {
-        $node = new Nop();
-
-        FullyQualifiedClassNameManipulator::setFqcn($node, null);
-
-        $this->assertNull(FullyQualifiedClassNameManipulator::getFqcn($node));
-    }
-
-    public static function hasFqcnProvider(): iterable
-    {
-        yield 'no FQCN' => [
-            new Nop(),
-            false,
-        ];
-
-        yield 'empty string FQCN' => [
-            new Nop(['fullyQualifiedClassName' => '']),
-            true,
-        ];
-
-        yield 'null FQCN' => [
-            new Nop(['fullyQualifiedClassName' => null]),
-            true,
-        ];
-
-        yield 'has FQCN' => [
-            new Nop(['fullyQualifiedClassName' => 'Acme\Foo']),
-            true,
-        ];
     }
 }

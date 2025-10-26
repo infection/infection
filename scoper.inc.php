@@ -33,32 +33,19 @@
 
 declare(strict_types=1);
 
-use Isolated\Symfony\Component\Finder\Finder;
-
-$polyfillsBootstrap = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/vendor/symfony/polyfill-*')
-    ->name('bootstrap.php');
-
 return [
-    'whitelist' => [
-        \Composer\Autoload\ClassLoader::class,
-        'Safe\*',
-        // PHP 8.0
-        'T_NAME_QUALIFIED',
-        'T_NAME_FULLY_QUALIFIED',
-        'T_NAME_RELATIVE',
-        'T_MATCH',
-        'T_NULLSAFE_OBJECT_OPERATOR',
-        'T_ATTRIBUTE',
+    'prefix' => 'Infected',
+    'expose-classes' => [
+        'Infection\Mutator\Definition',
+        'Infection\Mutator\Mutator',
+        'Infection\Mutator\MutatorCategory',
     ],
-    'files-whitelist' => \array_map(
-        static function ($file) {
-            return $file->getPathName();
-        },
-        \iterator_to_array($polyfillsBootstrap)
-    ),
-    'whitelist-global-constants' => false,
-    'whitelist-global-classes' => false,
-    'whitelist-global-functions' => false,
+    'exclude-namespaces' => [
+        // we have to exclude it cause Mutator depends on PhpParser/Node interface, and it's not in a separate package
+        '/^PhpParser/',
+    ],
+    'exclude-constants' => [
+        // Symfony global constants
+        '/^SYMFONY\_[\p{L}_]+$/',
+    ],
 ];

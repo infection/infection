@@ -35,9 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Logger\GitHub;
 
-use function escapeshellarg;
-use function Safe\sprintf;
-use function shell_exec;
+use function array_filter;
+use function array_merge;
+use function array_slice;
+use function count;
+use function explode;
+use function implode;
+use Infection\Process\ShellCommandLineExecutor;
+use const PHP_EOL;
+use RuntimeException;
+use function Safe\preg_match;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * @final
@@ -46,16 +54,106 @@ use function shell_exec;
  */
 class GitDiffFileProvider
 {
-    public const DEFAULT_BASE = 'origin/master';
+    private const NUM_ORIGIN_AND_BRANCH_PARTS = 2;
 
-    public function provide(string $gitDiffFilter, string $gitDiffBase): string
+    private const DEFAULT_BASE = 'origin/master';
+
+    private ?string $defaultBase = null;
+
+    public function __construct(
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+    ) {
+    }
+
+    public function provideDefaultBase(): string
     {
-        return (string) shell_exec(
-            sprintf(
-                'git diff %s --diff-filter=%s --name-only | grep src/ | paste -s -d "," -',
-                escapeshellarg($gitDiffBase),
-                escapeshellarg($gitDiffFilter)
-            )
-        );
+        if ($this->defaultBase !== null) {
+            return $this->defaultBase;
+        }
+
+        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
+        try {
+            $gitRefs = $this->shellCommandLineExecutor->execute([
+                'git',
+                'symbolic-ref',
+                'refs/remotes/origin/HEAD',
+            ]);
+
+            $parts = explode('/', $gitRefs);
+
+            if (count($parts) > self::NUM_ORIGIN_AND_BRANCH_PARTS) {
+                // extract origin/branch from a string like 'refs/remotes/origin/master'
+                return $this->defaultBase = implode('/', array_slice($parts, -self::NUM_ORIGIN_AND_BRANCH_PARTS));
+            }
+        } catch (RuntimeException) {
+            // e.g. no symbolic ref might be configured for a remote named "origin"
+        }
+
+        // unable to figure it out, return the default
+        return $this->defaultBase = self::DEFAULT_BASE;
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     */
+    public function provide(string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string
+    {
+        $referenceCommit = $this->findReferenceCommit($gitDiffBase);
+
+        $filter = $this->shellCommandLineExecutor->execute(array_merge(
+            [
+                'git',
+                'diff',
+                $referenceCommit,
+                '--diff-filter',
+                $gitDiffFilter,
+                '--name-only',
+                '--',
+            ],
+            $sourceDirectories,
+        ));
+
+        if ($filter === '') {
+            throw NoFilesInDiffToMutate::create();
+        }
+
+        return implode(',', explode(PHP_EOL, $filter));
+    }
+
+    public function provideWithLines(string $gitDiffBase): string
+    {
+        $referenceCommit = $this->findReferenceCommit($gitDiffBase);
+
+        $filter = $this->shellCommandLineExecutor->execute([
+            'git',
+            'diff',
+            $referenceCommit,
+            '--unified=0',
+            '--diff-filter=AM',
+        ]);
+        $lines = explode(PHP_EOL, $filter);
+        $lines = array_filter($lines, static fn ($line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
+
+        return implode(PHP_EOL, $lines);
+    }
+
+    private function findReferenceCommit(string $gitDiffBase): string
+    {
+        try {
+            $comparisonCommit = $this->shellCommandLineExecutor->execute([
+                'git',
+                'merge-base',
+                $gitDiffBase,
+                'HEAD',
+            ]);
+        } catch (ProcessFailedException) {
+            /**
+             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+             * Fall back to direct diff
+             */
+            $comparisonCommit = $gitDiffBase;
+        }
+
+        return $comparisonCommit;
     }
 }

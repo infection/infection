@@ -41,19 +41,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
+final readonly class MutationTestingResultsLoggerSubscriberFactory implements SubscriberFactory
 {
-    private MutationTestingResultsLogger $logger;
-
-    public function __construct(MutationTestingResultsLogger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private MutationTestingResultsLogger $logger,
+    ) {
     }
 
     public function create(OutputInterface $output): EventSubscriber
     {
         return new MutationTestingResultsLoggerSubscriber(
-            $this->logger
+            $this->logger,
         );
     }
 }

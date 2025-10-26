@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
+use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 
 trait MutantExecutionResultAssertions
@@ -43,11 +44,11 @@ trait MutantExecutionResultAssertions
         MutantExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
-        string $expectedDetectionStatus,
+        DetectionStatus $expectedDetectionStatus,
         string $expectedMutantDiff,
         string $expectedMutatorName,
         string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine
+        int $expectedOriginalStartingLine,
     ): void {
         $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
         $this->assertSame($expectedProcessOutput, $result->getProcessOutput());

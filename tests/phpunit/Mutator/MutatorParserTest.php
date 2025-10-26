@@ -35,15 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use Infection\Mutator\Arithmetic\Assignment;
 use Infection\Mutator\MutatorParser;
+use Infection\Tests\Fixtures\Mutator\FakeMutator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutatorParser::class)]
 final class MutatorParserTest extends TestCase
 {
-    /**
-     * @var MutatorParser
-     */
-    private $mutatorParser;
+    private MutatorParser $mutatorParser;
 
     protected function setUp(): void
     {
@@ -51,22 +53,26 @@ final class MutatorParserTest extends TestCase
     }
 
     /**
-     * @dataProvider mutatorInputProvider
-     *
      * @param string[] $expectedMutators
      */
+    #[DataProvider('mutatorInputProvider')]
     public function test_it_can_parse_the_provided_input(
         string $mutatorInput,
-        array $expectedMutators
+        array $expectedMutators,
     ): void {
         $parsedMutators = $this->mutatorParser->parse($mutatorInput);
 
         $this->assertSame($expectedMutators, $parsedMutators);
     }
 
-    public function mutatorInputProvider(): iterable
+    public static function mutatorInputProvider(): iterable
     {
         yield 'empty string' => ['', []];
+
+        yield 'long name to be replaced with short name' => [
+            Assignment::class,
+            ['Assignment'],
+        ];
 
         yield 'string with only spaces' => ['  ', []];
 
@@ -95,6 +101,16 @@ final class MutatorParserTest extends TestCase
                 'TrueValue',
                 'FalseValue',
                 '@boolean',
+            ],
+        ];
+
+        yield 'custom mutator class' => [
+            'Minus,@boolean,Infection\\Tests\\Fixtures\\Mutator\\FakeMutator,Minus',
+            [
+                'Minus',
+                '@boolean',
+                FakeMutator::class,
+                'Minus',
             ],
         ];
     }

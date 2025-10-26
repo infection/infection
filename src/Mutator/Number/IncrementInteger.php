@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Number;
 
+use function array_key_exists;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
@@ -51,16 +52,20 @@ final class IncrementInteger extends AbstractNumberMutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    private const FUNCTIONS_RETURNING_MAX_INTEGER = [
+        'preg_match' => 1,
+    ];
+
+    public static function getDefinition(): Definition
     {
         return new Definition(
             'Increments an integer value with 1.',
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a = 20;
-+ $a = 21;
-DIFF
+                - $a = 20;
+                + $a = 21;
+                DIFF,
         );
     }
 
@@ -75,6 +80,11 @@ DIFF
 
         $value = $node->value + 1;
 
+        /*
+         * Parser gives us only positive numbers we have to check if parent node
+         * isn't a minus sign. If so, then means we have a negated positive number so
+         * we have to subtract to it instead of adding.
+         */
         if ($parentNode instanceof Node\Expr\UnaryMinus) {
             $value = $node->value - 1;
         }
@@ -88,13 +98,16 @@ DIFF
             return false;
         }
 
-        if ($node->value === PHP_INT_MAX) {
+        $parentNode = ParentConnector::getParent($node);
+
+        // We cannot increment largest positive integer, but we can do that for a negative integer
+        if ($node->value === PHP_INT_MAX && !$parentNode instanceof Node\Expr\UnaryMinus) {
             return false;
         }
 
         if (
             $node->value === 0
-            && ($this->isPartOfComparison($node) || ParentConnector::getParent($node) instanceof Node\Expr\Assign)
+            && ($this->isPartOfComparison($node) || $parentNode instanceof Node\Expr\Assign)
         ) {
             return false;
         }
@@ -107,7 +120,7 @@ DIFF
             return false;
         }
 
-        return true;
+        return $this->isAllowedComparison($node);
     }
 
     private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool
@@ -134,5 +147,42 @@ DIFF
             && $parentNode->name instanceof Node\Name
             && $parentNode->name->toLowerString() === 'preg_split'
         ;
+    }
+
+    private function isAllowedComparison(Node\Scalar\LNumber $node): bool
+    {
+        if (!$this->isPartOfComparison($node)) {
+            return true;
+        }
+
+        $parentNode = ParentConnector::getParent($node);
+
+        if (!$parentNode instanceof Node\Expr\BinaryOp) {
+            return true;
+        }
+
+        if (
+            $parentNode->left instanceof Node\Expr\FuncCall
+            && $parentNode->left->name instanceof Node\Name
+            && array_key_exists(
+                $parentNode->left->name->toLowerString(),
+                self::FUNCTIONS_RETURNING_MAX_INTEGER,
+            )
+        ) {
+            return $node->value !== self::FUNCTIONS_RETURNING_MAX_INTEGER[$parentNode->left->name->toLowerString()];
+        }
+
+        if (
+            $parentNode->right instanceof Node\Expr\FuncCall
+            && $parentNode->right->name instanceof Node\Name
+            && array_key_exists(
+                $parentNode->right->name->toLowerString(),
+                self::FUNCTIONS_RETURNING_MAX_INTEGER,
+            )
+        ) {
+            return $node->value !== self::FUNCTIONS_RETURNING_MAX_INTEGER[$parentNode->right->name->toLowerString()];
+        }
+
+        return true;
     }
 }

@@ -39,40 +39,87 @@ use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\PhpParser\MutatedNode;
-use Infection\Tests\Mutator\MutatorName;
-use Infection\Tests\SingletonContainer;
+use Infection\Testing\MutatorName;
+use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
+use PhpParser\ParserFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Webmozart\Assert\Assert;
 
+#[CoversClass(MutantCodeFactory::class)]
 final class MutantCodeFactoryTest extends TestCase
 {
-    /**
-     * @var MutantCodeFactory
-     */
-    private $codeFactory;
+    private const PHP_TO_BE_MUTATED_CODE = <<<'PHP_WRAP'
+        <?php
+
+        $a = PHP_INT_MAX - 33;
+        PHP_WRAP;
+
+    private const PHP_UNTOUCHED_CODE = <<<'PHP_WRAP'
+        <?php
+
+        namespace PHPStan_Integration;
+
+        class SourceClass
+        {
+            /**
+             * @template T
+             * @param array<T> $values
+             * @return list<T>
+             */
+            public function makeAList(array $values): array
+            {
+                // some code to generate more mutations
+
+                $strings = [
+                '1'];
+
+                $ints = array_map(function ($value): int {
+                    return (int) $value;
+                }, $strings);
+
+                $nonEmptyArray = ['1'];
+
+                $nonEmptyArrayFromMethod = $this->returnNonEmptyArray();
+
+                $inlineNonEmpty = ['1'];
+
+                return array_values($values);
+            }
+
+            /**
+             * @return non-empty-array<int, string>
+             */
+            private function returnNonEmptyArray(): array
+            {
+                return ['test'];
+            }
+        }
+
+        PHP_WRAP;
+
+    private MutantCodeFactory $codeFactory;
 
     protected function setUp(): void
     {
         $this->codeFactory = SingletonContainer::getContainer()->getMutantCodeFactory();
     }
 
-    /**
-     * @dataProvider mutationProvider
-     */
+    #[DataProvider('mutationProvider')]
     public function test_it_creates_the_mutant_code_from_the_given_mutation(
         Mutation $mutation,
-        string $expectedMutantCode
+        string $expectedMutantCode,
     ): void {
         $mutantCode = $this->codeFactory->createCode($mutation);
 
         $this->assertSame($expectedMutantCode, $mutantCode);
     }
 
-    /**
-     * @dataProvider mutationProvider
-     */
+    #[DataProvider('mutationProvider')]
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
-        Mutation $mutation
+        Mutation $mutation,
     ): void {
         $originalNodesDump = SingletonContainer::getNodeDumper()->dump($mutation->getOriginalFileAst());
 
@@ -83,55 +130,20 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($originalNodesDump, $originalNodesDumpAfterMutation);
     }
 
-    public function mutationProvider(): iterable
+    public static function mutationProvider(): iterable
     {
-        yield [
+        $parser = (new ParserFactory())->createForHostVersion();
+
+        $originalStmts = $parser->parse(self::PHP_UNTOUCHED_CODE);
+        $originalTokens = $parser->getTokens();
+
+        Assert::notNull($originalStmts);
+
+        yield 'keeps pretty-printing' => [
             new Mutation(
                 '/path/to/acme/Foo.php',
-                [new Node\Stmt\Namespace_(
-                    new Node\Name(
-                        'Acme',
-                        [
-                            'startLine' => 3,
-                            'startTokenPos' => 4,
-                            'startFilePos' => 17,
-                            'endLine' => 3,
-                            'endTokenPos' => 4,
-                            'endFilePos' => 20,
-                        ]
-                    ),
-                    [new Node\Stmt\Echo_(
-                        [new Node\Scalar\LNumber(
-                            10,
-                            [
-                                'startLine' => 5,
-                                'startTokenPos' => 9,
-                                'startFilePos' => 29,
-                                'endLine' => 5,
-                                'endTokenPos' => 9,
-                                'endFilePos' => 30,
-                                'kind' => 10,
-                            ]
-                        )],
-                        [
-                            'startLine' => 5,
-                            'startTokenPos' => 7,
-                            'startFilePos' => 24,
-                            'endLine' => 5,
-                            'endTokenPos' => 10,
-                            'endFilePos' => 31,
-                        ]
-                    )],
-                    [
-                        'startLine' => 3,
-                        'startTokenPos' => 2,
-                        'startFilePos' => 7,
-                        'endLine' => 5,
-                        'endTokenPos' => 10,
-                        'endFilePos' => 31,
-                        'kind' => 1,
-                    ]
-                )],
+                $originalStmts,
+                Plus::class,
                 MutatorName::getName(Plus::class),
                 [
                     'startLine' => 5,
@@ -142,9 +154,9 @@ final class MutantCodeFactoryTest extends TestCase
                     'endFilePos' => 30,
                     'kind' => 10,
                 ],
-                Node\Scalar\LNumber::class,
+                Node\Scalar\Int_::class,
                 MutatedNode::wrap(
-                    new Node\Scalar\LNumber(
+                    new Node\Scalar\Int_(
                         15,
                         [
                             'startLine' => 5,
@@ -154,19 +166,64 @@ final class MutantCodeFactoryTest extends TestCase
                             'endTokenPos' => 9,
                             'endFilePos' => 30,
                             'kind' => 10,
-                        ]
-                    )
+                        ],
+                    ),
                 ),
                 0,
-                []
+                [],
+                $originalTokens,
+                self::PHP_UNTOUCHED_CODE,
             ),
-            <<<'PHP'
-<?php
+            self::PHP_UNTOUCHED_CODE,
+        ];
 
-namespace Acme;
+        $originalStmts = $parser->parse(self::PHP_TO_BE_MUTATED_CODE);
+        $originalTokens = $parser->getTokens();
 
-echo 15;
-PHP
+        Assert::notNull($originalStmts);
+
+        yield 'mutates + to -' => [
+            new Mutation(
+                '/path/to/acme/Foo.php',
+                $originalStmts,
+                Plus::class,
+                MutatorName::getName(Plus::class),
+                [
+                    'startLine' => 3,
+                    'startTokenPos' => 10,
+                    'startFilePos' => 26,
+                    'endLine' => 3,
+                    'endTokenPos' => 10,
+                    'endFilePos' => 27,
+                    'rawValue' => '33',
+                    'kind' => 10,
+                ],
+                Node\Scalar\Int_::class,
+                MutatedNode::wrap(
+                    new Node\Scalar\Int_(
+                        32,
+                        [
+                            'startLine' => 3,
+                            'startTokenPos' => 10,
+                            'startFilePos' => 26,
+                            'endLine' => 3,
+                            'endTokenPos' => 10,
+                            'endFilePos' => 27,
+                            'rawValue' => '32',
+                            'kind' => 10,
+                        ],
+                    ),
+                ),
+                0,
+                [],
+                $originalTokens,
+                self::PHP_TO_BE_MUTATED_CODE,
+            ),
+            <<<'PHP_WRAP'
+                <?php
+
+                $a = PHP_INT_MAX - 32;
+                PHP_WRAP,
         ];
     }
 }

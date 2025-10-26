@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use Infection\FileSystem\FileFilter;
-use Infection\FileSystem\SourceFileFilter;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -56,8 +55,6 @@ use Webmozart\Assert\Assert;
  */
 class BufferedSourceFileFilter implements FileFilter
 {
-    private FileFilter $filter;
-
     /**
      * An associative array mapping real paths to SplFileInfo objects.
      *
@@ -66,15 +63,12 @@ class BufferedSourceFileFilter implements FileFilter
     private array $sourceFiles = [];
 
     /**
-     * @param SourceFileFilter|FileFilter $filter
      * @param iterable<SplFileInfo> $sourceFiles
      */
     public function __construct(
-        FileFilter $filter,
-        iterable $sourceFiles
+        private readonly FileFilter $filter,
+        iterable $sourceFiles,
     ) {
-        $this->filter = $filter;
-
         // Make a map of source files so we can check covered files against it.
         // We don't filter here on the assumption that hash table lookups are faster.
         foreach ($sourceFiles as $sourceFile) {
@@ -82,10 +76,16 @@ class BufferedSourceFileFilter implements FileFilter
         }
     }
 
+    /**
+     * We duck-typed the input to be iterable<SplFileInfo|Trace> in the interface,
+     * but we actually only use iterable<Trace> here.
+     */
     public function filter(iterable $input): iterable
     {
         return take($this->filter->filter($input))
-            ->filter(function (Trace $trace) {
+            ->filter(function ($trace): bool {
+                Assert::isInstanceOf($trace, Trace::class);
+
                 $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
                 Assert::string($traceRealPath);

@@ -35,166 +35,169 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Unwrap;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Unwrap\UnwrapArrayDiffUassoc;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(UnwrapArrayDiffUassoc::class)]
 final class UnwrapArrayDiffUassocTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
+                $a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_diff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
-PHP
+                $a = array_diff_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = \Class_With_Const::Const;
-PHP
+                $a = \Class_With_Const::Const;
+                PHP,
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_diff_uassoc' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = \array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
+                $a = \array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly within if statements' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if (array_diff_uassoc($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if (array_diff_uassoc($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
+                    return true;
+                }
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-if ($a === $a) {
-    return true;
-}
-PHP
+                $a = ['foo' => 'bar'];
+                if ($a === $a) {
+                    return true;
+                }
+                PHP,
         ];
 
         yield 'It mutates correctly when array_diff_uassoc is wrongly capitalized' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = aRraY_dIfF_uAsSoC(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
+                $a = aRraY_dIfF_uAsSoC(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It mutates correctly when array_diff_uassoc uses functions as input' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_diff_uassoc($foo->bar(), $foo->baz(), $keyCompareFunc);
-PHP
+                $a = array_diff_uassoc($foo->bar(), $foo->baz(), $keyCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = $foo->bar();
-PHP
+                $a = $foo->bar();
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
-PHP
+                $a = array_map('strtolower', array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
-PHP
+                $a = array_diff_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = ['foo' => 'bar'];
-PHP
+                $a = ['foo' => 'bar'];
+                PHP,
         ];
 
         yield 'It does not mutate other array_ calls' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = array_map('strtolower', ['foo' => 'bar']);
-PHP
+                $a = array_map('strtolower', ['foo' => 'bar']);
+                PHP,
         ];
 
         yield 'It does not mutate functions named array_diff_uassoc' => [
             <<<'PHP'
-<?php
+                <?php
 
-function array_diff_uassoc($array, $array1, $array2)
-{
-}
-PHP
+                function array_diff_uassoc($array, $array1, $array2)
+                {
+                }
+                PHP,
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 'array_diff_uassoc';
+                $a = 'array_diff_uassoc';
 
-$b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-PHP
+                $b = $a(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
+                PHP,
         ];
     }
 }

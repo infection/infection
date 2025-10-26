@@ -35,37 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Configuration\Entry\Badge;
 use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\StrykerConfig;
 
 trait LogsAssertions
 {
-    use BadgeAssertions;
-
     private function assertLogsStateIs(
         Logs $logs,
         ?string $expectedTextLogFilePath,
+        ?string $expectedHtmlLogFilePath,
         ?string $expectedSummaryLogFilePath,
         ?string $expectedJsonLogFilePath,
+        ?string $expectedGitlabLogFilePath,
         ?string $expectedDebugLogFilePath,
         ?string $expectedPerMutatorFilePath,
         bool $expectedUseGitHubAnnotationsLogger,
-        ?Badge $expectedBadge
+        ?StrykerConfig $expectedStrykerConfig,
+        ?string $expectedSummaryJsonLogFilePath,
     ): void {
         $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
+        $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
         $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
         $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
+        $this->assertSame($expectedGitlabLogFilePath, $logs->getGitlabLogFilePath());
         $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
         $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger());
+        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger(), 'Use GithubAnnotationLogger is incorrect');
+        $this->assertSame($expectedSummaryJsonLogFilePath, $logs->getSummaryJsonLogFilePath());
 
-        $badge = $logs->getBadge();
+        $strykerConfig = $logs->getStrykerConfig();
 
-        if ($expectedBadge === null) {
-            $this->assertNull($badge);
+        if ($expectedStrykerConfig === null) {
+            $this->assertNull($strykerConfig);
         } else {
-            $this->assertNotNull($badge);
-            $this->assertBadgeStateIs($badge, $expectedBadge->getBranch());
+            $this->assertNotNull($strykerConfig);
+
+            self::assertEquals($expectedStrykerConfig, $strykerConfig);
         }
     }
 }

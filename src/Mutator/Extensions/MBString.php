@@ -49,6 +49,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetConfigClassName;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -64,37 +65,37 @@ final class MBString implements ConfigurableMutator
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
-    private array $converters;
+    private readonly array $converters;
 
     public function __construct(MBStringConfig $config)
     {
         $this->converters = self::createConverters($config->getAllowedFunctions());
     }
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
-example:
+                Replaces a statement making use of the mbstring extension with its vanilla code equivalent. For
+                example:
 
-```php
-$x = mb_strlen($str) < 10;
-```
+                ```php
+                $x = mb_strlen($str) < 10;
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = strlen($str) < 10;
-```
-TXT
+                ```php
+                $x = strlen($str) < 10;
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = mb_strlen($str) < 10;
-+ $x = strlen($str) < 10;
-DIFF
+                - $x = mb_strlen($str) < 10;
+                + $x = strlen($str) < 10;
+                DIFF,
         );
     }
 
@@ -150,7 +151,7 @@ DIFF
                 'mb_substr' => self::makeFunctionAndRemoveExtraArgsMapper('substr', 3),
                 'mb_convert_case' => self::makeConvertCaseMapper(),
             ],
-            array_fill_keys($allowedFunctions, null)
+            array_fill_keys($allowedFunctions, null),
         );
     }
 
@@ -202,6 +203,10 @@ DIFF
             return null;
         }
 
+        if ($node->args[1] instanceof Node\VariadicPlaceholder) {
+            return null;
+        }
+
         $mode = $node->args[1]->value;
 
         if ($mode instanceof Node\Scalar\LNumber) {
@@ -244,14 +249,14 @@ DIFF
     }
 
     /**
-     * @param Node\Arg[] $args
+     * @param array<Node\Arg|Node\VariadicPlaceholder> $args
      */
     private static function mapFunctionCall(Node\Expr\FuncCall $node, string $newFuncName, array $args): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(
-            new Node\Name($newFuncName, $node->name->getAttributes()),
+            new Node\Name($newFuncName, NodeAttributes::getAllExceptOriginalNode($node->name)),
             $args,
-            $node->getAttributes()
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 }

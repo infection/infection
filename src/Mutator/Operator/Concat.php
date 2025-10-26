@@ -40,6 +40,7 @@ use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use PhpParser\Node;
+use PhpParser\PrettyPrinter\Standard;
 
 /**
  * @internal
@@ -50,29 +51,29 @@ final class Concat implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Flips the operands of the string concatenation operator `.`. For example:
+                Flips the operands of the string concatenation operator `.`. For example:
 
-```php
-'foo' . 'bar';
-```
+                ```php
+                'foo' . 'bar';
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-'bar' . 'foo';
-```
-TXT
+                ```php
+                'bar' . 'foo';
+                ```
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- 'foo' . 'bar';
-+ 'bar' . 'foo';
-DIFF
+                - 'foo' . 'bar';
+                + 'bar' . 'foo';
+                DIFF,
         );
     }
 
@@ -81,13 +82,19 @@ DIFF
      */
     public function mutate(Node $node): iterable
     {
+        $printer = new Standard();
+
         if ($node->left instanceof Node\Expr\BinaryOp\Concat) {
             $left = new Node\Expr\BinaryOp\Concat($node->left->left, $node->right);
             $right = $node->left->right;
-
-            yield new Node\Expr\BinaryOp\Concat($left, $right);
         } else {
-            yield new Node\Expr\BinaryOp\Concat($node->right, $node->left);
+            [$left, $right] = [$node->right, $node->left];
+        }
+
+        $newNode = new Node\Expr\BinaryOp\Concat($left, $right);
+
+        if ($printer->prettyPrint([clone $node]) !== $printer->prettyPrint([$newNode])) {
+            yield $newNode;
         }
     }
 

@@ -42,10 +42,10 @@ use function file_exists;
 use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use function iterator_to_array;
-use function Safe\sprintf;
+use function sprintf;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\PathUtil\Path;
 
 /**
  * @internal
@@ -53,14 +53,13 @@ use Webmozart\PathUtil\Path;
  */
 class IndexXmlCoverageLocator
 {
-    private string $coveragePath;
-    private string $defaultIndexPath;
+    private readonly string $defaultIndexPath;
 
     private ?string $indexPath = null;
 
-    public function __construct(string $coveragePath)
-    {
-        $this->coveragePath = $coveragePath;
+    public function __construct(
+        private readonly string $coveragePath,
+    ) {
         $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
     }
 
@@ -83,7 +82,7 @@ class IndexXmlCoverageLocator
         if (!file_exists($this->coveragePath)) {
             throw new FileNotFound(sprintf(
                 'Could not find any "index.xml" file in "%s"',
-                $this->coveragePath
+                $this->coveragePath,
             ));
         }
 
@@ -93,7 +92,7 @@ class IndexXmlCoverageLocator
                 ->in($this->coveragePath)
                 ->name('/^index\.xml$/i')
                 ->sortByName(),
-            false
+            false,
         );
 
         if (count($files) > 1) {
@@ -103,12 +102,10 @@ class IndexXmlCoverageLocator
                 implode(
                     '", "',
                     array_map(
-                        static function (SplFileInfo $fileInfo): string {
-                            return Path::canonicalize($fileInfo->getPathname());
-                        },
-                        $files
-                    )
-                )
+                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
+                        $files,
+                    ),
+                ),
             ));
         }
 
@@ -120,7 +117,7 @@ class IndexXmlCoverageLocator
 
         throw new FileNotFound(sprintf(
             'Could not find any "index.xml" file in "%s"',
-            $this->coveragePath
+            $this->coveragePath,
         ));
     }
 }

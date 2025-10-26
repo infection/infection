@@ -40,8 +40,9 @@ use function array_keys;
 use Infection\Console\IO;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\ProfileList;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Question\Question;
 use Webmozart\Assert\Assert;
@@ -67,30 +68,32 @@ final class DescribeCommand extends BaseCommand
             $question = new Question('What mutator do you wish to describe?');
             $question->setAutocompleterValues(array_keys(ProfileList::ALL_MUTATORS));
             $mutator = $io->askQuestion(
-                $question
+                $question,
             );
         }
 
-        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)) {
+        if (!array_key_exists($mutator, ProfileList::ALL_MUTATORS)
+            && !MutatorResolver::isValidMutator($mutator)
+        ) {
             $io->error(sprintf(
                 '"The %s mutator does not exist"',
-                $mutator
+                $mutator,
             ));
 
             return false;
         }
 
-        $mutatorClass = ProfileList::ALL_MUTATORS[$mutator];
+        $mutatorClass = ProfileList::ALL_MUTATORS[$mutator] ?? $mutator;
 
         Assert::subclassOf($mutatorClass, Mutator::class);
 
-        /** @var ?Definition $definition */
+        /** @var Definition $definition */
         $definition = $mutatorClass::getDefinition();
 
         if ($definition === null) {
             $io->error(sprintf(
                 'Mutator "%s" does not have a definition',
-                $mutator
+                $mutator,
             ));
 
             return false;
@@ -108,7 +111,7 @@ final class DescribeCommand extends BaseCommand
                 '',
                 'For example:',
                 $diffColorizer->colorize($diff),
-            ]
+            ],
         );
 
         $remedy = $definition->getRemedies();

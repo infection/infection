@@ -37,6 +37,8 @@ namespace Infection\Logger;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Console\LogVerbosity;
+use Infection\Logger\Html\HtmlFileLogger;
+use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Psr\Log\LoggerInterface;
@@ -48,31 +50,18 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FileLoggerFactory
 {
-    private MetricsCalculator $metricsCalculator;
-    private ResultsCollector $resultsCollector;
-
-    private Filesystem $filesystem;
-    private string $logVerbosity;
-    private bool $debugMode;
-    private bool $onlyCoveredCode;
-    private LoggerInterface $logger;
-
     public function __construct(
-        MetricsCalculator $metricsCalculator,
-        ResultsCollector $resultsCollector,
-        Filesystem $filesystem,
-        string $logVerbosity,
-        bool $debugMode,
-        bool $onlyCoveredCode,
-        LoggerInterface $logger
+        private readonly MetricsCalculator $metricsCalculator,
+        private readonly ResultsCollector $resultsCollector,
+        private readonly Filesystem $filesystem,
+        private readonly string $logVerbosity,
+        private readonly bool $debugMode,
+        private readonly bool $onlyCoveredCode,
+        private readonly LoggerInterface $logger,
+        private readonly StrykerHtmlReportBuilder $strykerHtmlReportBuilder,
+        private readonly ?string $loggerProjectRootDirectory,
+        private readonly float $processTimeout,
     ) {
-        $this->metricsCalculator = $metricsCalculator;
-        $this->resultsCollector = $resultsCollector;
-        $this->filesystem = $filesystem;
-        $this->logVerbosity = $logVerbosity;
-        $this->debugMode = $debugMode;
-        $this->onlyCoveredCode = $onlyCoveredCode;
-        $this->logger = $logger;
     }
 
     public function createFromLogEntries(Logs $logConfig): MutationTestingResultsLogger
@@ -80,10 +69,6 @@ class FileLoggerFactory
         $loggers = [];
 
         foreach ($this->createLineLoggers($logConfig) as $filePath => $lineLogger) {
-            if ($filePath === null) {
-                continue;
-            }
-
             $loggers[] = $this->wrapWithFileLogger($filePath, $lineLogger);
         }
 
@@ -91,7 +76,7 @@ class FileLoggerFactory
     }
 
     /**
-     * @return iterable<?string, LineMutationTestingResultsLogger>
+     * @return iterable<string, LineMutationTestingResultsLogger>
      */
     private function createLineLoggers(Logs $logConfig): iterable
     {
@@ -99,15 +84,37 @@ class FileLoggerFactory
             return;
         }
 
-        yield $logConfig->getTextLogFilePath() => $this->createTextLogger();
+        if ($logConfig->getTextLogFilePath() !== null) {
+            yield $logConfig->getTextLogFilePath() => $this->createTextLogger();
+        }
 
-        yield $logConfig->getSummaryLogFilePath() => $this->createSummaryLogger();
+        if ($logConfig->getHtmlLogFilePath() !== null) {
+            yield $logConfig->getHtmlLogFilePath() => $this->createHtmlLogger();
+        }
 
-        yield $logConfig->getJsonLogFilePath() => $this->createJsonLogger();
+        if ($logConfig->getSummaryLogFilePath() !== null) {
+            yield $logConfig->getSummaryLogFilePath() => $this->createSummaryLogger();
+        }
 
-        yield $logConfig->getDebugLogFilePath() => $this->createDebugLogger();
+        if ($logConfig->getJsonLogFilePath() !== null) {
+            yield $logConfig->getJsonLogFilePath() => $this->createJsonLogger();
+        }
 
-        yield $logConfig->getPerMutatorFilePath() => $this->createPerMutatorLogger();
+        if ($logConfig->getGitlabLogFilePath() !== null) {
+            yield $logConfig->getGitlabLogFilePath() => $this->createGitlabLogger();
+        }
+
+        if ($logConfig->getDebugLogFilePath() !== null) {
+            yield $logConfig->getDebugLogFilePath() => $this->createDebugLogger();
+        }
+
+        if ($logConfig->getPerMutatorFilePath() !== null) {
+            yield $logConfig->getPerMutatorFilePath() => $this->createPerMutatorLogger();
+        }
+
+        if ($logConfig->getSummaryJsonLogFilePath() !== null) {
+            yield $logConfig->getSummaryJsonLogFilePath() => $this->createSummaryJsonLogger();
+        }
 
         if ($logConfig->getUseGitHubAnnotationsLogger()) {
             yield GitHubAnnotationsLogger::DEFAULT_OUTPUT => $this->createGitHubAnnotationsLogger();
@@ -120,7 +127,7 @@ class FileLoggerFactory
             $filePath,
             $this->filesystem,
             $lineLogger,
-            $this->logger
+            $this->logger,
         );
     }
 
@@ -130,7 +137,14 @@ class FileLoggerFactory
             $this->resultsCollector,
             $this->logVerbosity === LogVerbosity::DEBUG,
             $this->onlyCoveredCode,
-            $this->debugMode
+            $this->debugMode,
+        );
+    }
+
+    private function createHtmlLogger(): LineMutationTestingResultsLogger
+    {
+        return new HtmlFileLogger(
+            $this->strykerHtmlReportBuilder,
         );
     }
 
@@ -144,13 +158,18 @@ class FileLoggerFactory
         return new JsonLogger(
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->onlyCoveredCode
+            $this->onlyCoveredCode,
         );
+    }
+
+    private function createGitlabLogger(): LineMutationTestingResultsLogger
+    {
+        return new GitLabCodeQualityLogger($this->resultsCollector, $this->loggerProjectRootDirectory);
     }
 
     private function createGitHubAnnotationsLogger(): LineMutationTestingResultsLogger
     {
-        return new GitHubAnnotationsLogger($this->resultsCollector);
+        return new GitHubAnnotationsLogger($this->resultsCollector, $this->loggerProjectRootDirectory);
     }
 
     private function createDebugLogger(): LineMutationTestingResultsLogger
@@ -158,7 +177,7 @@ class FileLoggerFactory
         return new DebugFileLogger(
             $this->metricsCalculator,
             $this->resultsCollector,
-            $this->onlyCoveredCode
+            $this->onlyCoveredCode,
         );
     }
 
@@ -166,7 +185,13 @@ class FileLoggerFactory
     {
         return new PerMutatorLogger(
             $this->metricsCalculator,
-            $this->resultsCollector
+            $this->resultsCollector,
+            $this->processTimeout,
         );
+    }
+
+    private function createSummaryJsonLogger(): LineMutationTestingResultsLogger
+    {
+        return new SummaryJsonLogger($this->metricsCalculator);
     }
 }

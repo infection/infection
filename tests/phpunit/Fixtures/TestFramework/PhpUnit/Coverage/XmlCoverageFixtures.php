@@ -104,10 +104,6 @@ final class XmlCoverageFixtures
                     ],
                 ],
                 'byMethod' => [
-                    'mutate' => [
-                        'startLine' => 19,
-                        'endLine' => 22,
-                    ],
                     'shouldMutate' => [
                         'startLine' => 24,
                         'endLine' => 35,
@@ -137,10 +133,6 @@ final class XmlCoverageFixtures
                     ],
                 ],
                 'byMethod' => [
-                    'mutate' => [
-                        'startLine' => 19,
-                        'endLine' => 22,
-                    ],
                     'shouldMutate' => [
                         'startLine' => 24,
                         'endLine' => 35,
@@ -170,10 +162,6 @@ final class XmlCoverageFixtures
                     ],
                 ],
                 'byMethod' => [
-                    'mutate' => [
-                        'startLine' => 19,
-                        'endLine' => 22,
-                    ],
                     'shouldMutate' => [
                         'startLine' => 24,
                         'endLine' => 35,

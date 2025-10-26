@@ -39,6 +39,8 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
+use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
 /**
@@ -50,20 +52,20 @@ final class Increment implements Mutator
 {
     use GetMutatorName;
 
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
-(`--`).
-TXT
+                Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
+                (`--`).
+                TXT
             ,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
-- $a++;
-+ $a--;
-DIFF
+                - $a++;
+                + $a--;
+                DIFF,
         );
     }
 
@@ -75,20 +77,26 @@ DIFF
     public function mutate(Node $node): iterable
     {
         if ($node instanceof Node\Expr\PreInc) {
-            yield new Node\Expr\PreDec($node->var, $node->getAttributes());
+            yield new Node\Expr\PreDec($node->var, NodeAttributes::getAllExceptOriginalNode($node));
 
             return;
         }
 
-        if ($node instanceof Node\Expr\PostInc) {
-            yield new Node\Expr\PostDec($node->var, $node->getAttributes());
-
-            return;
-        }
+        yield new Node\Expr\PostDec($node->var, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool
     {
-        return $node instanceof Node\Expr\PreInc || $node instanceof Node\Expr\PostInc;
+        if (!$node instanceof Node\Expr\PreInc && !$node instanceof Node\Expr\PostInc) {
+            return false;
+        }
+
+        $parentNode = ParentConnector::findParent($node);
+
+        if ($parentNode instanceof Node\Stmt\For_) {
+            return false;
+        }
+
+        return true;
     }
 }

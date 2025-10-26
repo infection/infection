@@ -35,16 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \Infection\Tests\AutoReview\IntegrationGroup\IoCodeDetector
- */
+#[CoversClass(IoCodeDetector::class)]
 final class IoCodeDetectorTest extends TestCase
 {
-    /**
-     * @dataProvider codeProvider
-     */
+    #[DataProvider('codeProvider')]
     public function test_it_can_detect_io_operations(string $code, bool $expected): void
     {
         $actual = IoCodeDetector::codeContainsIoOperations($code);
@@ -52,7 +50,7 @@ final class IoCodeDetectorTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function codeProvider(): iterable
+    public static function codeProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -61,100 +59,99 @@ final class IoCodeDetectorTest extends TestCase
 
         yield 'core function' => [
             <<<'PHP'
-<?php
-echo basename('/etc/sudoers.d', '.d');
-PHP
+                <?php
+                echo basename('/etc/sudoers.d', '.d');
+                PHP
             ,
-            false,  // Cannot detect this one since the call is not fully-qualified and there is no
-                    // use statements - too tricky to detect
+            false,  // Cannot detect this one since the call is not fully-qualified and there is no use statements - too tricky to detect
         ];
 
         yield 'core function - use statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-use function basename;
+                use function basename;
 
-echo basename('/etc/sudoers.d', '.d');
-PHP
+                echo basename('/etc/sudoers.d', '.d');
+                PHP
             ,
             true,
         ];
 
         yield 'core function - fully-qualified call' => [
             <<<'PHP'
-<?php
+                <?php
 
-echo \basename('/etc/sudoers.d', '.d');
-PHP
+                echo \basename('/etc/sudoers.d', '.d');
+                PHP
             ,
             true,
         ];
 
         yield 'Symfony FileSystem - use statement' => [
             <<<'PHP'
-<?php
+                <?php
 
-use Symfony\Component\Filesystem\Filesystem;
+                use Symfony\Component\Filesystem\Filesystem;
 
-(new Filesystem)->dumpFile('foo.php', '');
-PHP
+                (new Filesystem)->dumpFile('foo.php', '');
+                PHP
             ,
             true,
         ];
 
         yield 'Symfony FileSystem - FQCN' => [
             <<<'PHP'
-<?php
+                <?php
 
-echo \Symfony\Component\Filesystem\Filesystem::class;
-PHP
+                echo \Symfony\Component\Filesystem\Filesystem::class;
+                PHP
             ,
             false,
         ];
 
         yield 'Safe file-system function' => [
             <<<'PHP'
-<?php
+                <?php
 
-use function Safe\getcwd;
+                use function Safe\getcwd;
 
-getcwd();
-PHP
+                getcwd();
+                PHP
             ,
             true,
         ];
 
         yield 'Safe file-system function as fully-qualified call' => [
             <<<'PHP'
-<?php
+                <?php
 
-\Safe\rename('foo', 'bar');
-PHP
+                \Safe\rename('foo', 'bar');
+                PHP
             ,
             true,
         ];
 
         yield 'Safe non-file-system function' => [
             <<<'PHP'
-<?php
+                <?php
 
-use function Safe\sprintf();
+                use function Safe\sprintf();
 
-sprintf('%s', 'foo');
-PHP
+                sprintf('%s', 'foo');
+                PHP
             ,
             false,
         ];
 
         yield 'Statement containing a word match of a FS function' => [
             <<<'PHP'
-<?php
+                <?php
 
-/**
- * copyright
- */
-PHP
+                /**
+                 * copyright
+                 */
+                PHP
             ,
             false,
         ];

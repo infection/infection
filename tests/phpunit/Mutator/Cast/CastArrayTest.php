@@ -35,35 +35,167 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Cast;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Cast\CastArray;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(CastArray::class)]
 final class CastArrayTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to array' => [
             <<<'PHP'
-<?php
+                <?php
 
-(array) 1.0;
-PHP
+                (array) 1.0;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-1.0;
-PHP
+                1.0;
+                PHP
             ,
+        ];
+
+        yield 'It removes casting to array in conditions' => [
+            <<<'PHP'
+                <?php
+
+                if ((array) implode()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                if (implode()) {
+                    echo 'Hello';
+                }
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to array in global return' => [
+            <<<'PHP'
+                <?php
+
+                return (array) implode();
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                return implode();
+                PHP
+            ,
+        ];
+
+        yield 'It removes casting to array in return of untyped-function' => [
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return (array) implode();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                function noReturnType()
+                {
+                    return implode();
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to array in return of array-function when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsArray(): array
+                {
+                    return (array) implode();
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function returnsArray(): array
+                {
+                    return implode();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to array in return of array-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsArray(): array {
+                    return (array) implode();
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to array in nested return of array-function when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function returnsArray(): array {
+                    if (true) {
+                        return (array) implode();
+                    }
+                    return [];
+                }
+                PHP,
+        ];
+
+        yield 'It removes casting to array in function parameters when strict-types=0' => [
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    implode((array) 5);
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                declare (strict_types=0);
+                function doFoo()
+                {
+                    implode(5);
+                }
+                PHP,
+        ];
+
+        yield 'It not removes casting to array in function parameters when strict-types=1' => [
+            <<<'PHP'
+                <?php declare(strict_types=1);
+
+                function doFoo()
+                {
+                    implode((array) 5);
+                }
+                PHP,
         ];
     }
 }

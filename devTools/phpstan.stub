@@ -1,0 +1,10 @@
+<?php
+
+namespace PhpParser\Node {
+    class Name {
+        /**
+         * @return class-string
+         */
+        public function toString() {}
+    }
+}

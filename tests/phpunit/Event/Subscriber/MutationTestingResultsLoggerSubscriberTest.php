@@ -39,8 +39,10 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Logger\MutationTestingResultsLogger;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MutationTestingResultsLoggerSubscriber::class)]
 final class MutationTestingResultsLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_testing_finished(): void

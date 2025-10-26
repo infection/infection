@@ -41,31 +41,31 @@ use Infection\Mutator\MutatorCategory;
 /**
  * @internal
  */
-final class UnwrapArrayKeys extends AbstractUnwrapMutator
+final class UnwrapArrayKeys extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_keys` function call with its operand. For example:
+                Replaces an `array_keys` function call with its operand. For example:
 
-```php
-$x = array_keys(['foo' => 'bar']);
-```
+                ```php
+                $x = array_keys(['foo' => 'bar']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo' => 'bar'];
-```
-TXT
+                ```php
+                $x = ['foo' => 'bar'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_keys(['foo' => 'bar']);
-+ $x = ['foo' => 'bar'];
-DIFF
+                - $x = array_keys(['foo' => 'bar']);
+                + $x = ['foo' => 'bar'];
+                DIFF,
         );
     }
 

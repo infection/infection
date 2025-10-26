@@ -59,39 +59,38 @@ final class OutputFormatterStyleConfigurator
     private static function configureMutantStyle(OutputFormatterInterface $formatter): void
     {
         $formatter->setStyle('with-error', new OutputFormatterStyle('green'));
-        $formatter->setStyle(
-            'uncovered',
-            new OutputFormatterStyle('blue', null, ['bold'])
-        );
+        $formatter->setStyle('with-syntax-error', new OutputFormatterStyle('red', null, ['bold']));
+        $formatter->setStyle('uncovered', new OutputFormatterStyle('blue', null, ['bold']));
         $formatter->setStyle('timeout', new OutputFormatterStyle('yellow'));
-        $formatter->setStyle(
-            'escaped',
-            new OutputFormatterStyle('red', null, ['bold'])
-        );
+        $formatter->setStyle('escaped', new OutputFormatterStyle('red', null, ['bold']));
         $formatter->setStyle('killed', new OutputFormatterStyle('green'));
+        $formatter->setStyle('killed-by-static-analysis', new OutputFormatterStyle('green'));
         $formatter->setStyle('skipped', new OutputFormatterStyle('magenta'));
+        $formatter->setStyle('ignored', new OutputFormatterStyle('white'));
         $formatter->setStyle('code', new OutputFormatterStyle('white'));
     }
 
     private static function configureDiffStyle(OutputFormatterInterface $formatter): void
     {
-        $formatter->setStyle('diff-add', new OutputFormatterStyle('green'));
-        $formatter->setStyle('diff-del', new OutputFormatterStyle('red'));
+        $formatter->setStyle('diff-add', new OutputFormatterStyle('green', null, ['bold']));
+        $formatter->setStyle('diff-add-inline', new OutputFormatterStyle('green', null, ['bold', 'reverse']));
+        $formatter->setStyle('diff-del', new OutputFormatterStyle('red', null, ['bold']));
+        $formatter->setStyle('diff-del-inline', new OutputFormatterStyle('red', null, ['bold', 'reverse']));
     }
 
     private static function configureMutationScoreStyle(OutputFormatterInterface $formatter): void
     {
         $formatter->setStyle(
             'low',
-            new OutputFormatterStyle('red', null, ['bold'])
+            new OutputFormatterStyle('red', null, ['bold']),
         );
         $formatter->setStyle(
             'medium',
-            new OutputFormatterStyle('yellow', null, ['bold'])
+            new OutputFormatterStyle('yellow', null, ['bold']),
         );
         $formatter->setStyle(
             'high',
-            new OutputFormatterStyle('green', null, ['bold'])
+            new OutputFormatterStyle('green', null, ['bold']),
         );
     }
 }

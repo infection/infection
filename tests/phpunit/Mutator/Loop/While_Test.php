@@ -35,68 +35,74 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Loop;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Loop\While_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(While_::class)]
 final class While_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates expression part from variable to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-$condition = true;
+                $condition = true;
 
-while ($condition) {
-}
+                while ($condition) {
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$condition = true;
-while (false) {
-}
-PHP
+                $condition = true;
+
+                while (false) {
+                }
+
+                PHP,
         ];
 
         yield 'It mutates expression part from boolean true to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-while (true) {
-}
+                while (true) {
+                }
 
-PHP
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-while (false) {
-}
-PHP
+                while (false) {
+                }
+
+                PHP,
         ];
 
         yield 'It does not mutate expression part in do-while loop to false' => [
             <<<'PHP'
-<?php
+                <?php
 
-do {
+                do {
 
-} while (true);
+                } while (true);
 
-PHP
+                PHP,
         ];
     }
 }

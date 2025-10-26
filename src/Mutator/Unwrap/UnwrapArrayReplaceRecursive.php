@@ -43,31 +43,31 @@ use PhpParser\Node;
 /**
  * @internal
  */
-final class UnwrapArrayReplaceRecursive extends AbstractUnwrapMutator
+final class UnwrapArrayReplaceRecursive extends AbstractFunctionUnwrapMutator
 {
-    public static function getDefinition(): ?Definition
+    public static function getDefinition(): Definition
     {
         return new Definition(
             <<<'TXT'
-Replaces an `array_replace_recursive` function call with its first operand. For example:
+                Replaces an `array_replace_recursive` function call with its first operand. For example:
 
-```php
-$x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-```
+                ```php
+                $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
+                ```
 
-Will be mutated to:
+                Will be mutated to:
 
-```php
-$x = ['foo', 'bar', 'baz'];
-```
-TXT
+                ```php
+                $x = ['foo', 'bar', 'baz'];
+                ```
+                TXT
             ,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
-- $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
-+ $x = ['foo', 'bar', 'baz'];
-DIFF
+                - $x = array_replace_recursive(['foo', 'bar', 'baz'], ['oof']);
+                + $x = ['foo', 'bar', 'baz'];
+                DIFF,
         );
     }
 

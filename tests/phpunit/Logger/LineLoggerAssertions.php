@@ -43,11 +43,11 @@ trait LineLoggerAssertions
 {
     private function assertLoggedContentIs(
         string $expectedContents,
-        LineMutationTestingResultsLogger $logger
+        LineMutationTestingResultsLogger $logger,
     ): void {
         $this->assertSame(
             $expectedContents,
-            normalizeLineReturn(implode("\n", $logger->getLogLines()))
+            normalizeLineReturn(implode("\n", $logger->getLogLines())),
         );
     }
 }

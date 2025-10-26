@@ -49,24 +49,15 @@ use Webmozart\Assert\Assert;
  */
 class ProxyTrace implements Trace
 {
-    private SplFileInfo $sourceFile;
-
-    /**
-     * @var ?Deferred<TestLocations>
-     */
-    private ?Deferred $lazyTestLocations;
-
     private ?TestLocator $tests = null;
 
     /**
      * @param Deferred<TestLocations> $lazyTestLocations
      */
-    public function __construct(SplFileInfo $sourceFile, ?Deferred $lazyTestLocations = null)
-    {
-        $this->sourceFile = $sourceFile;
-
-        // There's no point to have it parsed right away as we may not need it, e.g. because of a filter
-        $this->lazyTestLocations = $lazyTestLocations;
+    public function __construct(
+        private readonly SplFileInfo $sourceFile,
+        private readonly ?Deferred $lazyTestLocations = null,
+    ) {
     }
 
     public function getSourceFileInfo(): SplFileInfo
@@ -99,11 +90,7 @@ class ProxyTrace implements Trace
 
     public function getTests(): ?TestLocations
     {
-        if ($this->lazyTestLocations !== null) {
-            return $this->lazyTestLocations->get();
-        }
-
-        return null;
+        return $this->lazyTestLocations?->get();
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable

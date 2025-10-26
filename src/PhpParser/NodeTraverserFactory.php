@@ -35,19 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
-use Infection\PhpParser\Visitor\FullyQualifiedClassNameVisitor;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\PhpParser\Visitor\ParentConnectorVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use SplObjectStorage;
 
 /**
@@ -67,7 +67,7 @@ class NodeTraverserFactory
         $nodeIgnorers[] = new InterfaceIgnorer();
         $nodeIgnorers[] = new AbstractMethodIgnorer();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
 
         $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
@@ -75,13 +75,22 @@ class NodeTraverserFactory
             null,
             [
                 'preserveOriginalNames' => true,
+                // must be `false` for pretty-printing to work properly
+                // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
                 'replaceNodes' => false,
-            ])
+            ]),
         );
-        $traverser->addVisitor(new ParentConnectorVisitor());
-        $traverser->addVisitor(new FullyQualifiedClassNameVisitor());
+        $traverser->addVisitor(new ParentConnectingVisitor());
         $traverser->addVisitor(new ReflectionVisitor());
         $traverser->addVisitor($mutationVisitor);
+
+        return $traverser;
+    }
+
+    public function createPreTraverser(): NodeTraverserInterface
+    {
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor(new NextConnectingVisitor());
 
         return $traverser;
     }

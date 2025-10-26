@@ -35,34 +35,104 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Operator;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Operator\Throw_;
+use Infection\Testing\BaseMutatorTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Throw_::class)]
 final class Throw_Test extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
-        yield 'It removes the throw statement' => [
+        yield 'It removes the throw expression' => [
             <<<'PHP'
-<?php
+                <?php
 
-throw new \Exception();
-PHP
+                throw new \Exception();
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-new \Exception();
-PHP
+                new \Exception();
+                PHP
+            ,
+        ];
+
+        yield 'It mutates throw in match non-default arm' => [
+            <<<'PHP'
+                <?php
+
+                match ($x) {
+                    0 => throw new \Exception(),
+                    default => '',
+                };
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                match ($x) {
+                    0 => new \Exception(),
+                    default => '',
+                };
+                PHP,
+        ];
+
+        yield 'It does not mutate throw in match default arm to prevent overlap with MatchArmRemoval' => [
+            <<<'PHP'
+                <?php
+
+                match ($x) {
+                    default => throw new \Exception(),
+                };
+                PHP
+            ,
+        ];
+
+        yield 'It mutates throw in switch non-default case' => [
+            <<<'PHP'
+                <?php
+
+                switch ($x) {
+                    case true:
+                        throw new \Exception();
+                    default:
+                        $s = '';
+                }
+                PHP
+            ,
+            <<<'PHP'
+                <?php
+
+                switch ($x) {
+                    case true:
+                        new \Exception();
+                    default:
+                        $s = '';
+                }
+                PHP,
+        ];
+
+        yield 'It does not mutate throw in switch default-arm to prevent overlap with SharedCaseRemoval' => [
+            <<<'PHP'
+                <?php
+
+                switch ($x) {
+                    case true: $s = ''; break;
+                    default: throw new \Exception();
+                }
+                PHP
             ,
         ];
     }

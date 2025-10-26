@@ -38,7 +38,7 @@ namespace Infection\Resource\Memory;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use const PHP_EOL;
-use function Safe\sprintf;
+use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -48,18 +48,11 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class MemoryLimiter
 {
-    private Filesystem $fileSystem;
-    private string $phpIniPath;
-    private MemoryLimiterEnvironment $environment;
-
     public function __construct(
-        Filesystem $fileSystem,
-        string $phpIniPath,
-        MemoryLimiterEnvironment $environment
+        private readonly Filesystem $fileSystem,
+        private readonly string $phpIniPath,
+        private readonly MemoryLimiterEnvironment $environment,
     ) {
-        $this->fileSystem = $fileSystem;
-        $this->phpIniPath = $phpIniPath;
-        $this->environment = $environment;
     }
 
     public function limitMemory(string $processOutput, TestFrameworkAdapter $adapter): void
@@ -104,9 +97,9 @@ class MemoryLimiter
         try {
             $this->fileSystem->appendToFile(
                 $tmpConfigPath,
-                PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit)
+                PHP_EOL . sprintf('memory_limit = %dM', (int) $memoryLimit),
             );
-        } catch (IOException $exception) {
+        } catch (IOException) {
             // Cannot add a memory limit: file is not writable
         }
     }

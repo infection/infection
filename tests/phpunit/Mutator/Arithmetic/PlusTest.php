@@ -35,85 +35,88 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Arithmetic;
 
-use Infection\Tests\Mutator\BaseMutatorTestCase;
+use Infection\Mutator\Arithmetic\Plus;
+use Infection\Testing\BaseMutatorTestCase;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\LNumber;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
+#[CoversClass(Plus::class)]
 final class PlusTest extends BaseMutatorTestCase
 {
     /**
-     * @dataProvider mutationsProvider
-     *
      * @param string|string[] $expected
      */
+    #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = []): void
     {
-        $this->doTest($input, $expected);
+        $this->assertMutatesInput($input, $expected);
     }
 
-    public function mutationsProvider(): iterable
+    public static function mutationsProvider(): iterable
     {
         yield 'It mutates normal plus' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 + 3;
-PHP
+                $a = 10 + 3;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 10 - 3;
-PHP
+                $a = 10 - 3;
+                PHP
             ,
         ];
 
         yield 'It does not mutate plus equals' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a += 2;
-PHP
+                $a = 1;
+                $a += 2;
+                PHP
             ,
         ];
 
         yield 'It does not mutate increment' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a++;
-PHP
+                $a = 1;
+                $a++;
+                PHP
             ,
         ];
 
         yield 'It does mutate a fake increment' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a + +1;
-PHP
+                $a = 1;
+                $a + +1;
+                PHP
             ,
             <<<'PHP'
-<?php
+                <?php
 
-$a = 1;
-$a - +1;
-PHP
+                $a = 1;
+                $a - +1;
+                PHP
             ,
         ];
 
         yield 'It does not mutate additon of arrays' => [
             <<<'PHP'
-<?php
+                <?php
 
-$a = [0 => 1] + [1 => 3];
-$b = 1 + [1 => 3];
-$c = [1 => 1] + 3;
-PHP
+                $a = [0 => 1] + [1 => 3];
+                $b = 1 + [1 => 3];
+                $c = [1 => 1] + 3;
+                PHP
             ,
         ];
     }
@@ -129,7 +132,7 @@ PHP
     {
         $plusExpression = new Node\Expr\BinaryOp\Plus(
             new Array_([new LNumber(1)]),
-            new Array_([new LNumber(1)])
+            new Array_([new LNumber(1)]),
         );
 
         $this->assertFalse($this->mutator->canMutate($plusExpression));
