@@ -123,6 +123,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     public function assertMinimumVersionSatisfied(): void
     {
         $version = $this->getVersion();
+
         if (str_starts_with($version, 'dev-')) {
             return;
         }
