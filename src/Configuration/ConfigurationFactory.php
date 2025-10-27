@@ -239,7 +239,6 @@ class ConfigurationFactory
         $tmpDir = (string) $schema->getTmpDir();
 
         if ($tmpDir === '') {
-            // TODO: could be scoped?
             $tmpDir = sys_get_temp_dir();
         } elseif (!Path::isAbsolute($tmpDir)) {
             $tmpDir = sprintf('%s/%s', $configDir, $tmpDir);
@@ -248,54 +247,14 @@ class ConfigurationFactory
         return $this->tmpDirProvider->providePath($tmpDir);
     }
 
-    private function retrievePhpUnit(SchemaConfiguration $schema, string $infectionConfigDir): PhpUnit
+    private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->getPhpUnit();
-
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
-        $customPath = $phpUnit->getCustomPath();
-
-        $newConfigDir = null === $phpUnitConfigDir
-            ? $infectionConfigDir
-            : (
-                Path::isAbsolute($phpUnitConfigDir)
-                    ? $phpUnitConfigDir
-                    : Path::join($infectionConfigDir, $phpUnitConfigDir)
-            );
-        $newCustomPath = null === $customPath
-            ? null
-            : (
-                Path::isAbsolute($customPath)
-                    ? $customPath
-                    : Path::join($infectionConfigDir, $customPath)
-            );
-
-        return new PhpUnit($newConfigDir, $newCustomPath);
+        return $schema->getPhpUnit()->withAbsolutePaths($configDir);
     }
 
-    private function retrievePhpStan(SchemaConfiguration $schema, string $infectionConfigDir): PhpStan
+    private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        $phpStan = clone $schema->getPhpStan();
-
-        $phpStanConfigDir = $phpStan->getConfigDir();
-        $customPath = $phpStan->getCustomPath();
-
-        $newConfigDir = null === $phpStanConfigDir
-            ? $infectionConfigDir
-            : (
-            Path::isAbsolute($phpStanConfigDir)
-                ? $phpStanConfigDir
-                : Path::join($infectionConfigDir, $phpStanConfigDir)
-            );
-        $newCustomPath = null === $customPath
-            ? null
-            : (
-            Path::isAbsolute($customPath)
-                ? $customPath
-                : Path::join($infectionConfigDir, $customPath)
-            );
-
-        return new PhpStan($newConfigDir, $newCustomPath);
+        return $schema->getPhpStan()->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(

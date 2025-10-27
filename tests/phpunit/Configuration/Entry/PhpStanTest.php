@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -44,40 +43,54 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PhpStan::class)]
 final class PhpStanTest extends TestCase
 {
-    #[DataProvider('valuesProvider')]
-    public function test_it_can_be_instantiated(
-        ?string $configDir,
-        ?string $executablePath,
+    #[DataProvider('basePathProvider')]
+    public function test_it_can_create_a_new_instance_with_absolute_paths(
+        PhpStan $phpStan,
+        string $basePath,
+        PhpStan $expected,
     ): void {
-        $phpUnit = new PhpStan($configDir, $executablePath);
+        $originalPhpStan = clone $phpStan;
 
-        $this->assertSame($configDir, $phpUnit->getConfigDir());
-        $this->assertSame($executablePath, $phpUnit->getCustomPath());
+        $actual = $phpStan->withAbsolutePaths($basePath);
+
+        $this->assertEquals($expected, $actual);
+        // Sanity check
+        $this->assertEquals($originalPhpStan, $phpStan);
     }
 
-    public function test_it_can_change_its_configuration_dir(): void
-    {
-        $phpUnit = new PhpUnit(
-            '/path/to/phpstan-config-folder',
-            '/path/to/phpstan',
-        );
-
-        $phpUnit->withConfigDir('/path/to/another-phpstan-config-folder');
-
-        $this->assertSame('/path/to/another-phpstan-config-folder', $phpUnit->getConfigDir());
-        $this->assertSame('/path/to/phpstan', $phpUnit->getCustomPath());
-    }
-
-    public static function valuesProvider(): iterable
+    public static function basePathProvider(): iterable
     {
         yield 'minimal' => [
-            null,
-            null,
+            new PhpStan(null, null),
+            '/path/to/project',
+            new PhpStan(
+                '/path/to/project',
+                null,
+            ),
         ];
 
-        yield 'complete' => [
-            '/path/to/phpunit-config-folder',
-            '/path/to/phpunit',
+        yield 'both paths are relative' => [
+            new PhpStan(
+                'devTools/phpstan',
+                'devTools/phpstan/bin/phpstan',
+            ),
+            '/path/to/project',
+            new PhpStan(
+                '/path/to/project/devTools/phpstan',
+                '/path/to/project/devTools/phpstan/bin/phpstan',
+            ),
+        ];
+
+        yield 'both paths are absolute' => [
+            new PhpStan(
+                '/path/to/another-project/devTools/phpstan',
+                '/path/to/another-project/devTools/phpstan/bin/phpstan',
+            ),
+            '/path/to/project',
+            new PhpStan(
+                '/path/to/another-project/devTools/phpstan',
+                '/path/to/another-project/devTools/phpstan/bin/phpstan',
+            ),
         ];
     }
 }
