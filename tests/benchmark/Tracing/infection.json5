@@ -8,7 +8,7 @@
         ],
     },
     "phpUnit": {
-        configDir: "benchmark-source",
+        "configDir": "benchmark-source",
         "customPath": "./../../../vendor/bin/phpunit"
     }
 }
