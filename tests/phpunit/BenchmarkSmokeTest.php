@@ -56,7 +56,7 @@ final class BenchmarkSmokeTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
 
-    private ?string $phpExecutable;
+    private string $phpExecutable;
 
     /**
      * @param non-empty-list<string> $command
