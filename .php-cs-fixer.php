@@ -189,5 +189,5 @@ return (new Config())
         'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
-    ->setCacheFile(__DIR__.'/build/.php_cs.cache')
+    ->setCacheFile(__DIR__ . '/build/.php_cs.cache')
 ;
