@@ -115,6 +115,8 @@ final class VersionParserTest extends TestCase
         yield 'PHPUnit' => ['PHPUnit 7.5.11 by Sebastian Bergmann and contributors.', '7.5.11'];
 
         yield 'PHPStan' => ['PHPStan - PHP Static Analysis Tool 2.1.x-dev@cfa0299', '2.1.x-dev@cfa0299'];
+
+        yield 'PHPStan Dev' => ['PHPStan - PHP Static Analysis Tool dev-648dbd911cef28707338fe5c25875d50e7875391@648dbd9', 'dev-648dbd911cef28707338fe5c25875d50e7875391@648dbd9'];
     }
 
     public static function invalidVersionProvider(): iterable
