@@ -41,8 +41,9 @@ FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
-BENCHMARK_TRACING_COVERAGE=tests/benchmark/Tracing/coverage
-BENCHMARK_TRACING_SOURCES=tests/benchmark/Tracing/sources
+BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
+BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/benchmark-source
+BENCHMARK_TRACING_COVERAGE_SOURCE_DIR=$(BENCHMARK_TRACING_SUBMODULE)/dist/coverage
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -129,7 +130,7 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump
 
 .PHONY: profile_tracing
-profile_tracing: vendor $(BENCHMARK_TRACING_SOURCES) $(BENCHMARK_TRACING_COVERAGE)
+profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative
 	blackfire run \
 		--samples=5 \
@@ -268,18 +269,27 @@ $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sourc
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-$(BENCHMARK_TRACING_COVERAGE): tests/benchmark/Tracing/coverage.tar.gz
-	@echo "Untarring the coverage, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
+$(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR)
+	@echo "Generating coverage"
+	@rm -rf $(BENCHMARK_TRACING_COVERAGE_DIR) || true
+	cp -R $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	@# Correct the absolute paths found
+	PROJECT_ROOT=$$(pwd)/$(BENCHMARK_TRACING_SUBMODULE) \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-type f \
+			-exec sed -i.bak "s|/path/to/project|$${PROJECT_ROOT}|g" {} \; \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-name "*.bak" \
+			-type f \
+			-delete
 	touch -c $@
 
-$(BENCHMARK_TRACING_SOURCES): tests/benchmark/Tracing/sources.tar.gz
-	@echo "Untarring the sources, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
-	touch -c $@
+$(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR):
+	git submodule update --init $(BENCHMARK_TRACING_SUBMODULE)
 
 clean:
 	rm -fr tests/benchmark/MutationGenerator/sources
-	rm -fr tests/benchmark/Tracing/coverage
-	rm -fr tests/benchmark/Tracing/sources
+	@rm -fr tests/benchmark/Tracing/sources
+	rm -fr $(BENCHMARK_TRACING_COVERAGE_DIR)
+	rm -fr $(BENCHMARK_TRACING_VENDOR)
 	git clean -f -X tests/e2e/
