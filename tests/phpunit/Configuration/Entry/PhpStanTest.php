@@ -77,7 +77,7 @@ final class PhpStanTest extends TestCase
             '/path/to/project',
             new PhpStan(
                 '/path/to/project/devTools/phpstan',
-                'devTools/phpstan/bin/phpstan',
+                '/path/to/project/devTools/phpstan/bin/phpstan',
             ),
         ];
 

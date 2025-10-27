@@ -77,7 +77,7 @@ final class PhpUnitTest extends TestCase
             '/path/to/project',
             new PhpUnit(
                 '/path/to/project/devTools/phpunit',
-                'devTools/phpunit/bin/phpunit',
+                '/path/to/project/devTools/phpunit/bin/phpunit',
             ),
         ];
 
