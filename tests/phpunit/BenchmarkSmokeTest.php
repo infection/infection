@@ -97,7 +97,7 @@ final class BenchmarkSmokeTest extends TestCase
         yield 'MutationGenerator' => [
             [
                 Path::canonicalize(self::BENCHMARK_DIR . '/MutationGenerator/profile.php'),
-                '1',
+                '-max-mutation-count=1',
                 '--debug',
             ],
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
@@ -106,7 +106,7 @@ final class BenchmarkSmokeTest extends TestCase
         yield 'Tracing' => [
             [
                 Path::canonicalize(self::BENCHMARK_DIR . '/Tracing/profile.php'),
-                '1',
+                '--max-trace-count=1',
                 '--debug',
             ],
             self::BENCHMARK_DIR . '/Tracing/coverage',
