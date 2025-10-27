@@ -42,7 +42,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -91,12 +91,12 @@ final class BenchmarkTest extends TestCase
     public static function provideBenchmarks(): iterable
     {
         yield 'MutationGenerator' => [
-            realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
+            Path::canonicalize(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
         ];
 
         yield 'Tracing' => [
-            realpath(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
+            Path::canonicalize(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
             self::BENCHMARK_DIR . '/Tracing/sources',
         ];
     }
