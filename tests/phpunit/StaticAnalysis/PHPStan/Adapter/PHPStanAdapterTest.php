@@ -289,6 +289,8 @@ final class PHPStanAdapterTest extends TestCase
         yield 'dev version 2.1.x' => ['2.1.x-dev@cfa0299'];
 
         yield 'dev version 2.2.x' => ['2.2.x-dev@cfa0299'];
+
+        yield 'PHPStan-src dev' => ['dev-648dbd911cef28707338fe5c25875d50e7875391@648dbd9'];
     }
 
     /**
