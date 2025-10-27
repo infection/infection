@@ -144,6 +144,7 @@ parameters:
         - ../tests/benchmark/MutationGenerator/sources (?)
         - ../tests/benchmark/Tracing/coverage (?)
         - ../tests/benchmark/Tracing/sources (?)
+        - ../tests/benchmark/Tracing/benchmark-source (?)
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false
