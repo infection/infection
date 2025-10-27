@@ -63,13 +63,13 @@ $generateTraces = static function (int $maxCount) use ($container): iterable {
     $i = 0;
 
     foreach ($traces as $trace) {
-        ++$i;
-
         if ($i === $maxCount) {
             break;
         }
 
         yield $trace;
+
+        ++$i;
     }
 };
 
