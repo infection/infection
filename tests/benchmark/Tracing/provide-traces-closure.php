@@ -79,10 +79,6 @@ $generateTraces = static function (int $maxCount) use ($container): iterable {
  * @return positive-int|0
  */
 return static function (int $maxCount) use ($generateTraces): int {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
     $traces = $generateTraces($maxCount);
     $count = 0;
 

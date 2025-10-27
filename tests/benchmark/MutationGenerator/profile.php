@@ -60,7 +60,7 @@ $input = new ArgvInput(
             null,
             InputOption::VALUE_REQUIRED,
             'Maximum number of mutations retrieved. Use -1 for no maximum',
-            '-1',
+            5000,
         ),
         new InputOption(
             DEBUG_OPT,
@@ -76,7 +76,7 @@ $io = new SymfonyStyle($input, $output);
 $generateMutations = require __DIR__ . '/generate-mutations-closure.php';
 
 /** @var positive-int $maxTraceCount */
-$maxMutationsCount = (static function (InputInterface $input, string $optionName): ?int {
+$maxMutationsCount = (static function (InputInterface $input, string $optionName): int {
     $option = $input->getOption($optionName);
 
     Assert::integerish(
