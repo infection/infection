@@ -124,6 +124,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
     {
         $version = $this->getVersion();
 
+        // running on phpstan-src itself
         if (str_starts_with($version, 'dev-')) {
             return;
         }
