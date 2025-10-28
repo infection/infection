@@ -121,7 +121,7 @@ profile:
 
 .PHONY: profile_mutation_generator
 profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
-	composer dump --classmap-authoritative
+	composer dump --classmap-authoritative --quiet
 	blackfire run \
 		--samples=5 \
 		--title="MutationGenerator" \
@@ -131,7 +131,7 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 
 .PHONY: profile_tracing
 profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
-	composer dump --classmap-authoritative
+	composer dump --classmap-authoritative --quiet
 	blackfire run \
 		--samples=5 \
 		--title="Tracing" \

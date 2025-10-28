@@ -1567,12 +1567,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
 
 		-
-			message: '#^Static property Infection\\Tests\\Process\\Runner\\InitialTestsRunnerTest\:\:\$phpBin \(string\) does not accept string\|false\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/Process/Runner/InitialTestsRunnerTest.php
-
-		-
 			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'
 			identifier: method.notFound
 			count: 1

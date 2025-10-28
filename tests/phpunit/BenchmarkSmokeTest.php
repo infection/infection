@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
@@ -44,7 +45,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -55,8 +55,6 @@ use Symfony\Component\Process\Process;
 final class BenchmarkSmokeTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
-
-    private string $phpExecutable;
 
     /**
      * @param non-empty-list<string> $command
@@ -81,7 +79,7 @@ final class BenchmarkSmokeTest extends TestCase
         $this->assertFileExists($path);
 
         $benchmarkProcess = new Process([
-            $this->getPhpExecutable(),
+            TestPhpExecutableFinder::find(),
             ...$command,
         ]);
 
@@ -111,16 +109,5 @@ final class BenchmarkSmokeTest extends TestCase
             ],
             self::BENCHMARK_DIR . '/Tracing/coverage',
         ];
-    }
-
-    private function getPhpExecutable(): string
-    {
-        if (!isset($this->phpExecutable)) {
-            $executable = (new PhpExecutableFinder())->find();
-
-            $this->phpExecutable = $executable === false ? 'php' : $executable;
-        }
-
-        return $this->phpExecutable;
     }
 }
