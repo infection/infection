@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Framework\OperatingSystem;
 use Infection\Str;
 use Infection\Tests\TestingUtility\Platform;
 use const PHP_EOL;
@@ -213,7 +214,7 @@ final class StrTest extends TestCase
         string $value,
         string $expected,
     ): void {
-        if (Platform::isWindows()) {
+        if (OperatingSystem::isWindows()) {
             $value = str_replace("\n", "\r\n", $value);
             $expected = str_replace("\n", "\r\n", $expected);
         }
