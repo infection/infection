@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use Symfony\Component\Filesystem\Path;
 use const DIRECTORY_SEPARATOR;
 use function explode;
 use function getenv;
@@ -44,7 +45,6 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -142,8 +142,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         }
 
         $this->assertSame(
-            normalizePath($expected),
-            normalizePath($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
+            Path::normalize($expected),
+            Path::normalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
             'Should return the phpunit path',
         );
 
@@ -181,8 +181,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         }
 
         $this->assertSame(
-            normalizePath(realpath($expected)),
-            normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
+            Path::canonicalize($expected),
+            Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
             'should return the vendor bin link or .bat',
         );
     }
@@ -200,8 +200,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         $this->assertSame(
-            normalizePath(realpath($mock->getPackageScript())),
-            normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
+            Path::canonicalize($mock->getPackageScript()),
+            Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
             'should return the package script from .bat',
         );
     }

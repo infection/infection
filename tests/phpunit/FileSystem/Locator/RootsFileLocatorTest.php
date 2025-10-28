@@ -38,7 +38,6 @@ namespace Infection\Tests\FileSystem\Locator;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\Framework\OperatingSystem;
-use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,6 +46,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Requires IO reads
@@ -78,7 +78,10 @@ final class RootsFileLocatorTest extends TestCase
     ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locate($file);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(
+            Path::normalize($expected),
+            Path::normalize($path),
+        );
     }
 
     /**
@@ -115,7 +118,10 @@ final class RootsFileLocatorTest extends TestCase
     ): void {
         $path = (new RootsFileLocator($roots, $this->filesystem))->locateOneOf($files);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(
+            Path::normalize($expected),
+            Path::normalize($path),
+        );
     }
 
     /**
