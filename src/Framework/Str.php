@@ -53,7 +53,7 @@ final class Str
 {
     use CannotBeInstantiated;
 
-    private const ALL_LINE_RETURNS = ["\r\n", "\n", "\r"];
+    private const ALL_LINE_RETURNS = ["\r\n", "\r", "\n"];
 
     public static function toSystemLineReturn(string $value): string
     {
