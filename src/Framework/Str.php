@@ -42,8 +42,8 @@ use function explode;
 use function implode;
 use Infection\CannotBeInstantiated;
 use const PHP_EOL;
-use function preg_replace;
 use function Safe\mb_convert_encoding;
+use function Safe\preg_replace;
 use function trim;
 
 /**
