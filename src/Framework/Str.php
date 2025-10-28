@@ -96,38 +96,12 @@ final class Str
             "\n",
             self::toLinuxLineReturn($value),
         );
-        $linesCount = count($lines);
 
-        // Trim leading empty lines
-        for ($i = 0; $i < $linesCount; ++$i) {
-            $line = $lines[$i];
+        $trimmedLines = self::removeTrailingBlankLines(
+            self::removeLeadingBlankLines($lines),
+        );
 
-            if (trim($line) === '') {
-                unset($lines[$i]);
-
-                continue;
-            }
-
-            break;
-        }
-
-        $lines = array_values($lines);
-        $linesCount = count($lines);
-
-        // Trim trailing empty lines
-        for ($i = $linesCount - 1; $i >= 0; --$i) {
-            $line = $lines[$i];
-
-            if (trim($line) === '') {
-                unset($lines[$i]);
-
-                continue;
-            }
-
-            break;
-        }
-
-        return implode(PHP_EOL, $lines);
+        return implode(PHP_EOL, $trimmedLines);
     }
 
     public static function convertToUtf8(string $string): string
@@ -136,5 +110,53 @@ final class Str
         $utf8String = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
 
         return $utf8String;
+    }
+
+    /**
+     * @param list<string> $lines
+     *
+     * @return list<string>
+     */
+    private static function removeLeadingBlankLines(array $lines): array
+    {
+        $linesCount = count($lines);
+
+        for ($index = 0; $index < $linesCount; ++$index) {
+            $line = $lines[$index];
+
+            if (trim($line) === '') {
+                unset($lines[$index]);
+
+                continue;
+            }
+
+            break;
+        }
+
+        return array_values($lines);
+    }
+
+    /**
+     * @param list<string> $lines
+     *
+     * @return string[]
+     */
+    private static function removeTrailingBlankLines(array $lines): array
+    {
+        $linesCount = count($lines);
+
+        for ($index = $linesCount - 1; $index > 0; --$index) {
+            $line = $lines[$index];
+
+            if (trim($line) === '') {
+                unset($lines[$index]);
+
+                continue;
+            }
+
+            break;
+        }
+
+        return $lines;
     }
 }

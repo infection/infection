@@ -292,20 +292,30 @@ final class StrTest extends TestCase
 
         yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
             <<<'TXT'
-                  
+
 
                   Hello...
-                    
+
                  ...World!
-                  
+
 
                 TXT
             ,
             <<<'TXT'
                   Hello...
-                    
+
                  ...World!
                 TXT,
+        ];
+
+        yield 'string with content followed by single whitespace line' => [
+            "Hello\n  ",
+            'Hello',
+        ];
+
+        yield 'string with only newlines' => [
+            "\n\n\n",
+            '',
         ];
     }
 
