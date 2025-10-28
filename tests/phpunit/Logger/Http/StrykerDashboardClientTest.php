@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\Http;
 
 use Generator;
+use Infection\Framework\Str;
 use Infection\Logger\Http\Response;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
-use Infection\Str;
 use Infection\Tests\Logger\DummyLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

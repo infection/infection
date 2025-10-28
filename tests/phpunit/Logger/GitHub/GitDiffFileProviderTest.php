@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\GitHub;
 
 use function implode;
+use Infection\Framework\Str;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\Str;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

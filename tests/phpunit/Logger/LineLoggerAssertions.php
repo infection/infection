@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function implode;
+use Infection\Framework\Str;
 use Infection\Logger\LineMutationTestingResultsLogger;
-use Infection\Str;
 
 trait LineLoggerAssertions
 {

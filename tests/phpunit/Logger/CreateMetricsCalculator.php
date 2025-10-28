@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Framework\Str;
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
@@ -42,7 +43,6 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
-use Infection\Str;
 use Infection\Testing\MutatorName;
 use function Later\now;
 

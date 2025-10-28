@@ -39,7 +39,7 @@ use Closure;
 use DOMDocument;
 use const E_ALL;
 use Infection\Framework\OperatingSystem;
-use Infection\Str;
+use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;

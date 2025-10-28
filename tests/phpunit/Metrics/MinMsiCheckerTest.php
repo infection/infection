@@ -37,10 +37,10 @@ namespace Infection\Tests\Metrics;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Str;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

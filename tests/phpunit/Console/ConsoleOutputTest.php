@@ -37,8 +37,8 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\ConsoleLogger;
-use Infection\Str;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

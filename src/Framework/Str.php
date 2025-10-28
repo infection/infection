@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Framework;
 
 use function array_map;
 use function array_values;
 use function count;
 use function explode;
 use function implode;
+use Infection\CannotBeInstantiated;
 use const PHP_EOL;
 use function Safe\mb_convert_encoding;
 use function str_replace;

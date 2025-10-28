@@ -37,7 +37,7 @@ namespace Infection\Tests\Configuration\Schema;
 
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
-use Infection\Str;
+use Infection\Framework\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

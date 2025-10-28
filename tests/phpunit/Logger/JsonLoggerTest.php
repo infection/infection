@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Framework\Str;
 use Infection\Logger\JsonLogger;
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
-use Infection\Str;
 use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

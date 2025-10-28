@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser;
 
+use Infection\Framework\Str;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
-use Infection\Str;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Error;
 use PhpParser\Node;

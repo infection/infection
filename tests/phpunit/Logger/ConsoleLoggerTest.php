@@ -37,8 +37,8 @@ namespace Infection\Tests\Logger;
 
 use DateTimeImmutable as UnsafeDateTimeImmutable;
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\ConsoleLogger;
-use Infection\Str;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;

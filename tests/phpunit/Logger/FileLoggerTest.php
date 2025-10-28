@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Framework\Str;
 use Infection\Logger\FileLogger;
-use Infection\Str;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use PHPUnit\Framework\Attributes\CoversClass;

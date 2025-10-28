@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Infection\Str;
+use Infection\Framework\Str;
 use Psr\Log\AbstractLogger;
 use Webmozart\Assert\Assert;
 

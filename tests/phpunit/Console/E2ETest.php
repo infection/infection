@@ -50,7 +50,7 @@ use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Framework\OperatingSystem;
-use Infection\Str;
+use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
 use function is_readable;
 use const PHP_OS;

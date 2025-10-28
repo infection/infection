@@ -33,11 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Framework;
 
 use Infection\Framework\OperatingSystem;
-use Infection\Str;
-use Infection\Tests\TestingUtility\Platform;
+use Infection\Framework\Str;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Framework\Str;
 use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
-use Infection\Str;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use const JSON_THROW_ON_ERROR;
 use PHPUnit\Framework\Attributes\CoversClass;

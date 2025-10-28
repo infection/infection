@@ -38,7 +38,7 @@ namespace Infection\Tests\Configuration\Schema;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
-use Infection\Str;
+use Infection\Framework\Str;
 use function json_last_error_msg;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
