@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Framework\OperatingSystem;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
-use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -56,7 +56,7 @@ final class BenchmarkTest extends TestCase
     #[DataProvider('provideBenchmarks')]
     public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
     {
-        if (PHP_OS_FAMILY === 'Windows') {
+        if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('Not interested in profiling on Windows');
         }
 

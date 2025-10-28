@@ -33,30 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Processor;
+namespace Infection\Framework;
 
-use Fidry\CpuCoreCounter\CpuCoreCounter;
-use Fidry\CpuCoreCounter\NumberOfCpuCoreNotFound;
-use Infection\Framework\OperatingSystem;
+use Infection\CannotBeInstantiated;
+use const PHP_OS_FAMILY;
 
 /**
  * @internal
  */
-final class CpuCoresCountProvider
+final class OperatingSystem
 {
-    /**
-     * Copied and adapter from Psalm project: https://github.com/vimeo/psalm/blob/4.x/src/Psalm/Internal/Analyzer/ProjectAnalyzer.php#L1454
-     */
-    public static function provide(): int
-    {
-        if (OperatingSystem::isWindows()) {
-            return 1;
-        }
+    use CannotBeInstantiated;
 
-        try {
-            return (new CpuCoreCounter())->getCount();
-        } catch (NumberOfCpuCoreNotFound) {
-            return 1;
-        }
+    public static function isWindows(): bool
+    {
+        return PHP_OS_FAMILY === 'Windows';
     }
 }
