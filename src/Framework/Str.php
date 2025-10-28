@@ -55,6 +55,9 @@ final class Str
 
     private const LINE_RETURNS_REGEX = '/\r\n|\r|\n/';
 
+    /**
+     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
+     */
     public static function toSystemLineReturn(string $value): string
     {
         return preg_replace(
@@ -64,6 +67,9 @@ final class Str
         );
     }
 
+    /**
+     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
+     */
     public static function toLinuxLineReturn(string $value): string
     {
         return preg_replace(
