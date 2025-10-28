@@ -1825,7 +1825,7 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of function Infection\\Tests\\normalizePath expects string, string\|null given\.$#'
+			message: '#^Parameter \#1 \$path of static method Symfony\\Component\\Filesystem\\Path::normalize\(\) expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
