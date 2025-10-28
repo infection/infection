@@ -367,18 +367,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\BenchmarkTest\:\:getPhpExecutable\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/BenchmarkTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\BenchmarkTest\:\:\$phpExecutable \(string\|null\) does not accept string\|false\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/BenchmarkTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\CI\\ConfigurableEnv\:\:\$variables has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1577,12 +1565,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
-
-		-
-			message: '#^Static property Infection\\Tests\\Process\\Runner\\InitialTestsRunnerTest\:\:\$phpBin \(string\) does not accept string\|false\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/Process/Runner/InitialTestsRunnerTest.php
 
 		-
 			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'

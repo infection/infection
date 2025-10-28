@@ -44,30 +44,23 @@ use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversClass(InitialStaticAnalysisRunner::class)]
 final class InitialStaticAnalysisRunnerTest extends TestCase
 {
-    private static string $phpBin;
-
     private InitialStaticAnalysisProcessFactory&MockObject $processFactoryMock;
 
     private EventDispatcherCollector $eventDispatcher;
 
     private InitialStaticAnalysisRunner $runner;
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$phpBin = (string) (new PhpExecutableFinder())->find();
-    }
 
     protected function setUp(): void
     {
@@ -109,6 +102,10 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
     private function createProcessForCode(string $code): Process
     {
-        return new Process([self::$phpBin, '-r', $code]);
+        return new Process([
+            TestPhpExecutableFinder::find(),
+            '-r',
+            $code,
+        ]);
     }
 }
