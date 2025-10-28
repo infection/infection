@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use Symfony\Component\Filesystem\Path;
 use const DIRECTORY_SEPARATOR;
 use function explode;
 use function getenv;
@@ -54,6 +53,7 @@ use function Safe\realpath;
 use function sprintf;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @see MockVendor
