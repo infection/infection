@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
 use const PHP_OS_FAMILY;
 use const PHP_SAPI;
@@ -44,7 +45,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 #[Group('integration')]
@@ -52,11 +52,6 @@ use Symfony\Component\Process\Process;
 final class BenchmarkTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
-
-    /**
-     * @var string|null
-     */
-    private $phpExecutable;
 
     #[DataProvider('provideBenchmarks')]
     public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
@@ -76,7 +71,7 @@ final class BenchmarkTest extends TestCase
         $this->assertFileExists($path);
 
         $benchmarkProcess = new Process([
-            $this->getPhpExecutable(),
+            TestPhpExecutableFinder::find(),
             $path,
             '1',
         ]);
@@ -99,10 +94,5 @@ final class BenchmarkTest extends TestCase
             realpath(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
             self::BENCHMARK_DIR . '/Tracing/sources',
         ];
-    }
-
-    private function getPhpExecutable(): string
-    {
-        return $this->phpExecutable ??= (new PhpExecutableFinder())->find();
     }
 }
