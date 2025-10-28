@@ -42,8 +42,8 @@ use function explode;
 use function implode;
 use Infection\CannotBeInstantiated;
 use const PHP_EOL;
+use function preg_replace;
 use function Safe\mb_convert_encoding;
-use function str_replace;
 use function trim;
 
 /**
@@ -53,12 +53,12 @@ final class Str
 {
     use CannotBeInstantiated;
 
-    private const ALL_LINE_RETURNS = ["\r\n", "\r", "\n"];
+    private const LINE_RETURNS_REGEX = '/\r\n|\r|\n/';
 
     public static function toSystemLineReturn(string $value): string
     {
-        return str_replace(
-            self::ALL_LINE_RETURNS,
+        return preg_replace(
+            self::LINE_RETURNS_REGEX,
             PHP_EOL,
             $value,
         );
@@ -66,8 +66,8 @@ final class Str
 
     public static function toLinuxLineReturn(string $value): string
     {
-        return str_replace(
-            self::ALL_LINE_RETURNS,
+        return preg_replace(
+            self::LINE_RETURNS_REGEX,
             "\n",
             $value,
         );
