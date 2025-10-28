@@ -60,6 +60,7 @@ use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\Framework\Enum\EnumBucket;
+use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
@@ -128,6 +129,7 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutatorName::class,
         BaseMutatorTestCase::class,
+        OperatingSystem::class,
         SimpleMutation::class,
         StringNormalizer::class,
         SourceTestClassNameScheme::class,

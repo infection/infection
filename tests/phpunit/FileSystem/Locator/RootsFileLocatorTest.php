@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Locator;
 
-use function defined;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
+use Infection\Framework\OperatingSystem;
 use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -257,7 +257,7 @@ final class RootsFileLocatorTest extends TestCase
             }
         };
 
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (!OperatingSystem::isWindows()) {
             $generators[] = static function () use ($root): iterable {
                 $title = 'one root';
                 $case = 'locate symlinked file';
@@ -311,7 +311,7 @@ final class RootsFileLocatorTest extends TestCase
 
         $fixturesDir = realpath(self::FIXTURES_DIR);
 
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (!OperatingSystem::isWindows()) {
             yield [
                 [$fixturesDir],
                 'broken-symlink',
