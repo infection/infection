@@ -64,13 +64,6 @@ function normalize_trailing_spaces(string $value): string
     );
 }
 
-function generator_to_phpunit_data_provider(iterable $source): iterable
-{
-    foreach ($source as $key => $value) {
-        yield $key => [$value];
-    }
-}
-
 /**
  * Creates a temporary directory.
  *

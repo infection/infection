@@ -33,45 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use function array_filter;
-use function array_values;
 use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
-use function iterator_to_array;
-use ReflectionClass;
 
-final class SubscriberProvider
+final class DataProviderFactory
 {
     use CannotBeInstantiated;
 
     /**
-     * @var string[]|null
+     * @template Key
+     * @template Value
+     *
+     * @param iterable<Key, Value> $source
+     *
+     * @return iterable<Key, array{Value}>
      */
-    private static $subscriberClasses;
-
-    public static function provideSubscriberClasses(): iterable
+    public static function fromIterable(iterable $source): iterable
     {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
-
-            return;
+        foreach ($source as $key => $value) {
+            yield $key => [$value];
         }
-
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static fn (string $class): bool => $class !== EventSubscriber::class
-                && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class),
-        ));
-
-        yield from self::$subscriberClasses;
-    }
-
-    public static function subscriberClassesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(self::provideSubscriberClasses());
     }
 }
