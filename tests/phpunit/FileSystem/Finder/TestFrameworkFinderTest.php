@@ -143,7 +143,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $this->assertSame(
             Path::normalize($expected),
-            Path::canonicalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
+            Path::normalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
             'Should return the phpunit path',
         );
 

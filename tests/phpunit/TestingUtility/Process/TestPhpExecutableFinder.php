@@ -33,64 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
+namespace Infection\Tests\TestingUtility\Process;
 
-use function getenv;
-use function Infection\Tests\make_tmp_dir;
-use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
-use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
-use function sys_get_temp_dir;
+use Infection\CannotBeInstantiated;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Webmozart\Assert\Assert;
 
-/**
- * @private
- */
-abstract class FileSystemTestCase extends TestCase
+final class TestPhpExecutableFinder
 {
-    private const TMP_DIR_NAME = 'infection-test';
+    use CannotBeInstantiated;
 
-    protected string $cwd = '';
+    private static string $phpExecutable;
 
-    protected string $tmp = '';
-
-    public static function tearDownAfterClass(): void
+    public static function find(): string
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
+        if (!isset(self::$phpExecutable)) {
+            self::$phpExecutable = self::lookup();
+        }
+
+        return self::$phpExecutable;
     }
 
-    protected function setUp(): void
+    private static function lookup(): string
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
+        $finder = new PhpExecutableFinder();
+        $executable = $finder->find();
 
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-    }
-
-    protected function tearDown(): void
-    {
-        (new Filesystem())->remove($this->tmp);
-    }
-
-    final protected static function removeTmpDir(): void
-    {
-        $testToken = getenv('TEST_TOKEN');
-
-        (new Filesystem())->remove(
-            Path::normalize(
-                sprintf(
-                    '%s/%s/%s',
-                    realpath(sys_get_temp_dir()),
-                    self::TMP_DIR_NAME,
-                    $testToken === false || $testToken === '' ? '1' : $testToken,
-                ),
-            ),
+        Assert::notFalse(
+            $executable,
+            'Expected to find a PHP executable. None found.',
         );
+
+        return $executable;
     }
 }

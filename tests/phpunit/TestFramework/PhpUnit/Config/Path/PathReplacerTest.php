@@ -72,11 +72,10 @@ final class PathReplacerTest extends TestCase
         $pathReplacer->replaceInNode($node);
         $nodeValue = $node->nodeValue;
 
-        $actualPath = $nodeValue === null
-            ? $nodeValue
-            : Path::normalize($nodeValue);
-
-        $this->assertSame($expectedPath, $actualPath);
+        $this->assertSame(
+            $expectedPath,
+            Path::normalize($node->nodeValue),
+        );
     }
 
     public static function pathProvider(): iterable

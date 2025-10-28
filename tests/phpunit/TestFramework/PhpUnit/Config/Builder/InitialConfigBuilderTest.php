@@ -163,7 +163,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertInstanceOf(DOMNodeList::class, $directories);
 
         $this->assertSame(1, $directories->length);
-        $this->assertSame($this->projectPath . '/*Bundle', Path::normalize($directories[0]->nodeValue));
+        $this->assertSame(
+            $this->projectPath . '/*Bundle',
+            Path::normalize($directories[0]->nodeValue),
+        );
     }
 
     public function test_it_sets_stops_on_failure(): void
@@ -206,7 +209,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $xml = file_get_contents($this->builder->build('6.5'));
 
-        $bootstrap = Path::canonicalize($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
+        $bootstrap = Path::normalize(
+            $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue,
+        );
 
         $this->assertSame($this->projectPath . '/app/autoload2.php', $bootstrap);
     }

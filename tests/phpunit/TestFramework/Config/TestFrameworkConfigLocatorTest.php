@@ -74,7 +74,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpunit.xml.dist file.',
         );
     }
@@ -88,7 +88,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/AltDistFile/phpunit.dist.xml',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpunit.xml.dist file.',
         );
     }
@@ -102,7 +102,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/XmlFile/phpunit.xml',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpunit.xml file.',
         );
     }
@@ -116,7 +116,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/BothXmlAndDist/phpunit.xml',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpunit.xml file.',
         );
     }
@@ -130,7 +130,7 @@ final class TestFrameworkConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpunit.xml.dist',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpunit.xml.dist file.',
         );
 

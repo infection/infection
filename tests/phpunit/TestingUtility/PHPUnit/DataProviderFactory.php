@@ -33,58 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use function random_int;
-use function Safe\realpath;
-use function str_replace;
-use function strrpos;
-use function substr;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
-use function sys_get_temp_dir;
+use Infection\CannotBeInstantiated;
 
-/**
- * Creates a temporary directory.
- *
- * @param string $namespace the directory path in the system's temporary directory
- * @param string $className the name of the test class
- *
- * @return string The path to the created directory
- *
- * @TODO: extract the FS utils from Box if they are not going to be merged to Symfony
- */
-function make_tmp_dir(string $namespace, string $className): string
+final class DataProviderFactory
 {
-    if (($pos = strrpos($className, '\\')) !== false) {
-        $shortClass = substr($className, $pos + 1);
-    } else {
-        $shortClass = $className;
-    }
+    use CannotBeInstantiated;
 
-    // Usage of realpath() is important if the temporary directory is a
-    // symlink to another directory (e.g. /var => /private/var on some Macs)
-    // We want to know the real path to avoid comparison failures with
-    // code that uses real paths only
-    $systemTempDir = str_replace('\\', '/', realpath(sys_get_temp_dir()));
-    $basePath = $systemTempDir . '/' . $namespace . '/' . $shortClass;
-
-    $result = false;
-    $attempts = 0;
-    $filesystem = new Filesystem();
-
-    do {
-        $tmpDir = Path::normalize($basePath . random_int(10000, 99999));
-
-        try {
-            $filesystem->mkdir($tmpDir, 0777);
-
-            $result = true;
-        } catch (IOException) {
-            ++$attempts;
+    /**
+     * @template Key
+     * @template Value
+     *
+     * @param iterable<Key, Value> $source
+     *
+     * @return iterable<Key, array{Value}>
+     */
+    public static function fromIterable(iterable $source): iterable
+    {
+        foreach ($source as $key => $value) {
+            yield $key => [$value];
         }
-    } while ($result === false && $attempts <= 10);
-
-    return $tmpDir;
+    }
 }

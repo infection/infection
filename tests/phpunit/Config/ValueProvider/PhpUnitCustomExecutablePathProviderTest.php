@@ -96,7 +96,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->with(TestFrameworkTypes::PHPUNIT)
             ->will($this->throwException(new FinderException()));
 
-        $customExecutable = Path::normalize(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar');
+        $customExecutable = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar');
 
         $path = $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream("{$customExecutable}\n")),

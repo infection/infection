@@ -49,6 +49,7 @@ use Infection\Console\Application;
 use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Framework\OperatingSystem;
 use Infection\Str;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestingUtility\Platform;
@@ -338,7 +339,7 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
         }
 
-        if (Platform::isWindows()) {
+        if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('This test can be unstable on Windows');
         }
 

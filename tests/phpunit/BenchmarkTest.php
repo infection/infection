@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Framework\OperatingSystem;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
-use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 #[Group('integration')]
@@ -53,15 +53,10 @@ final class BenchmarkTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
 
-    /**
-     * @var string|null
-     */
-    private $phpExecutable;
-
     #[DataProvider('provideBenchmarks')]
     public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
     {
-        if (PHP_OS_FAMILY === 'Windows') {
+        if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('Not interested in profiling on Windows');
         }
 
@@ -76,7 +71,7 @@ final class BenchmarkTest extends TestCase
         $this->assertFileExists($path);
 
         $benchmarkProcess = new Process([
-            $this->getPhpExecutable(),
+            TestPhpExecutableFinder::find(),
             $path,
             '1',
         ]);
@@ -91,18 +86,13 @@ final class BenchmarkTest extends TestCase
     public static function provideBenchmarks(): iterable
     {
         yield 'MutationGenerator' => [
-            realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
+            Path::canonicalize(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
         ];
 
         yield 'Tracing' => [
-            realpath(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
+            Path::canonicalize(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
             self::BENCHMARK_DIR . '/Tracing/sources',
         ];
-    }
-
-    private function getPhpExecutable(): string
-    {
-        return $this->phpExecutable ??= (new PhpExecutableFinder())->find();
     }
 }

@@ -74,7 +74,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/DistFile/phpstan.neon.dist',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.neon.dist file.',
         );
     }
@@ -88,7 +88,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/AltDistFile/phpstan.dist.neon',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.dist.neon file.',
         );
     }
@@ -102,7 +102,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/NeonFile/phpstan.neon',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.neon file.',
         );
     }
@@ -116,7 +116,7 @@ final class StaticAnalysisConfigLocatorTest extends TestCase
 
         $this->assertStringEndsWith(
             'tests/phpunit/Fixtures/ConfigLocator/BothNeonAndDist/phpstan.neon',
-            Path::canonicalize($output),
+            Path::normalize($output),
             'Did not find the correct phpstan.neon file.',
         );
     }

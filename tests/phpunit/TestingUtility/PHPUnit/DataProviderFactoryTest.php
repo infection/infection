@@ -33,64 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use function getenv;
-use function Infection\Tests\make_tmp_dir;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
-use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
-use function sys_get_temp_dir;
+use function Pipeline\take;
 
-/**
- * @private
- */
-abstract class FileSystemTestCase extends TestCase
+#[CoversClass(DataProviderFactory::class)]
+final class DataProviderFactoryTest extends TestCase
 {
-    private const TMP_DIR_NAME = 'infection-test';
-
-    protected string $cwd = '';
-
-    protected string $tmp = '';
-
-    public static function tearDownAfterClass(): void
+    public function test_it_creates_a_phpunit_data_provider_from_an_iterable(): void
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-    }
+        $input = [
+            'a' => 'A',
+            'b' => 'B',
+        ];
 
-    protected function setUp(): void
-    {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
+        $expected = [
+            'a' => ['A'],
+            'b' => ['B'],
+        ];
 
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-    }
+        $actual = take(DataProviderFactory::fromIterable($input))->toAssoc();
 
-    protected function tearDown(): void
-    {
-        (new Filesystem())->remove($this->tmp);
-    }
-
-    final protected static function removeTmpDir(): void
-    {
-        $testToken = getenv('TEST_TOKEN');
-
-        (new Filesystem())->remove(
-            Path::normalize(
-                sprintf(
-                    '%s/%s/%s',
-                    realpath(sys_get_temp_dir()),
-                    self::TMP_DIR_NAME,
-                    $testToken === false || $testToken === '' ? '1' : $testToken,
-                ),
-            ),
-        );
+        $this->assertEquals($expected, $actual);
     }
 }

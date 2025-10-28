@@ -37,8 +37,9 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
 use DOMDocument;
-use const E_ALL;
 use Infection\Str;
+use const E_ALL;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
@@ -887,7 +888,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         } catch (InvalidPhpUnitConfiguration $exception) {
             $infectionPath = sprintf(
                 '%s%s',
-                Platform::isWindows() ? 'file:/' : '',
+                OperatingSystem::isWindows() ? 'file:/' : '',
                 Path::canonicalize(__DIR__ . '/../../../../../'),
             );
 
