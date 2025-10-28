@@ -33,60 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use DOMDocument;
-use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
+use Infection\CannotBeInstantiated;
 
-#[Group('integration')]
-#[CoversClass(PathReplacer::class)]
-final class PathReplacerTest extends TestCase
+final class DataProviderFactory
 {
+    use CannotBeInstantiated;
+
     /**
-     * @var string
+     * @template Key
+     * @template Value
+     *
+     * @param iterable<Key, Value> $source
+     *
+     * @return iterable<Key, array{Value}>
      */
-    private static $projectPath;
-
-    protected function setUp(): void
+    public static function fromIterable(iterable $source): iterable
     {
-        self::$projectPath = Path::canonicalize(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path');
-    }
-
-    #[DataProvider('pathProvider')]
-    public function test_it_replaces_relative_path_with_absolute_path(
-        string $originalPath,
-        string $expectedPath,
-    ): void {
-        $pathReplacer = new PathReplacer(new Filesystem());
-
-        $dom = new DOMDocument();
-        $node = $dom->createElement('phpunit', $originalPath);
-        $dom->appendChild($node);
-
-        $pathReplacer->replaceInNode($node);
-
-        $this->assertSame(
-            $expectedPath,
-            Path::normalize($node->nodeValue),
-        );
-    }
-
-    public static function pathProvider(): iterable
-    {
-        yield ['autoload.php', self::$projectPath . '/autoload.php'];
-
-        yield ['./autoload.php', self::$projectPath . '/autoload.php'];
-
-        yield ['../autoload.php', self::$projectPath . '/../autoload.php'];
-
-        yield ['/autoload.php', '/autoload.php'];
-
-        yield ['./*Bundle', self::$projectPath . '/*Bundle'];
+        foreach ($source as $key => $value) {
+            yield $key => [$value];
+        }
     }
 }

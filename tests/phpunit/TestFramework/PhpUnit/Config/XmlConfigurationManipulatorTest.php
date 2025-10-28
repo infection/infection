@@ -38,13 +38,13 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 use Closure;
 use DOMDocument;
 use const E_ALL;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -887,7 +887,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
         } catch (InvalidPhpUnitConfiguration $exception) {
             $infectionPath = sprintf(
                 '%s%s',
-                PHP_OS_FAMILY === 'Windows' ? 'file:/' : '',
+                OperatingSystem::isWindows() ? 'file:/' : '',
                 Path::canonicalize(__DIR__ . '/../../../../../'),
             );
 

@@ -889,18 +889,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
 		-
-			message: '#^Function Infection\\Tests\\generator_to_phpunit_data_provider\(\) has parameter \$source with no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Helpers.php
-
-		-
-			message: '#^Function Infection\\Tests\\generator_to_phpunit_data_provider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Helpers.php
-
-		-
 			message: '#^Method Infection\\Tests\\Logger\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1825,7 +1813,7 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of function Infection\\Tests\\normalizePath expects string, string\|null given\.$#'
+			message: '#^Parameter \#1 \$path of static method Symfony\\Component\\Filesystem\\Path::normalize\(\) expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
