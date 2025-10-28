@@ -130,9 +130,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -143,9 +141,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -158,9 +154,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#1';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -171,9 +165,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'timedOut#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -186,9 +178,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#1';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -199,9 +189,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -214,9 +202,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed by SA#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'killed by SA#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -229,9 +215,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#1';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -242,9 +226,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'error#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -257,9 +239,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#1';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -270,9 +250,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'syntaxError#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -286,9 +264,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 9,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#1';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#1';"),
                         'processOutput' => 'process output',
                     ],
                     [
@@ -299,9 +275,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -343,9 +317,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'uncovered#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'uncovered#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -389,9 +361,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'ignored#0';"),
                         'processOutput' => 'process output',
                     ],
                 ],
@@ -433,9 +403,7 @@ final class JsonLoggerTest extends TestCase
                             'originalFilePath' => 'foo/bar',
                             'originalStartLine' => 10,
                         ],
-                        'diff' => Str::toSystemLineReturn(
-                            "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';",
-                        ),
+                        'diff' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
                         'processOutput' => 'process output',
                     ],
                 ],

@@ -96,9 +96,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'PregQuote',
                     'description' => 'Escaped Mutant for Mutator PregQuote',
-                    'content' => Str::toSystemLineReturn(
-                        "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';",
-                    ),
+                    'content' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -113,9 +111,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => Str::toSystemLineReturn(
-                        "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';",
-                    ),
+                    'content' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -136,9 +132,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => Str::toSystemLineReturn(
-                        "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';",
-                    ),
+                    'content' => Str::toSystemLineReturn("--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',

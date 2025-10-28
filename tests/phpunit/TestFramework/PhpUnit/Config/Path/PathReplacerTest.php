@@ -70,7 +70,6 @@ final class PathReplacerTest extends TestCase
         $dom->appendChild($node);
 
         $pathReplacer->replaceInNode($node);
-        $nodeValue = $node->nodeValue;
 
         $this->assertSame(
             $expectedPath,
