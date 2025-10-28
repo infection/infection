@@ -115,6 +115,12 @@ final class BenchmarkSmokeTest extends TestCase
 
     private function getPhpExecutable(): string
     {
-        return $this->phpExecutable ??= (new PhpExecutableFinder())->find();
+        if (!isset($this->phpExecutable)) {
+            $executable = (new PhpExecutableFinder())->find();
+
+            $this->phpExecutable = $executable === false ? 'php' : $executable;
+        }
+
+        return $this->phpExecutable;
     }
 }
