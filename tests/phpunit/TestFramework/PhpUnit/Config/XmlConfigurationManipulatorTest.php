@@ -37,14 +37,13 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
 use DOMDocument;
-use Infection\Str;
 use const E_ALL;
 use Infection\Framework\OperatingSystem;
+use Infection\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
-use Infection\Tests\TestingUtility\Platform;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

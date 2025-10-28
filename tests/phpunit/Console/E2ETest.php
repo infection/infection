@@ -52,7 +52,6 @@ use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Framework\OperatingSystem;
 use Infection\Str;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestingUtility\Platform;
 use function is_readable;
 use const PHP_OS;
 use const PHP_SAPI;
