@@ -48,8 +48,8 @@ use Infection\Mutator\FunctionSignature\PublicVisibility;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Str;
 use Infection\Testing\MutatorName;
-use function Infection\Tests\normalize_trailing_spaces;
 use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
@@ -468,7 +468,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             $processOutput,
             $detectionStatus,
-            now(normalize_trailing_spaces($diff)),
+            now(Str::normalize($diff)),
             $mutantHash,
             $mutatorClassName,
             $mutatorName ?? MutatorName::getName($mutatorClassName),

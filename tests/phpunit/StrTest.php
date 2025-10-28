@@ -36,23 +36,194 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Str;
+use Infection\Tests\TestingUtility\Platform;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function str_replace;
 
 #[CoversClass(Str::class)]
 final class StrTest extends TestCase
 {
-    #[DataProvider('stringProvider')]
-    public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
-    {
-        $this->assertSame(
-            $expected,
-            normalizeLineReturn(Str::trimLineReturns($value)),
-        );
+    #[DataProvider('toSystemLineReturnProvider')]
+    public function test_it_can_normalize_a_string_line_return_to_the_system_line_return(
+        string $value,
+        string $expected,
+    ): void {
+        $actual = Str::toSystemLineReturn($value);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function stringProvider(): iterable
+    public static function toSystemLineReturnProvider(): iterable
+    {
+        yield 'Unix/Linux (LF)' => [
+            "\n",
+            PHP_EOL,
+        ];
+
+        yield 'Windows (CRLF)' => [
+            "\r\n",
+            PHP_EOL,
+        ];
+
+        yield 'Classic MacOS (CRLF)' => [
+            "\r",
+            PHP_EOL,
+        ];
+    }
+
+    #[DataProvider('toLinuxLineReturnProvider')]
+    public function test_it_can_normalize_a_string_line_return_to_the_linux_line_return(
+        string $value,
+        string $expected,
+    ): void {
+        $actual = Str::toLinuxLineReturn($value);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function toLinuxLineReturnProvider(): iterable
+    {
+        yield 'Unix/Linux (LF)' => [
+            "\n",
+            "\n",
+        ];
+
+        yield 'Windows (CRLF)' => [
+            "\r\n",
+            "\n",
+        ];
+
+        yield 'Classic MacOS (CRLF)' => [
+            "\r",
+            "\n",
+        ];
+    }
+
+    #[DataProvider('stringValuesProvider')]
+    public function test_it_removes_trailing_spaces_and_replaces_line_returns_to_the_unix_line_return(
+        string $input,
+        string $expected,
+    ): void {
+        $actual = Str::normalize($input);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function stringValuesProvider(): iterable
+    {
+        yield 'empty' => ['', ''];
+
+        yield 'spaces' => [' ', ''];
+
+        yield 'multi-line spaces' => [
+            <<<'TXT'
+
+
+                TXT
+            ,
+            <<<'TXT'
+
+
+                TXT,
+        ];
+
+        yield 'text' => ['foo', 'foo'];
+
+        yield 'text with spaces' => [' foo ', ' foo'];
+
+        yield 'multi-line text with spaces' => [
+            <<<'TXT'
+
+                 foo
+                 bar
+
+                TXT
+            ,
+            <<<'TXT'
+
+                 foo
+                 bar
+
+                TXT,
+        ];
+
+        yield 'Unix/Linux (LF)' => [
+            "\n",
+            "\n",
+        ];
+
+        yield 'Windows (CRLF)' => [
+            "\r\n",
+            "\n",
+        ];
+
+        yield 'Classic MacOS (CRLF)' => [
+            "\r",
+            "\n",
+        ];
+
+        yield 'multiline Unix/Linux (LF) with spaces' => [
+            "\n"
+            . " line1 \n"
+            . " line2 \n"
+            . "\n",
+            <<<'TXT'
+
+                 line1
+                 line2
+
+
+                TXT,
+        ];
+
+        yield 'multiline Windows (CRLF) with spaces' => [
+            "\r\n"
+            . " line1 \r\n"
+            . " line2 \r\n"
+            . "\r\n",
+            <<<'TXT'
+
+                 line1
+                 line2
+
+
+                TXT,
+        ];
+
+        yield 'multiline Classic MacOS (CRLF)with spaces' => [
+            "\r"
+            . " line1 \r"
+            . " line2 \r"
+            . "\r",
+            <<<'TXT'
+
+                 line1
+                 line2
+
+
+                TXT,
+        ];
+    }
+
+    #[DataProvider('trimLineReturnProvider')]
+    public function test_it_can_trim_string_of_line_returns_without_replacing_the_line_return_used(
+        string $value,
+        string $expected,
+    ): void {
+        if (Platform::isWindows()) {
+            $value = str_replace("\n", "\r\n", $value);
+            $expected = str_replace("\n", "\r\n", $expected);
+        }
+
+        $actual = Str::trimLineReturns($value);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function trimLineReturnProvider(): iterable
     {
         yield 'empty' => [
             '',
@@ -136,5 +307,38 @@ final class StrTest extends TestCase
                  ...World!
                 TXT,
         ];
+    }
+
+    #[DataProvider('utf8StringConversionProvider')]
+    public function test_it_converts_strings_to_utf8_encoding(string $input, string $expected): void
+    {
+        $result = Str::convertToUtf8($input);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public static function utf8StringConversionProvider(): iterable
+    {
+        yield 'simple ASCII string' => ['Hello World', 'Hello World'];
+
+        yield 'UTF-8 with accents' => ['Héllo Wörld', 'Héllo Wörld'];
+
+        yield 'UTF-8 with Chinese characters' => ['你好', '你好'];
+
+        yield 'UTF-8 with emojis' => ['Hello 🎉', 'Hello 🎉'];
+
+        yield 'empty string' => ['', ''];
+
+        yield 'multi-line string' => ["Line1\nLine2\nLine3", "Line1\nLine2\nLine3"];
+
+        yield 'mixed special characters' => ['Café ñ ü ö 世界', 'Café ñ ü ö 世界'];
+
+        yield 'invalid byte sequence 1' => ["Hello\xC0\xC1World", 'Hello??World'];
+
+        yield 'invalid byte sequence 2' => ["Test\xF5\xF6\xF7\xF8", 'Test????'];
+
+        yield 'truncated multi-byte' => ["Hello\xC2World", 'Hello?World'];
+
+        yield 'overlong encoding' => ["Test\xC0\x80", 'Test??'];
     }
 }

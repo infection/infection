@@ -1843,12 +1843,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of function Infection\\Tests\\normalizePath expects string, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php
-
-		-
 			message: '#^Parameter \#1 \$callback of function set_error_handler expects \(callable\(int, string, string, int\)\: bool\)\|null, Closure\(int, string, string, string\)\: void given\.$#'
 			identifier: argument.type
 			count: 1

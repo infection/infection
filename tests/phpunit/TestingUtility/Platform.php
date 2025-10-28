@@ -33,25 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\Tests\TestingUtility;
 
-use function array_map;
-use function explode;
-use function implode;
 use Infection\CannotBeInstantiated;
+use const PHP_OS_FAMILY;
 
-/**
- * @internal
- */
-final class StringNormalizer
+final class Platform
 {
     use CannotBeInstantiated;
 
-    public static function normalizeString(string $string): string
+    public static function isLinux(): bool
     {
-        return implode(
-            "\n",
-            array_map('rtrim', explode("\n", $string)),
-        );
+        return PHP_OS_FAMILY === 'Linux';
+    }
+
+    public static function isOSX(): bool
+    {
+        return PHP_OS_FAMILY === 'Darwin';
+    }
+
+    public static function isWindows(): bool
+    {
+        return PHP_OS_FAMILY === 'Windows';
     }
 }

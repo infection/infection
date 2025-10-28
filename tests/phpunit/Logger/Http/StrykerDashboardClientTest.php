@@ -39,8 +39,8 @@ use Generator;
 use Infection\Logger\Http\Response;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Str;
 use Infection\Tests\Logger\DummyLogger;
-use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -104,10 +104,11 @@ final class StrykerDashboardClientTest extends TestCase
             [
                 [
                     LogLevel::NOTICE,
-                    normalizeLineReturn(<<<'EOF'
-                        Dashboard response:
-                        Report received!
-                        EOF
+                    Str::toLinuxLineReturn(
+                        <<<'EOF'
+                            Dashboard response:
+                            Report received!
+                            EOF,
                     ),
                     [],
                 ],

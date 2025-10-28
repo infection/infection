@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
+use Infection\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
-use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -66,7 +66,7 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
                 <lib-xml-errors>
                 TXT
             ,
-            normalizeLineReturn($exception->getMessage()),
+            Str::toLinuxLineReturn($exception->getMessage()),
         );
     }
 }

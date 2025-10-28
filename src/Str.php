@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use function array_map;
 use function array_values;
 use function count;
 use function explode;
@@ -51,11 +52,48 @@ final class Str
 {
     use CannotBeInstantiated;
 
-    public static function trimLineReturns(string $string): string
+    private const ALL_LINE_RETURNS = ["\r\n", "\n", "\r"];
+
+    public static function toSystemLineReturn(string $value): string
+    {
+        return str_replace(
+            self::ALL_LINE_RETURNS,
+            PHP_EOL,
+            $value,
+        );
+    }
+
+    public static function toLinuxLineReturn(string $value): string
+    {
+        return str_replace(
+            self::ALL_LINE_RETURNS,
+            "\n",
+            $value,
+        );
+    }
+
+    /**
+     * Removes trailing spaces and normalizes the line return (to the unix/linux one).
+     */
+    public static function normalize(string $value): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                rtrim(...),
+                explode(
+                    "\n",
+                    self::toLinuxLineReturn($value),
+                ),
+            ),
+        );
+    }
+
+    public static function trimLineReturns(string $value): string
     {
         $lines = explode(
             "\n",
-            str_replace("\r\n", "\n", $string),
+            self::toLinuxLineReturn($value),
         );
         $linesCount = count($lines);
 

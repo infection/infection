@@ -40,7 +40,7 @@ use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Framework\Enum\EnumBucket;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Tests\TestingUtility\LineReturnNormalizer;
+use Infection\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -57,7 +57,7 @@ final class DotFormatterTest extends TestCase
         $output = new BufferedOutput();
         $formatter = new DotFormatter($output);
 
-        $expected = LineReturnNormalizer::normalize(
+        $expected = Str::toSystemLineReturn(
             implode(
                 "\n",
                 [
@@ -184,7 +184,7 @@ final class DotFormatterTest extends TestCase
             );
         }
 
-        $expected = LineReturnNormalizer::normalize(
+        $expected = Str::toSystemLineReturn(
             <<<'TXT'
 
                 .: killed by tests, A: killed by SA, M: escaped, U: uncovered
@@ -216,7 +216,7 @@ final class DotFormatterTest extends TestCase
             );
         }
 
-        $expected = LineReturnNormalizer::normalize(
+        $expected = Str::toSystemLineReturn(
             <<<'TXT'
 
                 .: killed by tests, A: killed by SA, M: escaped, U: uncovered

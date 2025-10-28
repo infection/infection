@@ -40,7 +40,7 @@ use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use function Infection\Tests\normalize_trailing_spaces;
+use Infection\Str;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -127,7 +127,7 @@ final class MinMsiCheckerTest extends TestCase
 
                 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch()),
+            Str::normalize($this->output->fetch()),
         );
     }
 
@@ -146,7 +146,7 @@ final class MinMsiCheckerTest extends TestCase
 
                 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch()),
+            Str::normalize($this->output->fetch()),
         );
     }
 
@@ -168,7 +168,7 @@ final class MinMsiCheckerTest extends TestCase
 
                 TXT
             ,
-            normalize_trailing_spaces($this->output->fetch()),
+            Str::normalize($this->output->fetch()),
         );
     }
 

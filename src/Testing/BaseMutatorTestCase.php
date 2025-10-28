@@ -45,6 +45,7 @@ use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use Infection\Str;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
@@ -72,7 +73,7 @@ abstract class BaseMutatorTestCase extends TestCase
     {
         $expectedCodeSamples = (array) $expectedCode;
 
-        $inputCode = StringNormalizer::normalizeString($inputCode);
+        $inputCode = Str::normalize($inputCode);
 
         if ($inputCode === $expectedCode) {
             $this->fail('Input code cant be the same as mutated code');
@@ -87,7 +88,7 @@ abstract class BaseMutatorTestCase extends TestCase
                 'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Make sure mutator is enabled and mutates the source code. Mutants are: %s',
                 count($expectedCodeSamples),
                 count($mutants),
-                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants)),
+                Str::normalize(implode(PHP_EOL, $mutants)),
             ),
         );
 
@@ -102,8 +103,8 @@ abstract class BaseMutatorTestCase extends TestCase
             Assert::string($expectedCodeSample);
 
             $this->assertSame(
-                StringNormalizer::normalizeString($expectedCodeSample),
-                StringNormalizer::normalizeString($realMutatedCode),
+                Str::normalize($expectedCodeSample),
+                Str::normalize($realMutatedCode),
             );
 
             if (!$allowInvalidCode) {

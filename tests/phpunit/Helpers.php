@@ -35,10 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use function array_map;
-use const DIRECTORY_SEPARATOR;
-use function explode;
-use function implode;
 use function random_int;
 use function Safe\realpath;
 use function str_replace;
@@ -46,31 +42,8 @@ use function strrpos;
 use function substr;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
-
-/**
- * Normalizes path. Replaces backslashes with forward ones
- */
-function normalizePath(string $value): string
-{
-    return str_replace(DIRECTORY_SEPARATOR, '/', $value);
-}
-
-function normalizeLineReturn(string $value): string
-{
-    return str_replace(["\r\n", "\r"], "\n", $value);
-}
-
-function normalize_trailing_spaces(string $value): string
-{
-    return implode(
-        "\n",
-        array_map(
-            'rtrim',
-            explode("\n", normalizeLineReturn($value)),
-        ),
-    );
-}
 
 function generator_to_phpunit_data_provider(iterable $source): iterable
 {
@@ -109,7 +82,7 @@ function make_tmp_dir(string $namespace, string $className): string
     $filesystem = new Filesystem();
 
     do {
-        $tmpDir = normalizePath($basePath . random_int(10000, 99999));
+        $tmpDir = Path::canonicalize($basePath . random_int(10000, 99999));
 
         try {
             $filesystem->mkdir($tmpDir, 0777);

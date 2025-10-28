@@ -38,7 +38,7 @@ namespace Infection\Tests\FileSystem\Locator;
 use function defined;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
-use function Infection\Tests\normalizePath as p;
+use Infection\Tests\TestingUtility\Platform;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,6 +47,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(RootsFileOrDirectoryLocator::class)]
@@ -69,7 +70,10 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
     {
         $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locate($file);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(
+            Path::canonicalize($expected),
+            Path::canonicalize($path),
+        );
     }
 
     #[DataProvider('invalidPathsProvider')]
@@ -99,7 +103,10 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
     ): void {
         $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locateOneOf($files);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(
+            Path::canonicalize($expected),
+            Path::canonicalize($path),
+        );
     }
 
     #[DataProvider('multipleInvalidPathsProvider')]
@@ -264,7 +271,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (!Platform::isWindows()) {
             $generators[] = static function () use ($root): iterable {
                 $title = 'one root';
                 $case = 'locate symlinked file';

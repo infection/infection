@@ -49,8 +49,9 @@ use Infection\Console\Application;
 use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Str;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestingUtility\LineReturnNormalizer;
+use Infection\Tests\TestingUtility\Platform;
 use function is_readable;
 use const PHP_OS;
 use const PHP_SAPI;
@@ -212,7 +213,7 @@ final class E2ETest extends TestCase
         }
 
         $expected = file_get_contents('expected-output.txt');
-        $expected = LineReturnNormalizer::normalize($expected);
+        $expected = Str::toSystemLineReturn($expected);
 
         $this->assertStringEqualsFile('infection.log', $expected, sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
@@ -337,7 +338,7 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (Platform::isWindows()) {
             $this->markTestSkipped('This test can be unstable on Windows');
         }
 

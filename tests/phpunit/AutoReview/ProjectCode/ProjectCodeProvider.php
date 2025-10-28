@@ -85,7 +85,6 @@ use Infection\Testing\SimpleMutation;
 use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Testing\SourceTestClassNameScheme;
-use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use function Infection\Tests\generator_to_phpunit_data_provider;
 use function iterator_to_array;
@@ -129,7 +128,6 @@ final class ProjectCodeProvider
         MutatorName::class,
         BaseMutatorTestCase::class,
         SimpleMutation::class,
-        StringNormalizer::class,
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,

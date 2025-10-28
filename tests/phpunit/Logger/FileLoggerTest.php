@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use Infection\Logger\FileLogger;
+use Infection\Str;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
-use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -77,7 +77,7 @@ final class FileLoggerTest extends FileSystemTestCase
             bar
             TXT;
 
-        $expectedContent = LineReturnNormalizer::normalize($expectedContent);
+        $expectedContent = Str::toSystemLineReturn($expectedContent);
 
         $this->fileSystemMock
             ->expects($this->once())

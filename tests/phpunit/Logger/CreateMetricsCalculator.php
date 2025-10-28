@@ -42,8 +42,8 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Mutator\Regex\PregQuote;
+use Infection\Str;
 use Infection\Testing\MutatorName;
-use function Infection\Tests\normalize_trailing_spaces;
 use function Later\now;
 
 trait CreateMetricsCalculator
@@ -186,17 +186,19 @@ trait CreateMetricsCalculator
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             'process output',
             $detectionStatus,
-            now(normalize_trailing_spaces(
-                <<<DIFF
-                    --- Original
-                    +++ New
-                    @@ @@
+            now(
+                Str::normalize(
+                    <<<DIFF
+                        --- Original
+                        +++ New
+                        @@ @@
 
-                    - echo 'original';
-                    + echo '$echoMutatedMessage';
+                        - echo 'original';
+                        + echo '$echoMutatedMessage';
 
-                    DIFF,
-            )),
+                        DIFF,
+                ),
+            ),
             'a1b2c3',
             $mutatorClassName,
             MutatorName::getName($mutatorClassName),
