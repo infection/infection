@@ -33,45 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview\Event;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use function array_filter;
-use function array_values;
-use Infection\CannotBeInstantiated;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
-use function iterator_to_array;
-use ReflectionClass;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
-final class SubscriberProvider
+#[CoversClass(DataProviderFactory::class)]
+final class DataProviderFactoryTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    /**
-     * @var string[]|null
-     */
-    private static $subscriberClasses;
-
-    public static function provideSubscriberClasses(): iterable
+    public function test_it_creates_a_phpunit_data_provider_from_an_iterable(): void
     {
-        if (self::$subscriberClasses !== null) {
-            yield from self::$subscriberClasses;
+        $input = [
+            'a' => 'A',
+            'b' => 'B',
+        ];
 
-            return;
-        }
+        $expected = [
+            'a' => ['A'],
+            'b' => ['B'],
+        ];
 
-        self::$subscriberClasses = array_values(array_filter(
-            iterator_to_array(ProjectCodeProvider::provideSourceClasses(), true),
-            static fn (string $class): bool => $class !== EventSubscriber::class
-                && (new ReflectionClass($class))->implementsInterface(EventSubscriber::class),
-        ));
+        $actual = take(DataProviderFactory::fromIterable($input))->toAssoc();
 
-        yield from self::$subscriberClasses;
-    }
-
-    public static function subscriberClassesProvider(): iterable
-    {
-        yield from DataProviderFactory::fromIterable(self::provideSubscriberClasses());
+        $this->assertEquals($expected, $actual);
     }
 }
