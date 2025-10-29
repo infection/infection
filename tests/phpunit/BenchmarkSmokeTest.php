@@ -45,7 +45,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -86,12 +85,7 @@ final class BenchmarkSmokeTest extends TestCase
             TestPhpExecutableFinder::find(),
             ...$command,
         ]);
-
-        $benchmarkProcess->run();
-
-        if (!$benchmarkProcess->isSuccessful()) {
-            throw new ProcessFailedException($benchmarkProcess);
-        }
+        $benchmarkProcess->mustRun();
 
         $actualOutput = StringNormalizer::normalizeString($benchmarkProcess->getOutput());
 
