@@ -2,5 +2,12 @@
     "$schema": "./vendor/phpbench/phpbench/phpbench.schema.json",
     "runner.bootstrap": "vendor/autoload.php",
     "runner.executor": "local",
-    "runner.file_pattern": "*Bench.php"
+    "runner.file_pattern": "*Bench.php",
+    "report.outputs": {
+        "html": {
+            "renderer": "html",
+            "path": "build/phpbench/tracing.html",
+            "title": "Trace Generation Benchmark Report"
+        }
+    }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\Benchmark\MutationGenerator;
 
 use Closure;
 use Infection\Benchmark\InstrumentorFactory;
@@ -17,24 +17,24 @@ use function extension_loaded;
 use const PHP_INT_MAX;
 
 /**
- * To execute this test run `make benchmark_tracing`
+ * To execute this test run `make benchmark_mutation_generator`
  */
-final class TracingBench
+final class MutationGeneratorBench
 {
     private Closure $main;
     private int $count;
 
     public function setUp(): void
     {
-        $provideTraces = require __DIR__ . '/provide-traces-closure.php';
+        $generateMutations = require __DIR__ . '/generate-mutations-closure.php';
 
-        $this->main = static fn () => $provideTraces(PHP_INT_MAX);
+        $this->main = static fn () => $generateMutations(PHP_INT_MAX);
     }
 
     #[BeforeMethods('setUp')]
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
-    public function benchTracing(): void
+    public function benchMutationGeneration(): void
     {
         $this->count = ($this->main)();
     }
@@ -44,7 +44,7 @@ final class TracingBench
         Assert::greaterThan(
             $this->count,
             0,
-            'No trace was generated.',
+            'No mutation was generated.',
         );
     }
 }

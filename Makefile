@@ -118,6 +118,15 @@ profile:
 	$(MAKE) profile_mutation_generator
 	$(MAKE) profile_tracing
 
+.PHONY: benchmark
+benchmark: vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/Benchmark --report=aggregate --report=bar_chart_time
+	composer dump
+
 .PHONY: profile_mutation_generator
 profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
@@ -126,6 +135,12 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
+	composer dump
+
+.PHONY: benchmark_mutation_generator
+benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/Benchmark/MutationGenerator --report=aggregate --report=bar_chart_time
 	composer dump
 
 .PHONY: profile_tracing
@@ -141,7 +156,7 @@ profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVER
 .PHONY: benchmark_tracing
 benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative --quiet
-	vendor/bin/phpbench run tests/Benchmark/Tracing
+	vendor/bin/phpbench run tests/Benchmark/Tracing --report=aggregate --report=bar_chart_time
 	composer dump
 
 
