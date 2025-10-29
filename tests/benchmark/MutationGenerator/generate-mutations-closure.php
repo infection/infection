@@ -39,7 +39,6 @@ use function array_map;
 use Infection\Container;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
-use const PHP_INT_MAX;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -72,11 +71,12 @@ $mutators = $container->getMutatorFactory()->create(
 
 $fileMutationGenerator = $container->getFileMutationGenerator();
 
+/**
+ * @param positive-int $maxCount
+ *
+ * @return positive-int|0
+ */
 return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): int {
-    if ($maxCount < 0) {
-        $maxCount = PHP_INT_MAX;
-    }
-
     $count = 0;
 
     foreach ($traces as $trace) {
