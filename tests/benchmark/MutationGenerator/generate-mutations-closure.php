@@ -91,7 +91,7 @@ return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mu
             ++$count;
 
             if ($count >= $maxCount) {
-                break;
+                break 2;
             }
         }
     }
