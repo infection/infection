@@ -40,12 +40,14 @@ use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function str_repeat;
+use function str_replace;
 
 #[CoversClass(Str::class)]
 final class StrTest extends TestCase
 {
     #[DataProvider('toSystemLineEndingsProvider')]
-    public function test_it_replaces_any_line_ending_by_the_system_line_endings(
+    public function test_it_replaces_any_line_ending_by_the_system_line_ending(
         string $value,
         string $expected,
     ): void {
@@ -73,7 +75,7 @@ final class StrTest extends TestCase
     }
 
     #[DataProvider('toUnixLineEndingsProvider')]
-    public function test_it_replaces_any_line_ending_by_the_unix_line_endings(
+    public function test_it_replaces_any_line_ending_by_the_unix_line_ending(
         string $value,
         string $expected,
     ): void {
@@ -100,99 +102,190 @@ final class StrTest extends TestCase
         ];
     }
 
-    #[DataProvider('stringProvider')]
-    public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
-    {
-        $this->assertSame(
-            $expected,
-            Str::toUnixLineEndings(Str::trimLineReturns($value)),
-        );
+    #[DataProvider('trimLinesProvider')]
+    public function test_it_trims_the_lines_and_replace_the_line_endings_by_the_unix_line_ending(
+        string $input,
+        string $expected,
+    ): void {
+        $actual = Str::rTrimLines($input);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function stringProvider(): iterable
+    #[DataProvider('trimLinesProvider')]
+    public function test_it_trims_blank_lines_and_replaces_the_line_endings_by_the_system_line_ending(
+        string $value,
+        string $expectedTrimmedLines,
+        ?string $expectedTrimmedBlankLines = null,
+    ): void {
+        $expected = $expectedTrimmedBlankLines ?? $expectedTrimmedLines;
+
+        $actual = Str::removeOuterBlankLines($value);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function trimLinesProvider(): iterable
     {
         yield 'empty' => [
             '',
             '',
         ];
 
-        yield 'string with untrimmed spaces' => [
+        yield 'blank string' => [
             '  ',
             '',
         ];
 
-        yield 'string without line return' => [
+        yield 'string without any line endings' => [
             'Hello!',
             'Hello!',
         ];
 
-        yield 'string with leading line returns' => [
-            <<<'TXT'
+        yield 'string without line endings with spaces' => [
+            ' Hello world! ',
+            ' Hello world!',
+            ' Hello world! ',
+        ];
 
+        yield 'string with only Unix/Linux (LF) line endings' => [
+            str_repeat("\n", 3),
+            str_repeat("\n", 3),
+            '',
+        ];
 
-                Hello!
-                TXT
-            ,
+        yield 'string with only Windows (CRLF) line endings' => [
+            str_repeat("\r\n", 3),
+            str_repeat("\n", 3),
+            '',
+        ];
+
+        yield 'string with only Classic MacOS (CRLF) line endings' => [
+            str_repeat("\r", 3),
+            str_repeat("\n", 3),
+            '',
+        ];
+
+        yield 'string with leading Unix/Linux (LF) line endings' => [
+            str_repeat("\n", 3) . 'Hello!',
+            str_repeat("\n", 3) . 'Hello!',
             'Hello!',
         ];
 
-        yield 'string with trailing line returns' => [
-            <<<'TXT'
-                Hello!
-
-
-                TXT
-            ,
+        yield 'string with leading Windows (CRLF) line endings' => [
+            str_repeat("\r\n", 3) . 'Hello!',
+            str_repeat("\n", 3) . 'Hello!',
             'Hello!',
         ];
 
-        yield 'string with leading & trailing line returns' => [
-            <<<'TXT'
+        yield 'string with leading Classic MacOS (CRLF) line endings' => [
+            str_repeat("\r", 3) . 'Hello!',
+            str_repeat("\n", 3) . 'Hello!',
+            // TODO: fix this bug
+            str_repeat("\r", 3) . 'Hello!',
+        ];
 
-
-                Hello!
-
-
-                TXT
-            ,
+        yield 'string with trailing Unix/Linux (LF) line endings' => [
+            'Hello!' . str_repeat("\n", 3),
+            'Hello!' . str_repeat("\n", 3),
             'Hello!',
         ];
 
-        yield 'string with leading, trailing & in-between line returns' => [
-            <<<'TXT'
-
-
-                Hello...
-
-                ...World!
-
-
-                TXT
-            ,
-            <<<'TXT'
-                Hello...
-
-                ...World!
-                TXT,
+        yield 'string with trailing Windows (CRLF) line endings' => [
+            'Hello!' . str_repeat("\r\n", 3),
+            'Hello!' . str_repeat("\n", 3),
+            'Hello!',
         ];
 
-        yield 'string with leading, trailing & in-between line returns & dirty empty strings' => [
-            <<<'TXT'
-                  
-
-                  Hello...
-                    
-                 ...World!
-                  
-
-                TXT
-            ,
-            <<<'TXT'
-                  Hello...
-                    
-                 ...World!
-                TXT,
+        yield 'string with trailing Classic MacOS (CRLF) line endings' => [
+            'Hello!' . str_repeat("\r", 3),
+            'Hello!' . str_repeat("\n", 3),
+            // TODO: fix this bug
+            'Hello!' . str_repeat("\r", 3),
         ];
+
+        yield 'string with leading & trailing Unix/Linux (LF) line endings' => [
+            str_repeat("\n", 3) . 'Hello!' . str_repeat("\n", 3),
+            str_repeat("\n", 3) . 'Hello!' . str_repeat("\n", 3),
+            'Hello!',
+        ];
+
+        yield 'string with leading & trailing Windows (CRLF) line endings' => [
+            str_repeat("\r\n", 3) . 'Hello!' . str_repeat("\r\n", 3),
+            str_repeat("\n", 3) . 'Hello!' . str_repeat("\n", 3),
+            'Hello!',
+        ];
+
+        yield 'string with leading & trailing Classic MacOS (CRLF) line endings' => [
+            str_repeat("\r", 3) . 'Hello!' . str_repeat("\r", 3),
+            str_repeat("\n", 3) . 'Hello!' . str_repeat("\n", 3),
+            // TODO: fix this bug
+            str_repeat("\r", 3) . 'Hello!' . str_repeat("\r", 3),
+        ];
+
+        yield from (static function () {
+            $s = ' ';   // Adding those variables for visibility
+            $value = <<<TXT
+
+                $s
+                {$s}Hello...$s 
+
+                $s
+                $s...World!$s 
+                $s
+
+                TXT;
+
+            $expectedTrimmedLines = <<<TXT
+
+
+                {$s}Hello...
+
+
+                $s...World!
+
+
+                TXT;
+
+            $expectedTrimmedBlankLines = <<<TXT
+                {$s}Hello...$s$s
+
+                $s
+                $s...World!$s$s
+                TXT;
+
+            yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Unix/Linux (LF) line endings' => [
+                $value,
+                $expectedTrimmedLines,
+                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+            ];
+
+            yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Windows (CRLF) line endings' => [
+                str_replace("\n", "\r\n", $value),
+                $expectedTrimmedLines,
+                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+            ];
+
+            yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Classic MacOS (CRLF) line endings' => [
+                str_replace("\n", "\r", $value),
+                $expectedTrimmedLines,
+                // TODO: fix this bug
+                str_replace(
+                    "\n",
+                    "\r",
+                    <<<TXT
+
+                        $s
+                        {$s}Hello...$s$s
+
+                        $s
+                        $s...World!$s$s
+                        $s
+
+                        TXT,
+                ),
+            ];
+        })();
     }
 
     #[DataProvider('utf8StringConversionProvider')]

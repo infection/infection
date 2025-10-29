@@ -168,7 +168,7 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
 
             $lines[] = self::getMutatorLine($index, $executionResult);
             $lines[] = '';
-            $lines[] = Str::trimLineReturns($executionResult->getMutantDiff());
+            $lines[] = Str::removeOuterBlankLines($executionResult->getMutantDiff());
 
             if ($this->debugMode) {
                 $lines[] = '';
@@ -221,7 +221,7 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
             PHP_EOL,
             array_map(
                 static fn (string $line): string => '  ' . $line,
-                explode(PHP_EOL, Str::trimLineReturns($value)),
+                explode(PHP_EOL, Str::removeOuterBlankLines($value)),
             ),
         );
     }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Framework;
 
+use function array_map;
 use function array_values;
 use function count;
 use function explode;
@@ -86,11 +87,33 @@ final class Str
         );
     }
 
-    public static function trimLineReturns(string $string): string
+    /**
+     * Trim the whitespace from the end of all lines. The line endings are
+     * replaced by the unix line ending.
+     */
+    public static function rTrimLines(string $value): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                rtrim(...),
+                explode(
+                    "\n",
+                    self::toUnixLineEndings($value),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Removes all lines and removes leading and trailing blank lines. Line
+     * endings are replaced by the system line endings.
+     */
+    public static function removeOuterBlankLines(string $value): string
     {
         $lines = explode(
             "\n",
-            str_replace("\r\n", "\n", $string),
+            str_replace("\r\n", "\n", $value),
         );
         $linesCount = count($lines);
 
