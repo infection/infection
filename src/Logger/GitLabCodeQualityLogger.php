@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Logger;
 
 use function getenv;
+use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
-use Infection\Str;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
 use function Safe\shell_exec;
