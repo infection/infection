@@ -122,7 +122,7 @@ if (!is_int($count) || $count === 0) {
 
 $output->writeln(
     sprintf(
-        '%d traces generated.',
+        '%d trace(s) generated.',
         $count,
     ),
 );
