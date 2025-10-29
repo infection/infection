@@ -59,7 +59,7 @@ $traces = array_map(
     static function (SplFileInfo $fileInfo): Trace {
         require_once $fileInfo->getRealPath();
 
-        return new PartialTrace($fileInfo);
+        return new EmptyTrace($fileInfo);
     },
     iterator_to_array($files, false),
 );

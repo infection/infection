@@ -40,13 +40,10 @@ use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Symfony\Component\Finder\SplFileInfo;
 
-final class PartialTrace implements Trace
+final readonly class EmptyTrace implements Trace
 {
-    private $sourceFileInfo;
-
-    public function __construct(SplFileInfo $sourceFileInfo)
+    public function __construct(private SplFileInfo $sourceFileInfo)
     {
-        $this->sourceFileInfo = $sourceFileInfo;
     }
 
     public function getSourceFileInfo(): SplFileInfo
