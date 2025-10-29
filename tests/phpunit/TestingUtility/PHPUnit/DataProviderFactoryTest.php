@@ -33,64 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use Infection\Configuration\Entry\PhpStan;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
-#[CoversClass(PhpStan::class)]
-final class PhpStanTest extends TestCase
+#[CoversClass(DataProviderFactory::class)]
+final class DataProviderFactoryTest extends TestCase
 {
-    #[DataProvider('basePathProvider')]
-    public function test_it_can_create_a_new_instance_with_absolute_paths(
-        PhpStan $phpStan,
-        string $basePath,
-        PhpStan $expected,
-    ): void {
-        $originalPhpStan = clone $phpStan;
+    public function test_it_creates_a_phpunit_data_provider_from_an_iterable(): void
+    {
+        $input = [
+            'a' => 'A',
+            'b' => 'B',
+        ];
 
-        $actual = $phpStan->withAbsolutePaths($basePath);
+        $expected = [
+            'a' => ['A'],
+            'b' => ['B'],
+        ];
+
+        $actual = take(DataProviderFactory::fromIterable($input))->toAssoc();
 
         $this->assertEquals($expected, $actual);
-        // Sanity check
-        $this->assertEquals($originalPhpStan, $phpStan);
-    }
-
-    public static function basePathProvider(): iterable
-    {
-        yield 'minimal' => [
-            new PhpStan(null, null),
-            '/path/to/project',
-            new PhpStan(
-                '/path/to/project',
-                null,
-            ),
-        ];
-
-        yield 'both paths are relative' => [
-            new PhpStan(
-                'devTools/phpstan',
-                'devTools/phpstan/bin/phpstan',
-            ),
-            '/path/to/project',
-            new PhpStan(
-                '/path/to/project/devTools/phpstan',
-                '/path/to/project/devTools/phpstan/bin/phpstan',
-            ),
-        ];
-
-        yield 'both paths are absolute' => [
-            new PhpStan(
-                '/path/to/another-project/devTools/phpstan',
-                '/path/to/another-project/devTools/phpstan/bin/phpstan',
-            ),
-            '/path/to/project',
-            new PhpStan(
-                '/path/to/another-project/devTools/phpstan',
-                '/path/to/another-project/devTools/phpstan/bin/phpstan',
-            ),
-        ];
     }
 }

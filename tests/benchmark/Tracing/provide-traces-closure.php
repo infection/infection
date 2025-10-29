@@ -37,6 +37,7 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
+use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
@@ -46,40 +47,38 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 $container = Container::create()->withValues(
     logger: new NullLogger(),
     output: new NullOutput(),
-    configFile: __DIR__ . '/cpu-core-counter/infection.json5',
+    configFile: __DIR__ . '/infection.json5',
     existingCoveragePath: __DIR__ . '/coverage',
     useNoopMutators: true,
 );
 
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
+/**
+ * @param positive-int $maxCount
+ *
+ * @return iterable<Trace>
+ */
+$generateTraces = static function (int $maxCount) use ($container): iterable {
     $traces = $container->getUnionTraceProvider()->provideTraces();
-
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return yield from $traces;
-    }
 
     $i = 0;
 
     foreach ($traces as $trace) {
-        ++$i;
-
         if ($i === $maxCount) {
             break;
         }
 
         yield $trace;
+
+        ++$i;
     }
 };
 
-/*
+/**
+ * @param positive-int $maxCount
+ *
  * @return positive-int|0
  */
 return static function (int $maxCount) use ($generateTraces): int {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
     $traces = $generateTraces($maxCount);
     $count = 0;
 

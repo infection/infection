@@ -33,26 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Framework;
 
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
+use Infection\CannotBeInstantiated;
+use const PHP_OS_FAMILY;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+/**
+ * @internal
+ */
+final class OperatingSystem
+{
+    use CannotBeInstantiated;
 
-const MAX_MUTATIONS_COUNT_ARG = 'max-mutations-count';
-
-$input = new ArgvInput(
-    null,
-    new InputDefinition([
-        new InputArgument(
-            MAX_MUTATIONS_COUNT_ARG,
-            InputArgument::OPTIONAL,
-            'Maximum number of mutations retrieved. Use -1 for no maximum',
-            50,
-        ),
-    ]),
-);
-
-(require __DIR__ . '/generate-mutations-closure.php')((int) $input->getArgument(MAX_MUTATIONS_COUNT_ARG));
+    public static function isWindows(): bool
+    {
+        return PHP_OS_FAMILY === 'Windows';
+    }
+}

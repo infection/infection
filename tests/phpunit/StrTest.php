@@ -137,4 +137,37 @@ final class StrTest extends TestCase
                 TXT,
         ];
     }
+
+    #[DataProvider('utf8StringConversionProvider')]
+    public function test_it_converts_strings_to_utf8_encoding(string $input, string $expected): void
+    {
+        $result = Str::convertToUtf8($input);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public static function utf8StringConversionProvider(): iterable
+    {
+        yield 'simple ASCII string' => ['Hello World', 'Hello World'];
+
+        yield 'UTF-8 with accents' => ['Héllo Wörld', 'Héllo Wörld'];
+
+        yield 'UTF-8 with Chinese characters' => ['你好', '你好'];
+
+        yield 'UTF-8 with emojis' => ['Hello 🎉', 'Hello 🎉'];
+
+        yield 'empty string' => ['', ''];
+
+        yield 'multi-line string' => ["Line1\nLine2\nLine3", "Line1\nLine2\nLine3"];
+
+        yield 'mixed special characters' => ['Café ñ ü ö 世界', 'Café ñ ü ö 世界'];
+
+        yield 'invalid byte sequence 1' => ["Hello\xC0\xC1World", 'Hello??World'];
+
+        yield 'invalid byte sequence 2' => ["Test\xF5\xF6\xF7\xF8", 'Test????'];
+
+        yield 'truncated multi-byte' => ["Hello\xC2World", 'Hello?World'];
+
+        yield 'overlong encoding' => ["Test\xC0\x80", 'Test??'];
+    }
 }

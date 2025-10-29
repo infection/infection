@@ -35,50 +35,52 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Framework\OperatingSystem;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
-use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
+/**
+ * Smoke test to ensure the benchmark profile scripts somewhat work.
+ */
 #[Group('integration')]
 #[CoversNothing]
-final class BenchmarkTest extends TestCase
+final class BenchmarkSmokeTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
 
     /**
-     * @var string|null
+     * @param non-empty-list<string> $command
      */
-    private $phpExecutable;
-
     #[DataProvider('provideBenchmarks')]
-    public function test_all_the_benchmarks_can_be_executed(string $path, string $sourcesLocation): void
+    public function test_all_the_benchmarks_can_be_executed(array $command, string $sourcesLocation): void
     {
-        if (PHP_OS_FAMILY === 'Windows') {
-            $this->markTestSkipped('Not interested in profiling on Windows');
+        if (OperatingSystem::isWindows()) {
+            $this->markTestSkipped('Not interested in profiling on Windows.');
         }
 
         if (PHP_SAPI === 'phpdbg') {
-            $this->markTestSkipped('This test requires running without PHPDBG');
+            $this->markTestSkipped('This test requires running without PHPDBG.');
         }
 
         if (!is_dir($sourcesLocation)) {
-            $this->markTestIncomplete('Benchmark requires uncompressed sources');
+            $this->markTestIncomplete('Benchmark requires sources to be prepared.');
         }
+
+        $path = $command[0];
 
         $this->assertFileExists($path);
 
         $benchmarkProcess = new Process([
-            $this->getPhpExecutable(),
-            $path,
-            '1',
+            TestPhpExecutableFinder::find(),
+            ...$command,
         ]);
 
         $benchmarkProcess->run();
@@ -91,18 +93,21 @@ final class BenchmarkTest extends TestCase
     public static function provideBenchmarks(): iterable
     {
         yield 'MutationGenerator' => [
-            realpath(self::BENCHMARK_DIR . '/MutationGenerator/generate-mutations.php'),
+            [
+                Path::canonicalize(self::BENCHMARK_DIR . '/MutationGenerator/profile.php'),
+                '--max-mutation-count=1',
+                '--debug',
+            ],
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
         ];
 
         yield 'Tracing' => [
-            realpath(self::BENCHMARK_DIR . '/Tracing/provide-traces.php'),
-            self::BENCHMARK_DIR . '/Tracing/sources',
+            [
+                Path::canonicalize(self::BENCHMARK_DIR . '/Tracing/profile.php'),
+                '--max-trace-count=1',
+                '--debug',
+            ],
+            self::BENCHMARK_DIR . '/Tracing/coverage',
         ];
-    }
-
-    private function getPhpExecutable(): string
-    {
-        return $this->phpExecutable ??= (new PhpExecutableFinder())->find();
     }
 }

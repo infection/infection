@@ -1,3 +1,3 @@
-[submodule "tests/benchmark/Tracing/cpu-core-counter"]
-	path = tests/benchmark/Tracing/cpu-core-counter
-	url = https://github.com/theofidry/cpu-core-counter.git
+[submodule "tests/benchmark/Tracing/benchmark-source"]
+	path = tests/benchmark/Tracing/benchmark-source
+	url = https://github.com/infection/benchmark-source.git
