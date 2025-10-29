@@ -37,7 +37,6 @@ namespace Infection\Benchmark\Tracing;
 
 use Generator;
 use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
@@ -52,39 +51,26 @@ $container = Container::create()->withValues(
     useNoopMutators: true,
 );
 
-/**
- * @param positive-int $maxCount
- *
- * @return iterable<Trace>
- */
-$generateTraces = static function (int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
-
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        if ($i === $maxCount) {
-            break;
-        }
-
-        yield $trace;
-
-        ++$i;
-    }
-};
+$traceProvider = $container->getUnionTraceProvider();
 
 /**
  * @param positive-int $maxCount
  *
  * @return positive-int|0
  */
-return static function (int $maxCount) use ($generateTraces): int {
-    $traces = $generateTraces($maxCount);
+return static function (int $maxCount) use ($traceProvider): int {
     $count = 0;
 
-    foreach ($traces as $_) {
+    // Iterate over the generator: do not use `iterator_to_array()` which is
+    // less Garbage-Collector friendly.
+    foreach ($traceProvider->provideTraces() as $trace) {
         ++$count;
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
+
+        if ($count >= $maxCount) {
+            break;
+        }
+
+        // Continue
     }
 
     return $count;
