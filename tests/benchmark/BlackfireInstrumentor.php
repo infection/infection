@@ -52,31 +52,20 @@ final class BlackfireInstrumentor implements Instrumentor
     /**
      * @template T
      *
-     * @param Closure(): T $main
+     * @param Closure(): T $createMain
      *
      * @return T
      */
-    public function profile(Closure $main, SymfonyStyle $io): mixed
+    public function profile(Closure $createMain, int $sampleSize, SymfonyStyle $io): int
     {
         self::check($io);
 
         $probe = BlackfireProbe::getMainInstance();
 
-        $probe->enable();
+        $result = 0;
 
-        try {
-            $result = $main();
-
-            $probe->disable();
-        } catch (Throwable $throwable) {
-            $probe->discard();
-
-            $io->warning(sprintf(
-                'An error occurred. The profile has been discarded please check the error first: "%s"',
-                $throwable->getMessage(),
-            ));
-
-            throw $throwable;
+        for ($i = 0; $i < $sampleSize; ++$i) {
+            $result += self::profileSample($createMain, $probe, $io);
         }
 
         return $result;
@@ -121,6 +110,38 @@ final class BlackfireInstrumentor implements Instrumentor
                 . ' result in an unnecessary overhead. Consider running the command %s',
                 'composer dump-autoload --classmap-authoritative',
             ));
+        }
+    }
+
+    /**
+     * @param Closure(): (Closure(): positive-int|0) $main
+     */
+    private static function profileSample(
+        Closure $createMain,
+        BlackfireProbe $probe,
+        SymfonyStyle $io,
+    ): int {
+        $main = $createMain();
+
+        $probe->enable();
+
+        try {
+            $result = $main();
+
+            $probe->disable();
+
+            return $result;
+        } catch (Throwable $throwable) {
+            $probe->discard();
+
+            $io->warning(
+                sprintf(
+                    'An error occurred. The profile has been discarded please check the error first: "%s"',
+                    $throwable->getMessage(),
+                ),
+            );
+
+            throw $throwable;
         }
     }
 }

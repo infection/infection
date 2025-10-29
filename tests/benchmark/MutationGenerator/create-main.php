@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\MutationGenerator;
 
+use Closure;
 use function array_map;
 use Infection\Container;
 use Infection\TestFramework\Coverage\Trace;
@@ -44,57 +45,73 @@ use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$container = Container::create();
+/**
+ * @return iterable<SplFileInfo>
+ */
+function collectSources(): iterable
+{
+    return Finder::create()
+        ->files()
+        ->in(__DIR__ . '/sources')
+        ->name('*.php')
+    ;
+}
 
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
+function createTrace(SplFileInfo $fileInfo): Trace {
+    require_once $fileInfo->getRealPath();
 
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false),
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true]),
-    true,
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
+    return new PartialTrace($fileInfo);
+}
 
 /**
  * @param positive-int $maxCount
  *
- * @return positive-int|0
+ * @return Closure():positive-int|0
  */
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): int {
-    $count = 0;
+return static function (int $maxCount): Closure {
+    $container = Container::create();
 
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            [],
-        );
+    $files = Finder::create()
+        ->files()
+        ->in(__DIR__ . '/sources')
+        ->name('*.php')
+    ;
 
-        foreach ($mutations as $_) {
-            ++$count;
+    // Since those files are not autoloaded, we need to manually autoload them
+    require_once __DIR__ . '/sources/autoload.php';
 
-            if ($count >= $maxCount) {
-                break 2;
+    $traces = array_map(
+        createTrace(...),
+        iterator_to_array(collectSources()),
+    );
+
+    $mutators = $container->getMutatorFactory()->create(
+        $container->getMutatorResolver()->resolve(['@default' => true]),
+        true,
+    );
+
+    $fileMutationGenerator = $container->getFileMutationGenerator();
+
+    return function () use ($traces, $fileMutationGenerator, $mutators, $maxCount): int {
+        $count = 0;
+
+        foreach ($traces as $trace) {
+            $mutations = $fileMutationGenerator->generate(
+                $trace,
+                false,
+                $mutators,
+                [],
+            );
+
+            foreach ($mutations as $_) {
+                ++$count;
+
+                if ($count >= $maxCount) {
+                    break 2;
+                }
             }
         }
-    }
 
-    return $count;
+        return $count;
+    };
 };

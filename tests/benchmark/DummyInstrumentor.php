@@ -40,8 +40,16 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class DummyInstrumentor implements Instrumentor
 {
-    public function profile(Closure $main, SymfonyStyle $io): mixed
+    public function profile(Closure $createMain, int $sampleSize, SymfonyStyle $io): int
     {
-        return $main();
+        $result = 0;
+
+        for ($i = 0; $i < $sampleSize; $i++) {
+            $main = $createMain();
+
+            $result += $main();
+        }
+
+        return $result;
     }
 }

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\Tracing;
 
+use Closure;
 use Generator;
 use Infection\Container;
 use Infection\TestFramework\Coverage\Trace;
@@ -44,48 +45,34 @@ use Symfony\Component\Console\Output\NullOutput;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$container = Container::create()->withValues(
-    logger: new NullLogger(),
-    output: new NullOutput(),
-    configFile: __DIR__ . '/infection.json5',
-    existingCoveragePath: __DIR__ . '/coverage',
-    useNoopMutators: true,
-);
-
 /**
  * @param positive-int $maxCount
  *
- * @return iterable<Trace>
+ * @return Closure():positive-int|0
  */
-$generateTraces = static function (int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
+return static function (int $maxCount): Closure {
+    $container = Container::create()->withValues(
+        logger: new NullLogger(),
+        output: new NullOutput(),
+        configFile: __DIR__ . '/infection.json5',
+        existingCoveragePath: __DIR__ . '/coverage',
+        useNoopMutators: true,
+    );
+    $traceProvider = $container->getUnionTraceProvider();
 
-    $i = 0;
+    return static function () use ($maxCount, $traceProvider) {
+        $count = 0;
 
-    foreach ($traces as $trace) {
-        if ($i === $maxCount) {
-            break;
+        foreach ($traceProvider->provideTraces() as $trace) {
+            $count++;
+
+            if ($count >= $maxCount) {
+                break;
+            }
+
+            // Continue
         }
 
-        yield $trace;
-
-        ++$i;
-    }
-};
-
-/**
- * @param positive-int $maxCount
- *
- * @return positive-int|0
- */
-return static function (int $maxCount) use ($generateTraces): int {
-    $traces = $generateTraces($maxCount);
-    $count = 0;
-
-    foreach ($traces as $_) {
-        ++$count;
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
-    }
-
-    return $count;
+        return $count;
+    };
 };

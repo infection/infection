@@ -71,9 +71,8 @@ $input = new ArgvInput(
     ]),
 );
 $output = new ConsoleOutput();
+$errorOutput = $output->getErrorOutput();
 $io = new SymfonyStyle($input, $output);
-
-$generateMutations = require __DIR__ . '/generate-mutations-closure.php';
 
 /** @var positive-int $maxTraceCount */
 $maxMutationsCount = (static function (InputInterface $input, string $optionName): int {
@@ -108,10 +107,23 @@ $maxMutationsCount = (static function (InputInterface $input, string $optionName
 
 $debug = $input->getOption(DEBUG_OPT);
 
+$errorOutput->writeln([
+    sprintf(
+        'MAX_TRACE_COUNT_OPT=%d',
+        $maxTraceCount,
+    ),
+    sprintf(
+        'ITERATIONS=%d',
+        5,
+    ),
+    '–––––',
+]);
+
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static fn (): int => $generateMutations($maxMutationsCount),
+    static fn (): int => (require __DIR__.'/create-main.php')($maxMutationsCount),
+    5,
     $io,
 );
 
