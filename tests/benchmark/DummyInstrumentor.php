@@ -40,7 +40,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class DummyInstrumentor implements Instrumentor
 {
-    public function profile(Closure $main, SymfonyStyle $io): mixed
+    public function profile(Closure $main, SymfonyStyle $io): int
     {
         return $main();
     }
