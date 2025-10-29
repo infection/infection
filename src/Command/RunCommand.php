@@ -629,16 +629,22 @@ final class RunCommand extends BaseCommand
 
         $this->installTestFrameworkIfNeeded($container, $io);
 
+        $application = $this->getApplication();
+
+        // Log the detected debuggers _before_ a restart to ensure xdebug is not left out; log it
+        // only once though
+        if (!XdebugHandler::hasBeenRestarted()) {
+            $io->writeln($application->getHelp());
+            $io->newLine();
+
+            $this->logRunningWithDebugger($logger);
+        } else {
+            $logger->notice('Xdebug has been disabled for the main process');
+        }
+
         // Check if the application needs a restart _after_ configuring the command or adding
         // a missing test framework
         XdebugHandler::check($logger);
-
-        $application = $this->getApplication();
-
-        $io->writeln($application->getHelp());
-        $io->newLine();
-
-        $this->logRunningWithDebugger($consoleOutput);
 
         if (!$application->isAutoExitEnabled()) {
             // When we're not in control of exit codes, that means it's the caller
@@ -682,14 +688,18 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function logRunningWithDebugger(ConsoleOutput $consoleOutput): void
+    private function logRunningWithDebugger(LoggerInterface $logger): void
     {
         if (PHP_SAPI === 'phpdbg') {
-            $consoleOutput->logRunningWithDebugger(PHP_SAPI);
-        } elseif (extension_loaded('xdebug')) {
-            $consoleOutput->logRunningWithDebugger('Xdebug');
-        } elseif (extension_loaded('pcov')) {
-            $consoleOutput->logRunningWithDebugger('PCOV');
+            $logger->notice('phpdbg detected');
+        }
+
+        if (extension_loaded('pcov')) {
+            $logger->notice('pcov detected');
+        }
+
+        if (extension_loaded('xdebug')) {
+            $logger->notice('Xdebug detected');
         }
     }
 
