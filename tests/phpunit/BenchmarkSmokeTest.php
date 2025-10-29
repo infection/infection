@@ -35,8 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use Infection\Framework\OperatingSystem;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
-use const PHP_OS_FAMILY;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -44,19 +45,16 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
  * Smoke test to ensure the benchmark profile scripts somewhat work.
  */
-#[Group('benchmark')]
+#[Group('integration')]
 #[CoversNothing]
 final class BenchmarkSmokeTest extends TestCase
 {
     private const BENCHMARK_DIR = __DIR__ . '/../benchmark';
-
-    private ?string $phpExecutable;
 
     /**
      * @param non-empty-list<string> $command
@@ -64,7 +62,7 @@ final class BenchmarkSmokeTest extends TestCase
     #[DataProvider('provideBenchmarks')]
     public function test_all_the_benchmarks_can_be_executed(array $command, string $sourcesLocation): void
     {
-        if (PHP_OS_FAMILY === 'Windows') {
+        if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('Not interested in profiling on Windows.');
         }
 
@@ -81,7 +79,7 @@ final class BenchmarkSmokeTest extends TestCase
         $this->assertFileExists($path);
 
         $benchmarkProcess = new Process([
-            $this->getPhpExecutable(),
+            TestPhpExecutableFinder::find(),
             ...$command,
         ]);
 
@@ -97,7 +95,7 @@ final class BenchmarkSmokeTest extends TestCase
         yield 'MutationGenerator' => [
             [
                 Path::canonicalize(self::BENCHMARK_DIR . '/MutationGenerator/profile.php'),
-                '1',
+                '--max-mutation-count=1',
                 '--debug',
             ],
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
@@ -106,15 +104,10 @@ final class BenchmarkSmokeTest extends TestCase
         yield 'Tracing' => [
             [
                 Path::canonicalize(self::BENCHMARK_DIR . '/Tracing/profile.php'),
-                '1',
+                '--max-trace-count=1',
                 '--debug',
             ],
             self::BENCHMARK_DIR . '/Tracing/coverage',
         ];
-    }
-
-    private function getPhpExecutable(): string
-    {
-        return $this->phpExecutable ??= (new PhpExecutableFinder())->find();
     }
 }

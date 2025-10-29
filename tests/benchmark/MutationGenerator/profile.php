@@ -49,7 +49,7 @@ use Webmozart\Assert\Assert;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-const MAX_MUTATIONS_COUNT_OPT = 'max-mutations-count';
+const MAX_MUTATIONS_COUNT_OPT = 'max-mutation-count';
 const DEBUG_OPT = 'debug';
 
 $input = new ArgvInput(
@@ -121,7 +121,7 @@ if ($count === 0) {
 
 $output->writeln(
     sprintf(
-        '%d mutations generated.',
+        '%d mutation(s) generated.',
         $count,
     ),
 );

@@ -33,68 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Tests\TestingUtility\PHPUnit;
 
-use function array_map;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+#[CoversClass(DataProviderFactory::class)]
+final class DataProviderFactoryTest extends TestCase
+{
+    public function test_it_creates_a_phpunit_data_provider_from_an_iterable(): void
+    {
+        $input = [
+            'a' => 'A',
+            'b' => 'B',
+        ];
 
-$container = Container::create();
+        $expected = [
+            'a' => ['A'],
+            'b' => ['B'],
+        ];
 
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
+        $actual = take(DataProviderFactory::fromIterable($input))->toAssoc();
 
-// Since those files are not autoloaded, we need to manually autoload them
-require_once __DIR__ . '/sources/autoload.php';
-
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
-        require_once $fileInfo->getRealPath();
-
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false),
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true]),
-    true,
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
-
-/**
- * @param positive-int $maxCount
- *
- * @return positive-int|0
- */
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): int {
-    $count = 0;
-
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
-            false,
-            $mutators,
-            [],
-        );
-
-        foreach ($mutations as $_) {
-            ++$count;
-
-            if ($count >= $maxCount) {
-                break 2;
-            }
-        }
+        $this->assertEquals($expected, $actual);
     }
-
-    return $count;
-};
+}

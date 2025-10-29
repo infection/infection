@@ -37,13 +37,12 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use DOMDocument;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
-use function Infection\Tests\normalizePath as p;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(PathReplacer::class)]
@@ -56,7 +55,7 @@ final class PathReplacerTest extends TestCase
 
     protected function setUp(): void
     {
-        self::$projectPath = p(realpath(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path'));
+        self::$projectPath = Path::canonicalize(__DIR__ . '/../../../../Fixtures/Files/phpunit/project-path');
     }
 
     #[DataProvider('pathProvider')]
@@ -72,7 +71,10 @@ final class PathReplacerTest extends TestCase
 
         $pathReplacer->replaceInNode($node);
 
-        $this->assertSame($expectedPath, p($node->nodeValue));
+        $this->assertSame(
+            $expectedPath,
+            Path::normalize($node->nodeValue),
+        );
     }
 
     public static function pathProvider(): iterable
