@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Framework;
 
 use Infection\Framework\Str;
-use function Infection\Tests\normalizeLineReturn;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -44,12 +44,68 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Str::class)]
 final class StrTest extends TestCase
 {
+    #[DataProvider('toSystemLineEndingsProvider')]
+    public function test_it_replaces_any_line_ending_by_the_system_line_endings(
+        string $value,
+        string $expected,
+    ): void {
+        $actual = Str::toSystemLineEndings($value);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function toSystemLineEndingsProvider(): iterable
+    {
+        yield 'Unix/Linux (LF)' => [
+            "\n",
+            PHP_EOL,
+        ];
+
+        yield 'Windows (CRLF)' => [
+            "\r\n",
+            PHP_EOL,
+        ];
+
+        yield 'Classic MacOS (CRLF)' => [
+            "\r",
+            PHP_EOL,
+        ];
+    }
+
+    #[DataProvider('toUnixLineEndingsProvider')]
+    public function test_it_replaces_any_line_ending_by_the_unix_line_endings(
+        string $value,
+        string $expected,
+    ): void {
+        $actual = Str::toUnixLineEndings($value);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function toUnixLineEndingsProvider(): iterable
+    {
+        yield 'Unix/Linux (LF)' => [
+            "\n",
+            "\n",
+        ];
+
+        yield 'Windows (CRLF)' => [
+            "\r\n",
+            "\n",
+        ];
+
+        yield 'Classic MacOS (CRLF)' => [
+            "\r",
+            "\n",
+        ];
+    }
+
     #[DataProvider('stringProvider')]
     public function test_it_can_trim_string_of_line_returns(string $value, string $expected): void
     {
         $this->assertSame(
             $expected,
-            normalizeLineReturn(Str::trimLineReturns($value)),
+            Str::toUnixLineEndings(Str::trimLineReturns($value)),
         );
     }
 

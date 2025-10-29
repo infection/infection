@@ -38,6 +38,7 @@ namespace Infection\Tests;
 use function array_map;
 use function explode;
 use function implode;
+use Infection\Framework\Str;
 use function random_int;
 use function Safe\realpath;
 use function str_replace;
@@ -48,18 +49,13 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
-function normalizeLineReturn(string $value): string
-{
-    return str_replace(["\r\n", "\r"], "\n", $value);
-}
-
 function normalize_trailing_spaces(string $value): string
 {
     return implode(
         "\n",
         array_map(
             'rtrim',
-            explode("\n", normalizeLineReturn($value)),
+            explode("\n", Str::toUnixLineEndings($value)),
         ),
     );
 }
