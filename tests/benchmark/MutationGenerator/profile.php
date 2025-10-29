@@ -121,7 +121,7 @@ if ($count === 0) {
 
 $output->writeln(
     sprintf(
-        '%d mutations generated.',
+        '%d mutation(s) generated.',
         $count,
     ),
 );
