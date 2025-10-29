@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests;
 
 use Infection\Framework\OperatingSystem;
+use Infection\Testing\StringNormalizer;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use function is_dir;
 use const PHP_SAPI;
@@ -60,8 +61,11 @@ final class BenchmarkSmokeTest extends TestCase
      * @param non-empty-list<string> $command
      */
     #[DataProvider('provideBenchmarks')]
-    public function test_all_the_benchmarks_can_be_executed(array $command, string $sourcesLocation): void
-    {
+    public function test_all_the_benchmarks_can_be_executed(
+        array $command,
+        string $sourcesLocation,
+        string $expectedOutput,
+    ): void {
         if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('Not interested in profiling on Windows.');
         }
@@ -88,6 +92,10 @@ final class BenchmarkSmokeTest extends TestCase
         if (!$benchmarkProcess->isSuccessful()) {
             throw new ProcessFailedException($benchmarkProcess);
         }
+
+        $actualOutput = StringNormalizer::normalizeString($benchmarkProcess->getOutput());
+
+        $this->assertStringContainsString($expectedOutput, $actualOutput);
     }
 
     public static function provideBenchmarks(): iterable
@@ -99,6 +107,10 @@ final class BenchmarkSmokeTest extends TestCase
                 '--debug',
             ],
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
+            <<<'STDOUT'
+                1 mutation(s) generated.
+
+                STDOUT,
         ];
 
         yield 'Tracing' => [
@@ -108,6 +120,10 @@ final class BenchmarkSmokeTest extends TestCase
                 '--debug',
             ],
             self::BENCHMARK_DIR . '/Tracing/coverage',
+            <<<'STDOUT'
+                1 trace(s) generated.
+
+                STDOUT,
         ];
     }
 }
