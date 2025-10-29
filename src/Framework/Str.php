@@ -43,7 +43,6 @@ use function implode;
 use Infection\CannotBeInstantiated;
 use const PHP_EOL;
 use function Safe\mb_convert_encoding;
-use function str_replace;
 use function strtr;
 use function trim;
 
@@ -113,7 +112,7 @@ final class Str
     {
         $lines = explode(
             "\n",
-            str_replace("\r\n", "\n", $value),
+            self::toUnixLineEndings($value),
         );
         $linesCount = count($lines);
 

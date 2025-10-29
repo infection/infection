@@ -181,8 +181,7 @@ final class StrTest extends TestCase
         yield 'string with leading Classic MacOS (CRLF) line endings' => [
             str_repeat("\r", 3) . 'Hello!',
             str_repeat("\n", 3) . 'Hello!',
-            // TODO: fix this bug
-            str_repeat("\r", 3) . 'Hello!',
+            'Hello!',
         ];
 
         yield 'string with trailing Unix/Linux (LF) line endings' => [
@@ -200,8 +199,7 @@ final class StrTest extends TestCase
         yield 'string with trailing Classic MacOS (CRLF) line endings' => [
             'Hello!' . str_repeat("\r", 3),
             'Hello!' . str_repeat("\n", 3),
-            // TODO: fix this bug
-            'Hello!' . str_repeat("\r", 3),
+            'Hello!',
         ];
 
         yield 'string with leading & trailing Unix/Linux (LF) line endings' => [
@@ -219,8 +217,7 @@ final class StrTest extends TestCase
         yield 'string with leading & trailing Classic MacOS (CRLF) line endings' => [
             str_repeat("\r", 3) . 'Hello!' . str_repeat("\r", 3),
             str_repeat("\n", 3) . 'Hello!' . str_repeat("\n", 3),
-            // TODO: fix this bug
-            str_repeat("\r", 3) . 'Hello!' . str_repeat("\r", 3),
+            'Hello!',
         ];
 
         yield from (static function () {
@@ -269,21 +266,7 @@ final class StrTest extends TestCase
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Classic MacOS (CRLF) line endings' => [
                 str_replace("\n", "\r", $value),
                 $expectedTrimmedLines,
-                // TODO: fix this bug
-                str_replace(
-                    "\n",
-                    "\r",
-                    <<<TXT
-
-                        $s
-                        {$s}Hello...$s$s
-
-                        $s
-                        $s...World!$s$s
-                        $s
-
-                        TXT,
-                ),
+                Str::toSystemLineEndings($expectedTrimmedBlankLines),
             ];
         })();
     }
