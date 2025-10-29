@@ -166,7 +166,7 @@ autoreview: cs-check phpstan psalm validate test-autoreview rector-check detect-
 
 .PHONY: test
 test:		 	## Runs all the tests
-test: autoreview test-unit test-e2e test-infection
+test: autoreview test-unit test-benchmark test-e2e test-infection
 
 .PHONY: test-docker
 test-docker:		## Runs all the tests on the different Docker platforms
@@ -192,6 +192,15 @@ test-unit-docker: test-unit-82-docker
 
 test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+
+.PHONY: test-benchmark
+test-benchmark:	 	## Runs the benchmark tests
+test-benchmark: $(PHPUNIT) \
+		vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	$(PHPUNIT) --group=benchmark
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
