@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Infection\Benchmark\InstrumentorFactory;
-use function is_int;
 use LogicException;
 use const PHP_INT_MAX;
 use function sprintf;
@@ -116,7 +115,7 @@ $count = $instrumentor->profile(
     $io,
 );
 
-if (!is_int($count) || $count === 0) {
+if ($count === 0) {
     throw new LogicException('Something went wrong, no traces were actually generated.');
 }
 
