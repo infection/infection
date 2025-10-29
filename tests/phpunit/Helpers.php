@@ -35,10 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
-use function array_map;
-use function explode;
-use function implode;
-use Infection\Framework\Str;
 use function random_int;
 use function Safe\realpath;
 use function str_replace;
@@ -48,17 +44,6 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
-
-function normalize_trailing_spaces(string $value): string
-{
-    return implode(
-        "\n",
-        array_map(
-            'rtrim',
-            explode("\n", Str::toUnixLineEndings($value)),
-        ),
-    );
-}
 
 /**
  * Creates a temporary directory.
