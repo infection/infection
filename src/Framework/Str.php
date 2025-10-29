@@ -43,6 +43,7 @@ use Infection\CannotBeInstantiated;
 use const PHP_EOL;
 use function Safe\mb_convert_encoding;
 use function str_replace;
+use function strtr;
 use function trim;
 
 /**
@@ -51,6 +52,39 @@ use function trim;
 final class Str
 {
     use CannotBeInstantiated;
+
+    private const SYSTEM_LINE_ENDINGS_REPLACEMENT = [
+        "\r\n" => PHP_EOL,
+        "\n" => PHP_EOL,
+        "\r" => PHP_EOL,
+    ];
+
+    private const UNIX_LINE_ENDINGS_REPLACEMENT = [
+        "\r\n" => "\n",
+        "\r" => "\n",
+    ];
+
+    /**
+     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
+     */
+    public static function toSystemLineEndings(string $value): string
+    {
+        return strtr(
+            $value,
+            self::SYSTEM_LINE_ENDINGS_REPLACEMENT,
+        );
+    }
+
+    /**
+     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
+     */
+    public static function toUnixLineEndings(string $value): string
+    {
+        return strtr(
+            $value,
+            self::UNIX_LINE_ENDINGS_REPLACEMENT,
+        );
+    }
 
     public static function trimLineReturns(string $string): string
     {

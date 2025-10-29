@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\GitHub;
 
 use function implode;
+use Infection\Framework\Str;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -115,7 +115,7 @@ final class GitDiffFileProviderTest extends TestCase
             +        $strrev = \strrev($encryptedMessage);
 
             EOF;
-        $gitUnifiedOutput = LineReturnNormalizer::normalize($gitUnifiedOutput);
+        $gitUnifiedOutput = Str::toSystemLineEndings($gitUnifiedOutput);
 
         $expectedUnifiedReturn = <<<'EOF'
             diff --git a/tests/FooTest.php b/tests/FooTest.php
@@ -125,7 +125,7 @@ final class GitDiffFileProviderTest extends TestCase
             @@ -21 +31,4 @@ final class Bar
 
             EOF;
-        $expectedUnifiedReturn = LineReturnNormalizer::normalize($expectedUnifiedReturn);
+        $expectedUnifiedReturn = Str::toSystemLineEndings($expectedUnifiedReturn);
 
         $shellCommandLineExecutor->expects($this->any())
             ->method('execute')
