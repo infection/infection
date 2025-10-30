@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
-name: Benchmark Tests
+name: Benchmarks
 
 on:
   pull_request:
@@ -36,10 +36,13 @@ jobs:
         shell: bash
         run: make test-benchmark
 
+  # TODO: add the actual benchmark execution
+  #  https://github.com/infection/infection/pull/2516
+
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:
-    name: Unit & Integration Tests Status
+    name: Benchmarks Status
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: tests
