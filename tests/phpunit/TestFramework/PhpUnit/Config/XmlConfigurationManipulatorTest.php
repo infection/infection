@@ -39,11 +39,11 @@ use Closure;
 use DOMDocument;
 use const E_ALL;
 use Infection\Framework\OperatingSystem;
+use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
-use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -840,7 +840,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             $this->fail('Expected exception to be thrown');
         } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
             $this->assertContains(
-                normalizeLineReturn($exception->getMessage()),
+                Str::toUnixLineEndings($exception->getMessage()),
                 $errorMessages,
             );
         } finally {
@@ -894,7 +894,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             $errorMessage = str_replace(
                 $infectionPath,
                 '/path/to/infection',
-                normalizeLineReturn($exception->getMessage()),
+                Str::toUnixLineEndings($exception->getMessage()),
             );
 
             $this->assertSame(

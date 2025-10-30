@@ -111,7 +111,7 @@ $debug = $input->getOption(DEBUG_OPT);
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static fn (): int => $generateMutations($maxMutationsCount),
+    static fn () => $generateMutations($maxMutationsCount),
     $io,
 );
 

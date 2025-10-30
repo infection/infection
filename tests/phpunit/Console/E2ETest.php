@@ -50,8 +50,8 @@ use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\Framework\OperatingSystem;
+use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use function is_readable;
 use const PHP_OS;
 use const PHP_SAPI;
@@ -213,7 +213,7 @@ final class E2ETest extends TestCase
         }
 
         $expected = file_get_contents('expected-output.txt');
-        $expected = LineReturnNormalizer::normalize($expected);
+        $expected = Str::toSystemLineEndings($expected);
 
         $this->assertStringEqualsFile('infection.log', $expected, sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
