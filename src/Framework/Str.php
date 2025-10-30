@@ -145,7 +145,7 @@ final class Str
             break;
         }
 
-        return implode(PHP_EOL, $lines);
+        return implode("\n", $lines);
     }
 
     public static function convertToUtf8(string $string): string
