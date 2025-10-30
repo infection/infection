@@ -30,6 +30,8 @@ PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest
 
+PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
+
 INFECTION=./build/infection.phar
 
 DOCKER_RUN=docker compose run --rm
@@ -124,7 +126,7 @@ benchmark: vendor \
 		$(BENCHMARK_TRACING_SUBMODULE) \
 		$(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative --quiet
-	vendor/bin/phpbench run tests/benchmark --report=aggregate --report=bar_chart_time
+	vendor/bin/phpbench run tests/benchmark $(PHPBENCH_REPORTS)
 	composer dump
 
 .PHONY: profile_mutation_generator
@@ -140,7 +142,7 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 .PHONY: benchmark_mutation_generator
 benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
-	vendor/bin/phpbench run tests/benchmark/MutationGenerator --report=aggregate --report=bar_chart_time
+	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
 	composer dump
 
 .PHONY: profile_tracing
@@ -156,7 +158,7 @@ profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVER
 .PHONY: benchmark_tracing
 benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative --quiet
-	vendor/bin/phpbench run tests/benchmark/Tracing --report=aggregate --report=bar_chart_time
+	vendor/bin/phpbench run tests/benchmark/Tracing $(PHPBENCH_REPORTS)
 	composer dump
 
 

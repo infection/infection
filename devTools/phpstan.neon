@@ -124,6 +124,9 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/benchmark/*/*Bench.php
     level: 8
     paths:
         - ../src
