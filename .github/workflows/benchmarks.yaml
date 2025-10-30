@@ -1,7 +1,7 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:braces
 
-name: Benchmark Tests
+name: Benchmarks
 
 on:
   pull_request:
@@ -37,30 +37,30 @@ jobs:
         run: make test-benchmark
 
   benchmarks:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    name: 'Tests'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
+      name: 'Tests'
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer
+          - name: Setup PHP
+            uses: shivammathur/setup-php@v2
+            with:
+                php-version: '8.4'
+                tools: composer
 
-      - name: Install dependencies
-        uses: ramsey/composer-install@v3
+          - name: Install dependencies
+            uses: ramsey/composer-install@v3
 
-      - name: Run benchmarks
-        shell: bash
-        run: make benchmark
+          - name: Run benchmarks
+            shell: bash
+            run: make benchmark
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
   tests-status:
-    name: Unit & Integration Tests Status
+    name: Benchmarks Status
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs:
