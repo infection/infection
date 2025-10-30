@@ -254,19 +254,19 @@ final class StrTest extends TestCase
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Unix/Linux (LF) line endings' => [
                 $value,
                 $expectedTrimmedLines,
-                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+                $expectedTrimmedBlankLines,
             ];
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Windows (CRLF) line endings' => [
                 str_replace("\n", "\r\n", $value),
                 $expectedTrimmedLines,
-                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+                $expectedTrimmedBlankLines,
             ];
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Classic MacOS (CRLF) line endings' => [
                 str_replace("\n", "\r", $value),
                 $expectedTrimmedLines,
-                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+                $expectedTrimmedBlankLines,
             ];
         })();
     }
