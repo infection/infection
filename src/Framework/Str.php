@@ -106,7 +106,7 @@ final class Str
 
     /**
      * Removes all lines and removes leading and trailing blank lines. Line
-     * endings are replaced by the system line endings.
+     * endings are replaced by the unix line endings.
      */
     public static function removeOuterBlankLines(string $value): string
     {

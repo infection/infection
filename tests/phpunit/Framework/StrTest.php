@@ -113,7 +113,7 @@ final class StrTest extends TestCase
     }
 
     #[DataProvider('trimLinesProvider')]
-    public function test_it_trims_blank_lines_and_replaces_the_line_endings_by_the_system_line_ending(
+    public function test_it_trims_blank_lines_and_replaces_the_line_endings_by_the_unix_line_ending(
         string $value,
         string $expectedTrimmedLines,
         ?string $expectedTrimmedBlankLines = null,
