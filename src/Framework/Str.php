@@ -33,15 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Framework;
 
+use function array_map;
 use function array_values;
 use function count;
 use function explode;
 use function implode;
+use Infection\CannotBeInstantiated;
 use const PHP_EOL;
 use function Safe\mb_convert_encoding;
-use function str_replace;
+use function strtr;
 use function trim;
 
 /**
@@ -51,11 +53,66 @@ final class Str
 {
     use CannotBeInstantiated;
 
-    public static function trimLineReturns(string $string): string
+    private const SYSTEM_LINE_ENDINGS_REPLACEMENT = [
+        "\r\n" => PHP_EOL,
+        "\n" => PHP_EOL,
+        "\r" => PHP_EOL,
+    ];
+
+    private const UNIX_LINE_ENDINGS_REPLACEMENT = [
+        "\r\n" => "\n",
+        "\r" => "\n",
+    ];
+
+    /**
+     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
+     */
+    public static function toSystemLineEndings(string $value): string
+    {
+        return strtr(
+            $value,
+            self::SYSTEM_LINE_ENDINGS_REPLACEMENT,
+        );
+    }
+
+    /**
+     * @psalm-suppress InvalidReturnStatement,InvalidReturnType
+     */
+    public static function toUnixLineEndings(string $value): string
+    {
+        return strtr(
+            $value,
+            self::UNIX_LINE_ENDINGS_REPLACEMENT,
+        );
+    }
+
+    /**
+     * Trim the whitespace from the end of all lines. The line endings are
+     * replaced by the unix line ending.
+     */
+    public static function rTrimLines(string $value): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                rtrim(...),
+                explode(
+                    "\n",
+                    self::toUnixLineEndings($value),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Removes all lines and removes leading and trailing blank lines. Line
+     * endings are replaced by the system line endings.
+     */
+    public static function removeOuterBlankLines(string $value): string
     {
         $lines = explode(
             "\n",
-            str_replace("\r\n", "\n", $string),
+            self::toUnixLineEndings($value),
         );
         $linesCount = count($lines);
 

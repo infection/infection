@@ -38,7 +38,7 @@ namespace Infection\Tests\Configuration\Schema;
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
 use Infection\Configuration\Schema\SchemaValidator;
-use function Infection\Tests\normalizeLineReturn;
+use Infection\Framework\Str;
 use function json_last_error_msg;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -69,7 +69,7 @@ final class SchemaValidatorTest extends TestCase
             } else {
                 $this->assertSame(
                     $expectedErrorMessage,
-                    normalizeLineReturn($exception->getMessage()),
+                    Str::toUnixLineEndings($exception->getMessage()),
                 );
             }
         }
