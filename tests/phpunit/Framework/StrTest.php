@@ -113,7 +113,7 @@ final class StrTest extends TestCase
     }
 
     #[DataProvider('trimLinesProvider')]
-    public function test_it_trims_blank_lines_and_replaces_the_line_endings_by_the_system_line_ending(
+    public function test_it_trims_blank_lines_and_replaces_the_line_endings_by_the_unix_line_ending(
         string $value,
         string $expectedTrimmedLines,
         ?string $expectedTrimmedBlankLines = null,
@@ -254,19 +254,19 @@ final class StrTest extends TestCase
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Unix/Linux (LF) line endings' => [
                 $value,
                 $expectedTrimmedLines,
-                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+                $expectedTrimmedBlankLines,
             ];
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Windows (CRLF) line endings' => [
                 str_replace("\n", "\r\n", $value),
                 $expectedTrimmedLines,
-                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+                $expectedTrimmedBlankLines,
             ];
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Classic MacOS (CRLF) line endings' => [
                 str_replace("\n", "\r", $value),
                 $expectedTrimmedLines,
-                Str::toSystemLineEndings($expectedTrimmedBlankLines),
+                $expectedTrimmedBlankLines,
             ];
         })();
     }
