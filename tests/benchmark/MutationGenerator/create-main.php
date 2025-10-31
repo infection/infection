@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\MutationGenerator;
 
-use Closure;
 use function array_map;
+use Closure;
 use Infection\Container;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
@@ -57,7 +57,8 @@ function collectSources(): iterable
     ;
 }
 
-function createTrace(SplFileInfo $fileInfo): Trace {
+function createTrace(SplFileInfo $fileInfo): Trace
+{
     require_once $fileInfo->getRealPath();
 
     return new PartialTrace($fileInfo);
@@ -70,12 +71,6 @@ function createTrace(SplFileInfo $fileInfo): Trace {
  */
 return static function (int $maxCount): Closure {
     $container = Container::create();
-
-    $files = Finder::create()
-        ->files()
-        ->in(__DIR__ . '/sources')
-        ->name('*.php')
-    ;
 
     // Since those files are not autoloaded, we need to manually autoload them
     require_once __DIR__ . '/sources/autoload.php';
@@ -92,7 +87,7 @@ return static function (int $maxCount): Closure {
 
     $fileMutationGenerator = $container->getFileMutationGenerator();
 
-    return function () use ($traces, $fileMutationGenerator, $mutators, $maxCount): int {
+    return static function () use ($traces, $fileMutationGenerator, $mutators, $maxCount): int {
         $count = 0;
 
         foreach ($traces as $trace) {

@@ -106,9 +106,6 @@ final class BlackfireInstrumentor implements Instrumentor
         }
     }
 
-    /**
-     * @param Closure(): (Closure(): positive-int|0) $main
-     */
     private static function profileSample(
         Closure $createMain,
         BlackfireProbe $probe,

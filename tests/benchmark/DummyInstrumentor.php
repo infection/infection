@@ -44,7 +44,7 @@ final class DummyInstrumentor implements Instrumentor
     {
         $result = 0;
 
-        for ($i = 0; $i < $sampleSize; $i++) {
+        for ($i = 0; $i < $sampleSize; ++$i) {
             $main = $createMain();
 
             $result += $main();

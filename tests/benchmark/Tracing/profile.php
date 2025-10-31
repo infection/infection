@@ -122,7 +122,7 @@ $errorOutput->writeln([
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static fn () => (require __DIR__.'/create-main.php')($maxTraceCount),
+    static fn () => (require __DIR__ . '/create-main.php')($maxTraceCount),
     5,
     $io,
 );

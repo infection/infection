@@ -36,10 +36,7 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Closure;
-use Generator;
 use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -64,7 +61,7 @@ return static function (int $maxCount): Closure {
         $count = 0;
 
         foreach ($traceProvider->provideTraces() as $trace) {
-            $count++;
+            ++$count;
 
             if ($count >= $maxCount) {
                 break;
