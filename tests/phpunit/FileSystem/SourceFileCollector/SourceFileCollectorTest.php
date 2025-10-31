@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
-use function array_map;
-use function array_values;
 use Infection\FileSystem\SourceFileCollector;
-use function natcasesort;
+use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -49,27 +47,28 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
-    private const FIXTURES = __DIR__ . '/Fixtures';
+    private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
     /**
      * @param string[] $sourceDirectories
      * @param string[] $excludedFilesOrDirectories
-     * @param list<string> $expected
+     * @param list<string> $expectedList
      */
     #[DataProvider('sourceFilesProvider')]
-    public function test_it_can_collect_files(array $sourceDirectories, array $excludedFilesOrDirectories, array $expected): void
-    {
-        $root = self::FIXTURES;
-
-        $files = (new SourceFileCollector())->collectFiles($sourceDirectories, $excludedFilesOrDirectories);
-
-        $files = take($files)->toList();
-
-        $this->assertSame(
-            $expected,
-            self::normalizePaths($files, $root),
+    public function test_it_can_collect_files(
+        array $sourceDirectories,
+        array $excludedFilesOrDirectories,
+        array $expectedList,
+    ): void {
+        $files = (new SourceFileCollector())->collectFiles(
+            $sourceDirectories,
+            $excludedFilesOrDirectories,
         );
-        $this->assertIsList($files);
+
+        self::assertIsEqualCanonicalizing(
+            $expectedList,
+            take($files)->toAssoc(),
+        );
     }
 
     /**
@@ -84,7 +83,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, no excludes' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             [],
             [
                 'case0/a.php',
@@ -94,7 +93,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'multiple directories, no filter, no excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [self::FIXTURES_ROOT . '/case0', self::FIXTURES_ROOT . '/case1'],
             [],
             [
                 'case0/a.php',
@@ -106,7 +105,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, one excludes' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -115,8 +114,8 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, absolute path excludes' => [
-            [self::FIXTURES . '/case0'],
-            [self::FIXTURES . '/sub-dir'],
+            [self::FIXTURES_ROOT . '/case0'],
+            [self::FIXTURES_ROOT . '/sub-dir'],
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
@@ -125,7 +124,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, relative path excludes relative to source root' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             ['case0/sub-dir'],
             [
                 'case0/a.php',
@@ -135,7 +134,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'multiple directories, no filter, one common excludes' => [
-            [self::FIXTURES . '/case0', self::FIXTURES . '/case1'],
+            [self::FIXTURES_ROOT . '/case0', self::FIXTURES_ROOT . '/case1'],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -145,7 +144,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'exclude file by its name' => [
-            [self::FIXTURES . '/case1'],
+            [self::FIXTURES_ROOT . '/case1'],
             ['a.php'],
             [
                 'case1/sub-dir/b.php',
@@ -153,7 +152,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory, no filter, one common excludes and one file exclude' => [
-            [self::FIXTURES . '/case0'],
+            [self::FIXTURES_ROOT . '/case0'],
             [
                 'sub-dir',
                 'a.php',
@@ -165,23 +164,60 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param SplFileInfo[] $files
+     * @param list<string> $expectedList
+     * @param array<string, SplFileInfo> $actual
+     */
+    private static function assertIsEqualCanonicalizing(
+        array $expectedList,
+        array $actual,
+    ): void {
+        $root = self::FIXTURES_ROOT;
+
+        $normalizedExpected = self::createExpected($expectedList, $root);
+        $normalizedActual = self::normalizePaths($actual, $root);
+
+        ksort($normalizedExpected);
+        ksort($normalizedActual);
+
+        self::assertSame($normalizedExpected, $normalizedActual);
+    }
+
+    /**
+     * @param array<string, SplFileInfo> $files
      *
-     * @return string[] File real paths relative to the current temporary directory
+     * @return array<string, string> File real paths relative to the current temporary directory
      */
     private static function normalizePaths(array $files, string $root): array
     {
         $root = Path::normalize($root);
 
-        $files = array_values(
-            array_map(
-                static fn (SplFileInfo $fileInfo): string => Path::makeRelative($fileInfo->getPathname(), $root),
-                $files,
-            ),
-        );
+        $result = [];
 
-        natcasesort($files);
+        foreach ($files as $pathName => $fileInfo) {
+            $result[Path::normalize($pathName)] = Path::makeRelative(
+                $fileInfo->getPathname(),
+                $root,
+            );
+        }
 
-        return array_values($files);
+        return $result;
+    }
+
+    /**
+     * @param list<string> $expectedList
+     *
+     * @return array<string, string> File real paths relative to the current temporary directory
+     */
+    private static function createExpected(array $expectedList, string $root): array
+    {
+        $expected = [];
+
+        foreach ($expectedList as $path) {
+            $pathname = Path::normalize($root . '/' . $path);
+
+            $expected[$pathname] = Path::normalize($path);
+        }
+
+        return $expected;
     }
 }

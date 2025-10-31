@@ -84,7 +84,7 @@ final readonly class ConcreteComposerExecutableFinder implements ComposerExecuta
     {
         return sprintf(
             '%s %s',
-            (new PhpExecutableFinder())->find(),
+            (new PhpExecutableFinder())->find() ?: 'php',
             $path,
         );
     }

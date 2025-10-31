@@ -97,7 +97,7 @@ class MemoryLimiter
         try {
             $this->fileSystem->appendToFile(
                 $tmpConfigPath,
-                PHP_EOL . sprintf('memory_limit = %dM', $memoryLimit),
+                PHP_EOL . sprintf('memory_limit = %dM', (int) $memoryLimit),
             );
         } catch (IOException) {
             // Cannot add a memory limit: file is not writable

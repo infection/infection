@@ -38,9 +38,9 @@ namespace Infection\Logger;
 use function array_map;
 use function explode;
 use function implode;
+use Infection\Framework\Str;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Str;
 use const PHP_EOL;
 use function sprintf;
 use function str_repeat;
@@ -168,7 +168,7 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
 
             $lines[] = self::getMutatorLine($index, $executionResult);
             $lines[] = '';
-            $lines[] = Str::trimLineReturns($executionResult->getMutantDiff());
+            $lines[] = Str::removeOuterBlankLines($executionResult->getMutantDiff());
 
             if ($this->debugMode) {
                 $lines[] = '';
@@ -221,7 +221,7 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
             PHP_EOL,
             array_map(
                 static fn (string $line): string => '  ' . $line,
-                explode(PHP_EOL, Str::trimLineReturns($value)),
+                explode("\n", Str::removeOuterBlankLines($value)),
             ),
         );
     }

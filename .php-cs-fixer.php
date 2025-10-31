@@ -60,6 +60,7 @@ $finder = Finder::create()
         'tests/benchmark/MutationGenerator/sources',
         'tests/benchmark/Tracing/coverage',
         'tests/benchmark/Tracing/sources',
+        'tests/benchmark/Tracing/benchmark-source',
         'tests/e2e',
         'tests/phpunit/Fixtures',
     ])
@@ -150,12 +151,14 @@ return (new Config())
         'phpdoc_align' => [
             'align' => 'left',
         ],
+        // Allow inline Psalm suppress statements
+        'phpdoc_to_comment' => false,
         'php_unit_dedicate_assert' => true,
         'php_unit_method_casing' => [
             'case' => 'snake_case',
         ],
         'php_unit_set_up_tear_down_visibility' => true,
-        'php_unit_strict' => true,
+        'php_unit_strict' => false,
         'phpdoc_order_by_value' => [
             'annotations' => ['covers'],
         ],
@@ -187,4 +190,5 @@ return (new Config())
         'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
+    ->setCacheFile(__DIR__ . '/build/.php_cs.cache')
 ;

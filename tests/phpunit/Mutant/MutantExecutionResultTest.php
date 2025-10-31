@@ -142,6 +142,8 @@ final class MutantExecutionResultTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             $mutatedCode,
             $mutantDiff = <<<'DIFF'
@@ -175,7 +177,7 @@ final class MutantExecutionResultTest extends TestCase
         MutantExecutionResult $result,
         string $expectedProcessCommandLine,
         string $expectedProcessOutput,
-        string $expectedDetectionStatus,
+        DetectionStatus $expectedDetectionStatus,
         string $expectedMutantDiff,
         string $expectedMutatorClass,
         string $expectedMutatorName,

@@ -35,14 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_flip;
-use function array_keys;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\DetectionStatus;
-use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -128,6 +125,25 @@ final class TargetDetectionStatusesProviderTest extends TestCase
                 DetectionStatus::KILLED_BY_TESTS,
                 DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
                 DetectionStatus::ERROR,
+                DetectionStatus::NOT_COVERED,
+            ],
+            $provider->get(),
+        );
+    }
+
+    public function test_it_provides_not_covered_when_with_uncovered_option_is_used(): void
+    {
+        $logs = $this->createMock(Logs::class);
+
+        $provider = new TargetDetectionStatusesProvider(
+            $logs,
+            logVerbosity: LogVerbosity::NORMAL,
+            onlyCoveredMode: false,
+            numberOfShownMutations: 0,
+        );
+
+        $this->assertProvides(
+            [
                 DetectionStatus::NOT_COVERED,
             ],
             $provider->get(),
@@ -292,32 +308,13 @@ final class TargetDetectionStatusesProviderTest extends TestCase
 
     private function assertProvides(array $expected, array $actual): void
     {
-        $expected = array_flip($expected);
-        ksort($expected);
-
-        ksort($actual);
-
-        $this->assertSame(array_keys($expected), array_keys($actual));
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     private function assertProvidesExcluding(array $excluding, array $actual): void
     {
-        $expected = $this->getDetectionStatusesIndexExcluding($excluding);
-        ksort($expected);
+        $expected = DetectionStatus::getCasesExcluding(...$excluding);
 
-        ksort($actual);
-
-        $this->assertSame(array_keys($expected), array_keys($actual));
-    }
-
-    private function getDetectionStatusesIndexExcluding(array $excludeList): array
-    {
-        $detectionStatuses = array_flip(DetectionStatus::ALL);
-
-        foreach ($excludeList as $exclude) {
-            unset($detectionStatuses[$exclude]);
-        }
-
-        return $detectionStatuses;
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 }

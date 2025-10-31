@@ -45,6 +45,7 @@ use Infection\Event\InitialTestSuiteWasStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
+use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -53,18 +54,12 @@ use PHPUnit\Framework\TestCase;
 use function str_contains;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\InputStream;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private static $phpBin;
-
     /**
      * @var InitialTestsRunProcessFactory|MockObject
      */
@@ -79,11 +74,6 @@ final class InitialTestsRunnerTest extends TestCase
      * @var InitialTestsRunner
      */
     private $runner;
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$phpBin = (new PhpExecutableFinder())->find();
-    }
 
     protected function setUp(): void
     {
@@ -175,6 +165,10 @@ final class InitialTestsRunnerTest extends TestCase
 
     private function createProcessForCode(string $code): Process
     {
-        return new Process([self::$phpBin, '-r', $code]);
+        return new Process([
+            TestPhpExecutableFinder::find(),
+            '-r',
+            $code,
+        ]);
     }
 }

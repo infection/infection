@@ -37,6 +37,7 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
@@ -68,6 +69,7 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
 
@@ -117,6 +119,7 @@ class ConfigurationFactory
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
+        ?string $textLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
@@ -149,17 +152,14 @@ class ConfigurationFactory
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collectFiles(
-                $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes(),
-            ),
+            $this->collectFiles($schema),
             $this->retrieveFilter(
                 $sourceFilter,
                 $schema->getSource()->getDirectories(),
             ),
             $this->getGitSource($sourceFilter),
             $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
+            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -250,36 +250,12 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->getPhpUnit();
-
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
-
-        if ($phpUnitConfigDir === null) {
-            $phpUnit->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir,
-            ));
-        }
-
-        return $phpUnit;
+        return $schema->getPhpUnit()->withAbsolutePaths($configDir);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        $phpStan = clone $schema->getPhpStan();
-
-        $phpStanConfigDir = $phpStan->getConfigDir();
-
-        if ($phpStanConfigDir === null) {
-            $phpStan->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpStanConfigDir)) {
-            $phpStan->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpStanConfigDir,
-            ));
-        }
-
-        return $phpStan;
+        return $schema->getPhpStan()->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(
@@ -357,6 +333,34 @@ class ConfigurationFactory
     }
 
     /**
+     * @return iterable<string, SplFileInfo>
+     */
+    private function collectFiles(SchemaConfiguration $schema): iterable
+    {
+        $source = $schema->getSource();
+        $schemaDirname = dirname($schema->getFile());
+
+        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+            ? $path
+            : Path::join(
+                $schemaDirname,
+                $path,
+            );
+
+        return $this->sourceFileCollector->collectFiles(
+            // We need to make the source file paths absolute, otherwise the
+            // collector will collect the files relative to the current working
+            // directory instead of relative to the location of the configuration
+            // file.
+            array_map(
+                $mapToAbsolutePath(...),
+                $source->getDirectories(),
+            ),
+            $source->getExcludes(),
+        );
+    }
+
+    /**
      * @param string[] $sourceDirectories
      */
     private function retrieveFilter(
@@ -383,7 +387,7 @@ class ConfigurationFactory
         return $this->gitDiffFileProvider->provide($filter, $baseBranch, $sourceDirectories);
     }
 
-    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -399,6 +403,10 @@ class ConfigurationFactory
 
         if ($htmlLogFilePath !== null) {
             $logs->setHtmlLogFilePath($htmlLogFilePath);
+        }
+
+        if ($textLogFilePath !== null) {
+            $logs->setTextLogFilePath($textLogFilePath);
         }
 
         return new Logs(

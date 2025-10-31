@@ -59,7 +59,7 @@ $traces = array_map(
     static function (SplFileInfo $fileInfo): Trace {
         require_once $fileInfo->getRealPath();
 
-        return new PartialTrace($fileInfo);
+        return new EmptyTrace($fileInfo);
     },
     iterator_to_array($files, false),
 );
@@ -71,11 +71,12 @@ $mutators = $container->getMutatorFactory()->create(
 
 $fileMutationGenerator = $container->getFileMutationGenerator();
 
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): void {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
+/**
+ * @param positive-int $maxCount
+ *
+ * @return positive-int|0
+ */
+return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): int {
     $count = 0;
 
     foreach ($traces as $trace) {
@@ -89,9 +90,11 @@ return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mu
         foreach ($mutations as $_) {
             ++$count;
 
-            if ($maxCount !== null && $count === $maxCount) {
-                return;
+            if ($count >= $maxCount) {
+                break 2;
             }
         }
     }
+
+    return $count;
 };

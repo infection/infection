@@ -772,9 +772,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
-        $mutantProcessContainer = $this->createMock(MutantProcessContainer::class);
-
-        return $mutantProcessContainer;
+        return $this->createMock(MutantProcessContainer::class);
     }
 
     private function someIterable(?callable $callback = null): Callback
@@ -837,6 +835,8 @@ final class MutationTestingRunnerTest extends TestCase
                     $time,
                 ),
             ] : [],
+            [],
+            '',
         );
     }
 }

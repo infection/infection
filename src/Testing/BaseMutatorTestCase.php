@@ -43,11 +43,11 @@ use function implode;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Throwable;
@@ -140,7 +140,7 @@ abstract class BaseMutatorTestCase extends TestCase
         $mutations = $this->getMutationsFromCode($code, $settings);
 
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new CloningVisitor());
 
         $mutants = [];
 
@@ -151,7 +151,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = SingletonContainer::getPrinter()->print($mutatedStatements, $mutation);
 
             $traverser->removeVisitor($mutatorVisitor);
         }
@@ -164,13 +164,17 @@ abstract class BaseMutatorTestCase extends TestCase
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $parser = SingletonContainer::getContainer()->getParser();
+        $nodes = $parser->parse($code);
+        $originalFileTokens = $parser->getTokens();
 
         $this->assertNotNull($nodes);
 
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
             $nodes,
+            $originalFileTokens,
+            $code,
         );
 
         // Pre-traverse the nodes to connect them

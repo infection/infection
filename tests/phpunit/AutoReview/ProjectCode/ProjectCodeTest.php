@@ -61,9 +61,6 @@ use function sprintf;
 #[CoversNothing]
 final class ProjectCodeTest extends TestCase
 {
-    /**
-     * @requires OSFAMILY Windows Cannot check if the file is executable on Windows
-     */
     public function test_infection_bin_is_executable(): void
     {
         $infectionFile = __DIR__ . '/../../../../bin/infection';
@@ -242,7 +239,8 @@ final class ProjectCodeTest extends TestCase
             ),
             array_filter(
                 $properties,
-                static fn (ReflectionProperty $property): bool => $property->class === $className,
+                static fn (ReflectionProperty $property): bool => $property->class === $className
+                    && !$property->isReadOnly(),
             ),
         );
 

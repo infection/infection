@@ -35,25 +35,38 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\Tracing;
 
-use Infection\Benchmark\BlackfireInstrumentor;
+use Infection\Benchmark\InstrumentorFactory;
+use LogicException;
+use const PHP_INT_MAX;
+use function sprintf;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Webmozart\Assert\Assert;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-const MAX_TRACE_COUNT_ARG = 'max-trace-count';
+const MAX_TRACE_COUNT_OPT = 'max-trace-count';
+const DEBUG_OPT = 'debug';
 
 $input = new ArgvInput(
     null,
     new InputDefinition([
-        new InputArgument(
-            MAX_TRACE_COUNT_ARG,
-            InputArgument::OPTIONAL,
+        new InputOption(
+            MAX_TRACE_COUNT_OPT,
+            null,
+            InputOption::VALUE_REQUIRED,
             'Maximum number of traces retrieved. Use -1 for no maximum',
-            50,
+            '-1',
+        ),
+        new InputOption(
+            DEBUG_OPT,
+            null,
+            InputOption::VALUE_NONE,
+            'To use to execute the code without actually profiling.',
         ),
     ]),
 );
@@ -61,12 +74,54 @@ $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
 $provideTraces = require __DIR__ . '/provide-traces-closure.php';
-/** @var int $maxTraceCount */
-$maxTraceCount = (int) $input->getArgument(MAX_TRACE_COUNT_ARG);
 
-BlackfireInstrumentor::profile(
-    static function () use ($provideTraces, $maxTraceCount): void {
-        $provideTraces($maxTraceCount);
-    },
+/** @var positive-int $maxTraceCount */
+$maxTraceCount = (static function (InputInterface $input, string $optionName): int {
+    $option = $input->getOption($optionName);
+
+    Assert::integerish(
+        $option,
+        sprintf(
+            'Expected value of option "%s" to be integerish. Got "%s".',
+            $optionName,
+            $option,
+        ),
+    );
+
+    $intValue = (int) $option;
+
+    if ($intValue === -1) {
+        return PHP_INT_MAX;
+    }
+
+    Assert::positiveInteger(
+        $intValue,
+        sprintf(
+            'Expected value of option "%s" to be a positive integer or -1. Got "%s".',
+            $optionName,
+            $intValue,
+        ),
+    );
+
+    return $intValue;
+})($input, MAX_TRACE_COUNT_OPT);
+
+$debug = $input->getOption(DEBUG_OPT);
+
+$instrumentor = InstrumentorFactory::create($debug);
+
+$count = $instrumentor->profile(
+    static fn () => $provideTraces($maxTraceCount),
     $io,
+);
+
+if ($count === 0) {
+    throw new LogicException('Something went wrong, no traces were actually generated.');
+}
+
+$output->writeln(
+    sprintf(
+        '%d trace(s) generated.',
+        $count,
+    ),
 );

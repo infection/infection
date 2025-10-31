@@ -49,7 +49,7 @@ class SourceFileCollector
      * @param string[] $sourceDirectories
      * @param string[] $excludedFilesOrDirectories
      *
-     * @return iterable<SplFileInfo>
+     * @return iterable<string, SplFileInfo>
      */
     public function collectFiles(
         array $sourceDirectories,

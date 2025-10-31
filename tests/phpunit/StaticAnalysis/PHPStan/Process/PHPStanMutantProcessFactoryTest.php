@@ -81,6 +81,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -107,7 +109,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                '--fail-without-result-cache',
                 '--memory-limit=-1',
             ])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
@@ -177,6 +178,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -203,7 +206,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                '--fail-without-result-cache',
                 '--memory-limit=-1',
                 '--level=max',
             ])
@@ -274,6 +276,8 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                         0.01,
                     ),
                 ],
+                [],
+                '',
             ),
             'killed#0',
             <<<'DIFF'
@@ -300,7 +304,6 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
                 '--error-format=json',
                 '--no-progress',
                 '-vv',
-                '--fail-without-result-cache',
             ])
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
