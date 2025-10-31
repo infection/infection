@@ -221,7 +221,7 @@ final readonly class TextFileLogger implements LineMutationTestingResultsLogger
             PHP_EOL,
             array_map(
                 static fn (string $line): string => '  ' . $line,
-                explode(PHP_EOL, Str::removeOuterBlankLines($value)),
+                explode("\n", Str::removeOuterBlankLines($value)),
             ),
         );
     }
