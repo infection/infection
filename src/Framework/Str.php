@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Framework;
 
 use function array_map;
-use function array_values;
 use function count;
 use function explode;
 use function implode;
@@ -44,7 +43,6 @@ use Infection\CannotBeInstantiated;
 use const PHP_EOL;
 use function Safe\mb_convert_encoding;
 use function strtr;
-use function trim;
 
 /**
  * @internal
@@ -94,13 +92,7 @@ final class Str
     {
         return implode(
             "\n",
-            array_map(
-                rtrim(...),
-                explode(
-                    "\n",
-                    self::toUnixLineEndings($value),
-                ),
-            ),
+            self::splitIntoRTrimmedLines($value),
         );
     }
 
@@ -110,42 +102,27 @@ final class Str
      */
     public static function cleanForDisplay(string $value): string
     {
-        $lines = explode(
-            "\n",
-            self::rTrimLines($value),
+        $lines = self::splitIntoRTrimmedLines($value);
+
+        $firstEmptyBlankLineIndex = self::findFirstNonEmptyLineIndex($lines);
+
+        if ($firstEmptyBlankLineIndex === null) {
+            return '';  // All lines are blank
+        }
+
+        $lastNonEmptyLineIndex = self::findLastNonEmptyLineIndex(
+            $lines,
+            $firstEmptyBlankLineIndex,
         );
-        $linesCount = count($lines);
 
-        // Trim leading empty lines
-        for ($i = 0; $i < $linesCount; ++$i) {
-            $line = $lines[$i];
-
-            if ($line === '') {
-                unset($lines[$i]);
-
-                continue;
-            }
-
-            break;
-        }
-
-        $lines = array_values($lines);
-        $linesCount = count($lines);
-
-        // Trim trailing empty lines
-        for ($i = $linesCount - 1; $i >= 0; --$i) {
-            $line = $lines[$i];
-
-            if ($line === '') {
-                unset($lines[$i]);
-
-                continue;
-            }
-
-            break;
-        }
-
-        return implode("\n", $lines);
+        return implode(
+            "\n",
+            array_slice(
+                $lines,
+                $firstEmptyBlankLineIndex,
+                $lastNonEmptyLineIndex - $firstEmptyBlankLineIndex + 1,
+            ),
+        );
     }
 
     public static function convertToUtf8(string $string): string
@@ -154,5 +131,54 @@ final class Str
         $utf8String = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
 
         return $utf8String;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function splitIntoRTrimmedLines(string $value): array
+    {
+        return array_map(
+            rtrim(...),
+            explode(
+                "\n",
+                self::toUnixLineEndings($value),
+            ),
+        );
+    }
+
+    /**
+     * @return int<0,max>|null
+     */
+    private static function findFirstNonEmptyLineIndex(array $lines): ?int
+    {
+        foreach ($lines as $index => $line) {
+            if ($line !== '') {
+                return $index;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param int<0,max> $firstNonEmptyLineIndex
+     *
+     * @return int<0,max>|null
+     */
+    private static function findLastNonEmptyLineIndex(
+        array $lines,
+        int $firstNonEmptyLineIndex,
+    ): ?int
+    {
+        $linesCount = count($lines);
+
+        for ($index = $linesCount - 1; $index >= $firstNonEmptyLineIndex; --$index) {
+            if ($lines[$index] !== '') {
+                return $index;
+            }
+        }
+
+        return null;
     }
 }
