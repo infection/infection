@@ -39,16 +39,15 @@ use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
-use function Safe\realpath;
 use function Safe\touch;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageLocator::class)]
@@ -81,7 +80,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     {
         (new Filesystem())->dumpFile('coverage-xml/index.xml', '');
 
-        $expected = normalizePath(realpath($this->tmp . '/coverage-xml/index.xml'));
+        $expected = Path::canonicalize($this->tmp . '/coverage-xml/index.xml');
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
@@ -96,7 +95,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
         (new Filesystem())->dumpFile('coverage-xml/INDEX.XML', '');
 
-        $expected = normalizePath(realpath($this->tmp . '/coverage-xml/index.xml'));
+        $expected = Path::canonicalize($this->tmp . '/coverage-xml/index.xml');
 
         $actual = $this->locator->locate();
 
@@ -108,7 +107,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     {
         (new Filesystem())->dumpFile($indexRelativePath, '');
 
-        $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $indexRelativePath));
+        $expected = Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . $indexRelativePath);
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
@@ -123,8 +122,8 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not locate the XML coverage index file. More than one file has been found: "%s", "%s"',
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'index.xml')),
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml')),
+            Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . 'index.xml'),
+            Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . 'sub-dir/index.xml'),
         ));
 
         $this->locator->locate();

@@ -124,9 +124,6 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
-        -
-            message: '#Anonymous function should return iterable.* but return statement is missing\.#'
-            path: ../tests/benchmark/Tracing/provide-traces-closure.php
 
         # Test builders provide fluent API methods that may not be used immediately
         -
@@ -149,6 +146,7 @@ parameters:
         - ../tests/benchmark/MutationGenerator/sources (?)
         - ../tests/benchmark/Tracing/coverage (?)
         - ../tests/benchmark/Tracing/sources (?)
+        - ../tests/benchmark/Tracing/benchmark-source (?)
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false

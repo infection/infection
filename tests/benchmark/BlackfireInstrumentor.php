@@ -49,14 +49,7 @@ use Webmozart\Assert\Assert;
  */
 final class BlackfireInstrumentor implements Instrumentor
 {
-    /**
-     * @template T
-     *
-     * @param Closure(): T $main
-     *
-     * @return T
-     */
-    public function profile(Closure $main, SymfonyStyle $io): mixed
+    public function profile(Closure $main, SymfonyStyle $io): int
     {
         self::check($io);
 

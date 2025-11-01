@@ -367,18 +367,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\BenchmarkTest\:\:getPhpExecutable\(\) should return string but returns string\|false\.$#'
-			identifier: return.type
-			count: 1
-			path: ../tests/phpunit/BenchmarkTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\BenchmarkTest\:\:\$phpExecutable \(string\|null\) does not accept string\|false\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/BenchmarkTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\CI\\ConfigurableEnv\:\:\$variables has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -899,18 +887,6 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Function Infection\\Tests\\generator_to_phpunit_data_provider\(\) has parameter \$source with no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Helpers.php
-
-		-
-			message: '#^Function Infection\\Tests\\generator_to_phpunit_data_provider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Helpers.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
@@ -1579,12 +1555,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
 
 		-
-			message: '#^Static property Infection\\Tests\\Process\\Runner\\InitialTestsRunnerTest\:\:\$phpBin \(string\) does not accept string\|false\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: ../tests/phpunit/Process/Runner/InitialTestsRunnerTest.php
-
-		-
 			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1843,7 +1813,7 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of function Infection\\Tests\\normalizePath expects string, string\|null given\.$#'
+			message: '#^Parameter \#1 \$path of static method Symfony\\Component\\Filesystem\\Path::normalize\(\) expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Path/PathReplacerTest.php

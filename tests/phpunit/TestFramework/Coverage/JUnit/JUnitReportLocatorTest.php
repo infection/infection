@@ -39,16 +39,15 @@ use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath;
 use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
-use function Safe\realpath;
 use function Safe\touch;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(JUnitReportLocator::class)]
@@ -84,7 +83,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         touch('junit.xml');
 
-        $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
+        $expected = Path::canonicalize($this->tmp . '/junit.xml');
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
@@ -99,7 +98,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         touch('JUNIT.XML');
 
-        $expected = normalizePath(realpath($this->tmp . '/junit.xml'));
+        $expected = Path::canonicalize($this->tmp . '/junit.xml');
 
         $actual = $this->locator->locate();
 
@@ -111,7 +110,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         (new Filesystem())->dumpFile($jUnitRelativePaths, '');
 
-        $expected = normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths));
+        $expected = Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths);
 
         $this->assertSame($expected, $this->locator->locate());
         // Call second time to check the cached result
@@ -126,8 +125,8 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(
             'Could not locate the JUnit file: more than one file has been found with the pattern "*.junit.xml": "%s", "%s"',
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpspec.junit.xml')),
-            normalizePath(realpath($this->tmp . DIRECTORY_SEPARATOR . 'phpunit.junit.xml')),
+            Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . 'phpspec.junit.xml'),
+            Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . 'phpunit.junit.xml'),
         ));
 
         $this->locator->locate();

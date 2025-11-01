@@ -46,45 +46,31 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 $container = Container::create()->withValues(
     logger: new NullLogger(),
     output: new NullOutput(),
+    configFile: __DIR__ . '/infection.json5',
     existingCoveragePath: __DIR__ . '/coverage',
     useNoopMutators: true,
 );
 
-$generateTraces = static function (?int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
+$traceProvider = $container->getUnionTraceProvider();
 
-    if ($maxCount === null) {
-        // Avoid extra limiting generator for a simpler case
-        return $traces;
-    }
+/**
+ * @param positive-int $maxCount
+ *
+ * @return positive-int|0
+ */
+return static function (int $maxCount) use ($traceProvider): int {
+    $count = 0;
 
-    $i = 0;
+    // Iterate over the generator: do not use `iterator_to_array()` which is
+    // less Garbage-Collector friendly.
+    foreach ($traceProvider->provideTraces() as $trace) {
+        ++$count;
 
-    foreach ($traces as $trace) {
-        ++$i;
-
-        if ($i === $maxCount) {
+        if ($count >= $maxCount) {
             break;
         }
 
-        yield $trace;
-    }
-};
-
-/*
- * @return positive-int|0
- */
-return static function (int $maxCount) use ($generateTraces): int {
-    if ($maxCount < 0) {
-        $maxCount = null;
-    }
-
-    $traces = $generateTraces($maxCount);
-    $count = 0;
-
-    foreach ($traces as $_) {
-        ++$count;
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
+        // Continue
     }
 
     return $count;

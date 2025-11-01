@@ -27,10 +27,10 @@ files_with_trailing_spaces=$(
     git grep -In "\\s$" \
         ':!tests/autoloaded/*' \
         ':!tests/e2e/*' \
-        ':!tests/phpunit/StrTest.php' \
+        ':!tests/phpunit/Framework/StrTest.php' \
         ':!tests/phpunit/StringNormalizerTest.php' \
         ':!tests/phpunit/Fixtures/Files/phpunit/format-whitespace/original-phpunit.xml' \
-        ':!tests/benchmark/Tracing/coverage.tar.gz' \
+        ':!tests/benchmark/Tracing/benchmark-source' \
         ':!tests/benchmark/MutationGenerator/sources.tar.gz' \
     | sort -fh
 )

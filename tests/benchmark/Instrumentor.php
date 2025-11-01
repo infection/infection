@@ -41,9 +41,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 interface Instrumentor
 {
     /**
-     * @template T
-     *
-     * @param Closure(): T $main
+     * @param Closure():(positive-int|0) $main
      */
-    public function profile(Closure $main, SymfonyStyle $io): mixed;
+    public function profile(Closure $main, SymfonyStyle $io): int;
 }
