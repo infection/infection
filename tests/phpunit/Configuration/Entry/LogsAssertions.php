@@ -40,7 +40,7 @@ use Infection\Configuration\Entry\StrykerConfig;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @phpstan-require-implements TestCase
+ * @phpstan-require-extends TestCase
  */
 trait LogsAssertions
 {

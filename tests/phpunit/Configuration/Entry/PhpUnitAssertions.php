@@ -39,7 +39,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @phpstan-require-implements TestCase
+ * @phpstan-require-extends TestCase
  */
 trait PhpUnitAssertions
 {

@@ -41,7 +41,7 @@ use Infection\Logger\LineMutationTestingResultsLogger;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @phpstan-require-implements TestCase
+ * @phpstan-require-extends TestCase
  */
 trait LineLoggerAssertions
 {

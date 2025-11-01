@@ -48,7 +48,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @phpstan-require-implements TestCase
+ * @phpstan-require-extends TestCase
  */
 trait ConfigurationAssertions
 {
