@@ -125,6 +125,14 @@ parameters:
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
 
+        # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
+        -
+            message: '#::profile\(\) should return int but returns int\|null#'
+            path: ../tests/benchmark/BlackfireInstrumentor.php
+        -
+            message: '#::profile\(\) should return int but returns int.*\|null#'
+            path: ../tests/benchmark/DummyInstrumentor.php
+
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod

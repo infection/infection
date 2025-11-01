@@ -41,7 +41,7 @@ use Infection\Tests\Mutation\MutationAssertions;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @phpstan-require-implements TestCase
+ * @phpstan-require-extends TestCase
  */
 trait MutantAssertions
 {
