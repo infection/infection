@@ -33,49 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Configuration\Entry\Logs;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantExecutionResultAssertions
+#[CoversClass(LogsBuilder::class)]
+final class LogsBuilderTest extends TestCase
 {
-    private function assertResultEquals(
-        MutantExecutionResult $expected,
-        MutantExecutionResult $actual,
-    ): void {
-        $this->assertResultStateIs(
-            $actual,
-            $expected->getProcessCommandLine(),
-            $expected->getProcessOutput(),
-            $expected->getDetectionStatus(),
-            $expected->getMutantDiff(),
-            $expected->getMutatorName(),
-            $expected->getOriginalFilePath(),
-            $expected->getOriginalStartingLine(),
-        );
+    #[DataProvider('logsProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Logs $logs): void
+    {
+        $actual = LogsBuilder::from($logs)->build();
+
+        $this->assertEquals($logs, $actual);
     }
 
-    private function assertResultStateIs(
-        MutantExecutionResult $result,
-        string $expectedProcessCommandLine,
-        string $expectedProcessOutput,
-        DetectionStatus $expectedDetectionStatus,
-        string $expectedMutantDiff,
-        string $expectedMutatorName,
-        string $expectedOriginalFilePath,
-        int $expectedOriginalStartingLine,
-    ): void {
-        $this->assertSame($expectedProcessCommandLine, $result->getProcessCommandLine());
-        $this->assertSame($expectedProcessOutput, $result->getProcessOutput());
-        $this->assertSame($expectedDetectionStatus, $result->getDetectionStatus());
-        $this->assertSame($expectedMutantDiff, $result->getMutantDiff());
-        $this->assertSame($expectedMutatorName, $result->getMutatorName());
-        $this->assertSame($expectedOriginalFilePath, $result->getOriginalFilePath());
-        $this->assertSame($expectedOriginalStartingLine, $result->getOriginalStartingLine());
+    public static function logsProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            LogsBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            LogsBuilder::withCompleteTestData()->build(),
+        ];
     }
 }
