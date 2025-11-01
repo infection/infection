@@ -41,6 +41,7 @@ use function count;
 use function explode;
 use function implode;
 use Infection\CannotBeInstantiated;
+use LogicException;
 use const PHP_EOL;
 use function Safe\mb_convert_encoding;
 use function strtr;
@@ -184,6 +185,6 @@ final class Str
             }
         }
 
-        return $firstNonEmptyLineIndex;
+        throw new LogicException('This should never happen!');
     }
 }
