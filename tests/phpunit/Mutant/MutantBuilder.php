@@ -68,6 +68,9 @@ final class MutantBuilder
         );
     }
 
+    /**
+     * @deprecated use `::withMinimalTestData()` or `::withCompleteTestData()` instead.
+     */
     public static function materialize(
         string $mutantFilePath,
         Mutation $mutation,
