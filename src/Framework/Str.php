@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Framework;
 
 use function array_map;
+use function array_slice;
 use function count;
 use function explode;
 use function implode;
@@ -148,6 +149,8 @@ final class Str
     }
 
     /**
+     * @param list<string> $lines
+     *
      * @return int<0,max>|null
      */
     private static function findFirstNonEmptyLineIndex(array $lines): ?int
@@ -162,15 +165,17 @@ final class Str
     }
 
     /**
+     * @psalm-suppress InvalidArrayOffset,InvalidReturnStatement,InvalidReturnType
+     *
+     * @param list<string> $lines
      * @param int<0,max> $firstNonEmptyLineIndex
      *
-     * @return int<0,max>|null
+     * @return int<0,max>
      */
     private static function findLastNonEmptyLineIndex(
         array $lines,
         int $firstNonEmptyLineIndex,
-    ): ?int
-    {
+    ): int {
         $linesCount = count($lines);
 
         for ($index = $linesCount - 1; $index >= $firstNonEmptyLineIndex; --$index) {
@@ -179,6 +184,6 @@ final class Str
             }
         }
 
-        return null;
+        return $firstNonEmptyLineIndex;
     }
 }
