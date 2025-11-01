@@ -105,14 +105,14 @@ final class Str
     }
 
     /**
-     * Removes all lines and removes leading and trailing blank lines. Line
+     * Trims the whitespace from the end of all lines and removes the leading and trailing blank lines. Line
      * endings are replaced by the unix line endings.
      */
-    public static function removeOuterBlankLines(string $value): string
+    public static function cleanForDisplay(string $value): string
     {
         $lines = explode(
             "\n",
-            self::toUnixLineEndings($value),
+            self::rTrimLines($value),
         );
         $linesCount = count($lines);
 
@@ -120,7 +120,7 @@ final class Str
         for ($i = 0; $i < $linesCount; ++$i) {
             $line = $lines[$i];
 
-            if (trim($line) === '') {
+            if ($line === '') {
                 unset($lines[$i]);
 
                 continue;
@@ -136,7 +136,7 @@ final class Str
         for ($i = $linesCount - 1; $i >= 0; --$i) {
             $line = $lines[$i];
 
-            if (trim($line) === '') {
+            if ($line === '') {
                 unset($lines[$i]);
 
                 continue;

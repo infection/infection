@@ -37,7 +37,6 @@ namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Configuration\Configuration;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
@@ -45,6 +44,7 @@ use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Testing\MutatorName;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
 use PhpParser\Node\Stmt\Nop;
@@ -128,18 +128,16 @@ final class MutantProcessContainerFactoryTest extends TestCase
             ->willReturn($executionResultMock)
         ;
 
-        $configurationMock = $this->createMock(Configuration::class);
-        $configurationMock
-            ->method('isDryRun')
-            ->willReturn(false)
-        ;
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withDryRun(false)
+            ->build();
 
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
             $processFactoryTimeout,
             $resultFactoryMock,
             [],
-            $configurationMock,
+            $configuration,
         );
 
         $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);
