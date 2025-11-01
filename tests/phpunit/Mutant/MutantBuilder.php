@@ -42,7 +42,7 @@ use function Later\now;
 
 final class MutantBuilder
 {
-    public static function build(
+    public static function materialize(
         string $mutantFilePath = '/path/to/mutant',
         ?Mutation $mutation = null,
         string $mutatedCode = 'mutated code',

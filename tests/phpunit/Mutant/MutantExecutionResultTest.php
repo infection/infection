@@ -117,7 +117,7 @@ final class MutantExecutionResultTest extends TestCase
         $originalCode = '<?php $a = 1;';
         $mutatedCode = '<?php $a = 1;';
 
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',

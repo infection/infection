@@ -58,7 +58,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
     #[DataProvider('timeoutDataProvider')]
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
