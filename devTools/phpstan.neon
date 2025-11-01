@@ -124,6 +124,9 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
+        -
+            message: '#::profile\(\) should return int but returns int\|null#'
+            path: ../tests/benchmark/BlackfireInstrumentor.php
 
         # Test builders provide fluent API methods that may not be used immediately
         -

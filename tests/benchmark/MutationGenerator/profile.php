@@ -109,7 +109,7 @@ $debug = $input->getOption(DEBUG_OPT);
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static fn (): int => (require __DIR__ . '/create-main.php')($maxMutationsCount),
+    static fn () => (require __DIR__ . '/create-main.php')($maxMutationsCount),
     5,
     $io,
 );
