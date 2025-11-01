@@ -124,6 +124,11 @@ parameters:
         -
             message: '#Call to function iterator_.* on a separate line has no effect#'
             path: ../tests/*
+
+        # Test builders provide fluent API methods that may not be used immediately
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/phpunit/**/*Builder.php
     level: 8
     paths:
         - ../src
