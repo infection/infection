@@ -91,7 +91,7 @@ final class MutantFactoryTest extends TestCase
                 new Node\Name('Acme'),
                 [new Node\Scalar\LNumber(0)],
             )],
-            $tests = [
+            [
                 new TestLocation(
                     'FooTest::test_it_can_instantiate',
                     '/path/to/acme/FooTest.php',
@@ -127,8 +127,6 @@ final class MutantFactoryTest extends TestCase
             $mutation,
             'mutated code',
             'code diff',
-            true,
-            $tests,
             'original code',
         );
     }
