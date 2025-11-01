@@ -35,43 +35,41 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\Tracing;
 
-use Generator;
+use Closure;
 use Infection\Container;
-use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$container = Container::create()->withValues(
-    logger: new NullLogger(),
-    output: new NullOutput(),
-    configFile: __DIR__ . '/infection.json5',
-    existingCoveragePath: __DIR__ . '/coverage',
-    useNoopMutators: true,
-);
-
-$traceProvider = $container->getUnionTraceProvider();
-
 /**
  * @param positive-int $maxCount
  *
- * @return positive-int|0
+ * @return Closure():(positive-int|0)
  */
-return static function (int $maxCount) use ($traceProvider): int {
-    $count = 0;
+return static function (int $maxCount): Closure {
+    $container = Container::create()->withValues(
+        logger: new NullLogger(),
+        output: new NullOutput(),
+        configFile: __DIR__ . '/infection.json5',
+        existingCoveragePath: __DIR__ . '/coverage',
+        useNoopMutators: true,
+    );
+    $traceProvider = $container->getUnionTraceProvider();
 
-    // Iterate over the generator: do not use `iterator_to_array()` which is
-    // less Garbage-Collector friendly.
-    foreach ($traceProvider->provideTraces() as $trace) {
-        ++$count;
+    return static function () use ($maxCount, $traceProvider) {
+        $count = 0;
 
-        if ($count >= $maxCount) {
-            break;
+        foreach ($traceProvider->provideTraces() as $trace) {
+            ++$count;
+
+            if ($count >= $maxCount) {
+                break;
+            }
+
+            // Continue
         }
 
-        // Continue
-    }
-
-    return $count;
+        return $count;
+    };
 };

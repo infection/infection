@@ -73,8 +73,6 @@ $input = new ArgvInput(
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
-$provideTraces = require __DIR__ . '/provide-traces-closure.php';
-
 /** @var positive-int $maxTraceCount */
 $maxTraceCount = (static function (InputInterface $input, string $optionName): int {
     $option = $input->getOption($optionName);
@@ -111,7 +109,8 @@ $debug = $input->getOption(DEBUG_OPT);
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static fn () => $provideTraces($maxTraceCount),
+    static fn () => (require __DIR__ . '/create-main.php')($maxTraceCount),
+    5,
     $io,
 );
 
