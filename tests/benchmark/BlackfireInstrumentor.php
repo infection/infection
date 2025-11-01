@@ -39,6 +39,7 @@ use BlackfireProbe;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use function extension_loaded;
+use LogicException;
 use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
@@ -55,10 +56,13 @@ final class BlackfireInstrumentor implements Instrumentor
 
         $probe = BlackfireProbe::getMainInstance();
 
-        $result = 0;
+        $result = null;
 
         for ($i = 0; $i < $sampleSize; ++$i) {
-            $result += self::profileSample($createMain, $probe, $io);
+            $previousResult = $result;
+            $result = self::profileSample($createMain, $probe, $io);
+
+            self::ensureResultInvariance($previousResult, $result);
         }
 
         return $result;
@@ -132,6 +136,21 @@ final class BlackfireInstrumentor implements Instrumentor
             );
 
             throw $throwable;
+        }
+    }
+
+    private static function ensureResultInvariance(
+        ?int $previous,
+        int $new,
+    ): void {
+        if ($previous !== null && $new !== $previous) {
+            throw new LogicException(
+                sprintf(
+                    'Expected the script to return the same output for each sample. Expected %d but got %d.',
+                    $previous,
+                    $new,
+                ),
+            );
         }
     }
 }

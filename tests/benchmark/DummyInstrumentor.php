@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Benchmark;
 
 use Closure;
+use LogicException;
+use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class DummyInstrumentor implements Instrumentor
@@ -47,9 +49,27 @@ final class DummyInstrumentor implements Instrumentor
         for ($i = 0; $i < $sampleSize; ++$i) {
             $main = $createMain();
 
-            $result += $main();
+            $previousResult = $result;
+            $result = $main();
+
+            self::ensureResultInvariance($previousResult, $result);
         }
 
         return $result;
+    }
+
+    private static function ensureResultInvariance(
+        ?int $previous,
+        int $new,
+    ): void {
+        if ($previous !== null && $new !== $previous) {
+            throw new LogicException(
+                sprintf(
+                    'Expected the script to return the same output for each sample. Expected %d but got %d.',
+                    $previous,
+                    $new,
+                ),
+            );
+        }
     }
 }

@@ -45,6 +45,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
+// Since those files are not autoloaded, we need to manually autoload them
+require_once __DIR__ . '/sources/autoload.php';
+
 /**
  * @return iterable<SplFileInfo>
  */
@@ -61,23 +64,23 @@ function createTrace(SplFileInfo $fileInfo): Trace
 {
     require_once $fileInfo->getRealPath();
 
-    return new PartialTrace($fileInfo);
+    return new EmptyTrace($fileInfo);
 }
 
 /**
  * @param positive-int $maxCount
  *
- * @return Closure():positive-int|0
+ * @return Closure():(positive-int|0)
  */
 return static function (int $maxCount): Closure {
     $container = Container::create();
 
-    // Since those files are not autoloaded, we need to manually autoload them
-    require_once __DIR__ . '/sources/autoload.php';
-
     $traces = array_map(
         createTrace(...),
-        iterator_to_array(collectSources()),
+        iterator_to_array(
+            collectSources(),
+            false,
+        ),
     );
 
     $mutators = $container->getMutatorFactory()->create(

@@ -45,7 +45,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 /**
  * @param positive-int $maxCount
  *
- * @return Closure():positive-int|0
+ * @return Closure():(positive-int|0)
  */
 return static function (int $maxCount): Closure {
     $container = Container::create()->withValues(
