@@ -38,7 +38,11 @@ namespace Infection\Tests\Mutant;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-implements TestCase
+ */
 trait MutantAssertions
 {
     /**

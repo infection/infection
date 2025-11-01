@@ -37,7 +37,11 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-implements TestCase
+ */
 trait LogsAssertions
 {
     private function assertLogsStateIs(

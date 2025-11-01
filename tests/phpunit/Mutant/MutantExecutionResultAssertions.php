@@ -37,7 +37,11 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-implements TestCase
+ */
 trait MutantExecutionResultAssertions
 {
     private function assertResultStateIs(
