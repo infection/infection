@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Testing\SimpleMutation;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
