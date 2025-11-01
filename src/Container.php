@@ -239,7 +239,7 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                $container->getConfiguration()->isForGitDiffLines(),
+                $container->getConfiguration()->gitSource?->isForDiffLines ?? false,
             ),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
@@ -256,7 +256,7 @@ final class Container extends DIContainer
                 $container->getConfiguration()->getSourceFiles(),
             ),
             SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
-                $container->getConfiguration()->getSourceFilesFilter(),
+                $container->getConfiguration()->getSourceFilter(),
                 $container->getConfiguration()->getSourceFilesExcludes(),
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
@@ -449,8 +449,8 @@ final class Container extends DIContainer
                     $container->getNodeTraverserFactory(),
                     $container->getLineRangeCalculator(),
                     $container->getFilesDiffChangedLines(),
-                    $configuration->isForGitDiffLines(),
-                    $configuration->getGitDiffBase(),
+                    $configuration->gitSource?->isForDiffLines ?? false,
+                    $configuration->gitSource?->baseBranch,
                 );
             },
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {

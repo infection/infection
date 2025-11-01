@@ -103,7 +103,7 @@ trait ConfigurationAssertions
             self::normalizePaths($configuration->getSourceFiles()),
             'Failed sourceFiles check',
         );
-        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter(), 'Failed sourceFilesFilter check');
+        $this->assertSame($expectedFilter, $configuration->getSourceFilter(), 'Failed sourceFilesFilter check');
         $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes(), 'Failed sourceFilesExcludes check');
         $this->assertEquals($expectedLogs, $configuration->getLogs());
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity(), 'Failed logVerbosity check');
