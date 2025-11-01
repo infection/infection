@@ -59,6 +59,7 @@ final class MutantAssertionsTest extends TestCase
                 $this->fail('Expected mutants to not be equal.');
             }
         } catch (ExpectationFailedException $failure) {
+            // @phpstan-ignore if.alwaysFalse
             if ($expected) {
                 throw $failure;
             }

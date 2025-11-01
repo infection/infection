@@ -49,12 +49,12 @@ trait MutantAssertions
         Mutant $actual,
     ): void {
         $this->assertMutantStateIs(
-            $actual,
-            $expected->getFilePath(),
-            $expected->getMutation(),
-            $expected->getMutatedCode()->get(),
-            $expected->getDiff()->get(),
-            $expected->getPrettyPrintedOriginalCode()->get(),
+            mutant: $actual,
+            expectedFilePath: $expected->getFilePath(),
+            expectedMutation: $expected->getMutation(),
+            expectedMutatedCode: $expected->getMutatedCode()->get(),
+            expectedDiff: $expected->getDiff()->get(),
+            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
         );
     }
 

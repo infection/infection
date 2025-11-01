@@ -57,6 +57,7 @@ final class MutationAssertionsTest extends TestCase
                 $this->fail('Expected mutations to not be equal.');
             }
         } catch (ExpectationFailedException $failure) {
+            // @phpstan-ignore if.alwaysFalse
             if ($expected) {
                 throw $failure;
             }

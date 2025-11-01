@@ -66,6 +66,7 @@ use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
@@ -130,6 +131,7 @@ final class ProjectCodeProvider
         StopInfectionOnSigintSignalSubscriber::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MutantExecutionResult::class,
         MutatorName::class,
         BaseMutatorTestCase::class,
         OperatingSystem::class,
