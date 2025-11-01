@@ -41,8 +41,6 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Tests\Configuration\Entry\LogsAssertions;
-use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
 use function ltrim;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -52,9 +50,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 trait ConfigurationAssertions
 {
-    use LogsAssertions;
-    use PhpUnitAssertions;
-
     /**
      * @param string[] $expectedSourceDirectories
      * @param string[] $expectedSourceFilesExcludes

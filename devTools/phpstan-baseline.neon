@@ -589,30 +589,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:assertSourceStateIs\(\) has parameter \$expectedDirectories with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:assertSourceStateIs\(\) has parameter \$expectedExcludes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:test_it_can_be_instantiated\(\) has parameter \$directories with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:test_it_can_be_instantiated\(\) has parameter \$excludes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Configuration\\Schema\\InvalidSchemaTest\:\:test_it_can_be_instantiated\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
