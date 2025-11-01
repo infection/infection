@@ -17,6 +17,10 @@
         <env name="COLUMNS" value="100" force="true" />
     </php>
 
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
+
     <testsuites>
         <testsuite name="Infection Test Suite">
             <directory>tests/phpunit</directory>

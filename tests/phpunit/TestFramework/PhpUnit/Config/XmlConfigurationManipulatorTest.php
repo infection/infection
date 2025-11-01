@@ -38,13 +38,13 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 use Closure;
 use DOMDocument;
 use const E_ALL;
+use Infection\Framework\OperatingSystem;
+use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\SafeDOMXPath;
-use function Infection\Tests\normalizeLineReturn;
 use InvalidArgumentException;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -840,7 +840,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             $this->fail('Expected exception to be thrown');
         } catch (InvalidArgumentException|InvalidPhpUnitConfiguration $exception) {
             $this->assertContains(
-                normalizeLineReturn($exception->getMessage()),
+                Str::toUnixLineEndings($exception->getMessage()),
                 $errorMessages,
             );
         } finally {
@@ -887,14 +887,14 @@ final class XmlConfigurationManipulatorTest extends TestCase
         } catch (InvalidPhpUnitConfiguration $exception) {
             $infectionPath = sprintf(
                 '%s%s',
-                PHP_OS_FAMILY === 'Windows' ? 'file:/' : '',
+                OperatingSystem::isWindows() ? 'file:/' : '',
                 Path::canonicalize(__DIR__ . '/../../../../../'),
             );
 
             $errorMessage = str_replace(
                 $infectionPath,
                 '/path/to/infection',
-                normalizeLineReturn($exception->getMessage()),
+                Str::toUnixLineEndings($exception->getMessage()),
             );
 
             $this->assertSame(

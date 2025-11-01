@@ -60,6 +60,7 @@ $finder = Finder::create()
         'tests/benchmark/MutationGenerator/sources',
         'tests/benchmark/Tracing/coverage',
         'tests/benchmark/Tracing/sources',
+        'tests/benchmark/Tracing/benchmark-source',
         'tests/e2e',
         'tests/phpunit/Fixtures',
     ])
@@ -189,4 +190,5 @@ return (new Config())
         'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
+    ->setCacheFile(__DIR__ . '/build/.php_cs.cache')
 ;
