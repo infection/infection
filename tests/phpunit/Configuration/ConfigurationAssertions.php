@@ -41,8 +41,6 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Tests\Configuration\Entry\LogsAssertions;
-use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
 use function ltrim;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -52,9 +50,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 trait ConfigurationAssertions
 {
-    use LogsAssertions;
-    use PhpUnitAssertions;
-
     /**
      * @param string[] $expectedSourceDirectories
      * @param string[] $expectedSourceFilesExcludes
@@ -110,26 +105,10 @@ trait ConfigurationAssertions
         );
         $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter(), 'Failed sourceFilesFilter check');
         $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes(), 'Failed sourceFilesExcludes check');
-        $this->assertLogsStateIs(
-            $configuration->getLogs(),
-            $expectedLogs->getTextLogFilePath(),
-            $expectedLogs->getHtmlLogFilePath(),
-            $expectedLogs->getSummaryLogFilePath(),
-            $expectedLogs->getJsonLogFilePath(),
-            $expectedLogs->getGitlabLogFilePath(),
-            $expectedLogs->getDebugLogFilePath(),
-            $expectedLogs->getPerMutatorFilePath(),
-            $expectedLogs->getUseGitHubAnnotationsLogger(),
-            $expectedLogs->getStrykerConfig(),
-            $expectedLogs->getSummaryJsonLogFilePath(),
-        );
+        $this->assertEquals($expectedLogs, $configuration->getLogs());
         $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity(), 'Failed logVerbosity check');
         $this->assertSame($expectedTmpDir, $configuration->getTmpDir(), 'Failed tmpDir check');
-        $this->assertPhpUnitStateIs(
-            $configuration->getPhpUnit(),
-            $expectedPhpUnit->getConfigDir(),
-            $expectedPhpUnit->getCustomPath(),
-        );
+        $this->assertEquals($expectedPhpUnit, $configuration->getPhpUnit());
         $this->assertSame($expectedPhpStan->getConfigDir(), $configuration->getPhpStan()->getConfigDir(), 'Failed PHPStan config dir check');
         $this->assertSame($expectedPhpStan->getCustomPath(), $configuration->getPhpStan()->getCustomPath(), 'Failed PHPStan custom path check');
         $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10., 'Failed mutators check');
