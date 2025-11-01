@@ -46,12 +46,12 @@ trait MutantAssertions
         Mutation $expectedMutation,
         string $expectedMutatedCode,
         string $expectedDiff,
-        string $originalCode,
+        string $expectedPrettyPrintedOriginalCode,
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
         $this->assertSame($expectedMutation, $mutant->getMutation());
         $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
         $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($originalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
     }
 }
