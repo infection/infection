@@ -37,7 +37,11 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait MutantAssertions
 {
     public function assertMutantStateIs(

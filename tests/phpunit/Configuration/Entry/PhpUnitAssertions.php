@@ -36,7 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\PhpUnit;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait PhpUnitAssertions
 {
     private function assertPhpUnitStateIs(

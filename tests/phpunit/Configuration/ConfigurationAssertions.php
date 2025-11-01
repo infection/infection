@@ -44,8 +44,12 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Tests\Configuration\Entry\LogsAssertions;
 use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
 use function ltrim;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait ConfigurationAssertions
 {
     use LogsAssertions;
