@@ -44,7 +44,7 @@ final class DummyInstrumentor implements Instrumentor
 {
     public function profile(Closure $createMain, int $sampleSize, SymfonyStyle $io): int
     {
-        $result = 0;
+        $result = null;
 
         for ($i = 0; $i < $sampleSize; ++$i) {
             $main = $createMain();
