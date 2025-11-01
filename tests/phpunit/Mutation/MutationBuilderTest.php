@@ -33,34 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutation;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
+use Infection\Tests\Mutation\MutationBuilder\MutationBuilderScenario;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutantExecutionResultBuilder::class)]
-final class MutantExecutionResultBuilderTest extends TestCase
+#[CoversClass(MutationBuilder::class)]
+#[CoversClass(MutationBuilderScenario::class)]
+final class MutationBuilderTest extends TestCase
 {
-    use MutantExecutionResultAssertions;
+    use MutationAssertions;
 
-    #[DataProvider('executionResultProvider')]
-    public function test_it_can_build_from_existing_result(MutantExecutionResult $result): void
+    #[DataProvider('mutationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Mutation $mutation): void
     {
-        $actual = MutantExecutionResultBuilder::from($result)->build();
+        $actual = MutationBuilder::from($mutation)->build();
 
-        $this->assertResultEquals($result, $actual);
+        $this->assertEquals($mutation, $actual);
     }
 
-    public static function executionResultProvider(): iterable
+    public static function mutationProvider(): iterable
     {
-        yield 'minimal execution result' => [
-            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+        yield 'minimal test data' => [
+            MutationBuilder::withMinimalTestData()->build(),
         ];
 
-        yield 'complete execution result' => [
-            MutantExecutionResultBuilder::withCompleteTestData()->build(),
+        yield 'complete test data' => [
+            MutationBuilder::withCompleteTestData()->build(),
         ];
     }
 }

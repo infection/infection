@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\Mutation\Mutation;
-use Infection\Tests\Mutation\MutationBuilder\MutationBuilder;
+use Infection\Mutant\Mutant;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -47,99 +46,21 @@ final class MutantBuilderTest extends TestCase
     use MutantAssertions;
 
     #[DataProvider('mutantBuilder')]
-    public function test_it_can_build_a_mutant(
-        MutantBuilder $builder,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $mutant = $builder->build();
+    public function test_it_can_build_from_existing_mutant(Mutant $mutant): void
+    {
+        $actual = MutantBuilder::from($mutant)->build();
 
-        $this->assertMutantStateIs(
-            $mutant,
-            $expectedFilePath,
-            $expectedMutation,
-            $expectedMutatedCode,
-            $expectedDiff,
-            $expectedPrettyPrintedOriginalCode,
-        );
+        $this->assertMutantEquals($mutant, $actual);
     }
 
     public static function mutantBuilder(): iterable
     {
         yield 'minimal mutant' => [
-            MutantBuilder::withMinimalTestData(),
-            '/path/to/mutant',
-            MutationBuilder::withMinimalTestData()->build(),
-            <<<'PHP'
-                <?php $a = 2;
-                PHP,
-            <<<'PHP'
-                --- Original
-                +++ Mutated
-                @@ @@
-                -$a = 1;
-                +$a = 2;
-                PHP,
-            <<<'PHP'
-                <?php $a = 1;
-                PHP,
+            MutantBuilder::withMinimalTestData()->build(),
         ];
 
         yield 'complete mutant' => [
-            MutantBuilder::withCompleteTestData(),
-            '/path/to/src/mutants/Foo_mutant_0.php',
-            MutationBuilder::withCompleteTestData()->build(),
-            <<<'PHP'
-                <?php
-
-                namespace Acme;
-
-                class Foo
-                {
-                    public function bar(): void
-                    {
-                        // Mutated: removed for loop
-                    }
-                }
-
-                PHP,
-            <<<'PHP'
-                --- Original
-                +++ Mutated
-                @@ @@
-                -        for ($i = 0; $i < 10; $i++) {
-                -            echo $i;
-                -        }
-                +        // Mutated: removed for loop
-                PHP,
-            <<<'PHP'
-                <?php
-
-                namespace Acme;
-
-                class Foo
-                {
-                    public function bar(): void
-                    {
-                        for ($i = 0; $i < 10; $i++) {
-                            echo $i;
-                        }
-                    }
-                }
-
-                PHP,
+            MutantBuilder::withCompleteTestData()->build(),
         ];
-    }
-
-    #[DataProvider('mutantBuilder')]
-    public function test_it_can_build_from_existing_mutant(MutantBuilder $builder): void
-    {
-        $expected = $builder->build();
-        $actual = MutantBuilder::from($expected)->build();
-
-        $this->assertMutantEquals($expected, $actual);
     }
 }

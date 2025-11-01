@@ -117,52 +117,66 @@ final class MutantExecutionResultBuilder
     {
         return new self(
             processCommandLine: 'vendor/bin/phpunit --configuration phpunit.xml --filter FooTest',
-            processOutput: 'PHPUnit 11.0.0 by Sebastian Bergmann
+            processOutput: <<<'STDOUT'
+                PHPUnit 11.0.0 by Sebastian Bergmann
 
-Time: 00:00.123, Memory: 16.00 MB
+                Time: 00:00.123, Memory: 16.00 MB
 
-FAILURES!
-Tests: 2, Assertions: 5, Failures: 1.',
+                FAILURES!
+                Tests: 2, Assertions: 5, Failures: 1.
+                STDOUT,
             detectionStatus: DetectionStatus::KILLED_BY_TESTS,
-            mutantDiff: now('--- Original
-+++ Mutated
-@@ @@
--        for ($i = 0; $i < 10; $i++) {
--            echo $i;
--        }
-+        // Mutated: removed for loop'),
+            mutantDiff: now(
+                <<<'PHP_DIFF'
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -        for ($i = 0; $i < 10; $i++) {
+                    -            echo $i;
+                    -        }
+                    +        // Mutated: removed for loop
+                    PHP_DIFF,
+            ),
             mutantHash: 'abc123def456789',
             mutatorClass: For_::class,
             mutatorName: MutatorName::getName(For_::class),
             originalFilePath: '/path/to/src/Foo.php',
             originalStartingLine: 10,
             originalEndingLine: 15,
-            originalCode: now('<?php
+            originalCode: now(
+                <<<'PHP'
+                    <?php
 
-namespace Acme;
+                    namespace Acme;
 
-class Foo
-{
-    public function bar(): void
-    {
-        for ($i = 0; $i < 10; $i++) {
-            echo $i;
-        }
-    }
-}
-'),
-            mutatedCode: now('<?php
+                    class Foo
+                    {
+                        public function bar(): void
+                        {
+                            for ($i = 0; $i < 10; $i++) {
+                                echo $i;
+                            }
+                        }
+                    }
 
-namespace Acme;
+                    PHP,
+            ),
+            mutatedCode: now(
+                <<<'PHP'
+                    <?php
 
-class Foo
-{
-    public function bar(): void
-    {
-        // Mutated: removed for loop
-    }
-}
-'),
+                    namespace Acme;
+
+                    class Foo
+                    {
+                        public function bar(): void
+                        {
+                            // Mutated: removed for loop
+                        }
+                    }
+
+                    PHP,
+            ),
             tests: [
                 new TestLocation(
                     'FooTest::test_it_can_do_something',

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\MutationBuilder;
+namespace Infection\Tests\Mutation;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
@@ -139,20 +139,22 @@ final class MutationBuilder
                 ),
             ],
             originalFileTokens: [],
-            originalFileContent: '<?php
+            originalFileContent: <<<'PHP'
+                <?php
 
-namespace Acme;
+                namespace Acme;
 
-class Foo
-{
-    public function bar(): void
-    {
-        for ($i = 0; $i < 10; $i++) {
-            echo $i;
-        }
-    }
-}
-',
+                class Foo
+                {
+                    public function bar(): void
+                    {
+                        for ($i = 0; $i < 10; $i++) {
+                            echo $i;
+                        }
+                    }
+                }
+
+                PHP,
         );
     }
 

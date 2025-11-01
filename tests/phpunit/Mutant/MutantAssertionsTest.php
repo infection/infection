@@ -35,32 +35,48 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\Mutant\MutantExecutionResult;
-use PHPUnit\Framework\Attributes\CoversClass;
+use Infection\Mutant\Mutant;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutantExecutionResultBuilder::class)]
-final class MutantExecutionResultBuilderTest extends TestCase
+#[CoversTrait(MutantAssertions::class)]
+final class MutantAssertionsTest extends TestCase
 {
-    use MutantExecutionResultAssertions;
+    use MutantAssertions;
 
-    #[DataProvider('executionResultProvider')]
-    public function test_it_can_build_from_existing_result(MutantExecutionResult $result): void
-    {
-        $actual = MutantExecutionResultBuilder::from($result)->build();
+    #[DataProvider('mutantProvider')]
+    public function test_it_can_compare_mutants(
+        Mutant $left,
+        Mutant $right,
+        bool $expected,
+    ): void {
+        try {
+            $this->assertMutantEquals($left, $right);
 
-        $this->assertResultEquals($result, $actual);
+            if (!$expected) {
+                $this->fail('Expected mutants to not be equal.');
+            }
+        } catch (ExpectationFailedException $failure) {
+            if ($expected) {
+                throw $failure;
+            }
+        }
     }
 
-    public static function executionResultProvider(): iterable
+    public static function mutantProvider(): iterable
     {
-        yield 'minimal execution result' => [
-            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+        yield 'equal' => [
+            MutantBuilder::withMinimalTestData()->build(),
+            MutantBuilder::withMinimalTestData()->build(),
+            true,
         ];
 
-        yield 'complete execution result' => [
-            MutantExecutionResultBuilder::withCompleteTestData()->build(),
+        yield 'not equal' => [
+            MutantBuilder::withMinimalTestData()->build(),
+            MutantBuilder::withCompleteTestData()->build(),
+            false,
         ];
     }
 }

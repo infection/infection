@@ -37,7 +37,6 @@ namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
@@ -58,8 +57,6 @@ final class MutantProcessContainerTest extends TestCase
 
     private Mutant $mutant;
 
-    private MutantExecutionResult $mutantExecutionResult;
-
     /**
      * @var LazyMutantProcessFactory|MockObject
      */
@@ -68,7 +65,6 @@ final class MutantProcessContainerTest extends TestCase
     protected function setUp(): void
     {
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $this->mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
         $this->phpUnitMutantProcess = $this->createMock(MutantProcess::class);
         $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessFactory::class);
     }

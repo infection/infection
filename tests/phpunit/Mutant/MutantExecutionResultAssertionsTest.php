@@ -36,31 +36,47 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\MutantExecutionResult;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutantExecutionResultBuilder::class)]
-final class MutantExecutionResultBuilderTest extends TestCase
+#[CoversTrait(MutantExecutionResultAssertions::class)]
+final class MutantExecutionResultAssertionsTest extends TestCase
 {
     use MutantExecutionResultAssertions;
 
-    #[DataProvider('executionResultProvider')]
-    public function test_it_can_build_from_existing_result(MutantExecutionResult $result): void
-    {
-        $actual = MutantExecutionResultBuilder::from($result)->build();
+    #[DataProvider('mutantExecutionResultProvider')]
+    public function test_it_can_compare_mutants(
+        MutantExecutionResult $left,
+        MutantExecutionResult $right,
+        bool $expected,
+    ): void {
+        try {
+            $this->assertResultEquals($left, $right);
 
-        $this->assertResultEquals($result, $actual);
+            if (!$expected) {
+                $this->fail('Expected mutants to not be equal.');
+            }
+        } catch (ExpectationFailedException $failure) {
+            if ($expected) {
+                throw $failure;
+            }
+        }
     }
 
-    public static function executionResultProvider(): iterable
+    public static function mutantExecutionResultProvider(): iterable
     {
-        yield 'minimal execution result' => [
+        yield 'equal' => [
             MutantExecutionResultBuilder::withMinimalTestData()->build(),
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+            true,
         ];
 
-        yield 'complete execution result' => [
+        yield 'not equal' => [
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
             MutantExecutionResultBuilder::withCompleteTestData()->build(),
+            false,
         ];
     }
 }
