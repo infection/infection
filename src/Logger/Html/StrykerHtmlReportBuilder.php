@@ -252,7 +252,7 @@ final readonly class StrykerHtmlReportBuilder
                 return [
                     'id' => $result->getMutantHash(),
                     'mutatorName' => $result->getMutatorName(),
-                    'replacement' => Str::convertToUtf8(Str::removeOuterBlankLines(ltrim($replacement))),
+                    'replacement' => Str::convertToUtf8(Str::cleanForDisplay(ltrim($replacement))),
                     'description' => $this->getMutatorDescription($result->getMutatorName(), $result->getMutatorClass()),
                     'location' => [
                         'start' => ['line' => $result->getOriginalStartingLine(), 'column' => $startingColumn],
@@ -260,7 +260,7 @@ final readonly class StrykerHtmlReportBuilder
                     ],
                     'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()->value],
                     'statusReason' => Str::convertToUtf8(
-                        Str::removeOuterBlankLines($result->getProcessOutput()),
+                        Str::cleanForDisplay($result->getProcessOutput()),
                     ),
                     'coveredBy' => array_unique(array_map(
                         fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),

@@ -38,7 +38,11 @@ namespace Infection\Tests\Logger;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Logger\LineMutationTestingResultsLogger;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait LineLoggerAssertions
 {
     private function assertLoggedContentIs(

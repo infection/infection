@@ -113,14 +113,14 @@ final class StrTest extends TestCase
     }
 
     #[DataProvider('trimLinesProvider')]
-    public function test_it_trims_blank_lines_and_replaces_the_line_endings_by_the_unix_line_ending(
+    public function test_it_rtrim_lines_trims_blank_lines_and_replaces_the_line_endings_by_the_unix_line_ending(
         string $value,
         string $expectedTrimmedLines,
-        ?string $expectedTrimmedBlankLines = null,
+        ?string $expectedCleanedLines = null,
     ): void {
-        $expected = $expectedTrimmedBlankLines ?? $expectedTrimmedLines;
+        $expected = $expectedCleanedLines ?? $expectedTrimmedLines;
 
-        $actual = Str::removeOuterBlankLines($value);
+        $actual = Str::cleanForDisplay($value);
 
         $this->assertSame($expected, $actual);
     }
@@ -145,7 +145,6 @@ final class StrTest extends TestCase
         yield 'string without line endings with spaces' => [
             ' Hello world! ',
             ' Hello world!',
-            ' Hello world! ',
         ];
 
         yield 'string with only Unix/Linux (LF) line endings' => [
@@ -225,10 +224,10 @@ final class StrTest extends TestCase
             $value = <<<TXT
 
                 $s
-                {$s}Hello...$s 
+                {$s}Hello...$s
 
                 $s
-                $s...World!$s 
+                $s...World!$s
                 $s
 
                 TXT;
@@ -244,29 +243,29 @@ final class StrTest extends TestCase
 
                 TXT;
 
-            $expectedTrimmedBlankLines = <<<TXT
-                {$s}Hello...$s$s
+            $expectedCleanedLines = <<<TXT
+                {$s}Hello...
 
-                $s
-                $s...World!$s$s
+
+                $s...World!
                 TXT;
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Unix/Linux (LF) line endings' => [
                 $value,
                 $expectedTrimmedLines,
-                $expectedTrimmedBlankLines,
+                $expectedCleanedLines,
             ];
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Windows (CRLF) line endings' => [
                 str_replace("\n", "\r\n", $value),
                 $expectedTrimmedLines,
-                $expectedTrimmedBlankLines,
+                $expectedCleanedLines,
             ];
 
             yield 'string with leading, trailing & in-between line endings and spaces and blank lines – Classic MacOS (CRLF) line endings' => [
                 str_replace("\n", "\r", $value),
                 $expectedTrimmedLines,
-                $expectedTrimmedBlankLines,
+                $expectedCleanedLines,
             ];
         })();
     }

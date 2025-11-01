@@ -106,9 +106,9 @@ final readonly class JsonLogger implements LineMutationTestingResultsLogger
                     'originalFilePath' => $mutantProcess->getOriginalFilePath(),
                     'originalStartLine' => $mutantProcess->getOriginalStartingLine(),
                 ],
-                'diff' => Str::convertToUtf8(Str::removeOuterBlankLines($mutantProcess->getMutantDiff())),
+                'diff' => Str::convertToUtf8(Str::cleanForDisplay($mutantProcess->getMutantDiff())),
                 'processOutput' => Str::convertToUtf8(
-                    Str::removeOuterBlankLines($mutantProcess->getProcessOutput()),
+                    Str::cleanForDisplay($mutantProcess->getProcessOutput()),
                 ),
             ];
         }

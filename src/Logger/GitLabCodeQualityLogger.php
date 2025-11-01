@@ -72,7 +72,7 @@ final class GitLabCodeQualityLogger implements LineMutationTestingResultsLogger
                 'check_name' => $escapedExecutionResult->getMutatorName(),
                 'description' => 'Escaped Mutant for Mutator ' . $escapedExecutionResult->getMutatorName(),
                 'content' => Str::convertToUtf8(
-                    Str::removeOuterBlankLines($escapedExecutionResult->getMutantDiff()),
+                    Str::cleanForDisplay($escapedExecutionResult->getMutantDiff()),
                 ),
                 'categories' => ['Escaped Mutant'],
                 'location' => [
