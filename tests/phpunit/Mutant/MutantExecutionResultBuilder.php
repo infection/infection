@@ -95,19 +95,31 @@ final class MutantExecutionResultBuilder
             processCommandLine: 'vendor/bin/phpunit --configuration phpunit.xml',
             processOutput: '',
             detectionStatus: DetectionStatus::KILLED_BY_TESTS,
-            mutantDiff: now('--- Original
-+++ Mutated
-@@ @@
--$a = 1;
-+$a = 2;'),
+            mutantDiff: now(
+                <<<'PHP_DIFF'
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                    PHP_DIFF,
+            ),
             mutantHash: 'abc123def456',
             mutatorClass: For_::class,
             mutatorName: MutatorName::getName(For_::class),
             originalFilePath: 'src/Foo.php',
             originalStartingLine: 10,
             originalEndingLine: 15,
-            originalCode: now('<?php $a = 1;'),
-            mutatedCode: now('<?php $a = 2;'),
+            originalCode: now(
+                <<<'PHP'
+                    <?php $a = 1;
+                    PHP,
+            ),
+            mutatedCode: now(
+                <<<'PHP'
+                    <?php $a = 2;
+                    PHP,
+            ),
             tests: [],
             processRuntime: 0.123,
         );
