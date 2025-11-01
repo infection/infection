@@ -36,23 +36,19 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Mutation\Mutation;
-use Infection\Tests\Mutation\MutationBuilder\MutationBuilderScenario;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MutationBuilder::class)]
-#[CoversClass(MutationBuilderScenario::class)]
 final class MutationBuilderTest extends TestCase
 {
-    use MutationAssertions;
-
     #[DataProvider('mutationProvider')]
     public function test_it_can_create_a_builder_from_a_built_instance(Mutation $mutation): void
     {
         $actual = MutationBuilder::from($mutation)->build();
 
-        $this->assertEquals($mutation, $actual);
+        MutationAssertions::assertEquals($mutation, $actual);
     }
 
     public static function mutationProvider(): iterable

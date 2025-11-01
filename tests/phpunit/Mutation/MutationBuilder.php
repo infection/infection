@@ -123,7 +123,7 @@ final class MutationBuilder
                 'startFilePos' => 2,
                 'endFilePos' => 4,
             ],
-            mutatedNodeClass: 'PhpParser\\Node\\Stmt\\Nop',
+            mutatedNodeClass: Nop::class,
             mutatedNode: MutatedNode::wrap(new Nop()),
             mutationByMutatorIndex: 3,
             tests: [
