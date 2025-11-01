@@ -664,7 +664,7 @@ final class RunCommand extends BaseCommand
      */
     private function getSourceFilter(InputInterface $input): string|GitOptions|null
     {
-        $gitOptions = $this->getGitOptions($input);
+        $gitOptions = self::getGitOptions($input);
         $filter = self::getFilter($input);
 
         self::assertOnlyOneTypeOfFiltering($filter, $gitOptions);
