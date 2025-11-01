@@ -49,7 +49,7 @@ trait MutantAssertions
         string $expectedPrettyPrintedOriginalCode,
     ): void {
         $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertSame($expectedMutation, $mutant->getMutation());
+        $this->assertEquals($expectedMutation, $mutant->getMutation());
         $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
         $this->assertSame($expectedDiff, $mutant->getDiff()->get());
         $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
