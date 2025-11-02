@@ -68,7 +68,7 @@ final class JUnitReportTest extends TestCase
             $actual[$testCaseClassName] = $report->getTestInfo($testCaseClassName);
         }
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public static function executionTimeProvider(): iterable

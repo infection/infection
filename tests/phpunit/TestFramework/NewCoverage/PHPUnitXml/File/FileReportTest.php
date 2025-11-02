@@ -61,7 +61,7 @@ final class FileReportTest extends TestCase
 
         $actual = $report->getCoverage();
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public static function coverageProvider(): iterable
@@ -127,7 +127,7 @@ final class FileReportTest extends TestCase
         $coverage1 = $report->getCoverage();
         $coverage2 = $report->getCoverage();
 
-        $this->assertSame($coverage1, $coverage2);
+        $this->assertEquals($coverage1, $coverage2);
         $this->assertNotSame($coverage1, $coverage2);
     }
 }

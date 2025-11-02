@@ -60,7 +60,7 @@ final class UncoveredTraceProviderTest extends TestCase
             ->willReturn([$fileInfo])
         ;
 
-        $provider = new UncoveredTraceProvider($filter);
+        $provider = new UncoveredTraceProvider($filter, false);
 
         /** @var Trace[] $traces */
         $traces = iterator_to_array($provider->provideTraces(), false);
@@ -69,5 +69,21 @@ final class UncoveredTraceProviderTest extends TestCase
         $this->assertInstanceOf(ProxyTrace::class, $traces[0]);
         $this->assertSame($fileInfo, $traces[0]->getSourceFileInfo());
         $this->assertFalse($traces[0]->hasTests());
+    }
+
+    public function test_it_provides_no_trace_if_only_covered_code_should_be_used(): void
+    {
+        $filter = $this->createMock(BufferedSourceFileFilter::class);
+        $filter
+            ->expects($this->never())
+            ->method('getUnseenInCoverageReportFiles')
+        ;
+
+        $provider = new UncoveredTraceProvider($filter, true);
+
+        /** @var Trace[] $traces */
+        $traces = iterator_to_array($provider->provideTraces(), false);
+
+        $this->assertCount(0, $traces);
     }
 }

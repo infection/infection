@@ -54,7 +54,7 @@ final class SafeDOMXPathTest extends TestCase
             <author>Giada De Laurentiis</author>
             <year>2005</year>
           </book>
-            
+
           <book category="fantasy">
             <title lang="en">The Hobbit</title>
             <author>J.R.R. Tolkien</author>

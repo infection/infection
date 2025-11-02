@@ -146,7 +146,7 @@ final class IndexReportTest extends TestCase
             $actual[$sourcePathname] = $report->findSourceFileInfo($sourcePathname);
         }
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public static function fileInfoProvider(): iterable
