@@ -45,7 +45,6 @@ use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\Tracing\PHPUnitCoverageTracer;
-use Infection\TestFramework\Tracing\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -77,7 +76,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 ),
                 jUnitReportLocator: JUnitReportLocator::create(
                     self::COVERAGE_REPORT_DIR,
-                    self::COVERAGE_REPORT_DIR.'/junit.xml',
+                    self::COVERAGE_REPORT_DIR . '/junit.xml',
                 ),
             ),
         );

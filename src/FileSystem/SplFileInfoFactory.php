@@ -60,7 +60,6 @@ final class SplFileInfoFactory
 
         // If no base path provided, use the directory of the file as a base
         if ($basePath === '') {
-            $basePath = $splFileInfo->getPath();
             $relativePath = '';
             $relativePathname = $splFileInfo->getFilename();
         } else {

@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
 use function array_map;
 use function count;
 use function current;
 use function file_exists;
 use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
+use Infection\TestFramework\NewCoverage\Locator\ReportLocator;
 use function iterator_to_array;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
