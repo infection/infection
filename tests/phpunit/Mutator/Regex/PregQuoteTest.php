@@ -95,6 +95,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
+
                 $a = \Class_With_Const::Const;
                 PHP,
         ];

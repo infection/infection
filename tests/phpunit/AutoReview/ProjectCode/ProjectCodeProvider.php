@@ -42,6 +42,8 @@ use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
+use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
@@ -59,11 +61,11 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileCollector;
+use Infection\Framework\Enum\EnumBucket;
+use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutation\MutationAttributeKeys;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
@@ -88,7 +90,7 @@ use Infection\Testing\SingletonContainer;
 use Infection\Testing\SourceTestClassNameScheme;
 use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
-use function Infection\Tests\generator_to_phpunit_data_provider;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
 use function ltrim;
 use function Pipeline\take;
@@ -118,9 +120,7 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
-        DetectionStatus::class,
         DummyFileSystem::class,
-        MutationAttributeKeys::class,
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
@@ -128,11 +128,14 @@ final class ProjectCodeProvider
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         StopInfectionOnSigintSignalSubscriber::class,
+        Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutatorName::class,
         BaseMutatorTestCase::class,
+        OperatingSystem::class,
         SimpleMutation::class,
         StringNormalizer::class,
+        Source::class,
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
@@ -146,6 +149,7 @@ final class ProjectCodeProvider
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
         SourceFileCollector::class,
+        EnumBucket::class,
     ];
 
     /**
@@ -220,7 +224,7 @@ final class ProjectCodeProvider
 
     public static function sourceClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
+        yield from DataProviderFactory::fromIterable(
             self::provideSourceClasses(),
         );
     }
@@ -235,7 +239,7 @@ final class ProjectCodeProvider
 
     public static function concreteSourceClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
+        yield from DataProviderFactory::fromIterable(
             self::provideConcreteSourceClasses(),
         );
     }
@@ -254,6 +258,7 @@ final class ProjectCodeProvider
                 $reflectionClass = new ReflectionClass($className);
 
                 return !$reflectionClass->isInterface()
+                    && !$reflectionClass->isEnum()
                     && !in_array(
                         $className,
                         [
@@ -275,7 +280,7 @@ final class ProjectCodeProvider
 
     public static function sourceClassesToCheckForPublicPropertiesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
+        yield from DataProviderFactory::fromIterable(
             self::provideSourceClassesToCheckForPublicProperties(),
         );
     }
@@ -316,14 +321,14 @@ final class ProjectCodeProvider
     // test instead of a test provider.
     public static function classesTestProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
+        yield from DataProviderFactory::fromIterable(
             self::provideTestClasses(),
         );
     }
 
     public static function nonTestedConcreteClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider([
+        yield from DataProviderFactory::fromIterable([
             ...self::NON_TESTED_CONCRETE_CLASSES,
             ...self::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION,
         ]);
@@ -331,7 +336,7 @@ final class ProjectCodeProvider
 
     public static function nonFinalExtensionClasses(): iterable
     {
-        yield from generator_to_phpunit_data_provider(
+        yield from DataProviderFactory::fromIterable(
             self::NON_FINAL_EXTENSION_CLASSES,
         );
     }

@@ -38,6 +38,7 @@ namespace Infection\Mutator\Regex;
 use Generator;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use function strtolower;
@@ -69,7 +70,7 @@ abstract class AbstractPregMatch implements Mutator
         foreach ($this->mutateRegex($originalRegex) as $mutatedRegex) {
             $newArgument = $this->getNewRegexArgument($mutatedRegex, $node->args[0]);
 
-            yield new FuncCall($node->name, [$newArgument] + $node->args, $node->getAttributes());
+            yield new FuncCall($node->name, [$newArgument] + $node->args, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 
@@ -109,8 +110,8 @@ abstract class AbstractPregMatch implements Mutator
     private function getNewRegexArgument(string $regex, Node\Arg $argument): Node\Arg
     {
         return new Node\Arg(
-            new Node\Scalar\String_($regex, $argument->value->getAttributes()),
-            $argument->byRef, $argument->unpack, $argument->getAttributes(),
+            new Node\Scalar\String_($regex, NodeAttributes::getAllExceptOriginalNode($argument->value)),
+            $argument->byRef, $argument->unpack, NodeAttributes::getAllExceptOriginalNode($argument),
         );
     }
 }

@@ -95,6 +95,7 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
@@ -316,8 +317,13 @@ final class Container extends DIContainer
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->getTmpDir(),
                 $container->getDiffer(),
-                $container->getPrinter(),
                 $container->getMutantCodeFactory(),
+            ),
+            MutantCodeFactory::class => static fn (self $container): MutantCodeFactory => new MutantCodeFactory(
+                $container->getMutatedCodePrinter(),
+            ),
+            MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
+                $container->getPrinter(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
@@ -599,7 +605,7 @@ final class Container extends DIContainer
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
-        string $formatterName = self::DEFAULT_FORMATTER_NAME,
+        FormatterName $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
@@ -1037,6 +1043,11 @@ final class Container extends DIContainer
     public function getMinMsiChecker(): MinMsiChecker
     {
         return $this->get(MinMsiChecker::class);
+    }
+
+    private function getMutatedCodePrinter(): MutantCodePrinter
+    {
+        return $this->get(MutantCodePrinter::class);
     }
 
     private function getStopwatch(): Stopwatch

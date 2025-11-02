@@ -37,6 +37,7 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
@@ -66,6 +67,7 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
 
@@ -151,10 +153,7 @@ class ConfigurationFactory
         return new Configuration(
             $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
             $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collectFiles(
-                $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes(),
-            ),
+            $this->collectFiles($schema),
             $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             $schema->getSource()->getExcludes(),
             $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
@@ -250,36 +249,12 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->getPhpUnit();
-
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
-
-        if ($phpUnitConfigDir === null) {
-            $phpUnit->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir,
-            ));
-        }
-
-        return $phpUnit;
+        return $schema->getPhpUnit()->withAbsolutePaths($configDir);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        $phpStan = clone $schema->getPhpStan();
-
-        $phpStanConfigDir = $phpStan->getConfigDir();
-
-        if ($phpStanConfigDir === null) {
-            $phpStan->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpStanConfigDir)) {
-            $phpStan->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpStanConfigDir,
-            ));
-        }
-
-        return $phpStan;
+        return $schema->getPhpStan()->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(
@@ -354,6 +329,34 @@ class ConfigurationFactory
         }
 
         return $map;
+    }
+
+    /**
+     * @return iterable<string, SplFileInfo>
+     */
+    private function collectFiles(SchemaConfiguration $schema): iterable
+    {
+        $source = $schema->getSource();
+        $schemaDirname = dirname($schema->getFile());
+
+        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+            ? $path
+            : Path::join(
+                $schemaDirname,
+                $path,
+            );
+
+        return $this->sourceFileCollector->collectFiles(
+            // We need to make the source file paths absolute, otherwise the
+            // collector will collect the files relative to the current working
+            // directory instead of relative to the location of the configuration
+            // file.
+            array_map(
+                $mapToAbsolutePath(...),
+                $source->getDirectories(),
+            ),
+            $source->getExcludes(),
+        );
     }
 
     /**

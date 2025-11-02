@@ -38,11 +38,12 @@ namespace Infection\Tests\FileSystem;
 use function getenv;
 use Infection\FileSystem\Filesystem;
 use function Infection\Tests\make_tmp_dir;
-use function Infection\Tests\normalizePath;
 use PHPUnit\Framework\TestCase;
 use function Safe\getcwd;
 use function Safe\realpath;
 use function sprintf;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
 // TODO: could take mine instead.
@@ -87,7 +88,7 @@ abstract class FileSystemTestCase extends TestCase
         $testToken = getenv('TEST_TOKEN');
 
         (new Filesystem())->remove(
-            normalizePath(
+            Path::normalize(
                 sprintf(
                     '%s/%s/%s',
                     realpath(sys_get_temp_dir()),

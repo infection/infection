@@ -52,17 +52,12 @@ final class MutantTest extends TestCase
 {
     use MutantAssertions;
 
-    /**
-     * @param TestLocation[] $expectedTests
-     */
     #[DataProvider('valuesProvider')]
     public function test_it_can_be_instantiated(
         string $filePath,
         Mutation $mutation,
         string $mutatedCode,
         string $diff,
-        bool $expectedCoveredByTests,
-        array $expectedTests,
         string $originalCode,
     ): void {
         $mutant = new Mutant($filePath, $mutation, now($mutatedCode), now($diff), now($originalCode));
@@ -73,8 +68,6 @@ final class MutantTest extends TestCase
             $mutation,
             $mutatedCode,
             $diff,
-            $expectedCoveredByTests,
-            $expectedTests,
             $originalCode,
         );
     }
@@ -115,11 +108,11 @@ final class MutantTest extends TestCase
                 MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
                 $tests,
+                [],
+                '',
             ),
             'mutated code',
             'diff value',
-            true,
-            $tests,
             $originalCode,
         ];
 
@@ -138,11 +131,11 @@ final class MutantTest extends TestCase
                 MutatedNode::wrap(new Node\Scalar\LNumber(1)),
                 0,
                 [],
+                [],
+                '',
             ),
             'mutated code',
             'diff value',
-            false,
-            [],
             $originalCode,
         ];
     }

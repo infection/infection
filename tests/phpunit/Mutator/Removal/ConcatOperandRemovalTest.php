@@ -63,13 +63,11 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
             [
                 <<<'PHP'
                     <?php
-
                     'bar';
                     PHP
                 ,
                 <<<'PHP'
                     <?php
-
                     'foo';
                     PHP
                 ,
