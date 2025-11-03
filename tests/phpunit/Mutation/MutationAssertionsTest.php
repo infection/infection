@@ -33,43 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Mutation;
 
-use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantAssertions
+#[CoversClass(MutationAssertions::class)]
+final class MutationAssertionsTest extends TestCase
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
+    #[DataProvider('mutationProvider')]
+    public function test_it_can_compare_mutations(
+        Mutation $left,
+        Mutation $right,
+        bool $expected,
     ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
-        );
+        try {
+            MutationAssertions::assertEquals($left, $right);
+
+            if (!$expected) {
+                $this->fail('Expected mutations to not be equal.');
+            }
+        } catch (ExpectationFailedException $failure) {
+            // @phpstan-ignore if.alwaysFalse
+            if ($expected) {
+                throw $failure;
+            }
+        }
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    public static function mutationProvider(): iterable
+    {
+        yield 'equal' => [
+            MutationBuilder::withMinimalTestData()->build(),
+            MutationBuilder::withMinimalTestData()->build(),
+            true,
+        ];
+
+        yield 'not equal' => [
+            MutationBuilder::withMinimalTestData()->build(),
+            MutationBuilder::withCompleteTestData()->build(),
+            false,
+        ];
+
+        yield 'equal but different states' => [
+            (static function () {
+                $mutation = MutationBuilder::withCompleteTestData()->build();
+
+                self::fetchLazyState($mutation);
+
+                return $mutation;
+            })(),
+            MutationBuilder::withCompleteTestData()->build(),
+            true,
+        ];
+    }
+
+    private static function fetchLazyState(Mutation $mutation): void
+    {
+        $mutation->getNominalTestExecutionTime();
+        $mutation->getHash();
     }
 }

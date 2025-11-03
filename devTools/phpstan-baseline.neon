@@ -571,48 +571,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationTest\:\:assertConfigurationStateIs\(\) has parameter \$expectedMutators with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationTest\:\:test_it_can_be_instantiated\(\) has parameter \$mutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationTest.php
-
-		-
-			message: '#^Parameter \#1 \$fileInfos of static method Infection\\Tests\\Configuration\\ConfigurationTest\:\:normalizePaths\(\) expects array\<Symfony\\Component\\Finder\\SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:assertSourceStateIs\(\) has parameter \$expectedDirectories with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:assertSourceStateIs\(\) has parameter \$expectedExcludes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:test_it_can_be_instantiated\(\) has parameter \$directories with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Entry\\SourceTest\:\:test_it_can_be_instantiated\(\) has parameter \$excludes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Entry/SourceTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Configuration\\Schema\\InvalidSchemaTest\:\:test_it_can_be_instantiated\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1127,12 +1085,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/MockedContainer.php
-
-		-
-			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutant/MutantFactoryTest.php
 
 		-
 			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'

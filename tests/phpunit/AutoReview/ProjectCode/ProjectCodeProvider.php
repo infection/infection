@@ -43,6 +43,8 @@ use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
+use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
@@ -65,6 +67,7 @@ use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Metrics\MetricsCalculator;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
@@ -126,12 +129,15 @@ final class ProjectCodeProvider
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         StopInfectionOnSigintSignalSubscriber::class,
+        Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MutantExecutionResult::class,
         MutatorName::class,
         BaseMutatorTestCase::class,
         OperatingSystem::class,
         SimpleMutation::class,
         StringNormalizer::class,
+        Source::class,
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,

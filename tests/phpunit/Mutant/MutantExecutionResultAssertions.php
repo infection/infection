@@ -49,14 +49,14 @@ trait MutantExecutionResultAssertions
         MutantExecutionResult $actual,
     ): void {
         $this->assertResultStateIs(
-            $actual,
-            $expected->getProcessCommandLine(),
-            $expected->getProcessOutput(),
-            $expected->getDetectionStatus(),
-            $expected->getMutantDiff(),
-            $expected->getMutatorName(),
-            $expected->getOriginalFilePath(),
-            $expected->getOriginalStartingLine(),
+            result: $actual,
+            expectedProcessCommandLine: $expected->getProcessCommandLine(),
+            expectedProcessOutput: $expected->getProcessOutput(),
+            expectedDetectionStatus: $expected->getDetectionStatus(),
+            expectedMutantDiff: $expected->getMutantDiff(),
+            expectedMutatorName: $expected->getMutatorName(),
+            expectedOriginalFilePath: $expected->getOriginalFilePath(),
+            expectedOriginalStartingLine: $expected->getOriginalStartingLine(),
         );
     }
 

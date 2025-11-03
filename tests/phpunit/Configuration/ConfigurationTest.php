@@ -60,51 +60,51 @@ final class ConfigurationTest extends TestCase
     {
         yield 'no option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions(null)
-            ->build(),
+                ->withStaticAnalysisToolOptions(null)
+                ->build(),
             [],
         ];
 
         yield 'empty string option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions('')
-            ->build(),
+                ->withStaticAnalysisToolOptions('')
+                ->build(),
             [],
         ];
 
         yield 'fake blank string option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions('{u+020}')
-            ->build(),
+                ->withStaticAnalysisToolOptions('{u+020}')
+                ->build(),
             ['--{u+020}'],
         ];
 
         yield 'single option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions('--memory-limit=-1')
-            ->build(),
+                ->withStaticAnalysisToolOptions('--memory-limit=-1')
+                ->build(),
             ['--memory-limit=-1'],
         ];
 
         // TODO: this looks weird...
         yield 'not an option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions('src')
-            ->build(),
+                ->withStaticAnalysisToolOptions('src')
+                ->build(),
             ['--src'],
         ];
 
         yield 'multiple options' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions('--memory-limit=2G --level=max')
-            ->build(),
+                ->withStaticAnalysisToolOptions('--memory-limit=2G --level=max')
+                ->build(),
             ['--memory-limit=2G', '--level=max'],
         ];
 
         yield 'multiple options with one non-option' => [
             ConfigurationBuilder::withMinimalTestData()
-            ->withStaticAnalysisToolOptions('src --memory-limit=2G --level=max tests')
-            ->build(),
+                ->withStaticAnalysisToolOptions('src --memory-limit=2G --level=max tests')
+                ->build(),
             [
                 '--src',
                 '--memory-limit=2G',

@@ -37,7 +37,8 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
-use Infection\Tests\Mutation\MutationBuilder\MutationBuilder;
+use Infection\Tests\Mutation\MutationBuilder;
+use InvalidArgumentException;
 use Later\Interfaces\Deferred;
 use function Later\now;
 
@@ -68,13 +69,20 @@ final class MutantBuilder
         );
     }
 
+    /**
+     * @deprecated use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+     */
     public static function materialize(
-        string $mutantFilePath,
-        Mutation $mutation,
-        string $mutatedCode,
-        string $diff,
-        string $prettyPrintedOriginalCode,
+        string $mutantFilePath = '/path/to/mutant',
+        ?Mutation $mutation = null,
+        string $mutatedCode = 'mutated code',
+        string $diff = 'diff',
+        string $prettyPrintedOriginalCode = '<?php $a = 1;',
     ): Mutant {
+        if ($mutation === null) {
+            throw new InvalidArgumentException('Mutation cannot be null');
+        }
+
         return self::withMinimalTestData()
             ->withMutantFilePath($mutantFilePath)
             ->withMutation($mutation)
@@ -89,21 +97,24 @@ final class MutantBuilder
         return new self(
             mutantFilePath: '/path/to/mutant',
             mutation: MutationBuilder::withMinimalTestData()->build(),
-            mutatedCode: now(<<<'PHP'
-                <?php $a = 2;
-                PHP,
+            mutatedCode: now(
+                <<<'PHP'
+                    <?php $a = 2;
+                    PHP,
             ),
-            diff: now(<<<'PHP'
-                --- Original
-                +++ Mutated
-                @@ @@
-                -$a = 1;
-                +$a = 2;
-                PHP,
+            diff: now(
+                <<<'PHP'
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                    PHP,
             ),
-            prettyPrintedOriginalCode: now(<<<'PHP'
-                <?php $a = 1;
-                PHP,
+            prettyPrintedOriginalCode: now(
+                <<<'PHP'
+                    <?php $a = 1;
+                    PHP,
             ),
         );
     }
@@ -113,47 +124,50 @@ final class MutantBuilder
         return new self(
             mutantFilePath: '/path/to/src/mutants/Foo_mutant_0.php',
             mutation: MutationBuilder::withCompleteTestData()->build(),
-            mutatedCode: now(<<<'PHP'
-                <?php
+            mutatedCode: now(
+                <<<'PHP'
+                    <?php
 
-                namespace Acme;
+                    namespace Acme;
 
-                class Foo
-                {
-                    public function bar(): void
+                    class Foo
                     {
-                        // Mutated: removed for loop
-                    }
-                }
-
-                PHP,
-            ),
-            diff: now(<<<'PHP'
-                --- Original
-                +++ Mutated
-                @@ @@
-                -        for ($i = 0; $i < 10; $i++) {
-                -            echo $i;
-                -        }
-                +        // Mutated: removed for loop
-                PHP,
-            ),
-            prettyPrintedOriginalCode: now(<<<'PHP'
-                <?php
-
-                namespace Acme;
-
-                class Foo
-                {
-                    public function bar(): void
-                    {
-                        for ($i = 0; $i < 10; $i++) {
-                            echo $i;
+                        public function bar(): void
+                        {
+                            // Mutated: removed for loop
                         }
                     }
-                }
 
-                PHP,
+                    PHP,
+            ),
+            diff: now(
+                <<<'PHP'
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -        for ($i = 0; $i < 10; $i++) {
+                    -            echo $i;
+                    -        }
+                    +        // Mutated: removed for loop
+                    PHP,
+            ),
+            prettyPrintedOriginalCode: now(
+                <<<'PHP'
+                    <?php
+
+                    namespace Acme;
+
+                    class Foo
+                    {
+                        public function bar(): void
+                        {
+                            for ($i = 0; $i < 10; $i++) {
+                                echo $i;
+                            }
+                        }
+                    }
+
+                    PHP,
             ),
         );
     }

@@ -33,34 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+<<<<<<<< HEAD:tests/phpunit/Configuration/Schema/SchemaConfigurationBuilderTest.php
+namespace Infection\Tests\Configuration\Schema;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Configuration\Schema\SchemaConfiguration;
+========
+namespace Infection\Tests\Mutation;
+
+use Infection\Mutation\Mutation;
+>>>>>>>> upstream/master:tests/phpunit/Mutation/MutationBuilderTest.php
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutantExecutionResultBuilder::class)]
-final class MutantExecutionResultBuilderTest extends TestCase
+<<<<<<<< HEAD:tests/phpunit/Configuration/Schema/SchemaConfigurationBuilderTest.php
+#[CoversClass(SchemaConfigurationBuilder::class)]
+final class SchemaConfigurationBuilderTest extends TestCase
 {
-    use MutantExecutionResultAssertions;
-
-    #[DataProvider('executionResultProvider')]
-    public function test_it_can_build_from_existing_result(MutantExecutionResult $result): void
+    #[DataProvider('configurationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(SchemaConfiguration $configuration): void
     {
-        $actual = MutantExecutionResultBuilder::from($result)->build();
+        $actual = SchemaConfigurationBuilder::from($configuration)->build();
 
-        $this->assertResultEquals($result, $actual);
+        $this->assertEquals($configuration, $actual);
     }
 
-    public static function executionResultProvider(): iterable
+    public static function configurationProvider(): iterable
     {
-        yield 'minimal execution result' => [
-            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+        yield 'minimal test data' => [
+            SchemaConfigurationBuilder::withMinimalTestData()->build(),
         ];
 
-        yield 'complete execution result' => [
-            MutantExecutionResultBuilder::withCompleteTestData()->build(),
+        yield 'complete test data' => [
+            SchemaConfigurationBuilder::withCompleteTestData()->build(),
+========
+#[CoversClass(MutationBuilder::class)]
+final class MutationBuilderTest extends TestCase
+{
+    #[DataProvider('mutationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Mutation $mutation): void
+    {
+        $actual = MutationBuilder::from($mutation)->build();
+
+        MutationAssertions::assertEquals($mutation, $actual);
+    }
+
+    public static function mutationProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            MutationBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            MutationBuilder::withCompleteTestData()->build(),
+>>>>>>>> upstream/master:tests/phpunit/Mutation/MutationBuilderTest.php
         ];
     }
 }

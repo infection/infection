@@ -39,27 +39,31 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use PhpParser\Node;
 use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Assert;
 
 /**
- * @phpstan-require-implements TestCase
+ * A mutation has some lazy/computed state hence two mutations can be equal yet have different states. To
+ * compare two mutations without this issue, the assertions of this class should be used instead.
  */
-trait MutationAssertions
+final class MutationAssertions
 {
-    public function assertMutationEquals(
+    public static function assertEquals(
         Mutation $expected,
         Mutation $actual,
     ): void {
-        $this->assertSame($expected->getOriginalFilePath(), $actual->getOriginalFilePath());
-        $this->assertEquals($expected->getOriginalFileAst(), $actual->getOriginalFileAst());
-        $this->assertSame($expected->getMutatorClass(), $actual->getMutatorClass());
-        $this->assertSame($expected->getMutatorName(), $actual->getMutatorName());
-        $this->assertSame($expected->getAttributes(), $actual->getAttributes());
-        $this->assertSame($expected->getMutatedNodeClass(), $actual->getMutatedNodeClass());
-        $this->assertEquals($expected->getAllTests(), $actual->getAllTests());
-        $this->assertEquals($expected->getOriginalFileTokens(), $actual->getOriginalFileTokens());
-        $this->assertSame($expected->getOriginalFileContent(), $actual->getOriginalFileContent());
-        $this->assertSame($expected->isCoveredByTest(), $actual->isCoveredByTest());
+        self::assertStateIs(
+            mutation: $actual,
+            expectedOriginalFilePath: $expected->getOriginalFilePath(),
+            expectedOriginalFileAst: $expected->getOriginalFileAst(),
+            expectedMutatorClass: $expected->getMutatorClass(),
+            expectedMutatorName: $expected->getMutatorName(),
+            expectedAttributes: $expected->getAttributes(),
+            expectedMutatedNodeClass: $expected->getMutatedNodeClass(),
+            expectedTests: $expected->getAllTests(),
+            expectedFileTokens: $expected->getOriginalFileTokens(),
+            expectedOriginalFileContent: $expected->getOriginalFileContent(),
+            expectedCoveredByTests: $expected->isCoveredByTest(),
+        );
     }
 
     /**
@@ -68,7 +72,7 @@ trait MutationAssertions
      * @param TestLocation[] $expectedTests
      * @param Token[] $expectedFileTokens
      */
-    public function assertMutationStateIs(
+    public static function assertStateIs(
         Mutation $mutation,
         string $expectedOriginalFilePath,
         array $expectedOriginalFileAst,
@@ -81,15 +85,15 @@ trait MutationAssertions
         string $expectedOriginalFileContent,
         bool $expectedCoveredByTests,
     ): void {
-        $this->assertSame($expectedOriginalFilePath, $mutation->getOriginalFilePath());
-        $this->assertEquals($expectedOriginalFileAst, $mutation->getOriginalFileAst());
-        $this->assertSame($expectedMutatorClass, $mutation->getMutatorClass());
-        $this->assertSame($expectedMutatorName, $mutation->getMutatorName());
-        $this->assertSame($expectedAttributes, $mutation->getAttributes());
-        $this->assertSame($expectedMutatedNodeClass, $mutation->getMutatedNodeClass());
-        $this->assertEquals($expectedTests, $mutation->getAllTests());
-        $this->assertEquals($expectedFileTokens, $mutation->getOriginalFileTokens());
-        $this->assertSame($expectedOriginalFileContent, $mutation->getOriginalFileContent());
-        $this->assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
+        Assert::assertSame($expectedOriginalFilePath, $mutation->getOriginalFilePath());
+        Assert::assertEquals($expectedOriginalFileAst, $mutation->getOriginalFileAst());
+        Assert::assertSame($expectedMutatorClass, $mutation->getMutatorClass());
+        Assert::assertSame($expectedMutatorName, $mutation->getMutatorName());
+        Assert::assertSame($expectedAttributes, $mutation->getAttributes());
+        Assert::assertSame($expectedMutatedNodeClass, $mutation->getMutatedNodeClass());
+        Assert::assertEquals($expectedTests, $mutation->getAllTests());
+        Assert::assertEquals($expectedFileTokens, $mutation->getOriginalFileTokens());
+        Assert::assertSame($expectedOriginalFileContent, $mutation->getOriginalFileContent());
+        Assert::assertSame($expectedCoveredByTests, $mutation->isCoveredByTest());
     }
 }
