@@ -41,9 +41,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 interface Instrumentor
 {
     /**
-     * @template T
-     *
-     * @param Closure(): T $main
+     * @param Closure(): (Closure(): (positive-int|0)) $createMain
+     * @param positive-int $sampleSize
      */
-    public function profile(Closure $main, SymfonyStyle $io): mixed;
+    public function profile(Closure $createMain, int $sampleSize, SymfonyStyle $io): int;
 }

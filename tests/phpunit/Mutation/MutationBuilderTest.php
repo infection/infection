@@ -33,59 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\Tests\Mutation;
 
-use Generator;
-use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
-use function iterator_to_array;
-use Psr\Log\NullLogger;
-use Symfony\Component\Console\Output\NullOutput;
+use Infection\Mutation\Mutation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+#[CoversClass(MutationBuilder::class)]
+final class MutationBuilderTest extends TestCase
+{
+    #[DataProvider('mutationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Mutation $mutation): void
+    {
+        $actual = MutationBuilder::from($mutation)->build();
 
-$container = Container::create()->withValues(
-    logger: new NullLogger(),
-    output: new NullOutput(),
-    configFile: __DIR__ . '/infection.json5',
-    existingCoveragePath: __DIR__ . '/coverage',
-    useNoopMutators: true,
-);
-
-/**
- * @param positive-int $maxCount
- *
- * @return iterable<Trace>
- */
-$generateTraces = static function (int $maxCount) use ($container): iterable {
-    $traces = $container->getUnionTraceProvider()->provideTraces();
-
-    $i = 0;
-
-    foreach ($traces as $trace) {
-        if ($i === $maxCount) {
-            break;
-        }
-
-        yield $trace;
-
-        ++$i;
-    }
-};
-
-/**
- * @param positive-int $maxCount
- *
- * @return positive-int|0
- */
-return static function (int $maxCount) use ($generateTraces): int {
-    $traces = $generateTraces($maxCount);
-    $count = 0;
-
-    foreach ($traces as $_) {
-        ++$count;
-        // Iterate over the generator: do not use iterator_to_array which is less GC friendly
+        MutationAssertions::assertEquals($mutation, $actual);
     }
 
-    return $count;
-};
+    public static function mutationProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            MutationBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            MutationBuilder::withCompleteTestData()->build(),
+        ];
+    }
+}

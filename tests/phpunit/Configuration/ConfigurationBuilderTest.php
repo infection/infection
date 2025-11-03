@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -33,43 +34,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Configuration;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
+use Infection\Configuration\Configuration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantAssertions
+#[CoversClass(ConfigurationBuilder::class)]
+final class ConfigurationBuilderTest extends TestCase
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
-        );
+    #[DataProvider('configurationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Configuration $configuration): void
+    {
+        $actual = ConfigurationBuilder::from($configuration)->build();
+
+        $this->assertEquals($configuration, $actual);
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    /**
+     * @return iterable<string, array{Configuration}>
+     */
+    public static function configurationProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            ConfigurationBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            ConfigurationBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

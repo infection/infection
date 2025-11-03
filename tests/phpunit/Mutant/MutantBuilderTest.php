@@ -33,51 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Tests\Mutant;
 
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\Mutant\Mutant;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class PartialTrace implements Trace
+#[CoversClass(MutantBuilder::class)]
+final class MutantBuilderTest extends TestCase
 {
-    private $sourceFileInfo;
+    use MutantAssertions;
 
-    public function __construct(SplFileInfo $sourceFileInfo)
+    #[DataProvider('mutantBuilder')]
+    public function test_it_can_build_from_existing_mutant(Mutant $mutant): void
     {
-        $this->sourceFileInfo = $sourceFileInfo;
+        $actual = MutantBuilder::from($mutant)->build();
+
+        $this->assertMutantEquals($mutant, $actual);
     }
 
-    public function getSourceFileInfo(): SplFileInfo
+    public static function mutantBuilder(): iterable
     {
-        return $this->sourceFileInfo;
-    }
+        yield 'minimal mutant' => [
+            MutantBuilder::withMinimalTestData()->build(),
+        ];
 
-    public function getRealPath(): string
-    {
-        return $this->sourceFileInfo->getRealPath();
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFileInfo->getRelativePathname();
-    }
-
-    public function hasTests(): bool
-    {
-        return false;
-    }
-
-    public function getTests(): TestLocations
-    {
-        return new TestLocations();
-    }
-
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        return [];
+        yield 'complete mutant' => [
+            MutantBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

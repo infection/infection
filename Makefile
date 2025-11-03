@@ -122,7 +122,6 @@ profile:
 profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
 	blackfire run \
-		--samples=5 \
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
@@ -132,7 +131,6 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative --quiet
 	blackfire run \
-		--samples=5 \
 		--title="Tracing" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/Tracing/profile.php

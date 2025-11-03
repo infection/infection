@@ -33,43 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Benchmark\MutationGenerator;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\Coverage\NodeLineRangeData;
+use Infection\TestFramework\Coverage\TestLocations;
+use Infection\TestFramework\Coverage\Trace;
+use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantAssertions
+final readonly class EmptyTrace implements Trace
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
-        );
+    public function __construct(private SplFileInfo $sourceFileInfo)
+    {
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    public function getSourceFileInfo(): SplFileInfo
+    {
+        return $this->sourceFileInfo;
+    }
+
+    public function getRealPath(): string
+    {
+        return $this->sourceFileInfo->getRealPath();
+    }
+
+    public function getRelativePathname(): string
+    {
+        return $this->sourceFileInfo->getRelativePathname();
+    }
+
+    public function hasTests(): bool
+    {
+        return false;
+    }
+
+    public function getTests(): TestLocations
+    {
+        return new TestLocations();
+    }
+
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        return [];
     }
 }

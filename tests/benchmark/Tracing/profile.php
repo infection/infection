@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Infection\Benchmark\InstrumentorFactory;
-use function is_int;
 use LogicException;
 use const PHP_INT_MAX;
 use function sprintf;
@@ -74,8 +73,6 @@ $input = new ArgvInput(
 $output = new ConsoleOutput();
 $io = new SymfonyStyle($input, $output);
 
-$provideTraces = require __DIR__ . '/provide-traces-closure.php';
-
 /** @var positive-int $maxTraceCount */
 $maxTraceCount = (static function (InputInterface $input, string $optionName): int {
     $option = $input->getOption($optionName);
@@ -112,11 +109,12 @@ $debug = $input->getOption(DEBUG_OPT);
 $instrumentor = InstrumentorFactory::create($debug);
 
 $count = $instrumentor->profile(
-    static fn () => $provideTraces($maxTraceCount),
+    static fn () => (require __DIR__ . '/create-main.php')($maxTraceCount),
+    5,
     $io,
 );
 
-if (!is_int($count) || $count === 0) {
+if ($count === 0) {
     throw new LogicException('Something went wrong, no traces were actually generated.');
 }
 

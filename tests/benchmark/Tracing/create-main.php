@@ -33,69 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Benchmark\Tracing;
 
-use function array_values;
-use function count;
-use function explode;
-use function implode;
-use const PHP_EOL;
-use function Safe\mb_convert_encoding;
-use function str_replace;
-use function trim;
+use Closure;
+use function function_exists;
+use Infection\Container;
+use Infection\TestFramework\Coverage\Trace;
+use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\NullOutput;
 
-/**
- * @internal
- */
-final class Str
-{
-    use CannotBeInstantiated;
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-    public static function trimLineReturns(string $string): string
+if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
+    function fetchTraceLazyState(Trace $trace): void
     {
-        $lines = explode(
-            "\n",
-            str_replace("\r\n", "\n", $string),
-        );
-        $linesCount = count($lines);
-
-        // Trim leading empty lines
-        for ($i = 0; $i < $linesCount; ++$i) {
-            $line = $lines[$i];
-
-            if (trim($line) === '') {
-                unset($lines[$i]);
-
-                continue;
-            }
-
-            break;
-        }
-
-        $lines = array_values($lines);
-        $linesCount = count($lines);
-
-        // Trim trailing empty lines
-        for ($i = $linesCount - 1; $i >= 0; --$i) {
-            $line = $lines[$i];
-
-            if (trim($line) === '') {
-                unset($lines[$i]);
-
-                continue;
-            }
-
-            break;
-        }
-
-        return implode(PHP_EOL, $lines);
-    }
-
-    public static function convertToUtf8(string $string): string
-    {
-        /** @var string $utf8String */
-        $utf8String = mb_convert_encoding($string, 'UTF-8', 'UTF-8');
-
-        return $utf8String;
+        $trace->getSourceFileInfo();
+        $trace->hasTests();
+        $trace->getTests();
     }
 }
+
+/**
+ * @param positive-int $maxCount
+ *
+ * @return Closure():(positive-int|0)
+ */
+return static function (int $maxCount): Closure {
+    $container = Container::create()->withValues(
+        logger: new NullLogger(),
+        output: new NullOutput(),
+        configFile: __DIR__ . '/infection.json5',
+        existingCoveragePath: __DIR__ . '/coverage',
+        useNoopMutators: true,
+    );
+    $traceProvider = $container->getUnionTraceProvider();
+
+    return static function () use ($maxCount, $traceProvider) {
+        $count = 0;
+
+        foreach ($traceProvider->provideTraces() as $trace) {
+            fetchTraceLazyState($trace);
+
+            ++$count;
+
+            if ($count >= $maxCount) {
+                break;
+            }
+        }
+
+        return $count;
+    };
+};

@@ -33,22 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility;
+namespace Infection\Tests\Configuration\Schema;
 
-use Infection\CannotBeInstantiated;
-use const PHP_EOL;
-use function str_replace;
+use Infection\Configuration\Schema\SchemaConfiguration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class LineReturnNormalizer
+#[CoversClass(SchemaConfigurationBuilder::class)]
+final class SchemaConfigurationBuilderTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    public static function normalize(string $value): string
+    #[DataProvider('configurationProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(SchemaConfiguration $configuration): void
     {
-        return str_replace(
-            "\n",
-            PHP_EOL,
-            $value,
-        );
+        $actual = SchemaConfigurationBuilder::from($configuration)->build();
+
+        $this->assertEquals($configuration, $actual);
+    }
+
+    public static function configurationProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            SchemaConfigurationBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            SchemaConfigurationBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Benchmark\MutationGenerator;
 
 use function array_map;
+use Closure;
+use function function_exists;
 use Infection\Container;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
@@ -44,57 +46,75 @@ use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$container = Container::create();
-
-$files = Finder::create()
-    ->files()
-    ->in(__DIR__ . '/sources')
-    ->name('*.php')
-;
-
 // Since those files are not autoloaded, we need to manually autoload them
 require_once __DIR__ . '/sources/autoload.php';
 
-$traces = array_map(
-    static function (SplFileInfo $fileInfo): Trace {
+if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    function collectSources(): iterable
+    {
+        return Finder::create()
+            ->files()
+            ->in(__DIR__ . '/sources')
+            ->name('*.php')
+        ;
+    }
+}
+
+if (!function_exists('Infection\Benchmark\MutationGenerator\createTrace')) {
+    function createTrace(SplFileInfo $fileInfo): Trace
+    {
         require_once $fileInfo->getRealPath();
 
-        return new PartialTrace($fileInfo);
-    },
-    iterator_to_array($files, false),
-);
-
-$mutators = $container->getMutatorFactory()->create(
-    $container->getMutatorResolver()->resolve(['@default' => true]),
-    true,
-);
-
-$fileMutationGenerator = $container->getFileMutationGenerator();
+        return new EmptyTrace($fileInfo);
+    }
+}
 
 /**
  * @param positive-int $maxCount
  *
- * @return positive-int|0
+ * @return Closure():(positive-int|0)
  */
-return static function (int $maxCount) use ($fileMutationGenerator, $traces, $mutators): int {
-    $count = 0;
+return static function (int $maxCount): Closure {
+    $container = Container::create();
 
-    foreach ($traces as $trace) {
-        $mutations = $fileMutationGenerator->generate(
-            $trace,
+    $traces = array_map(
+        createTrace(...),
+        iterator_to_array(
+            collectSources(),
             false,
-            $mutators,
-            [],
-        );
+        ),
+    );
 
-        foreach ($mutations as $_) {
-            ++$count;
+    $mutators = $container->getMutatorFactory()->create(
+        $container->getMutatorResolver()->resolve(['@default' => true]),
+        true,
+    );
 
-            if ($count >= $maxCount) {
-                break 2;
+    $fileMutationGenerator = $container->getFileMutationGenerator();
+
+    return static function () use ($traces, $fileMutationGenerator, $mutators, $maxCount): int {
+        $count = 0;
+
+        foreach ($traces as $trace) {
+            $mutations = $fileMutationGenerator->generate(
+                $trace,
+                false,
+                $mutators,
+                [],
+            );
+
+            foreach ($mutations as $_) {
+                ++$count;
+
+                if ($count >= $maxCount) {
+                    break 2;
+                }
             }
         }
-    }
 
-    return $count;
+        return $count;
+    };
 };

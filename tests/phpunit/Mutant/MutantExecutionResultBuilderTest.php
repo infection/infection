@@ -33,18 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Mutant;
 
-use Infection\Configuration\Entry\PhpUnit;
+use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-trait PhpUnitAssertions
+#[CoversClass(MutantExecutionResultBuilder::class)]
+final class MutantExecutionResultBuilderTest extends TestCase
 {
-    private function assertPhpUnitStateIs(
-        PhpUnit $phpUnit,
-        ?string $expectedConfigDir,
-        ?string $expectedExecutablePath,
-    ): void {
-        $this->assertSame($expectedConfigDir, $phpUnit->getConfigDir());
-        $this->assertSame($expectedExecutablePath, $phpUnit->getCustomPath());
+    use MutantExecutionResultAssertions;
+
+    #[DataProvider('executionResultProvider')]
+    public function test_it_can_build_from_existing_result(MutantExecutionResult $result): void
+    {
+        $actual = MutantExecutionResultBuilder::from($result)->build();
+
+        $this->assertResultEquals($result, $actual);
+    }
+
+    public static function executionResultProvider(): iterable
+    {
+        yield 'minimal execution result' => [
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete execution result' => [
+            MutantExecutionResultBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

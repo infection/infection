@@ -33,40 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Tests\Mutation;
 
-use Infection\Configuration\Entry\Source;
+use Infection\Mutation\Mutation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Source::class)]
-final class SourceTest extends TestCase
+#[CoversClass(MutationAssertions::class)]
+final class MutationAssertionsTest extends TestCase
 {
-    use SourceAssertions;
+    #[DataProvider('mutationProvider')]
+    public function test_it_can_compare_mutations(
+        Mutation $left,
+        Mutation $right,
+        bool $expected,
+    ): void {
+        try {
+            MutationAssertions::assertEquals($left, $right);
 
-    #[DataProvider('valuesProvider')]
-    public function test_it_can_be_instantiated(array $directories, array $excludes): void
-    {
-        $source = new Source($directories, $excludes);
-
-        $this->assertSourceStateIs(
-            $source,
-            $directories,
-            $excludes,
-        );
+            if (!$expected) {
+                $this->fail('Expected mutations to not be equal.');
+            }
+        } catch (ExpectationFailedException $failure) {
+            // @phpstan-ignore if.alwaysFalse
+            if ($expected) {
+                throw $failure;
+            }
+        }
     }
 
-    public static function valuesProvider(): iterable
+    public static function mutationProvider(): iterable
     {
-        yield 'minimal' => [
-            [],
-            [],
+        yield 'equal' => [
+            MutationBuilder::withMinimalTestData()->build(),
+            MutationBuilder::withMinimalTestData()->build(),
+            true,
         ];
 
-        yield 'complete' => [
-            ['src', 'lib'],
-            ['fixtures', 'tests'],
+        yield 'not equal' => [
+            MutationBuilder::withMinimalTestData()->build(),
+            MutationBuilder::withCompleteTestData()->build(),
+            false,
         ];
+
+        yield 'equal but different states' => [
+            (static function () {
+                $mutation = MutationBuilder::withCompleteTestData()->build();
+
+                self::fetchLazyState($mutation);
+
+                return $mutation;
+            })(),
+            MutationBuilder::withCompleteTestData()->build(),
+            true,
+        ];
+    }
+
+    private static function fetchLazyState(Mutation $mutation): void
+    {
+        $mutation->getNominalTestExecutionTime();
+        $mutation->getHash();
     }
 }

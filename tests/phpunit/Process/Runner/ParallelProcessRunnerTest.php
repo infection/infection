@@ -39,7 +39,6 @@ use function count;
 use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
@@ -47,6 +46,8 @@ use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
+use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Iterator;
 use function iterator_count;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -168,7 +169,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $mutantProcess = new DummyMutantProcess(
             $process,
-            $this->createMock(Mutant::class),
+            MutantBuilder::withMinimalTestData()->build(),
             $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
             false,
         );
@@ -216,7 +217,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
@@ -305,7 +306,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $mutant = new DummyMutantProcess(
             $process,
-            $this->createMock(Mutant::class),
+            MutantBuilder::withMinimalTestData()->build(),
             $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
             false,
         );
@@ -688,7 +689,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
@@ -745,7 +746,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
@@ -800,7 +801,7 @@ final class ParallelProcessRunnerTest extends TestCase
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             ),
@@ -848,24 +849,21 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        $mutantExecutionResultMock = $this->createMock(MutantExecutionResult::class);
-
-        $mutantExecutionResultMock
-            ->expects($this->once())
-            ->method('getDetectionStatus')
-            ->willReturn(DetectionStatus::ESCAPED);
+        $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::ESCAPED)
+            ->build();
 
         $mutantExecutionResultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $mutantExecutionResultFactoryMock
             ->expects($this->once())
             ->method('createFromProcess')
-            ->willReturn($mutantExecutionResultMock);
+            ->willReturn($mutantExecutionResult);
 
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $phpUnitProcessMock,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $mutantExecutionResultFactoryMock,
                 false,
             ),
@@ -911,7 +909,7 @@ final class ParallelProcessRunnerTest extends TestCase
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 true,
             ),
