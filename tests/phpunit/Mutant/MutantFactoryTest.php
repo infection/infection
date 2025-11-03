@@ -35,15 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\Differ;
+use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantFactory;
-use Infection\Mutation\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\PhpParser\MutatedNode;
-use Infection\Testing\MutatorName;
-use PhpParser\Node;
+use Infection\Tests\Mutation\MutationBuilder;
+use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -86,19 +83,9 @@ final class MutantFactoryTest extends TestCase
 
     public function test_it_creates_a_mutant_instance_from_the_given_mutation(): void
     {
-        $mutation = self::createMutation(
-            [new Node\Stmt\Namespace_(
-                new Node\Name('Acme'),
-                [new Node\Scalar\LNumber(0)],
-            )],
-            [
-                new TestLocation(
-                    'FooTest::test_it_can_instantiate',
-                    '/path/to/acme/FooTest.php',
-                    0.01,
-                ),
-            ],
-        );
+        $mutation = MutationBuilder::withMinimalTestData()
+            ->withOriginalFileContent('original code')
+            ->build();
 
         $expectedMutantFilePath = sprintf(
             '/path/to/tmp/mutant.%s.infection.php',
@@ -119,24 +106,22 @@ final class MutantFactoryTest extends TestCase
             ->willReturn('code diff')
         ;
 
-        $mutant = $this->mutantFactory->create($mutation);
-
-        $this->assertMutantStateIs(
-            $mutant,
+        $expected = new Mutant(
             $expectedMutantFilePath,
             $mutation,
-            'mutated code',
-            'code diff',
-            'original code',
+            now('mutated code'),
+            now('code diff'),
+            now('original code'),
         );
+
+        $mutant = $this->mutantFactory->create($mutation);
+
+        $this->assertMutantEquals($expected, $mutant);
     }
 
     public function test_it_printing_the_original_file_is_memoized(): void
     {
-        $mutation = self::createMutation(
-            [new Node\Stmt\Nop()],
-            [],
-        );
+        $mutation = MutationBuilder::withMinimalTestData()->build();
 
         $this->differMock
             ->expects($this->atLeastOnce())
@@ -149,33 +134,5 @@ final class MutantFactoryTest extends TestCase
 
         $this->mutantFactory->create($mutation)->getPrettyPrintedOriginalCode()->get();
         $this->mutantFactory->create($mutation)->getDiff()->get();
-    }
-
-    /**
-     * @param Node[] $originalNodes
-     * @param TestLocation[] $tests
-     */
-    private static function createMutation(array $originalNodes, array $tests): Mutation
-    {
-        return new Mutation(
-            '/path/to/acme/Foo.php',
-            $originalNodes,
-            Plus::class,
-            MutatorName::getName(Plus::class),
-            [
-                'startLine' => 3,
-                'endLine' => 5,
-                'startTokenPos' => 21,
-                'endTokenPos' => 31,
-                'startFilePos' => 43,
-                'endFilePos' => 53,
-            ],
-            Node\Scalar\LNumber::class,
-            MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-            0,
-            $tests,
-            [],
-            'original code',
-        );
     }
 }

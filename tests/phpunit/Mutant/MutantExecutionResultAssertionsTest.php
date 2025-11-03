@@ -35,41 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutant;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
+use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantAssertions
+#[CoversTrait(MutantExecutionResultAssertions::class)]
+final class MutantExecutionResultAssertionsTest extends TestCase
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
+    use MutantExecutionResultAssertions;
+
+    #[DataProvider('mutantExecutionResultProvider')]
+    public function test_it_can_compare_mutants(
+        MutantExecutionResult $left,
+        MutantExecutionResult $right,
+        bool $expected,
     ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
-        );
+        try {
+            $this->assertResultEquals($left, $right);
+
+            if (!$expected) {
+                $this->fail('Expected mutants to not be equal.');
+            }
+        } catch (ExpectationFailedException $failure) {
+            // @phpstan-ignore if.alwaysFalse
+            if ($expected) {
+                throw $failure;
+            }
+        }
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    public static function mutantExecutionResultProvider(): iterable
+    {
+        yield 'equal' => [
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+            true,
+        ];
+
+        yield 'not equal' => [
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+            MutantExecutionResultBuilder::withCompleteTestData()->build(),
+            false,
+        ];
     }
 }
