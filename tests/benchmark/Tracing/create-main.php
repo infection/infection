@@ -33,18 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\Entry;
+namespace Infection\Benchmark\Tracing;
 
-use Infection\Configuration\Entry\Source;
+use Closure;
+use function function_exists;
+use Infection\Container;
+use Infection\TestFramework\Coverage\Trace;
+use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\NullOutput;
 
-trait SourceAssertions
-{
-    private function assertSourceStateIs(
-        Source $source,
-        array $expectedDirectories,
-        array $expectedExcludes,
-    ): void {
-        $this->assertSame($expectedDirectories, $source->getDirectories());
-        $this->assertSame($expectedExcludes, $source->getExcludes());
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
+    function fetchTraceLazyState(Trace $trace): void
+    {
+        $trace->getSourceFileInfo();
+        $trace->hasTests();
+        $trace->getTests();
     }
 }
+
+/**
+ * @param positive-int $maxCount
+ *
+ * @return Closure():(positive-int|0)
+ */
+return static function (int $maxCount): Closure {
+    $container = Container::create()->withValues(
+        logger: new NullLogger(),
+        output: new NullOutput(),
+        configFile: __DIR__ . '/infection.json5',
+        existingCoveragePath: __DIR__ . '/coverage',
+        useNoopMutators: true,
+    );
+    $traceProvider = $container->getUnionTraceProvider();
+
+    return static function () use ($maxCount, $traceProvider) {
+        $count = 0;
+
+        foreach ($traceProvider->provideTraces() as $trace) {
+            fetchTraceLazyState($trace);
+
+            ++$count;
+
+            if ($count >= $maxCount) {
+                break;
+            }
+        }
+
+        return $count;
+    };
+};

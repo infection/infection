@@ -36,41 +36,29 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\StrykerConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-trait LogsAssertions
+#[CoversClass(LogsBuilder::class)]
+final class LogsBuilderTest extends TestCase
 {
-    private function assertLogsStateIs(
-        Logs $logs,
-        ?string $expectedTextLogFilePath,
-        ?string $expectedHtmlLogFilePath,
-        ?string $expectedSummaryLogFilePath,
-        ?string $expectedJsonLogFilePath,
-        ?string $expectedGitlabLogFilePath,
-        ?string $expectedDebugLogFilePath,
-        ?string $expectedPerMutatorFilePath,
-        bool $expectedUseGitHubAnnotationsLogger,
-        ?StrykerConfig $expectedStrykerConfig,
-        ?string $expectedSummaryJsonLogFilePath,
-    ): void {
-        $this->assertSame($expectedTextLogFilePath, $logs->getTextLogFilePath());
-        $this->assertSame($expectedHtmlLogFilePath, $logs->getHtmlLogFilePath());
-        $this->assertSame($expectedSummaryLogFilePath, $logs->getSummaryLogFilePath());
-        $this->assertSame($expectedJsonLogFilePath, $logs->getJsonLogFilePath());
-        $this->assertSame($expectedGitlabLogFilePath, $logs->getGitlabLogFilePath());
-        $this->assertSame($expectedDebugLogFilePath, $logs->getDebugLogFilePath());
-        $this->assertSame($expectedPerMutatorFilePath, $logs->getPerMutatorFilePath());
-        $this->assertSame($expectedUseGitHubAnnotationsLogger, $logs->getUseGitHubAnnotationsLogger(), 'Use GithubAnnotationLogger is incorrect');
-        $this->assertSame($expectedSummaryJsonLogFilePath, $logs->getSummaryJsonLogFilePath());
+    #[DataProvider('logsProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Logs $logs): void
+    {
+        $actual = LogsBuilder::from($logs)->build();
 
-        $strykerConfig = $logs->getStrykerConfig();
+        $this->assertEquals($logs, $actual);
+    }
 
-        if ($expectedStrykerConfig === null) {
-            $this->assertNull($strykerConfig);
-        } else {
-            $this->assertNotNull($strykerConfig);
+    public static function logsProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            LogsBuilder::withMinimalTestData()->build(),
+        ];
 
-            self::assertEquals($expectedStrykerConfig, $strykerConfig);
-        }
+        yield 'complete test data' => [
+            LogsBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

@@ -37,16 +37,16 @@ namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Configuration\Configuration;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
 use Infection\PhpParser\MutatedNode;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Testing\MutatorName;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,7 +58,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
     #[DataProvider('timeoutDataProvider')]
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -116,30 +116,24 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $eventDispatcher = new EventDispatcherCollector();
 
-        $executionResultMock = $this->createMock(MutantExecutionResult::class);
-        $executionResultMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $executionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
 
         $resultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
-            ->willReturn($executionResultMock)
+            ->willReturn($executionResult)
         ;
 
-        $configurationMock = $this->createMock(Configuration::class);
-        $configurationMock
-            ->method('isDryRun')
-            ->willReturn(false)
-        ;
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withDryRun(false)
+            ->build();
 
         $factory = new MutantProcessContainerFactory(
             $testFrameworkAdapterMock,
             $processFactoryTimeout,
             $resultFactoryMock,
             [],
-            $configurationMock,
+            $configuration,
         );
 
         $mutantProcess = $factory->create($mutant, $testFrameworkExtraOptions);

@@ -33,45 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\Tests\Mutant;
 
-use Generator;
-use Infection\Container;
-use function iterator_to_array;
-use Psr\Log\NullLogger;
-use Symfony\Component\Console\Output\NullOutput;
+use Infection\Mutant\Mutant;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
+#[CoversClass(MutantBuilder::class)]
+final class MutantBuilderTest extends TestCase
+{
+    use MutantAssertions;
 
-$container = Container::create()->withValues(
-    logger: new NullLogger(),
-    output: new NullOutput(),
-    configFile: __DIR__ . '/infection.json5',
-    existingCoveragePath: __DIR__ . '/coverage',
-    useNoopMutators: true,
-);
+    #[DataProvider('mutantBuilder')]
+    public function test_it_can_build_from_existing_mutant(Mutant $mutant): void
+    {
+        $actual = MutantBuilder::from($mutant)->build();
 
-$traceProvider = $container->getUnionTraceProvider();
-
-/**
- * @param positive-int $maxCount
- *
- * @return positive-int|0
- */
-return static function (int $maxCount) use ($traceProvider): int {
-    $count = 0;
-
-    // Iterate over the generator: do not use `iterator_to_array()` which is
-    // less Garbage-Collector friendly.
-    foreach ($traceProvider->provideTraces() as $trace) {
-        ++$count;
-
-        if ($count >= $maxCount) {
-            break;
-        }
-
-        // Continue
+        $this->assertMutantEquals($mutant, $actual);
     }
 
-    return $count;
-};
+    public static function mutantBuilder(): iterable
+    {
+        yield 'minimal mutant' => [
+            MutantBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete mutant' => [
+            MutantBuilder::withCompleteTestData()->build(),
+        ];
+    }
+}
