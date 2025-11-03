@@ -53,9 +53,7 @@ final class MutationGeneratorBench
 
     public function setUp(): void
     {
-        $generateMutations = require __DIR__ . '/generate-mutations-closure.php';
-
-        $this->main = static fn () => $generateMutations(PHP_INT_MAX);
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX);
     }
 
     public function tearDown(): void

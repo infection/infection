@@ -53,9 +53,7 @@ final class TracingBench
 
     public function setUp(): void
     {
-        $provideTraces = require __DIR__ . '/provide-traces-closure.php';
-
-        $this->main = static fn () => $provideTraces(PHP_INT_MAX);
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX);
     }
 
     public function tearDown(): void
