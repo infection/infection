@@ -66,6 +66,7 @@ final class TestLocations
     }
 
     /**
+     * TODO: maybe could be separated for laziness
      * @return array<string, SourceMethodLineRange>
      */
     public function getSourceMethodRangeByMethod(): array

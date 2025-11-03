@@ -33,65 +33,78 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
 
-use function array_merge;
+use Infection\FileSystem\SplFileInfoFactory;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\TraceProviderRegistry;
-use function iterator_to_array;
+use Infection\TestFramework\Tracing\EmptyTrace;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 
 #[CoversClass(TraceProviderRegistry::class)]
-final class UnionTraceProviderTest extends TestCase
+final class TraceProviderRegistryTest extends TestCase
 {
-    public function test_it_provides_traces(): void
-    {
-        $canary = [1, 2, 3];
+    /**
+     * @param TraceProvider $providers
+     * @param Trace[]       $expected
+     */
+    #[DataProvider('traceProvider')]
+    public function test_it_provides_traces(
+        array $providers,
+        array $expected,
+    ): void {
+        $provider = new TraceProviderRegistry(...$providers);
 
-        $coveredTraceProvider = $this->createMock(TraceProvider::class);
-        $coveredTraceProvider
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn($canary)
-        ;
+        $actual = take($provider->provideTraces())->toAssoc();
 
-        $uncoveredTraceProvider = $this->createMock(TraceProvider::class);
-        $uncoveredTraceProvider
-            ->expects($this->never())
-            ->method('provideTraces')
-        ;
-
-        $provider = new TraceProviderRegistry($coveredTraceProvider, $uncoveredTraceProvider, true);
-
-        /** @var array<Trace> $traces */
-        $traces = iterator_to_array($provider->provideTraces(), false);
-        $this->assertSame($canary, $traces);
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_adds_uncovered_traces(): void
+    public static function traceProvider(): iterable
     {
-        $canary = [1, 2, 3];
+        $fileInfo = SplFileInfoFactory::fromPath(__FILE__, __DIR__);
 
-        $coveredTraceProvider = $this->createMock(TraceProvider::class);
-        $coveredTraceProvider
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn($canary)
-        ;
+        $trace1 = new EmptyTrace($fileInfo);
+        $trace2 = new EmptyTrace($fileInfo);
+        $trace3 = new EmptyTrace($fileInfo);
 
-        $uncoveredTraceProvider = $this->createMock(TraceProvider::class);
-        $uncoveredTraceProvider
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn($canary)
-        ;
+        yield 'no provider' => [
+            [],
+            [],
+        ];
 
-        $provider = new TraceProviderRegistry($coveredTraceProvider, $uncoveredTraceProvider, false);
+        yield 'one provider' => [
+            [
+                new DummyTraceProvider([
+                    $trace1,
+                    $trace2,
+                ]),
+            ],
+            [
+                $trace1,
+                $trace2,
+            ],
+        ];
 
-        /** @var array<Trace> $traces */
-        $traces = iterator_to_array($provider->provideTraces(), false);
-        $this->assertSame(array_merge($canary, $canary), $traces);
+        yield 'multiple providers' => [
+            [
+                new DummyTraceProvider([
+                    $trace1,
+                    $trace2,
+                ]),
+                new DummyTraceProvider([
+                    $trace3,
+                ]),
+            ],
+            [
+                $trace1,
+                $trace2,
+                $trace3,
+            ],
+        ];
     }
 }

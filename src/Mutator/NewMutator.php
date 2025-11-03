@@ -33,35 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace App\Mutator;
 
-/**
- * @internal
- */
-final readonly class TraceProviderRegistry implements TraceProvider
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use PhpParser\Node;
+
+class NewMutator implements Mutator
 {
-    /**
-     * @var list<TraceProvider>
-     */
-    private array $providers;
+    public static function getDefinition(): Definition
+    {
+        return new Definition(
+            <<<'TXT'
+                TODO: add description of this mutator here
+                TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+                - TODO: show the source code before mutation
+                + TODO: show the source code after mutation
+                DIFF,
+        );
+    }
 
-    public function __construct(
-        TraceProvider ...$providers,
-    ) {
-        $this->providers = $providers;
+    public function canMutate(Node $node): bool
+    {
+        // TODO: update the logic to decide if this mutator can mutate $node
+        return false;
     }
 
     /**
-     * @return iterable<Trace>
+     * @psalm-mutation-free
+     *
+     * @return iterable<TODO>
      */
-    public function provideTraces(): iterable
+    public function mutate(Node $node): iterable
     {
-        foreach ($this->providers as $provider) {
-            // We cannot use yield from here as otherwise some traces may
-            // be erased due to having the same key.
-            foreach ($provider->provideTraces() as $trace) {
-                yield $trace;
-            }
-        }
+        // TODO: update the logic to return mutated nodes
+        yield $node;
+    }
+
+    public function getName(): string
+    {
+        return self::class;
     }
 }

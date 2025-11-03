@@ -35,8 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\NewCoverage\PHPUnitXml\File;
 
+use function array_filter;
 use function array_map;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use function array_values;
 use function iterator_to_array;
 
 /**
@@ -70,7 +72,7 @@ final class FileReport
      *
      * @return non-empty-list<LineCoverage>
      */
-    public function getCoverage(): array
+    public function getLineCoverage(): array
     {
         return array_map(
             LineCoverage::fromNode(...),
@@ -78,6 +80,44 @@ final class FileReport
                 $this->getXPath()->queryList('//coverage:coverage//coverage:line'),
             ),
         );
+    }
+
+    /**
+     * @return list<MethodLineRange>
+     */
+    public function getCoveredSourceMethodLineRanges(): array
+    {
+        return array_values(
+            array_filter(
+                array_map(
+                    MethodLineRange::tryFromNode(...),
+                    iterator_to_array(
+                        $this->getSourceMethodNodes(),
+                    ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * If the declaring file is a class with methods, it will contain the node `class.method[n]`.
+     * If it is a trait, it will be `trait.method[n]` instead.
+     *
+     * @return iterable
+     */
+    private function getSourceMethodNodes(): iterable
+    {
+        $count = 0;
+
+        foreach ($this->getXPath()->queryList('//coverage:class//coverage:method') as $node) {
+            $count++;
+
+            yield $node;
+        }
+
+        if ($count === 0) {
+            yield from $this->getXPath()->queryList('//coverage:trait//coverage:method');
+        }
     }
 
     private function getXPath(): SafeDOMXPath

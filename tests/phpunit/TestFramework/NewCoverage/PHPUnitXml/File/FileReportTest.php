@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\NewCoverage\PHPUnitXml\File;
 
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\MethodLineRange;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +52,7 @@ final class FileReportTest extends TestCase
      * @param non-empty-list<LineCoverage> $expected
      */
     #[DataProvider('coverageProvider')]
-    public function test_it_can_tell_if_a_source_file_has_tests(
+    public function test_it_collect_the_line_coverage_data(
         string $xmlPathname,
         array $expected,
     ): void {
@@ -59,7 +60,7 @@ final class FileReportTest extends TestCase
             Path::canonicalize($xmlPathname),
         );
 
-        $actual = $report->getCoverage();
+        $actual = $report->getLineCoverage();
 
         $this->assertEquals($expected, $actual);
     }
@@ -117,17 +118,100 @@ final class FileReportTest extends TestCase
         ];
     }
 
+    /**
+     * @param list<MethodLineRange> $expected
+     */
+    #[DataProvider('methodLineRangeProvider')]
+    public function test_it_collect_the_source_method_line_ranges(
+        string $xmlPathname,
+        array $expected,
+    ): void {
+        $report = new FileReport(
+            Path::canonicalize($xmlPathname),
+        );
+
+        $actual = $report->getCoveredSourceMethodLineRanges();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function methodLineRangeProvider(): iterable
+    {
+        yield 'class with a single covered method' => [
+            self::FIXTURE_DIR . '/MemoizedCiDetector.php.xml',
+            [
+                new MethodLineRange(
+                    'detectCurrentCiServer',
+            54,
+                    61,
+                ),
+            ],
+        ];
+
+        yield 'class with multiple covered methods and some not covered' => [
+            self::FIXTURE_DIR . '/Str.php.xml',
+            [
+                new MethodLineRange(
+                    'trimLineReturns',
+                    54,
+                    92,
+                ),
+                new MethodLineRange(
+                    'halfCoveredMethod',
+                    94,
+                    100,
+                ),
+                new MethodLineRange(
+                    'almostNotCoveredMethod',
+                    94,
+                    100,
+                ),
+            ],
+        ];
+
+        yield 'trait with multiple covered methods and some not covered' => [
+            self::FIXTURE_DIR . '/StrTrait.php.xml',
+            [
+                new MethodLineRange(
+                    'trimLineReturns',
+                    54,
+                    92,
+                ),
+                new MethodLineRange(
+                    'halfCoveredMethod',
+                    94,
+                    100,
+                ),
+                new MethodLineRange(
+                    'almostNotCoveredMethod',
+                    94,
+                    100,
+                ),
+            ],
+        ];
+    }
+
     // This is because we use to construct a Trace, hence we what should be
-    // memoized is the end result. Otherwise, we are just bloating the memory
+    // memoized are the end-result. Otherwise, we are just bloating the memory
     // unnecessarily.
     public function test_the_information_is_not_memoized(): void
     {
         $report = new FileReport(self::FIXTURE_DIR . '/MemoizedCiDetector.php.xml');
 
-        $coverage1 = $report->getCoverage();
-        $coverage2 = $report->getCoverage();
+        $lineCoverage1 = $report->getLineCoverage();
+        $lineCoverage2 = $report->getLineCoverage();
 
-        $this->assertEquals($coverage1, $coverage2);
-        $this->assertNotSame($coverage1, $coverage2);
+        $this->assertEqualButNotSame($lineCoverage1, $lineCoverage2);
+
+        $sourceMethodLineRange1 = $report->getCoveredSourceMethodLineRanges();
+        $sourceMethodLineRange2 = $report->getCoveredSourceMethodLineRanges();
+
+        $this->assertEqualButNotSame($sourceMethodLineRange1, $sourceMethodLineRange2);
+    }
+
+    private function assertEqualButNotSame(mixed $expected, mixed $actual): void
+    {
+        $this->assertEquals($expected, $actual);
+        $this->assertNotSame($expected, $actual);
     }
 }

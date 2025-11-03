@@ -43,14 +43,21 @@ use Infection\TestFramework\NewCoverage\JUnit\JUnitReport;
 use Infection\TestFramework\NewCoverage\JUnit\TestInfo;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\File\LineCoverage;
+use Infection\TestFramework\NewCoverage\PHPUnitXml\File\MethodLineRange;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use function array_key_exists;
 
 final class PHPUnitXmlReport
 {
     private readonly JUnitReport $jUnitReport;
 
     private readonly IndexReport $indexReport;
+
+    /**
+     * @var array<string, FileReport>
+     */
+    private array $fileReports = [];
 
     /**
      * @param Closure():IndexReport $getIndexReport
@@ -88,9 +95,17 @@ final class PHPUnitXmlReport
      *
      * @return non-empty-list<LineCoverage>
      */
-    public function getCoverage(string $coveragePathname): array
+    public function getLineCoverage(string $coveragePathname): array
     {
-        return (new FileReport($coveragePathname))->getCoverage();
+        return $this->getFileReport($coveragePathname)->getLineCoverage();
+    }
+
+    /**
+     * @return list<MethodLineRange>
+     */
+    public function getCoveredSourceMethodLineRanges(string $coveragePathname): array
+    {
+        return $this->getFileReport($coveragePathname)->getCoveredSourceMethodLineRanges();
     }
 
     /**
@@ -128,5 +143,15 @@ final class PHPUnitXmlReport
         }
 
         return $this->indexReport;
+    }
+
+    private function getFileReport(string $coveragePathname): FileReport
+    {
+        if (!array_key_exists($coveragePathname, $this->fileReports)) {
+            $this->fileReports[$coveragePathname] = new FileReport($coveragePathname);
+        }
+
+        // TODO: may need to clean them up for memory efficiency
+        return $this->fileReports[$coveragePathname];
     }
 }

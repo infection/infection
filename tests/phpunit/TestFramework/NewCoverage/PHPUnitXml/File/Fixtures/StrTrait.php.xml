@@ -9,7 +9,7 @@
             <classes count="1" tested="0" percent="0.00"/>
             <traits count="0" tested="0" percent="0"/>
         </totals>
-        <class name="Infection\Str" start="50" executable="22" executed="20" crap="6.03">
+        <trait name="Infection\Str" start="50" executable="22" executed="20" crap="6.03">
             <namespace name="Infection"/>
             <method name="trimLineReturns" signature="trimLineReturns(string $string): string"
                     start="54" end="92" crap="5" executable="20" executed="20" coverage="100"/>
@@ -19,7 +19,7 @@
                     start="94" end="100" crap="2" executable="2" executed="0" coverage="50"/>
             <method name="almostNotCoveredMethod" signature="almostNotCoveredMethod(string $string): string"
                     start="94" end="100" crap="2" executable="2" executed="0" coverage="0.12"/>
-        </class>
+        </trait>
         <coverage>
             <line nr="56">
                 <covered

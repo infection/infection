@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
+use function array_map;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -74,26 +76,75 @@ final class PHPUnitCoverageTracer
 
     private function createTestLocations(SourceFileIndexXmlInfo $fileInfo): TestLocations
     {
-        $coverage = $this->getReport()->getCoverage($fileInfo->coveragePathname);
+        $linesCoverage = $this->getReport()->getLineCoverage($fileInfo->coveragePathname);
 
         $lines = [];
 
-        foreach ($coverage as $item) {
-            foreach ($item->coveredBy as $test) {
-                $testCaseClassName = explode('::', $test, 2)[0];
-                $testInfo = $this->getReport()->getTestInfo($testCaseClassName);
-
-                $lines[$item->lineNumber][] = new TestLocation(
-                    $test,
-                    $testInfo->location,
-                    $testInfo->executionTime,
-                );
-            }
+        foreach ($linesCoverage as $lineCoverage) {
+            $lines[$lineCoverage->lineNumber] = array_map(
+                $this->createTestLocation(...),
+                $lineCoverage->coveredBy,
+            );
         }
 
         return new TestLocations(
-            $lines,
-            [],
+            $this->createTestLocationsByLine($fileInfo),
+            $this->createCoveredSourceMethodLineRangesByMethodName($fileInfo),
+        );
+    }
+
+    /**
+     * @param SourceFileIndexXmlInfo $fileInfo
+     *
+     * @return array<int, list<TestLocation>>
+     */
+    private function createTestLocationsByLine(SourceFileIndexXmlInfo $fileInfo): array
+    {
+        $linesCoverage = $this->getReport()->getLineCoverage($fileInfo->coveragePathname);
+
+        $lines = [];
+
+        foreach ($linesCoverage as $lineCoverage) {
+            $lines[$lineCoverage->lineNumber] = array_map(
+                $this->createTestLocation(...),
+                $lineCoverage->coveredBy,
+            );
+        }
+
+        return $lines;
+    }
+
+    /**
+     * @param SourceFileIndexXmlInfo $fileInfo
+     *
+     * @return array<string, SourceMethodLineRange>
+     */
+    private function createCoveredSourceMethodLineRangesByMethodName(SourceFileIndexXmlInfo $fileInfo): array
+    {
+        // TODO: to double check here... This is a bit inefficient as we could easily achieve the final form from the get go.
+        $methodLineRanges = $this->getReport()->getCoveredSourceMethodLineRanges($fileInfo->coveragePathname);
+
+        $indexedMethodLineRanges = [];
+
+        foreach ($methodLineRanges as $methodRange) {
+            $indexedMethodLineRanges[$methodRange->methodName] = new SourceMethodLineRange(
+                $methodRange->startLine,
+                $methodRange->endLine,
+            );
+        }
+
+        return $indexedMethodLineRanges;
+    }
+
+    private function createTestLocation(string $test): TestLocation
+    {
+        $testCaseClassName = explode('::', $test, 2)[0];
+        $testInfo = $this->getReport()->getTestInfo($testCaseClassName);
+
+         return new TestLocation(
+            $test,
+            $testInfo->location,
+            $testInfo->executionTime,
         );
     }
 

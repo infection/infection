@@ -33,18 +33,49 @@
 
 declare(strict_types=1);
 
-namespace newSrc\TestFramework\Coverage\JUnit;
+namespace App\Mutator;
 
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use PhpParser\Node;
 
-/**
- * TODO: heavily inspired from IndexXmlCoverageParser
- * @see IndexXmlCoverageParser
- */
-final class FileReportParser
+class CustomMutator implements Mutator
 {
-    public function parse(string $fileName): PHPUnitXmlReport
+    public static function getDefinition(): Definition
     {
-        // TODO: the implementation need to be lazy and streamed.
+        return new Definition(
+            <<<'TXT'
+                TODO: add description of this mutator here
+                TXT
+            ,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+                - TODO: show the source code before mutation
+                + TODO: show the source code after mutation
+                DIFF,
+        );
+    }
+
+    public function canMutate(Node $node): bool
+    {
+        // TODO: update the logic to decide if this mutator can mutate $node
+        return false;
+    }
+
+    /**
+     * @psalm-mutation-free
+     *
+     * @return iterable<TODO>
+     */
+    public function mutate(Node $node): iterable
+    {
+        // TODO: update the logic to return mutated nodes
+        yield $node;
+    }
+
+    public function getName(): string
+    {
+        return self::class;
     }
 }
