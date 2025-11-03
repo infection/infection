@@ -39,7 +39,7 @@ jobs:
   benchmarks:
       runs-on: ubuntu-latest
       timeout-minutes: 30
-      name: 'Tests'
+      name: 'Benchmarks'
       steps:
           - name: Checkout code
             uses: actions/checkout@v4
