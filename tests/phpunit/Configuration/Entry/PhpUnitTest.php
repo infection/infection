@@ -37,25 +37,60 @@ namespace Infection\Tests\Configuration\Entry;
 
 use Infection\Configuration\Entry\PhpUnit;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PhpUnit::class)]
 final class PhpUnitTest extends TestCase
 {
-    public function test_it_can_change_its_configuration_dir(): void
+    #[DataProvider('basePathProvider')]
+    public function test_it_can_create_a_new_instance_with_absolute_paths(
+        PhpUnit $phpunit,
+        string $basePath,
+        PhpUnit $expected,
+    ): void {
+        $originalPhpunit = clone $phpunit;
+
+        $actual = $phpunit->withAbsolutePaths($basePath);
+
+        $this->assertEquals($expected, $actual);
+        // Sanity check
+        $this->assertEquals($originalPhpunit, $phpunit);
+    }
+
+    public static function basePathProvider(): iterable
     {
-        $phpUnit = new PhpUnit(
-            '/path/to/phpunit-config',
-            '/path/to/phpunit',
-        );
+        yield 'minimal' => [
+            new PhpUnit(null, null),
+            '/path/to/project',
+            new PhpUnit(
+                '/path/to/project',
+                null,
+            ),
+        ];
 
-        $phpUnit->withConfigDir('/path/to/another-phpunit-config');
+        yield 'both paths are relative' => [
+            new PhpUnit(
+                'devTools/phpunit',
+                'devTools/phpunit/bin/phpunit',
+            ),
+            '/path/to/project',
+            new PhpUnit(
+                '/path/to/project/devTools/phpunit',
+                '/path/to/project/devTools/phpunit/bin/phpunit',
+            ),
+        ];
 
-        $expected = new PhpUnit(
-            '/path/to/another-phpunit-config',
-            '/path/to/phpunit',
-        );
-
-        $this->assertEquals($expected, $phpUnit);
+        yield 'both paths are absolute' => [
+            new PhpUnit(
+                '/path/to/another-project/devTools/phpunit',
+                '/path/to/another-project/devTools/phpunit/bin/phpunit',
+            ),
+            '/path/to/project',
+            new PhpUnit(
+                '/path/to/another-project/devTools/phpunit',
+                '/path/to/another-project/devTools/phpunit/bin/phpunit',
+            ),
+        ];
     }
 }

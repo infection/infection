@@ -46,8 +46,9 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
+ * @final
  */
-final class MutantExecutionResult
+class MutantExecutionResult
 {
     private readonly string $mutatorClass;
 

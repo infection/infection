@@ -33,40 +33,13 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:tests/phpunit/Configuration/Schema/SchemaConfigurationBuilderTest.php
-namespace Infection\Tests\Configuration\Schema;
-
-use Infection\Configuration\Schema\SchemaConfiguration;
-========
 namespace Infection\Tests\Mutation;
 
 use Infection\Mutation\Mutation;
->>>>>>>> upstream/master:tests/phpunit/Mutation/MutationBuilderTest.php
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-<<<<<<<< HEAD:tests/phpunit/Configuration/Schema/SchemaConfigurationBuilderTest.php
-#[CoversClass(SchemaConfigurationBuilder::class)]
-final class SchemaConfigurationBuilderTest extends TestCase
-{
-    #[DataProvider('configurationProvider')]
-    public function test_it_can_create_a_builder_from_a_built_instance(SchemaConfiguration $configuration): void
-    {
-        $actual = SchemaConfigurationBuilder::from($configuration)->build();
-
-        $this->assertEquals($configuration, $actual);
-    }
-
-    public static function configurationProvider(): iterable
-    {
-        yield 'minimal test data' => [
-            SchemaConfigurationBuilder::withMinimalTestData()->build(),
-        ];
-
-        yield 'complete test data' => [
-            SchemaConfigurationBuilder::withCompleteTestData()->build(),
-========
 #[CoversClass(MutationBuilder::class)]
 final class MutationBuilderTest extends TestCase
 {
@@ -86,7 +59,6 @@ final class MutationBuilderTest extends TestCase
 
         yield 'complete test data' => [
             MutationBuilder::withCompleteTestData()->build(),
->>>>>>>> upstream/master:tests/phpunit/Mutation/MutationBuilderTest.php
         ];
     }
 }

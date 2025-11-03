@@ -41,8 +41,9 @@ use Later\Interfaces\Deferred;
 
 /**
  * @internal
+ * @final
  */
-final class Mutant
+class Mutant
 {
     /**
      * @param Deferred<string> $mutatedCode
