@@ -1378,8 +1378,8 @@ final class ConfigurationFactoryTest extends TestCase
                                 ->build(),
                         )
                         ->withTmpDir('config/tmp')
-                        ->withPhpUnit(new PhpUnit('config/phpunit-dir', 'config/phpunit'))
-                        ->withPhpStan(new PhpStan('config/phpstan-dir', 'bin/phpstan'))
+                        ->withPhpUnit(new PhpUnit('config/phpunit-dir', '/path/to/config/phpunit'))
+                        ->withPhpStan(new PhpStan('config/phpstan-dir', '/path/to/bin/phpstan'))
                         ->withMutators(['@default' => true])
                         ->withTestFramework('phpunit')
                         ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
@@ -1447,8 +1447,8 @@ final class ConfigurationFactoryTest extends TestCase
                     )
                     ->withLogVerbosity(LogVerbosity::NONE)
                     ->withTmpDir('/path/to/config/tmp/infection')
-                    ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', 'config/phpunit'))
-                    ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', 'bin/phpstan'))
+                    ->withPhpUnit(new PhpUnit('/path/to/config/phpunit-dir', '/path/to/config/phpunit'))
+                    ->withPhpStan(new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'))
                     ->withMutators([
                         'TrueValue' => new TrueValue(new TrueValueConfig([])),
                     ])
@@ -1461,7 +1461,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withCoveragePath('/path/to/dist/coverage')
                     ->withSkipCoverage(true)
                     ->withDebug(true)
-                    ->withWithUncovered(true)
+                    ->withUncovered(true)
                     ->withNoProgress(true)
                     ->withIgnoreMsiWithNoMutations(true)
                     ->withMinMsi(72.3)
