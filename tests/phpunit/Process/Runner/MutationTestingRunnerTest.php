@@ -45,6 +45,7 @@ use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
@@ -127,7 +128,6 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             $this->diffSourceCodeMatcher,
-            false,
             self::TIMEOUT,
             [],
         );
@@ -144,7 +144,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->with($this->emptyIterable())
         ;
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, false);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -220,7 +221,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->with($this->iterableContaining([$process0, $process1]))
         ;
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, false);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $ignoredMutantCount = 2;
 
@@ -303,13 +305,13 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             $this->diffSourceCodeMatcher,
-            false,
             self::TIMEOUT,
             [],
             'fd952823181329ed33260b45eb3aa956', // mutation with index 0
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, false);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -384,12 +386,12 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
-            true,
             100.0,
             [],
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, true);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -446,14 +448,14 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
-            true,
             100.0,
             [
                 'For_' => ['Assert::.*'],
             ],
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, true);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -511,7 +513,6 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
-            true,
             100.0,
             [
                 'For_' => ['Assert::.*'],
@@ -519,7 +520,8 @@ final class MutationTestingRunnerTest extends TestCase
             'mutant-id-1',
         );
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, true);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [
@@ -544,7 +546,6 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             $this->diffSourceCodeMatcher,
-            true,
             100.0,
             [
                 'For_' => ['Assert::.*'],
@@ -591,12 +592,12 @@ final class MutationTestingRunnerTest extends TestCase
             $this->eventDispatcher,
             $this->fileSystemMock,
             new DiffSourceCodeMatcher(),
-            true,
             100.0,
             [],
         );
 
-        $this->runner->run($mutations, '');
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, true);
+        $this->runner->run($mutations, $numberOfMutants, '');
     }
 
     public function test_it_dispatches_events_even_when_no_mutations_is_given(): void
@@ -620,7 +621,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->with($this->emptyIterable())
         ;
 
-        $this->runner->run($mutations, $testFrameworkExtraOptions);
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, true);
+        $this->runner->run($mutations, $numberOfMutants, $testFrameworkExtraOptions);
 
         $this->assertAreSameEvents(
             [

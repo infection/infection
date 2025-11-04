@@ -44,6 +44,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
+use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
@@ -89,19 +90,24 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $initialTestSuiteOutput = $this->runInitialTestSuite();
-        $this->runInitialStaticAnalysis();
+        $mutations = $this->runMutationGeneration();
+        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->config->noProgress());
 
-        /*
-         * Limit the memory used for the mutation processes based on the memory
-         * used for the initial test run.
-         * This is done AFTER static analysis to avoid restricting PHPStan's memory.
-         */
-        if ($initialTestSuiteOutput !== null) {
-            $this->memoryLimiter->limitMemory($initialTestSuiteOutput, $this->adapter);
+        if ($numberOfMutants > 0) {
+            $initialTestSuiteOutput = $this->runInitialTestSuite();
+            $this->runInitialStaticAnalysis();
+
+            /*
+             * Limit the memory used for the mutation processes based on the memory
+             * used for the initial test run.
+             * This is done AFTER static analysis to avoid restricting PHPStan's memory.
+             */
+            if ($initialTestSuiteOutput !== null) {
+                $this->memoryLimiter->limitMemory($initialTestSuiteOutput, $this->adapter);
+            }
+
+            $this->runMutationAnalysis($mutations, $numberOfMutants);
         }
-
-        $this->runMutationAnalysis();
 
         try {
             $this->minMsiChecker->checkMetrics(
@@ -186,15 +192,25 @@ final readonly class Engine
         return explode(' ', (string) $this->config->getInitialTestsPhpOptions());
     }
 
-    private function runMutationAnalysis(): void
+    /**
+     * @return iterable<Mutation>
+     */
+    private function runMutationGeneration(): iterable
     {
-        $mutations = $this->mutationGenerator->generate(
+        return $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
             $this->getNodeIgnorers(),
         );
+    }
 
+    /**
+     * @param iterable<Mutation> $mutations
+     */
+    private function runMutationAnalysis(iterable $mutations, int $numberOfMutations): void
+    {
         $this->mutationTestingRunner->run(
             $mutations,
+            $numberOfMutations,
             $this->getFilteredExtraOptionsForMutant(),
         );
     }
