@@ -42,6 +42,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
+use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
@@ -149,6 +150,7 @@ final class ProjectCodeProvider
      * For example, test cases that are in a child directory.
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+        ConfigurationFactory::class,
         FilterBuilder::class,
         SourceFileCollector::class,
         EnumBucket::class,
