@@ -45,7 +45,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
-use PhpParser\Node;
 
 final class ConfigurationFactoryScenario
 {
@@ -522,7 +521,7 @@ final class ConfigurationFactoryScenario
 
     /**
      * @param array<string, mixed> $configMutators
-     * @param array<string, \Infection\Mutator\Mutator> $expectedMutators
+     * @param array<string, Mutator> $expectedMutators
      * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     public function forValueForMutators(
