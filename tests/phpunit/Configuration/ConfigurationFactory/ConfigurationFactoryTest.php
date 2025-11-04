@@ -295,33 +295,16 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'minimal' => [$defaultScenario];
 
-        yield 'null html file log path with existing path from config file' => [
-            $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                ->withLogs(
-                    $defaultLogsBuilder
-                    ->withHtmlLogFilePath('/from-config.html')
-                    ->build(),
-                )
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withLogs(
-                        $defaultLogsBuilder
-                            ->withHtmlLogFilePath('/from-config.html')
-                            ->build(),
-                    )
-                ->build(),
+        yield 'null html file log path' => [
+            $defaultScenario->forValueForHtmlLogFilePath(
+                '/path/to/from-config.html',
+                null,
+                '/path/to/from-config.html',
             ),
         ];
 
         yield 'absolute html file log path' => [
-            self::createValueForHtmlLogFilePath(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForHtmlLogFilePath(
                 '/path/to/from-config.html',
                 null,
                 '/path/to/from-config.html',
@@ -329,11 +312,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'relative html file log path' => [
-            self::createValueForHtmlLogFilePath(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForHtmlLogFilePath(
                 'relative/path/to/from-config.html',
                 null,
                 '/path/to/relative/path/to/from-config.html',
@@ -341,11 +320,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'override html file log path from CLI option with existing path from config file' => [
-            self::createValueForHtmlLogFilePath(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForHtmlLogFilePath(
                 '/from-config.html',
                 '/from-cli.html',
                 '/from-cli.html',
@@ -353,11 +328,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'set html file log path from CLI option when config file has no setting' => [
-            self::createValueForHtmlLogFilePath(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForHtmlLogFilePath(
                 null,
                 '/from-cli.html',
                 '/from-cli.html',
@@ -365,11 +336,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'null html file log path in config and CLI' => [
-            self::createValueForHtmlLogFilePath(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForHtmlLogFilePath(
                 null,
                 null,
                 null,
@@ -431,69 +398,49 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'null timeout' => [
-            self::createValueForTimeout(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTimeout(
                 null,
                 10,
             ),
         ];
 
         yield 'config timeout' => [
-            self::createValueForTimeout(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTimeout(
                 20,
                 20,
             ),
         ];
 
         yield 'null tmp dir' => [
-            self::createValueForTmpDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTmpDir(
                 null,
                 sys_get_temp_dir() . '/infection',
             ),
         ];
 
         yield 'empty tmp dir' => [
-            self::createValueForTmpDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTmpDir(
                 '',
                 sys_get_temp_dir() . '/infection',
             ),
         ];
 
         yield 'relative tmp dir path' => [
-            self::createValueForTmpDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTmpDir(
                 'relative/path/to/tmp',
                 '/path/to/relative/path/to/tmp/infection',
             ),
         ];
 
         yield 'absolute tmp dir path' => [
-            self::createValueForTmpDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTmpDir(
                 '/absolute/path/to/tmp',
                 '/absolute/path/to/tmp/infection',
             ),
         ];
 
         yield 'no existing base path for code coverage' => [
-            self::createValueForCoveragePath(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForCoveragePath(
                 null,
                 false,
                 sys_get_temp_dir() . '/infection',
@@ -501,9 +448,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'absolute base path for code coverage' => [
-            self::createValueForCoveragePath(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForCoveragePath(
                 '/path/to/coverage',
                 true,
                 '/path/to/coverage',
@@ -511,9 +456,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'relative base path for code coverage' => [
-            self::createValueForCoveragePath(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForCoveragePath(
                 'relative/path/to/coverage',
                 true,
                 '/path/to/relative/path/to/coverage',
@@ -521,39 +464,28 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'no PHPUnit config dir' => [
-            self::createValueForPhpUnitConfigDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForPhpUnitConfigDir(
                 'relative/path/to/phpunit/config',
                 '/path/to/relative/path/to/phpunit/config',
             ),
         ];
 
         yield 'relative PHPUnit config dir' => [
-            self::createValueForPhpUnitConfigDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForPhpUnitConfigDir(
                 'relative/path/to/phpunit/config',
                 '/path/to/relative/path/to/phpunit/config',
             ),
         ];
 
         yield 'absolute PHPUnit config dir' => [
-            self::createValueForPhpUnitConfigDir(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForPhpUnitConfigDir(
                 '/path/to/phpunit/config',
                 '/path/to/phpunit/config',
             ),
         ];
 
         yield 'progress in non-CI environment' => [
-            self::createValueForNoProgress(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForNoProgress(
                 false,
                 false,
                 false,
@@ -561,9 +493,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'progress in CI environment' => [
-            self::createValueForNoProgress(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForNoProgress(
                 true,
                 false,
                 true,
@@ -571,9 +501,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'no progress in non-CI environment' => [
-            self::createValueForNoProgress(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForNoProgress(
                 false,
                 true,
                 true,
@@ -581,9 +509,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'no progress in CI environment' => [
-            self::createValueForNoProgress(
-                $defaultScenario,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForNoProgress(
                 true,
                 true,
                 true,
@@ -591,10 +517,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'Github Actions annotation disabled, not logged in non-Github Actions environment' => [
-            self::createValueForGithubActionsDetected(
-                $defaultScenario,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGithubActionsDetected(
                 false,
                 false,
                 false,
@@ -602,10 +525,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'Github Actions annotation disabled, not logged in Github Actions environment' => [
-            self::createValueForGithubActionsDetected(
-                $defaultScenario,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGithubActionsDetected(
                 false,
                 true,
                 false,
@@ -613,10 +533,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'Github Actions annotation not provided, not logged in non-Github Actions environment' => [
-            self::createValueForGithubActionsDetected(
-                $defaultScenario,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGithubActionsDetected(
                 null,
                 false,
                 false,
@@ -624,10 +541,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'Github Actions annotation not provided, logged in Github Actions environment' => [
-            self::createValueForGithubActionsDetected(
-                $defaultScenario,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGithubActionsDetected(
                 null,
                 true,
                 true,
@@ -635,10 +549,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'Github Actions annotation enabled, logged in non-Github Actions environment' => [
-            self::createValueForGithubActionsDetected(
-                $defaultScenario,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGithubActionsDetected(
                 true,
                 false,
                 true,
@@ -646,10 +557,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'Github Actions annotation enabled, logged in Github Actions environment' => [
-            self::createValueForGithubActionsDetected(
-                $defaultScenario,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGithubActionsDetected(
                 true,
                 true,
                 true,
@@ -657,11 +565,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'null GitLab file log path with existing path from config file' => [
-            self::createValueForGitlabLogger(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGitlabLogger(
                 '/from-config.json',
                 null,
                 '/from-config.json',
@@ -669,11 +573,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'absolute GitLab file log path' => [
-            self::createValueForGitlabLogger(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGitlabLogger(
                 '/path/to/from-config.json',
                 null,
                 '/path/to/from-config.json',
@@ -681,11 +581,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'relative GitLab file log path' => [
-            self::createValueForGitlabLogger(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGitlabLogger(
                 'relative/path/to/from-config.json',
                 null,
                 '/path/to/relative/path/to/from-config.json',
@@ -693,11 +589,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'override GitLab file log path from CLI option with existing path from config file' => [
-            self::createValueForGitlabLogger(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGitlabLogger(
                 '/from-config.json',
                 '/from-cli.json',
                 '/from-cli.json',
@@ -705,11 +597,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'set GitLab file log path from CLI option when config file has no setting' => [
-            self::createValueForGitlabLogger(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGitlabLogger(
                 null,
                 '/from-cli.json',
                 '/from-cli.json',
@@ -717,11 +605,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'null GitLab file log path in config and CLI' => [
-            self::createValueForGitlabLogger(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultLogsBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForGitlabLogger(
                 null,
                 null,
                 null,
@@ -729,10 +613,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignoreMsiWithNoMutations not specified in schema and true in input' => [
-            self::createValueForIgnoreMsiWithNoMutations(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreMsiWithNoMutations(
                 null,
                 true,
                 true,
@@ -740,10 +621,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignoreMsiWithNoMutations not specified in schema and false in input' => [
-            self::createValueForIgnoreMsiWithNoMutations(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreMsiWithNoMutations(
                 null,
                 false,
                 false,
@@ -751,10 +629,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignoreMsiWithNoMutations true in schema and not specified in input' => [
-            self::createValueForIgnoreMsiWithNoMutations(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreMsiWithNoMutations(
                 true,
                 null,
                 true,
@@ -762,10 +637,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignoreMsiWithNoMutations false in schema and not specified in input' => [
-            self::createValueForIgnoreMsiWithNoMutations(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreMsiWithNoMutations(
                 false,
                 null,
                 false,
@@ -773,10 +645,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignoreMsiWithNoMutations true in schema and false in input' => [
-            self::createValueForIgnoreMsiWithNoMutations(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreMsiWithNoMutations(
                 true,
                 false,
                 false,
@@ -784,10 +653,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignoreMsiWithNoMutations false in schema and true in input' => [
-            self::createValueForIgnoreMsiWithNoMutations(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreMsiWithNoMutations(
                 false,
                 true,
                 true,
@@ -795,10 +661,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minMsi not specified in schema and not specified in input' => [
-            self::createValueForMinMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinMsi(
                 null,
                 null,
                 null,
@@ -806,10 +669,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minMsi specified in schema and not specified in input' => [
-            self::createValueForMinMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinMsi(
                 33.3,
                 null,
                 33.3,
@@ -817,10 +677,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minMsi not specified in schema and specified in input' => [
-            self::createValueForMinMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinMsi(
                 null,
                 21.2,
                 21.2,
@@ -828,10 +685,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minMsi specified in schema and specified in input' => [
-            self::createValueForMinMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinMsi(
                 33.3,
                 21.2,
                 21.2,
@@ -839,10 +693,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minCoveredMsi not specified in schema and not specified in input' => [
-            self::createValueForMinCoveredMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinCoveredMsi(
                 null,
                 null,
                 null,
@@ -850,10 +701,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minCoveredMsi specified in schema and not specified in input' => [
-            self::createValueForMinCoveredMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinCoveredMsi(
                 33.3,
                 null,
                 33.3,
@@ -861,10 +709,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minCoveredMsi not specified in schema and specified in input' => [
-            self::createValueForMinCoveredMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinCoveredMsi(
                 null,
                 21.2,
                 21.2,
@@ -872,10 +717,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'minCoveredMsi specified in schema and specified in input' => [
-            self::createValueForMinCoveredMsi(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMinCoveredMsi(
                 33.3,
                 21.2,
                 21.2,
@@ -883,10 +725,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'no static analysis tool' => [
-            self::createValueForStaticAnalysisTool(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisTool(
                 null,
                 null,
                 null,
@@ -894,10 +733,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'static analysis tool from config' => [
-            self::createValueForStaticAnalysisTool(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisTool(
                 'phpstan',
                 null,
                 'phpstan',
@@ -905,10 +741,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'static analysis tool from input' => [
-            self::createValueForStaticAnalysisTool(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisTool(
                 null,
                 'phpstan',
                 'phpstan',
@@ -916,10 +749,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'static analysis tool from config & input' => [
-            self::createValueForStaticAnalysisTool(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisTool(
                 'phpstan',
                 'phpstan',
                 'phpstan',
@@ -927,10 +757,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'no test framework' => [
-            self::createValueForTestFramework(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFramework(
                 null,
                 null,
                 'phpunit',
@@ -939,10 +766,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework from config' => [
-            self::createValueForTestFramework(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFramework(
                 'phpspec',
                 null,
                 'phpspec',
@@ -951,10 +775,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework from input' => [
-            self::createValueForTestFramework(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFramework(
                 null,
                 'phpspec',
                 'phpspec',
@@ -963,10 +784,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework from config & input' => [
-            self::createValueForTestFramework(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFramework(
                 'phpunit',
                 'phpspec',
                 'phpspec',
@@ -975,10 +793,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test no test PHP options' => [
-            self::createValueForInitialTestsPhpOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForInitialTestsPhpOptions(
                 null,
                 null,
                 null,
@@ -986,10 +801,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test test PHP options from config' => [
-            self::createValueForInitialTestsPhpOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForInitialTestsPhpOptions(
                 '-d zend_extension=xdebug.so',
                 null,
                 '-d zend_extension=xdebug.so',
@@ -997,10 +809,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test test PHP options from input' => [
-            self::createValueForInitialTestsPhpOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForInitialTestsPhpOptions(
                 null,
                 '-d zend_extension=xdebug.so',
                 '-d zend_extension=xdebug.so',
@@ -1008,10 +817,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test test PHP options from config & input' => [
-            self::createValueForInitialTestsPhpOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForInitialTestsPhpOptions(
                 '-d zend_extension=another_xdebug.so',
                 '-d zend_extension=xdebug.so',
                 '-d zend_extension=xdebug.so',
@@ -1019,10 +825,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test no framework PHP options' => [
-            self::createValueForTestFrameworkExtraOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 null,
                 null,
@@ -1031,10 +834,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework PHP options from config' => [
-            self::createValueForTestFrameworkExtraOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 '--debug',
                 null,
@@ -1043,10 +843,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework PHP options from input' => [
-            self::createValueForTestFrameworkExtraOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 null,
                 '--debug',
@@ -1055,10 +852,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework PHP options from config & input' => [
-            self::createValueForTestFrameworkExtraOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpunit',
                 '--stop-on-failure',
                 '--debug',
@@ -1067,10 +861,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test framework PHP options from config with phpspec framework' => [
-            self::createValueForTestFrameworkExtraOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkExtraOptions(
                 'phpspec',
                 '--debug',
                 null,
@@ -1079,10 +870,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test no static analysis tool options' => [
-            self::createValueForStaticAnalysisToolOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisToolOptions(
                 null,
                 null,
                 null,
@@ -1090,10 +878,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test static analysis tool options from config' => [
-            self::createValueForStaticAnalysisToolOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisToolOptions(
                 '--memory-limit=-1',
                 null,
                 '--memory-limit=-1',
@@ -1101,10 +886,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test static analysis tool options from input' => [
-            self::createValueForStaticAnalysisToolOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisToolOptions(
                 null,
                 '--memory-limit=-1',
                 '--memory-limit=-1',
@@ -1112,10 +894,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'test static analysis tool options from config & input' => [
-            self::createValueForStaticAnalysisToolOptions(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForStaticAnalysisToolOptions(
                 '--level=max',
                 '--memory-limit=-1',
                 '--memory-limit=-1',
@@ -1123,10 +902,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'PHPUnit test framework' => [
-            self::createValueForTestFrameworkKey(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkKey(
                 'phpunit',
                 '--debug',
                 '--debug',
@@ -1134,10 +910,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'phpSpec test framework' => [
-            self::createValueForTestFrameworkKey(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkKey(
                 'phpspec',
                 '--debug',
                 '--debug',
@@ -1145,10 +918,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'codeception test framework' => [
-            self::createValueForTestFrameworkKey(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForTestFrameworkKey(
                 'codeception',
                 '--debug',
                 '--debug',
@@ -1156,10 +926,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'no mutator' => [
-            self::createValueForMutators(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMutators(
                 [],
                 '',
                 false,
@@ -1168,10 +935,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'mutators from config' => [
-            self::createValueForMutators(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMutators(
                 [
                     '@default' => false,
                     'MethodCallRemoval' => (object) [
@@ -1194,10 +958,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'noop mutators from config' => [
-            self::createValueForMutators(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMutators(
                 [
                     '@default' => false,
                     'MethodCallRemoval' => (object) [
@@ -1220,10 +981,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignore source code by regex' => [
-            self::createValueForIgnoreSourceCodeByRegex(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreSourceCodeByRegex(
                 [
                     '@default' => false,
                     'MethodCallRemoval' => (object) [
@@ -1235,10 +993,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'ignore source code by regex with duplicates' => [
-            self::createValueForIgnoreSourceCodeByRegex(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForIgnoreSourceCodeByRegex(
                 [
                     '@default' => false,
                     'MethodCallRemoval' => (object) [
@@ -1255,10 +1010,7 @@ final class ConfigurationFactoryTest extends TestCase
         ];
 
         yield 'mutators from config & input' => [
-            self::createValueForMutators(
-                $defaultScenario,
-                $defaultSchemaBuilder,
-                $defaultConfigurationBuilder,
+            $defaultScenario->forValueForMutators(
                 [
                     '@default' => true,
                     'global-ignoreSourceCodeByRegex' => ['Assert::.*'],
@@ -1287,13 +1039,13 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultSchemaBuilder
                         ->withSource(new Source(['src/'], ['vendor/']))
                         ->withLogs(Logs::createEmpty())
-                        ->withThreads(5)
+                        ->withThreads(5),
                 )
                 ->withInput(
                     $defaultInputBuilder
                         ->withFilter('src/Foo.php, src/Bar.php')
                         ->withGitDiffFilter(null)
-                        ->withUseGitHubLogger(false)
+                        ->withUseGitHubLogger(false),
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
@@ -1315,13 +1067,13 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultSchemaBuilder
                         ->withSource(new Source(['/absolute/src/'], ['vendor/']))
                         ->withLogs(Logs::createEmpty())
-                        ->withThreads(5)
+                        ->withThreads(5),
                 )
                 ->withInput(
                     $defaultInputBuilder
                         ->withFilter('src/Foo.php, src/Bar.php')
                         ->withGitDiffFilter(null)
-                        ->withUseGitHubLogger(false)
+                        ->withUseGitHubLogger(false),
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
@@ -1471,11 +1223,11 @@ final class ConfigurationFactoryTest extends TestCase
                         ->withLogs(LogsBuilder::withMinimalTestData()->build())
                         ->withTmpDir('')
                         ->withMutators(['@default' => false, 'CustomMutator' => true])
-                        ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                        ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php'),
                 )
                 ->withInput(
                     $defaultInputBuilder
-                        ->withUseGitHubLogger(false)
+                        ->withUseGitHubLogger(false),
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
@@ -1490,492 +1242,6 @@ final class ConfigurationFactoryTest extends TestCase
                         ->build(),
                 ),
         ];
-    }
-
-    private static function createValueForTimeout(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?float $schemaTimeout,
-        float $expectedTimeout,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withTimeout($schemaTimeout)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withTimeout($expectedTimeout)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForTmpDir(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $configTmpDir,
-        ?string $expectedTmpDir,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withTmpDir($configTmpDir)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withTmpDir($expectedTmpDir)
-                    ->withCoveragePath($expectedTmpDir)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForCoveragePath(
-        ConfigurationFactoryScenario $defaultScenario,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $existingCoveragePath,
-        bool $expectedSkipCoverage,
-        string $expectedCoveragePath,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withExistingCoveragePath($existingCoveragePath),
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withCoveragePath($expectedCoveragePath)
-                    ->withSkipCoverage($expectedSkipCoverage)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForPhpUnitConfigDir(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $phpUnitConfigDir,
-        ?string $expectedPhpUnitConfigDir,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withPhpUnit(new PhpUnit($phpUnitConfigDir, null))
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withPhpUnit(new PhpUnit($expectedPhpUnitConfigDir, null))
-                    ->build(),
-            );
-    }
-
-    private static function createValueForNoProgress(
-        ConfigurationFactoryScenario $defaultScenario,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        bool $ciDetected,
-        bool $noProgress,
-        bool $expectedNoProgress,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withCiDetected($ciDetected)
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withNoProgress($noProgress),
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withNoProgress($expectedNoProgress)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForGithubActionsDetected(
-        ConfigurationFactoryScenario $defaultScenario,
-        LogsBuilder $defaultLogsBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?bool $inputUseGitHubAnnotationsLogger,
-        bool $githubActionsDetected,
-        bool $useGitHubAnnotationsLogger,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withGithubActionsDetected($githubActionsDetected)
-            ->withSchema(
-                SchemaConfigurationBuilder::from($defaultScenario->schemaBuilder->build())
-                    ->withLogs(Logs::createEmpty())
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withUseGitHubLogger($inputUseGitHubAnnotationsLogger)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withLogs(
-                        $defaultLogsBuilder
-                            ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)
-                            ->build(),
-                    )
-                    ->build(),
-            );
-    }
-
-    private static function createValueForGitlabLogger(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        LogsBuilder $defaultLogsBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $gitlabFileLogPathInConfig,
-        ?string $gitlabFileLogPathFromCliOption,
-        ?string $expectedGitlabFileLogPath,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withLogs(
-                        LogsBuilder::withMinimalTestData()
-                            ->withGitlabLogFilePath($gitlabFileLogPathInConfig)
-                            ->build(),
-                    )
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withGitlabLogFilePath($gitlabFileLogPathFromCliOption)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withLogs(
-                        $defaultLogsBuilder
-                            ->withGitlabLogFilePath($expectedGitlabFileLogPath)
-                            ->build(),
-                    )
-                    ->build(),
-            );
-    }
-
-    private static function createValueForIgnoreMsiWithNoMutations(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?bool $ignoreMsiWithNoMutationsFromSchemaConfiguration,
-        ?bool $ignoreMsiWithNoMutationsFromInput,
-        ?bool $expectedIgnoreMsiWithNoMutations,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withPhpUnit(new PhpUnit('/path/to', null))
-                    ->withPhpStan(new PhpStan('/path/to', null))
-                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromSchemaConfiguration)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromInput)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withPhpUnit(new PhpUnit('/path/to', null))
-                    ->withPhpStan(new PhpStan('/path/to', null))
-                    ->withIgnoreMsiWithNoMutations($expectedIgnoreMsiWithNoMutations)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForMinMsi(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?float $minMsiFromSchemaConfiguration,
-        ?float $minMsiFromInput,
-        ?float $expectedMinMsi,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withPhpUnit(new PhpUnit('/path/to', null))
-                    ->withPhpStan(new PhpStan('/path/to', null))
-                    ->withMinMsi($minMsiFromSchemaConfiguration)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withMinMsi($minMsiFromInput)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withPhpUnit(new PhpUnit('/path/to', null))
-                    ->withPhpStan(new PhpStan('/path/to', null))
-                    ->withMinMsi($expectedMinMsi)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForMinCoveredMsi(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?float $minCoveredMsiFromSchemaConfiguration,
-        ?float $minCoveredMsiFromInput,
-        ?float $expectedMinCoveredMsi,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withPhpUnit(new PhpUnit('/path/to', null))
-                    ->withPhpStan(new PhpStan('/path/to', null))
-                    ->withMinCoveredMsi($minCoveredMsiFromSchemaConfiguration)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withMinCoveredMsi($minCoveredMsiFromInput)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withPhpUnit(new PhpUnit('/path/to', null))
-                    ->withPhpStan(new PhpStan('/path/to', null))
-                    ->withMinCoveredMsi($expectedMinCoveredMsi)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForTestFramework(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $configTestFramework,
-        ?string $inputTestFramework,
-        string $expectedTestFramework,
-        string $expectedTestFrameworkExtraOptions,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withTestFramework($configTestFramework)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withTestFramework($inputTestFramework)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withTestFramework($expectedTestFramework)
-                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForStaticAnalysisTool(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $configStaticAnalysisTool,
-        ?string $inputStaticAnalysisTool,
-        ?string $expectedStaticAnalysisTool,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withTestFramework(TestFrameworkTypes::PHPUNIT)
-                    ->withStaticAnalysisTool($configStaticAnalysisTool)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withStaticAnalysisTool($inputStaticAnalysisTool)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withStaticAnalysisTool($expectedStaticAnalysisTool)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForInitialTestsPhpOptions(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $configInitialTestsPhpOptions,
-        ?string $inputInitialTestsPhpOptions,
-        ?string $expectedInitialTestPhpOptions,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withInitialTestsPhpOptions($configInitialTestsPhpOptions)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withInitialTestsPhpOptions($inputInitialTestsPhpOptions)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withInitialTestsPhpOptions($expectedInitialTestPhpOptions)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForTestFrameworkExtraOptions(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        string $configTestFramework,
-        ?string $configTestFrameworkExtraOptions,
-        ?string $inputTestFrameworkExtraOptions,
-        string $expectedTestFrameworkExtraOptions,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withTestFramework($configTestFramework)
-                    ->withTestFrameworkExtraOptions($configTestFrameworkExtraOptions)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withTestFramework($configTestFramework)
-                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForStaticAnalysisToolOptions(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $configStaticAnalysisToolOptions,
-        ?string $inputStaticAnalysisToolOptions,
-        ?string $expectedStaticAnalysisToolOptions,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withStaticAnalysisToolOptions($configStaticAnalysisToolOptions)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withStaticAnalysisToolOptions($inputStaticAnalysisToolOptions)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withStaticAnalysisToolOptions($expectedStaticAnalysisToolOptions)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForTestFrameworkKey(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        string $configTestFramework,
-        string $inputTestFrameworkExtraOptions,
-        string $expectedTestFrameworkExtraOptions,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withTestFramework($configTestFramework)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withTestFramework($configTestFramework)
-                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
-                    ->build(),
-            );
-    }
-
-    /**
-     * @param array<string, Mutator> $expectedMutators
-     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
-     */
-    private static function createValueForMutators(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        array $configMutators,
-        string $inputMutators,
-        bool $useNoopMutators,
-        array $expectedMutators,
-        array $expectedIgnoreSourceCodeMutatorsMap = [],
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withMutators($configMutators)
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withMutatorsInput($inputMutators)
-                    ->withUseNoopMutators($useNoopMutators)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withMutators($expectedMutators)
-                    ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
-                    ->build(),
-            );
-    }
-
-    /**
-     * @param array<string, mixed> $configMutators
-     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
-     */
-    private static function createValueForIgnoreSourceCodeByRegex(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        array $configMutators,
-        array $expectedIgnoreSourceCodeMutatorsMap,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withMutators($configMutators)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withMutators([
-                        'MethodCallRemoval' => new MethodCallRemoval(),
-                    ])
-                    ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
-                    ->build(),
-            );
-    }
-
-    private static function createValueForHtmlLogFilePath(
-        ConfigurationFactoryScenario $defaultScenario,
-        SchemaConfigurationBuilder $defaultSchemaBuilder,
-        LogsBuilder $defaultLogsBuilder,
-        ConfigurationBuilder $defaultConfigurationBuilder,
-        ?string $htmlFileLogPathInConfig,
-        ?string $htmlFileLogPathFromCliOption,
-        ?string $expectedHtmlFileLogPath,
-    ): ConfigurationFactoryScenario {
-        return $defaultScenario
-            ->withSchema(
-                $defaultSchemaBuilder
-                    ->withLogs(
-                        LogsBuilder::withMinimalTestData()
-                            ->withHtmlLogFilePath($htmlFileLogPathInConfig)
-                            ->build(),
-                    )
-            )
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withHtmlLogFilePath($htmlFileLogPathFromCliOption)
-            )
-            ->withExpected(
-                $defaultConfigurationBuilder
-                    ->withLogs(
-                        $defaultLogsBuilder
-                            ->withHtmlLogFilePath($expectedHtmlFileLogPath)
-                            ->build(),
-                    )
-                    ->build(),
-            );
     }
 
     /**

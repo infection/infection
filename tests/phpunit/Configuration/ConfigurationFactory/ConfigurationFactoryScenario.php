@@ -36,10 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Infection\Configuration\Configuration;
-use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
+use Infection\Configuration\Entry\PhpUnit;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
+use PhpParser\Node;
 
 final class ConfigurationFactoryScenario
 {
@@ -112,7 +118,7 @@ final class ConfigurationFactoryScenario
         ?string $textFileLogPathInConfig,
         ?string $textFileLogPathFromCliOption,
         ?string $expectedTextFileLogPath,
-    ): ConfigurationFactoryScenario {
+    ): self {
         return $this
             ->withSchema(
                 $this->schemaBuilder
@@ -124,7 +130,7 @@ final class ConfigurationFactoryScenario
             )
             ->withInput(
                 $this->inputBuilder
-                    ->withTextLogFilePath($textFileLogPathFromCliOption)
+                    ->withTextLogFilePath($textFileLogPathFromCliOption),
             )
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
@@ -133,6 +139,436 @@ final class ConfigurationFactoryScenario
                             ->withTextLogFilePath($expectedTextFileLogPath)
                             ->build(),
                     )
+                    ->build(),
+            );
+    }
+
+    public function forValueForHtmlLogFilePath(
+        ?string $htmlFileLogPathInConfig,
+        ?string $htmlFileLogPathFromCliOption,
+        ?string $expectedHtmlFileLogPath,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withHtmlLogFilePath($htmlFileLogPathInConfig)
+                            ->build(),
+                    ),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withHtmlLogFilePath($htmlFileLogPathFromCliOption),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withLogs(
+                        LogsBuilder::from($this->expected->getLogs())
+                            ->withHtmlLogFilePath($expectedHtmlFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            );
+    }
+
+    public function forValueForGitlabLogger(
+        ?string $gitlabFileLogPathInConfig,
+        ?string $gitlabFileLogPathFromCliOption,
+        ?string $expectedGitlabFileLogPath,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withGitlabLogFilePath($gitlabFileLogPathInConfig)
+                            ->build(),
+                    ),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withGitlabLogFilePath($gitlabFileLogPathFromCliOption),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withLogs(
+                        LogsBuilder::from($this->expected->getLogs())
+                            ->withGitlabLogFilePath($expectedGitlabFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            );
+    }
+
+    public function forValueForTimeout(
+        ?float $schemaTimeout,
+        float $expectedTimeout,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTimeout($schemaTimeout),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withTimeout($expectedTimeout)
+                    ->build(),
+            );
+    }
+
+    public function forValueForTmpDir(
+        ?string $configTmpDir,
+        string $expectedTmpDir,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTmpDir($configTmpDir),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withTmpDir($expectedTmpDir)
+                    ->withCoveragePath($expectedTmpDir)
+                    ->build(),
+            );
+    }
+
+    public function forValueForCoveragePath(
+        ?string $existingCoveragePath,
+        bool $expectedSkipCoverage,
+        string $expectedCoveragePath,
+    ): self {
+        return $this
+            ->withInput(
+                $this->inputBuilder
+                    ->withExistingCoveragePath($existingCoveragePath),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withCoveragePath($expectedCoveragePath)
+                    ->withSkipCoverage($expectedSkipCoverage)
+                    ->build(),
+            );
+    }
+
+    public function forValueForPhpUnitConfigDir(
+        ?string $phpUnitConfigDir,
+        ?string $expectedPhpUnitConfigDir,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withPhpUnit(new PhpUnit($phpUnitConfigDir, null)),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withPhpUnit(new PhpUnit($expectedPhpUnitConfigDir, null))
+                    ->build(),
+            );
+    }
+
+    public function forValueForNoProgress(
+        bool $ciDetected,
+        bool $noProgress,
+        bool $expectedNoProgress,
+    ): self {
+        return $this
+            ->withCiDetected($ciDetected)
+            ->withInput(
+                $this->inputBuilder
+                    ->withNoProgress($noProgress),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withNoProgress($expectedNoProgress)
+                    ->build(),
+            );
+    }
+
+    public function forValueForGithubActionsDetected(
+        ?bool $inputUseGitHubAnnotationsLogger,
+        bool $githubActionsDetected,
+        bool $useGitHubAnnotationsLogger,
+    ): self {
+        return $this
+            ->withGithubActionsDetected($githubActionsDetected)
+            ->withSchema(
+                SchemaConfigurationBuilder::from($this->schemaBuilder->build())
+                    ->withLogs(Logs::createEmpty()),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withUseGitHubLogger($inputUseGitHubAnnotationsLogger),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withLogs(
+                        LogsBuilder::from($this->expected->getLogs())
+                            ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)
+                            ->build(),
+                    )
+                    ->build(),
+            );
+    }
+
+    public function forValueForIgnoreMsiWithNoMutations(
+        ?bool $ignoreMsiWithNoMutationsFromSchemaConfiguration,
+        ?bool $ignoreMsiWithNoMutationsFromInput,
+        bool $expectedIgnoreMsiWithNoMutations,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromSchemaConfiguration),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromInput),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withIgnoreMsiWithNoMutations($expectedIgnoreMsiWithNoMutations)
+                    ->build(),
+            );
+    }
+
+    public function forValueForMinMsi(
+        ?float $minMsiFromSchemaConfiguration,
+        ?float $minMsiFromInput,
+        ?float $expectedMinMsi,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinMsi($minMsiFromSchemaConfiguration),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withMinMsi($minMsiFromInput),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinMsi($expectedMinMsi)
+                    ->build(),
+            );
+    }
+
+    public function forValueForMinCoveredMsi(
+        ?float $minCoveredMsiFromSchemaConfiguration,
+        ?float $minCoveredMsiFromInput,
+        ?float $expectedMinCoveredMsi,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinCoveredMsi($minCoveredMsiFromSchemaConfiguration),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withMinCoveredMsi($minCoveredMsiFromInput),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinCoveredMsi($expectedMinCoveredMsi)
+                    ->build(),
+            );
+    }
+
+    public function forValueForTestFramework(
+        ?string $configTestFramework,
+        ?string $inputTestFramework,
+        string $expectedTestFramework,
+        string $expectedTestFrameworkExtraOptions,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTestFramework($configTestFramework),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withTestFramework($inputTestFramework),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withTestFramework($expectedTestFramework)
+                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
+                    ->build(),
+            );
+    }
+
+    public function forValueForStaticAnalysisTool(
+        ?string $configStaticAnalysisTool,
+        ?string $inputStaticAnalysisTool,
+        ?string $expectedStaticAnalysisTool,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTestFramework(TestFrameworkTypes::PHPUNIT)
+                    ->withStaticAnalysisTool($configStaticAnalysisTool),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withStaticAnalysisTool($inputStaticAnalysisTool),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withStaticAnalysisTool($expectedStaticAnalysisTool)
+                    ->build(),
+            );
+    }
+
+    public function forValueForInitialTestsPhpOptions(
+        ?string $configInitialTestsPhpOptions,
+        ?string $inputInitialTestsPhpOptions,
+        ?string $expectedInitialTestPhpOptions,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withInitialTestsPhpOptions($configInitialTestsPhpOptions),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withInitialTestsPhpOptions($inputInitialTestsPhpOptions),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withInitialTestsPhpOptions($expectedInitialTestPhpOptions)
+                    ->build(),
+            );
+    }
+
+    public function forValueForTestFrameworkExtraOptions(
+        string $configTestFramework,
+        ?string $configTestFrameworkExtraOptions,
+        ?string $inputTestFrameworkExtraOptions,
+        string $expectedTestFrameworkExtraOptions,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTestFramework($configTestFramework)
+                    ->withTestFrameworkExtraOptions($configTestFrameworkExtraOptions),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withTestFramework($configTestFramework)
+                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
+                    ->build(),
+            );
+    }
+
+    public function forValueForStaticAnalysisToolOptions(
+        ?string $configStaticAnalysisToolOptions,
+        ?string $inputStaticAnalysisToolOptions,
+        ?string $expectedStaticAnalysisToolOptions,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withStaticAnalysisToolOptions($configStaticAnalysisToolOptions),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withStaticAnalysisToolOptions($inputStaticAnalysisToolOptions),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withStaticAnalysisToolOptions($expectedStaticAnalysisToolOptions)
+                    ->build(),
+            );
+    }
+
+    public function forValueForTestFrameworkKey(
+        string $configTestFramework,
+        string $inputTestFrameworkExtraOptions,
+        string $expectedTestFrameworkExtraOptions,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withTestFramework($configTestFramework),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withTestFramework($configTestFramework)
+                    ->withTestFrameworkExtraOptions($expectedTestFrameworkExtraOptions)
+                    ->build(),
+            );
+    }
+
+    /**
+     * @param array<string, mixed> $configMutators
+     * @param array<string, Mutator<Node>> $expectedMutators
+     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
+     */
+    public function forValueForMutators(
+        array $configMutators,
+        string $inputMutators,
+        bool $useNoopMutators,
+        array $expectedMutators,
+        array $expectedIgnoreSourceCodeMutatorsMap = [],
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withMutators($configMutators),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withMutatorsInput($inputMutators)
+                    ->withUseNoopMutators($useNoopMutators),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withMutators($expectedMutators)
+                    ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
+                    ->build(),
+            );
+    }
+
+    /**
+     * @param array<string, mixed> $configMutators
+     * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
+     */
+    public function forValueForIgnoreSourceCodeByRegex(
+        array $configMutators,
+        array $expectedIgnoreSourceCodeMutatorsMap,
+    ): self {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withMutators($configMutators),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withMutators([
+                        'MethodCallRemoval' => new MethodCallRemoval(),
+                    ])
+                    ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
                     ->build(),
             );
     }

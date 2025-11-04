@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\Configuration\ConfigurationFactory;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -149,6 +150,7 @@ final class ProjectCodeProvider
      * For example, test cases that are in a child directory.
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+        ConfigurationFactory::class,
         FilterBuilder::class,
         SourceFileCollector::class,
         EnumBucket::class,
