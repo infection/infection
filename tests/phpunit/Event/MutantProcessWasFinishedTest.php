@@ -33,63 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Tests\Event;
 
-use Infection\Configuration\Configuration;
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final class ConfigurationFactoryScenario
+#[CoversClass(MutantProcessWasFinished::class)]
+final class MutantProcessWasFinishedTest extends TestCase
 {
-    public function __construct(
-        public bool $ciDetected,
-        public bool $githubActionsDetected,
-        public ConfigurationFactoryInput $input,
-        public Configuration $expected,
-    ) {
-    }
-
-    public static function create(
-        bool $ciDetected,
-        bool $githubActionsDetected,
-        ConfigurationFactoryInput $input,
-        Configuration $expected,
-    ): self {
-        return new self(
-            $ciDetected,
-            $githubActionsDetected,
-            $input,
-            $expected,
-        );
-    }
-
-    public function withCiDetected(bool $ciDetected): self
+    public function test_it_exposes_its_mutant_process(): void
     {
-        $clone = clone $this;
-        $clone->ciDetected = $ciDetected;
+        $executionResultMock = $this->createMock(MutantExecutionResult::class);
 
-        return $clone;
-    }
+        $event = new MutantProcessWasFinished($executionResultMock);
 
-    public function withGithubActionsDetected(bool $githubActionsDetected): self
-    {
-        $clone = clone $this;
-        $clone->githubActionsDetected = $githubActionsDetected;
-
-        return $clone;
-    }
-
-    public function withInput(ConfigurationFactoryInput $input): self
-    {
-        $clone = clone $this;
-        $clone->input = $input;
-
-        return $clone;
-    }
-
-    public function withExpected(Configuration $expected): self
-    {
-        $clone = clone $this;
-        $clone->expected = $expected;
-
-        return $clone;
+        $this->assertSame($executionResultMock, $event->getExecutionResult());
     }
 }
