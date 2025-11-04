@@ -257,7 +257,7 @@ final class Container extends DIContainer
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
             TraceProviderRegistry::class => static fn (self $container): TraceProviderRegistry => new TraceProviderRegistry(
-                $container->getCoveredTraceProvider(),
+                $container->get(PHPUnitCoverageTraceProvider::class),
                 $container->getUncoveredTraceProvider(),
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
