@@ -1087,12 +1087,6 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Mutant/MutantTest.php
-
-		-
 			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects array\<Infection\\Mutator\\Mutator\<PhpParser\\Node\>\>, array\{Infection\\Mutator\\IgnoreMutator\<PhpParser\\Node\\Expr\\BinaryOp\\Plus\>\} given\.$#'
 			identifier: argument.type
 			count: 4
