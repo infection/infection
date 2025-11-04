@@ -522,7 +522,7 @@ final class ConfigurationFactoryScenario
 
     /**
      * @param array<string, mixed> $configMutators
-     * @param array<string, Mutator<Node>> $expectedMutators
+     * @param array<string, \Infection\Mutator\Mutator> $expectedMutators
      * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     public function forValueForMutators(
