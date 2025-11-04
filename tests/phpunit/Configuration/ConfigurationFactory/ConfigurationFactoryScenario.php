@@ -36,13 +36,18 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Infection\Configuration\Configuration;
+use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Tests\Configuration\ConfigurationBuilder;
+use Infection\Tests\Configuration\Entry\LogsBuilder;
+use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 
 final class ConfigurationFactoryScenario
 {
     public function __construct(
         public bool $ciDetected,
         public bool $githubActionsDetected,
-        public ConfigurationFactoryInput $input,
+        public SchemaConfigurationBuilder $schemaBuilder,
+        public ConfigurationFactoryInputBuilder $inputBuilder,
         public Configuration $expected,
     ) {
     }
@@ -50,13 +55,15 @@ final class ConfigurationFactoryScenario
     public static function create(
         bool $ciDetected,
         bool $githubActionsDetected,
-        ConfigurationFactoryInput $input,
+        SchemaConfigurationBuilder $schemaBuilder,
+        ConfigurationFactoryInputBuilder $inputBuilder,
         Configuration $expected,
     ): self {
         return new self(
             $ciDetected,
             $githubActionsDetected,
-            $input,
+            $schemaBuilder,
+            $inputBuilder,
             $expected,
         );
     }
@@ -77,10 +84,18 @@ final class ConfigurationFactoryScenario
         return $clone;
     }
 
-    public function withInput(ConfigurationFactoryInput $input): self
+    public function withSchema(SchemaConfigurationBuilder $schemaBuilder): self
     {
         $clone = clone $this;
-        $clone->input = $input;
+        $clone->schemaBuilder = $schemaBuilder;
+
+        return $clone;
+    }
+
+    public function withInput(ConfigurationFactoryInputBuilder $builder): self
+    {
+        $clone = clone $this;
+        $clone->inputBuilder = $builder;
 
         return $clone;
     }
@@ -91,5 +106,34 @@ final class ConfigurationFactoryScenario
         $clone->expected = $expected;
 
         return $clone;
+    }
+
+    public function forValueForTextLogFilePath(
+        ?string $textFileLogPathInConfig,
+        ?string $textFileLogPathFromCliOption,
+        ?string $expectedTextFileLogPath,
+    ): ConfigurationFactoryScenario {
+        return $this
+            ->withSchema(
+                $this->schemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withTextLogFilePath($textFileLogPathInConfig)
+                            ->build(),
+                    ),
+            )
+            ->withInput(
+                $this->inputBuilder
+                    ->withTextLogFilePath($textFileLogPathFromCliOption)
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withLogs(
+                        LogsBuilder::from($this->expected->getLogs())
+                            ->withTextLogFilePath($expectedTextFileLogPath)
+                            ->build(),
+                    )
+                    ->build(),
+            );
     }
 }

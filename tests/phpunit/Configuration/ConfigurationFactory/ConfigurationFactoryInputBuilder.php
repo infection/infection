@@ -37,10 +37,9 @@ namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
 
-final class ConfigurationFactoryInput
+final class ConfigurationFactoryInputBuilder
 {
     public function __construct(
-        private SchemaConfiguration $schema,
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
         private bool $skipInitialTests,
@@ -74,14 +73,6 @@ final class ConfigurationFactoryInput
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
     ) {
-    }
-
-    public function withSchema(SchemaConfiguration $schema): self
-    {
-        $clone = clone $this;
-        $clone->schema = $schema;
-
-        return $clone;
     }
 
     public function withExistingCoveragePath(?string $existingCoveragePath): self
@@ -340,11 +331,6 @@ final class ConfigurationFactoryInput
         return $clone;
     }
 
-    public function getSchema(): SchemaConfiguration
-    {
-        return $this->schema;
-    }
-
     /**
      * @return array{
      *     0: SchemaConfiguration,
@@ -382,10 +368,10 @@ final class ConfigurationFactoryInput
      *     32: string|null
      * }
      */
-    public function build(): array
+    public function build(SchemaConfiguration $schema): array
     {
         return [
-            $this->schema,
+            $schema,
             $this->existingCoveragePath,
             $this->initialTestsPhpOptions,
             $this->skipInitialTests,
