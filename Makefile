@@ -30,6 +30,8 @@ PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest
 
+PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
+
 INFECTION=./build/infection.phar
 
 DOCKER_RUN=docker compose run --rm
@@ -118,6 +120,15 @@ profile:
 	$(MAKE) profile_mutation_generator
 	$(MAKE) profile_tracing
 
+.PHONY: benchmark
+benchmark: vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark $(PHPBENCH_REPORTS)
+	composer dump
+
 .PHONY: profile_mutation_generator
 profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
@@ -125,6 +136,12 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
+	composer dump
+
+.PHONY: benchmark_mutation_generator
+benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
 	composer dump
 
 .PHONY: profile_tracing
@@ -136,6 +153,12 @@ profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVER
 		php tests/benchmark/Tracing/profile.php
 	composer dump
 
+.PHONY: benchmark_tracing
+benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/Tracing $(PHPBENCH_REPORTS)
+	composer dump
+
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
@@ -143,7 +166,7 @@ autoreview: cs-check phpstan psalm validate test-autoreview rector-check detect-
 
 .PHONY: test
 test:		 	## Runs all the tests
-test: autoreview test-unit test-e2e test-infection
+test: autoreview test-unit test-benchmark test-e2e test-infection
 
 .PHONY: test-docker
 test-docker:		## Runs all the tests on the different Docker platforms
@@ -169,6 +192,15 @@ test-unit-docker: test-unit-82-docker
 
 test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+
+.PHONY: test-benchmark
+test-benchmark:	 	## Runs the benchmark tests
+test-benchmark: $(PHPUNIT) \
+		vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	$(PHPUNIT) --group=benchmark
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests

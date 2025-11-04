@@ -38,6 +38,7 @@
 
     <groups>
         <exclude>
+            <group>benchmark</group>
             <group>e2e</group>
         </exclude>
     </groups>
