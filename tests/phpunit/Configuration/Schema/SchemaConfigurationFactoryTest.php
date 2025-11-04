@@ -59,7 +59,6 @@ use PHPUnit\Framework\TestCase;
 use function Safe\json_decode;
 use function sprintf;
 use stdClass;
-use function var_export;
 
 #[CoversClass(Logs::class)]
 #[CoversClass(PhpUnit::class)]
@@ -105,10 +104,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             $rawConfig,
         );
 
-        $this->assertSame(
-            var_export($expected, true),
-            var_export($actual, true),
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public static function provideRawConfig(): iterable
