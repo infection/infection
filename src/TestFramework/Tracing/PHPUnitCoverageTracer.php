@@ -76,17 +76,6 @@ final class PHPUnitCoverageTracer
 
     private function createTestLocations(SourceFileIndexXmlInfo $fileInfo): TestLocations
     {
-        $linesCoverage = $this->getReport()->getLineCoverage($fileInfo->coveragePathname);
-
-        $lines = [];
-
-        foreach ($linesCoverage as $lineCoverage) {
-            $lines[$lineCoverage->lineNumber] = array_map(
-                $this->createTestLocation(...),
-                $lineCoverage->coveredBy,
-            );
-        }
-
         return new TestLocations(
             $this->createTestLocationsByLine($fileInfo),
             $this->createCoveredSourceMethodLineRangesByMethodName($fileInfo),
