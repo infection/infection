@@ -49,7 +49,6 @@ use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use function iterator_to_array;
 use LogicException;
 use function sprintf;
 use function str_pad;
@@ -246,18 +245,20 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     private function showGeneratedLogFiles(): void
     {
-        /** @var FileLogger[] $fileLoggers */
-        $fileLoggers = iterator_to_array($this->getFileLoggers($this->mutationTestingResultsLogger->getLoggers()));
+        $hasLoggers = false;
 
-        if ($fileLoggers !== []) {
-            $this->output->writeln(['', 'Generated Reports:']);
-
-            foreach ($fileLoggers as $fileLogger) {
-                $this->output->writeln(
-                    $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
-                );
+        /** @var FileLogger $fileLogger */
+        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->getLoggers()) as $fileLogger) {
+            if (!$hasLoggers) {
+                $this->output->writeln(['', 'Generated Reports:']);
             }
+            $this->output->writeln(
+                $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
+            );
+            $hasLoggers = true;
+        }
 
+        if ($hasLoggers) {
             return;
         }
 
