@@ -33,6 +33,12 @@ jobs:
             dependencies: locked
             coverage-driver: xdebug
             symfony-version: '6.4.*'
+          - operating-system: ubuntu-latest
+            php-version: '8.4'
+            minimum-stability: dev
+            dependencies: highest
+            coverage-driver: pcov
+            symfony-version: '8.0.x-dev'
         exclude:
           - dependencies: 'locked'
             symfony-version: '7.*.*'
@@ -59,6 +65,10 @@ jobs:
         if: "matrix.php-version >= '8.4'"
         run: |
           composer config platform.php 8.4.99
+
+      - name: Configure Composer minimum-stability
+        if: matrix.minimum-stability
+        run: composer config minimum-stability ${{ matrix.minimum-stability }}
 
       - name: Enforce the Symfony version used
         if: matrix.dependencies != 'locked'
