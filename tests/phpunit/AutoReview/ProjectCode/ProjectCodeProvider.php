@@ -44,6 +44,7 @@ use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
@@ -135,6 +136,7 @@ final class ProjectCodeProvider
         MutatorName::class,
         BaseMutatorTestCase::class,
         OperatingSystem::class,
+        SchemaConfiguration::class,
         SimpleMutation::class,
         StringNormalizer::class,
         Source::class,
