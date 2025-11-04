@@ -210,7 +210,6 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultSchemaBuilder = SchemaConfigurationBuilder::from($defaultSchema);
 
         $defaultInputBuilder = new ConfigurationFactoryInputBuilder(
-            $defaultSchema,
             existingCoveragePath: null,
             initialTestsPhpOptions: null,
             skipInitialTests: false,
@@ -298,16 +297,13 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'null html file log path with existing path from config file' => [
             $defaultScenario
-            ->withInput(
-                $defaultInputBuilder->withSchema(
-                    $defaultSchemaBuilder
-                    ->withLogs(
-                        $defaultLogsBuilder
-                        ->withHtmlLogFilePath('/from-config.html')
-                        ->build(),
-                    )
+            ->withSchema(
+                $defaultSchemaBuilder
+                ->withLogs(
+                    $defaultLogsBuilder
+                    ->withHtmlLogFilePath('/from-config.html')
                     ->build(),
-                ),
+                )
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1287,18 +1283,17 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'with source files' => [
             $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder
+                        ->withSource(new Source(['src/'], ['vendor/']))
+                        ->withLogs(Logs::createEmpty())
+                        ->withThreads(5)
+                )
                 ->withInput(
                     $defaultInputBuilder
-                        ->withSchema(
-                            $defaultSchemaBuilder
-                                ->withSource(new Source(['src/'], ['vendor/']))
-                                ->withLogs(Logs::createEmpty())
-                                ->withThreads(5)
-                                ->build(),
-                        )
                         ->withFilter('src/Foo.php, src/Bar.php')
                         ->withGitDiffFilter(null)
-                        ->withUseGitHubLogger(false),
+                        ->withUseGitHubLogger(false)
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
@@ -1316,18 +1311,17 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'with absolute source directory paths' => [
             $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder
+                        ->withSource(new Source(['/absolute/src/'], ['vendor/']))
+                        ->withLogs(Logs::createEmpty())
+                        ->withThreads(5)
+                )
                 ->withInput(
                     $defaultInputBuilder
-                        ->withSchema(
-                            $defaultSchemaBuilder
-                                ->withSource(new Source(['/absolute/src/'], ['vendor/']))
-                                ->withLogs(Logs::createEmpty())
-                                ->withThreads(5)
-                                ->build(),
-                        )
                         ->withFilter('src/Foo.php, src/Bar.php')
                         ->withGitDiffFilter(null)
-                        ->withUseGitHubLogger(false),
+                        ->withUseGitHubLogger(false)
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
@@ -1347,36 +1341,35 @@ final class ConfigurationFactoryTest extends TestCase
             ConfigurationFactoryScenario::create(
                 ciDetected: false,
                 githubActionsDetected: false,
+                schemaBuilder: SchemaConfigurationBuilder::withMinimalTestData()
+                    ->withTimeout(10.0)
+                    ->withSource(new Source(['src/'], ['vendor/']))
+                    ->withLogs(
+                        LogsBuilder::withCompleteTestData()
+                            ->withTextLogFilePath('/text.log')
+                            ->withHtmlLogFilePath('/report.html')
+                            ->withSummaryLogFilePath('/summary.log')
+                            ->withJsonLogFilePath('/json.log')
+                            ->withGitlabLogFilePath('/gitlab.log')
+                            ->withDebugLogFilePath('/debug.log')
+                            ->withPerMutatorFilePath('/mutator.log')
+                            ->withUseGitHubAnnotationsLogger(true)
+                            ->withStrykerConfig(StrykerConfig::forFullReport('master'))
+                            ->withSummaryJsonLogFilePath('/summary.json')
+                            ->build(),
+                    )
+                    ->withTmpDir('config/tmp')
+                    ->withPhpUnit(new PhpUnit('config/phpunit-dir', '/path/to/config/phpunit'))
+                    ->withPhpStan(new PhpStan('config/phpstan-dir', '/path/to/bin/phpstan'))
+                    ->withMutators(['@default' => true])
+                    ->withTestFramework('phpunit')
+                    ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                    ->withInitialTestsPhpOptions('-d zend_extension=wrong_xdebug.so')
+                    ->withTestFrameworkExtraOptions('--debug')
+                    ->withStaticAnalysisToolOptions('--memory-limit=-1')
+                    ->withThreads('max')
+                    ->withStaticAnalysisTool('phpstan'),
                 inputBuilder: new ConfigurationFactoryInputBuilder(
-                    schemaBuilder: SchemaConfigurationBuilder::withMinimalTestData()
-                        ->withTimeout(10.0)
-                        ->withSource(new Source(['src/'], ['vendor/']))
-                        ->withLogs(
-                            LogsBuilder::withCompleteTestData()
-                                ->withTextLogFilePath('/text.log')
-                                ->withHtmlLogFilePath('/report.html')
-                                ->withSummaryLogFilePath('/summary.log')
-                                ->withJsonLogFilePath('/json.log')
-                                ->withGitlabLogFilePath('/gitlab.log')
-                                ->withDebugLogFilePath('/debug.log')
-                                ->withPerMutatorFilePath('/mutator.log')
-                                ->withUseGitHubAnnotationsLogger(true)
-                                ->withStrykerConfig(StrykerConfig::forFullReport('master'))
-                                ->withSummaryJsonLogFilePath('/summary.json')
-                                ->build(),
-                        )
-                        ->withTmpDir('config/tmp')
-                        ->withPhpUnit(new PhpUnit('config/phpunit-dir', '/path/to/config/phpunit'))
-                        ->withPhpStan(new PhpStan('config/phpstan-dir', '/path/to/bin/phpstan'))
-                        ->withMutators(['@default' => true])
-                        ->withTestFramework('phpunit')
-                        ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
-                        ->withInitialTestsPhpOptions('-d zend_extension=wrong_xdebug.so')
-                        ->withTestFrameworkExtraOptions('--debug')
-                        ->withStaticAnalysisToolOptions('--memory-limit=-1')
-                        ->withThreads('max')
-                        ->withStaticAnalysisTool('phpstan')
-                        ->build(),
                     existingCoveragePath: 'dist/coverage',
                     initialTestsPhpOptions: '-d zend_extension=xdebug.so',
                     skipInitialTests: false,
@@ -1472,18 +1465,17 @@ final class ConfigurationFactoryTest extends TestCase
 
         yield 'custom mutator with bootstrap file' => [
             $defaultScenario
+                ->withSchema(
+                    $defaultSchemaBuilder
+                        ->withSource(new Source([], []))
+                        ->withLogs(LogsBuilder::withMinimalTestData()->build())
+                        ->withTmpDir('')
+                        ->withMutators(['@default' => false, 'CustomMutator' => true])
+                        ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
+                )
                 ->withInput(
                     $defaultInputBuilder
-                        ->withSchema(
-                            $defaultSchemaBuilder
-                                ->withSource(new Source([], []))
-                                ->withLogs(LogsBuilder::withMinimalTestData()->build())
-                                ->withTmpDir('')
-                                ->withMutators(['@default' => false, 'CustomMutator' => true])
-                                ->withBootstrap(__DIR__ . '/../../Fixtures/Files/bootstrap/bootstrap.php')
-                                ->build(),
-                        )
-                        ->withUseGitHubLogger(false),
+                        ->withUseGitHubLogger(false)
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
@@ -1508,13 +1500,9 @@ final class ConfigurationFactoryTest extends TestCase
         float $expectedTimeout,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withTimeout($schemaTimeout)
-                            ->build(),
-                    ),
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withTimeout($schemaTimeout)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1531,13 +1519,9 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedTmpDir,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withTmpDir($configTmpDir)
-                            ->build(),
-                    ),
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withTmpDir($configTmpDir)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1575,13 +1559,9 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedPhpUnitConfigDir,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withPhpUnit(new PhpUnit($phpUnitConfigDir, null))
-                            ->build(),
-                    ),
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withPhpUnit(new PhpUnit($phpUnitConfigDir, null))
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1620,14 +1600,13 @@ final class ConfigurationFactoryTest extends TestCase
     ): ConfigurationFactoryScenario {
         return $defaultScenario
             ->withGithubActionsDetected($githubActionsDetected)
+            ->withSchema(
+                SchemaConfigurationBuilder::from($defaultScenario->schemaBuilder->build())
+                    ->withLogs(Logs::createEmpty())
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        SchemaConfigurationBuilder::from($defaultScenario->inputBuilder->getSchema())
-                            ->withLogs(Logs::createEmpty())
-                            ->build(),
-                    )
-                    ->withUseGitHubLogger($inputUseGitHubAnnotationsLogger),
+                    ->withUseGitHubLogger($inputUseGitHubAnnotationsLogger)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1650,18 +1629,17 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedGitlabFileLogPath,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withLogs(
-                                LogsBuilder::withMinimalTestData()
-                                    ->withGitlabLogFilePath($gitlabFileLogPathInConfig)
-                                    ->build(),
-                            )
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withGitlabLogFilePath($gitlabFileLogPathInConfig)
                             ->build(),
                     )
-                    ->withGitlabLogFilePath($gitlabFileLogPathFromCliOption),
+            )
+            ->withInput(
+                $defaultScenario->inputBuilder
+                    ->withGitlabLogFilePath($gitlabFileLogPathFromCliOption)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1683,16 +1661,15 @@ final class ConfigurationFactoryTest extends TestCase
         ?bool $expectedIgnoreMsiWithNoMutations,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromSchemaConfiguration)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withPhpUnit(new PhpUnit('/path/to', null))
-                            ->withPhpStan(new PhpStan('/path/to', null))
-                            ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromSchemaConfiguration)
-                            ->build(),
-                    )
-                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromInput),
+                    ->withIgnoreMsiWithNoMutations($ignoreMsiWithNoMutationsFromInput)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1712,16 +1689,15 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinMsi,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinMsi($minMsiFromSchemaConfiguration)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withPhpUnit(new PhpUnit('/path/to', null))
-                            ->withPhpStan(new PhpStan('/path/to', null))
-                            ->withMinMsi($minMsiFromSchemaConfiguration)
-                            ->build(),
-                    )
-                    ->withMinMsi($minMsiFromInput),
+                    ->withMinMsi($minMsiFromInput)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1741,16 +1717,15 @@ final class ConfigurationFactoryTest extends TestCase
         ?float $expectedMinCoveredMsi,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withPhpUnit(new PhpUnit('/path/to', null))
+                    ->withPhpStan(new PhpStan('/path/to', null))
+                    ->withMinCoveredMsi($minCoveredMsiFromSchemaConfiguration)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withPhpUnit(new PhpUnit('/path/to', null))
-                            ->withPhpStan(new PhpStan('/path/to', null))
-                            ->withMinCoveredMsi($minCoveredMsiFromSchemaConfiguration)
-                            ->build(),
-                    )
-                    ->withMinCoveredMsi($minCoveredMsiFromInput),
+                    ->withMinCoveredMsi($minCoveredMsiFromInput)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1771,14 +1746,13 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFrameworkExtraOptions,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withTestFramework($configTestFramework)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withTestFramework($configTestFramework)
-                            ->build(),
-                    )
-                    ->withTestFramework($inputTestFramework),
+                    ->withTestFramework($inputTestFramework)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1797,15 +1771,14 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedStaticAnalysisTool,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withTestFramework(TestFrameworkTypes::PHPUNIT)
+                    ->withStaticAnalysisTool($configStaticAnalysisTool)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withTestFramework(TestFrameworkTypes::PHPUNIT)
-                            ->withStaticAnalysisTool($configStaticAnalysisTool)
-                            ->build(),
-                    )
-                    ->withStaticAnalysisTool($inputStaticAnalysisTool),
+                    ->withStaticAnalysisTool($inputStaticAnalysisTool)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1823,14 +1796,13 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedInitialTestPhpOptions,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withInitialTestsPhpOptions($configInitialTestsPhpOptions)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withInitialTestsPhpOptions($configInitialTestsPhpOptions)
-                            ->build(),
-                    )
-                    ->withInitialTestsPhpOptions($inputInitialTestsPhpOptions),
+                    ->withInitialTestsPhpOptions($inputInitialTestsPhpOptions)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1849,15 +1821,14 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFrameworkExtraOptions,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withTestFramework($configTestFramework)
+                    ->withTestFrameworkExtraOptions($configTestFrameworkExtraOptions)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withTestFramework($configTestFramework)
-                            ->withTestFrameworkExtraOptions($configTestFrameworkExtraOptions)
-                            ->build(),
-                    )
-                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
+                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1876,14 +1847,13 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedStaticAnalysisToolOptions,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withStaticAnalysisToolOptions($configStaticAnalysisToolOptions)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withStaticAnalysisToolOptions($configStaticAnalysisToolOptions)
-                            ->build(),
-                    )
-                    ->withStaticAnalysisToolOptions($inputStaticAnalysisToolOptions),
+                    ->withStaticAnalysisToolOptions($inputStaticAnalysisToolOptions)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1901,14 +1871,13 @@ final class ConfigurationFactoryTest extends TestCase
         string $expectedTestFrameworkExtraOptions,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withTestFramework($configTestFramework)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withTestFramework($configTestFramework)
-                            ->build(),
-                    )
-                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions),
+                    ->withTestFrameworkExtraOptions($inputTestFrameworkExtraOptions)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1933,15 +1902,14 @@ final class ConfigurationFactoryTest extends TestCase
         array $expectedIgnoreSourceCodeMutatorsMap = [],
     ): ConfigurationFactoryScenario {
         return $defaultScenario
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withMutators($configMutators)
+            )
             ->withInput(
                 $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withMutators($configMutators)
-                            ->build(),
-                    )
                     ->withMutatorsInput($inputMutators)
-                    ->withUseNoopMutators($useNoopMutators),
+                    ->withUseNoopMutators($useNoopMutators)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1963,13 +1931,9 @@ final class ConfigurationFactoryTest extends TestCase
         array $expectedIgnoreSourceCodeMutatorsMap,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withMutators($configMutators)
-                            ->build(),
-                    ),
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withMutators($configMutators)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
@@ -1991,18 +1955,17 @@ final class ConfigurationFactoryTest extends TestCase
         ?string $expectedHtmlFileLogPath,
     ): ConfigurationFactoryScenario {
         return $defaultScenario
-            ->withInput(
-                $defaultScenario->inputBuilder
-                    ->withSchema(
-                        $defaultSchemaBuilder
-                            ->withLogs(
-                                LogsBuilder::withMinimalTestData()
-                                    ->withHtmlLogFilePath($htmlFileLogPathInConfig)
-                                    ->build(),
-                            )
+            ->withSchema(
+                $defaultSchemaBuilder
+                    ->withLogs(
+                        LogsBuilder::withMinimalTestData()
+                            ->withHtmlLogFilePath($htmlFileLogPathInConfig)
                             ->build(),
                     )
-                    ->withHtmlLogFilePath($htmlFileLogPathFromCliOption),
+            )
+            ->withInput(
+                $defaultScenario->inputBuilder
+                    ->withHtmlLogFilePath($htmlFileLogPathFromCliOption)
             )
             ->withExpected(
                 $defaultConfigurationBuilder
