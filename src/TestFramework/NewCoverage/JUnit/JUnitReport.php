@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\NewCoverage\JUnit;
 
-// TODO: rather than converting directly to TestFileTimeData, this adds a layer of abstraction to expose the report as a PHP object.
-//  Need to be revisted.
 use function array_key_exists;
 use function dirname;
 use DOMElement;
@@ -49,31 +47,28 @@ use PHPUnit\Framework\TestCase;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
+// TODO: rather than converting directly to TestFileTimeData, this adds a layer of abstraction to expose the report as a PHP object.
+//  Need to be revisted.
 final class JUnitReport
 {
-    private readonly string $coverageDirPathname;
-
     private SafeDOMXPath $xPath;
 
     /**
-     * @var array<string, float>
+     * @var array<string, TestInfo>
      */
     private array $indexedExecutionTimes = [];
 
-    private Generator $fileInfosGenerator;
-
     private bool $traversed = false;
-
-    private string $source;
 
     public function __construct(
         private readonly string $pathname,
     ) {
-        $this->coverageDirPathname = dirname($pathname);
     }
 
     /**
      * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
+     *
+     * @throws TestFileNameNotFoundException
      */
     public function getTestInfo(string $test): TestInfo
     {
@@ -145,39 +140,6 @@ final class JUnitReport
         //
         //        // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
         //        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $testCaseClassName);
-    }
-
-    /**
-     * @return Generator<SourceFileIndexXmlInfo>
-     */
-    private function getFileInfosGenerator(): Generator
-    {
-        $source = $this->getPhpunitSource();
-        $files = $this->getXPath()->queryList('//coverage:file');
-
-        foreach ($files as $file) {
-            Assert::isInstanceOf($file, DOMElement::class);
-
-            yield SourceFileIndexXmlInfo::fromNode(
-                $file,
-                $this->coverageDirPathname,
-                $source,
-            );
-        }
-
-        $this->traversed = true;
-        unset($this->xPath);
-        unset($this->fileInfosGenerator);
-    }
-
-    private function getPhpunitSource(): string
-    {
-        if (!isset($this->source)) {
-            $project = $this->getXPath()->queryElement('/coverage:phpunit/coverage:project');
-            $this->source = $project->getAttribute('source');
-        }
-
-        return $this->source;
     }
 
     private function getXPath(): SafeDOMXPath
