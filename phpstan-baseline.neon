@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationBuilder::withMutators() has parameter $mutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: tests/phpunit/Configuration/ConfigurationBuilder.php
+
+		-
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
+			identifier: missingType.generics
+			count: 1
+			path: tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryScenario.php
