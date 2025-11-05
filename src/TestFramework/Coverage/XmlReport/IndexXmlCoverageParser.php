@@ -63,7 +63,10 @@ class IndexXmlCoverageParser
         string $xmlIndexCoverageContent,
         string $coverageBasePath,
     ): iterable {
-        $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
+        $xPath = XPathFactory::createXPath(
+            $xmlIndexCoverageContent,
+            namespace: 'p',
+        );
 
         self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
 
@@ -80,7 +83,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $projectSource = self::getProjectSource($xPath);
 
-        foreach ($xPath->query('//file') as $node) {
+        foreach ($xPath->query('//p:file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(
@@ -97,7 +100,7 @@ class IndexXmlCoverageParser
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
-        $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
+        $lineCoverage = $xPath->query('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines')->item(0);
 
         if (
             !$lineCoverage instanceof DOMElement
@@ -113,13 +116,13 @@ class IndexXmlCoverageParser
     private static function getProjectSource(SafeDOMXPath $xPath): string
     {
         // PHPUnit >= 6
-        $sourceNodes = $xPath->query('//project/@source');
+        $sourceNodes = $xPath->query('//p:project/@source');
 
         if ($sourceNodes->length > 0) {
             return $sourceNodes[0]->nodeValue;
         }
 
         // PHPUnit < 6
-        return $xPath->query('//project/@name')[0]->nodeValue;
+        return $xPath->query('//p:project/@name')[0]->nodeValue;
     }
 }

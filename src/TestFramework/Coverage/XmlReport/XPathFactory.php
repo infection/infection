@@ -48,14 +48,22 @@ final class XPathFactory
 {
     use CannotBeInstantiated;
 
-    public static function createXPath(string $coverageContent): SafeDOMXPath
-    {
+    public static function createXPath(
+        string $coverageContent,
+        string $namespace,
+    ): SafeDOMXPath {
         $document = new DOMDocument();
-        $success = @$document->loadXML(self::removeNamespace($coverageContent));
 
+        $success = @$document->loadXML($coverageContent);
         Assert::true($success);
 
-        return new SafeDOMXPath($document);
+        $xPath = new SafeDOMXPath($document);
+        $xPath->registerNamespace(
+            $namespace,
+            $xPath->document->documentElement->namespaceURI,
+        );
+
+        return $xPath;
     }
 
     /**

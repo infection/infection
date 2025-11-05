@@ -44,8 +44,11 @@ final class XPathFactoryTest extends TestCase
 {
     public function test_it_removes_namespace(): void
     {
-        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
+        $xPath = XPathFactory::createXPath(
+            '<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>',
+            namespace: 'p',
+        );
 
-        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
+        $this->assertStringContainsString('xmlns', $xPath->document->saveXML());
     }
 }
