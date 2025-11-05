@@ -130,7 +130,7 @@ final class PHPUnitCoverageTracer
         $testCaseClassName = explode('::', $test, 2)[0];
         $testInfo = $this->getReport()->getTestInfo($testCaseClassName);
 
-         return new TestLocation(
+        return new TestLocation(
             $test,
             $testInfo->location,
             $testInfo->executionTime,
