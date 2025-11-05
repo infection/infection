@@ -62,6 +62,29 @@ final readonly class SafeDOMXPath
         return $this->$property;
     }
 
+    public static function fromFile(string $pathname): self
+    {
+        Assert::file($pathname);
+        Assert::readable($pathname);
+
+        $dom = new DOMDocument();
+        $loaded = @$dom->load($pathname);
+
+        Assert::true(
+            $loaded,
+            sprintf(
+                'The file "%s" does not contain valid XML.',
+                $pathname,
+            ),
+        );
+
+        return new self($dom);
+    }
+
+    /**
+     * Warning: doing a `file_get_contents()` + `::fromString()` is quite slower
+     * than `::fromFile()`.
+     */
     public static function fromString(string $xml): self
     {
         $document = new DOMDocument();

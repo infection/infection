@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\TestFramework\SafeDOMXPath;
 
 use DOMDocument;
 use Infection\TestFramework\SafeDOMXPath;
