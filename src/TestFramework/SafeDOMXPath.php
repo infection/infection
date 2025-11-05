@@ -39,6 +39,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
+use function Safe\preg_replace;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -49,6 +50,7 @@ use Webmozart\Assert\Assert;
  */
 final readonly class SafeDOMXPath
 {
+    const XMLNS_NAMESPACE = '/xmlns=\".*?\"/';
     private DOMXPath $xPath;
 
     public function __construct(
@@ -62,7 +64,10 @@ final readonly class SafeDOMXPath
         return $this->$property;
     }
 
-    public static function fromFile(string $pathname): self
+    public static function fromFile(
+        string $pathname,
+        bool $removeNamespace = false,
+    ): self
     {
         Assert::file($pathname);
         Assert::readable($pathname);
@@ -111,5 +116,16 @@ final readonly class SafeDOMXPath
         Assert::isInstanceOf($nodes, DOMNodeList::class);
 
         return $nodes;
+    }
+
+    /**
+     * Remove namespace to work with xPath without a headache.
+     */
+    private static function removeNamespace(string $xml): string
+    {
+        $cleanedXml = preg_replace(self::XMLNS_NAMESPACE, '', $xml);
+        Assert::string($cleanedXml);
+
+        return $cleanedXml;
     }
 }

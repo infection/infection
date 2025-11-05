@@ -59,7 +59,7 @@ final class XPathFactory
     }
 
     /**
-     * Remove namespace to work with xPath without a headache
+     * Remove namespace to work with xPath without a headache.
      */
     private static function removeNamespace(string $xml): string
     {

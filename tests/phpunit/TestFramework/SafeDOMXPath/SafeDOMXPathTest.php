@@ -39,7 +39,9 @@ use DOMDocument;
 use Infection\TestFramework\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Path;
 use function sprintf;
 
 #[CoversClass(SafeDOMXPath::class)]
@@ -71,18 +73,53 @@ final class SafeDOMXPathTest extends TestCase
         $this->assertNull($xPath->document->namespaceURI);
     }
 
-    public function test_it_can_be_created_for_an_xml_file(): void
+    #[DataProvider('validXmlFileProvider')]
+    public function test_it_can_be_created_for_an_xml_file(
+        string $pathname,
+        ?string $expectedNamespace,
+        string $expectedFirstElementTagName,
+    ): void
     {
         $xPath = SafeDOMXPath::fromFile(
-            __DIR__ . '/example.xml',
+            Path::canonicalize($pathname),
         );
 
         $firstElement = $xPath->document->firstElementChild;
 
         // @phpstan-ignore property.nonObject
-        $this->assertSame('http://www.w3.org/TR/html5/', $firstElement->namespaceURI);
+        $this->assertSame($expectedNamespace, $firstElement->namespaceURI);
         // @phpstan-ignore property.nonObject
-        $this->assertSame('note', $firstElement->tagName);
+        $this->assertSame($expectedFirstElementTagName, $firstElement->tagName);
+    }
+
+    public static function validXmlFileProvider(): iterable
+    {
+        yield 'file with namespace' => [
+            __DIR__ . '/example-with-namespace.xml',
+            'http://www.w3.org/TR/html5/',
+            'note',
+        ];
+
+        yield 'file without namespace' => [
+            __DIR__ . '/example-without-namespace.xml',
+            null,
+            'note',
+        ];
+    }
+
+    public function test_it_can_be_created_without_a_namespace_for_an_xml_file(): void
+    {
+        $xPath = SafeDOMXPath::fromFile(
+            Path::canonicalize(__DIR__ . '/example-with-namespace.xml'),
+            removeNamespace: true,
+        );
+
+        $firstElement = $xPath->document->namespaceURI;
+
+        // @phpstan-ignore property.nonObject
+        $this->assertSame(null, $firstElement->namespaceURI);
+        // @phpstan-ignore property.nonObject
+        $this->assertSame($expectedFirstElementTagName, $firstElement->tagName);
     }
 
     public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_file(): void
