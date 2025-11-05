@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use Infection\TestFramework\SafeDOMXPath;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -152,6 +153,7 @@ final class ProjectCodeProvider
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
+        SafeDOMXPath::class,
         SourceFileCollector::class,
         EnumBucket::class,
     ];

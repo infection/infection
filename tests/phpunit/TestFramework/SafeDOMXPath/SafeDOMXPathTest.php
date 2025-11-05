@@ -79,7 +79,9 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstElement = $xPath->document->firstElementChild;
 
+        // @phpstan-ignore property.nonObject
         $this->assertSame('http://www.w3.org/TR/html5/', $firstElement->namespaceURI);
+        // @phpstan-ignore property.nonObject
         $this->assertSame('note', $firstElement->tagName);
     }
 
