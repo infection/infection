@@ -40,6 +40,7 @@ use Infection\TestFramework\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 #[CoversClass(SafeDOMXPath::class)]
 final class SafeDOMXPathTest extends TestCase
@@ -68,6 +69,34 @@ final class SafeDOMXPathTest extends TestCase
         $xPath = new SafeDOMXPath($domDocument);
 
         $this->assertNull($xPath->document->namespaceURI);
+    }
+
+    public function test_it_can_be_created_for_an_xml_file(): void
+    {
+        $xPath = SafeDOMXPath::fromFile(
+            __DIR__ . '/example.xml',
+        );
+
+        $firstElement = $xPath->document->firstElementChild;
+
+        $this->assertSame('http://www.w3.org/TR/html5/', $firstElement->namespaceURI);
+        $this->assertSame('note', $firstElement->tagName);
+    }
+
+    public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_file(): void
+    {
+        $pathname = __DIR__ . '/invalid.xml';
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                sprintf(
+                    'The file "%s" does not contain valid XML.',
+                    $pathname,
+                ),
+            ),
+        );
+
+        SafeDOMXPath::fromFile($pathname);
     }
 
     public function test_it_can_be_created_for_an_xml_string(): void
