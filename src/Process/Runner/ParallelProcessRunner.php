@@ -95,7 +95,7 @@ class ParallelProcessRunner implements ProcessRunner
     {
         /*
          * It takes about 100000 ms for a mutated process to finish, where it takes
-         * about 5000 ms to make it. Therefore instead of just waiting we can produce
+         * about 5000 ms to make it. Therefore, instead of just waiting, we can produce
          * new processes so that when a process or several finish, we would have
          * additional jobs on hand, without a need to wait for them to be created.
          *
@@ -133,18 +133,20 @@ class ParallelProcessRunner implements ProcessRunner
             }
 
             while ($this->hasProcessesThatCouldBeFreed($threadCount)) {
-                // While we wait, try fetch a good amount of next processes from the queue,
+                // While we wait, try to fetch a good number of next processes from the queue,
                 // reducing the poll delay with each loaded process
-                $this->wait($this->fillBucketOnce($bucket, $generator, $threadCount));
+                $this->sleepRemaining(
+                    timeSpentDoingWork: $this->fillBucketOnce($bucket, $generator, $threadCount),
+                );
 
-                // yield back so that we can work on process result
+                // yield back so that we can work on a process result
                 yield from $this->tryToFreeNotRunningProcess($bucket);
 
                 // Continue if we still have too many running processes and no processes were terminated
             }
 
             // this termination is added for the case when there are few processes than threads, and we don't fill/free processes above
-            // yield back so that we can work on process result
+            // yield back so that we can work on a process result
             yield from $this->tryToFreeNotRunningProcess($bucket);
 
             // In any case try to load at least one process to the bucket
@@ -166,6 +168,7 @@ class ParallelProcessRunner implements ProcessRunner
      *
      * @param SplQueue<MutantProcessContainer> $bucket
      * @param Iterator<MutantProcessContainer> $input
+     * @return int Milliseconds spent doing work
      */
     protected function fillBucketOnce(SplQueue $bucket, Iterator $input, int $threadCount): int
     {
@@ -187,9 +190,10 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
+     * Adaptive polling: sleep for remaining poll interval after accounting for work done.
      * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
      */
-    protected function wait(int $timeSpentDoingWork): void
+    protected function sleepRemaining(int $timeSpentDoingWork): void
     {
         $this->clock->usleep(max(0, $this->poll - $timeSpentDoingWork));
     }

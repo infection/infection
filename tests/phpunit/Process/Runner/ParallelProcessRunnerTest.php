@@ -467,7 +467,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         // Test scenario where poll - timeSpentDoingWork would be negative
         $timeSpentDoingWork = 15000; // 15ms, more than poll time
@@ -491,7 +491,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         // Test scenario where poll - timeSpentDoingWork would be exactly 0
         $timeSpentDoingWork = 10000; // Exactly poll time
@@ -515,7 +515,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         $timeSpentDoingWork = 2000; // 2ms
 
@@ -538,7 +538,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         $timeSpentDoingWork = 1000; // 1ms
 
@@ -711,7 +711,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
             ->setConstructorArgs([2, 0, new TimeSpy()])
-            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce', 'wait'])
+            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce', 'sleepRemaining'])
             ->getMock();
 
         $callCount = 0;
@@ -732,7 +732,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         // wait should be called with the return value from fillBucketOnce
         $runner->expects($this->atLeastOnce())
-            ->method('wait')
+            ->method('sleepRemaining')
             ->with($this->identicalTo(self::SIMULATED_TIME_MICROSECONDS)); // Must be called with the fillBucketOnce return value
 
         // Create processes
