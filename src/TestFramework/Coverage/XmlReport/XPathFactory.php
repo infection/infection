@@ -38,7 +38,6 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use DOMDocument;
 use Infection\CannotBeInstantiated;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
 use Webmozart\Assert\Assert;
 
 /**
@@ -48,26 +47,22 @@ final class XPathFactory
 {
     use CannotBeInstantiated;
 
-    public static function createXPath(string $coverageContent): SafeDOMXPath
-    {
+    public static function createXPath(
+        string $coverageContent,
+        string $namespace,
+    ): SafeDOMXPath {
         $document = new DOMDocument();
-        $success = @$document->loadXML(self::removeNamespace($coverageContent));
 
+        $success = @$document->loadXML($coverageContent);
         Assert::true($success);
 
-        return new SafeDOMXPath($document);
-    }
+        // @phpstan-ignore property.nonObject
+        $namespaceUri = $document->documentElement->namespaceURI;
+        Assert::notNull($namespaceUri, 'Expected the first document element to have a namespace URI. None found.');
 
-    /**
-     * Remove namespace to work with xPath without a headache.
-     */
-    private static function removeNamespace(string $xml): string
-    {
-        /** @var string $cleanedXml */
-        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
+        $xPath = new SafeDOMXPath($document);
+        $xPath->registerNamespace($namespace, $namespaceUri);
 
-        Assert::string($cleanedXml);
-
-        return $cleanedXml;
+        return $xPath;
     }
 }

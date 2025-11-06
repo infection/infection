@@ -118,6 +118,12 @@ final readonly class SafeDOMXPath
         return $nodes;
     }
 
+    public function registerNamespace(string $prefix, string $namespace): void
+    {
+        $result = $this->xPath->registerNamespace($prefix, $namespace);
+        Assert::true($result);
+    }
+
     /**
      * Remove namespace to work with xPath without a headache.
      */
