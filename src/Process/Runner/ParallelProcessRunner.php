@@ -142,7 +142,10 @@ class ParallelProcessRunner implements ProcessRunner
             // yield back so that we can work on a process result
             yield from $this->tryToFreeNotRunningProcess();
 
-            // Keep the queue populated for the next iteration
+            // Keep the queue populated for the next iteration. This ensures we always have
+            // work ready when threads become available. Without this, the loop would exit
+            // prematurely when the queue empties (we check for isEmpty() below), even
+            // if the generator has more processes.
             $this->queue->enqueueFrom($generator);
         } while (!$this->queue->isEmpty() || $this->runningProcessContainers !== []);
     }
