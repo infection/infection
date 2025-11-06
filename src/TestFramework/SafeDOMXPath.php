@@ -39,6 +39,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -61,12 +62,18 @@ final readonly class SafeDOMXPath
         return $this->$property;
     }
 
-    public static function fromString(string $content): self
+    public static function fromString(string $xml): self
     {
         $document = new DOMDocument();
-        $success = @$document->loadXML($content);
+        $success = @$document->loadXML($xml);
 
-        Assert::true($success);
+        Assert::true(
+            $success,
+            sprintf(
+                'The string "%s" is not valid XML.',
+                $xml,
+            ),
+        );
 
         return new self($document);
     }

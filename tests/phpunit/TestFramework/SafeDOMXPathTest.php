@@ -94,7 +94,11 @@ final class SafeDOMXPathTest extends TestCase
 
     public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_string(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The string "Hello world!" is not valid XML.',
+            ),
+        );
 
         SafeDOMXPath::fromString('Hello world!');
     }
