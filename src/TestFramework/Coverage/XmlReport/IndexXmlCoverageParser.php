@@ -63,10 +63,7 @@ class IndexXmlCoverageParser
         string $xmlIndexCoverageContent,
         string $coverageBasePath,
     ): iterable {
-        $xPath = XPathFactory::createXPath(
-            $xmlIndexCoverageContent,
-            namespace: 'p',
-        );
+        $xPath = SafeDOMXPath::fromString($xmlIndexCoverageContent, 'p');
 
         self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
 

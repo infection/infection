@@ -84,6 +84,7 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
+use Infection\TestFramework\SafeDOMXPath;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
@@ -152,6 +153,7 @@ final class ProjectCodeProvider
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
         FilterBuilder::class,
+        SafeDOMXPath::class,
         SourceFileCollector::class,
         EnumBucket::class,
     ];

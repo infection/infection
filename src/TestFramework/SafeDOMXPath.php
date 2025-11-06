@@ -62,9 +62,46 @@ final readonly class SafeDOMXPath
         return $this->$property;
     }
 
-    public static function fromString(string $xml): self
+    public static function fromFile(string $pathname): self
     {
+        Assert::file($pathname);
+        Assert::readable($pathname);
+
+        $dom = new DOMDocument();
+        $loaded = @$dom->load($pathname);
+
+        Assert::true(
+            $loaded,
+            sprintf(
+                'The file "%s" does not contain valid XML.',
+                $pathname,
+            ),
+        );
+
+        return new self($dom);
+    }
+
+    /**
+     * Warning: doing a `file_get_contents()` + `::fromString()` is quite slower
+     * than `::fromFile()`.
+     *
+     * @param bool|null $formatOutput Nicely formats output with indentation and extra space. Has no effect if the document was loaded with preserveWhitespace enabled.
+     *
+     * @see https://php.net/manual/en/class.domdocument.php#domdocument.props.formatoutput
+     */
+    public static function fromString(
+        string $xml,
+        ?string $namespace = null,
+        bool $preserveWhiteSpace = true,
+        ?bool $formatOutput = null,
+    ): self {
         $document = new DOMDocument();
+        $document->preserveWhiteSpace = $preserveWhiteSpace;
+
+        if ($formatOutput !== null) {
+            $document->formatOutput = $formatOutput;
+        }
+
         $success = @$document->loadXML($xml);
 
         Assert::true(
@@ -75,7 +112,20 @@ final readonly class SafeDOMXPath
             ),
         );
 
-        return new self($document);
+        $xPath = new self($document);
+
+        if ($namespace !== null) {
+            // Beware that this is not a universal solution: it only works because
+            // of the type of document we handle.
+            // A generic XML can have the namespace at the root or any element...
+            // @phpstan-ignore property.nonObject
+            $namespaceUri = $document->documentElement->namespaceURI;
+            Assert::notNull($namespaceUri, 'Expected the first document element to have a namespace URI. None found.');
+
+            $xPath->registerNamespace($namespace, $namespaceUri);
+        }
+
+        return $xPath;
     }
 
     /**
@@ -90,7 +140,7 @@ final readonly class SafeDOMXPath
         return $nodes;
     }
 
-    public function registerNamespace(string $prefix, string $namespace): void
+    private function registerNamespace(string $prefix, string $namespace): void
     {
         $result = $this->xPath->registerNamespace($prefix, $namespace);
         Assert::true($result);
