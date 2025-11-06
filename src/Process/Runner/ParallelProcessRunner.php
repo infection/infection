@@ -91,8 +91,8 @@ class ParallelProcessRunner implements ProcessRunner
     public function run(iterable $processContainers): iterable
     {
         /*
-         * It takes about 100000 ms for a mutated process to finish, where it takes
-         * about 5000 ms to make it. Therefore, instead of just waiting, we can produce
+         * It takes about 100,000 ms for a mutated process to finish, where it takes
+         * about 5,000 ms to make it. Therefore, instead of just waiting, we can produce
          * new processes so that when a process or several finish, we would have
          * additional jobs on hand, without a need to wait for them to be created.
          *
@@ -154,7 +154,7 @@ class ParallelProcessRunner implements ProcessRunner
     }
 
     /**
-     * Adaptive polling: sleep for a remaining poll interval after accounting for work done.
+     * Adaptive polling: sleep for the remaining poll interval after accounting for work done.
      * @param int $timeSpentDoingWork Time to subtract from the poll time when we did some work in between polls
      */
     protected function sleepRemaining(int $timeSpentDoingWork): void
