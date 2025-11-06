@@ -36,11 +36,22 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Closure;
+use function function_exists;
 use Infection\Container;
+use Infection\TestFramework\Coverage\Trace;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
+
+if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
+    function fetchTraceLazyState(Trace $trace): void
+    {
+        $trace->getSourceFileInfo();
+        $trace->hasTests();
+        $trace->getTests();
+    }
+}
 
 /**
  * @param positive-int $maxCount
@@ -61,13 +72,13 @@ return static function (int $maxCount): Closure {
         $count = 0;
 
         foreach ($traceProvider->provideTraces() as $trace) {
+            fetchTraceLazyState($trace);
+
             ++$count;
 
             if ($count >= $maxCount) {
                 break;
             }
-
-            // Continue
         }
 
         return $count;

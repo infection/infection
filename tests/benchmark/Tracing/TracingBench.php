@@ -33,43 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Benchmark\Tracing;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
-use PHPUnit\Framework\TestCase;
+use Closure;
+use const PHP_INT_MAX;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Iterations;
+use Webmozart\Assert\Assert;
 
 /**
- * @phpstan-require-extends TestCase
+ * To execute this test run `make benchmark_tracing`
  */
-trait MutantAssertions
+final class TracingBench
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
+    private Closure $main;
+
+    private int $count;
+
+    public function setUp(): void
+    {
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX);
+    }
+
+    public function tearDown(): void
+    {
+        Assert::greaterThan(
+            $this->count,
+            0,
+            'No trace was generated.',
         );
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    #[BeforeMethods('setUp')]
+    #[AfterMethods('tearDown')]
+    #[Iterations(5)]
+    public function benchTracing(): void
+    {
+        $this->count = ($this->main)();
     }
 }
