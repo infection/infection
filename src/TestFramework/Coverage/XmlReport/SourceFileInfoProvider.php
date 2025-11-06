@@ -91,12 +91,15 @@ class SourceFileInfoProvider
             ));
         }
 
-        return $this->xPath = XPathFactory::createXPath(file_get_contents($coverageFile));
+        return $this->xPath = XPathFactory::createXPath(
+            file_get_contents($coverageFile),
+            namespace: 'p',
+        );
     }
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->query('/phpunit/file')[0];
+        $fileNode = $xPath->query('/p:phpunit/p:file')[0];
 
         Assert::notNull($fileNode);
 

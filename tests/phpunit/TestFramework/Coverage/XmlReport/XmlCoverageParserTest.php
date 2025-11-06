@@ -177,7 +177,7 @@ final class XmlCoverageParserTest extends TestCase
      */
     private function createSourceFileInfoProvider(string $xml)
     {
-        $xPath = XPathFactory::createXPath($xml);
+        $xPath = XPathFactory::createXPath($xml, 'p');
 
         $providerMock = $this->createMock(SourceFileInfoProvider::class);
 
