@@ -33,43 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutant;
+namespace Infection\Tests\Configuration\Entry;
 
-use Infection\Mutant\Mutant;
-use Infection\Mutation\Mutation;
+use Infection\Configuration\Entry\Logs;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @phpstan-require-extends TestCase
- */
-trait MutantAssertions
+#[CoversClass(LogsBuilder::class)]
+final class LogsBuilderTest extends TestCase
 {
-    public function assertMutantEquals(
-        Mutant $expected,
-        Mutant $actual,
-    ): void {
-        $this->assertMutantStateIs(
-            mutant: $actual,
-            expectedFilePath: $expected->getFilePath(),
-            expectedMutation: $expected->getMutation(),
-            expectedMutatedCode: $expected->getMutatedCode()->get(),
-            expectedDiff: $expected->getDiff()->get(),
-            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
-        );
+    #[DataProvider('logsProvider')]
+    public function test_it_can_create_a_builder_from_a_built_instance(Logs $logs): void
+    {
+        $actual = LogsBuilder::from($logs)->build();
+
+        $this->assertEquals($logs, $actual);
     }
 
-    public function assertMutantStateIs(
-        Mutant $mutant,
-        string $expectedFilePath,
-        Mutation $expectedMutation,
-        string $expectedMutatedCode,
-        string $expectedDiff,
-        string $expectedPrettyPrintedOriginalCode,
-    ): void {
-        $this->assertSame($expectedFilePath, $mutant->getFilePath());
-        $this->assertEquals($expectedMutation, $mutant->getMutation());
-        $this->assertSame($expectedMutatedCode, $mutant->getMutatedCode()->get());
-        $this->assertSame($expectedDiff, $mutant->getDiff()->get());
-        $this->assertSame($expectedPrettyPrintedOriginalCode, $mutant->getPrettyPrintedOriginalCode()->get());
+    public static function logsProvider(): iterable
+    {
+        yield 'minimal test data' => [
+            LogsBuilder::withMinimalTestData()->build(),
+        ];
+
+        yield 'complete test data' => [
+            LogsBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

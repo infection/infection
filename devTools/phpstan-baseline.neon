@@ -571,24 +571,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationTest\:\:assertConfigurationStateIs\(\) has parameter \$expectedMutators with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationTest\:\:test_it_can_be_instantiated\(\) has parameter \$mutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationTest.php
-
-		-
-			message: '#^Parameter \#1 \$fileInfos of static method Infection\\Tests\\Configuration\\ConfigurationTest\:\:normalizePaths\(\) expects array\<Symfony\\Component\\Finder\\SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Configuration\\Schema\\InvalidSchemaTest\:\:test_it_can_be_instantiated\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -599,12 +581,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Schema\\SchemaConfigurationTest\:\:test_it_can_be_instantiated\(\) has parameter \$mutators with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Console\\E2ETest\:\:runInfection\(\) has parameter \$argvExtra with no value type specified in iterable type array\.$#'
@@ -1103,18 +1079,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/MockedContainer.php
-
-		-
-			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutant/MutantFactoryTest.php
-
-		-
-			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Mutant/MutantTest.php
 
 		-
 			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects array\<Infection\\Mutator\\Mutator\<PhpParser\\Node\>\>, array\{Infection\\Mutator\\IgnoreMutator\<PhpParser\\Node\\Expr\\BinaryOp\\Plus\>\} given\.$#'
