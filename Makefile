@@ -159,6 +159,12 @@ benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COV
 	vendor/bin/phpbench run tests/benchmark/Tracing $(PHPBENCH_REPORTS)
 	composer dump
 
+.PHONY: benchmark_dom_loading
+benchmark_dom_loading: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/DOMDocument --report=aggregate --report=benchmark_compare
+	composer dump
+
 
 .PHONY: autoreview
 autoreview: 	 	## Runs various checks (static analysis & AutoReview test suite)
