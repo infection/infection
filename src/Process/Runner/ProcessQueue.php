@@ -45,6 +45,7 @@ use Webmozart\Assert\Assert;
 /**
  * @final
  * @internal
+ * @psalm-suppress InvalidParamDefault
  */
 class ProcessQueue
 {
@@ -52,9 +53,6 @@ class ProcessQueue
 
     private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
-    /**
-     * @psalm-suppress InvalidParamDefault
-     */
     public function __construct(
         /** @var SplQueue<MutantProcessContainer> $bucket */
         private readonly SplQueue $bucket = new SplQueue(),
