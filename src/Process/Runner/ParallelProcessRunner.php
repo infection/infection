@@ -104,6 +104,9 @@ class ParallelProcessRunner implements ProcessRunner
             ? $processContainers
             : self::toGenerator($processContainers);
 
+        // To get going, try to load at least one process to the bucket
+        $this->queue->enqueueFrom($generator);
+
         $threadCount = max(1, $this->threadCount);
         $this->availableThreadIndexes = range(1, $threadCount);
 
@@ -112,9 +115,6 @@ class ParallelProcessRunner implements ProcessRunner
             if ($this->shouldStop) {
                 break;
             }
-
-            // To get going, try to load at least one process to the bucket
-            $this->queue->enqueueFrom($generator);
 
             if (!$this->queue->isEmpty()) {
                 $mutantProcessContainer = $this->queue->dequeue();
@@ -141,6 +141,9 @@ class ParallelProcessRunner implements ProcessRunner
             // this termination is added for the case when there are few processes than threads, and we don't fill/free processes above
             // yield back so that we can work on a process result
             yield from $this->tryToFreeNotRunningProcess();
+
+            // Keep the queue populated for the next iteration
+            $this->queue->enqueueFrom($generator);
         } while (!$this->queue->isEmpty() || $this->runningProcessContainers !== []);
     }
 
