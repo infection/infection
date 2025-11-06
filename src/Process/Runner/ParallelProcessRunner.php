@@ -69,7 +69,7 @@ class ParallelProcessRunner implements ProcessRunner
     private bool $shouldStop = false;
 
     /**
-     * @param positive-int $poll Delay (in milliseconds) to wait in-between two polls
+     * @param non-negative-int $poll Delay (in milliseconds) to wait in-between two polls
      */
     public function __construct(
         private readonly int $threadCount,
