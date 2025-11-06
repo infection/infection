@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
-use DOMDocument;
 use const E_ALL;
 use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
@@ -1128,13 +1127,10 @@ final class XmlConfigurationManipulatorTest extends TestCase
 
     private function createXPath(string $xml): SafeDOMXPath
     {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $success = $dom->loadXML($xml);
-
-        $this->assertTrue($success);
-
-        return new SafeDOMXPath($dom);
+        return SafeDOMXPath::fromString(
+            $xml,
+            preserveWhiteSpace: false,
+            formatOutput: true,
+        );
     }
 }

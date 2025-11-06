@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use Infection\TestFramework\SafeDOMXPath;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function in_array;
@@ -85,6 +84,7 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
+use Infection\TestFramework\SafeDOMXPath;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;

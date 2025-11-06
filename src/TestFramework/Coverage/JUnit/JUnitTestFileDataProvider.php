@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\SafeDOMXPath;

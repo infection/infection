@@ -91,10 +91,7 @@ class SourceFileInfoProvider
             ));
         }
 
-        return $this->xPath = XPathFactory::createXPath(
-            file_get_contents($coverageFile),
-            namespace: 'p',
-        );
+        return $this->xPath = SafeDOMXPath::fromString(file_get_contents($coverageFile), 'p');
     }
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
