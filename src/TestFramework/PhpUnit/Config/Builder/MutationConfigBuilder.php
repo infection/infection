@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use DOMDocument;
 use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -55,7 +54,7 @@ class MutationConfigBuilder extends ConfigBuilder
 {
     private ?string $originalBootstrapFile = null;
 
-    private ?DOMDocument $dom = null;
+    private readonly SafeDOMXPath $xPath;
 
     public function __construct(
         private readonly string $tmpDir,
@@ -76,8 +75,7 @@ class MutationConfigBuilder extends ConfigBuilder
         string $mutationOriginalFilePath,
         string $version,
     ): string {
-        $dom = $this->getDom();
-        $xPath = new SafeDOMXPath($dom);
+        $xPath = $this->getXPath();
 
         $this->configManipulator->replaceWithAbsolutePaths($xPath);
 
@@ -104,7 +102,7 @@ class MutationConfigBuilder extends ConfigBuilder
         );
 
         $this->setCustomBootstrapPath($customAutoloadFilePath, $xPath);
-        $this->setFilteredTestsToRun($tests, $dom, $xPath);
+        $this->setFilteredTestsToRun($tests, $xPath);
 
         file_put_contents(
             $customAutoloadFilePath,
@@ -117,25 +115,23 @@ class MutationConfigBuilder extends ConfigBuilder
 
         $path = $this->buildPath($mutationHash);
 
-        file_put_contents($path, $dom->saveXML());
+        file_put_contents($path, $xPath->document->saveXML());
 
         return $path;
     }
 
-    private function getDom(): DOMDocument
+    private function getXPath(): SafeDOMXPath
     {
-        if ($this->dom !== null) {
-            return $this->dom;
+        if (!isset($this->xPath)) {
+            /** @psalm-suppress InaccessibleProperty */
+            $this->xPath = SafeDOMXPath::fromString(
+                $this->originalXmlConfigContent,
+                preserveWhiteSpace: false,
+                formatOutput: true,
+            );
         }
 
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $success = @$dom->loadXML($this->originalXmlConfigContent);
-
-        Assert::true($success);
-
-        return $this->dom = $dom;
+        return $this->xPath;
     }
 
     private function createCustomAutoloadWithInterceptor(
@@ -186,11 +182,11 @@ class MutationConfigBuilder extends ConfigBuilder
     /**
      * @param TestLocation[] $tests
      */
-    private function setFilteredTestsToRun(array $tests, DOMDocument $dom, SafeDOMXPath $xPath): void
+    private function setFilteredTestsToRun(array $tests, SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuite($xPath);
 
-        $this->addTestSuiteWithFilteredTestFiles($tests, $dom, $xPath);
+        $this->addTestSuiteWithFilteredTestFiles($tests, $xPath);
     }
 
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
@@ -224,7 +220,6 @@ class MutationConfigBuilder extends ConfigBuilder
      */
     private function addTestSuiteWithFilteredTestFiles(
         array $tests,
-        DOMDocument $dom,
         SafeDOMXPath $xPath,
     ): void {
         $testSuites = $xPath->query('/phpunit/testsuites');
@@ -236,13 +231,13 @@ class MutationConfigBuilder extends ConfigBuilder
             $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
         }
 
-        $testSuite = $dom->createElement('testsuite');
+        $testSuite = $xPath->document->createElement('testsuite');
         $testSuite->setAttribute('name', 'Infection testsuite with filtered tests');
 
         $uniqueTestFilePaths = $this->jUnitTestCaseSorter->getUniqueSortedFileNames($tests);
 
         foreach ($uniqueTestFilePaths as $testFilePath) {
-            $file = $dom->createElement('file', $testFilePath);
+            $file = $xPath->document->createElement('file', $testFilePath);
 
             $testSuite->appendChild($file);
         }
