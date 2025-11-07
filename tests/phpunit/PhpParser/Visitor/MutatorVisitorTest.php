@@ -111,8 +111,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                         }
 
                     }
-                    PHP
-                ,
+                    PHP,
                 new Mutation(
                     'path/to/file',
                     $nodes,
@@ -169,8 +168,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
 
 
                     }
-                    PHP
-                ,
+                    PHP,
                 new Mutation(
                     'path/to/file',
                     $nodes,
@@ -229,8 +227,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                             return 'bye';
                         }
                     }
-                    PHP
-                ,
+                    PHP,
                 new Mutation(
                     'path/to/file',
                     $nodes,
@@ -288,8 +285,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                             return 'bye';
                         }
                     }
-                    PHP
-                ,
+                    PHP,
                 new Mutation(
                     'path/to/file',
                     $nodes,

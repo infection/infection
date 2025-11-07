@@ -59,8 +59,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_filter(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_filter(\Class_With_Const::Const, 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_filter(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 if (array_filter($a, 'is_int') === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_FiLtEr(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_filter($foo->bar(), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -169,8 +163,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 $a = array_map('strtolower', array_filter(['A', 1, 'C'], function($char): bool {
                     return !is_int($char);
                 }));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -185,8 +178,7 @@ final class UnwrapArrayFilterTest extends BaseMutatorTestCase
                 $a = 'array_filter';
 
                 $b = $a([1,2,3], 'is_int');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

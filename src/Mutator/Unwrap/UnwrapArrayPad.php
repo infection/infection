@@ -58,8 +58,7 @@ final class UnwrapArrayPad extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = ['foo'];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

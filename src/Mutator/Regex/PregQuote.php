@@ -66,8 +66,7 @@ final class PregQuote implements Mutator
                 $x = $string;
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

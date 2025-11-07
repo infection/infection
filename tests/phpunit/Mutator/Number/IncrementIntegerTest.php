@@ -63,16 +63,14 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 if ($foo === 10) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if ($foo === 11) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not increment assigment of 0' => [
@@ -80,8 +78,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 $foo = 0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not increment 0 in greater comparison' => [
@@ -171,16 +168,14 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 if ($foo === 1) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if ($foo === 2) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not increment floats' => [
@@ -200,16 +195,14 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 if ($foo === -10) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if ($foo === -9) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not increment limit argument of preg_split function when it equals to -1' => [
@@ -224,8 +217,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 preg_split('//', 'string', 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -238,8 +230,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 preg_split('//', 'string', -2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -254,8 +245,7 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 random_int(10000000, {$maxInt});
-                PHP
-            ,
+                PHP,
             <<<"PHP"
                 <?php
 
@@ -273,16 +263,14 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
                 if (\$foo === {$minIntPlus1}) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<"PHP"
                 <?php
 
                 if (\$foo === {$minIntPlus2}) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not increment preg_match() return value above 1 on identical comparison' => [

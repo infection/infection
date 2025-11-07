@@ -87,8 +87,7 @@ final class SchemaValidatorTest extends TestCase
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
                  - [source] The property source is required
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'invalid timeout' => [
@@ -100,8 +99,7 @@ final class SchemaValidatorTest extends TestCase
                 "/path/to/config" does not match the expected JSON schema:
                  - [source] The property source is required
                  - [timeout] String value found, but a number is required
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'invalid custom mutator' => [
@@ -121,8 +119,7 @@ final class SchemaValidatorTest extends TestCase
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
                  - [mutators] The property CustomMutator is not defined and the definition does not allow additional properties
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'valid custom mutator' => [

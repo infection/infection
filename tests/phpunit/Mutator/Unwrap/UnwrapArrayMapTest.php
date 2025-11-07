@@ -59,8 +59,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', \Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_map('strtolower', ['A', 'B', 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 if (array_map('strtolower', $a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ArRaY_mAp('strtolower', ['A', 'B', 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', $foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -169,8 +163,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 $a = array_filter(array_map(function(string $letter): string {
                     return strtolower($letter);
                 }, ['A', 'B', 'C']), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -183,27 +176,23 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', ['A', 'B', 'C'], \Class_With_Const::Const, $foo->bar());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 'B', 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -214,8 +203,7 @@ final class UnwrapArrayMapTest extends BaseMutatorTestCase
                 $a = 'array_map';
 
                 $b = $a('strtolower', [3,4,5]);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

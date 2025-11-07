@@ -60,8 +60,7 @@ final class TernaryTest extends BaseMutatorTestCase
                 <?php
 
                 isset($b) ? 'B' : 'C';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -75,8 +74,7 @@ final class TernaryTest extends BaseMutatorTestCase
 
                 $foo = 'foo';
                 $foo ?: 'bar';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -91,15 +89,13 @@ final class TernaryTest extends BaseMutatorTestCase
                     <?php
 
                     true ? 'true' : false ? 't' : 'f';
-                    PHP
-                ,
+                    PHP,
                 [
                     <<<'PHP'
                         <?php
 
                         (true ? false : 'true') ? 't' : 'f';
-                        PHP
-                    ,
+                        PHP,
                     <<<'PHP'
                         <?php
 
@@ -113,15 +109,13 @@ final class TernaryTest extends BaseMutatorTestCase
                     <?php
 
                     true ?: false ?: 'f';
-                    PHP
-                ,
+                    PHP,
                 [
                     <<<'PHP'
                         <?php
 
                         (true ? false : true) ?: 'f';
-                        PHP
-                    ,
+                        PHP,
                     <<<'PHP'
                         <?php
 
@@ -135,15 +129,13 @@ final class TernaryTest extends BaseMutatorTestCase
                     <?php
 
                     (true ? 'true' : false) ? 't' : 'f';
-                    PHP
-                ,
+                    PHP,
                 [
                     <<<'PHP'
                         <?php
 
                         (true ? false : 'true') ? 't' : 'f';
-                        PHP
-                    ,
+                        PHP,
                     <<<'PHP'
                         <?php
 
@@ -157,15 +149,13 @@ final class TernaryTest extends BaseMutatorTestCase
                     <?php
 
                     ((true ?: false) ? 't' : 'f');
-                    PHP
-                ,
+                    PHP,
                 [
                     <<<'PHP'
                         <?php
 
                         (true ? false : true) ? 't' : 'f';
-                        PHP
-                    ,
+                        PHP,
                     <<<'PHP'
                         <?php
 

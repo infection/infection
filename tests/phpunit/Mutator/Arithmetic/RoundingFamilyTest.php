@@ -59,8 +59,7 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
                 <?php
 
                 $var = round(1.23);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -149,8 +148,7 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
                 <?php
 
                 $var = round(1.23, 2, PHP_ROUND_HALF_UP);
-                PHP_WRAP
-            ,
+                PHP_WRAP,
             [
                 <<<'PHP'
                     <?php
@@ -223,8 +221,7 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
                 <?php
 
                 echo ceil($result = $this->average());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

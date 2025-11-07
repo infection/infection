@@ -59,21 +59,18 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge_recursive(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -82,21 +79,18 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge_recursive(\Class_With_Const::Const, ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -105,21 +99,18 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_merge_recursive(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -131,8 +122,7 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 if (array_merge_recursive($a, ['D']) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -141,8 +131,7 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                     if ($a === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -150,8 +139,7 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                     if (['D'] === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -160,21 +148,18 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_MeRgE_rEcUrSiVe(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -183,21 +168,18 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge_recursive($foo->bar(), $foo->baz());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->baz();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -206,15 +188,13 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_merge_recursive(['A', 1, 'C'], ['D']));
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['A', 1, 'C']);
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -228,8 +208,7 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge_recursive(['A', 1, 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -242,21 +221,18 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge_recursive(['A', 1, 'C'], ['D'], ['E', 'F']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -290,8 +266,7 @@ final class UnwrapArrayMergeRecursiveTest extends BaseMutatorTestCase
                 $a = 'array_merge_recursive';
 
                 $b = $a([1,2,3], [3,4,5]);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

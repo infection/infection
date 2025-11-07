@@ -88,8 +88,7 @@ final class MBString implements ConfigurableMutator
                 ```php
                 $x = strlen($str) < 10;
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

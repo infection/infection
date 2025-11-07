@@ -60,15 +60,13 @@ final class ModEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a %= 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a *= 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate normal mod' => [
@@ -76,8 +74,7 @@ final class ModEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 10 % 3;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

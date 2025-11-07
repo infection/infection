@@ -157,8 +157,7 @@ final class StrykerDashboardClientTest extends TestCase
                     <<<'EOF'
                         Dashboard response:
                         Report invalid!
-                        EOF
-                    ,
+                        EOF,
                     [],
                 ],
             ],

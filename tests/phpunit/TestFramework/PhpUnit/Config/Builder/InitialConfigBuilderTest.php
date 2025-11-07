@@ -475,8 +475,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents($configurationPath),
         );
     }
