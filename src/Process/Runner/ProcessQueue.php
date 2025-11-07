@@ -52,10 +52,10 @@ class ProcessQueue
 
     private const NANO_SECONDS_IN_MILLI_SECOND = 1_000_000;
 
+    /**
+     * @param SplQueue<MutantProcessContainer> $bucket
+     */
     public function __construct(
-        /**
-         * @param SplQueue<MutantProcessContainer> $bucket
-         */
         private readonly SplQueue $bucket = new SplQueue(),
         private readonly DuoClock $clock = new DuoClock(),
     ) {
