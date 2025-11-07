@@ -54,7 +54,7 @@ class MutationConfigBuilder extends ConfigBuilder
 {
     private ?string $originalBootstrapFile = null;
 
-    private readonly SafeDOMXPath $xPath;
+    private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
         private readonly string $tmpDir,
@@ -122,7 +122,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getXPath(): SafeDOMXPath
     {
-        if (!isset($this->xPath)) {
+        if ($this->xPath === null) {
             /** @psalm-suppress InaccessibleProperty */
             $this->xPath = SafeDOMXPath::fromString(
                 $this->originalXmlConfigContent,
@@ -192,11 +192,13 @@ class MutationConfigBuilder extends ConfigBuilder
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuiteNodes(
+            /** @phpstan-ignore argument.type  */
             $xPath->query('/phpunit/testsuites/testsuite'),
         );
 
         // Handle situation when test suite is directly inside root node
         $this->removeExistingTestSuiteNodes(
+            /** @phpstan-ignore argument.type  */
             $xPath->query('/phpunit/testsuite'),
         );
     }

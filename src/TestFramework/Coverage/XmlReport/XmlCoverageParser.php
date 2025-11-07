@@ -95,7 +95,9 @@ class XmlCoverageParser
         }
 
         return new TestLocations(
+            /** @phpstan-ignore argument.type */
             self::collectCoveredLinesData($coveredLineNodes),
+            /** @phpstan-ignore argument.type */
             self::collectMethodsCoverageData($coveredMethodNodes),
         );
     }

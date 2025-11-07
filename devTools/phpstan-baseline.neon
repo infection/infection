@@ -1663,12 +1663,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
 
 		-
-			message: '#^Parameter \#2 \$haystack of method PHPUnit\\Framework\\Assert\:\:assertStringContainsString\(\) expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XPathFactoryTest.php
-
-		-
 			message: '#^Cannot call method getSourceMethodRangeByMethod\(\) on Infection\\TestFramework\\Coverage\\TestLocations\|null\.$#'
 			identifier: method.nonObject
 			count: 1

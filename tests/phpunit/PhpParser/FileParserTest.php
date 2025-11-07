@@ -289,6 +289,7 @@ final class FileParserTest extends TestCase
                 parent::__construct($path, $path, $path);
             }
 
+            /** @throws void */
             public function getContents(): string
             {
                 return $this->contents;

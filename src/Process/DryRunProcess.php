@@ -69,11 +69,13 @@ final class DryRunProcess extends Process
         return true;
     }
 
+    /** @throws void */
     public function getOutput(): string
     {
         return self::PASSING_TEST_OUTPUT;
     }
 
+    /** @throws void */
     public function getStartTime(): float
     {
         return 0.0;

@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
@@ -84,10 +85,12 @@ final readonly class XmlConfigurationManipulator
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->query('/phpunit/logging') as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
             $node->parentNode?->removeChild($node);
         }
 
         foreach ($xPath->query('/phpunit/coverage/report') as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
             $node->parentNode?->removeChild($node);
         }
     }
@@ -373,6 +376,7 @@ final readonly class XmlConfigurationManipulator
     private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
     {
         foreach ($xPath->query($nodeQuery) as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
             $node->parentNode?->removeChild($node);
         }
     }
