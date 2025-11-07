@@ -54,8 +54,7 @@ class ProcessQueue
 
     public function __construct(
         /**
-         * @psalm-suppress InvalidParamDefault
-         * @var SplQueue<MutantProcessContainer> $bucket
+         * @param SplQueue<MutantProcessContainer> $bucket
          */
         private readonly SplQueue $bucket = new SplQueue(),
         private readonly DuoClock $clock = new DuoClock(),
