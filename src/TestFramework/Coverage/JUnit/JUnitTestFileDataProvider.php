@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\XML\SafeDOMXPath;
@@ -110,18 +109,6 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
 
     private function getXPath(): SafeDOMXPath
     {
-        return $this->xPath ??= self::createXPath($this->jUnitLocator->locate());
-    }
-
-    private static function createXPath(string $jUnitPath): SafeDOMXPath
-    {
-        Assert::fileExists($jUnitPath);
-
-        $dom = new DOMDocument();
-        $success = @$dom->load($jUnitPath);
-
-        Assert::true($success);
-
-        return new SafeDOMXPath($dom);
+        return $this->xPath ??= SafeDOMXPath::fromFile($this->jUnitLocator->locate());
     }
 }
