@@ -485,8 +485,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 Generated Reports:
                          - relative/path.log
                          - /absolute/path.html
-                TEXT
-            ,
+                TEXT,
             $output,
         );
         $this->assertStringNotContainsString(

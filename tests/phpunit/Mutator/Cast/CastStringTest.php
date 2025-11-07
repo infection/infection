@@ -59,14 +59,12 @@ final class CastStringTest extends BaseMutatorTestCase
                 <?php
 
                 (string) 1.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to string in conditions' => [
@@ -76,16 +74,14 @@ final class CastStringTest extends BaseMutatorTestCase
                 if ((string) random_int()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if (random_int()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to string in global return' => [
@@ -93,14 +89,12 @@ final class CastStringTest extends BaseMutatorTestCase
                 <?php
 
                 return (string) random_int();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return random_int();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to string in return of untyped-function' => [

@@ -56,8 +56,7 @@ final class LessThan implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a less-than operator (`<`) with the less-than-or-equal-to operator (`<=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
                 This mutator shifts the compared values highlighting an untested boundary.

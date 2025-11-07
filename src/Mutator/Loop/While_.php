@@ -75,8 +75,7 @@ final class While_ implements Mutator
                     // ...
                 }
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -59,15 +59,13 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !(a() || b());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -83,8 +81,7 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
                 }
 
                 $var = a() || b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -97,8 +94,7 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
                     }
 
                     $var = !(a() || b());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -107,15 +103,13 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b() || c() || d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !(a() || b() || c() || d());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -124,8 +118,7 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !(a() || !b());
-                PHP
-            ,
+                PHP,
         ];
     }
 }

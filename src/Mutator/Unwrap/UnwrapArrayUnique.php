@@ -58,8 +58,7 @@ final class UnwrapArrayUnique extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = ['a', 'a', 'b'];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

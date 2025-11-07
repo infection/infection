@@ -18,7 +18,7 @@ BOX=./.tools/box
 BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
-PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.65.0/php-cs-fixer.phar"
+PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.89.2/php-cs-fixer.phar"
 
 PHPSTAN=./vendor/bin/phpstan
 RECTOR=./vendor/bin/rector

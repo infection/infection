@@ -58,8 +58,7 @@ final class UnwrapArrayChunk extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = $array;
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

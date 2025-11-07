@@ -61,14 +61,12 @@ final class IntegerNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return -1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates negative -2 int return to positive' => [
@@ -76,14 +74,12 @@ final class IntegerNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return -2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates positive 1 int return to negative' => [
@@ -91,14 +87,12 @@ final class IntegerNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return -1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates positive 2 int return to negative' => [
@@ -106,14 +100,12 @@ final class IntegerNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return -2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate int zero' => [
@@ -121,8 +113,7 @@ final class IntegerNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate floats' => [
@@ -130,8 +121,7 @@ final class IntegerNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 1.0;
-                PHP
-            ,
+                PHP,
         ];
     }
 

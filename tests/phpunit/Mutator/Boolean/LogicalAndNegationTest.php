@@ -59,8 +59,7 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -82,8 +81,7 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
                 }
 
                 $var = a() && b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -96,8 +94,7 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
                     }
 
                     $var = !(a() && b());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -106,8 +103,7 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b() && c() && d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

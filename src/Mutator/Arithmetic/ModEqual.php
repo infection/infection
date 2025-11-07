@@ -56,8 +56,7 @@ final class ModEqual implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a modulo assignment operator (`%=`) with a multiplication assignment operator (`*=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

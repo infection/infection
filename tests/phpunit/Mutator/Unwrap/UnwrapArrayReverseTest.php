@@ -59,8 +59,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_reverse(['A', 1, 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_reverse(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_reverse(['A', 1, 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 if (array_reverse($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_ReVeRsE(['A', 1, 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_reverse($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_reverse(['A', 1, 'C']));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_reverse(['A', 1, 'C'], $preserveKeys);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -197,8 +189,7 @@ final class UnwrapArrayReverseTest extends BaseMutatorTestCase
                 $a = 'array_reverse';
 
                 $b = $a([1,2,3]);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

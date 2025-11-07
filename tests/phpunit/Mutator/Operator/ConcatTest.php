@@ -61,8 +61,7 @@ final class ConcatTest extends BaseMutatorTestCase
                 $a = 'foo';
                 $b = 'bar';
                 $a . $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -80,8 +79,7 @@ final class ConcatTest extends BaseMutatorTestCase
                 $b = 'bar';
                 $c = 'baz';
                 $a . $b . $c;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -90,8 +88,7 @@ final class ConcatTest extends BaseMutatorTestCase
                     $b = 'bar';
                     $c = 'baz';
                     $b . $a . $c;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -112,8 +109,7 @@ final class ConcatTest extends BaseMutatorTestCase
                 $c = 'c';
                 $e = 'e';
                 $a . $b . $c . 'd' . $e;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -123,8 +119,7 @@ final class ConcatTest extends BaseMutatorTestCase
                     $c = 'c';
                     $e = 'e';
                     $b . $a . $c . 'd' . $e;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -133,8 +128,7 @@ final class ConcatTest extends BaseMutatorTestCase
                     $c = 'c';
                     $e = 'e';
                     $a . $c . $b . 'd' . $e;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -143,8 +137,7 @@ final class ConcatTest extends BaseMutatorTestCase
                     $c = 'c';
                     $e = 'e';
                     $a . $b . 'd' . $c . $e;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -153,8 +146,7 @@ final class ConcatTest extends BaseMutatorTestCase
                     $c = 'c';
                     $e = 'e';
                     $a . $b . $c . $e . 'd';
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -164,8 +156,7 @@ final class ConcatTest extends BaseMutatorTestCase
 
                 $a = 'foo';
                 $a . $a;
-                PHP
-            ,
+                PHP,
             [],
         ];
 
@@ -175,8 +166,7 @@ final class ConcatTest extends BaseMutatorTestCase
 
                 $a = 'foo';
                 $a . $a . $a;
-                PHP
-            ,
+                PHP,
             [],
         ];
 
@@ -185,8 +175,7 @@ final class ConcatTest extends BaseMutatorTestCase
                 <?php
 
                 'foo' . 'foo';
-                PHP
-            ,
+                PHP,
             [],
         ];
     }

@@ -119,8 +119,7 @@ final class LineRangeCalculatorTest extends TestCase
                 }
 
 
-                PHP
-            ,
+                PHP,
             range(5, 44),
         ];
 
@@ -134,8 +133,7 @@ final class LineRangeCalculatorTest extends TestCase
                         $a = $findMe;
                     })();
                 }
-                PHP
-            ,
+                PHP,
             [6],
         ];
 
@@ -149,8 +147,7 @@ final class LineRangeCalculatorTest extends TestCase
                         // ...
                     }
                 }
-                PHP
-            ,
+                PHP,
             [4],
         ];
     }

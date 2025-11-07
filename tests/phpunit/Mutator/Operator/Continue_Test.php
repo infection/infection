@@ -61,16 +61,14 @@ final class Continue_Test extends BaseMutatorTestCase
                 while (true) {
                     continue;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 while (true) {
                     break;
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not replaces continue with break in switch' => [
@@ -81,8 +79,7 @@ final class Continue_Test extends BaseMutatorTestCase
                     case 1:
                         continue;
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }

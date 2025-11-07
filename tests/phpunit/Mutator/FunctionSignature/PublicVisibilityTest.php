@@ -207,8 +207,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                     {
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [

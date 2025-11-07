@@ -59,8 +59,7 @@ final class SyntaxErrorTest extends BaseMutatorTestCase
                 <?php
 
                 $this->methodCall();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

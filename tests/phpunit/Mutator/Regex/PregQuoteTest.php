@@ -59,8 +59,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                 <?php
 
                 $a = preg_quote('bbbb');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -74,8 +73,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
 
                 $a = 'to_quote';
                 $a = preg_quote($a);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -90,8 +88,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
 
 
                 $a = preg_quote(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -105,8 +102,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \preg_quote('bbbb');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -119,8 +115,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                 <?php
 
                 $a = preg_quote('bbbb','/');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -154,8 +149,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                 if (preg_quote($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -171,8 +165,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                 <?php
 
                 $a = PreG_qUotE('bbbb','/');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -185,8 +178,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                 <?php
 
                 $a = preg_quote($foo->bar(),'/');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -203,8 +195,7 @@ final class PregQuoteTest extends BaseMutatorTestCase
                         return strtolower(preg_quote($key . (ctype_alnum($value) ? '' : $value), '/'));
                     }, $input);
                 };
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
