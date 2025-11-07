@@ -41,7 +41,6 @@ use Infection\Process\Runner\ProcessQueue;
 use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use SplQueue;
 
 #[CoversClass(ProcessQueue::class)]
 final class ProcessQueueTest extends TestCase
