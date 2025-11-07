@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\TestFrameworkTypes;
+use Webmozart\Assert\Assert;
 use function array_filter;
 use function array_map;
 use function array_values;
@@ -53,9 +56,21 @@ class SchemaConfigurationFactory
 {
     public function create(string $path, stdClass $rawConfig): SchemaConfiguration
     {
+        $timeout = $rawConfig->timeout ?? null;
+        $testFramework = $rawConfig->testFramework ?? null;
+        $staticAnalysisTool = $rawConfig->staticAnalysisTool ?? null;
+
+        // Those values are already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrGreaterThanEq($timeout, 0);
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
+        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+
         return new SchemaConfiguration(
             $path,
-            $rawConfig->timeout ?? null,
+            $timeout,
             self::createSource($rawConfig->source),
             self::createLogs($rawConfig->logs ?? new stdClass()),
             self::normalizeString($rawConfig->tmpDir ?? null),
@@ -65,7 +80,7 @@ class SchemaConfigurationFactory
             $rawConfig->minMsi ?? null,
             $rawConfig->minCoveredMsi ?? null,
             (array) ($rawConfig->mutators ?? []),
-            $rawConfig->testFramework ?? null,
+            $testFramework,
             self::normalizeString($rawConfig->bootstrap ?? null),
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
             self::normalizeString($rawConfig->testFrameworkOptions ?? null),

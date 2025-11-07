@@ -46,43 +46,36 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class SchemaConfiguration
+final readonly class SchemaConfiguration
 {
-    private readonly ?float $timeout;
-
-    private readonly ?string $testFramework;
-
-    private readonly ?string $staticAnalysisTool;
-
     /**
      * @param array<string, mixed> $mutators
+     * @param TestFrameworkTypes::* $testFramework
+     * @param StaticAnalysisToolTypes::* $staticAnalysisTool
      */
     public function __construct(
-        private readonly string $file,
-        ?float $timeout,
-        private readonly Source $source,
-        private readonly Logs $logs,
-        private readonly ?string $tmpDir,
-        private readonly PhpUnit $phpUnit,
-        private readonly PhpStan $phpStan,
-        private readonly ?bool $ignoreMsiWithNoMutations,
-        private readonly ?float $minMsi,
-        private readonly ?float $minCoveredMsi,
-        private readonly array $mutators,
-        ?string $testFramework,
-        private readonly ?string $bootstrap,
-        private readonly ?string $initialTestsPhpOptions,
-        private readonly ?string $testFrameworkExtraOptions,
-        private readonly ?string $staticAnalysisToolOptions,
-        private readonly string|int|null $threads,
-        ?string $staticAnalysisTool,
+        private string $file,
+        private ?float $timeout,
+        private Source $source,
+        private Logs $logs,
+        private ?string $tmpDir,
+        private PhpUnit $phpUnit,
+        private PhpStan $phpStan,
+        private ?bool $ignoreMsiWithNoMutations,
+        private ?float $minMsi,
+        private ?float $minCoveredMsi,
+        private array $mutators,
+        private ?string $testFramework,
+        private ?string $bootstrap,
+        private ?string $initialTestsPhpOptions,
+        private ?string $testFrameworkExtraOptions,
+        private ?string $staticAnalysisToolOptions,
+        private string|int|null $threads,
+        private ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
-        $this->timeout = $timeout;
-        $this->testFramework = $testFramework;
-        $this->staticAnalysisTool = $staticAnalysisTool;
     }
 
     public function getFile(): string
