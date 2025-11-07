@@ -59,8 +59,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_udiff(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 if (array_udiff($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_UdIfF(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_udiff($foo->bar(), $foo->baz(), $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -149,8 +143,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_udiff(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -163,8 +156,7 @@ final class UnwrapArrayUdiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_udiff(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

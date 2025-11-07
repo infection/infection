@@ -59,8 +59,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('/a/', 'b', $foo);
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 
@@ -82,8 +81,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 <?php
 
                 PreG_maTch('/a/', 'b', $foo);
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 
@@ -104,8 +102,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('/a/', 'b', $a->b);
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 
@@ -118,8 +115,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE);
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 
@@ -132,8 +128,7 @@ final class PregMatchMatchesTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('/a/', 'b', $foo, PREG_OFFSET_CAPTURE, 3);
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 

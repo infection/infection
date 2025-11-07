@@ -75,8 +75,7 @@ final class DoWhile implements Mutator
                     // ...
                 } while (false);
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

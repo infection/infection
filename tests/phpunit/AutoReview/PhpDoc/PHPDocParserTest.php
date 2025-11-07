@@ -68,8 +68,7 @@ final class PHPDocParserTest extends TestCase
                 second and later lines should be
                 removed but the code sample should
                 still be indented.
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             [],
         ];
 
@@ -93,8 +92,7 @@ final class PHPDocParserTest extends TestCase
                 @var \DateTime[]
                 @Groups({"a", "b"})
                 @ORM\Entity
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@var', '@Groups', '@ORM\Entity'],
         ];
 
@@ -105,8 +103,7 @@ final class PHPDocParserTest extends TestCase
                  This is a long description.
 
                  @return void
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@return'],
         ];
 
@@ -115,8 +112,7 @@ final class PHPDocParserTest extends TestCase
                 @final
                 @final
                 @internal
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@final', '@internal'],
         ];
 
@@ -128,8 +124,7 @@ final class PHPDocParserTest extends TestCase
                     This is a text with an {@internal inline tag where a closing brace (}) is shown}.
                     Or an {@internal inline tag with a literal {@link} in it}.
                 Do note that an {@internal inline tag that has an opening brace ({) does not break out}.
-                DOCBLOCK
-            ,
+                DOCBLOCK,
             ['@internal', '@link'],
         ];
     }

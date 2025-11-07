@@ -66,8 +66,7 @@ final class SpreadRemoval implements Mutator
                 ```php
                 $x = [$collection, 4, 5];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -151,8 +151,7 @@ class MutationConfigBuilder extends ConfigBuilder
                 %s
                 require_once '%s';
 
-                PHP
-            ,
+                PHP,
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
             $originalAutoloadFile,
         );

@@ -66,8 +66,7 @@ final class SpreadOneItem implements Mutator
                 ```php
                 $x = [[...$collection][0], 4, 5];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

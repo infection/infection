@@ -61,8 +61,7 @@ final class DocBlockParserTest extends TestCase
                  * multi-line
                  * doc-block
                  */
-                PHP
-            ,
+                PHP,
             <<<'TEXT'
                 This is a
                 multi-line
@@ -75,8 +74,7 @@ final class DocBlockParserTest extends TestCase
                 /**
                  * Single line doc-block
                  */
-                PHP
-            ,
+                PHP,
             'Single line doc-block',
         ];
 
@@ -88,8 +86,7 @@ final class DocBlockParserTest extends TestCase
                    * doc-block
                  * with weird indentation
                     */
-                PHP
-            ,
+                PHP,
             <<<'TEXT'
                 This is a
                 multi-line
@@ -101,16 +98,14 @@ final class DocBlockParserTest extends TestCase
         yield [
             <<<'PHP'
                 /** Inlined doc-block */
-                PHP
-            ,
+                PHP,
             'Inlined doc-block',
         ];
 
         yield [
             <<<'PHP'
                 // Comment
-                PHP
-            ,
+                PHP,
             'Comme', // Weird result: regular comments are not properly supported
         ];
     }

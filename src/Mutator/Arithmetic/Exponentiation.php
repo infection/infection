@@ -56,8 +56,7 @@ final class Exponentiation implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an exponentiation operator (`**`) with a division assignment operator (`/`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

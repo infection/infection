@@ -60,15 +60,13 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
 
                 $this->foo();
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
 
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes a method call with parameters' => [
@@ -77,15 +75,13 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
 
                 $foo->bar(3, 4);
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
 
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It remove a static method call without parameters' => [
@@ -94,8 +90,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
 
                 self::foo();
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -110,8 +105,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
 
                 THatClass::bar(3, 4);
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -126,15 +120,13 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
 
                 $foo?->bar(3, 4);
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
 
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not remove a method call that is assigned to something' => [
@@ -143,8 +135,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
 
                 $b = $this->foo();
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not remove a method call within a statement' => [
@@ -158,8 +149,7 @@ final class MethodCallRemovalTest extends BaseMutatorTestCase
                     $a = 3;
                 }
 
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not remove a method call that is the parameter of another function or method' => [

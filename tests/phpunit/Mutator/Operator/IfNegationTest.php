@@ -65,8 +65,7 @@ final class IfNegationTest extends BaseMutatorTestCase
                 } else {
                     return 3;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -86,8 +85,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if ($array[0]) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -104,8 +102,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if ($foo) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -122,8 +119,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if ($this->foo()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -140,8 +136,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if (self::foo()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -158,8 +153,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if (self::FOO) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -176,8 +170,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if ($foo()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -194,8 +187,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if (($this->foo)()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -212,8 +204,7 @@ final class IfNegationTest extends BaseMutatorTestCase
 
                 if (a()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

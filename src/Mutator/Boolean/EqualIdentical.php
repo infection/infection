@@ -58,8 +58,7 @@ final class EqualIdentical extends AbstractIdenticalComparison
             <<<'TXT'
                 Replaces a loose comparison (using the equal operator (`==`)) with a strict comparison (using the
                 identical operator (`===`)).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

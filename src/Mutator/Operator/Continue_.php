@@ -56,8 +56,7 @@ final class Continue_ implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a continue statement (`continue`) with its counterpart break statement (`break`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

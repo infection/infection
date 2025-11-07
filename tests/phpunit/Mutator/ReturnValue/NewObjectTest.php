@@ -125,8 +125,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
-                CODE
-            ,
+                CODE,
         ];
 
         yield 'It does not mutate when function contains another function but return null is not allowed' => [
@@ -151,8 +150,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
-                CODE
-            ,
+                CODE,
         ];
 
         yield 'It mutates when scalar return typehint allows null' => [
@@ -172,8 +170,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
-                CODE
-            ,
+                CODE,
         ];
 
         yield 'It does not mutate the return of an anonymous class' => [
