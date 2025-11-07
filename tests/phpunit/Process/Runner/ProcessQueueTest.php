@@ -100,7 +100,7 @@ final class ProcessQueueTest extends TestCase
     public function test_enqueue_from_with_valid_iterator_enqueues_item(): void
     {
         $clock = new TimeSpy();
-        $queue = new ProcessQueue(new SplQueue(), $clock);
+        $queue = new ProcessQueue($clock);
 
         $container = $this->createMock(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
@@ -162,7 +162,7 @@ final class ProcessQueueTest extends TestCase
     public function test_enqueue_from_accepts_items_when_below_capacity(): void
     {
         $clock = new TimeSpy();
-        $queue = new ProcessQueue(new SplQueue(), $clock);
+        $queue = new ProcessQueue($clock);
 
         // Add one item
         $queue->enqueue($this->createMock(MutantProcessContainer::class));
@@ -186,7 +186,7 @@ final class ProcessQueueTest extends TestCase
     public function test_enqueue_from_measures_time_correctly(): void
     {
         $clockMock = $this->createMock(TimeSpy::class);
-        $queue = new ProcessQueue(new SplQueue(), $clockMock);
+        $queue = new ProcessQueue($clockMock);
 
         $container = $this->createMock(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
@@ -217,7 +217,7 @@ final class ProcessQueueTest extends TestCase
         // Mutated: (end + start) * NANO_SECONDS_IN_MILLI_SECOND
 
         $clockMock = $this->createMock(TimeSpy::class);
-        $queue = new ProcessQueue(new SplQueue(), $clockMock);
+        $queue = new ProcessQueue($clockMock);
 
         $container = $this->createMock(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
@@ -244,7 +244,7 @@ final class ProcessQueueTest extends TestCase
     public function test_enqueue_from_advances_iterator(): void
     {
         $clock = new TimeSpy();
-        $queue = new ProcessQueue(new SplQueue(), $clock);
+        $queue = new ProcessQueue($clock);
 
         $container = $this->createMock(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
@@ -263,7 +263,7 @@ final class ProcessQueueTest extends TestCase
     public function test_enqueue_from_with_default_max_depth_of_one(): void
     {
         $clock = new TimeSpy();
-        $queue = new ProcessQueue(new SplQueue(), $clock);
+        $queue = new ProcessQueue($clock);
 
         $container = $this->createMock(MutantProcessContainer::class);
         $iterator = $this->createMock(Iterator::class);
