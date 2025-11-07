@@ -68,7 +68,7 @@ class ProcessQueue
      *
      * @param Iterator<MutantProcessContainer> $input
      * @param positive-int $maxQueueDepth
-     * @return int Milliseconds spent doing work to enqueue a process
+     * @return int Microseconds spent doing work to enqueue a process
      */
     public function enqueueFrom(Iterator $input, int $maxQueueDepth = self::MINIMAL_DEPTH): int
     {
@@ -116,6 +116,6 @@ class ProcessQueue
 
     private static function ns2ms(float $time): int
     {
-        return (int) $time * self::NANO_SECONDS_IN_MILLI_SECOND;
+        return (int) ($time * self::NANO_SECONDS_IN_MILLI_SECOND);
     }
 }

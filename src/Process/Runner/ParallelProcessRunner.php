@@ -120,7 +120,7 @@ class ParallelProcessRunner implements ProcessRunner
                 $mutantProcessContainer = $this->queue->dequeue();
                 $threadIndex = array_shift($this->availableThreadIndexes);
 
-                Assert::integer($threadIndex, 'Thread index can not be null. If thread index is null, it means there\'s a bug in the implementation. Double check there\'s an empty check.');
+                Assert::integer($threadIndex, 'Thread index cannot be null. This indicates a bug - verify the isEmpty() check is present before dequeue().');
 
                 $this->startProcess($mutantProcessContainer, $threadIndex);
             }
