@@ -1803,11 +1803,11 @@ parameters:
 		-
 			rawMessage: Cannot access property $namespaceURI on DOMElement|null.
 			identifier: property.nonObject
-			count: 1
+			count: 2
 			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
 
 		-
 			rawMessage: Cannot access property $tagName on DOMElement|null.
 			identifier: property.nonObject
-			count: 2
+			count: 3
 			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
