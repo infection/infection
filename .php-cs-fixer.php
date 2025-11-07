@@ -77,10 +77,10 @@ return (new Config())
     ->setParallelConfig(ParallelConfigFactory::detect())
     ->setRiskyAllowed(true)
     ->setRules([
-        '@PHP71Migration' => true,
-        '@PHP71Migration:risky' => true,
-        '@PHPUnit60Migration:risky' => true,
-        '@PHPUnit75Migration:risky' => true,
+        '@PHP7x1Migration' => true,
+        '@PHP7x1Migration:risky' => true,
+        '@PHPUnit6x0Migration:risky' => true,
+        '@PHPUnit7x5Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'array_indentation' => true,
