@@ -85,7 +85,6 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstElement = $xPath->document->firstElementChild;
 
-        // @phpstan-ignore property.nonObject
         $this->assertSame($expectedFirstElementTagName, $firstElement->tagName);
     }
 
@@ -148,14 +147,12 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstElement = $xPath->document->firstElementChild;
 
-        // @phpstan-ignore property.nonObject
         // Beware: this is only the _document_ namespace, not a namespace registered to the XPath.
         $this->assertSame(
             'https://schema.phpunit.de/coverage/1.0',
             $firstElement->namespaceURI,
             'Expected the document namespace to be left alone.',
         );
-        // @phpstan-ignore property.nonObject
         // Sanity check: ensuring we correctly parsed the XML.
         $this->assertSame('phpunit', $firstElement->tagName);
 
@@ -199,9 +196,7 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstElement = $xPath->document->firstElementChild;
 
-        // @phpstan-ignore property.nonObject
         $this->assertNull($firstElement->namespaceURI);
-        // @phpstan-ignore property.nonObject
         // Sanity check: ensuring we correctly parsed the XML.
         $this->assertSame('phpunit', $firstElement->tagName);
 
