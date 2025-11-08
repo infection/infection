@@ -65,8 +65,7 @@ final readonly class SafeDOMXPath
     public static function fromFile(
         string $pathname,
         ?string $namespace = null,
-    ): self
-    {
+    ): self {
         Assert::file($pathname);
         Assert::readable($pathname);
 

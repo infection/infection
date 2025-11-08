@@ -29,6 +29,6 @@
 /tests/e2e/SymfonyFlex/phpunit.xml*
 /tests/e2e/SymfonyFlex/symfony.lock
 /tests/e2e/SymfonyFlex/tests/.gitignore
-/tests/phpunit/**/*/generated_index.xml
 /tests/error.log
+/tests/phpunit/**/*/generated_index.xml
 /vendor/
