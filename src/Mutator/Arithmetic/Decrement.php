@@ -58,8 +58,7 @@ final class Decrement implements Mutator
             <<<'TXT'
                 Replaces a pre- or post-decrement operator (`--`) with the analogue pre- or post-increment operator
                 (`++`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

@@ -61,8 +61,7 @@ final class UnwrapArrayMap extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = ['foo', 'bar', 'baz'];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                     This mutation escaping suggests that the `$callback` transformation passed to

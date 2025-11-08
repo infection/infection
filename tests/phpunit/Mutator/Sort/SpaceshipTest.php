@@ -64,14 +64,12 @@ final class SpaceshipTest extends BaseMutatorTestCase
                 <?php
 
                 $a <=> $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $b <=> $a;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not swap operators when result is identical zero on the right side' => [

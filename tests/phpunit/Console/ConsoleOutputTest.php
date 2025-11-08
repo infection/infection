@@ -85,8 +85,7 @@ final class ConsoleOutputTest extends TestCase
                  !        result
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -101,8 +100,7 @@ final class ConsoleOutputTest extends TestCase
                  ! [NOTE] Running infection with an unknown log-verbosity option, falling back to default option
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -115,8 +113,7 @@ final class ConsoleOutputTest extends TestCase
             <<<'TXT'
                 [notice] You are running Infection with foo enabled.
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -132,8 +129,7 @@ final class ConsoleOutputTest extends TestCase
                            It is your responsibility to disable xdebug/phpdbg unless needed.
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -152,8 +148,7 @@ final class ConsoleOutputTest extends TestCase
                  !        MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -172,8 +167,7 @@ final class ConsoleOutputTest extends TestCase
                  !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }

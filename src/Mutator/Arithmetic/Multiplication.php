@@ -59,8 +59,7 @@ final class Multiplication implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

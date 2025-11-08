@@ -72,8 +72,7 @@ final class GitHubAnnotationsLogger implements LineMutationTestingResultsLogger
                     Escaped Mutant for Mutator "{$escapedExecutionResult->getMutatorName()}":
 
                     {$escapedExecutionResult->getMutantDiff()}
-                    TEXT
-                ,
+                    TEXT,
             ];
 
             $lines[] = $this->buildAnnotation(

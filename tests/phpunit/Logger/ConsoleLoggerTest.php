@@ -138,8 +138,7 @@ final class ConsoleLoggerTest extends TestCase
                  ! [NOTE] message
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($output->fetch()),
         );
 
@@ -150,8 +149,7 @@ final class ConsoleLoggerTest extends TestCase
                  [WARNING] message
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($output->fetch()),
         );
 
@@ -162,8 +160,7 @@ final class ConsoleLoggerTest extends TestCase
                  [ERROR] message
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($output->fetch()),
         );
     }

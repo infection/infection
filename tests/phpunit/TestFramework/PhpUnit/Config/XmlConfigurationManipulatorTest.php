@@ -124,8 +124,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 		</testsuite>
                 	</testsuites>
                 </phpunit>
-                XML
-            ,
+                XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->replaceWithAbsolutePaths($xPath);
             },
@@ -183,8 +182,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             <<<'XML'
                 <phpunit cacheTokens="true">
                 </phpunit>
-                XML
-            ,
+                XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes($xPath, ['src/', 'examples/'], []);
             },
@@ -207,8 +205,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             <<<'XML'
                 <phpunit cacheTokens="true">
                 </phpunit>
-                XML
-            ,
+                XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->addOrUpdateLegacyCoverageWhitelistNodes(
                     $xPath,
@@ -235,8 +232,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             <<<'XML'
                 <phpunit cacheTokens="true">
                 </phpunit>
-                XML
-            ,
+                XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->addOrUpdateCoverageIncludeNodes($xPath, ['src/', 'examples/'], []);
             },
@@ -259,8 +255,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             <<<'XML'
                 <phpunit cacheTokens="true">
                 </phpunit>
-                XML
-            ,
+                XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->addOrUpdateCoverageIncludeNodes($xPath,
                     ['src/', 'examples/'],
@@ -286,8 +281,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             <<<'XML'
                 <phpunit cacheTokens="true">
                 </phpunit>
-                XML
-            ,
+                XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->addOrUpdateSourceIncludeNodes($xPath, ['src/', 'examples/'], []);
             },
@@ -322,8 +316,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     </exclude>
                   </coverage>
                 </phpunit>
-                XML_WRAP
-            ,
+                XML_WRAP,
         );
     }
 
@@ -385,8 +378,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->setStopOnFailureOrDefect('9.3', $xPath);
             },
@@ -428,8 +420,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->setStopOnFailureOrDefect('10.0', $xPath);
             },
@@ -509,8 +500,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateColours($xPath);
             },
@@ -553,8 +543,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             >
             </phpunit>
 
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateResultCaching($xPath);
             },
@@ -595,8 +584,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateResultCaching($xPath);
             },
@@ -629,8 +617,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateStderrRedirection($xPath);
             },
@@ -653,8 +640,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->deactivateStderrRedirection($xPath);
             },
@@ -677,8 +663,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->handleResultCacheAndExecutionOrder('11.0', $xPath, 'a1b2c3', '/tmp');
             },
@@ -703,8 +688,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->handleResultCacheAndExecutionOrder('7.3', $xPath, 'a1b2c3', '/tmp');
             },
@@ -729,8 +713,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->handleResultCacheAndExecutionOrder('7.1', $xPath, 'a1b2c3', '/tmp');
             },
@@ -761,8 +744,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                 syntaxCheck="false"
             >
             </phpunit>
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeExistingPrinters($xPath);
             },
@@ -904,8 +886,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     [Error] Element 'invalid': This element is not expected.
                      in /path/to/infection/ (line 7, col 0)
 
-                    EOF
-                ,
+                    EOF,
                 $errorMessage,
             );
         }
@@ -965,8 +946,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
             >
             </phpunit>
 
-            XML
-            ,
+            XML,
             static function (XmlConfigurationManipulator $configManipulator, SafeDOMXPath $xPath): void {
                 $configManipulator->removeDefaultTestSuite($xPath);
             },
@@ -1065,9 +1045,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     <text outputFile="logfile.txt"/>
                 </logging>
             </phpunit>
-            XML_WRAP
-
-            ,
+            XML_WRAP,
             $changeXml,
             $expectedXml,
         );
@@ -1106,8 +1084,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
                     <log type="coverage-html" target="/path/to/tmp"/>
                 </logging>
             </phpunit>
-            XML
-            ,
+            XML,
             $changeXml,
             $expectedXml,
         );

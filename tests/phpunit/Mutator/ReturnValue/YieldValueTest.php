@@ -78,8 +78,7 @@ final class YieldValueTest extends BaseMutatorTestCase
                 $a = function () {
                     (yield $b);
                 };
-                PHP
-            ,
+                PHP,
         ];
     }
 }

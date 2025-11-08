@@ -125,8 +125,7 @@ final class MinMsiCheckerTest extends TestCase
                  !        MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -144,8 +143,7 @@ final class MinMsiCheckerTest extends TestCase
                  !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }
@@ -166,8 +164,7 @@ final class MinMsiCheckerTest extends TestCase
                  !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
+                TXT,
             Str::rTrimLines($this->output->fetch()),
         );
     }

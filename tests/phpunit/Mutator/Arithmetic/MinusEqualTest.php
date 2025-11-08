@@ -60,15 +60,13 @@ final class MinusEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a -=2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a += 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate normal minus' => [
@@ -77,8 +75,7 @@ final class MinusEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a = $a - 2;
-                PHP
-            ,
+                PHP,
         ];
     }
 }
