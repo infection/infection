@@ -146,8 +146,7 @@ class CoverageChecker
 
             Issue(s):
             %s
-            TXT
-            ,
+            TXT,
             'https://github.com/infection/infection',
             $initialTestSuiteCommandLine,
             $initialTestSuiteOutput,

@@ -66,8 +66,7 @@ final class UnwrapArrayCombine extends AbstractFunctionUnwrapMutator
                 $x = $array2;
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -59,8 +59,7 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
                 <?php
 
                 $a['value'] ??= 'otherValue';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
                 <?php
 
                 $a['value'] ??= 'other' . ' Value';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
                 <?php
 
                 $a['value'] ??= $var;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -101,8 +98,7 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
                 <?php
 
                 $a['value'] = $foo ?? $bar;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

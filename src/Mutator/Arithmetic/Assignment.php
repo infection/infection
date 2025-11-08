@@ -57,8 +57,7 @@ final class Assignment implements Mutator
             <<<'TXT'
                 Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
                 assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

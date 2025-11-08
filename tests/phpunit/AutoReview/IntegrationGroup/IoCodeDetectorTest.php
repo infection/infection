@@ -61,8 +61,7 @@ final class IoCodeDetectorTest extends TestCase
             <<<'PHP'
                 <?php
                 echo basename('/etc/sudoers.d', '.d');
-                PHP
-            ,
+                PHP,
             false,  // Cannot detect this one since the call is not fully-qualified and there is no use statements - too tricky to detect
         ];
 
@@ -73,8 +72,7 @@ final class IoCodeDetectorTest extends TestCase
                 use function basename;
 
                 echo basename('/etc/sudoers.d', '.d');
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -83,8 +81,7 @@ final class IoCodeDetectorTest extends TestCase
                 <?php
 
                 echo \basename('/etc/sudoers.d', '.d');
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -95,8 +92,7 @@ final class IoCodeDetectorTest extends TestCase
                 use Symfony\Component\Filesystem\Filesystem;
 
                 (new Filesystem)->dumpFile('foo.php', '');
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -105,8 +101,7 @@ final class IoCodeDetectorTest extends TestCase
                 <?php
 
                 echo \Symfony\Component\Filesystem\Filesystem::class;
-                PHP
-            ,
+                PHP,
             false,
         ];
 
@@ -117,8 +112,7 @@ final class IoCodeDetectorTest extends TestCase
                 use function Safe\getcwd;
 
                 getcwd();
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -127,8 +121,7 @@ final class IoCodeDetectorTest extends TestCase
                 <?php
 
                 \Safe\rename('foo', 'bar');
-                PHP
-            ,
+                PHP,
             true,
         ];
 
@@ -139,8 +132,7 @@ final class IoCodeDetectorTest extends TestCase
                 use function Safe\sprintf();
 
                 sprintf('%s', 'foo');
-                PHP
-            ,
+                PHP,
             false,
         ];
 
@@ -151,8 +143,7 @@ final class IoCodeDetectorTest extends TestCase
                 /**
                  * copyright
                  */
-                PHP
-            ,
+                PHP,
             false,
         ];
     }

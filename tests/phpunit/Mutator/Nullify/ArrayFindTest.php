@@ -59,14 +59,12 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = array_find($numbers, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $positive = null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with an array' => [
@@ -74,8 +72,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = array_find(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -88,8 +85,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = array_find(\Class_With_Const::Const, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -102,8 +98,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = \array_find(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -136,8 +131,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 if (array_find(['A', 1, 'C'], fn ($number) => $number > 0)) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -152,8 +146,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRray_Find(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -166,8 +159,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_find($foo->bar(), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -182,8 +174,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 $a = array_find(array_filter(['A', 1, 'C'], function($char): bool {
                     return !is_int($char);
                 }), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -198,8 +189,7 @@ final class ArrayFindTest extends BaseMutatorTestCase
                 $a = 'array_find';
 
                 $b = $a([1, 2, 3], 'is_int');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

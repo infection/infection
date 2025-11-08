@@ -59,8 +59,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $array[0] && $array[1];
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -80,8 +79,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $foo && $bar;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -101,8 +99,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $this->foo() && $bar->baz();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -122,8 +119,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $this->foo($a) && $bar->baz($b);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -143,21 +139,18 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = self::foo() && static::bar() && Test::baz();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !self::foo() && static::bar() && Test::baz();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $var = self::foo() && !static::bar() && Test::baz();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -171,15 +164,13 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = self::FOO && self::BAR;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !self::FOO && self::BAR;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -193,15 +184,13 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $foo() && $bar();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !$foo() && $bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -215,15 +204,13 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = ($this->foo)() && ($this->bar)();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !($this->foo)() && ($this->bar)();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -237,8 +224,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -258,27 +244,23 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b() && c() && d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !a() && b() && c() && d();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $var = a() && !b() && c() && d();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $var = a() && b() && !c() && d();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -308,15 +290,13 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !(a() && !b());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !(!a() && !b());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -325,8 +305,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && (b() || c());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -341,8 +320,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() === false && $c !== false && d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It preserves formatting for non-modified code' => [
@@ -359,8 +337,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                 }
 
                 $var = a() && b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -375,8 +352,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                     }
 
                     $var = !a() && b();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -390,8 +366,7 @@ final class LogicalAndSingleSubExprNegationTest extends BaseMutatorTestCase
                     }
 
                     $var = a() && !b();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
     }

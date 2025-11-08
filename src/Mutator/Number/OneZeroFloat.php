@@ -54,8 +54,7 @@ final class OneZeroFloat extends AbstractNumberMutator
         return new Definition(
             <<<'TXT'
                 Replaces a zero float value (`0.0`) with a non-zero float value (`1.0`) and vice-versa.
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

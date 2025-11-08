@@ -64,8 +64,7 @@ final class InvalidPhpUnitConfigurationTest extends TestCase
             <<<'TXT'
                 The file "/path/to/phpunit.xml" does not pass the XSD schema validation.
                 <lib-xml-errors>
-                TXT
-            ,
+                TXT,
             Str::toUnixLineEndings($exception->getMessage()),
         );
     }

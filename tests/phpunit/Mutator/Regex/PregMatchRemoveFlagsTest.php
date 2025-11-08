@@ -99,8 +99,7 @@ final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
                     <?php
 
                     pReG_MaTcH('~some-regexp$~g', 'irrelevant');
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 

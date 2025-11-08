@@ -61,8 +61,7 @@ final class Yield_Test extends BaseMutatorTestCase
                 $a = function () {
                     (yield $a => $b);
                 };
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 
@@ -79,8 +78,7 @@ final class Yield_Test extends BaseMutatorTestCase
                 $a = function () {
                     (yield $b);
                 };
-                PHP
-            ,
+                PHP,
         ];
     }
 }

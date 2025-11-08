@@ -59,8 +59,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucwords('good afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucwords(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \ucwords('good afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 if (ucwords($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 <?php
 
                 $a = uCwOrDs('good afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucwords($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -151,8 +145,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 $a = ucwords(array_reduce($words, function (string $carry, string $item) {
                     return $carry . substr($item, 0, 1);
                 }));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -187,8 +180,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 $a = 'ucwords';
 
                 $b = $a('FooBar');
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not break when ucwords uses a delimiter parameter' => [
@@ -196,8 +188,7 @@ final class UnwrapUcWordsTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucwords('good|afternoon|world', '|');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

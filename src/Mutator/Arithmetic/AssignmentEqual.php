@@ -56,8 +56,7 @@ final class AssignmentEqual implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an equal (`==`) or identical (`===`) comparison operator with an assignment operator (`=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

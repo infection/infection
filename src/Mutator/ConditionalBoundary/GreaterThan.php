@@ -56,8 +56,7 @@ final class GreaterThan implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a greater-than operator (`>`) with the greater-than-or-equal-to operator (`>=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
                 This mutator shifts the compared values highlighting an untested boundary.

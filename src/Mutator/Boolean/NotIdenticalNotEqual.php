@@ -59,8 +59,7 @@ final class NotIdenticalNotEqual implements Mutator
             <<<'TXT'
                 Replaces a strict inequality comparison (using a not-identical operator (`!==`)) with a loose
                 inequality comparison (using a not-equal operator (`!=`)).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_ADDITION,
             null,
             <<<'DIFF'
