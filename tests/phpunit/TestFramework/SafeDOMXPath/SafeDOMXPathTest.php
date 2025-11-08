@@ -86,10 +86,10 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstElement = $xPath->document->firstElementChild;
 
-        // @phpstan-ignore property.nonObject
         // Beware: this is only the _document_ namespace, not a namespace registered to the XPath.
         $this->assertSame(
             $expectedDocumentNamespace,
+            // @phpstan-ignore property.nonObject
             $firstElement->namespaceURI,
             'Expected the document namespace to be left alone.',
         );
