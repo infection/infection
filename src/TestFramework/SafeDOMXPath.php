@@ -62,13 +62,16 @@ final readonly class SafeDOMXPath
         return $this->$property;
     }
 
-    public static function fromFile(string $pathname): self
+    public static function fromFile(
+        string $pathname,
+        ?string $namespace = null,
+    ): self
     {
         Assert::file($pathname);
         Assert::readable($pathname);
 
-        $dom = new DOMDocument();
-        $loaded = @$dom->load($pathname);
+        $document = new DOMDocument();
+        $loaded = @$document->load($pathname);
 
         Assert::true(
             $loaded,
@@ -78,7 +81,20 @@ final readonly class SafeDOMXPath
             ),
         );
 
-        return new self($dom);
+        $xPath = new self($document);
+
+        if ($namespace !== null) {
+            // Beware that this is not a universal solution: it only works because
+            // of the type of document we handle.
+            // A generic XML can have the namespace at the root or any element...
+            // @phpstan-ignore property.nonObject
+            $namespaceUri = $document->documentElement->namespaceURI;
+            Assert::notNull($namespaceUri, 'Expected the first document element to have a namespace URI. None found.');
+
+            $xPath->registerNamespace($namespace, $namespaceUri);
+        }
+
+        return $xPath;
     }
 
     /**

@@ -33,54 +33,54 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
-use function array_diff;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
+use Traversable;
+use function array_diff;
+use function iterator_to_array;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function Safe\realpath;
 use function sprintf;
 use function str_replace;
-use Symfony\Component\Filesystem\Path;
-use Traversable;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageParser::class)]
 final class IndexXmlCoverageParserTest extends TestCase
 {
-    /**
-     * @var string|null
-     */
-    private static $xml;
+    private static ?string $fixturesXmlFileName = null;
+    private static ?string $fixturesOldXmlFileName = null;
 
-    /**
-     * @var IndexXmlCoverageParser
-     */
-    private $parser;
+    private fileSystem $filesystem;
+    private IndexXmlCoverageParser $parser;
 
     protected function setUp(): void
     {
+        $this->filesystem = new Filesystem();
         $this->parser = new IndexXmlCoverageParser(false);
     }
 
     #[DataProvider('coverageProvider')]
-    public function test_it_collects_data_recursively_for_all_files(string $xml): void
+    public function test_it_collects_data_recursively_for_all_files(
+        string $coverageIndexPath,
+        string $coverageBasePath,
+    ): void
     {
         $sourceFilesData = $this->parser->parse(
-            '/path/to/index.xml',
-            $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+            $coverageIndexPath,
+            $coverageBasePath,
         );
 
         // zeroLevel + noPercentage + firstLevel + secondLevel
@@ -90,12 +90,7 @@ final class IndexXmlCoverageParserTest extends TestCase
     public function test_it_has_correct_coverage_data_for_each_file(): void
     {
         $sourceFilesData = $this->parser->parse(
-            '/path/to/index.xml',
-            preg_replace(
-                '/percent=".*"/',
-                '',
-                self::getXml(),
-            ),
+            self::getFixturesXmlFileName(),
             XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
         );
 
@@ -107,32 +102,9 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     public function test_it_correctly_parses_xml_when_directory_has_absolute_path_for_old_phpunit_versions(): void
     {
-        $xml = <<<'XML'
-            <?xml version="1.0"?>
-            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-                <driver name="xdebug" version="2.5.1"/>
-              </build>
-              <project source="/path/to/src">
-                <tests>
-                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-                </tests>
-                <directory name="/absolute/path">
-                  <totals>
-                    <lines total="913" comments="130" code="783" executable="348" executed="7" percent="0"/>
-                  </totals>
-                </directory>
-              </project>
-              <!-- The rest of the file has been removed for this test-->
-            </phpunit>
-            XML;
-
         $sourceFilesData = $this->parser->parse(
-            '/path/to/index.xml',
-            $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+            __DIR__.'/phpunit6_index_with_absolute_path.xml',
+            __DIR__,
         );
 
         $this->assertCoverageFixtureSame([], $sourceFilesData);
@@ -141,12 +113,7 @@ final class IndexXmlCoverageParserTest extends TestCase
     public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
     {
         $sourceFilesData = $this->parser->parse(
-            '/path/to/index.xml',
-            str_replace(
-                '/path/to/src',
-                realpath(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-                file_get_contents(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml'),
-            ),
+            self::getOldFixturesXmlFileName(),
             XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
         );
 
@@ -159,37 +126,41 @@ final class IndexXmlCoverageParserTest extends TestCase
     #[DataProvider('noCoveredLineReportProviders')]
     public function test_it_errors_when_no_lines_were_executed(string $xml): void
     {
+        $filename = __DIR__.'/generated_index.xml';
+        $this->filesystem->dumpFile($filename, $xml);
+
         $this->expectException(NoLineExecuted::class);
 
         $this->parser->parse(
-            '/path/to/index.xml',
-            $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+            $filename,
+            __DIR__,
         );
     }
 
     #[DataProvider('noCoveredLineReportProviders')]
     public function test_it_errors_for_git_diff_lines_mode_when_no_lines_were_executed(string $xml): void
     {
+        $filename = __DIR__.'/generated_index.xml';
+        $this->filesystem->dumpFile($filename, $xml);
+
         $this->expectException(NoLineExecutedInDiffLinesMode::class);
 
         (new IndexXmlCoverageParser(true))->parse(
-            '/path/to/index.xml',
-            $xml,
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
+            $filename,
+            __DIR__,
         );
     }
 
     public static function coverageProvider(): iterable
     {
-        yield 'nominal' => [self::getXml()];
+        yield 'nominal' => [
+            Path::canonicalize(__DIR__.'/index.xml'),
+            __DIR__,
+        ];
 
         yield 'PHPUnit <6' => [
-            preg_replace(
-                '/(source)(=\".*?\")/',
-                'name$2',
-                self::getXml(),
-            ),
+            Path::canonicalize(__DIR__.'/index-for_phpunit6_and_less.xml'),
+            __DIR__,
         ];
     }
 
@@ -241,22 +212,58 @@ final class IndexXmlCoverageParserTest extends TestCase
         ];
     }
 
-    private static function getXml(): string
+    private static function getFixturesXmlFileName(): string
     {
-        if (self::$xml !== null) {
-            return self::$xml;
+        if (self::$fixturesXmlFileName !== null) {
+            return self::$fixturesXmlFileName;
         }
 
-        $xml = file_get_contents(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/index.xml');
+        $sourceXml = Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR.'/index.xml');
+
+        $xml = file_get_contents($sourceXml);
 
         // Replaces dummy source path with the real path
-        self::$xml = preg_replace(
+        $correctedXml = preg_replace(
             '/(source=\").*?(\")/',
-            sprintf('$1%s$2', realpath(XmlCoverageFixtures::FIXTURES_SRC_DIR)),
+            sprintf(
+                '$1%s$2',
+                Path::canonicalize(XmlCoverageFixtures::FIXTURES_SRC_DIR),
+            ),
             $xml,
         );
 
-        return self::$xml;
+        self::$fixturesXmlFileName = Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR.'/generated_index.xml');
+
+        (new Filesystem())->dumpFile(self::$fixturesXmlFileName, $correctedXml);
+
+        return self::$fixturesXmlFileName;
+    }
+
+    private static function getOldFixturesXmlFileName(): string
+    {
+        if (self::$fixturesOldXmlFileName !== null) {
+            return self::$fixturesOldXmlFileName;
+        }
+
+        $sourceXml = Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR.'/index.xml');
+
+        $xml = file_get_contents($sourceXml);
+
+        // Replaces dummy source path with the real path
+        $correctedXml = preg_replace(
+            '/(name=\").*?(\")/',
+            sprintf(
+                '$1%s$2',
+                Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
+            ),
+            $xml,
+        );
+
+        self::$fixturesOldXmlFileName = Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR.'/generated_index.xml');
+
+        (new Filesystem())->dumpFile(self::$fixturesOldXmlFileName, $correctedXml);
+
+        return self::$fixturesOldXmlFileName;
     }
 
     /**

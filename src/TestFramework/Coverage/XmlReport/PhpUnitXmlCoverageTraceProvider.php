@@ -64,11 +64,9 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
         // have to deal with a FileNotFound exception here so we skip any friendly error handling
         $indexPath = $this->indexLocator->locate();
         $coverageBasePath = dirname($indexPath);
-        $indexContents = file_get_contents($indexPath);
 
         foreach ($this->indexParser->parse(
             $indexPath,
-            $indexContents,
             $coverageBasePath,
         ) as $infoProvider) {
             // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
