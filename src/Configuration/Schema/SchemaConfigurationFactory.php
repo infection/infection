@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Schema;
 
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
 use function array_filter;
 use function array_map;
 use function array_values;
@@ -46,8 +43,11 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
+use Infection\TestFramework\TestFrameworkTypes;
 use stdClass;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @final
@@ -56,21 +56,9 @@ class SchemaConfigurationFactory
 {
     public function create(string $path, stdClass $rawConfig): SchemaConfiguration
     {
-        $timeout = $rawConfig->timeout ?? null;
-        $testFramework = $rawConfig->testFramework ?? null;
-        $staticAnalysisTool = $rawConfig->staticAnalysisTool ?? null;
-
-        // Those values are already vetted by the validation of the JSON against
-        // the schema.json, hence there is no need to go an extra length about
-        // the type.
-        // It is more due to very defensive programming habits than necessity.
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
-
         return new SchemaConfiguration(
             $path,
-            $timeout,
+            self::getTimeout($rawConfig),
             self::createSource($rawConfig->source),
             self::createLogs($rawConfig->logs ?? new stdClass()),
             self::normalizeString($rawConfig->tmpDir ?? null),
@@ -80,14 +68,57 @@ class SchemaConfigurationFactory
             $rawConfig->minMsi ?? null,
             $rawConfig->minCoveredMsi ?? null,
             (array) ($rawConfig->mutators ?? []),
-            $testFramework,
+            self::getTestFramework($rawConfig),
             self::normalizeString($rawConfig->bootstrap ?? null),
             self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
             self::normalizeString($rawConfig->testFrameworkOptions ?? null),
             self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
             $rawConfig->threads ?? null,
-            $rawConfig->staticAnalysisTool ?? null,
+            self::getStaticAnalysisTool($rawConfig),
         );
+    }
+
+    private static function getTimeout(stdClass $rawConfig): ?float
+    {
+        $timeout = $rawConfig->timeout ?? null;
+
+        Assert::nullOrGreaterThanEq($timeout, 0);
+
+        return $timeout;
+    }
+
+    /**
+     * @return TestFrameworkTypes::*|null
+     */
+    private static function getTestFramework(stdClass $rawConfig): ?string
+    {
+        $testFramework = $rawConfig->testFramework ?? null;
+
+        // This value is already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
+
+        // @phpstan-ignore return.type
+        return $testFramework;
+    }
+
+    /**
+     * @return StaticAnalysisToolTypes::*|null
+     */
+    private static function getStaticAnalysisTool(stdClass $rawConfig): ?string
+    {
+        $staticAnalysisTool = $rawConfig->staticAnalysisTool ?? null;
+
+        // This value is already vetted by the validation of the JSON against
+        // the schema.json, hence there is no need to go an extra length about
+        // the type.
+        // It is more due to very defensive programming habits than necessity.
+        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+
+        // @phpstan-ignore return.type
+        return $staticAnalysisTool;
     }
 
     private static function createSource(stdClass $source): Source

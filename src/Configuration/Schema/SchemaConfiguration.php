@@ -50,8 +50,8 @@ final readonly class SchemaConfiguration
 {
     /**
      * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::* $testFramework
-     * @param StaticAnalysisToolTypes::* $staticAnalysisTool
+     * @param TestFrameworkTypes::*|null $testFramework
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function __construct(
         private string $file,
@@ -136,11 +136,17 @@ final readonly class SchemaConfiguration
         return $this->mutators;
     }
 
+    /**
+     * @return TestFrameworkTypes::*|null
+     */
     public function getTestFramework(): ?string
     {
         return $this->testFramework;
     }
 
+    /**
+     * @return StaticAnalysisToolTypes::*|null
+     */
     public function getStaticAnalysisTool(): ?string
     {
         return $this->staticAnalysisTool;
