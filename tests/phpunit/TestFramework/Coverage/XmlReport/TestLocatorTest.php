@@ -52,7 +52,7 @@ final class TestLocatorTest extends TestCase
     /**
      * @var array<string, TestLocations>|null
      */
-    private static $testsLocations;
+    private static ?array $testsLocations = null;
 
     public function test_it_can_determine_if_the_file_is_tested(): void
     {
