@@ -35,62 +35,28 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
+use Fidry\FileSystem\Test\FileSystemTestCase as FidryFileSystemTestCase;
 use function getenv;
-use function Infection\Tests\make_tmp_dir;
-use PHPUnit\Framework\TestCase;
-use function Safe\getcwd;
-use function Safe\realpath;
-use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
-use function sys_get_temp_dir;
+use function is_string;
 
 /**
  * @private
  */
-abstract class FileSystemTestCase extends TestCase
+abstract class FileSystemTestCase extends FidryFileSystemTestCase
 {
     private const TMP_DIR_NAME = 'infection-test';
 
-    protected string $cwd = '';
-
-    protected string $tmp = '';
-
-    public static function tearDownAfterClass(): void
+    public static function getTmpDirNamespace(): string
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-    }
+        // This is to make it thread safe with Infection. If you are not using
+        // infection or do not need thread safety, this can return a constant
+        // string, e.g. your project/library name.
+        $threadId = getenv('TEST_TOKEN');
 
-    protected function setUp(): void
-    {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
+        if (!is_string($threadId)) {
+            $threadId = '';
+        }
 
-        $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-    }
-
-    protected function tearDown(): void
-    {
-        (new Filesystem())->remove($this->tmp);
-    }
-
-    final protected static function removeTmpDir(): void
-    {
-        $testToken = getenv('TEST_TOKEN');
-
-        (new Filesystem())->remove(
-            Path::normalize(
-                sprintf(
-                    '%s/%s/%s',
-                    realpath(sys_get_temp_dir()),
-                    self::TMP_DIR_NAME,
-                    $testToken === false || $testToken === '' ? '1' : $testToken,
-                ),
-            ),
-        );
+        return self::TMP_DIR_NAME . $threadId;
     }
 }

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use function current;
+use Fidry\FileSystem\Test\Finder\SplFileInfoBuilder;
 use function file_exists;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
@@ -419,18 +420,15 @@ final class FileMutationGeneratorTest extends TestCase
         return $proxyTraceMock;
     }
 
-    private function createSplFileInfoMock(string $file, string $relativePath, string $relativePathname): SplFileInfo&MockObject
+    private function createSplFileInfoMock(string $file, string $relativePath, string $relativePathname): SplFileInfo
     {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock->method('__toString')->willReturn($file);
-        $splFileInfoMock->method('getFilename')->willReturn($file);
-        $splFileInfoMock->method('getRealPath')->willReturn($file);
-        $splFileInfoMock->method('getContents')->willReturn(
-            file_exists($file) ? file_get_contents($file) : 'content',
-        );
-        $splFileInfoMock->method('getRelativePath')->willReturn($relativePath);
-        $splFileInfoMock->method('getRelativePathname')->willReturn($relativePathname);
-
-        return $splFileInfoMock;
+        return SplFileInfoBuilder::withTestData()
+            ->withFile($file)
+            ->withRelativePath($relativePath)
+            ->withRelativePathname($relativePathname)
+            ->withContents(
+                file_exists($file) ? file_get_contents($file) : 'content',
+            )
+            ->build();
     }
 }

@@ -36,17 +36,16 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\FileSystem\Locator\FileNotFound;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
-use function Safe\touch;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -78,7 +77,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_index_file(): void
     {
-        (new Filesystem())->dumpFile('coverage-xml/index.xml', '');
+        FS::dumpFile('coverage-xml/index.xml', '');
 
         $expected = Path::canonicalize($this->tmp . '/coverage-xml/index.xml');
 
@@ -89,11 +88,11 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_index_file_with_the_wrong_case(): void
     {
-        if (PHP_OS_FAMILY !== 'Darwin') {
+        if (!OperatingSystem::isMacOs()) {
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
         }
 
-        (new Filesystem())->dumpFile('coverage-xml/INDEX.XML', '');
+        FS::dumpFile('coverage-xml/INDEX.XML', '');
 
         $expected = Path::canonicalize($this->tmp . '/coverage-xml/index.xml');
 
@@ -105,7 +104,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     #[DataProvider('indexPathsProvider')]
     public function test_it_can_find_more_exotic_index_file_names(string $indexRelativePath): void
     {
-        (new Filesystem())->dumpFile($indexRelativePath, '');
+        FS::dumpFile($indexRelativePath, '');
 
         $expected = Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . $indexRelativePath);
 
@@ -116,8 +115,8 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_locate_the_index_file_if_the_result_is_ambiguous(): void
     {
-        touch('index.xml');
-        (new Filesystem())->dumpFile('sub-dir/index.xml', '');
+        FS::touch('index.xml');
+        FS::dumpFile('sub-dir/index.xml', '');
 
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage(sprintf(

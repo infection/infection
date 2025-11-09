@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Config\ValueProvider;
 
 use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\NativeFileSystem;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Console\IO;
@@ -45,7 +47,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function random_int;
 use function Safe\mkdir;
-use Symfony\Component\Filesystem\Filesystem;
 use function sys_get_temp_dir;
 
 #[Group('integration')]
@@ -58,32 +59,28 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
     private $workspace;
 
     /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
-    /**
      * @var ExcludeDirsProvider
      */
     private $provider;
 
     protected function setUp(): void
     {
+        // TODO...
         $this->workspace = sys_get_temp_dir() . '/exclude' . microtime(true) . random_int(100, 999);
-        mkdir($this->workspace, 0777, true);
+        FS::mkdir($this->workspace, 0777, true);
 
-        $this->fileSystem = new Filesystem();
+        $this->fileSystem = new NativeFileSystem();
 
         $this->provider = new ExcludeDirsProvider(
             $this->createMock(ConsoleHelper::class),
             $this->getQuestionHelper(),
-            $this->fileSystem,
+            new NativeFileSystem(),
         );
     }
 
     protected function tearDown(): void
     {
-        $this->fileSystem->remove($this->workspace);
+        FS::remove($this->workspace);
     }
 
     #[DataProvider('excludeDirsProvider')]

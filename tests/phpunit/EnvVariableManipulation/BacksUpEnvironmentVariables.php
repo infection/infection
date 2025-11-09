@@ -37,6 +37,7 @@ namespace Infection\Tests\EnvVariableManipulation;
 
 use Webmozart\Assert\Assert;
 
+// TODO: use an extension instead; or is there a backup globals?
 trait BacksUpEnvironmentVariables
 {
     /**

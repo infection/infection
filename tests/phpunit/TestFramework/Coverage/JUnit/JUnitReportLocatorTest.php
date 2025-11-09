@@ -36,17 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\FileSystem\Locator\FileNotFound;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\chdir;
 use function Safe\touch;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -92,7 +92,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_junit_file_with_the_wrong_case(): void
     {
-        if (PHP_OS_FAMILY !== 'Darwin') {
+        if (!OperatingSystem::isMacOs()) {
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
         }
 
@@ -108,7 +108,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     #[DataProvider('jUnitPathsProvider')]
     public function test_it_can_find_more_exotic_junit_file_names(string $jUnitRelativePaths): void
     {
-        (new Filesystem())->dumpFile($jUnitRelativePaths, '');
+        FS::dumpFile($jUnitRelativePaths, '');
 
         $expected = Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths);
 

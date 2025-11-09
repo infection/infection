@@ -57,7 +57,6 @@ use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
-use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -123,7 +122,6 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NonExecutableFinder::class,
         AdapterInstaller::class,
-        DummyFileSystem::class,
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,

@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Fidry\FileSystem\FileSystem;
 use function implode;
 use function in_array;
 use const PHP_EOL;
@@ -43,7 +44,6 @@ use function Safe\file_put_contents;
 use function sprintf;
 use function str_starts_with;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -54,7 +54,7 @@ final readonly class FileLogger implements MutationTestingResultsLogger
 
     public function __construct(
         private string $filePath,
-        private Filesystem $fileSystem,
+        private FileSystem $fileSystem,
         private LineMutationTestingResultsLogger $lineLogger,
         private LoggerInterface $logger,
     ) {

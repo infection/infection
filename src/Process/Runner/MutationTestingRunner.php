@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
+use Fidry\FileSystem\FileSystem;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -49,7 +50,6 @@ use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
 use function Pipeline\take;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -65,7 +65,7 @@ class MutationTestingRunner
         private readonly MutantFactory $mutantFactory,
         private readonly ProcessRunner $processRunner,
         private readonly EventDispatcher $eventDispatcher,
-        private readonly Filesystem $fileSystem,
+        private readonly FileSystem $fileSystem,
         private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
         private readonly bool $runConcurrently,
         private readonly float $timeout,

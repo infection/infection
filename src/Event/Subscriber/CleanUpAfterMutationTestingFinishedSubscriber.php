@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Fidry\FileSystem\FileSystem;
 use Infection\Event\MutationTestingWasFinished;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 
 /**
  * @internal
@@ -47,14 +46,15 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements Ev
     private const PHPUNIT_RESULT_CACHE_PATTERN = '/\.phpunit\.result\.cache\.(.*)/';
 
     public function __construct(
-        private Filesystem $filesystem,
+        private FileSystem $filesystem,
         private string $tmpDir,
     ) {
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $finder = Finder::create()
+        $finder = $this->filesystem
+            ->createFinder()
             ->in($this->tmpDir)
             // leave PHPUnit's result cache files so that subsequent Infection runs are faster because of `executionOrder=defects`
             ->notName(self::PHPUNIT_RESULT_CACHE_PATTERN);
@@ -62,7 +62,8 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriber implements Ev
         $this->filesystem->remove($finder);
 
         // delete old result cache files, so we don't keep them forever
-        $finder = Finder::create()
+        $finder = $this->filesystem
+            ->createFinder()
             ->in($this->tmpDir)
             ->date('before 30 days ago')
             ->name(self::PHPUNIT_RESULT_CACHE_PATTERN)

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\Framework\Str;
 use Infection\Logger\FileLogger;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

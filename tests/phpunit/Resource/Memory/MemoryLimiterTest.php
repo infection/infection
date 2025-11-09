@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Memory;
 
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;

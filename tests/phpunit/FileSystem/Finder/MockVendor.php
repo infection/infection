@@ -36,11 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use function array_filter;
-use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FileSystem;
 use function implode;
+use Infection\Framework\OperatingSystem;
 use const PHP_EOL;
-use function Safe\file_put_contents;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class MockVendor
 {
@@ -75,7 +74,7 @@ final class MockVendor
 
     public function __construct(
         private readonly string $tmpDir,
-        private readonly Filesystem $fileSystem,
+        private readonly FileSystem $fileSystem,
     ) {
         $vendorDir = $this->tmpDir . '/vendor';
         $this->vendorBinDir = $vendorDir . '/bin';
@@ -90,7 +89,7 @@ final class MockVendor
 
         // The package main script
         $this->packageScript = $scriptDir . '/' . self::PACKAGE;
-        file_put_contents($this->packageScript, "#!/usr/bin/env php\n<?php\n");
+        $this->fileSystem->dumpFile($this->packageScript, "#!/usr/bin/env php\n<?php\n");
 
         // The relative path to the main script
         $this->scriptPath = $binaryPath . '/' . self::PACKAGE;
@@ -103,12 +102,12 @@ final class MockVendor
     {
         $this->emptyVendorBin();
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // Use an empty batch script to disable finding the main script
-            file_put_contents($this->vendorBinBat, '@ECHO OFF');
+            $this->fileSystem->dumpFile($this->vendorBinBat, '@ECHO OFF');
         } else {
             // Mimic a symlink
-            file_put_contents($this->vendorBinLink, "#!/usr/bin/env php\n<?php\n");
+            $this->fileSystem->dumpFile($this->vendorBinLink, "#!/usr/bin/env php\n<?php\n");
         }
     }
 
@@ -118,7 +117,7 @@ final class MockVendor
 
         // Use a valid batch script to test finding main script
         $code = $this->getComposerBatProxy($this->scriptPath);
-        file_put_contents($this->vendorBinBat, $code);
+        $this->fileSystem->dumpFile($this->vendorBinBat, $code);
     }
 
     public function setUpProjectBatchTest(): void
@@ -127,7 +126,7 @@ final class MockVendor
 
         // Use a valid batch script to test finding main script
         $code = $this->getProjectBatProxy($this->scriptPath);
-        file_put_contents($this->vendorBinBat, $code);
+        $this->fileSystem->dumpFile($this->vendorBinBat, $code);
     }
 
     public function getVendorBinDir(): string

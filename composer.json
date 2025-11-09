@@ -51,6 +51,7 @@
         "colinodell/json5": "^3.0",
         "composer/xdebug-handler": "^3.0",
         "fidry/cpu-core-counter": "^1.0",
+        "fidry/filesystem": "^2.0@beta",
         "infection/abstract-testframework-adapter": "^0.5.0",
         "infection/extension-installer": "^0.1.0",
         "infection/include-interceptor": "^0.2.5",

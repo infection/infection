@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder\Iterator;
 
-use const DIRECTORY_SEPARATOR;
 use function preg_quote;
 use ReturnTypeWillChange;
-use function str_replace;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
 /**
@@ -59,11 +58,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
     #[ReturnTypeWillChange]
     public function accept()
     {
-        $filename = $this->current()->getRealPath();
-
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $filename = str_replace('\\', '/', (string) $filename);
-        }
+        $filename = Path::canonicalize($this->current()->getRealPath());
 
         return $this->isAccepted($filename);
     }

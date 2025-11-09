@@ -35,16 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use const DIRECTORY_SEPARATOR;
 use function explode;
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\NativeFileSystem;
 use Generator;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,7 +55,6 @@ use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
 use function strlen;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -68,7 +69,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
     private static string $pathName;
 
-    private Filesystem $fileSystem;
+    private FileSystem $fileSystem;
 
     private ComposerExecutableFinder $composerFinder;
 
@@ -86,7 +87,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
         parent::setUp();
 
-        $this->fileSystem = new Filesystem();
+        $this->fileSystem = new NativeFileSystem();
 
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
@@ -102,7 +103,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
     public function test_it_can_load_a_custom_path(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
+        $filename = FS::tempnam($this->tmp, 'test');
 
         $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
@@ -111,7 +112,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
     public function test_invalid_custom_path_throws_exception(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
+        $filename = FS::tempnam($this->tmp, 'test');
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
@@ -129,7 +130,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // The main script must be found from the .bat file
             $expected = realpath('vendor/phpunit/phpunit/phpunit');
         } else {
@@ -168,7 +169,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
             $expected = $mock->getVendorBinBat();
         } else {
