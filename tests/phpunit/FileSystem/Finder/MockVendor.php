@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use Fidry\FileSystem\NativeFileSystem;
 use function array_filter;
 use Fidry\FileSystem\FileSystem;
 use function implode;
@@ -74,7 +75,7 @@ final class MockVendor
 
     public function __construct(
         private readonly string $tmpDir,
-        private readonly FileSystem $fileSystem,
+        private readonly FileSystem $fileSystem = new NativeFileSystem(),
     ) {
         $vendorDir = $this->tmpDir . '/vendor';
         $this->vendorBinDir = $vendorDir . '/bin';

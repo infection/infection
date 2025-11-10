@@ -116,9 +116,6 @@
         },
         "classmap": [
             "tests/autoloaded"
-        ],
-        "files": [
-            "tests/phpunit/Helpers.php"
         ]
     },
     "bin": [

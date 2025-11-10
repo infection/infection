@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use Fidry\FileSystem\FileSystem;
 use function array_fill;
 use function array_map;
 use ArrayIterator;
@@ -68,7 +69,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(MutationTestingRunner::class)]
@@ -96,10 +96,7 @@ final class MutationTestingRunnerTest extends TestCase
      */
     private $eventDispatcher;
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&FileSystem $fileSystemMock;
 
     /**
      * @var DiffSourceCodeMatcher|MockObject
@@ -117,7 +114,7 @@ final class MutationTestingRunnerTest extends TestCase
         $this->mutantFactoryMock = $this->createMock(MutantFactory::class);
         $this->processRunnerMock = $this->createMock(ProcessRunner::class);
         $this->eventDispatcher = new EventDispatcherCollector();
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
         $this->diffSourceCodeMatcher = $this->createMock(DiffSourceCodeMatcher::class);
 
         $this->runner = new MutationTestingRunner(

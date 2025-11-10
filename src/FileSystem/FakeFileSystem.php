@@ -40,6 +40,7 @@ use Fidry\FileSystem\FileSystem;
 use Symfony\Component\Finder\Finder;
 use Traversable;
 
+// TODO: replace with the one from the library
 final class FakeFileSystem implements FileSystem
 {
     public function isRelativePath(string $path): bool

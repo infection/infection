@@ -35,10 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Memory;
 
-use Fidry\FileSystem\Test\FileSystemTestCase;
+use Fidry\FileSystem\FileSystem;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\TestFramework\FakeAwareAdapter;
 use function microtime;
 use const PHP_EOL;
@@ -47,16 +48,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(MemoryLimiter::class)]
 final class MemoryLimiterTest extends FileSystemTestCase
 {
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&FileSystem $fileSystemMock;
 
     /**
      * @var AbstractTestFrameworkAdapter|MockObject
@@ -70,7 +67,7 @@ final class MemoryLimiterTest extends FileSystemTestCase
 
     protected function setUp(): void
     {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
         $this->adapterMock = $this->createMock(AbstractTestFrameworkAdapter::class);
         $this->environmentMock = $this->createMock(MemoryLimiterEnvironment::class);
 

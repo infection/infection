@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Fidry\FileSystem\Test\FileSystemTestCase;
+use Fidry\FileSystem\FileSystem;
 use Infection\Framework\Str;
 use Infection\Logger\FileLogger;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(FileLogger::class)]
@@ -52,10 +52,7 @@ final class FileLoggerTest extends FileSystemTestCase
 {
     private const LOG_FILE_PATH = '/path/to/text.log';
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&FileSystem $fileSystemMock;
 
     /**
      * @var DummyLogger
@@ -66,7 +63,7 @@ final class FileLoggerTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
+        $this->fileSystemMock = $this->createMock(FileSystem::class);
         $this->logger = new DummyLogger();
     }
 

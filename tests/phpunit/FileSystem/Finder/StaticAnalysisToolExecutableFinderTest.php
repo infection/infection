@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function explode;
 use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;

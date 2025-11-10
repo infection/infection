@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\NativeFileSystem;
 use const DIRECTORY_SEPARATOR;
 use function explode;
 use function getenv;
@@ -53,7 +56,6 @@ use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
 use function strlen;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -71,11 +73,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
      */
     private static $pathName;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
-
     private ComposerExecutableFinder $composerFinder;
 
     /**
@@ -92,8 +89,6 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         parent::setUp();
 
-        $this->fileSystem = new Filesystem();
-
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
             ->willReturn('/usr/bin/composer');
@@ -108,7 +103,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_it_can_load_a_custom_path(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
+        $filename = FS::tempnam($this->tmp, 'test');
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
@@ -117,9 +112,9 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_invalid_custom_path_throws_exception(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
+        $filename = FS::tempnam($this->tmp, 'test');
         // Remove it so that the file doesn't exist
-        $this->fileSystem->remove($filename);
+        FS::remove($filename);
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
@@ -165,7 +160,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_it_finds_framework_executable(): void
     {
-        $mock = new MockVendor($this->tmp, $this->fileSystem);
+        $mock = new MockVendor($this->tmp);
         $mock->setUpPlatformTest();
 
         // Set the path to a single directory (vendor/bin)
@@ -174,8 +169,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            // This .bat has no code, so main script will not be found
+        if (OperatingSystem::isWindows()) {
+            // This .bat has no code, so the main script will not be found
             $expected = $mock->getVendorBinBat();
         } else {
             $expected = $mock->getVendorBinLink();
@@ -191,7 +186,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     #[DataProvider('providesMockSetup')]
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
-        $mock = new MockVendor($this->tmp, $this->fileSystem);
+        $mock = new MockVendor($this->tmp);
         $mock->{$methodName}();
 
         // Set the path to a single directory (vendor/bin)
