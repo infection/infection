@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Fidry\FileSystem\NativeFileSystem;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Fidry\FileSystem\FileSystem;
@@ -559,6 +560,7 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            FileSystem::class => static fn (): FileSystem => new NativeFileSystem(),
         ]);
 
         return $container->withValues(

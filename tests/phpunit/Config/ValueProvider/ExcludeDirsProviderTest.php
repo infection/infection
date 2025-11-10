@@ -66,7 +66,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
 
     protected function setUp(): void
     {
-        $this->workspace = FS::tempnam(sys_get_temp_dir(), 'exclude');
+        $this->workspace = FS::makeTmpDir('exclude', self::class);
 
         $this->provider = new ExcludeDirsProvider(
             $this->createMock(ConsoleHelper::class),

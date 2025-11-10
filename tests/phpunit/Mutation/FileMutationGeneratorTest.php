@@ -164,7 +164,7 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($this->callback(
-                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === '/path/to/file',
+                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getPathname() === '/path/to/file',
             ))
             ->willReturn([$initialStatements, []])
         ;
@@ -194,7 +194,12 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock)
         ;
 
-        $trace = $this->createTraceMock('/path/to/file', 'relativePath', 'relativePathName', true);
+        $trace = $this->createTraceMock(
+            '/path/to/file',
+            'relativePath',
+            'relativePathName',
+            true,
+        );
 
         $mutations = $this->mutationGenerator->generate(
             $trace,
@@ -226,7 +231,7 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($this->callback(
-                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === $expectedFilePath,
+                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getPathname() === $expectedFilePath,
             ))
             ->willReturn([$initialStatements, []])
         ;
@@ -394,20 +399,20 @@ final class FileMutationGeneratorTest extends TestCase
     }
 
     /**
-     * @return Trace|MockObject
+     * @return Trace&MockObject
      */
     private function createTraceMock(
         string $file,
         string $relativePath,
         string $relativePathname,
         ?bool $hasTests = null,
-    ): Trace {
-        $splFileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
+    ): Trace&MockObject {
+        $splFileInfo = $this->createSplFileInfo($file, $relativePath, $relativePathname);
 
         $proxyTraceMock = $this->createMock(Trace::class);
         $proxyTraceMock
             ->method('getSourceFileInfo')
-            ->willReturn($splFileInfoMock)
+            ->willReturn($splFileInfo)
         ;
 
         if ($hasTests !== null) {
@@ -420,7 +425,7 @@ final class FileMutationGeneratorTest extends TestCase
         return $proxyTraceMock;
     }
 
-    private function createSplFileInfoMock(string $file, string $relativePath, string $relativePathname): SplFileInfo
+    private function createSplFileInfo(string $file, string $relativePath, string $relativePathname): SplFileInfo
     {
         return SplFileInfoBuilder::withTestData()
             ->withFile($file)

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use Fidry\FileSystem\FileSystem;
+use Symfony\Component\Filesystem\Path;
 use function array_key_exists;
 use function dirname;
 use function file_exists;
@@ -70,6 +72,7 @@ class StaticAnalysisToolExecutableFinder
 
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -80,7 +83,7 @@ class StaticAnalysisToolExecutableFinder
                 $this->addVendorBinToPath();
             }
 
-            $this->cachedPath[$staticAnalysisTool] = realpath($this->findStaticAnalysisExecutable($staticAnalysisTool, $customPath));
+            $this->cachedPath[$staticAnalysisTool] = $this->findStaticAnalysisExecutable($staticAnalysisTool, $customPath);
 
             Assert::string($this->cachedPath[$staticAnalysisTool]);
 
@@ -98,7 +101,7 @@ class StaticAnalysisToolExecutableFinder
             return false;
         }
 
-        if (file_exists($customPath)) {
+        if ($this->fileSystem->isReadableFile($customPath)) {
             return true;
         }
 
@@ -140,7 +143,7 @@ class StaticAnalysisToolExecutableFinder
     private function findStaticAnalysisExecutable(string $staticAnalysisTool, string $customPath): string
     {
         if ($this->shouldUseCustomPath($staticAnalysisTool, $customPath)) {
-            return $customPath;
+            return Path::canonicalize($customPath);
         }
 
         /*
@@ -179,6 +182,8 @@ class StaticAnalysisToolExecutableFinder
 
     private function findFromBatchFile(string $path): string
     {
+        $contents = $this->fileSystem->getFileContents($path);
+
         /* Check the proxy code (%~dp0 is the script path with a backslash),
          * then trim it and remove any leading directory slash and any trailing
          * components. This will extract the relative path from lines like:
@@ -186,7 +191,7 @@ class StaticAnalysisToolExecutableFinder
          *   SET BIN_TARGET=%~dp0/../path
          *   php %~dp0/path %*
          */
-        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
+        if (preg_match('/%~dp0(.+$)/mi', $contents, $match) === 1) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
             $script = realpath(dirname($path) . '/' . $target);
 

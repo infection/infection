@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Locator;
 
 /**
+ * TODO: move
  * @internal
  */
 interface Locator
