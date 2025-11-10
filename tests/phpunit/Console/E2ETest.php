@@ -102,7 +102,7 @@ final class E2ETest extends TestCase
      */
     private $previousLoader;
 
-    private static $countFailingComposerInstall = 0;
+    private static int $countFailingComposerInstall = 0;
 
     protected function setUp(): void
     {
