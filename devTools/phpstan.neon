@@ -142,7 +142,7 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/benchmark/*/*Bench.php
 
-        # We are testing user inout values hence by design they may not fit the specified type
+        # We are testing user input values hence by design they may not fit the specified type
         -
             message: '#\$testFramework#'
             identifier: argument.type
