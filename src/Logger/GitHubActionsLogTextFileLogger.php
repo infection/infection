@@ -33,33 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger;
+namespace Infection\Logger;
 
-use Infection\Framework\Str;
-use Psr\Log\AbstractLogger;
-use Webmozart\Assert\Assert;
+use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
+use function sprintf;
+use function trim;
 
-final class DummyLogger extends AbstractLogger
+/**
+ * Uses the GitHub Actions line grouping feature to make the output more digestable and collapsable.
+ *
+ * @see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#grouping-log-lines
+ *
+ * @internal
+ */
+final readonly class GitHubActionsLogTextFileLogger extends BaseTextFileLogger
 {
-    /**
-     * @var array<array{string, string, array<mixed>}>
-     */
-    private array $logs = [];
-
-    public function log($level, $message, array $context = []): void
+    protected function getHeadlineLines(string $headlinePrefix): string
     {
-        Assert::string($level);
-        Assert::string($message);
-
-        $this->logs[] = [
-            $level,
-            Str::toUnixLineEndings($message),
-            $context,
-        ];
+        return '';
     }
 
-    public function getLogs(): array
-    {
-        return $this->logs;
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    protected function getResultsLine(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections,
+    ): string {
+        $results = trim(parent::getResultsLine($executionResults, $headlinePrefix, $separateSections));
+
+        if ($results === '') {
+            return sprintf('0 %s mutants' . PHP_EOL, $headlinePrefix);
+        }
+
+        return sprintf('::group::%s mutants' . PHP_EOL . '%s' . PHP_EOL . '::endgroup::' . PHP_EOL, $headlinePrefix, $results);
     }
 }
