@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function array_map;
 use DOMDocument;
 use DOMNode;
@@ -42,7 +43,6 @@ use DOMNodeList;
 use DOMXPath;
 use function escapeshellarg;
 use Fidry\FileSystem\NativeFileSystem;
-use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;

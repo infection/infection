@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use const DIRECTORY_SEPARATOR;
 use Fidry\FileSystem\FS;
-use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;

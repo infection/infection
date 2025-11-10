@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use const DIRECTORY_SEPARATOR;
 use Fidry\FileSystem\FS;
 use Fidry\FileSystem\NativeFileSystem;
@@ -65,11 +66,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
 
     protected function setUp(): void
     {
-        // TODO...
-        $this->workspace = sys_get_temp_dir() . '/exclude' . microtime(true) . random_int(100, 999);
-        FS::mkdir($this->workspace, 0777, true);
-
-        $this->fileSystem = new NativeFileSystem();
+        $this->workspace = FS::tempnam(sys_get_temp_dir(), 'exclude');
 
         $this->provider = new ExcludeDirsProvider(
             $this->createMock(ConsoleHelper::class),
