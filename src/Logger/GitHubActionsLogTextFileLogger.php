@@ -35,28 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
-use function implode;
+use Infection\Mutant\MutantExecutionResult;
 use const PHP_EOL;
 use function sprintf;
-use function str_repeat;
-use function strlen;
+use function trim;
 
 /**
+ * Uses the GitHub Actions line grouping feature to make the output more digestable and collapsable.
+ *
+ * @see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#grouping-log-lines
+ *
  * @internal
  */
-final readonly class TextFileLogger extends BaseTextFileLogger
+final readonly class GitHubActionsLogTextFileLogger extends BaseTextFileLogger
 {
     protected function getHeadlineLines(string $headlinePrefix): string
     {
-        $headline = sprintf('%s mutants:', $headlinePrefix);
+        return '';
+    }
 
-        return implode(
-            PHP_EOL,
-            [
-                $headline,
-                str_repeat('=', strlen($headline)),
-                '',
-            ],
-        );
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    protected function getResultsLine(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections,
+    ): string {
+        $results = trim(parent::getResultsLine($executionResults, $headlinePrefix, $separateSections));
+
+        if ($results === '') {
+            return sprintf('0 %s mutants' . PHP_EOL, $headlinePrefix);
+        }
+
+        return sprintf('::group::%s mutants' . PHP_EOL . '%s' . PHP_EOL . '::endgroup::' . PHP_EOL, $headlinePrefix, $results);
     }
 }

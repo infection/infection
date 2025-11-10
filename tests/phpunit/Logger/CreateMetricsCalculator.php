@@ -48,7 +48,7 @@ use function Later\now;
 
 trait CreateMetricsCalculator
 {
-    private static $originalFilePrefix = '';
+    private static string $originalFilePrefix = '';
 
     private static function createCompleteMetricsCalculator(): MetricsCalculator
     {

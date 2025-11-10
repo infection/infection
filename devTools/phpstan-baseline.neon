@@ -829,12 +829,6 @@ parameters:
 			path: ../tests/phpunit/Logger/ConsoleLoggerTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\Logger\\DebugFileLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/DebugFileLoggerTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Logger\\DummyLogger\:\:getLogs\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -859,12 +853,6 @@ parameters:
 			path: ../tests/phpunit/Logger/GitHubAnnotationsLoggerTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\Logger\\GitHubAnnotationsLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/GitHubAnnotationsLoggerTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Logger\\GitLabCodeQualityLoggerTest\:\:assertLoggedContentIs\(\) has parameter \$expectedJson with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -873,12 +861,6 @@ parameters:
 		-
 			message: '#^Method Infection\\Tests\\Logger\\GitLabCodeQualityLoggerTest\:\:test_it_logs_correctly_with_mutations\(\) has parameter \$expectedContents with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/GitLabCodeQualityLoggerTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Logger\\GitLabCodeQualityLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
 			count: 1
 			path: ../tests/phpunit/Logger/GitLabCodeQualityLoggerTest.php
 
@@ -919,28 +901,10 @@ parameters:
 			path: ../tests/phpunit/Logger/JsonLoggerTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\Logger\\JsonLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/JsonLoggerTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Logger\\PerMutatorLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/PerMutatorLoggerTest.php
-
-		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Logger/StrykerLoggerFactoryTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Logger\\SummaryFileLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/SummaryFileLoggerTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\SummaryJsonLoggerTest\:\:assertLoggedContentIs\(\) has parameter \$expectedJson with no value type specified in iterable type array\.$#'
@@ -953,24 +917,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Logger/SummaryJsonLoggerTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Logger\\SummaryJsonLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/SummaryJsonLoggerTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Logger\\TextFileLoggerTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Logger/TextFileLoggerTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Metrics\\CalculatorTest\:\:\$originalFilePrefix has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/Metrics/CalculatorTest.php
 
 		-
 			message: '#^Parameter \#4 \$mutantDiff of class Infection\\Mutant\\MutantExecutionResult constructor expects Later\\Interfaces\\Deferred\<string\>, Later\\Interfaces\\Deferred\<non\-falsy\-string\> given\.$#'
