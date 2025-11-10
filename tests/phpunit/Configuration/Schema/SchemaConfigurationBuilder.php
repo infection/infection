@@ -48,6 +48,8 @@ final class SchemaConfigurationBuilder
 {
     /**
      * @param array<string, mixed> $mutators
+     * @param TestFrameworkTypes::*|null $testFramework
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     private function __construct(
         private string $file,
@@ -245,6 +247,9 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param TestFrameworkTypes::*|null $testFramework
+     */
     public function withTestFramework(?string $testFramework): self
     {
         $clone = clone $this;
@@ -293,6 +298,9 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
+     */
     public function withStaticAnalysisTool(?string $staticAnalysisTool): self
     {
         $clone = clone $this;
