@@ -78,6 +78,7 @@ final class SafeDOMXPathTest extends TestCase
     public function test_it_can_be_created_for_an_xml_file(
         string $pathname,
         string $expectedFirstElementTagName,
+        ?string $expectedDocumentNamespace,
     ): void {
         $xPath = SafeDOMXPath::fromFile(
             Path::canonicalize($pathname),
@@ -85,8 +86,23 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstElement = $xPath->document->firstElementChild;
 
+        // Beware: this is only the _document_ namespace, not a namespace registered to the XPath.
+        $this->assertSame(
+            $expectedDocumentNamespace,
+            // @phpstan-ignore property.nonObject
+            $firstElement->namespaceURI,
+            'Expected the document namespace to be left alone.',
+        );
+        // Sanity check: ensuring we correctly parsed the XML.
         // @phpstan-ignore property.nonObject
         $this->assertSame($expectedFirstElementTagName, $firstElement->tagName);
+
+        // Check that no namespace was registered.
+        // This is done by doing a query that _should_ return a result but does
+        // not because the XML is namespaced but not the XPath.
+        $expectedNodeCount = $expectedDocumentNamespace === null ? 1 : 0;
+        $phpunitNodes = $xPath->query('/phpunit');
+        $this->assertCount($expectedNodeCount, $phpunitNodes);
     }
 
     public static function validXmlFileProvider(): iterable
@@ -94,12 +110,40 @@ final class SafeDOMXPathTest extends TestCase
         yield 'file with namespace' => [
             __DIR__ . '/example-with-namespace.xml',
             'phpunit',
+            'https://schema.phpunit.de/coverage/1.0',
         ];
 
         yield 'file without namespace' => [
             __DIR__ . '/example-without-namespace.xml',
             'phpunit',
+            null,
         ];
+    }
+
+    public function test_it_can_be_created_for_an_xml_file_with_a_namespace_registered(): void
+    {
+        $xPath = SafeDOMXPath::fromFile(
+            __DIR__ . '/example-with-namespace.xml',
+            'p',
+        );
+
+        // Check that no namespace was registered.
+        $phpunitNodes = $xPath->query('/p:phpunit');
+        $this->assertCount(1, $phpunitNodes);
+    }
+
+    public function test_it_cannot_be_created_for_an_xml_file_with_a_namespace_registered_if_the_document_has_no_namespace(): void
+    {
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the first document element to have a namespace URI. None found.',
+            ),
+        );
+
+        SafeDOMXPath::fromFile(
+            __DIR__ . '/example-without-namespace.xml',
+            'p',
+        );
     }
 
     public function test_it_throws_an_exception_when_creating_it_from_an_invalid_xml_file(): void
