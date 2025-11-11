@@ -37,9 +37,9 @@ namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Locator\FileNotFound;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use const PHP_OS_FAMILY;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -92,7 +92,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_junit_file_with_the_wrong_case(): void
     {
-        if (PHP_OS_FAMILY !== 'Darwin') {
+        if (!OperatingSystem::isMacOs()) {
             $this->markTestSkipped('Cannot test this on case-sensitive OS');
         }
 
