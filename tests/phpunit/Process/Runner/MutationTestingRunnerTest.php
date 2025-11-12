@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
-use Fidry\FileSystem\FileSystem;
 use function array_fill;
 use function array_map;
 use ArrayIterator;
 use function count;
+use Fidry\FileSystem\FileSystem;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\DiffSourceCodeMatcher;

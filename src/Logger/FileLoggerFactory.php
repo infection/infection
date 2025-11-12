@@ -85,7 +85,7 @@ class FileLoggerFactory
         }
 
         if ($logConfig->getTextLogFilePath() !== null) {
-            yield $logConfig->getTextLogFilePath() => $this->createTextLogger();
+            yield $logConfig->getTextLogFilePath() => $this->createTextLogger($logConfig);
         }
 
         if ($logConfig->getHtmlLogFilePath() !== null) {
@@ -131,8 +131,20 @@ class FileLoggerFactory
         );
     }
 
-    private function createTextLogger(): LineMutationTestingResultsLogger
+    private function createTextLogger(Logs $logConfig): LineMutationTestingResultsLogger
     {
+        if (
+            $logConfig->getUseGitHubAnnotationsLogger()
+            && $logConfig->getTextLogFilePath() === 'php://stdout'
+        ) {
+            return new GitHubActionsLogTextFileLogger(
+                $this->resultsCollector,
+                $this->logVerbosity === LogVerbosity::DEBUG,
+                $this->onlyCoveredCode,
+                $this->debugMode,
+            );
+        }
+
         return new TextFileLogger(
             $this->resultsCollector,
             $this->logVerbosity === LogVerbosity::DEBUG,

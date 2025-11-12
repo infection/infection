@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use Fidry\FileSystem\FileSystem;
-use Fidry\FileSystem\FS;
-use Fidry\FileSystem\NativeFileSystem;
-use const DIRECTORY_SEPARATOR;
 use function explode;
+use Fidry\FileSystem\FS;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;

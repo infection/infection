@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use Fidry\FileSystem\FileSystem;
-use Infection\FileSystem\FakeFileSystem;
 use function array_map;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\FileLoggerFactory;
+use Infection\Logger\GitHubActionsLogTextFileLogger;
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Logger\Html\HtmlFileLogger;
@@ -61,7 +61,6 @@ use Infection\Tests\Fixtures\Logger\FakeLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -148,6 +147,38 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
             ),
             [TextFileLogger::class],
+        ];
+
+        yield 'text logger outside of github actions' => [
+            new Logs(
+                'php://stdout',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                null,
+                null,
+            ),
+            [TextFileLogger::class],
+        ];
+
+        yield 'text logger in github actions' => [
+            new Logs(
+                'php://stdout',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null,
+                null,
+            ),
+            [GitHubActionsLogTextFileLogger::class, GitHubAnnotationsLogger::class],
         ];
 
         yield 'html logger' => [

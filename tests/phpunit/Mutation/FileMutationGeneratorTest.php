@@ -398,9 +398,6 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    /**
-     * @return Trace&MockObject
-     */
     private function createTraceMock(
         string $file,
         string $relativePath,

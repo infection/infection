@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Fidry\FileSystem\NativeFileSystem;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\NativeFileSystem;
 use Fidry\FileSystem\ReadOnlyFileSystem;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;

@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
-use Fidry\FileSystem\FileSystem;
-use Symfony\Component\Filesystem\Path;
 use function array_key_exists;
 use function dirname;
+use Fidry\FileSystem\FileSystem;
 use function file_exists;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
@@ -46,12 +45,12 @@ use function ltrim;
 use const PATH_SEPARATOR;
 use function rtrim;
 use RuntimeException;
-use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\preg_match;
 use function Safe\putenv;
 use function Safe\realpath;
 use function substr;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use function trim;

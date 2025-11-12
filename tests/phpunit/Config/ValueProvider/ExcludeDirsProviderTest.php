@@ -35,20 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Config\ValueProvider;
 
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use const DIRECTORY_SEPARATOR;
 use Fidry\FileSystem\FS;
 use Fidry\FileSystem\NativeFileSystem;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\ValueProvider\ExcludeDirsProvider;
 use Infection\Console\IO;
-use function microtime;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use function random_int;
 use function Safe\mkdir;
-use function sys_get_temp_dir;
 
 #[Group('integration')]
 #[CoversClass(ExcludeDirsProvider::class)]

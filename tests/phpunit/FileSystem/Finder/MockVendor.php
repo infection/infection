@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use Fidry\FileSystem\NativeFileSystem;
 use function array_filter;
 use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\NativeFileSystem;
 use function implode;
 use Infection\Framework\OperatingSystem;
 use const PHP_EOL;
