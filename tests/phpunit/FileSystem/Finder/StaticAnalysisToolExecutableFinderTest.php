@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use Infection\FileSystem\FakeFileSystem;
 use function explode;
 use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;
@@ -106,7 +107,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
     {
         $filename = FS::tempnam($this->tmp, 'test');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder(
+            $this->composerFinder,
+            $this->fileSystem,
+        );
 
         $this->assertSame($filename, $frameworkFinder->find('not-used', $filename), 'Should return the custom path');
     }
@@ -117,7 +121,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         // Remove it so that the file doesn't exist
         $this->fileSystem->remove($filename);
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder(
+            $this->composerFinder,
+            $this->fileSystem,
+        );
 
         $this->expectException(FinderException::class);
         $this->expectExceptionMessage('custom path');
@@ -129,7 +136,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
     {
         $path = getenv(self::$pathName);
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder(
+            $this->composerFinder,
+            $this->fileSystem,
+        );
 
         if (OperatingSystem::isWindows()) {
             // The main script must be found from the .bat file
@@ -168,7 +178,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder(
+            $this->composerFinder,
+            new FakeFileSystem(),
+        );
 
         if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
@@ -194,7 +207,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         putenv(sprintf('%s=%s', self::$pathName, $mock->getVendorBinDir()));
         putenv('PATHEXT=');
 
-        $frameworkFinder = new StaticAnalysisToolExecutableFinder($this->composerFinder);
+        $frameworkFinder = new StaticAnalysisToolExecutableFinder(
+            $this->composerFinder,
+            $this->fileSystem,
+        );
 
         $this->assertSame(
             Path::canonicalize($mock->getPackageScript()),

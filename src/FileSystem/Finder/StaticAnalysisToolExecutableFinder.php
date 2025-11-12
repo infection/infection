@@ -192,9 +192,9 @@ class StaticAnalysisToolExecutableFinder
          */
         if (preg_match('/%~dp0(.+$)/mi', $contents, $match) === 1) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
-            $script = realpath(dirname($path) . '/' . $target);
+            $script = Path::canonicalize(dirname($path) . '/' . $target);
 
-            if (file_exists($script)) {
+            if ($this->fileSystem->isReadableFile($script)) {
                 $path = $script;
             }
         }
