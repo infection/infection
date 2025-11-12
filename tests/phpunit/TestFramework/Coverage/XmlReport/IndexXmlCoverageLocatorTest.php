@@ -115,7 +115,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_locate_the_index_file_if_the_result_is_ambiguous(): void
     {
-        FS::touch('index.xml');
+        touch('index.xml');
         FS::dumpFile('sub-dir/index.xml', '');
 
         $this->expectException(FileNotFound::class);

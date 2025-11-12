@@ -43,7 +43,6 @@ use const PATH_SEPARATOR;
 use function sprintf;
 
 /**
- * TODO: port this class
  * @internal
  */
 final class NonExecutableFinder

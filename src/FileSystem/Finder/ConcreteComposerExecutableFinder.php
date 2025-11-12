@@ -44,8 +44,6 @@ use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
- * TODO: port this one
- *   check the one in PIE too
  * @internal
  */
 final readonly class ConcreteComposerExecutableFinder implements ComposerExecutableFinder
