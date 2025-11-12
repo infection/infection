@@ -48,7 +48,6 @@ use RuntimeException;
 use function Safe\getcwd;
 use function Safe\preg_match;
 use function Safe\putenv;
-use function Safe\realpath;
 use function substr;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\ExecutableFinder;

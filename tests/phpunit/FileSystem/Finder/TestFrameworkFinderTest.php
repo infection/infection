@@ -49,6 +49,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -85,6 +86,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->backupEnvironmentVariables();
 
         parent::setUp();
+
+        // For this test we expect to remain in the current working dir.
+        // Not ideal, but it is what it is for now.
+        chdir($this->cwd);
 
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')

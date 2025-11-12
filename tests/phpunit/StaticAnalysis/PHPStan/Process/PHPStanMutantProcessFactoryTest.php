@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Process;
 
+use Fidry\FileSystem\FileSystem;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
@@ -113,7 +114,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
-        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem = $this->createMock(FileSystem::class);
         $filesystem->expects($this->once())
             ->method('dumpFile')
             ->with(
@@ -211,7 +212,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
-        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem = $this->createMock(FileSystem::class);
         $filesystem->expects($this->once())
             ->method('dumpFile')
             ->with(
@@ -307,7 +308,7 @@ final class PHPStanMutantProcessFactoryTest extends TestCase
             ->willReturn(['/usr/bin/php', '/path/to/phpstan'])
         ;
 
-        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem = $this->createMock(FileSystem::class);
         $filesystem->expects($this->once())
             ->method('dumpFile');
 

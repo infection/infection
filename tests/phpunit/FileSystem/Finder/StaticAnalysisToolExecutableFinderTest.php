@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use Infection\FileSystem\FakeFileSystem;
 use function explode;
 use Fidry\FileSystem\FileSystem;
 use Fidry\FileSystem\FS;
 use Fidry\FileSystem\NativeFileSystem;
 use Generator;
 use function getenv;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
@@ -53,6 +53,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -88,6 +89,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         $this->backupEnvironmentVariables();
 
         parent::setUp();
+
+        // For this test we expect to remain in the current working dir.
+        // Not ideal, but it is what it is for now.
+        chdir($this->cwd);
 
         $this->fileSystem = new NativeFileSystem();
 
