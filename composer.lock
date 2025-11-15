@@ -294,20 +294,21 @@
         },
         {
             "name": "fidry/filesystem",
-            "version": "2.0.0-beta.0",
+            "version": "2.0.0-beta.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/filesystem.git",
-                "reference": "017dcef462bd605cea1efa6a3b94cdf89cae855f"
+                "reference": "b5f82c25307fd9486049fa49affc52fbcb36e108"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/filesystem/zipball/017dcef462bd605cea1efa6a3b94cdf89cae855f",
-                "reference": "017dcef462bd605cea1efa6a3b94cdf89cae855f",
+                "url": "https://api.github.com/repos/theofidry/filesystem/zipball/b5f82c25307fd9486049fa49affc52fbcb36e108",
+                "reference": "b5f82c25307fd9486049fa49affc52fbcb36e108",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.3",
+                "ext-mbstring": "*",
+                "php": "^8.2",
                 "symfony/filesystem": "^6.4 || ^7.0",
                 "symfony/finder": "^6.4 || ^7.0"
             },
@@ -315,7 +316,7 @@
                 "bamarni/composer-bin-plugin": "^1.4",
                 "ergebnis/composer-normalize": "^2.28",
                 "infection/infection": ">=0.26",
-                "phpunit/phpunit": "^12"
+                "phpunit/phpunit": "^11 || ^12"
             },
             "type": "library",
             "extra": {
@@ -348,7 +349,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/filesystem/issues",
-                "source": "https://github.com/theofidry/filesystem/tree/2.0.0-beta.0"
+                "source": "https://github.com/theofidry/filesystem/tree/2.0.0-beta.1"
             },
             "funding": [
                 {
@@ -356,7 +357,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-09T19:56:59+00:00"
+            "time": "2025-11-15T14:19:58+00:00"
         },
         {
             "name": "infection/abstract-testframework-adapter",
@@ -5489,5 +5490,5 @@
     "platform-overrides": {
         "php": "8.2.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
