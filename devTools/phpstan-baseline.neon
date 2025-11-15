@@ -1357,12 +1357,6 @@ parameters:
 			path: ../tests/phpunit/PhpParser/Visitor/IgnoreNode/BaseNodeIgnorerTestCase.php
 
 		-
-			message: '#^Parameter \#2 \$originalFileAst of class Infection\\Mutation\\Mutation constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
-
-		-
 			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'
 			identifier: method.notFound
 			count: 1
