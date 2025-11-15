@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function array_map;
+use Fidry\FileSystem\FakeFileSystem;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Console\LogVerbosity;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;

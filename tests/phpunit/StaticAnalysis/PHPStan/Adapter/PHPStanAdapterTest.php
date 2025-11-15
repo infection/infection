@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
+use Fidry\FileSystem\FakeFileSystem;
 use Fidry\FileSystem\FileSystem;
 use Generator;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;

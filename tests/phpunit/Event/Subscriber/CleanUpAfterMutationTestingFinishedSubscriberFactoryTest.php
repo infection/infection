@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Fidry\FileSystem\FakeFileSystem;
 use Fidry\FileSystem\FileSystem;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

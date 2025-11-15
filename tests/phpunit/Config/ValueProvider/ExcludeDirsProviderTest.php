@@ -45,15 +45,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\mkdir;
+use function str_replace;
 
 #[Group('integration')]
 #[CoversClass(ExcludeDirsProvider::class)]
 final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var string
-     */
-    private $workspace;
+    private string $tmp;
 
     /**
      * @var ExcludeDirsProvider
@@ -62,7 +60,9 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
 
     protected function setUp(): void
     {
-        $this->workspace = FS::makeTmpDir('exclude', self::class);
+        $this->tmp = FS::tmpDir(
+            str_replace('\\', '', self::class),
+        );
 
         $this->provider = new ExcludeDirsProvider(
             $this->createMock(ConsoleHelper::class),
@@ -73,7 +73,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
 
     protected function tearDown(): void
     {
-        FS::remove($this->workspace);
+        FS::remove($this->tmp);
     }
 
     #[DataProvider('excludeDirsProvider')]
@@ -115,8 +115,8 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
             $this->markTestSkipped('Stty is not available');
         }
 
-        $dir1 = $this->workspace . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;
-        $dir2 = $this->workspace . DIRECTORY_SEPARATOR . 'foo' . DIRECTORY_SEPARATOR;
+        $dir1 = $this->tmp . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR;
+        $dir2 = $this->tmp . DIRECTORY_SEPARATOR . 'foo' . DIRECTORY_SEPARATOR;
 
         mkdir($dir1);
         mkdir($dir2);
@@ -127,7 +127,7 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
                 $this->createStreamOutput(),
             ),
             ['src'],
-            [$this->workspace],
+            [$this->tmp],
         );
 
         $this->assertContains('foo', $excludeDirs);
@@ -139,9 +139,9 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
             $this->markTestSkipped('Stty is not available');
         }
 
-        $dirA = $this->workspace . DIRECTORY_SEPARATOR . 'a' . DIRECTORY_SEPARATOR;
-        $dirB = $this->workspace . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR;
-        $dirC = $this->workspace . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR;
+        $dirA = $this->tmp . DIRECTORY_SEPARATOR . 'a' . DIRECTORY_SEPARATOR;
+        $dirB = $this->tmp . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR;
+        $dirC = $this->tmp . DIRECTORY_SEPARATOR . 'c' . DIRECTORY_SEPARATOR;
 
         mkdir($dirA);
         mkdir($dirB);

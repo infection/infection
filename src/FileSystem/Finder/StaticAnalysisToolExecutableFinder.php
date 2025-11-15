@@ -141,13 +141,13 @@ class StaticAnalysisToolExecutableFinder
     private function findStaticAnalysisExecutable(string $staticAnalysisTool, string $customPath): string
     {
         if ($this->shouldUseCustomPath($staticAnalysisTool, $customPath)) {
-            return Path::canonicalize($customPath);
+            return $this->fileSystem->normalizedRealPath($customPath);
         }
 
         /*
          * There's a glitch where ExecutableFinder would find a non-executable
          * file on Windows, even if there's a proper executable .bat by its side.
-         * Therefore we have to explicitly look for a .bat first.
+         * Therefore, we have to explicitly look for a .bat first.
          */
         $candidates = [
             $staticAnalysisTool . '.bat',
@@ -180,7 +180,7 @@ class StaticAnalysisToolExecutableFinder
 
     private function findFromBatchFile(string $path): string
     {
-        $contents = $this->fileSystem->getFileContents($path);
+        $contents = $this->fileSystem->readFile($path);
 
         /* Check the proxy code (%~dp0 is the script path with a backslash),
          * then trim it and remove any leading directory slash and any trailing
