@@ -83,9 +83,7 @@ class MutantProcessContainerFactory
             timeout: $timeout,
         );
 
-        $configuration = $this->configuration;
-
-        if ($configuration->isDryRun) {
+        if ($this->configuration->isDryRun) {
             $process = DryRunProcess::fromProcess($process);
         }
 

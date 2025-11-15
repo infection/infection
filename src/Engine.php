@@ -220,8 +220,6 @@ final readonly class Engine
             );
         }
 
-        $configuration = $this->config;
-
-        return $configuration->testFrameworkExtraOptions;
+        return $this->config->testFrameworkExtraOptions;
     }
 }
