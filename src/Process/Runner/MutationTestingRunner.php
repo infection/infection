@@ -41,7 +41,6 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
-use Infection\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantFactory;
@@ -67,7 +66,6 @@ class MutationTestingRunner
         private readonly EventDispatcher $eventDispatcher,
         private readonly Filesystem $fileSystem,
         private readonly DiffSourceCodeMatcher $diffSourceCodeMatcher,
-        private readonly bool $runConcurrently,
         private readonly float $timeout,
         private readonly array $ignoreSourceCodeMutatorsMap,
         private readonly ?string $mutantId = null,
@@ -77,9 +75,8 @@ class MutationTestingRunner
     /**
      * @param iterable<Mutation> $mutations
      */
-    public function run(iterable $mutations, string $testFrameworkExtraOptions): void
+    public function run(iterable $mutations, int $numberOfMutants, string $testFrameworkExtraOptions): void
     {
-        $numberOfMutants = IterableCounter::bufferAndCountIfNeeded($mutations, $this->runConcurrently);
         $this->eventDispatcher->dispatch(new MutationTestingWasStarted($numberOfMutants, $this->processRunner));
 
         $processContainers = take($mutations)

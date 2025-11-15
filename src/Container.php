@@ -552,7 +552,6 @@ final class Container extends DIContainer
                         ? new DummyFileSystem()
                         : $container->getFileSystem(),
                     $container->getDiffSourceCodeMatcher(),
-                    $configuration->noProgress(),
                     $configuration->getProcessTimeout(),
                     $configuration->getIgnoreSourceCodeMutatorsMap(),
                     $configuration->getMutantId(),
