@@ -32,7 +32,8 @@ make test-benchmark
 
 PHPBench provides black-box performance testing with statistical analysis. It was chosen as the
 primary benchmarking tool because profilers like Blackfire introduce
-significant overhead (up to 40x in nested call scenarios), distorting real performance metrics.
+significant overhead, distorting real performance metrics.
+
 PHPBench provides reliable absolute timing without instrumentation overhead.
 
 ### Configuration
@@ -67,47 +68,20 @@ PHPBench provides several key metrics:
 
 ## Using Blackfire
 
-Blackfire provides white-box profiling with detailed call stack analysis.
+Blackfire provides white-box profiling with detailed call stack analysis. It is
+a good tool to identify what the bottlenecks are. However, it introduces an
+overhead that makes absolute timing unreliable. It is for finding hotspots, not
+measuring real performance.
 
 ### Prerequisites
 
 1. [Install Blackfire]
-2. Ensure `pcov` and `Xdebug` are not enabled
+2. Ensure [`pcov`][pcov] and [`Xdebug`][Xdebug] are not enabled
 
 ### Running Profiles
 
 It is recommended to use the corresponding `make profile_*` command to run a
 specific profile.
-
-### Profile Scripts
-
-Direct access to profiling scripts:
-
-```bash
-# Mutation generation profiling
-php tests/benchmark/MutationGenerator/profile.php [options]
-
-# Tracing profiling
-php tests/benchmark/Tracing/profile.php [options]
-```
-
-**Options**:
-
-- `--max-mutation-count=<int>`: Limit mutations (default: 5000, use -1 for unlimited)
-- `--max-trace-count=<int>`: Limit traces (default: -1 for unlimited)
-- `--debug`: Execute without profiling (for testing the script itself)
-
-### When to Use Blackfire
-
-Use Blackfire when you need to:
-
-- Identify specific functions consuming the most time.
-- Understand call hierarchies and patterns.
-- Find unexpected bottlenecks.
-- Validate optimization efforts.
-
-**Note**: Blackfire's overhead makes absolute timing unreliable. Use it for finding hotspots, not
-measuring real performance.
 
 ## Adding a New Benchmark
 
@@ -127,9 +101,19 @@ Follow these steps to add a new benchmark to Infection.
 - [Blackfire Documentation]
 
 [Blackfire Documentation]: https://docs.blackfire.io/introduction
+
 [Install Blackfire]: https://docs.blackfire.io/up-and-running/installation
+
 [KDE mode]: https://en.wikipedia.org/wiki/Kernel_density_estimation.
+
 [MutationGenerationBenchmarkReadme]: ../tests/benchmark/MutationGenerator/README.md
+
 [relative standard deviation]: https://en.wikipedia.org/wiki/Coefficient_of_variation
+
 [PHPBench Documentation]: https://phpbench.readthedocs.io
+
+[pcov]: https://github.com/krakjoe/pcov
+
 [TracingBenchmarkReadme]: ../tests/benchmark/Tracing/README.md
+
+[Xdebug]: https://xdebug.org/
