@@ -81,7 +81,7 @@ final class FinderExceptionTest extends TestCase
 
     public function test_test_custom_path_does_not_exsist(): void
     {
-        $exception = FinderException::testCustomPathDoesNotExist('framework', 'foo/bar/abc');
+        $exception = FinderException::invalidCustomPath('framework', 'foo/bar/abc');
 
         $this->assertInstanceOf(FinderException::class, $exception);
         $this->assertStringContainsString(

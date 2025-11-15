@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Memory;
 
+use Fidry\FileSystem\FileSystem;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use const PHP_EOL;
 use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -49,7 +49,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class MemoryLimiter
 {
     public function __construct(
-        private readonly Filesystem $fileSystem,
+        private readonly FileSystem $fileSystem,
         private readonly string $phpIniPath,
         private readonly MemoryLimiterEnvironment $environment,
     ) {

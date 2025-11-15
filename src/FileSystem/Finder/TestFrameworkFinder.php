@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use Fidry\FileSystem\FileSystem;
 use function array_key_exists;
 use function dirname;
 use function file_exists;
@@ -70,6 +71,7 @@ class TestFrameworkFinder
 
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -80,7 +82,7 @@ class TestFrameworkFinder
                 $this->addVendorBinToPath();
             }
 
-            $this->cachedPath[$testFrameworkName] = realpath($this->findTestFramework($testFrameworkName, $customPath));
+            $this->cachedPath[$testFrameworkName] = $this->findTestFramework($testFrameworkName, $customPath);
 
             Assert::string($this->cachedPath[$testFrameworkName]);
 
@@ -102,7 +104,7 @@ class TestFrameworkFinder
             return true;
         }
 
-        throw FinderException::testCustomPathDoesNotExist($testFrameworkName, $customPath);
+        throw FinderException::invalidCustomPath($testFrameworkName, $customPath);
     }
 
     private function addVendorBinToPath(): void
@@ -140,7 +142,7 @@ class TestFrameworkFinder
     private function findTestFramework(string $testFrameworkName, string $customPath): string
     {
         if ($this->shouldUseCustomPath($testFrameworkName, $customPath)) {
-            return $customPath;
+            return $this->fileSystem->normalizedRealPath($customPath);
         }
 
         /*
@@ -173,7 +175,7 @@ class TestFrameworkFinder
             }
         }
 
-        $nonExecutableFinder = new NonExecutableFinder();
+        $nonExecutableFinder = new NonExecutableFinder($this->fileSystem);
         $path = $nonExecutableFinder->searchNonExecutables($candidates, $extraDirs);
 
         if ($path !== null) {
