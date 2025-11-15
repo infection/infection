@@ -59,8 +59,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff(\Class_With_Const::Const, ['D']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_diff(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 if (array_diff($a, ['D']) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_DiFf(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff($foo->bar(), $foo->baz());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -149,8 +143,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_diff(['A', 1, 'C'], ['D']));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -163,8 +156,7 @@ final class UnwrapArrayDiffTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff(['A', 1, 'C'], ['D'], ['E', 'F']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

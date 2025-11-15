@@ -47,7 +47,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(TestFrameworkConfigLocator::class)]
 final class TestFrameworkConfigLocatorTest extends TestCase
 {
-    private $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
+    private string $baseDir = __DIR__ . '/../../Fixtures/ConfigLocator/';
 
     public function test_it_throws_an_error_if_no_config_file_found(): void
     {

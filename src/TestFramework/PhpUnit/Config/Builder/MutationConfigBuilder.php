@@ -54,7 +54,7 @@ class MutationConfigBuilder extends ConfigBuilder
 {
     private ?string $originalBootstrapFile = null;
 
-    private readonly SafeDOMXPath $xPath;
+    private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
         private readonly string $tmpDir,
@@ -122,7 +122,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getXPath(): SafeDOMXPath
     {
-        if (!isset($this->xPath)) {
+        if ($this->xPath === null) {
             /** @psalm-suppress InaccessibleProperty */
             $this->xPath = SafeDOMXPath::fromString(
                 $this->originalXmlConfigContent,
@@ -151,8 +151,7 @@ class MutationConfigBuilder extends ConfigBuilder
                 %s
                 require_once '%s';
 
-                PHP
-            ,
+                PHP,
             $this->getInterceptorFileContent($interceptorPath, $originalFilePath, $mutantFilePath),
             $originalAutoloadFile,
         );

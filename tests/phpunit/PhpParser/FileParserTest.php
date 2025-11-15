@@ -141,8 +141,7 @@ final class FileParserTest extends TestCase
             <<<'AST'
                 array(
                 )
-                AST
-            ,
+                AST,
         ];
 
         yield 'empty PHP file' => [

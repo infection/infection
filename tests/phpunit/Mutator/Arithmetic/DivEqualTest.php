@@ -60,15 +60,13 @@ final class DivEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a /=2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a *= 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not change normal division' => [
@@ -76,8 +74,7 @@ final class DivEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 10 / 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate division by 1 to avoid an equivalent mutation' => [
@@ -86,8 +83,7 @@ final class DivEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a /= 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate division by -1 to avoid an equivalent mutation' => [
@@ -96,8 +92,7 @@ final class DivEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a /= -1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate division by 1.0 to avoid an equivalent mutation' => [
@@ -106,8 +101,7 @@ final class DivEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a /= 1.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate division by -1.0 to avoid an equivalent mutation' => [
@@ -116,8 +110,7 @@ final class DivEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a /= -1.0;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

@@ -45,6 +45,11 @@ final class OperatingSystem
 {
     use CannotBeInstantiated;
 
+    public static function isMacOs(): bool
+    {
+        return PHP_OS_FAMILY === 'Darwin';
+    }
+
     public static function isWindows(): bool
     {
         return PHP_OS_FAMILY === 'Windows';

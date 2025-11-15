@@ -56,8 +56,7 @@ final class NullSafePropertyCall implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces the nullsafe property call operator (`?->`) with (`->`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

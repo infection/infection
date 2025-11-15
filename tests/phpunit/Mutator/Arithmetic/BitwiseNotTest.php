@@ -59,14 +59,12 @@ final class BitwiseNotTest extends BaseMutatorTestCase
                 <?php
 
                 ~2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 2;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

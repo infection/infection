@@ -61,8 +61,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                 $foo = 'foo';
                 $bar = 'bar';
                 $foo ?? $bar;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -80,8 +79,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                 $bar = 'bar';
                 $baz = 'baz';
                 $foo ?? $bar ?? $baz;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -90,8 +88,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                     $bar = 'bar';
                     $baz = 'baz';
                     $foo ?? $baz ?? $bar;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -111,8 +108,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                 $bar = 'bar';
                 $baz = 'baz';
                 $foo ?? $bar ?? $baz ?? 'oof';
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -121,8 +117,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                     $bar = 'bar';
                     $baz = 'baz';
                     $foo ?? $bar ?? 'oof' ?? $baz;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -130,8 +125,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                     $bar = 'bar';
                     $baz = 'baz';
                     $foo ?? $baz ?? $bar ?? 'oof';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -173,8 +167,7 @@ final class CoalesceTest extends BaseMutatorTestCase
 
                 $foo = 'foo';
                 $foo ?? null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not move null from the last position with 2 coalesce' => [
@@ -184,8 +177,7 @@ final class CoalesceTest extends BaseMutatorTestCase
                 $foo = 'foo';
                 $bar = 'bar';
                 $foo ?? $bar ?? null;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

@@ -60,8 +60,7 @@ final class DoWhileTest extends BaseMutatorTestCase
 
                 do {
                 } while (true);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -77,8 +76,7 @@ final class DoWhileTest extends BaseMutatorTestCase
                 do {
                     $condition = true;
                 } while ($condition);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

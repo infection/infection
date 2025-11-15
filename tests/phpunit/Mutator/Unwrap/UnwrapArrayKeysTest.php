@@ -59,8 +59,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_keys(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_keys(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_keys(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 if (array_keys($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_KeYs(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_keys($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_keys(['foo' => 'bar']));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -183,8 +176,7 @@ final class UnwrapArrayKeysTest extends BaseMutatorTestCase
                 $a = 'array_keys';
 
                 $b = $a(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

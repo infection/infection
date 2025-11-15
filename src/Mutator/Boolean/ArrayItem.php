@@ -58,8 +58,7 @@ final class ArrayItem implements Mutator
                 Replaces a key-value pair (`[$key => $value]`) array declaration with a value array declaration
                 (`[$key > $value]`) where the key or the value are potentially impure (i.e. have a side-effect);
                 For example `[$this->foo() => $b->bar]`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                 This mutation highlights the reliance of the side-effect(s) of the called key(s) and/or value(s)

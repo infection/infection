@@ -59,8 +59,7 @@ final class UnwrapStrReplace extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = '<body text=%body%>';
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

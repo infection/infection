@@ -71,8 +71,7 @@ final class For_ implements Mutator
                     // ...
                 }
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

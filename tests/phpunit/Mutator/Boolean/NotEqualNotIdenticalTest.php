@@ -59,14 +59,12 @@ final class NotEqualNotIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 $a != $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a !== $b;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a cast' => [
@@ -74,14 +72,12 @@ final class NotEqualNotIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 (int) $c != 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 (int) $c !== 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a constant' => [
@@ -89,14 +85,12 @@ final class NotEqualNotIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 $d != null;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $d !== null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a function' => [
@@ -104,14 +98,12 @@ final class NotEqualNotIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 false != strpos();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 false !== strpos();
-                PHP
-            ,
+                PHP,
         ];
     }
 }

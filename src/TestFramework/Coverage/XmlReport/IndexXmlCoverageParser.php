@@ -60,10 +60,9 @@ class IndexXmlCoverageParser
      */
     public function parse(
         string $coverageIndexPath,
-        string $xmlIndexCoverageContent,
         string $coverageBasePath,
     ): iterable {
-        $xPath = SafeDOMXPath::fromString($xmlIndexCoverageContent, 'p');
+        $xPath = SafeDOMXPath::fromFile($coverageIndexPath, 'p');
 
         self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
 

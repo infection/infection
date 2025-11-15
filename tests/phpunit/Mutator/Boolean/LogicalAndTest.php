@@ -59,14 +59,12 @@ final class LogicalAndTest extends BaseMutatorTestCase
                 <?php
 
                 true && false;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 true || false;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate logical lower and' => [
@@ -74,8 +72,7 @@ final class LogicalAndTest extends BaseMutatorTestCase
                 <?php
 
                 true and false;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

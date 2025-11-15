@@ -65,8 +65,7 @@ final class Finally_Test extends BaseMutatorTestCase
                 } finally {
                     $a = 3;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -75,8 +74,7 @@ final class Finally_Test extends BaseMutatorTestCase
                 } catch (\Exception $e) {
                     $a = 2;
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate when no catch() blocks are present' => [
@@ -88,8 +86,7 @@ final class Finally_Test extends BaseMutatorTestCase
                 } finally {
                     $a = 2;
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }
