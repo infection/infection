@@ -142,8 +142,10 @@ final readonly class Factory
             return [];
         }
 
-        /** @psalm-suppress InvalidArgument */
-        /** @var list<SplFileInfo> $files */
+        /**
+         * @var list<SplFileInfo> $files
+         * @psalm-suppress InvalidArgument
+         */
         $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->sourceFiles));
 
         return $files;
