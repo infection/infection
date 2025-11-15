@@ -379,12 +379,6 @@ parameters:
 			path: ../tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) has parameter \$expectedMutators with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForCoveragePath\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -530,18 +524,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$fileInfos of static method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:normalizePaths\(\) expects array\<Symfony\\Component\\Finder\\SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Parameter \#3 \$expectedSourceDirectories of method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects array\<string\>, array\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Parameter \#6 \$expectedSourceFilesExcludes of method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects array\<string\>, array\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
@@ -737,12 +719,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/StaticAnalysisToolExecutableFinderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\TestFrameworkFinderTest\:\:providesMockSetup\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
 			message: '#^Only booleans are allowed in a ternary operator condition, string\|false given\.$#'
@@ -1105,12 +1081,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Extensions/MBStringTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\FunctionSignature\\PublicVisibilityTest\:\:blacklistedProvider\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/FunctionSignature/PublicVisibilityTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Mutator\\IgnoreConfigTest\:\:test_it_can_check_that_the_given_elements_are_ignored\(\) has parameter \$ignored with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1385,12 +1355,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/PhpParser/Visitor/IgnoreNode/BaseNodeIgnorerTestCase.php
-
-		-
-			message: '#^Parameter \#2 \$originalFileAst of class Infection\\Mutation\\Mutation constructor expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/MutatorVisitorTest.php
 
 		-
 			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'

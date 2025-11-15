@@ -91,8 +91,8 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @param SplFileInfo[] $expectedSourceDirectories
-     * @param SplFileInfo[] $expectedSourceFilesExcludes
+     * @param string[] $expectedSourceDirectories
+     * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      * @param Mutator[] $expectedMutators
      */
