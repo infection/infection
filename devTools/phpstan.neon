@@ -46,7 +46,7 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNode\\>\\.$#"
+            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
 
@@ -121,17 +121,34 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
+
+        # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -
-            message: '#Call to function iterator_.* on a separate line has no effect#'
-            path: ../tests/*
+            message: '#::profile\(\) should return int but returns int\|null#'
+            path: ../tests/benchmark/BlackfireInstrumentor.php
         -
-            message: '#Anonymous function should return iterable.* but return statement is missing\.#'
-            path: ../tests/benchmark/Tracing/provide-traces-closure.php
+            message: '#::profile\(\) should return int but returns int.*\|null#'
+            path: ../tests/benchmark/DummyInstrumentor.php
 
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
+        # PHPBench benchmarks are not meant to be exposed.
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/benchmark/*/*Bench.php
+
+        # We are testing user input values hence by design they may not fit the specified type
+        -
+            message: '#\$testFramework#'
+            identifier: argument.type
+            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+        -
+            message: '#\$staticAnalysisTool#'
+            identifier: argument.type
+            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+
     level: 8
     paths:
         - ../src
@@ -149,6 +166,7 @@ parameters:
         - ../tests/benchmark/MutationGenerator/sources (?)
         - ../tests/benchmark/Tracing/coverage (?)
         - ../tests/benchmark/Tracing/sources (?)
+        - ../tests/benchmark/Tracing/benchmark-source (?)
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false

@@ -71,8 +71,7 @@ final class Foreach_ implements Mutator
                     // ...
                 }
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

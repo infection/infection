@@ -59,14 +59,12 @@ final class FloatNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return -2.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return 2.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates positive float return to negative' => [
@@ -74,14 +72,12 @@ final class FloatNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 2.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return -2.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate float zero' => [
@@ -89,8 +85,7 @@ final class FloatNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 0.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate integers' => [
@@ -98,8 +93,7 @@ final class FloatNegationTest extends BaseMutatorTestCase
                 <?php
 
                 return 1;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

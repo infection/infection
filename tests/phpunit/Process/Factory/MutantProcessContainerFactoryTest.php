@@ -47,6 +47,7 @@ use Infection\Testing\MutatorName;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,7 +59,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
     #[DataProvider('timeoutDataProvider')]
     public function test_it_creates_a_process_with_timeout(float $expectedProcessTimeout, float $testLocationExecutionTime, int $processFactoryTimeout): void
     {
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             $mutantFilePath = '/path/to/mutant',
             new Mutation(
                 $originalFilePath = 'path/to/Foo.php',
@@ -116,16 +117,12 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $eventDispatcher = new EventDispatcherCollector();
 
-        $executionResultMock = $this->createMock(MutantExecutionResult::class);
-        $executionResultMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $executionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
 
         $resultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
-            ->willReturn($executionResultMock)
+            ->willReturn($executionResult)
         ;
 
         $configuration = ConfigurationBuilder::withMinimalTestData()

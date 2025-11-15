@@ -63,14 +63,12 @@ final class __Name__Test extends BaseMutatorTestCase
                 <?php
 
                 $a = 10 + 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 10 - 3;
-                PHP
-            ,
+                PHP,
         ];
 
         //        yield 'It does not mutate other cases' => [

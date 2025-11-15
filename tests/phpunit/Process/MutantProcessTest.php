@@ -39,6 +39,7 @@ use Infection\Mutant\Mutant;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Tests\Mutant\MutantBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -57,10 +58,7 @@ final class MutantProcessTest extends TestCase
      */
     private $mutantExecutionResultFactory;
 
-    /**
-     * @var MockObject|Mutant
-     */
-    private $mutantMock;
+    private Mutant $mutant;
 
     /**
      * @var MutantProcess
@@ -70,12 +68,12 @@ final class MutantProcessTest extends TestCase
     protected function setUp(): void
     {
         $this->processMock = $this->createMock(Process::class);
-        $this->mutantMock = $this->createMock(Mutant::class);
+        $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $this->mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processMock,
-            $this->mutantMock,
+            $this->mutant,
             $this->mutantExecutionResultFactory,
         );
     }
@@ -85,7 +83,7 @@ final class MutantProcessTest extends TestCase
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
             $this->processMock,
-            $this->mutantMock,
+            $this->mutant,
             false,
         );
     }
@@ -97,7 +95,7 @@ final class MutantProcessTest extends TestCase
         $this->assertMutantProcessStateIs(
             $this->mutantProcess,
             $this->processMock,
-            $this->mutantMock,
+            $this->mutant,
             true,
         );
     }

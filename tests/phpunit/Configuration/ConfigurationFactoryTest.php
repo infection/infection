@@ -62,7 +62,6 @@ use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
-use function Infection\Tests\normalizePath;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -70,6 +69,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use function var_export;
@@ -91,8 +91,8 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
-     * @param SplFileInfo[] $expectedSourceDirectories
-     * @param SplFileInfo[] $expectedSourceFilesExcludes
+     * @param string[] $expectedSourceDirectories
+     * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
      * @param Mutator[] $expectedMutators
      */
@@ -249,7 +249,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedSourceFilesExcludes,
             $expectedLogs,
             $expectedLogVerbosity,
-            normalizePath($expectedTmpDir),
+            Path::normalize($expectedTmpDir),
             $expectedPhpUnit,
             $expectedPhpStan,
             $expectedMutators,
@@ -258,7 +258,7 @@ final class ConfigurationFactoryTest extends TestCase
             $expectedInitialTestsPhpOptions,
             $expectedTestFrameworkExtraOptions,
             $expectedStaticAnalysisToolOptions,
-            normalizePath($expectedCoveragePath),
+            Path::normalize($expectedCoveragePath),
             $expectedSkipCoverage,
             $expectedSkipInitialTests,
             $expectedDebug,
@@ -1077,9 +1077,9 @@ final class ConfigurationFactoryTest extends TestCase
             'expectedTmpDir' => '/path/to/config/tmp/infection',
             'expectedPhpUnit' => new PhpUnit(
                 '/path/to/config/phpunit-dir',
-                'config/phpunit',
+                '/path/to/config/phpunit',
             ),
-            'expectedPhpStan' => new PhpStan('/path/to/config/phpstan-dir', 'bin/phpstan'),
+            'expectedPhpStan' => new PhpStan('/path/to/config/phpstan-dir', '/path/to/bin/phpstan'),
             'expectedMutators' => (static fn (): array => [
                 'TrueValue' => new TrueValue(new TrueValueConfig([])),
             ])(),

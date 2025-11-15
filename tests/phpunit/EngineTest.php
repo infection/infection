@@ -167,7 +167,7 @@ final class EngineTest extends TestCase
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(false)
-            ->withWithUncovered(true)
+            ->withUncovered(true)
             ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);
@@ -285,7 +285,7 @@ final class EngineTest extends TestCase
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(false)
             ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
-            ->withWithUncovered(true)
+            ->withUncovered(true)
             ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);
@@ -428,7 +428,7 @@ final class EngineTest extends TestCase
     {
         $config = ConfigurationBuilder::withMinimalTestData()
             ->withSkipInitialTests(true)
-            ->withWithUncovered(true)
+            ->withUncovered(true)
             ->build();
 
         $adapter = $this->createMock(TestFrameworkAdapter::class);

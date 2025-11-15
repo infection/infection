@@ -39,6 +39,7 @@ use BlackfireProbe;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use function extension_loaded;
+use LogicException;
 use function sprintf;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
@@ -49,34 +50,19 @@ use Webmozart\Assert\Assert;
  */
 final class BlackfireInstrumentor implements Instrumentor
 {
-    /**
-     * @template T
-     *
-     * @param Closure(): T $main
-     *
-     * @return T
-     */
-    public function profile(Closure $main, SymfonyStyle $io): mixed
+    public function profile(Closure $createMain, int $sampleSize, SymfonyStyle $io): int
     {
         self::check($io);
 
         $probe = BlackfireProbe::getMainInstance();
 
-        $probe->enable();
+        $result = null;
 
-        try {
-            $result = $main();
+        for ($i = 0; $i < $sampleSize; ++$i) {
+            $previousResult = $result;
+            $result = self::profileSample($createMain, $probe, $io);
 
-            $probe->disable();
-        } catch (Throwable $throwable) {
-            $probe->discard();
-
-            $io->warning(sprintf(
-                'An error occurred. The profile has been discarded please check the error first: "%s"',
-                $throwable->getMessage(),
-            ));
-
-            throw $throwable;
+            self::ensureResultInvariance($previousResult, $result);
         }
 
         return $result;
@@ -121,6 +107,50 @@ final class BlackfireInstrumentor implements Instrumentor
                 . ' result in an unnecessary overhead. Consider running the command %s',
                 'composer dump-autoload --classmap-authoritative',
             ));
+        }
+    }
+
+    private static function profileSample(
+        Closure $createMain,
+        BlackfireProbe $probe,
+        SymfonyStyle $io,
+    ): int {
+        $main = $createMain();
+
+        $probe->enable();
+
+        try {
+            $result = $main();
+
+            $probe->disable();
+
+            return $result;
+        } catch (Throwable $throwable) {
+            $probe->discard();
+
+            $io->warning(
+                sprintf(
+                    'An error occurred. The profile has been discarded please check the error first: "%s"',
+                    $throwable->getMessage(),
+                ),
+            );
+
+            throw $throwable;
+        }
+    }
+
+    private static function ensureResultInvariance(
+        ?int $previous,
+        int $new,
+    ): void {
+        if ($previous !== null && $new !== $previous) {
+            throw new LogicException(
+                sprintf(
+                    'Expected the script to return the same output for each sample. Expected %d but got %d.',
+                    $previous,
+                    $new,
+                ),
+            );
         }
     }
 }

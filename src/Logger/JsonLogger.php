@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Logger;
 
+use Infection\Framework\Str;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Str;
 use function json_encode;
 use const JSON_THROW_ON_ERROR;
 
@@ -106,8 +106,10 @@ final readonly class JsonLogger implements LineMutationTestingResultsLogger
                     'originalFilePath' => $mutantProcess->getOriginalFilePath(),
                     'originalStartLine' => $mutantProcess->getOriginalStartingLine(),
                 ],
-                'diff' => Str::convertToUtf8(Str::trimLineReturns($mutantProcess->getMutantDiff())),
-                'processOutput' => Str::convertToUtf8(Str::trimLineReturns($mutantProcess->getProcessOutput())),
+                'diff' => Str::convertToUtf8(Str::cleanForDisplay($mutantProcess->getMutantDiff())),
+                'processOutput' => Str::convertToUtf8(
+                    Str::cleanForDisplay($mutantProcess->getProcessOutput()),
+                ),
             ];
         }
 

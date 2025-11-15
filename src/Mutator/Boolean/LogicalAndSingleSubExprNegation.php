@@ -55,8 +55,7 @@ final class LogicalAndSingleSubExprNegation extends AbstractSingleSubExprNegatio
         return new Definition(
             <<<'TXT'
                 Negates all sub-expressions separately in AND (`&&`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

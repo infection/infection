@@ -41,20 +41,22 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Tests\Configuration\Entry\LogsAssertions;
-use Infection\Tests\Configuration\Entry\PhpUnitAssertions;
+use Infection\Mutator\Mutator;
 use function ltrim;
+use PhpParser\Node;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait ConfigurationAssertions
 {
-    use LogsAssertions;
-    use PhpUnitAssertions;
-
     /**
      * @param string[] $expectedSourceDirectories
      * @param string[] $expectedSourceFilesExcludes
      * @param SplFileInfo[] $expectedSourceFiles
+     * @param array<string, Mutator<Node>> $expectedMutators
      * @param array<string, array<int, string>> $expectedIgnoreSourceCodeMutatorsMap
      */
     private function assertConfigurationStateIs(

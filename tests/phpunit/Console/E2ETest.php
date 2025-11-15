@@ -38,7 +38,6 @@ namespace Infection\Tests\Console;
 use function array_merge;
 use function basename;
 use Composer\Autoload\ClassLoader;
-use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function function_exists;
@@ -49,8 +48,9 @@ use Infection\Console\Application;
 use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Framework\OperatingSystem;
+use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestingUtility\LineReturnNormalizer;
 use function is_readable;
 use const PHP_OS;
 use const PHP_SAPI;
@@ -101,7 +101,7 @@ final class E2ETest extends TestCase
      */
     private $previousLoader;
 
-    private static $countFailingComposerInstall = 0;
+    private static int $countFailingComposerInstall = 0;
 
     protected function setUp(): void
     {
@@ -212,7 +212,7 @@ final class E2ETest extends TestCase
         }
 
         $expected = file_get_contents('expected-output.txt');
-        $expected = LineReturnNormalizer::normalize($expected);
+        $expected = Str::toSystemLineEndings($expected);
 
         $this->assertStringEqualsFile('infection.log', $expected, sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
@@ -250,7 +250,7 @@ final class E2ETest extends TestCase
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
             } catch (FinderException $e) {
-                if (DIRECTORY_SEPARATOR !== '\\') {
+                if (!OperatingSystem::isWindows()) {
                     throw $e;
                 }
 
@@ -337,7 +337,7 @@ final class E2ETest extends TestCase
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('This test can be unstable on Windows');
         }
 

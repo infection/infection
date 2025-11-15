@@ -56,8 +56,7 @@ final class LessThanOrEqualTo implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a greater-than-or-equal-to operator (`<=`) with the greater-than operator (`<`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -59,21 +59,18 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_combine(['A', B, 'C'], ['foo', 'bar', 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', B, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['foo', 'bar', 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -82,21 +79,18 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_combine(\Class_With_Const::Const, ['foo', 'bar', 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['foo', 'bar', 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -105,21 +99,18 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_combine(['A', B, 'C'], ['foo', 'bar', 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', B, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['foo', 'bar', 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -131,8 +122,7 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 if (array_combine($a, ['foo', 'bar', 'baz']) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -141,8 +131,7 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                     if ($a === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -150,8 +139,7 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                     if (['foo', 'bar', 'baz'] === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -160,21 +148,18 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_CoMbInE(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 'B', 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['foo', 'bar', 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -183,21 +168,18 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_combine($foo->bar(), $foo->baz());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->baz();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -206,15 +188,13 @@ final class UnwrapArrayCombineTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_combine(['A', 'B', 'C'], ['foo', 'bar', 'baz']));
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['A', 'B', 'C']);
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 

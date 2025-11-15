@@ -50,6 +50,8 @@ final readonly class SchemaConfiguration
 {
     /**
      * @param array<string, mixed> $mutators
+     * @param TestFrameworkTypes::*|null $testFramework
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function __construct(
         public string $file,

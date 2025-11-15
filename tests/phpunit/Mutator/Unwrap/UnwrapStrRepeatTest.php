@@ -59,8 +59,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 <?php
 
                 $a = str_repeat('Hello!', 3);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 <?php
 
                 $a = str_repeat(\Class_With_Const::Const, 3);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \str_repeat('Hello!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 if (str_repeat($a, 3) === $b) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 <?php
 
                 $a = sTr_RePeAt('Hello!', 3);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -138,8 +133,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                     $foo->bar(),
                     $foo->baz()
                 );
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -154,8 +148,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 $a = array_map(function ($b) {
                     return str_repeat($b, 3);
                 }, ['A', 'B']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -190,8 +183,7 @@ final class UnwrapStrRepeatTest extends BaseMutatorTestCase
                 $a = 'str_repeat';
 
                 $b = $a('foo', 3);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

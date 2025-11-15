@@ -56,8 +56,7 @@ final class Ternary implements Mutator
         return new Definition(
             <<<'TXT'
                 Swaps the ternary operator operands, e.g. replaces `true ? true : false` with `true ? false : true`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

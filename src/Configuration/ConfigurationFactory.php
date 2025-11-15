@@ -250,36 +250,12 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->phpUnit;
-
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
-
-        if ($phpUnitConfigDir === null) {
-            $phpUnit->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir,
-            ));
-        }
-
-        return $phpUnit;
+        return $schema->getPhpUnit()->withAbsolutePaths($configDir);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        $phpStan = clone $schema->phpStan;
-
-        $phpStanConfigDir = $phpStan->getConfigDir();
-
-        if ($phpStanConfigDir === null) {
-            $phpStan->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpStanConfigDir)) {
-            $phpStan->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpStanConfigDir,
-            ));
-        }
-
-        return $phpStan;
+        return $schema->getPhpStan()->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(

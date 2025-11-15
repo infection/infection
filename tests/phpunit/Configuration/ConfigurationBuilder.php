@@ -82,7 +82,7 @@ final class ConfigurationBuilder
         private bool $skipCoverage,
         private bool $skipInitialTests,
         private bool $debug,
-        private bool $withUncovered,
+        private bool $uncovered,
         private bool $noProgress,
         private bool $ignoreMsiWithNoMutations,
         private ?float $minMsi,
@@ -170,7 +170,7 @@ final class ConfigurationBuilder
             skipCoverage: false,
             skipInitialTests: false,
             debug: false,
-            withUncovered: false,
+            uncovered: false,
             noProgress: false,
             ignoreMsiWithNoMutations: false,
             minMsi: null,
@@ -202,16 +202,16 @@ final class ConfigurationBuilder
             sourceFilesFilter: 'src/Foo.php,src/Bar.php',
             sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
-                'text.log',
-                'report.html',
-                'summary.log',
-                'json.log',
-                'gitlab.log',
-                'debug.log',
-                'mutator.log',
-                true,
-                StrykerConfig::forBadge('master'),
-                'summary.json',
+                textLogFilePath: 'text.log',
+                htmlLogFilePath: 'report.html',
+                summaryLogFilePath: 'summary.log',
+                jsonLogFilePath: 'json.log',
+                gitlabLogFilePath: 'gitlab.log',
+                debugLogFilePath: 'debug.log',
+                perMutatorFilePath: 'mutator.log',
+                useGitHubAnnotationsLogger: true,
+                strykerConfig: StrykerConfig::forBadge('master'),
+                summaryJsonLogFilePath: 'summary.json',
             ),
             logVerbosity: 'default',
             tmpDir: '/tmp/infection-test',
@@ -232,7 +232,7 @@ final class ConfigurationBuilder
             skipCoverage: true,
             skipInitialTests: true,
             debug: true,
-            withUncovered: true,
+            uncovered: true,
             noProgress: true,
             ignoreMsiWithNoMutations: true,
             minMsi: 50.0,
@@ -420,10 +420,10 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withWithUncovered(bool $withUncovered): self
+    public function withUncovered(bool $uncovered): self
     {
         $clone = clone $this;
-        $clone->withUncovered = $withUncovered;
+        $clone->uncovered = $uncovered;
 
         return $clone;
     }
@@ -582,7 +582,7 @@ final class ConfigurationBuilder
             $this->skipCoverage,
             $this->skipInitialTests,
             $this->debug,
-            $this->withUncovered,
+            $this->uncovered,
             $this->noProgress,
             $this->ignoreMsiWithNoMutations,
             $this->minMsi,

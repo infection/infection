@@ -18,8 +18,7 @@ BOX=./.tools/box
 BOX_URL="https://github.com/humbug/box/releases/download/4.5.1/box.phar"
 
 PHP_CS_FIXER=./.tools/php-cs-fixer
-PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.65.0/php-cs-fixer.phar"
-PHP_CS_FIXER_CACHE=.php_cs.cache
+PHP_CS_FIXER_URL="https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.89.2/php-cs-fixer.phar"
 
 PHPSTAN=./vendor/bin/phpstan
 RECTOR=./vendor/bin/rector
@@ -31,6 +30,8 @@ PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest
 
+PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
+
 INFECTION=./build/infection.phar
 
 DOCKER_RUN=docker compose run --rm
@@ -41,8 +42,9 @@ FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
-BENCHMARK_TRACING_COVERAGE=tests/benchmark/Tracing/coverage
-BENCHMARK_TRACING_SOURCES=tests/benchmark/Tracing/sources
+BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
+BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/benchmark-source
+BENCHMARK_TRACING_COVERAGE_SOURCE_DIR=$(BENCHMARK_TRACING_SUBMODULE)/dist/coverage
 
 E2E_PHPUNIT_GROUP=integration,e2e
 PHPUNIT_GROUP=default
@@ -69,14 +71,14 @@ check_trailing_whitespaces:
 .PHONY: cs
 cs:	  	 	## Runs PHP-CS-Fixer
 cs: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff
+	$(PHP_CS_FIXER) fix -v --diff
 	LC_ALL=C sort -u .gitignore -o .gitignore
 	$(MAKE) check_trailing_whitespaces
 
 .PHONY: cs-check
 cs-check:		## Runs PHP-CS-Fixer in dry-run mode
 cs-check: $(PHP_CS_FIXER)
-	$(PHP_CS_FIXER) fix -v --cache-file=$(PHP_CS_FIXER_CACHE) --diff --dry-run
+	$(PHP_CS_FIXER) fix -v --diff --dry-run
 	LC_ALL=C sort -c -u .gitignore
 	$(MAKE) check_trailing_whitespaces
 
@@ -118,24 +120,43 @@ profile:
 	$(MAKE) profile_mutation_generator
 	$(MAKE) profile_tracing
 
+.PHONY: benchmark
+benchmark: vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark $(PHPBENCH_REPORTS)
+	composer dump
+
 .PHONY: profile_mutation_generator
 profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
-	composer dump --classmap-authoritative
+	composer dump --classmap-authoritative --quiet
 	blackfire run \
-		--samples=5 \
 		--title="MutationGenerator" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/MutationGenerator/profile.php
 	composer dump
 
+.PHONY: benchmark_mutation_generator
+benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
+	composer dump
+
 .PHONY: profile_tracing
-profile_tracing: vendor $(BENCHMARK_TRACING_SOURCES) $(BENCHMARK_TRACING_COVERAGE)
-	composer dump --classmap-authoritative
+profile_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
 	blackfire run \
-		--samples=5 \
 		--title="Tracing" \
 		--metadata="commit=$(COMMIT_HASH)" \
 		php tests/benchmark/Tracing/profile.php
+	composer dump
+
+.PHONY: benchmark_tracing
+benchmark_tracing: vendor $(BENCHMARK_TRACING_SUBMODULE) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/Tracing $(PHPBENCH_REPORTS)
 	composer dump
 
 
@@ -145,7 +166,7 @@ autoreview: cs-check phpstan psalm validate test-autoreview rector-check detect-
 
 .PHONY: test
 test:		 	## Runs all the tests
-test: autoreview test-unit test-e2e test-infection
+test: autoreview test-unit test-benchmark test-e2e test-infection
 
 .PHONY: test-docker
 test-docker:		## Runs all the tests on the different Docker platforms
@@ -171,6 +192,15 @@ test-unit-docker: test-unit-82-docker
 
 test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
 	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
+
+.PHONY: test-benchmark
+test-benchmark:	 	## Runs the benchmark tests
+test-benchmark: $(PHPUNIT) \
+		vendor \
+		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_TRACING_SUBMODULE) \
+		$(BENCHMARK_TRACING_COVERAGE_DIR)
+	$(PHPUNIT) --group=benchmark
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
@@ -268,18 +298,27 @@ $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sourc
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
 	touch -c $@
 
-$(BENCHMARK_TRACING_COVERAGE): tests/benchmark/Tracing/coverage.tar.gz
-	@echo "Untarring the coverage, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf coverage.tar.gz
+$(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR)
+	@echo "Generating coverage"
+	@rm -rf $(BENCHMARK_TRACING_COVERAGE_DIR) || true
+	cp -R $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR) $(BENCHMARK_TRACING_COVERAGE_DIR)
+	@# Correct the absolute paths found
+	PROJECT_ROOT=$$(pwd)/$(BENCHMARK_TRACING_SUBMODULE) \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-type f \
+			-exec sed -i.bak "s|/path/to/project|$${PROJECT_ROOT}|g" {} \; \
+		&& find $(BENCHMARK_TRACING_COVERAGE_DIR) \
+			-name "*.bak" \
+			-type f \
+			-delete
 	touch -c $@
 
-$(BENCHMARK_TRACING_SOURCES): tests/benchmark/Tracing/sources.tar.gz
-	@echo "Untarring the sources, this might take a while"
-	cd tests/benchmark/Tracing; tar -xzf sources.tar.gz
-	touch -c $@
+$(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR):
+	git submodule update --init $(BENCHMARK_TRACING_SUBMODULE)
 
 clean:
 	rm -fr tests/benchmark/MutationGenerator/sources
-	rm -fr tests/benchmark/Tracing/coverage
-	rm -fr tests/benchmark/Tracing/sources
+	@rm -fr tests/benchmark/Tracing/sources
+	rm -fr $(BENCHMARK_TRACING_COVERAGE_DIR)
+	rm -fr $(BENCHMARK_TRACING_VENDOR)
 	git clean -f -X tests/e2e/

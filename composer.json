@@ -77,6 +77,7 @@
     "require-dev": {
         "ext-simplexml": "*",
         "fidry/makefile": "^1.0",
+        "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-phpunit": "^2.0",
@@ -88,7 +89,8 @@
         "shipmonk/name-collision-detector": "^2.1",
         "sidz/phpstan-rules": "^0.5.1",
         "symfony/yaml": "^6.4 || ^7.0",
-        "thecodingmachine/phpstan-safe-rule": "^1.4"
+        "thecodingmachine/phpstan-safe-rule": "^1.4",
+        "webmozarts/strict-phpunit": "^7.15"
     },
     "config": {
         "platform": {

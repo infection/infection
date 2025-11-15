@@ -63,8 +63,7 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
                 {
                     public function nope(Bar $ignored): void;
                 }
-                PHP
-            ,
+                PHP,
             0,
         ];
 
@@ -79,8 +78,7 @@ final class InterfaceIgnorerTest extends BaseNodeIgnorerTestCase
                         $counted = true;
                     }
                 }
-                PHP
-            ,
+                PHP,
             2,
         ];
     }
