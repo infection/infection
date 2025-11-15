@@ -64,25 +64,7 @@ final class InitialTestsFailed extends Exception
                 $testFrameworkKey,
                 $exitCode,
             ),
-            sprintf(
-                'Refer to the %s\'s output below:',
-                $testFrameworkKey,
-            ),
         ];
-
-        $stdOut = $initialTestSuiteProcess->getOutput();
-
-        if ($stdOut !== '') {
-            $lines[] = 'STDOUT:';
-            $lines[] = $stdOut;
-        }
-
-        $stdError = $initialTestSuiteProcess->getErrorOutput();
-
-        if ($stdError !== '') {
-            $lines[] = 'STDERR:';
-            $lines[] = $stdError;
-        }
 
         return new self(implode("\n", $lines));
     }

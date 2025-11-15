@@ -59,7 +59,12 @@ class InitialTestsRunProcessFactory
         string $testFrameworkExtraOptions,
         array $phpExtraOptions,
         bool $skipCoverage,
+        bool $skipProgressBar,
     ): Process {
+        if ($skipProgressBar) {
+            $testFrameworkExtraOptions .= ' --no-progress';
+        }
+
         // If we're expecting to receive a code coverage, test process must run in a vanilla environment
         $processClass = $skipCoverage ? Process::class : OriginalPhpProcess::class;
 
@@ -68,6 +73,7 @@ class InitialTestsRunProcessFactory
                 $testFrameworkExtraOptions,
                 $phpExtraOptions,
                 $skipCoverage,
+                $skipProgressBar
             ),
             timeout: null, // Ignore the default timeout of 60 seconds
         );
