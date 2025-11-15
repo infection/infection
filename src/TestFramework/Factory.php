@@ -77,30 +77,21 @@ final readonly class Factory
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
-            $configuration1 = $this->infectionConfig;
-
-            $configuration2 = $this->infectionConfig;
-            $configuration3 = $this->infectionConfig;
-
-            $configuration4 = $this->infectionConfig;
-
-            $configuration5 = $this->infectionConfig;
-
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $configuration3->phpUnit->getCustomPath(),
+                    (string) $this->infectionConfig->phpUnit->customPath,
                 ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
-                (string) $configuration2->phpUnit->getConfigDir(),
+                (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $configuration1->sourceDirectories,
+                $this->infectionConfig->sourceDirectories,
                 $skipCoverage,
-                $configuration5->executeOnlyCoveringTestCases,
+                $this->infectionConfig->executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
-                $configuration4->mapSourceClassToTestStrategy,
+                $this->infectionConfig->mapSourceClassToTestStrategy,
             );
         }
 
@@ -151,9 +142,8 @@ final readonly class Factory
             return [];
         }
 
-        /** @var \Symfony\Component\Finder\SplFileInfo $files */
-        $configuration = $this->infectionConfig;
-        $files = iterator_to_array($this->sourceFileFilter->filter($configuration->sourceFiles));
+        /** @var list<SplFileInfo> $files */
+        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->sourceFiles));
 
         return $files;
     }

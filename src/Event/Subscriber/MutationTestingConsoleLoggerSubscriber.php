@@ -248,7 +248,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $hasLoggers = false;
 
         /** @var FileLogger $fileLogger */
-        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->getLoggers()) as $fileLogger) {
+        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->loggers) as $fileLogger) {
             if (!$hasLoggers) {
                 $this->output->writeln(['', 'Generated Reports:']);
             }

@@ -313,10 +313,10 @@ final class Container extends DIContainer
                 $container->getConfiguration()->threadCount,
             ),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
-                (string) $container->getConfiguration()->phpUnit->getConfigDir(),
+                (string) $container->getConfiguration()->phpUnit->configDir,
             ),
             StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
-                (string) $container->getConfiguration()->phpStan->getConfigDir(),
+                (string) $container->getConfiguration()->phpStan->configDir,
             ),
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),

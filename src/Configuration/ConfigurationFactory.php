@@ -250,12 +250,12 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        return $schema->getPhpUnit()->withAbsolutePaths($configDir);
+        return $schema->phpUnit->withAbsolutePaths($configDir);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        return $schema->getPhpStan()->withAbsolutePaths($configDir);
+        return $schema->phpStan->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(

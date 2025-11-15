@@ -117,21 +117,17 @@ final readonly class Engine
 
     private function runInitialTestSuite(): ?string
     {
-        $configuration2 = $this->config;
-
-        if ($configuration2->skipInitialTests) {
+        if ($this->config->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
 
             return null;
         }
 
-        $configuration = $this->config;
-        $configuration1 = $this->config;
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $configuration->testFrameworkExtraOptions,
+            $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
-            $configuration1->skipCoverage,
+            $this->config->skipCoverage,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
@@ -187,9 +183,7 @@ final readonly class Engine
      */
     private function getInitialTestsPhpOptionsArray(): array
     {
-        $configuration = $this->config;
-
-        return explode(' ', (string) $configuration->initialTestsPhpOptions);
+        return explode(' ', (string) $this->config->initialTestsPhpOptions);
     }
 
     private function runMutationAnalysis(): void
@@ -220,10 +214,8 @@ final readonly class Engine
     private function getFilteredExtraOptionsForMutant(): string
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
-            $configuration1 = $this->config;
-
             return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $configuration1->testFrameworkExtraOptions,
+                $this->config->testFrameworkExtraOptions,
                 $this->adapter->getInitialRunOnlyOptions(),
             );
         }

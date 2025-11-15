@@ -108,28 +108,11 @@ trait ConfigurationAssertions
         );
         $this->assertSame($expectedFilter, $configuration->sourceFilesFilter, 'Failed sourceFilesFilter check');
         $this->assertSame($expectedSourceFilesExcludes, $configuration->sourceFilesExcludes, 'Failed sourceFilesExcludes check');
-        $this->assertLogsStateIs(
-            $configuration->logs,
-            $expectedLogs->getTextLogFilePath(),
-            $expectedLogs->getHtmlLogFilePath(),
-            $expectedLogs->getSummaryLogFilePath(),
-            $expectedLogs->getJsonLogFilePath(),
-            $expectedLogs->getGitlabLogFilePath(),
-            $expectedLogs->getDebugLogFilePath(),
-            $expectedLogs->getPerMutatorFilePath(),
-            $expectedLogs->getUseGitHubAnnotationsLogger(),
-            $expectedLogs->getStrykerConfig(),
-            $expectedLogs->getSummaryJsonLogFilePath(),
-        );
+        $this->assertEquals($expectedLogs, $configuration->logs);
         $this->assertSame($expectedLogVerbosity, $configuration->logVerbosity, 'Failed logVerbosity check');
         $this->assertSame($expectedTmpDir, $configuration->tmpDir, 'Failed tmpDir check');
-        $this->assertPhpUnitStateIs(
-            $configuration->phpUnit,
-            $expectedPhpUnit->getConfigDir(),
-            $expectedPhpUnit->getCustomPath(),
-        );
-        $this->assertSame($expectedPhpStan->getConfigDir(), $configuration->phpStan->getConfigDir(), 'Failed PHPStan config dir check');
-        $this->assertSame($expectedPhpStan->getCustomPath(), $configuration->phpStan->getCustomPath(), 'Failed PHPStan custom path check');
+        $this->assertEquals($expectedPhpUnit, $configuration->phpUnit);
+        $this->assertEquals($expectedPhpStan, $configuration->phpStan);
         $this->assertEqualsWithDelta($expectedMutators, $configuration->mutators, 10., 'Failed mutators check');
         $this->assertSame($expectedTestFramework, $configuration->testFramework, 'Failed testFramework check');
         $this->assertSame($expectedBootstrap, $configuration->bootstrap, 'Failed bootstrap check');
