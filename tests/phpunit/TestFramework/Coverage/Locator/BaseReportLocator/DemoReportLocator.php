@@ -33,14 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator;
+namespace Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator;
 
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use Infection\FileSystem\Filesystem;
+use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
+use Symfony\Component\Finder\Finder;
 
-interface ReportLocator
+/**
+ * @internal
+ */
+final readonly class DemoReportLocator extends BaseReportLocator
 {
-    /**
-     * @throws NoReportFound
-     */
-    public function locate(): string;
+    public const FILENAME_REGEX = '/^.+\.demo$/';
+
+    public function __construct(
+        Filesystem $filesystem,
+        string $sourceDirectory,
+        string $defaultPathname,
+    ) {
+        parent::__construct($filesystem, $sourceDirectory, $defaultPathname);
+    }
+
+    protected function configureFinder(Finder $finder): void
+    {
+        $finder->name(self::FILENAME_REGEX);
+    }
 }

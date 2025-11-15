@@ -33,14 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator;
+namespace Infection\TestFramework\Coverage\Locator\Exception;
 
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use function implode;
+use JetBrains\PhpStorm\Pure;
+use RuntimeException;
+use function sprintf;
+use Throwable;
 
-interface ReportLocator
+final class TooManyReportsFound extends RuntimeException
 {
+    #[Pure]
+    public function __construct(
+        string $message = '',
+        int $code = 0,
+        ?Throwable $previous = null,
+        /**
+         * @var list<string>
+         */
+        public readonly ?array $reportPathnames = null,
+    ) {
+        parent::__construct($message, $code, $previous);
+    }
+
     /**
-     * @throws NoReportFound
+     * @param list<string> $reportPathnames
      */
-    public function locate(): string;
+    public static function create(array $reportPathnames): self
+    {
+        return new self(
+            sprintf(
+                'Found "%s".',
+                implode(
+                    '", "',
+                    $reportPathnames,
+                ),
+            ),
+            reportPathnames: $reportPathnames,
+        );
+    }
 }

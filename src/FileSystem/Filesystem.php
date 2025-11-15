@@ -43,7 +43,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-final class Filesystem extends SymfonyFilesystem
+class Filesystem extends SymfonyFilesystem
 {
     public function isReadableFile(string $path): bool
     {

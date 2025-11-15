@@ -40,7 +40,7 @@ use function current;
 use DomainException;
 use function implode;
 use Infection\FileSystem\Filesystem;
-use Infection\TestFramework\Coverage\Locator\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use function iter\map;

@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\Locator;
 
+use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\MemoizedLocator;
-use Infection\TestFramework\Coverage\Locator\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

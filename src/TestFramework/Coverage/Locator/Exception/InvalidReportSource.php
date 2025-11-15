@@ -33,10 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator;
+namespace Infection\TestFramework\Coverage\Locator\Exception;
 
 use RuntimeException;
+use function sprintf;
 
-final class NoReportFound extends RuntimeException
+final class InvalidReportSource extends RuntimeException
 {
+    public static function create(string $pathname): self
+    {
+        return new self(
+            sprintf(
+                'The pathname "%s" is not a valid or readable directory.',
+                $pathname,
+            ),
+        );
+    }
 }

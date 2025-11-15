@@ -33,14 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator;
+namespace Infection\TestFramework\Coverage\Locator\Exception;
 
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use RuntimeException;
+use function sprintf;
 
-interface ReportLocator
+final class NoReportFound extends RuntimeException
 {
-    /**
-     * @throws NoReportFound
-     */
-    public function locate(): string;
+    public static function create(string $sourceDirectory): self
+    {
+        return new self(
+            sprintf(
+                'No report found in "%s".',
+                $sourceDirectory,
+            ),
+        );
+    }
 }

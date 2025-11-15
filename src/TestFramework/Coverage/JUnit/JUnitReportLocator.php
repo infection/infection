@@ -35,144 +35,95 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use function count;
-use function current;
+use const DIRECTORY_SEPARATOR;
 use function implode;
 use Infection\FileSystem\Filesystem;
-use Infection\TestFramework\Coverage\Locator\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
+use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use function Pipeline\take;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 
 /**
  * @internal
- * @final
  */
-class JUnitReportLocator implements ReportLocator
+final readonly class JUnitReportLocator extends BaseReportLocator implements ReportLocator
 {
-    private const JUNIT_NAME_REGEX = '/^(.+\.)?junit\.xml$/i';
+    public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
-    /**
-     * @internal
-     */
-    public function __construct(
-        private Filesystem $filesystem,
-        private string $coverageDirPath,
-        private string $defaultJUnitPath,
-    ) {
-    }
+    private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
     public static function create(
         Filesystem $filesystem,
-        string $coverageDirPath,
-        ?string $defaultJUnitPath = null,
+        string $coverageDirectory,
+        ?string $defaultJUnitPathname = null,
     ): self {
         return new self(
             $filesystem,
-            $coverageDirPath,
-            $defaultJUnitPath === null
-                ? self::createPHPUnitDefaultJUnitPath($coverageDirPath)
-                : Path::canonicalize($defaultJUnitPath),
+            $coverageDirectory,
+            $defaultJUnitPathname === null
+                ? self::createPHPUnitDefaultJUnitPathname($coverageDirectory)
+                : Path::canonicalize($defaultJUnitPathname),
         );
     }
 
-    public static function createPHPUnitDefaultJUnitPath(string $coverageDirPath): string
+    protected function createInvalidReportSource(string $coverageDirectory): InvalidReportSource
     {
-        return Path::canonicalize($coverageDirPath . '/junit.xml');
+        return new InvalidReportSource(
+            sprintf(
+                'Could not find a JUnit report in "%s": the pathname is not a valid or readable directory.',
+                $coverageDirectory,
+            ),
+        );
     }
 
-    public function locate(): string
-    {
-        if ($this->filesystem->isReadableFile($this->defaultJUnitPath)) {
-            return $this->defaultJUnitPath;
-        }
-
-        if (!$this->filesystem->isReadableDirectory($this->coverageDirPath)) {
-            $this->throwNoCoverageDirectoryFound();
-        }
-
-        $files = $this->find();
-
-        if (count($files) > 1) {
-            $this->throwAmbiguousFilesFound($files);
-        }
-
-        /** @var string|false $report */
-        $report = current($files);
-
-        if ($report === false) {
-            $this->throwNoReportFound();
-        }
-
-        return $report;
+    protected function createTooManyReportsFound(
+        string $coverageDirectory,
+        array $reportPathnames,
+    ): TooManyReportsFound {
+        return new TooManyReportsFound(
+            sprintf(
+                'Could not find a JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                $coverageDirectory,
+                self::JUNIT_FILENAME_REGEX,
+                implode(
+                    '", "',
+                    $reportPathnames,
+                ),
+            ),
+            reportPathnames: $reportPathnames,
+        );
     }
 
-    /**
-     * @return list<string>
-     */
-    private function find(): array
+    protected function createNoReportFound(string $coverageDirectory): NoReportFound
     {
-        return take($this->createIndexFinder())
-            ->map(Filesystem::mapFileInfoToCanonicalPathname(...))
-            ->toList();
+        return new NoReportFound(
+            sprintf(
+                'Could not find a JUnit report in "%s": no file with the pattern "%s" was found.',
+                $coverageDirectory,
+                self::JUNIT_FILENAME_REGEX,
+            ),
+        );
     }
 
-    private function createIndexFinder(): Finder
+    protected function configureFinder(Finder $finder): void
     {
-        return $this->filesystem
-            ->createFinder()
-            ->files()
-            ->in($this->coverageDirPath)
-            ->name(self::JUNIT_NAME_REGEX)
+        // TODO: should the file depth be limited too?
+        $finder
+            ->name(self::JUNIT_FILENAME_REGEX)
+            // We sort by name for deterministic results. It has no impact on
+            // the happy path as we expect to find only one file.
+            // In the other scenario, this gives a more consistent result to the
+            // user for a failing scenario.
+            // This also makes testing easier.
             ->sortByName();
     }
 
-    /**
-     * @throws NoReportFound
-     */
-    private function throwNoCoverageDirectoryFound(): never
+    private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string
     {
-        throw new NoReportFound(
-            sprintf(
-                'Could not find a JUnit report in "%s": the directory does not exist or is not readable.',
-                $this->coverageDirPath,
-            ),
-        );
-    }
-
-    /**
-     * @param list<string> $files
-     *
-     * @throws NoReportFound
-     */
-    private function throwAmbiguousFilesFound(array $files): never
-    {
-        throw new NoReportFound(
-            sprintf(
-                'Could not find a JUnit report in "%s": more than one file with the pattern "%s" has been found. Found: "%s".',
-                $this->coverageDirPath,
-                self::JUNIT_NAME_REGEX,
-                implode(
-                    '", "',
-                    $files,
-                ),
-            ),
-        );
-    }
-
-    /**
-     * @throws NoReportFound
-     */
-    private function throwNoReportFound(): never
-    {
-        throw new NoReportFound(
-            sprintf(
-                'Could not find a JUnit report in "%s": no file with the pattern "%s" has been found.',
-                $this->coverageDirPath,
-                self::JUNIT_NAME_REGEX,
-            ),
-        );
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT_FILENAME);
     }
 }

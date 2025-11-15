@@ -155,10 +155,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
-use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -286,7 +284,7 @@ final class Container extends DIContainer
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
-                    $container->getDefaultJUnitFilePath(),
+                    $container->getJUnitReportLocator()->defaultPathname,
                     $config,
                     $container->getSourceFileFilter(),
                     GeneratedExtensionsConfig::EXTENSIONS,
@@ -365,7 +363,6 @@ final class Container extends DIContainer
                 JUnitReportLocator::create(
                     $container->getFileSystem(),
                     $container->getConfiguration()->coveragePath,
-                    JUnitReportLocator::createPHPUnitDefaultJUnitPath($container->getConfiguration()->coveragePath),
                 ),
             ),
             PHPUnitXmlProvider::class => static fn (self $container): PHPUnitXmlProvider => new PHPUnitXmlProvider(
@@ -1149,19 +1146,6 @@ final class Container extends DIContainer
     private function getProjectDir(): string
     {
         return $this->get(ProjectDirProvider::class)->getProjectDir();
-    }
-
-    private function getDefaultJUnitFilePath(): string
-    {
-        $configuration = $this->getConfiguration();
-
-        return $this->defaultJUnitPath ??= sprintf(
-            '%s/%s',
-            Path::canonicalize(
-                $configuration->coveragePath,
-            ),
-            'junit.xml',
-        );
     }
 
     private function getJUnitReportLocator(): JUnitReportLocator
