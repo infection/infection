@@ -33,23 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\Locator;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
-
-final readonly class DummyTraceProvider implements TraceProvider
+final readonly class HardcodedLocator implements ReportLocator
 {
-    /**
-     * @param Trace $traces
-     */
     public function __construct(
-        private array $traces,
+        private string $location,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public function locate(): string
     {
-        yield from $this->traces;
+        return $this->location;
     }
 }

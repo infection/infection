@@ -33,23 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\Index;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use DOMElement;
 
-final readonly class DummyTraceProvider implements TraceProvider
+/**
+ * Represents pieces of information gotten from the `totals` node in the index
+ * file of the PHPUnit XML coverage report for a source file.
+ */
+final readonly class LinesCoverageSummary
 {
     /**
-     * @param Trace $traces
+     * @param int<0, max> $total
+     * @param int<0, max> $comments
+     * @param int<0, max> $code
+     * @param int<0, max> $executable
+     * @param int<0, max> $executed
+     * @param float<0, max> $percent
      */
     public function __construct(
-        private array $traces,
+        public int $total,
+        public int $comments,
+        public int $code,
+        public int $executable,
+        public int $executed,
+        public float $percent,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public static function fromNode(DOMElement $node): self
     {
-        yield from $this->traces;
+        return new self(
+            (int) $node->getAttribute('total'),
+            (int) $node->getAttribute('comments'),
+            (int) $node->getAttribute('code'),
+            (int) $node->getAttribute('executable'),
+            (int) $node->getAttribute('executed'),
+            (float) $node->getAttribute('percent'),
+        );
     }
 }

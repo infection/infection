@@ -33,23 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\PHPUnitXml;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Coverage\JUnit\JUnitReport;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 
-final readonly class DummyTraceProvider implements TraceProvider
+final class PHPUnitXmlProvider
 {
-    /**
-     * @param Trace $traces
-     */
+    private PHPUnitXmlReport $report;
+
     public function __construct(
-        private array $traces,
+        private readonly ReportLocator $indexReportLocator,
+        private readonly ReportLocator $jUnitReportLocator,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public function get(): PHPUnitXmlReport
     {
-        yield from $this->traces;
+        if (!isset($this->report)) {
+            $this->report = new PHPUnitXmlReport(
+                fn () => new IndexReport($this->indexReportLocator->locate()),
+                fn () => new JUnitReport($this->jUnitReportLocator->locate()),
+            );
+        }
+
+        return $this->report;
     }
 }

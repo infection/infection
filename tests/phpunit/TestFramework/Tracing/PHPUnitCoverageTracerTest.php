@@ -39,11 +39,11 @@ use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\Filesystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReportLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\IndexReportLocator;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\Tracing\PHPUnitCoverageTracer;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -75,6 +75,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     self::COVERAGE_REPORT_DIR,
                 ),
                 jUnitReportLocator: JUnitReportLocator::create(
+                    $filesystem,
                     self::COVERAGE_REPORT_DIR,
                     self::COVERAGE_REPORT_DIR . '/junit.xml',
                 ),

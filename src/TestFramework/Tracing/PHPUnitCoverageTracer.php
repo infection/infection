@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use function array_map;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReport;
+use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -83,8 +83,6 @@ final class PHPUnitCoverageTracer
     }
 
     /**
-     * @param SourceFileIndexXmlInfo $fileInfo
-     *
      * @return array<int, list<TestLocation>>
      */
     private function createTestLocationsByLine(SourceFileIndexXmlInfo $fileInfo): array
@@ -104,8 +102,6 @@ final class PHPUnitCoverageTracer
     }
 
     /**
-     * @param SourceFileIndexXmlInfo $fileInfo
-     *
      * @return array<string, SourceMethodLineRange>
      */
     private function createCoveredSourceMethodLineRangesByMethodName(SourceFileIndexXmlInfo $fileInfo): array

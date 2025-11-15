@@ -33,23 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use function array_map;
+use DOMElement;
+use function iterator_to_array;
+use Webmozart\Assert\Assert;
 
-final readonly class DummyTraceProvider implements TraceProvider
+/**
+ * This represents the information available in the `file.coverage.line` element
+ * of a source file of the PHPUnit XML coverage report.
+ */
+final readonly class LineCoverage
 {
     /**
-     * @param Trace $traces
+     * @param int<0, max> $lineNumber
+     * @param non-empty-list<string> $coveredBy
      */
     public function __construct(
-        private array $traces,
+        public int $lineNumber,
+        public array $coveredBy,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public static function fromNode(
+        DOMElement $node,
+    ): self {
+        Assert::same('line', $node->tagName);
+
+        return new self(
+            (int) $node->getAttribute('nr'),
+            array_map(
+                self::parseCoveredBy(...),
+                iterator_to_array($node->getElementsByTagName('covered')),
+            ),
+        );
+    }
+
+    private static function parseCoveredBy(DOMElement $node): string
     {
-        yield from $this->traces;
+        Assert::same('covered', $node->tagName);
+
+        return $node->getAttribute('by');
     }
 }

@@ -33,23 +33,62 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\Index;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use DOMElement;
+use function str_ends_with;
+use function substr;
+use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
-final readonly class DummyTraceProvider implements TraceProvider
+/**
+ * Represents information about a source file from the index file of the PHPUnit
+ * XML coverage report.
+ *
+ * TODO: to replace SourceFileInfoProvider
+ */
+final readonly class SourceFileIndexXmlInfo
 {
-    /**
-     * @param Trace $traces
-     */
     public function __construct(
-        private array $traces,
+        public string $sourcePathname,
+        public string $coveragePathname,
+        private LinesCoverageSummary $linesCoverageSummary,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public function hasExecutedCode(): bool
     {
-        yield from $this->traces;
+        return $this->linesCoverageSummary->executed > 0;
+    }
+
+    public static function fromNode(
+        DOMElement $node,
+        string $coverageDirPathname,
+        string $coverageProjectSource,
+    ): self {
+        $coverageRelativePath = $node->getAttribute('href');
+        $coveragePathname = Path::join($coverageDirPathname, $coverageRelativePath);
+        Assert::true(str_ends_with($coveragePathname, '.php.xml'));
+
+        $sourcePathname = Path::join(
+            $coverageProjectSource,
+            substr(
+                $coverageRelativePath,
+                0,
+                -4,
+            ),
+        );
+
+        $totals = $node->firstElementChild;
+        Assert::string('totals', $totals->tagName);
+
+        $lines = $totals->firstElementChild;
+        Assert::string('lines', $totals->tagName);
+
+        return new self(
+            $sourcePathname,
+            $coveragePathname,
+            LinesCoverageSummary::fromNode($lines),
+        );
     }
 }

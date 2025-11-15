@@ -33,23 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
-
-final readonly class DummyTraceProvider implements TraceProvider
+final readonly class TestInfo
 {
-    /**
-     * @param Trace $traces
-     */
     public function __construct(
-        private array $traces,
+        public string $location,
+        public float $executionTime,
     ) {
-    }
-
-    public function provideTraces(): iterable
-    {
-        yield from $this->traces;
     }
 }

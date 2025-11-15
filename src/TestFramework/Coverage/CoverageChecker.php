@@ -41,7 +41,7 @@ use function extension_loaded;
 use function implode;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReportLocator;
 use function ini_get as ini_get_unsafe;
 use const PHP_EOL;
 use const PHP_SAPI;
@@ -69,7 +69,7 @@ class CoverageChecker
         private readonly bool $jUnitReport,
         private readonly JUnitReportLocator $jUnitReportLocator,
         string $testFrameworkAdapterName,
-        private readonly IndexXmlCoverageLocator $indexXmlCoverageLocator,
+        private readonly IndexReportLocator $indexXmlCoverageLocator,
     ) {
         $this->frameworkAdapterName = strtolower($testFrameworkAdapterName);
     }

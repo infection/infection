@@ -33,23 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+// TODO: similar to SourceMethodLineRange with the method name...
+use DOMElement;
+use Webmozart\Assert\Assert;
 
-final readonly class DummyTraceProvider implements TraceProvider
+final readonly class MethodLineRange
 {
     /**
-     * @param Trace $traces
+     * @param string $methodName E.g. "__construct": no namespace or class/trait name included.
+     * @param positive-int $startLine
+     * @param positive-int $endLine
      */
     public function __construct(
-        private array $traces,
+        public string $methodName,
+        public int $startLine,
+        public int $endLine,
     ) {
     }
 
-    public function provideTraces(): iterable
-    {
-        yield from $this->traces;
+    public static function tryFromNode(
+        DOMElement $node,
+    ): ?self {
+        Assert::same('method', $node->tagName);
+
+        // TODO: in the original code we deal with an int... Could be a float casted to an int
+        $isCovered = ((float) $node->getAttribute('coverage')) > 0;
+
+        if (!$isCovered) {
+            return null;
+        }
+
+        return new self(
+            $node->getAttribute('name'),
+            (int) $node->getAttribute('start'),
+            (int) $node->getAttribute('end'),
+        );
     }
 }

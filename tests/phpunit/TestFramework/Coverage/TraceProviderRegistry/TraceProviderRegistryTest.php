@@ -50,7 +50,7 @@ final class TraceProviderRegistryTest extends TestCase
 {
     /**
      * @param TraceProvider $providers
-     * @param Trace[]       $expected
+     * @param Trace[] $expected
      */
     #[DataProvider('traceProvider')]
     public function test_it_provides_traces(

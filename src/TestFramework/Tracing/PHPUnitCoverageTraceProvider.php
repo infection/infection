@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Tracing;
 
 use Infection\FileSystem\SplFileInfoFactory;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReport;
 use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlProvider;
-use Infection\TestFramework\NewCoverage\PHPUnitXml\PHPUnitXmlReport;
 
 /**
  * Filters traces and augments them with timing data from JUnit report.

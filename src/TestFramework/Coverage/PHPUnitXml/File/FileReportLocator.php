@@ -33,24 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
 use function count;
 use function current;
+use DomainException;
 use function implode;
 use Infection\FileSystem\Filesystem;
 use Infection\TestFramework\Coverage\Locator\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use function Pipeline\take;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use function iter\map;
+use function iter\toArray;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * TODO: heavily copied from IndexXmlCoverageLocator
+ * @see IndexXmlCoverageLocator
  * @internal
- * @final
  */
-class JUnitReportLocator implements ReportLocator
+final readonly class FileReportLocator implements ReportLocator
 {
     private const JUNIT_NAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
@@ -67,24 +72,19 @@ class JUnitReportLocator implements ReportLocator
     public static function create(
         Filesystem $filesystem,
         string $coverageDirPath,
-        ?string $defaultJUnitPath = null,
+        string $defaultJUnitPath,
     ): self {
         return new self(
             $filesystem,
             $coverageDirPath,
-            $defaultJUnitPath === null
-                ? self::createPHPUnitDefaultJUnitPath($coverageDirPath)
-                : Path::canonicalize($defaultJUnitPath),
+            Path::canonicalize($defaultJUnitPath),
         );
-    }
-
-    public static function createPHPUnitDefaultJUnitPath(string $coverageDirPath): string
-    {
-        return Path::canonicalize($coverageDirPath . '/junit.xml');
     }
 
     public function locate(): string
     {
+        throw new DomainException('TODO: not implemented.');
+
         if ($this->filesystem->isReadableFile($this->defaultJUnitPath)) {
             return $this->defaultJUnitPath;
         }
@@ -112,21 +112,19 @@ class JUnitReportLocator implements ReportLocator
     /**
      * @return list<string>
      */
-    private function find(): array
+    private function find(): Finder
     {
-        return take($this->createIndexFinder())
-            ->map(Filesystem::mapFileInfoToCanonicalPathname(...))
-            ->toList();
-    }
-
-    private function createIndexFinder(): Finder
-    {
-        return $this->filesystem
-            ->createFinder()
-            ->files()
-            ->in($this->coverageDirPath)
-            ->name(self::JUNIT_NAME_REGEX)
-            ->sortByName();
+        return toArray(
+            map(
+                static fn (SplFileInfo $fileInfo) => Path::canonicalize($fileInfo->getPathname()),
+                $this->filesystem
+                    ->createFinder()
+                    ->files()
+                    ->in($this->coverageDirPath)
+                    ->name(self::JUNIT_NAME_REGEX)
+                    ->sortByName(),
+            ),
+        );
     }
 
     /**
@@ -151,9 +149,8 @@ class JUnitReportLocator implements ReportLocator
     {
         throw new NoReportFound(
             sprintf(
-                'Could not find a JUnit report in "%s": more than one file with the pattern "%s" has been found. Found: "%s".',
+                'Could not find a JUnit report in "%s": more than one file with the pattern ".*" has been found. Found: "%s"',
                 $this->coverageDirPath,
-                self::JUNIT_NAME_REGEX,
                 implode(
                     '", "',
                     $files,
@@ -169,9 +166,8 @@ class JUnitReportLocator implements ReportLocator
     {
         throw new NoReportFound(
             sprintf(
-                'Could not find a JUnit report in "%s": no file with the pattern "%s" has been found.',
+                'Could not find a JUnit report in "%s": no file with the pattern ".*" has been found.',
                 $this->coverageDirPath,
-                self::JUNIT_NAME_REGEX,
             ),
         );
     }
