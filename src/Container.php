@@ -565,7 +565,9 @@ final class Container extends DIContainer
                     $configuration->mutantId,
                 );
             },
-            MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            MemoizedComposerExecutableFinder::class => static fn (self $container): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(
+                new ConcreteComposerExecutableFinder($container->getFileSystem()),
+            ),
             FileSystem::class => static fn (): FileSystem => new NativeFileSystem(),
         ]);
 

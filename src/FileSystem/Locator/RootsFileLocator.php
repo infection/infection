@@ -51,7 +51,7 @@ final readonly class RootsFileLocator implements Locator
      */
     public function __construct(
         private array $roots,
-        private FileSystem $filesystem,
+        private FileSystem $fileSystem,
     ) {
         Assert::allString($roots);
     }
@@ -60,9 +60,9 @@ final readonly class RootsFileLocator implements Locator
     {
         $canonicalFileName = Path::canonicalize($fileName);
 
-        if ($this->filesystem->isAbsolutePath($canonicalFileName)) {
-            if ($this->filesystem->isReadableFile($canonicalFileName)) {
-                return realpath($canonicalFileName);
+        if ($this->fileSystem->isAbsolutePath($canonicalFileName)) {
+            if ($this->fileSystem->isReadableFile($canonicalFileName)) {
+                return $this->fileSystem->normalizedRealPath($canonicalFileName);
             }
 
             throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
@@ -71,8 +71,8 @@ final readonly class RootsFileLocator implements Locator
         foreach ($this->roots as $path) {
             $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
 
-            if ($this->filesystem->isReadableFile($file)) {
-                return realpath($file);
+            if ($this->fileSystem->isReadableFile($file)) {
+                return $this->fileSystem->normalizedRealPath($file);
             }
         }
 

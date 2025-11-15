@@ -36,27 +36,44 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use function array_map;
+use Fidry\FileSystem\FileSystem;
 use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
+use Symfony\Component\Filesystem\Path;
 
-#[Group('integration')]
 #[CoversClass(DiffChangedLinesParser::class)]
 final class DiffChangedLinesParserTest extends TestCase
 {
+    private const PROJECT_DIR = __DIR__ . '/../../..';
+
+    private DiffChangedLinesParser $parser;
+
+    protected function setUp(): void
+    {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+
+        $fileSystemMock
+            ->method('normalizedRealPath')
+            // We do not want to do the realpath existence check here, but that
+            // means we need to mimic the relative path to absolute path transformation.
+            ->willReturnCallback(static fn (string $path) => Path::canonicalize(self::PROJECT_DIR . '/' . $path));
+
+        $this->parser = new DiffChangedLinesParser($fileSystemMock);
+    }
+
     #[DataProvider('provideDiffs')]
     public function test_it_converts_diff_to_files_and_changed_lines_map(string $diff, array $expectedMap): void
     {
-        $collector = new DiffChangedLinesParser();
+        $resultMap = $this->parser->parse($diff);
 
-        $resultMap = $collector->parse($diff);
-
-        $this->assertSame($this->convertToArray($expectedMap), $this->convertToArray($resultMap));
+        $this->assertSame(
+            self::toArrayWithKeys($expectedMap),
+            self::toArrayWithKeys($resultMap),
+        );
     }
 
     public static function provideDiffs(): Generator
@@ -70,7 +87,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -1207,0 +1213,5 @@ final class Container
                 DIFF,
             [
-                realpath('src/Container.php') => [
+                Path::canonicalize(self::PROJECT_DIR . '/src/Container.php') => [
                     new ChangedLinesRange(38, 38),
                     new ChangedLinesRange(534, 535),
                     new ChangedLinesRange(538, 540),
@@ -91,13 +108,13 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -0,0 +1,18 @@
                 DIFF,
             [
-                realpath('src/Container.php') => [
+                Path::canonicalize(self::PROJECT_DIR . '/src/Container.php') => [
                     new ChangedLinesRange(38, 38),
                     new ChangedLinesRange(534, 535),
                     new ChangedLinesRange(538, 540),
                     new ChangedLinesRange(1213, 1217),
                 ],
-                realpath('src/Differ/FilesDiffChangedLines.php') => [
+                Path::canonicalize(self::PROJECT_DIR . '/src/Differ/FilesDiffChangedLines.php') => [
                     new ChangedLinesRange(1, 18),
                 ],
             ],
@@ -107,7 +124,7 @@ final class DiffChangedLinesParserTest extends TestCase
     /**
      * @param array<string, array<int, ChangedLinesRange>> $map
      */
-    private function convertToArray(array $map): array
+    private static function toArrayWithKeys(array $map): array
     {
         return array_map(
             static fn (array $changedLinesRanges): array => array_map(

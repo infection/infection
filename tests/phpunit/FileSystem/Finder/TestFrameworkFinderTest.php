@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use Fidry\FileSystem\NativeFileSystem;
 use function explode;
 use Fidry\FileSystem\FS;
 use Fidry\FileSystem\Test\FileSystemTestCase;
@@ -89,6 +90,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         // For this test we expect to remain in the current working dir.
         // Not ideal, but it is what it is for now.
         self::safeChdir($this->cwd);
+
+        $this->fileSystem = new NativeFileSystem();
 
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')

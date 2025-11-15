@@ -103,7 +103,7 @@ class StaticAnalysisToolExecutableFinder
             return true;
         }
 
-        throw FinderException::testCustomPathDoesNotExist($staticAnalysisTool, $customPath);
+        throw FinderException::invalidCustomPath($staticAnalysisTool, $customPath);
     }
 
     private function addVendorBinToPath(): void
@@ -119,10 +119,10 @@ class StaticAnalysisToolExecutableFinder
 
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException) {
+        } catch (RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
 
-            if (file_exists($candidate)) {
+            if ($this->fileSystem->isReadableFile($candidate)) {
                 $vendorPath = $candidate;
             }
         }
@@ -168,7 +168,7 @@ class StaticAnalysisToolExecutableFinder
             }
         }
 
-        $nonExecutableFinder = new NonExecutableFinder();
+        $nonExecutableFinder = new NonExecutableFinder($this->fileSystem);
         $path = $nonExecutableFinder->searchNonExecutables($candidates, $extraDirs);
 
         if ($path !== null) {
