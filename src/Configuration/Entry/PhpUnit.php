@@ -40,11 +40,11 @@ use Symfony\Component\Filesystem\Path;
 /**
  * @internal
  */
-final class PhpUnit
+final readonly class PhpUnit
 {
     public function __construct(
         private ?string $configDir,
-        private readonly ?string $customPath,
+        private ?string $customPath,
     ) {
     }
 
