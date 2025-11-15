@@ -99,28 +99,27 @@ trait ConfigurationAssertions
         ?string $expectedStaticAnalysisTool,
         ?string $expectedMutantId,
     ): void {
-        $this->assertSame($expectedTimeout, $configuration->getProcessTimeout(), 'Failed timeout check');
-        $this->assertSame($expectedSourceDirectories, $configuration->getSourceDirectories(), 'Failed sourceDirectories check');
+        $this->assertSame($expectedTimeout, $configuration->processTimeout, 'Failed timeout check');
+        $this->assertSame($expectedSourceDirectories, $configuration->sourceDirectories, 'Failed sourceDirectories check');
         $this->assertSame(
             self::normalizePaths($expectedSourceFiles),
-            self::normalizePaths($configuration->getSourceFiles()),
+            self::normalizePaths($configuration->sourceFiles),
             'Failed sourceFiles check',
         );
-        $this->assertSame($expectedFilter, $configuration->getSourceFilesFilter(), 'Failed sourceFilesFilter check');
-        $this->assertSame($expectedSourceFilesExcludes, $configuration->getSourceFilesExcludes(), 'Failed sourceFilesExcludes check');
-        $this->assertEquals($expectedLogs, $configuration->getLogs());
-        $this->assertSame($expectedLogVerbosity, $configuration->getLogVerbosity(), 'Failed logVerbosity check');
-        $this->assertSame($expectedTmpDir, $configuration->getTmpDir(), 'Failed tmpDir check');
-        $this->assertEquals($expectedPhpUnit, $configuration->getPhpUnit());
-        $this->assertSame($expectedPhpStan->getConfigDir(), $configuration->getPhpStan()->getConfigDir(), 'Failed PHPStan config dir check');
-        $this->assertSame($expectedPhpStan->getCustomPath(), $configuration->getPhpStan()->getCustomPath(), 'Failed PHPStan custom path check');
-        $this->assertEqualsWithDelta($expectedMutators, $configuration->getMutators(), 10., 'Failed mutators check');
-        $this->assertSame($expectedTestFramework, $configuration->getTestFramework(), 'Failed testFramework check');
-        $this->assertSame($expectedBootstrap, $configuration->getBootstrap(), 'Failed bootstrap check');
-        $this->assertSame($expectedInitialTestsPhpOptions, $configuration->getInitialTestsPhpOptions(), 'Failed initialTestsPhpOptions check');
+        $this->assertSame($expectedFilter, $configuration->sourceFilesFilter, 'Failed sourceFilesFilter check');
+        $this->assertSame($expectedSourceFilesExcludes, $configuration->sourceFilesExcludes, 'Failed sourceFilesExcludes check');
+        $this->assertEquals($expectedLogs, $configuration->logs);
+        $this->assertSame($expectedLogVerbosity, $configuration->logVerbosity, 'Failed logVerbosity check');
+        $this->assertSame($expectedTmpDir, $configuration->tmpDir, 'Failed tmpDir check');
+        $this->assertEquals($expectedPhpUnit, $configuration->phpUnit);
+        $this->assertEquals($expectedPhpStan, $configuration->phpStan);
+        $this->assertEqualsWithDelta($expectedMutators, $configuration->mutators, 10., 'Failed mutators check');
+        $this->assertSame($expectedTestFramework, $configuration->testFramework, 'Failed testFramework check');
+        $this->assertSame($expectedBootstrap, $configuration->bootstrap, 'Failed bootstrap check');
+        $this->assertSame($expectedInitialTestsPhpOptions, $configuration->initialTestsPhpOptions, 'Failed initialTestsPhpOptions check');
         $this->assertSame(
             $expectedTestFrameworkExtraOptions,
-            $configuration->getTestFrameworkExtraOptions(),
+            $configuration->testFrameworkExtraOptions,
             'Failed testFrameworkExtraOptions check',
         );
         $this->assertSame(
@@ -128,27 +127,27 @@ trait ConfigurationAssertions
             $configuration->getStaticAnalysisToolOptions(),
             'Failed staticAnalysisToolOptions check',
         );
-        $this->assertSame($expectedCoveragePath, $configuration->getCoveragePath(), 'Failed coveragePath check');
-        $this->assertSame($expectedSkipCoverage, $configuration->shouldSkipCoverage(), 'Failed skipCoverage check');
-        $this->assertSame($expectedSkipInitialTests, $configuration->shouldSkipInitialTests(), 'Failed skipInitialTests check');
-        $this->assertSame($expectedDebug, $configuration->isDebugEnabled(), 'Failed isDebugEnabled check');
+        $this->assertSame($expectedCoveragePath, $configuration->coveragePath, 'Failed coveragePath check');
+        $this->assertSame($expectedSkipCoverage, $configuration->skipCoverage, 'Failed skipCoverage check');
+        $this->assertSame($expectedSkipInitialTests, $configuration->skipInitialTests, 'Failed skipInitialTests check');
+        $this->assertSame($expectedDebug, $configuration->isDebugEnabled, 'Failed isDebugEnabled check');
         $this->assertSame($expectedWithUncovered, !$configuration->mutateOnlyCoveredCode(), 'Failed onlyCoveredCode check');
-        $this->assertSame($expectedNoProgress, $configuration->noProgress(), 'Failed noProgress check');
-        $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations(), 'Failed ignoreMsiWithNoMutations check');
-        $this->assertSame($expectedMinMsi, $configuration->getMinMsi(), 'Failed minMsi check');
-        $this->assertSame($expectedNumberOfShownMutations, $configuration->getNumberOfShownMutations(), 'Failed numberOfShownMutations check');
-        $this->assertSame($expectedMinCoveredMsi, $configuration->getMinCoveredMsi(), 'Failed minCoveredMsi check');
-        $this->assertSame($expectedMsiPrecision, $configuration->getMsiPrecision(), 'Failed msiPrecision check');
-        $this->assertSame($expectedThreadCount, $configuration->getThreadCount(), 'Failed threadsCount check');
-        $this->assertSame($expectedDryRyn, $configuration->isDryRun(), 'Failed dryRun check');
-        $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->getIgnoreSourceCodeMutatorsMap(), 'Failed ignoreSourceCodeMutatorsMap check');
-        $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->getExecuteOnlyCoveringTestCases(), 'Failed executeOnlyCoveringTestCases check');
-        $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines(), 'Failed isForGitDiffLines check');
-        $this->assertSame($expectedGitDiffBase, $configuration->getGitDiffBase(), 'Failed gitDiffBase check');
-        $this->assertSame($expectedMapSourceClassToTest, $configuration->getMapSourceClassToTestStrategy(), 'Failed mapSourceClassToTestStrategy check');
-        $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->getLoggerProjectRootDirectory(), 'Failed loggerProjectRootDirectory check');
-        $this->assertSame($expectedStaticAnalysisTool, $configuration->getStaticAnalysisTool(), 'Failed staticAnalysisTool check');
-        $this->assertSame($expectedMutantId, $configuration->getMutantId(), 'Failed mutantId check');
+        $this->assertSame($expectedNoProgress, $configuration->noProgress, 'Failed noProgress check');
+        $this->assertSame($expectedIgnoreMsiWithNoMutations, $configuration->ignoreMsiWithNoMutations, 'Failed ignoreMsiWithNoMutations check');
+        $this->assertSame($expectedMinMsi, $configuration->minMsi, 'Failed minMsi check');
+        $this->assertSame($expectedNumberOfShownMutations, $configuration->numberOfShownMutations, 'Failed numberOfShownMutations check');
+        $this->assertSame($expectedMinCoveredMsi, $configuration->minCoveredMsi, 'Failed minCoveredMsi check');
+        $this->assertSame($expectedMsiPrecision, $configuration->msiPrecision, 'Failed msiPrecision check');
+        $this->assertSame($expectedThreadCount, $configuration->threadCount, 'Failed threadsCount check');
+        $this->assertSame($expectedDryRyn, $configuration->isDryRun, 'Failed dryRun check');
+        $this->assertSame($expectedIgnoreSourceCodeMutatorsMap, $configuration->ignoreSourceCodeMutatorsMap, 'Failed ignoreSourceCodeMutatorsMap check');
+        $this->assertSame($expectedExecuteOnlyCoveringTestCases, $configuration->executeOnlyCoveringTestCases, 'Failed executeOnlyCoveringTestCases check');
+        $this->assertSame($expectedIsForGitDiffLines, $configuration->isForGitDiffLines, 'Failed isForGitDiffLines check');
+        $this->assertSame($expectedGitDiffBase, $configuration->gitDiffBase, 'Failed gitDiffBase check');
+        $this->assertSame($expectedMapSourceClassToTest, $configuration->mapSourceClassToTestStrategy, 'Failed mapSourceClassToTestStrategy check');
+        $this->assertSame($expectedLoggerProjectRootDirectory, $configuration->loggerProjectRootDirectory, 'Failed loggerProjectRootDirectory check');
+        $this->assertSame($expectedStaticAnalysisTool, $configuration->staticAnalysisTool, 'Failed staticAnalysisTool check');
+        $this->assertSame($expectedMutantId, $configuration->mutantId, 'Failed mutantId check');
     }
 
     /**

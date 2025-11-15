@@ -633,8 +633,8 @@ final class ParallelProcessRunnerTest extends TestCase
             [
                 new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
-                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-                        private Process $nextProcessMock,
+                        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+                        private readonly Process $nextProcessMock,
                     ) {
                     }
 

@@ -40,11 +40,11 @@ use Symfony\Component\Filesystem\Path;
 /**
  * @internal
  */
-final class PhpUnit
+final readonly class PhpUnit
 {
     public function __construct(
-        private ?string $configDir,
-        private readonly ?string $customPath,
+        public ?string $configDir,
+        public ?string $customPath,
     ) {
     }
 
@@ -62,16 +62,6 @@ final class PhpUnit
             : self::makeAbsolute($customPath, $basePath);
 
         return new self($newConfigDir, $newCustomPath);
-    }
-
-    public function getConfigDir(): ?string
-    {
-        return $this->configDir;
-    }
-
-    public function getCustomPath(): ?string
-    {
-        return $this->customPath;
     }
 
     private static function makeAbsolute(string $path, string $basePath): string

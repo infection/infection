@@ -63,7 +63,7 @@ class StrykerDashboardClient
             $reportJson,
         );
 
-        $statusCode = $response->getStatusCode();
+        $statusCode = $response->statusCode;
 
         if (!in_array($statusCode, [Response::HTTP_OK, Response::HTTP_CREATED], true)) {
             $this->logger->warning(sprintf(
@@ -75,7 +75,7 @@ class StrykerDashboardClient
         $this->logger->notice(sprintf(
             'Dashboard response:%s%s',
             "\r\n",
-            $response->getBody(),
+            $response->body,
         ));
     }
 }

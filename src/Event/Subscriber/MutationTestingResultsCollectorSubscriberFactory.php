@@ -41,10 +41,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingResultsCollectorSubscriberFactory implements SubscriberFactory
+final readonly class MutationTestingResultsCollectorSubscriberFactory implements SubscriberFactory
 {
     /** @var Collector[] */
-    private readonly array $collectors;
+    private array $collectors;
 
     public function __construct(Collector ...$collectors)
     {
