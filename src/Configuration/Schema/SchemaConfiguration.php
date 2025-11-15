@@ -1,4 +1,4 @@
-<?php
+git<?php
 /**
  * This code is licensed under the BSD 3-Clause License.
  *
@@ -54,126 +54,27 @@ final readonly class SchemaConfiguration
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function __construct(
-        private string $file,
-        private ?float $timeout,
-        private Source $source,
-        private Logs $logs,
-        private ?string $tmpDir,
-        private PhpUnit $phpUnit,
-        private PhpStan $phpStan,
-        private ?bool $ignoreMsiWithNoMutations,
-        private ?float $minMsi,
-        private ?float $minCoveredMsi,
-        private array $mutators,
-        private ?string $testFramework,
-        private ?string $bootstrap,
-        private ?string $initialTestsPhpOptions,
-        private ?string $testFrameworkExtraOptions,
-        private ?string $staticAnalysisToolOptions,
-        private string|int|null $threads,
-        private ?string $staticAnalysisTool,
+        public string $file,
+        public ?float $timeout,
+        public Source $source,
+        public Logs $logs,
+        public ?string $tmpDir,
+        public PhpUnit $phpUnit,
+        public PhpStan $phpStan,
+        public ?bool $ignoreMsiWithNoMutations,
+        public ?float $minMsi,
+        public ?float $minCoveredMsi,
+        public array $mutators,
+        public ?string $testFramework,
+        public ?string $bootstrap,
+        public ?string $initialTestsPhpOptions,
+        public ?string $testFrameworkExtraOptions,
+        public ?string $staticAnalysisToolOptions,
+        public string|int|null $threads,
+        public ?string $staticAnalysisTool,
     ) {
         Assert::nullOrGreaterThanEq($timeout, 0);
         Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
-    }
-
-    public function getFile(): string
-    {
-        return $this->file;
-    }
-
-    public function getTimeout(): ?float
-    {
-        return $this->timeout;
-    }
-
-    public function getSource(): Source
-    {
-        return $this->source;
-    }
-
-    public function getLogs(): Logs
-    {
-        return $this->logs;
-    }
-
-    public function getTmpDir(): ?string
-    {
-        return $this->tmpDir;
-    }
-
-    public function getPhpUnit(): PhpUnit
-    {
-        return $this->phpUnit;
-    }
-
-    public function getPhpStan(): PhpStan
-    {
-        return $this->phpStan;
-    }
-
-    public function getIgnoreMsiWithNoMutations(): ?bool
-    {
-        return $this->ignoreMsiWithNoMutations;
-    }
-
-    public function getMinMsi(): ?float
-    {
-        return $this->minMsi;
-    }
-
-    public function getMinCoveredMsi(): ?float
-    {
-        return $this->minCoveredMsi;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function getMutators(): array
-    {
-        return $this->mutators;
-    }
-
-    /**
-     * @return TestFrameworkTypes::*|null
-     */
-    public function getTestFramework(): ?string
-    {
-        return $this->testFramework;
-    }
-
-    /**
-     * @return StaticAnalysisToolTypes::*|null
-     */
-    public function getStaticAnalysisTool(): ?string
-    {
-        return $this->staticAnalysisTool;
-    }
-
-    public function getBootstrap(): ?string
-    {
-        return $this->bootstrap;
-    }
-
-    public function getInitialTestsPhpOptions(): ?string
-    {
-        return $this->initialTestsPhpOptions;
-    }
-
-    public function getTestFrameworkExtraOptions(): ?string
-    {
-        return $this->testFrameworkExtraOptions;
-    }
-
-    public function getStaticAnalysisToolOptions(): ?string
-    {
-        return $this->staticAnalysisToolOptions;
-    }
-
-    public function getThreads(): string|int|null
-    {
-        return $this->threads;
     }
 }

@@ -42,6 +42,7 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Testing\StringNormalizer;
+use LogicException;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
@@ -270,7 +271,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                         }
                     }
                     PHP
-                ),
+                ) ?? throw new LogicException(),
                 <<<'PHP'
                     <?php
 

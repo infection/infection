@@ -59,12 +59,12 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         return [
             ['__construct'],
             ['__invoke'],
-            ['__call', '$n, $v'],
-            ['__callStatic', '$n, $v', 'static '],
-            ['__get', '$n'],
-            ['__set', '$n, $v'],
-            ['__isset', '$n'],
-            ['__unset', '$n'],
+            ['__call'],
+            ['__callStatic'],
+            ['__get'],
+            ['__set'],
+            ['__isset'],
+            ['__unset'],
             ['__toString'],
             ['__debugInfo'],
         ];

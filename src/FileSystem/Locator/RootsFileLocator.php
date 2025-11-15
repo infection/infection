@@ -44,21 +44,16 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class RootsFileLocator implements Locator
+final readonly class RootsFileLocator implements Locator
 {
-    /** @var string[] */
-    private readonly array $roots;
-
     /**
      * @param string[] $roots
      */
     public function __construct(
-        array $roots,
-        private readonly FileSystem $filesystem,
+        private array $roots,
+        private FileSystem $filesystem,
     ) {
         Assert::allString($roots);
-
-        $this->roots = $roots;
     }
 
     public function locate(string $fileName): string

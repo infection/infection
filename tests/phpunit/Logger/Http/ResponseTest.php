@@ -49,8 +49,8 @@ final class ResponseTest extends TestCase
     {
         $response = new Response($statusCode, $body);
 
-        $this->assertSame($statusCode, $response->getStatusCode());
-        $this->assertSame($body, $response->getBody());
+        $this->assertSame($statusCode, $response->statusCode);
+        $this->assertSame($body, $response->body);
     }
 
     public function test_it_provides_a_user_friendly_error_if_the_status_code_is_not_a_valid_http_status_code(): void
