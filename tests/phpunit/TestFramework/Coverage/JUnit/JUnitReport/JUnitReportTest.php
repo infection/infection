@@ -45,6 +45,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
+use function sprintf;
 
 /**
  * @phpstan-import-type TestInfo from JUnitReport
@@ -58,7 +59,14 @@ final class JUnitReportTest extends TestCase
     {
         $report = new JUnitReport(__FILE__);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                sprintf(
+                    'The file "%s" does not contain valid XML.',
+                    __FILE__,
+                ),
+            ),
+        );
 
         $report->getTestInfo('Foo\BarTest');
     }
