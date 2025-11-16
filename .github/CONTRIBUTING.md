@@ -19,11 +19,17 @@ To run the tests locally, you can run `make test`. It however requires [Docker][
 granular tests, you can run `make` to see the available commands.
 
 
+## Benchmarks
+
+Read the [Benchmark documentation].
+
+
 <br />
 <hr />
 
 « [Go back to the readme][readme] »
 
 
+[Benchmark documentation]: ../doc/benchmarking.md
 [docker]: https://www.docker.com/get-docker
 [readme]: /README.md
