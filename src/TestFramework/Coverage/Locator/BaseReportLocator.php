@@ -58,7 +58,7 @@ abstract readonly class BaseReportLocator implements ReportLocator
     protected function __construct(
         private Filesystem $filesystem,
         private string $sourceDirectory,
-        public string $defaultPathname,
+        private string $defaultPathname,
     ) {
     }
 
@@ -69,6 +69,11 @@ abstract readonly class BaseReportLocator implements ReportLocator
         }
 
         return $this->lookup();
+    }
+
+    public function getDefaultLocation(): string
+    {
+        return $this->defaultPathname;
     }
 
     protected function createInvalidReportSource(string $sourceDirectory): InvalidReportSource

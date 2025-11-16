@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\Locator;
 final class MemoizedLocator implements ReportLocator
 {
     private string $location;
+    private string $defaultLocation;
 
     public function __construct(
         private readonly ReportLocator $decoratedLocator,
@@ -51,5 +52,14 @@ final class MemoizedLocator implements ReportLocator
         }
 
         return $this->location;
+    }
+
+    public function getDefaultLocation(): string
+    {
+        if (!isset($this->defaultLocation)) {
+            $this->defaultLocation = $this->decoratedLocator->getDefaultLocation();
+        }
+
+        return $this->defaultLocation;
     }
 }

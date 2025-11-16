@@ -46,4 +46,9 @@ final readonly class HardcodedLocator implements ReportLocator
     {
         return $this->location;
     }
+
+    public function getDefaultLocation(): string
+    {
+        return $this->location;
+    }
 }

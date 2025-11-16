@@ -39,6 +39,7 @@ use function array_key_exists;
 use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use function preg_replace;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -62,7 +63,21 @@ final class JUnitReport
     }
 
     /**
-     * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
+     * Returns information of the test for a given test string.
+     *
+     * The form of the test string depends of the JUnit format of the test
+     * framework used. For example:
+     *
+     * - PHPUnit JUnit: 'App\Tests\DemoTest::test_it_works#item 0'.
+     * - Codeception BDD: 'FeatureA:Scenario A1'
+     *
+     * The output is the location of the test and time of execution. The location
+     * path may change based on the format. For example:
+     *
+     * - PHPUnit: an absolute path to the test file.
+     * - Codeception BDD: the path is relative to the project root.
+     *
+     * TODO: complete the docs here; the docs of the CoverageReport (calling class).
      *
      * @throws TestFileNameNotFoundException
      *
@@ -127,22 +142,35 @@ final class JUnitReport
      */
     private static function xPathQueries(string $testCaseClassName): iterable
     {
+        // A default format for <testsuite>
         yield sprintf(
             '//testsuite[@name="%s"][1]',
             $testCaseClassName,
         );
 
-        //        // A default format for <testsuite>
-        //        yield '//testsuite[@name="%s"][1]' => $testCaseClassName;
-        //
-        //        // A format where the class name is inside `class` attribute of `testcase` tag
-        //        yield '//testcase[@class="%s"][1]' => $testCaseClassName;
-        //
-        //        // A format where the class name is inside `file` attribute of `testcase` tag
-        //        yield '//testcase[contains(@file, "%s")][1]' => preg_replace('/^(.*):+.*$/', '$1.feature', $testCaseClassName);
-        //
-        //        // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
-        //        yield '//testcase[@class="%s"][1]' => preg_replace('/^(.*):+.*$/', '$1', $testCaseClassName);
+        // A format where the class name is inside `class` attribute of `testcase` tag
+        yield sprintf(
+            '//testcase[@class="%s"][1]',
+            $testCaseClassName,
+        );
+
+        // A format where the class name is inside `file` attribute of `testcase` tag
+        yield sprintf(
+            '//testcase[contains(@file, "%s")][1]',
+            // Example:
+            // App\Controller\AdminCest:FeatureA
+            // => App\Controller\AdminCest.feature
+            preg_replace('/^(.*):+.*$/', '$1.feature', $testCaseClassName),
+        );
+
+        // A format where the class name parsed from feature and is inside `class` attribute of `testcase` tag
+        yield sprintf(
+            '//testcase[@class="%s"][1]',
+            // Example:
+            // App\Controller\AdminCest:FeatureA
+            // => App\Controller\AdminCest
+            preg_replace('/^(.*):+.*$/', '$1', $testCaseClassName),
+        );
     }
 
     private function getXPath(): SafeDOMXPath

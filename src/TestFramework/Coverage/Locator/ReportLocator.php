@@ -43,4 +43,9 @@ interface ReportLocator
      * @throws NoReportFound
      */
     public function locate(): string;
+
+    /**
+     * Default location pathname.
+     */
+    public function getDefaultLocation(): string;
 }

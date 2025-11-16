@@ -264,7 +264,7 @@ final class Container extends DIContainer
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
-                    $container->getJUnitReportLocator()->defaultPathname,
+                    $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
                     $container->getSourceFileFilter(),
                     GeneratedExtensionsConfig::EXTENSIONS,
@@ -1105,7 +1105,7 @@ final class Container extends DIContainer
         return $this->get(UncoveredTraceProvider::class);
     }
 
-    private function getIndexXmlCoverageLocator(): IndexReportLocator
+    private function getIndexXmlCoverageLocator(): ReportLocator
     {
         return $this->get(IndexReportLocator::class);
     }
@@ -1115,7 +1115,7 @@ final class Container extends DIContainer
         return $this->get(ProjectDirProvider::class)->getProjectDir();
     }
 
-    private function getJUnitReportLocator(): JUnitReportLocator
+    private function getJUnitReportLocator(): ReportLocator
     {
         return $this->get(JUnitReportLocator::class);
     }

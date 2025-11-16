@@ -46,18 +46,26 @@ final class MemoizedLocatorTest extends TestCase
 {
     public function test_it_delegates_to_decorated_locator_on_first_call_and_delegate_the_cached_result_on_subsequent_calls(): void
     {
-        $expected = '/path/to/report.xml';
+        $expectedLocation = '/path/to/report.xml';
+        $expectedDefaultLocation = '/path/to/default-report.xml';
 
         $decoratedLocator = $this->createMock(ReportLocator::class);
         $decoratedLocator
             ->expects($this->once())
             ->method('locate')
-            ->willReturn($expected);
+            ->willReturn($expectedLocation);
+        $decoratedLocator
+            ->expects($this->once())
+            ->method('getDefaultLocation')
+            ->willReturn($expectedDefaultLocation);
 
         $memoizedLocator = new MemoizedLocator($decoratedLocator);
 
-        $this->assertSame($expected, $memoizedLocator->locate());
-        $this->assertSame($expected, $memoizedLocator->locate());
+        $this->assertSame($expectedLocation, $memoizedLocator->locate());
+        $this->assertSame($expectedLocation, $memoizedLocator->locate());
+
+        $this->assertSame($expectedDefaultLocation, $memoizedLocator->getDefaultLocation());
+        $this->assertSame($expectedDefaultLocation, $memoizedLocator->getDefaultLocation());
     }
 
     public function test_it_propagates_exceptions_from_decorated_locator(): void
