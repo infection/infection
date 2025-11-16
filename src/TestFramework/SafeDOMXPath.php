@@ -48,22 +48,15 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * @property DOMDocument $document
  */
 final readonly class SafeDOMXPath
 {
     private DOMXPath $xPath;
 
     public function __construct(
-        private DOMDocument $document,
+        public DOMDocument $document,
     ) {
         $this->xPath = new DOMXPath($document);
-    }
-
-    public function __get(string $property): DOMDocument
-    {
-        return $this->$property;
     }
 
     public static function fromFile(
