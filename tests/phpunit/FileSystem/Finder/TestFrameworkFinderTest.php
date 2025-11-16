@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use function chdir;
 use function explode;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -49,6 +48,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;

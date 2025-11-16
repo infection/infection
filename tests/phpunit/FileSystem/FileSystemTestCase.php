@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use function chdir;
 use function getenv;
 use function Infection\Tests\make_tmp_dir;
 use PHPUnit\Framework\TestCase;
+use function Safe\chdir;
 use function Safe\getcwd;
 use function Safe\realpath;
 use function sprintf;
