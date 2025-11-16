@@ -39,6 +39,7 @@ use Exception;
 use function sprintf;
 
 /**
+ * TODO: review class name & method name
  * @internal
  */
 final class TestFileNameNotFoundException extends Exception

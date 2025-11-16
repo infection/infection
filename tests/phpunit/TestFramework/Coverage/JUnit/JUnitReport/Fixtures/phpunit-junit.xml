@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+    <testsuite name="/path/to/project/phpunit.xml.dist" tests="5330"
+               assertions="18386" errors="0" failures="0" skipped="6" time="23.983992">
+        <testsuite name="Infection Test Suite" tests="5330" assertions="18386" errors="0"
+                   failures="0" skipped="6" time="23.983992">
+            <testsuite name="Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest"
+                       file="/path/to/project/tests/phpunit/Mutator/Unwrap/UnwrapArrayIntersectUassocTest.php"
+                       tests="11" assertions="56" errors="0" failures="0" skipped="0"
+                       time="0.912992">
+                <testsuite
+                        name="Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest::test_it_can_mutate"
+                        tests="11" assertions="56" errors="0" failures="0" skipped="0"
+                        time="0.912992">
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It does not mutate when a variable function name is used&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/Unwrap/UnwrapArrayIntersectUassocTest.php"
+                            line="50"
+                            class="Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest"
+                            classname="Infection.Tests.Mutator.Unwrap.UnwrapArrayIntersectUassocTest"
+                            assertions="2" time="0.869626"/>
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It mutates correctly when provided with a constant&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/Unwrap/UnwrapArrayIntersectUassocTest.php"
+                            line="50"
+                            class="Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest"
+                            classname="Infection.Tests.Mutator.Unwrap.UnwrapArrayIntersectUassocTest"
+                            assertions="6" time="0.014558"/>
+                </testsuite>
+            </testsuite>
+            <testsuite name="Infection\Tests\Mutator\ConditionalBoundary\LessThanTest"
+                       file="/path/to/project/tests/phpunit/Mutator/ConditionalBoundary/LessThanTest.php"
+                       tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.002211">
+                <testsuite
+                        name="Infection\Tests\Mutator\ConditionalBoundary\LessThanTest::test_it_can_mutate"
+                        tests="1" assertions="4" errors="0" failures="0" skipped="0"
+                        time="0.002211">
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It mutates less than&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/ConditionalBoundary/LessThanTest.php"
+                            line="50"
+                            class="Infection\Tests\Mutator\ConditionalBoundary\LessThanTest"
+                            classname="Infection.Tests.Mutator.ConditionalBoundary.LessThanTest"
+                            assertions="4" time="0.002211"/>
+                </testsuite>
+            </testsuite>
+            <testsuite name="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest"
+                       file="/path/to/project/tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
+                       tests="6" assertions="6" errors="0" failures="0" skipped="0" time="0.124324">
+                <testsuite
+                        name="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest::test_it_contains_vendors_when_sources_contains_current_dir"
+                        tests="3" assertions="3" errors="0" failures="0" skipped="0"
+                        time="0.049740">
+                    <testcase
+                            name="test_it_contains_vendors_when_sources_contains_current_dir with data set #2"
+                            file="/path/to/project/tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
+                            line="90"
+                            class="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest"
+                            classname="Infection.Tests.Config.ValueProvider.ExcludeDirsProviderTest"
+                            assertions="1" time="0.033326"/>
+                    <testcase
+                            name="test_it_contains_vendors_when_sources_contains_current_dir with data set #0"
+                            file="/path/to/project/tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
+                            line="90"
+                            class="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest"
+                            classname="Infection.Tests.Config.ValueProvider.ExcludeDirsProviderTest"
+                            assertions="1" time="0.008452"/>
+                </testsuite>
+                <testcase name="test_returns_an_array_with_incremented_keys_started_from_zero"
+                          file="/path/to/project/tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
+                          line="146"
+                          class="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest"
+                          classname="Infection.Tests.Config.ValueProvider.ExcludeDirsProviderTest"
+                          assertions="1" time="0.039245"/>
+                <testcase name="test_it_validates_dirs"
+                          file="/path/to/project/tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
+                          line="104"
+                          class="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest"
+                          classname="Infection.Tests.Config.ValueProvider.ExcludeDirsProviderTest"
+                          assertions="1" time="0.019264"/>
+                <testcase name="test_passes_when_correct_dir_typed"
+                          file="/path/to/project/tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php"
+                          line="122"
+                          class="Infection\Tests\Config\ValueProvider\ExcludeDirsProviderTest"
+                          classname="Infection.Tests.Config.ValueProvider.ExcludeDirsProviderTest"
+                          assertions="1" time="0.016075"/>
+            </testsuite>
+            <testsuite name="Infection\Tests\TestFramework\Coverage\SourceMethodLineRangeTest"
+                       file="/path/to/project/tests/phpunit/TestFramework/Coverage/SourceMethodLineRangeTest.php"
+                       tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.001043">
+                <testcase name="test_it_creates_self_with_named_constructor"
+                          file="/path/to/project/tests/phpunit/TestFramework/Coverage/SourceMethodLineRangeTest.php"
+                          line="45"
+                          class="Infection\Tests\TestFramework\Coverage\SourceMethodLineRangeTest"
+                          classname="Infection.Tests.TestFramework.Coverage.SourceMethodLineRangeTest"
+                          assertions="2" time="0.001043"/>
+            </testsuite>
+            <testsuite
+                    name="Infection\Tests\PhpParser\Visitor\FullyQualifiedClassNameManipulatorTest"
+                    file="/path/to/project/tests/phpunit/PhpParser/Visitor/FullyQualifiedClassNameManipulatorTest.php"
+                    tests="2" assertions="2" errors="0" failures="0" skipped="0" time="0.003486">
+                <testcase name="test_it_can_provide_the_node_fqcn"
+                          file="/path/to/project/tests/phpunit/PhpParser/Visitor/FullyQualifiedClassNameManipulatorTest.php"
+                          line="47"
+                          class="Infection\Tests\PhpParser\Visitor\FullyQualifiedClassNameManipulatorTest"
+                          classname="Infection.Tests.PhpParser.Visitor.FullyQualifiedClassNameManipulatorTest"
+                          assertions="1" time="0.002424"/>
+                <testcase name="test_it_can_provide_the_node_fqcn_for_an_anonymous_class"
+                          file="/path/to/project/tests/phpunit/PhpParser/Visitor/FullyQualifiedClassNameManipulatorTest.php"
+                          line="55"
+                          class="Infection\Tests\PhpParser\Visitor\FullyQualifiedClassNameManipulatorTest"
+                          classname="Infection.Tests.PhpParser.Visitor.FullyQualifiedClassNameManipulatorTest"
+                          assertions="1" time="0.001063"/>
+            </testsuite>
+            <testsuite name="Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest"
+                       file="/path/to/project/tests/phpunit/Mutator/FunctionSignature/ProtectedVisibilityTest.php"
+                       tests="13" assertions="42" errors="0" failures="0" skipped="0"
+                       time="0.053797">
+                <testsuite
+                        name="Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest::test_it_can_mutate"
+                        tests="13" assertions="42" errors="0" failures="0" skipped="0"
+                        time="0.053797">
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It does not mutate static flag&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/FunctionSignature/ProtectedVisibilityTest.php"
+                            line="53"
+                            class="Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest"
+                            classname="Infection.Tests.Mutator.FunctionSignature.ProtectedVisibilityTest"
+                            assertions="4" time="0.006528"/>
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It mutates protected to private&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/FunctionSignature/ProtectedVisibilityTest.php"
+                            line="53"
+                            class="Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest"
+                            classname="Infection.Tests.Mutator.FunctionSignature.ProtectedVisibilityTest"
+                            assertions="4" time="0.004288"/>
+                </testsuite>
+            </testsuite>
+            <testsuite name="Infection\Tests\Mutator\Arithmetic\ModulusTest"
+                       file="/path/to/project/tests/phpunit/Mutator/Arithmetic/ModulusTest.php"
+                       tests="2" assertions="6" errors="0" failures="0" skipped="0" time="0.005355">
+                <testsuite name="Infection\Tests\Mutator\Arithmetic\ModulusTest::test_it_can_mutate"
+                           tests="2" assertions="6" errors="0" failures="0" skipped="0"
+                           time="0.005355">
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It mutates normal mod&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/Arithmetic/ModulusTest.php"
+                            line="50" class="Infection\Tests\Mutator\Arithmetic\ModulusTest"
+                            classname="Infection.Tests.Mutator.Arithmetic.ModulusTest"
+                            assertions="4" time="0.002623"/>
+                    <testcase
+                            name="test_it_can_mutate with data set &quot;It does not mutate mod equals&quot;"
+                            file="/path/to/project/tests/phpunit/Mutator/Arithmetic/ModulusTest.php"
+                            line="50" class="Infection\Tests\Mutator\Arithmetic\ModulusTest"
+                            classname="Infection.Tests.Mutator.Arithmetic.ModulusTest"
+                            assertions="2" time="0.002732"/>
+                </testsuite>
+            </testsuite>
+            <testsuite name="Infection\Tests\Resource\Listener\PerformanceLoggerSubscriberTest"
+                       file="/path/to/project/tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
+                       tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.019953">
+                <testcase name="test_it_reacts_on_application_execution_events"
+                          file="/path/to/project/tests/phpunit/Resource/Listener/PerformanceLoggerSubscriberTest.php"
+                          line="64"
+                          class="Infection\Tests\Resource\Listener\PerformanceLoggerSubscriberTest"
+                          classname="Infection.Tests.Resource.Listener.PerformanceLoggerSubscriberTest"
+                          assertions="2" time="0.019953"/>
+            </testsuite>
+            <!-- ... -->
+        </testsuite>
+    </testsuite>
+</testsuites>
