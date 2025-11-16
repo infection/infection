@@ -38,13 +38,15 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function array_values;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
+use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\Coverage\TestLocations;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  * @final
+ *
+ * @phpstan-import-type MethodLineRange from FileReport
  */
 class TestLocator
 {
@@ -55,7 +57,7 @@ class TestLocator
 
     public function hasTests(): bool
     {
-        foreach ($this->testLocations->getTestsLocationsBySourceLine() as $testLocations) {
+        foreach ($this->testLocations->testLocationsByLine as $testLocations) {
             if ($testLocations !== []) {
                 return true;
             }
@@ -99,7 +101,7 @@ class TestLocator
         $uniqueTestLocations = [];
 
         foreach ($lineRange->range as $line) {
-            foreach ($this->testLocations->getTestsLocationsBySourceLine()[$line] ?? [] as $testLocation) {
+            foreach ($this->testLocations->testLocationsByLine[$line] ?? [] as $testLocation) {
                 $uniqueTestLocations[$testLocation->getMethod()] = $testLocation;
             }
         }
@@ -112,16 +114,18 @@ class TestLocator
      */
     private function getTestsForExecutedMethodOnLine(int $line): iterable
     {
-        foreach ($this->testLocations->getSourceMethodRangeByMethod() as $methodRange) {
-            /** @var SourceMethodLineRange $methodRange */
+        foreach ($this->testLocations->methodLineRangesByMethodName as $methodRange) {
+            /** @var MethodLineRange $startLine */
+            $startLine = $methodRange['startLine'];
+            $endLine = $methodRange['endLine'];
+
             if (
-                $line >= $methodRange->getStartLine()
-                && $line <= $methodRange->getEndLine()
+                $line >= $startLine
+                && $line <= $endLine
             ) {
-                return $this->getTestsForLineRange(new NodeLineRangeData(
-                    $methodRange->getStartLine(),
-                    $methodRange->getEndLine(),
-                ));
+                return $this->getTestsForLineRange(
+                    new NodeLineRangeData($startLine, $endLine),
+                );
             }
         }
 

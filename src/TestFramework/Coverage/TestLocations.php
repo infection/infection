@@ -37,19 +37,25 @@ namespace Infection\TestFramework\Coverage;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 
 /**
  * @internal
+ *
+ * @readonly
+ * @phpstan-import-type MethodLineRange from FileReport
  */
 final class TestLocations
 {
     /**
-     * @param array<int, array<int, TestLocation>> $byLine
-     * @param array<string, SourceMethodLineRange> $byMethod
+     * TODO: maybe could be separated for laziness??
+     *
+     * @param array<int, list<TestLocation>> $testLocationsByLine
+     * @param array<string, MethodLineRange> $methodLineRangesByMethodName
      */
     public function __construct(
-        private array $byLine = [],
-        private readonly array $byMethod = [],
+        public array $testLocationsByLine = [],
+        public array $methodLineRangesByMethodName = [],
     ) {
     }
 
@@ -58,18 +64,10 @@ final class TestLocations
      *
      * @see JUnitTestExecutionInfoAdder
      *
-     * @return array<int, array<int, TestLocation>>
+     * @return array<int, list<TestLocation>>
      */
     public function &getTestsLocationsBySourceLine(): array
     {
-        return $this->byLine;
-    }
-
-    /**
-     * @return array<string, SourceMethodLineRange>
-     */
-    public function getSourceMethodRangeByMethod(): array
-    {
-        return $this->byMethod;
+        return $this->testLocationsByLine;
     }
 }
