@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\Index;
 
+use Infection\FileSystem\FakeFilesystem;
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Filesystem;
 use Infection\Framework\OperatingSystem;
@@ -81,7 +82,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
         $expected = '/path/to/coverage/coverage-xml/index.xml';
 
         $locator = IndexReportLocator::create(
-            $this->createMock(Filesystem::class),
+            new FakeFilesystem(),
             $coverageDirectory,
         );
 
@@ -96,7 +97,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
         $expected = '/path/to/another-coverage/default-junit.xml';
 
         $locator = IndexReportLocator::create(
-            $this->createMock(Filesystem::class),
+            new FakeFilesystem(),
             $coverageDirectory,
             defaultPHPUnitXmlCoverageIndexPathname: $expected,
         );

@@ -59,9 +59,4 @@ class Filesystem extends SymfonyFilesystem
     {
         return Finder::create();
     }
-
-    public static function mapFileInfoToCanonicalPathname(SplFileInfo $fileInfo): string
-    {
-        return Path::canonicalize($fileInfo->getPathname());
-    }
 }

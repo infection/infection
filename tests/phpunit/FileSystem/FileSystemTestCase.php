@@ -46,7 +46,6 @@ use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
 
-// TODO: could take mine instead.
 /**
  * @private
  */

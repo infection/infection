@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use Infection\FileSystem\FakeFilesystem;
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\Filesystem;
 use Infection\Framework\OperatingSystem;
@@ -80,7 +81,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $expected = '/path/to/coverage/junit.xml';
 
         $locator = JUnitReportLocator::create(
-            $this->createMock(Filesystem::class),
+            new FakeFilesystem(),
             $coverageDirectory,
         );
 
@@ -95,7 +96,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $expected = '/path/to/another-coverage/default-junit.xml';
 
         $locator = JUnitReportLocator::create(
-            $this->createMock(Filesystem::class),
+            new FakeFilesystem(),
             $coverageDirectory,
             defaultJUnitPathname: $expected,
         );
