@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
+use function chdir;
 use function explode;
 use Generator;
 use function getenv;
@@ -85,6 +86,10 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         $this->backupEnvironmentVariables();
 
         parent::setUp();
+
+        // This test relies on the current working directory to be the project
+        // root.
+        chdir(__DIR__ . '/../../../../');
 
         $this->fileSystem = new Filesystem();
 
