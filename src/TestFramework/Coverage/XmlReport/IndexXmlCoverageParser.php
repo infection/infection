@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
+use RuntimeException;
 
 /**
  * @internal
@@ -79,7 +79,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $projectSource = self::getProjectSource($xPath);
 
-        foreach ($xPath->query('//p:file') as $node) {
+        foreach ($xPath->queryList('//p:file') as $node) {
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(
@@ -96,10 +96,10 @@ class IndexXmlCoverageParser
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
-        $lineCoverage = $xPath->query('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines')->item(0);
+        $lineCoverage = $xPath->queryElement('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines');
 
         if (
-            !$lineCoverage instanceof DOMElement
+            $lineCoverage === null
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
@@ -111,14 +111,19 @@ class IndexXmlCoverageParser
 
     private static function getProjectSource(SafeDOMXPath $xPath): string
     {
-        // PHPUnit >= 6
-        $sourceNodes = $xPath->query('//p:project/@source');
+        $sourceQueries = [
+            '//p:project/@source',  // PHPUnit >= 6
+            '//p:project/@name',    // PHPUnit < 6
+        ];
 
-        if ($sourceNodes->length > 0) {
-            return $sourceNodes[0]->nodeValue;
+        foreach ($sourceQueries as $sourceQuery) {
+            $source = $xPath->queryAttribute('//p:project/@source')?->nodeValue;
+
+            if ($source !== null) {
+                return $source;
+            }
         }
 
-        // PHPUnit < 6
-        return $xPath->query('//p:project/@name')[0]->nodeValue;
+        throw new RuntimeException('Could not find the source attribute for the project');
     }
 }
