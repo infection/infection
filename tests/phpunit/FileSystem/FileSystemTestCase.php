@@ -38,6 +38,7 @@ namespace Infection\Tests\FileSystem;
 use function getenv;
 use Infection\FileSystem\Filesystem;
 use function Infection\Tests\make_tmp_dir;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function Safe\getcwd;
 use function Safe\realpath;
@@ -49,6 +50,7 @@ use function sys_get_temp_dir;
 /**
  * @private
  */
+#[CoversClass(Filesystem::class)]
 abstract class FileSystemTestCase extends TestCase
 {
     private const TMP_DIR_NAME = 'infection-test';

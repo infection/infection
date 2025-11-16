@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 /**
+ * TODO: remove
  * @internal
  */
 final readonly class SourceMethodLineRange

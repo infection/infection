@@ -41,18 +41,15 @@ use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReport;
 use Infection\TestFramework\Coverage\TraceProvider;
 
 /**
- * Filters traces and augments them with timing data from JUnit report.
- *
  * @internal
- * TODO: replaces CoveredTraceProvider
  */
-final class PHPUnitCoverageTraceProvider implements TraceProvider
+final readonly class PHPUnitCoverageTraceProvider implements TraceProvider
 {
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private readonly PHPUnitXmlProvider $parser,
-        private readonly PHPUnitCoverageTracer $tracer,
+        private PHPUnitXmlProvider $parser,
+        private PHPUnitCoverageTracer $tracer,
     ) {
     }
 
@@ -62,8 +59,7 @@ final class PHPUnitCoverageTraceProvider implements TraceProvider
             yield $this->tracer->trace(
                 SplFileInfoFactory::fromPath(
                     $sourceFileInfo->sourcePathname,
-                    // TODO: do we need the base path?
-                    '',
+                    basePath: '',
                 ),
             );
         }

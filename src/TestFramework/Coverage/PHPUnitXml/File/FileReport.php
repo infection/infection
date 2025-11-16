@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
-use function array_filter;
 use function array_map;
-use function array_values;
+use DOMNode;
 use Infection\TestFramework\XML\SafeDOMXPath;
 use function iterator_to_array;
 
@@ -52,6 +51,15 @@ use function iterator_to_array;
  * - Information about the coverage: which line is covered and by what test.
  *
  * In Infection, we use this file to know which lines are covered and by what tests.
+ *
+ * `LineCoverage` represents the information available in the `file.coverage.line` element
+ * of a source file of the PHPUnit XML coverage report.
+ *
+ * `MethodLineRange` represents a method declaration and the line ranges of its declaration.
+ * The method name may look like "__construct", i.e. no namespace or class/trait name included.
+ *
+ * @phpstan-type LineCoverage array{'lineNumber': int<0, max>, 'coveredBy': non-empty-list<string>}
+ * @phpstan-type MethodLineRange array{'methodName': string, 'startLine': positive-int, 'endLine': positive-int}
  */
 final class FileReport
 {
@@ -75,7 +83,7 @@ final class FileReport
     public function getLineCoverage(): array
     {
         return array_map(
-            LineCoverage::fromNode(...),
+            LineCoverageParser::fromNode(...),
             iterator_to_array(
                 $this->getXPath()->queryList('//coverage:coverage//coverage:line'),
             ),
@@ -83,25 +91,28 @@ final class FileReport
     }
 
     /**
-     * @return list<MethodLineRange>
+     * @return array<string, MethodLineRange> method lines range indexed by their method name
      */
-    public function getCoveredSourceMethodLineRanges(): array
+    public function getIndexedCoveredSourceMethodLineRanges(): array
     {
-        return array_values(
-            array_filter(
-                array_map(
-                    MethodLineRange::tryFromNode(...),
-                    iterator_to_array(
-                        $this->getSourceMethodNodes(),
-                    ),
-                ),
-            ),
-        );
+        $indexedMethodLineRanges = [];
+
+        foreach ($this->getSourceMethodNodes() as $node) {
+            $methodLineRange = MethodLineRangeParser::tryFromNode($node);
+
+            if ($methodLineRange !== null) {
+                $indexedMethodLineRanges[$methodLineRange['methodName']] = $methodLineRange;
+            }
+        }
+
+        return $indexedMethodLineRanges;
     }
 
     /**
      * If the declaring file is a class with methods, it will contain the node `class.method[n]`.
      * If it is a trait, it will be `trait.method[n]` instead.
+     *
+     * @return iterable<DOMNode>
      */
     private function getSourceMethodNodes(): iterable
     {

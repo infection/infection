@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage\JUnit;
 
 /**
  * @internal
+ *          TOOD: check if still used; should be replaced by JUnitReport TestInfo
  */
 final class TestFileTimeData
 {

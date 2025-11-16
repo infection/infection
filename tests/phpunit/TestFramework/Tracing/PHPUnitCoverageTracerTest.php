@@ -37,9 +37,7 @@ namespace Infection\Tests\TestFramework\Tracing;
 
 use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\FileSystem\Filesystem;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReportLocator;
+use Infection\TestFramework\Coverage\Locator\HardcodedLocator;
 use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -66,17 +64,12 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
     protected function setUp(): void
     {
-        $filesystem = new Filesystem();
-
         $this->tracer = new PHPUnitCoverageTracer(
             new PHPUnitXmlProvider(
-                indexReportLocator: IndexReportLocator::create(
-                    $filesystem,
-                    self::COVERAGE_REPORT_DIR,
+                indexReportLocator: new HardcodedLocator(
+                    self::COVERAGE_REPORT_DIR . '/xml/index.xml',
                 ),
-                jUnitReportLocator: JUnitReportLocator::create(
-                    $filesystem,
-                    self::COVERAGE_REPORT_DIR,
+                jUnitReportLocator: new HardcodedLocator(
                     self::COVERAGE_REPORT_DIR . '/junit.xml',
                 ),
             ),

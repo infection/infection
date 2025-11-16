@@ -118,7 +118,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectExceptionObject(
             new InvalidReportSource(
                 sprintf(
-                    'Could not find a JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
                     $unknownDir,
                 ),
             ),
@@ -139,13 +139,15 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         try {
             $this->locator->locate();
+
+            $this->fail('Expected an exception to be thrown.');
         } catch (TooManyReportsFound $exception) {
             $this->assertEqualsCanonicalizing($expectedReportsPathnames, $exception->reportPathnames);
             $this->assertSame(
                 sprintf(
-                    'Could not find a JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
+                    'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
                     $this->tmp,
-                    '/^(.+\.)?junit\.xml$/i',
+                    JUnitReportLocator::JUNIT_FILENAME_REGEX,
                     $expectedReportsPathnames[0],
                     $expectedReportsPathnames[1],
                 ),
@@ -159,7 +161,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectExceptionObject(
             new NoReportFound(
                 sprintf(
-                    'Could not find a JUnit report in "%s": no file with the pattern "%s" was found.',
+                    'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
                     $this->tmp,
                     JUnitReportLocator::JUNIT_FILENAME_REGEX,
                 ),

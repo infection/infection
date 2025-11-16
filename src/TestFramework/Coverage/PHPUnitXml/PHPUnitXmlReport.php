@@ -35,19 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\PHPUnitXml;
 
-// TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
-//  Need to be revisted.
-
 use function array_key_exists;
 use Closure;
 use Infection\TestFramework\Coverage\JUnit\JUnitReport;
-use Infection\TestFramework\Coverage\JUnit\TestInfo;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
-use Infection\TestFramework\Coverage\PHPUnitXml\File\LineCoverage;
-use Infection\TestFramework\Coverage\PHPUnitXml\File\MethodLineRange;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 
+/**
+ * @phpstan-import-type TestInfo from JUnitReport
+ * @phpstan-import-type LineCoverage from FileReport
+ * @phpstan-import-type MethodLineRange from FileReport
+ */
 final class PHPUnitXmlReport
 {
     private readonly JUnitReport $jUnitReport;
@@ -101,17 +100,19 @@ final class PHPUnitXmlReport
     }
 
     /**
-     * @return list<MethodLineRange>
+     * @return array<string, MethodLineRange> method lines range indexed by their method name
      */
-    public function getCoveredSourceMethodLineRanges(string $coveragePathname): array
+    public function getIndexCoveredSourceMethodLineRanges(string $coveragePathname): array
     {
-        return $this->getFileReport($coveragePathname)->getCoveredSourceMethodLineRanges();
+        return $this->getFileReport($coveragePathname)->getIndexedCoveredSourceMethodLineRanges();
     }
 
     /**
      * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
+     *
+     * @return TestInfo
      */
-    public function getTestInfo(string $test): TestInfo
+    public function getTestInfo(string $test): array
     {
         return $this->getJUnitReport()->getTestInfo($test);
     }

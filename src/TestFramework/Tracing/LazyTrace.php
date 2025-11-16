@@ -47,9 +47,9 @@ final class LazyTrace implements Trace
 {
     private string $realPath;
 
-    private ?TestLocations $testLocations;
+    private ?TestLocations $testLocations = null;
 
-    private ?TestLocator $testLocator;
+    private ?TestLocator $testLocator = null;
 
     /**
      * @param Closure():TestLocations|null $lazyTestLocations

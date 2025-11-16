@@ -74,7 +74,7 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     {
         return new InvalidReportSource(
             sprintf(
-                'Could not find a JUnit report in "%s": the pathname is not a valid or readable directory.',
+                'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
                 $coverageDirectory,
             ),
         );
@@ -86,7 +86,7 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     ): TooManyReportsFound {
         return new TooManyReportsFound(
             sprintf(
-                'Could not find a JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
                 $coverageDirectory,
                 self::JUNIT_FILENAME_REGEX,
                 implode(
@@ -102,7 +102,7 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     {
         return new NoReportFound(
             sprintf(
-                'Could not find a JUnit report in "%s": no file with the pattern "%s" was found.',
+                'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
                 $coverageDirectory,
                 self::JUNIT_FILENAME_REGEX,
             ),

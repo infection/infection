@@ -1106,8 +1106,6 @@ final class XmlConfigurationManipulatorTest extends TestCase
     {
         return SafeDOMXPath::fromString(
             $xml,
-            preserveWhiteSpace: false,
-            formatOutput: true,
         );
     }
 }

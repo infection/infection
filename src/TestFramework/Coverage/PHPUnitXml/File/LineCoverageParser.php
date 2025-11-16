@@ -33,31 +33,39 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
-use function array_key_exists;
+use function array_map;
+use DOMElement;
+use function iterator_to_array;
+use Webmozart\Assert\Assert;
 
 /**
- * @internal
+ * @phpstan-import-type LineCoverage from FileReport
  */
-final class MemoizedTestFileDataProvider implements TestFileDataProvider
+final readonly class LineCoverageParser
 {
     /**
-     * @var array<string, TestFileTimeData>
+     * @return LineCoverage
      */
-    private array $cache = [];
+    public static function fromNode(
+        DOMElement $node,
+    ): array {
+        Assert::same('line', $node->tagName);
 
-    public function __construct(
-        private readonly TestFileDataProvider $provider,
-    ) {
+        return [
+            'lineNumber' => (int) $node->getAttribute('nr'),
+            'coveredBy' => array_map(
+                self::parseCoveredBy(...),
+                iterator_to_array($node->getElementsByTagName('covered')),
+            ),
+        ];
     }
 
-    public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
+    private static function parseCoveredBy(DOMElement $node): string
     {
-        if (!array_key_exists($fullyQualifiedClassName, $this->cache)) {
-            $this->cache[$fullyQualifiedClassName] = $this->provider->getTestFileInfo($fullyQualifiedClassName);
-        }
+        Assert::same('covered', $node->tagName);
 
-        return $this->cache[$fullyQualifiedClassName];
+        return $node->getAttribute('by');
     }
 }

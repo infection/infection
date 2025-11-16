@@ -126,8 +126,6 @@ class MutationConfigBuilder extends ConfigBuilder
             /** @psalm-suppress InaccessibleProperty */
             $this->xPath = SafeDOMXPath::fromString(
                 $this->originalXmlConfigContent,
-                preserveWhiteSpace: false,
-                formatOutput: true,
             );
         }
 

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitReport;
 
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -47,6 +47,7 @@ use function Safe\file_put_contents;
 use function Safe\tempnam;
 use function Safe\unlink;
 
+// TODO: this should replace be replaced by JUnitReportTest
 #[Group('integration')]
 #[CoversClass(JUnitTestFileDataProvider::class)]
 final class JUnitTestFileDataProviderTest extends TestCase

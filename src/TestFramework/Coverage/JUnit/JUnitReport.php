@@ -42,8 +42,9 @@ use Infection\TestFramework\XML\SafeDOMXPath;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
-// TODO: rather than converting directly to TestFileTimeData, this adds a layer of abstraction to expose the report as a PHP object.
-//  Need to be revisted.
+/**
+ * @phpstan-type TestInfo = array{location: string, executionTime: float}
+ */
 final class JUnitReport
 {
     private SafeDOMXPath $xPath;
@@ -64,15 +65,22 @@ final class JUnitReport
      * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
      *
      * @throws TestFileNameNotFoundException
+     *
+     * @return TestInfo
      */
-    public function getTestInfo(string $test): TestInfo
+    public function getTestInfo(string $test): array
     {
         return array_key_exists($test, $this->indexedExecutionTimes)
             ? $this->indexedExecutionTimes[$test]
             : $this->lookup($test);
     }
 
-    private function lookup(string $testCaseClassName): TestInfo
+    /**
+     * @throws TestFileNameNotFoundException
+     *
+     * @return TestInfo
+     */
+    private function lookup(string $testCaseClassName): array
     {
         $nodes = $this->findNode($testCaseClassName);
 
@@ -87,10 +95,10 @@ final class JUnitReport
         $node = $nodes->item(0);
         Assert::isInstanceOf($node, DOMElement::class);
 
-        $testInfo = new TestInfo(
-            location: $node->getAttribute('file'),
-            executionTime: (float) $node->getAttribute('time'),
-        );
+        $testInfo = [
+            'location' => $node->getAttribute('file'),
+            'executionTime' => (float) $node->getAttribute('time'),
+        ];
 
         $this->indexedExecutionTimes[$testCaseClassName] = $testInfo;
 

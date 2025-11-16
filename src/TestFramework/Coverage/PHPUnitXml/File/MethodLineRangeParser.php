@@ -33,13 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Coverage\PHPUnitXml\File;
 
-final readonly class TestInfo
+// TODO: similar to SourceMethodLineRange with the method name...
+use DOMElement;
+use Webmozart\Assert\Assert;
+
+/**
+ * @phpstan-import-type MethodLineRange from FileReport
+ */
+final readonly class MethodLineRangeParser
 {
+    /**
+     * @param string $methodName E.g. "__construct": no namespace or class/trait name included.
+     * @param positive-int $startLine
+     * @param positive-int $endLine
+     */
     public function __construct(
-        public string $location,
-        public float $executionTime,
+        public string $methodName,
+        public int $startLine,
+        public int $endLine,
     ) {
+    }
+
+    /**
+     * @return MethodLineRange|null
+     */
+    public static function tryFromNode(
+        DOMElement $node,
+    ): ?array {
+        Assert::same('method', $node->tagName);
+
+        // TODO: in the original code we deal with an int... Could be a float casted to an int
+        $isCovered = ((float) $node->getAttribute('coverage')) > 0;
+
+        if (!$isCovered) {
+            return null;
+        }
+
+        return [
+            'methodName' => $node->getAttribute('name'),
+            'startLine' => (int) $node->getAttribute('start'),
+            'endLine' => (int) $node->getAttribute('end'),
+        ];
     }
 }

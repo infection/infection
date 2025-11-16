@@ -77,8 +77,6 @@ class InitialConfigBuilder implements ConfigBuilder
 
         $xPath = SafeDOMXPath::fromString(
             $this->originalXmlConfigContent,
-            preserveWhiteSpace: false,
-            formatOutput: true,
         );
 
         $this->configManipulator->validate($path, $xPath);
