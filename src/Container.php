@@ -132,7 +132,7 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Locator\MemoizedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReportLocator;
-use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportProvider;
 use Infection\TestFramework\Coverage\TraceProviderRegistry;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use Infection\TestFramework\Factory;
@@ -342,7 +342,7 @@ final class Container extends DIContainer
                     $container->getConfiguration()->coveragePath,
                 ),
             ),
-            PHPUnitXmlProvider::class => static fn (self $container): PHPUnitXmlProvider => new PHPUnitXmlProvider(
+            PHPUnitXmlReportProvider::class => static fn (self $container): PHPUnitXmlReportProvider => new PHPUnitXmlReportProvider(
                 $container->getIndexXmlCoverageLocator(),
                 $container->getJUnitReportLocator(),
             ),

@@ -39,7 +39,7 @@ use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\Locator\HardcodedLocator;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
-use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportProvider;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Tracing\PHPUnitCoverageTracer;
@@ -68,7 +68,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
     protected function setUp(): void
     {
         $this->tracer = new PHPUnitCoverageTracer(
-            new PHPUnitXmlProvider(
+            new PHPUnitXmlReportProvider(
                 indexReportLocator: new HardcodedLocator(
                     self::COVERAGE_REPORT_DIR . '/xml/index.xml',
                 ),

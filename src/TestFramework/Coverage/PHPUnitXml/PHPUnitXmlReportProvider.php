@@ -39,25 +39,23 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReport;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 
-final class PHPUnitXmlProvider
+final readonly class PHPUnitXmlReportProvider
 {
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private readonly ReportLocator $indexReportLocator,
-        private readonly ReportLocator $jUnitReportLocator,
+        private ReportLocator $indexReportLocator,
+        private ReportLocator $jUnitReportLocator,
     ) {
+        // The report instantiation is free – everything is done lazily.
+        $this->report = new PHPUnitXmlReport(
+            fn () => new IndexReport($this->indexReportLocator->locate()),
+            fn () => new JUnitReport($this->jUnitReportLocator->locate()),
+        );
     }
 
     public function get(): PHPUnitXmlReport
     {
-        if (!isset($this->report)) {
-            $this->report = new PHPUnitXmlReport(
-                fn () => new IndexReport($this->indexReportLocator->locate()),
-                fn () => new JUnitReport($this->jUnitReportLocator->locate()),
-            );
-        }
-
         return $this->report;
     }
 }

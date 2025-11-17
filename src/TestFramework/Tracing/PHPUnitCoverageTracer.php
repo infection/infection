@@ -41,7 +41,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
-use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportProvider;
 use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReport;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
@@ -59,7 +59,7 @@ final class PHPUnitCoverageTracer
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private readonly PHPUnitXmlProvider $parser,
+        private readonly PHPUnitXmlReportProvider $parser,
     ) {
     }
 
