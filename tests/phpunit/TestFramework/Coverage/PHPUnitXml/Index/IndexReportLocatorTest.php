@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\Index;
 
-use Infection\FileSystem\FakeFilesystem;
 use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\Filesystem;
+use Infection\FileSystem\FakeFilesystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;

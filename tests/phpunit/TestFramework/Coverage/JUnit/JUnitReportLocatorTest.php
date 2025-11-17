@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\FileSystem\FakeFilesystem;
 use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\Filesystem;
+use Infection\FileSystem\FakeFilesystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;

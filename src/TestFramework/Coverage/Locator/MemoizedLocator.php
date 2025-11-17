@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\Locator;
 final class MemoizedLocator implements ReportLocator
 {
     private string $location;
+
     private string $defaultLocation;
 
     public function __construct(

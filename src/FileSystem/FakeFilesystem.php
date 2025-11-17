@@ -36,14 +36,8 @@ declare(strict_types=1);
 namespace Infection\FileSystem;
 
 use DomainException;
-use Traversable;
-use function is_dir;
-use function is_file;
-use function is_readable;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use Traversable;
 
 class FakeFilesystem extends Filesystem
 {
@@ -101,7 +95,7 @@ class FakeFilesystem extends Filesystem
         iterable|string $files,
         int $mode,
         int $umask = 0o000,
-        bool $recursive = false
+        bool $recursive = false,
     ): never {
         throw new DomainException('Unexpected call.');
     }
@@ -145,7 +139,7 @@ class FakeFilesystem extends Filesystem
         string $originDir,
         string $targetDir,
         ?Traversable $iterator = null,
-        array $options = []
+        array $options = [],
     ): never {
         throw new DomainException('Unexpected call.');
     }
