@@ -37,16 +37,10 @@ namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 
 use Exception;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
-use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
-use Infection\TestFramework\SafeDOMXPath;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
 
@@ -58,7 +52,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(FileReport::class)]
 final class FileReportTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__.'/Fixtures';
+    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
     /**
      * @param LineCoverage[]|Exception $expected
@@ -67,8 +61,7 @@ final class FileReportTest extends TestCase
     public function test_it_can_get_the_line_coverage(
         string $pathname,
         array|Exception $expected,
-    ): void
-    {
+    ): void {
         $report = new FileReport($pathname);
 
         if ($expected instanceof Exception) {
@@ -137,12 +130,12 @@ final class FileReportTest extends TestCase
         ];
 
         yield 'file with no covered lines' => [
-            self::FIXTURES_DIR.'/no-covered-lines.xml',
+            self::FIXTURES_DIR . '/no-covered-lines.xml',
             [],
         ];
 
         yield 'file with precent signs' => [
-            self::FIXTURES_DIR.'/file-with-percent-signs.xml',
+            self::FIXTURES_DIR . '/file-with-percent-signs.xml',
             [
                 self::createLineCoverage(
                     11,
@@ -153,7 +146,7 @@ final class FileReportTest extends TestCase
 
         // TODO: here in the previous implementation it was not returning the method
         yield 'file with empty precent signs' => [
-            self::FIXTURES_DIR.'/file-with-empty-percentage.xml',
+            self::FIXTURES_DIR . '/file-with-empty-percentage.xml',
             [
                 self::createLineCoverage(
                     11,
@@ -170,8 +163,7 @@ final class FileReportTest extends TestCase
     public function test_it_can_get_the_covered_source_method_line_ranges_indexed_by_method_name(
         string $pathname,
         array|Exception $expected,
-    ): void
-    {
+    ): void {
         $report = new FileReport($pathname);
 
         if ($expected instanceof Exception) {
@@ -203,19 +195,19 @@ final class FileReportTest extends TestCase
             [
                 '__construct' => self::createMethodLineRange(
                     '__construct',
-            27,
+                    27,
                     31,
                 ),
                 'execute' => self::createMethodLineRange(
                     'execute',
-            43,
+                    43,
                     60,
                 ),
             ],
         ];
 
         yield 'file with no covered lines' => [
-            self::FIXTURES_DIR.'/no-covered-lines.xml',
+            self::FIXTURES_DIR . '/no-covered-lines.xml',
             [],
         ];
 
@@ -231,8 +223,7 @@ final class FileReportTest extends TestCase
     private static function createLineCoverage(
         int $lineNumber,
         array $coveredBy,
-    ): array
-    {
+    ): array {
         return [
             'lineNumber' => $lineNumber,
             'coveredBy' => $coveredBy,
@@ -247,10 +238,9 @@ final class FileReportTest extends TestCase
      */
     private static function createMethodLineRange(
         string $methodName,
-        int  $startLine,
-        int  $endLine,
-    ): array
-    {
+        int $startLine,
+        int $endLine,
+    ): array {
         return [
             'methodName' => $methodName,
             'startLine' => $startLine,

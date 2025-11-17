@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 
+use function array_map;
 use Exception;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\LinesCoverageSummary;
@@ -45,7 +46,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function array_map;
 use function Pipeline\take;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -293,11 +293,11 @@ final class IndexReportTest extends TestCase
     {
         yield from take(self::indexProvider())
             ->filter(
-                function (array $scenario): bool {
+                static function (array $scenario): bool {
                     $expected = $scenario[1];
 
                     return !($expected instanceof Exception);
-                }
+                },
             )
             ->toAssoc();
     }
