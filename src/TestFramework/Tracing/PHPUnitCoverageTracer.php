@@ -112,12 +112,12 @@ final class PHPUnitCoverageTracer
     private function createTestLocation(string $test): TestLocation
     {
         $testCaseClassName = explode('::', $test, 2)[0];
-        [$location, $executionTime] = $this->getReport()->getTestInfo($testCaseClassName);
+        $testInfo = $this->getReport()->getTestInfo($testCaseClassName);
 
         return new TestLocation(
             $test,
-            $location,
-            $executionTime,
+            $testInfo['location'],
+            $testInfo['executionTime'],
         );
     }
 

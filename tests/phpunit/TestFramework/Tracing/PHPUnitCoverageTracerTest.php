@@ -38,8 +38,8 @@ namespace Infection\Tests\TestFramework\Tracing;
 use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\Locator\HardcodedLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlProvider;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Tracing\PHPUnitCoverageTracer;
@@ -53,6 +53,9 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Process;
 
+/**
+ * @phpstan-import-type MethodLineRange from FileReport
+ */
 #[CoversClass(PHPUnitCoverageTracer::class)]
 final class PHPUnitCoverageTracerTest extends TestCase
 {
@@ -387,10 +390,26 @@ final class PHPUnitCoverageTracerTest extends TestCase
                         ],
                     ],
                     [
-                        'count' => new SourceMethodLineRange(44, 50),
-                        'startCount' => new SourceMethodLineRange(52, 55),
-                        'setStep' => new SourceMethodLineRange(57, 60),
-                        'get' => new SourceMethodLineRange(62, 65),
+                        'count' => self::createMethodLineRange(
+                            'count',
+                            44,
+                            50,
+                        ),
+                        'startCount' => self::createMethodLineRange(
+                            'startCount',
+                            52,
+                            55,
+                        ),
+                        'setStep' => self::createMethodLineRange(
+                            'setStep',
+                            57,
+                            60,
+                        ),
+                        'get' => self::createMethodLineRange(
+                            'get',
+                            62,
+                            65,
+                        ),
                     ],
                 ),
             ),
@@ -412,5 +431,23 @@ final class PHPUnitCoverageTracerTest extends TestCase
             timeout: 5,
         );
         $process->mustRun();
+    }
+
+    /**
+     * @param positive-int $startLine
+     * @param positive-int $endLine
+     *
+     * @return MethodLineRange
+     */
+    private static function createMethodLineRange(
+        string $methodName,
+        int $startLine,
+        int $endLine,
+    ): array {
+        return [
+            'methodName' => $methodName,
+            'startLine' => $startLine,
+            'endLine' => $endLine,
+        ];
     }
 }
