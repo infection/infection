@@ -38,6 +38,7 @@ namespace Infection\Tests\FileSystem;
 use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\TestCase;
 use function Safe\getcwd;
+use function Safe\realpath;
 use function str_replace;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -53,8 +54,10 @@ abstract class FileSystemTestCase extends TestCase
     protected function setUp(): void
     {
         $this->cwd = getcwd();
-        $this->tmp = FS::tmpDir(
-            $this->getTmpDirPrefix(),
+        $this->tmp = realpath(
+            FS::tmpDir(
+                $this->getTmpDirPrefix(),
+            ),
         );
     }
 

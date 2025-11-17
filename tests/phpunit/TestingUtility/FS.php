@@ -91,7 +91,7 @@ final class FS
      * @see SymfonyFileSystem::tempnam()
      * @see self::tmpDir()
      */
-    public function tmpFile(string $prefix, string $suffix = '', ?string $targetDirectory = null): string
+    public static function tmpFile(string $prefix, string $suffix = '', ?string $targetDirectory = null): string
     {
         $filesystem = new Filesystem();
 
@@ -129,7 +129,7 @@ final class FS
      *
      * @see tempnam()
      */
-    public function tmpDir(string $prefix, ?string $targetDirectory = null): string
+    public static function tmpDir(string $prefix, ?string $targetDirectory = null): string
     {
         $filesystem = new Filesystem();
         $targetDirectory ??= sys_get_temp_dir();
