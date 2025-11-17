@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;

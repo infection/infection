@@ -54,7 +54,19 @@ final class JUnitReportTest extends TestCase
 {
     private const FIXTURE_DIR = __DIR__ . '/Fixtures';
 
-    public function test_it_throws_an_exception_if_the_junit_file_is_invalid_xml(): void
+    public function test_it_throws_an_exception_if_the_report_file_does_not_exist(): void
+    {
+        $report = new JUnitReport('/path/to/unknown.xml');
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException('The file "/path/to/unknown.xml" does not exist.'),
+        );
+
+        // We need to request a test info for to initiate the parsing/loading of the file.
+        $report->getTestInfo('ThisValueDoesNotMatterForThisTest');
+    }
+
+    public function test_it_throws_an_exception_if_the_report_file_is_invalid_xml(): void
     {
         $report = new JUnitReport(__FILE__);
 
@@ -67,7 +79,7 @@ final class JUnitReportTest extends TestCase
             ),
         );
 
-        $report->getTestInfo('Foo\BarTest');
+        $report->getTestInfo('App\UnknownTest');
     }
 
     /**

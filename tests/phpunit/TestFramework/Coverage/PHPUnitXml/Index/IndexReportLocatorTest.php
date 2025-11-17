@@ -85,7 +85,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
             $coverageDirectory,
         );
 
-        $actual = $locator->defaultPathname;
+        $actual = $locator->getDefaultLocation();
 
         $this->assertSame($expected, $actual);
     }
@@ -101,7 +101,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
             defaultPHPUnitXmlCoverageIndexPathname: $expected,
         );
 
-        $actual = $locator->defaultPathname;
+        $actual = $locator->getDefaultLocation();
 
         $this->assertSame($expected, $actual);
     }
