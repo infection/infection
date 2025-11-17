@@ -39,17 +39,15 @@ use Exception;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\LinesCoverageSummary;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function array_map;
 use function Pipeline\take;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(IndexReport::class)]
@@ -97,7 +95,7 @@ final class IndexReportTest extends TestCase
             [
                 new SourceFileIndexXmlInfo(
                     '/path/to/src/FirstLevel/firstLevel.php',
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/FirstLevel/firstLevel.php.xml'),
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR) . '/FirstLevel/firstLevel.php.xml',
                     new LinesCoverageSummary(
                         total: 55,
                         comments: 2,
@@ -109,7 +107,7 @@ final class IndexReportTest extends TestCase
                 ),
                 new SourceFileIndexXmlInfo(
                     '/path/to/src/FirstLevel/SecondLevel/secondLevel.php',
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/FirstLevel/SecondLevel/secondLevel.php.xml'),
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR) . '/FirstLevel/SecondLevel/secondLevel.php.xml',
                     new LinesCoverageSummary(
                         total: 114,
                         comments: 22,
@@ -121,7 +119,7 @@ final class IndexReportTest extends TestCase
                 ),
                 new SourceFileIndexXmlInfo(
                     '/path/to/src/FirstLevel/SecondLevel/secondLevelTrait.php',
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/FirstLevel/SecondLevel/secondLevelTrait.php.xml'),
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR) . '/FirstLevel/SecondLevel/secondLevelTrait.php.xml',
                     new LinesCoverageSummary(
                         total: 114,
                         comments: 22,
@@ -133,7 +131,7 @@ final class IndexReportTest extends TestCase
                 ),
                 new SourceFileIndexXmlInfo(
                     '/path/to/src/zeroLevel.php',
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/zeroLevel.php.xml'),
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR) . '/zeroLevel.php.xml',
                     new LinesCoverageSummary(
                         total: 99,
                         comments: 12,
@@ -145,7 +143,7 @@ final class IndexReportTest extends TestCase
                 ),
                 new SourceFileIndexXmlInfo(
                     '/path/to/src/noPercentage.php',
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/noPercentage.php.xml'),
+                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR) . '/noPercentage.php.xml',
                     new LinesCoverageSummary(
                         total: 55,
                         comments: 2,
@@ -266,6 +264,42 @@ final class IndexReportTest extends TestCase
             [],
             new NoLineExecuted('foo'),
         ];
+    }
+
+    /**
+     * @param list<SourceFileIndexXmlInfo> $expected
+     */
+    #[DataProvider('validIndexProvider')]
+    public function test_it_can_find_a_specific_file_information(
+        string $pathname,
+        array $expected,
+    ): void {
+        $report = new IndexReport($pathname);
+
+        $expectedSourcePathNames = array_map(
+            static fn (SourceFileIndexXmlInfo $sourceInfo) => $sourceInfo->sourcePathname,
+            $expected,
+        );
+
+        $actual = array_map(
+            static fn (string $sourcePathname) => $report->findSourceFileInfo($sourcePathname),
+            $expectedSourcePathNames,
+        );
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function validIndexProvider(): iterable
+    {
+        yield from take(self::indexProvider())
+            ->filter(
+                function (array $scenario): bool {
+                    $expected = $scenario[1];
+
+                    return !($expected instanceof Exception);
+                }
+            )
+            ->toAssoc();
     }
 
     // TODO: find where this test goes now

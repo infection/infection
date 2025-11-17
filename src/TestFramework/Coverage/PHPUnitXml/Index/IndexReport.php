@@ -106,8 +106,7 @@ final class IndexReport
     }
 
     /**
-     * @param string $sourcePathname Canonical pathname of the source file. It
-     *                               is expected to either be absolute, or it
+     * @param string $sourcePathname Absolute or relative canonical pathname of the source file. If relative, it
      *                               should be relative to the PHPUnit source
      *                               (configured in the PHPUnit configuration file).
      */
