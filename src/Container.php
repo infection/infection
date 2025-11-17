@@ -72,6 +72,7 @@ use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
@@ -133,9 +134,11 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Coverage\Locator\MemoizedLocator;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Coverage\XmlReport\Index\IndexReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
@@ -151,11 +154,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
-use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -233,8 +233,6 @@ final class Container extends DIContainer
 
     public const DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY = null;
 
-    private ?string $defaultJUnitPath = null;
-
     public static function create(): self
     {
         $container = new self([
@@ -264,8 +262,11 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            IndexXmlCoverageLocator::class => static fn (self $container): IndexXmlCoverageLocator => new IndexXmlCoverageLocator(
-                $container->getConfiguration()->coveragePath,
+            IndexReportLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
+                IndexReportLocator::create(
+                    $container->getFileSystem(),
+                    $container->getConfiguration()->coveragePath,
+                ),
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
                 [$container->getProjectDir()],
@@ -279,7 +280,7 @@ final class Container extends DIContainer
                     $container->getProjectDir(),
                     $container->getTestFrameworkConfigLocator(),
                     $container->getTestFrameworkFinder(),
-                    $container->getDefaultJUnitFilePath(),
+                    $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
                     $container->getSourceFileFilter(),
                     GeneratedExtensionsConfig::EXTENSIONS,
@@ -354,9 +355,11 @@ final class Container extends DIContainer
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
-            JUnitReportLocator::class => static fn (self $container): JUnitReportLocator => new JUnitReportLocator(
-                $container->getConfiguration()->coveragePath,
-                $container->getDefaultJUnitFilePath(),
+            JUnitReportLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
+                JUnitReportLocator::create(
+                    $container->getFileSystem(),
+                    $container->getConfiguration()->coveragePath,
+                ),
             ),
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
@@ -692,9 +695,9 @@ final class Container extends DIContainer
         return $clone;
     }
 
-    public function getFileSystem(): Filesystem
+    public function getFileSystem(): FileSystem
     {
-        return $this->get(Filesystem::class);
+        return $this->get(FileSystem::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider
@@ -1132,27 +1135,14 @@ final class Container extends DIContainer
         return $this->get(CoveredTraceProvider::class);
     }
 
-    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
+    private function getIndexXmlCoverageLocator(): IndexReportLocator
     {
-        return $this->get(IndexXmlCoverageLocator::class);
+        return $this->get(IndexReportLocator::class);
     }
 
     private function getProjectDir(): string
     {
         return $this->get(ProjectDirProvider::class)->getProjectDir();
-    }
-
-    private function getDefaultJUnitFilePath(): string
-    {
-        $configuration = $this->getConfiguration();
-
-        return $this->defaultJUnitPath ??= sprintf(
-            '%s/%s',
-            Path::canonicalize(
-                $configuration->coveragePath,
-            ),
-            'junit.xml',
-        );
     }
 
     private function getJUnitReportLocator(): JUnitReportLocator

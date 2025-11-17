@@ -33,29 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\JUnit;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport\Index;
 
 use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
+use Infection\TestFramework\Coverage\XmlReport\Index\IndexReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use function Safe\chdir;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
-#[CoversClass(JUnitReportLocator::class)]
-final class JUnitReportLocatorTest extends FileSystemTestCase
+#[CoversClass(IndexReportLocator::class)]
+final class IndexReportLocatorTest extends FileSystemTestCase
 {
     private FileSystem $filesystem;
 
-    private JUnitReportLocator $locator;
+    private IndexReportLocator $locator;
 
     protected function setUp(): void
     {
@@ -65,10 +66,10 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $this->filesystem = new FileSystem();
 
-        $this->locator = JUnitReportLocator::create(
+        $this->locator = IndexReportLocator::create(
             $this->filesystem,
             $this->tmp,
-            $this->tmp . '/junit.xml',
+            $this->tmp . '/coverage-xml/index.xml',
         );
     }
 
@@ -82,9 +83,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     public function test_it_infers_a_default_pathname_from_the_coverage_directory(): void
     {
         $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/coverage/junit.xml';
+        $expected = '/path/to/coverage/coverage-xml/index.xml';
 
-        $locator = JUnitReportLocator::create(
+        $locator = IndexReportLocator::create(
             new FakeFileSystem(),
             $coverageDirectory,
         );
@@ -99,10 +100,10 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $coverageDirectory = '/path/to/coverage';
         $expected = '/path/to/another-coverage/default-junit.xml';
 
-        $locator = JUnitReportLocator::create(
+        $locator = IndexReportLocator::create(
             new FakeFileSystem(),
             $coverageDirectory,
-            defaultJUnitPathname: $expected,
+            defaultPHPUnitXmlCoverageIndexPathname: $expected,
         );
 
         $actual = $locator->getDefaultLocation();
@@ -114,7 +115,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         $unknownDir = $this->tmp . '/unknown-dir';
 
-        $locator = JUnitReportLocator::create(
+        $locator = IndexReportLocator::create(
             $this->filesystem,
             $unknownDir,
             '/path/to/unknown-file',
@@ -123,7 +124,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectExceptionObject(
             new InvalidReportSource(
                 sprintf(
-                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
                     $unknownDir,
                 ),
             ),
@@ -132,14 +133,16 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $locator->locate();
     }
 
+    // This does not work on macOS as both files appear to be the same.
+    #[RequiresOperatingSystem('/^(?!Darwin)$/')]
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void
     {
-        $this->filesystem->touch('phpunit.junit.xml');
-        $this->filesystem->touch('phpspec.junit.xml');
+        $this->filesystem->touch('index.xml');
+        $this->filesystem->touch('INDEX.xml');
 
         $expectedReportsPathnames = [
-            Path::normalize($this->tmp . '/phpspec.junit.xml'),
-            Path::normalize($this->tmp . '/phpunit.junit.xml'),
+            Path::normalize($this->tmp . '/index.xml'),
+            Path::normalize($this->tmp . '/INDEX.xml'),
         ];
 
         try {
@@ -150,9 +153,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
             $this->assertEqualsCanonicalizing($expectedReportsPathnames, $exception->reportPathnames);
             $this->assertSame(
                 sprintf(
-                    'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
+                    'Could not find the XML coverage index report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
                     $this->tmp,
-                    JUnitReportLocator::JUNIT_FILENAME_REGEX,
+                    IndexReportLocator::INDEX_FILENAME_REGEX,
                     $expectedReportsPathnames[0],
                     $expectedReportsPathnames[1],
                 ),
@@ -166,9 +169,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->expectExceptionObject(
             new NoReportFound(
                 sprintf(
-                    'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
+                    'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
                     $this->tmp,
-                    JUnitReportLocator::JUNIT_FILENAME_REGEX,
+                    IndexReportLocator::INDEX_FILENAME_REGEX,
                 ),
             ),
         );
@@ -176,7 +179,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    #[DataProvider('jUnitPathnameProvider')]
+    #[DataProvider('indexPathnameProvider')]
     public function test_it_can_find_a_report_pathname(
         string $relativePathname,
         ?string $expectedRelativePathname = null,
@@ -191,33 +194,25 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public static function jUnitPathnameProvider(): iterable
+    public static function indexPathnameProvider(): iterable
     {
-        yield 'default name' => ['junit.xml'];
+        yield 'default name' => ['coverage-xml/index.xml'];
+
+        yield 'default name in directory outside of the default path' => ['index.xml'];
 
         yield 'all caps default name' => [
-            'JUNIT.XML',
+            'COVERAGE-XML/INDEX.XML',
             // On macOS (or case-insensitive systems), the default path will
             // match hence will be picked; Hence the case of the default path
             // is picked over the actual case of the file.
             OperatingSystem::isMacOs()
-                ? 'junit.xml'
-                : 'JUNIT.XML',
+                ? 'coverage-xml/index.xml'
+                : 'COVERAGE-XML/INDEX.XML',
         ];
 
-        yield 'from outdated documentation' => ['phpunit.junit.xml'];
+        yield 'in sub-directory' => ['sub-dir/index.xml'];
 
-        yield 'from outdated documentation in all caps' => ['PHPUNIT.JUNIT.XML'];
-
-        yield 'non conventional name' => ['foo2.junit.xml'];
-
-        yield 'in sub-directory' => ['sub-dir/junit.xml'];
-
-        yield 'outdated doc in sub-directory' => ['sub-dir/phpunit.junit.xml'];
-
-        yield 'non conventional name in sub-directory' => ['sub-dir/foo2.junit.xml'];
-
-        yield 'all caps in sub-directory' => ['sub-dir/JUNIT.XML'];
+        yield 'all caps in sub-directory' => ['sub-dir/INDEX.xml'];
     }
 
     #[DataProvider('invalidJunitPathnameProvider')]

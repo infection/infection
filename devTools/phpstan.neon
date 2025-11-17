@@ -122,6 +122,14 @@ parameters:
             count: 1
             path: ../tests/phpunit/MockedContainer.php
 
+        # We are not too interested in making the FakeFileSystem correct typewise.
+        -
+            message: "#Do not use magic number as default parameter#"
+            path: ../src/FileSystem/FakeFileSystem.php
+        -
+            identifier: missingType.iterableValue
+            path: ../src/FileSystem/FakeFileSystem.php
+
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -
             message: '#::profile\(\) should return int but returns int\|null#'

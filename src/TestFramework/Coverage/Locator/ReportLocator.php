@@ -33,44 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\Locator;
 
-use function dirname;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 
-/**
- * Provides the traces based on the PHPUnit XML coverage collected.
- *
- * @internal
- * @final
- */
-class PhpUnitXmlCoverageTraceProvider implements TraceProvider
+interface ReportLocator
 {
-    public function __construct(
-        private readonly ReportLocator $indexLocator,
-        private readonly IndexXmlCoverageParser $indexParser,
-        private readonly XmlCoverageParser $parser,
-    ) {
-    }
+    /**
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     */
+    public function locate(): string;
 
     /**
-     * @return iterable<Trace>
+     * Default location pathname.
      */
-    public function provideTraces(): iterable
-    {
-        // The existence of the file should have already been checked. Hence in theory we should not
-        // have to deal with a FileNotFound exception here so we skip any friendly error handling
-        $indexPath = $this->indexLocator->locate();
-        $coverageBasePath = dirname($indexPath);
-
-        foreach ($this->indexParser->parse(
-            $indexPath,
-            $coverageBasePath,
-        ) as $infoProvider) {
-            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
-        }
-    }
+    public function getDefaultLocation(): string;
 }
