@@ -37,7 +37,7 @@ namespace Infection\Tests;
 
 use Error;
 use Infection\Container;
-use Infection\FileSystem\Locator\FileNotFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
@@ -111,8 +111,7 @@ final class ContainerTest extends TestCase
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
 
-        $this->expectException(FileNotFound::class);
-        $this->expectExceptionMessage('Could not find any "index.xml" file in "/path/to/coverage"');
+        $this->expectException(ReportLocationThrowable::class);
 
         foreach ($traces as $trace) {
             $this->fail();
