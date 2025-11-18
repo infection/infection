@@ -33,13 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator\Exception;
+namespace Infection\Tests\TestFramework\Coverage\Locator\Throwable;
 
-use RuntimeException;
+use Exception;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use function sprintf;
 
-/**
- * @internal
- */
-final class TooManyReportsFound extends RuntimeException implements ReportLocationThrowable
+final class UnknownReportLocatorException extends Exception implements ReportLocationThrowable
 {
+    public static function create(string $coverageReportName): self
+    {
+        return new self(
+            sprintf(
+                'Could not locate the %s coverage report for some reasons!',
+                $coverageReportName,
+            ),
+        );
+    }
 }

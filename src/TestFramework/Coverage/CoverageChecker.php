@@ -40,7 +40,7 @@ use function count;
 use function extension_loaded;
 use function implode;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\Locator\Exception\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use function ini_get as ini_get_unsafe;
 use const PHP_EOL;

@@ -33,13 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator\Exception;
+namespace Infection\Tests\TestFramework\Coverage\Locator\Throwable;
 
-use RuntimeException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class NoReportFound extends RuntimeException implements ReportLocationThrowable
+#[CoversClass(UnknownReportLocatorException::class)]
+final class UnknownReportLocatorExceptionTest extends TestCase
 {
+    public function test_it_can_create_an_exception_for_a_coverage_report(): void
+    {
+        $exception = UnknownReportLocatorException::create('JUnit');
+
+        $this->assertSame(
+            'Could not locate the JUnit coverage report for some reasons!',
+            $exception->getMessage(),
+        );
+    }
 }
