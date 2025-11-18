@@ -37,6 +37,9 @@ namespace Infection\TestFramework\Coverage\Locator\Exception;
 
 use RuntimeException;
 
-final class TooManyReportsFound extends RuntimeException
+/**
+ * @internal
+ */
+final class TooManyReportsFound extends RuntimeException implements ReportLocationThrowable
 {
 }

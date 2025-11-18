@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\Locator\Exception;
 
-use RuntimeException;
+use Throwable;
 
 /**
  * @internal
  */
-final class InvalidReportSource extends RuntimeException implements ReportLocationThrowable
+interface ReportLocationThrowable extends Throwable
 {
 }

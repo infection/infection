@@ -77,6 +77,9 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -119,6 +122,7 @@ final class ProjectCodeProvider
         Application::class,
         ProgressFormatter::class,
         ConcreteComposerExecutableFinder::class,
+        InvalidReportSource::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         NodeMutationGenerator::class,
@@ -136,6 +140,7 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutantExecutionResult::class,
         MutatorName::class,
+        NoReportFound::class,
         BaseMutatorTestCase::class,
         OperatingSystem::class,
         SchemaConfiguration::class,
@@ -145,6 +150,7 @@ final class ProjectCodeProvider
         SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+        TooManyReportsFound::class,
     ];
 
     /**

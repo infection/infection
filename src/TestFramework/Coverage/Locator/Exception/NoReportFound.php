@@ -37,6 +37,9 @@ namespace Infection\TestFramework\Coverage\Locator\Exception;
 
 use RuntimeException;
 
-final class NoReportFound extends RuntimeException
+/**
+ * @internal
+ */
+final class NoReportFound extends RuntimeException implements ReportLocationThrowable
 {
 }
