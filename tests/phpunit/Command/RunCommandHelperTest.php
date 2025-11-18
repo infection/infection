@@ -141,4 +141,27 @@ final class RunCommandHelperTest extends TestCase
 
         yield [null, 'max'];
     }
+
+    #[DataProvider('providesIgnoreMsiWithNoMutations')]
+    public function test_it_returns_ignore_msi_with_no_mutations(?bool $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getIgnoreMsiWithNoMutations());
+    }
+
+    public static function providesIgnoreMsiWithNoMutations(): iterable
+    {
+        yield 'not provided' => [null, false];
+
+        yield 'provided without value' => [true, null];
+
+        yield 'provided with value 1' => [true, '1'];
+
+        yield 'provided with value true' => [true, 'true'];
+    }
 }

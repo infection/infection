@@ -84,6 +84,9 @@ final class RunCommand extends BaseCommand
     public const OPTION_SHOW_MUTATIONS = 'show-mutations';
 
     /** @var string */
+    public const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
+
+    /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
     private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
@@ -154,9 +157,6 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
-
-    /** @var string */
-    private const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
 
     /** @var string */
     private const OPTION_DEBUG = 'debug';
@@ -530,8 +530,7 @@ final class RunCommand extends BaseCommand
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
-            // VALUE_OPTIONAL with default false: false = not provided, null/other = provided
-            $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS) !== false ? true : null,
+            $commandHelper->getIgnoreMsiWithNoMutations(),
             MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
             $msiPrecision,
