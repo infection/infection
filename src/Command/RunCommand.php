@@ -86,6 +86,11 @@ final class RunCommand extends BaseCommand
     /** @var string */
     public const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
 
+    /**
+     * Sentinel value for VALUE_OPTIONAL options to distinguish "not provided" from "provided without value"
+     */
+    public const OPTION_VALUE_NOT_PROVIDED = false;
+
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
@@ -395,7 +400,7 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Ignore MSI violations with zero mutations',
-                false,
+                self::OPTION_VALUE_NOT_PROVIDED,
             )
             ->addOption(
                 self::OPTION_DEBUG,

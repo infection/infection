@@ -156,7 +156,7 @@ final class RunCommandHelperTest extends TestCase
 
     public static function providesIgnoreMsiWithNoMutations(): iterable
     {
-        yield 'not provided' => [null, false];
+        yield 'not provided' => [null, RunCommand::OPTION_VALUE_NOT_PROVIDED];
 
         yield 'provided without value' => [true, null];
 
