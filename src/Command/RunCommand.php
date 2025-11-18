@@ -529,7 +529,7 @@ final class RunCommand extends BaseCommand
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
-            $input->hasOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
+            $input->hasParameterOption('--' . self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
                 ? (bool) $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
                 : null,
             MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
