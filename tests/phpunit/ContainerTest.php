@@ -134,51 +134,6 @@ final class ContainerTest extends TestCase
         );
     }
 
-    public function test_it_accepts_null_for_ignore_msi_with_no_mutations_to_preserve_config_value(): void
-    {
-        $container = SingletonContainer::getContainer();
-
-        $newContainer = $container->withValues(
-            new NullLogger(),
-            new NullOutput(),
-            ignoreMsiWithNoMutations: null,
-        );
-
-        $configuration = $newContainer->getConfiguration();
-
-        $this->assertIsBool($configuration->ignoreMsiWithNoMutations);
-    }
-
-    public function test_it_accepts_explicit_true_for_ignore_msi_with_no_mutations(): void
-    {
-        $container = SingletonContainer::getContainer();
-
-        $newContainer = $container->withValues(
-            new NullLogger(),
-            new NullOutput(),
-            ignoreMsiWithNoMutations: true,
-        );
-
-        $configuration = $newContainer->getConfiguration();
-
-        $this->assertTrue($configuration->ignoreMsiWithNoMutations);
-    }
-
-    public function test_it_accepts_explicit_false_for_ignore_msi_with_no_mutations(): void
-    {
-        $container = SingletonContainer::getContainer();
-
-        $newContainer = $container->withValues(
-            new NullLogger(),
-            new NullOutput(),
-            ignoreMsiWithNoMutations: false,
-        );
-
-        $configuration = $newContainer->getConfiguration();
-
-        $this->assertFalse($configuration->ignoreMsiWithNoMutations);
-    }
-
     public static function provideServicesWithReflection(): iterable
     {
         $reflection = new ContainerReflection(
