@@ -36,9 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\Locator\FileNotFound;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -122,39 +124,58 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         touch('phpunit.junit.xml');
         touch('phpspec.junit.xml');
 
-        $this->expectException(FileNotFound::class);
-        $this->expectExceptionMessage(sprintf(
-            'Could not locate the JUnit file: more than one file has been found with the pattern "*.junit.xml": "%s", "%s"',
-            Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . 'phpspec.junit.xml'),
-            Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . 'phpunit.junit.xml'),
-        ));
+        $expectedReportsPathnames = [
+            Path::canonicalize($this->tmp . '/phpspec.junit.xml'),
+            Path::canonicalize($this->tmp . '/phpunit.junit.xml'),
+        ];
+
+        $this->expectExceptionObject(
+            new TooManyReportsFound(
+                sprintf(
+                    'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
+                    $this->tmp,
+                    JUnitReportLocator::JUNIT_FILENAME_REGEX,
+                    $expectedReportsPathnames[0],
+                    $expectedReportsPathnames[1],
+                ),
+            ),
+        );
 
         $this->locator->locate();
     }
 
     public function test_it_cannot_locate_the_junit_file_if_none_found(): void
     {
-        $this->expectException(FileNotFound::class);
-        $this->expectExceptionMessage(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->tmp,
-        ));
+        $this->expectExceptionObject(
+            new NoReportFound(
+                sprintf(
+                    'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
+                    $this->tmp,
+                    JUnitReportLocator::JUNIT_FILENAME_REGEX,
+                ),
+            ),
+        );
 
         $this->locator->locate();
     }
 
     public function test_it_cannot_locate_the_junit_file_in_a_non_existent_coverage_directory(): void
     {
+        $unknownDir = $this->tmp . '/unknown-dir';
+
         $locator = new JUnitReportLocator(
-            $this->tmp . '/unknown-dir',
+            $unknownDir,
             $this->tmp . '/junit.xml',
         );
 
-        $this->expectException(FileNotFound::class);
-        $this->expectExceptionMessage(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->tmp . '/unknown-dir',
-        ));
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    $unknownDir,
+                ),
+            ),
+        );
 
         $locator->locate();
     }
