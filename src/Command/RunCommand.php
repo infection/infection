@@ -393,8 +393,9 @@ final class RunCommand extends BaseCommand
             ->addOption(
                 self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS,
                 null,
-                InputOption::VALUE_NONE,
+                InputOption::VALUE_OPTIONAL,
                 'Ignore MSI violations with zero mutations',
+                false,
             )
             ->addOption(
                 self::OPTION_DEBUG,
@@ -529,9 +530,8 @@ final class RunCommand extends BaseCommand
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
-            $input->hasParameterOption('--' . self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
-                ? (bool) $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
-                : null,
+            // VALUE_OPTIONAL with default false: false = not provided, null/other = provided
+            $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS) !== false ? true : null,
             MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
             $msiPrecision,
