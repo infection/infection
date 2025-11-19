@@ -180,6 +180,28 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $locator->locate();
     }
 
+    public function test_it_cannot_locate_the_junit_file_if_the_coverage_directory_is_not_a_directory(): void
+    {
+        $file = $this->tmp . '/file';
+        touch($file);
+
+        $locator = new JUnitReportLocator(
+            $file,
+            $this->tmp . '/junit.xml',
+        );
+
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    $file,
+                ),
+            ),
+        );
+
+        $locator->locate();
+    }
+
     public static function jUnitPathsProvider(): iterable
     {
         yield 'outdated doc' => ['phpunit.junit.xml'];

@@ -174,6 +174,25 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
+    public function test_it_cannot_locate_the_junit_file_if_the_coverage_directory_is_not_a_directory(): void
+    {
+        $file = $this->tmp . '/file';
+        touch($file);
+
+        $locator = new IndexXmlCoverageLocator($file);
+
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
+                    $file,
+                ),
+            ),
+        );
+
+        $locator->locate();
+    }
+
     public static function indexPathsProvider(): iterable
     {
         yield 'nominal' => ['coverage-xml/index.xml'];
