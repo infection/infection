@@ -92,7 +92,6 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
 use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\SourceTestClassNameScheme;
 use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
@@ -143,7 +142,6 @@ final class ProjectCodeProvider
         SimpleMutation::class,
         StringNormalizer::class,
         Source::class,
-        SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
     ];

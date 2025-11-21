@@ -311,7 +311,7 @@ class ConfigurationFactory
     }
 
     /**
-     * @param array<string, mixed[]> $resolvedMutatorsMap
+     * @param array<class-string, mixed[]> $resolvedMutatorsMap
      *
      * @return array<string, array<int, string>>
      */
