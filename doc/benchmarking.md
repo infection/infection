@@ -38,12 +38,8 @@ PHPBench provides reliable absolute timing without instrumentation overhead.
 
 ### Configuration
 
-PHPBench is configured in [`phpbench.json`](../phpbench.json):
+PHPBench is configured in [`phpbench.json`](../phpbench.json).
 
-- **Bootstrap**: `vendor/autoload.php`
-- **File pattern**: `*Bench.php`
-- **Iterations**: 5 per benchmark (configurable via `#Iterations` attribute)
-- **Reports**: Aggregate statistics and bar chart visualizations
 
 ### Running PHPBench benchmarks
 
@@ -54,17 +50,15 @@ a specific benchmark.
 
 PHPBench provides several key metrics:
 
-- `its`: the number of iterations executed. The greater, the more likely reliable the aggregated
+- `its`: the number of iterations executed. The higher the value, the more likely reliable the aggregated
   data is.
 - `mem_peak`: the peak memory usage across all samples.
-- `mode`: the [KDE mode]. The lower the
-  better, simplifying it a bit, it is a better "mean" metric.
-- `rstdev`:
-  the [relative standard deviation]: the lower, the better. A greater value indicates the code is
+- `mode`: the [KDE mode]. The lower, the better. Simplifying it a bit, it is a better `mean` metric, as less
+  affected by outliers.
+- `rstdev`: the [relative standard deviation]: the lower, the better. A greater value indicates the code is
   behaviour differently (e.g. one time takes 1s, another 6s – not great). A way to lower it is to
-  increase the number of iterations (if the
-  code is inherently unstable, for example). The more stable the code is the less iterations are
-  needed. Typically, we want to stay underneath 5%.
+  increase the number of iterations – if the code is inherently unstable, for example. The more stable the code is, the
+  fewer iterations are needed. Typically, we want to stay underneath 5%.
 
 ## Using Blackfire
 
@@ -75,8 +69,8 @@ measuring real performance.
 
 ### Prerequisites
 
-1. [Install Blackfire]
-2. Ensure [`pcov`][pcov] and [`Xdebug`][Xdebug] are not enabled
+1. [Install Blackfire].
+2. Ensure [`pcov`][pcov] and [`Xdebug`][Xdebug] are not enabled.
 
 ### Running Profiles
 
@@ -100,20 +94,13 @@ Follow these steps to add a new benchmark to Infection.
 - [PHPBench Documentation]
 - [Blackfire Documentation]
 
+
 [Blackfire Documentation]: https://docs.blackfire.io/introduction
-
 [Install Blackfire]: https://docs.blackfire.io/up-and-running/installation
-
-[KDE mode]: https://en.wikipedia.org/wiki/Kernel_density_estimation.
-
+[KDE mode]: https://en.wikipedia.org/wiki/Kernel_density_estimation
 [MutationGenerationBenchmarkReadme]: ../tests/benchmark/MutationGenerator/README.md
-
 [relative standard deviation]: https://en.wikipedia.org/wiki/Coefficient_of_variation
-
 [PHPBench Documentation]: https://phpbench.readthedocs.io
-
 [pcov]: https://github.com/krakjoe/pcov
-
 [TracingBenchmarkReadme]: ../tests/benchmark/Tracing/README.md
-
 [Xdebug]: https://xdebug.org/
