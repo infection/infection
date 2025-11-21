@@ -61,14 +61,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 $a == $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a === $b;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a cast' => [
@@ -76,14 +74,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 (int) $c == 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 (int) $c === 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a constant' => [
@@ -91,14 +87,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 $d == null;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $d === null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a function' => [
@@ -106,14 +100,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 false == strpos();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 false === strpos();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates equal operator into identical operator for maybe same type operations (string)' => [

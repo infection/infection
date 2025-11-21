@@ -69,10 +69,10 @@ final readonly class StaticAnalysisToolFactory
                 $phpStanConfigPath,
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
-                    (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
+                    (string) $this->infectionConfig->phpStan->customPath,
                 ),
                 $timeout,
-                $this->infectionConfig->getTmpDir(),
+                $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
             );
         }

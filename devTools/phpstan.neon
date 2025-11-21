@@ -46,7 +46,7 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNode\\>\\.$#"
+            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
 
@@ -121,9 +121,6 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
-        -
-            message: '#Call to function iterator_.* on a separate line has no effect#'
-            path: ../tests/*
 
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -
@@ -137,6 +134,16 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
+        # PHPBench benchmarks are not meant to be exposed.
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/benchmark/*/*Bench.php
+
+        # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
+        -
+            identifier: argument.type
+            path: ../tests/phpunit/Framework/ClassNameTest.php
+
     level: 8
     paths:
         - ../src

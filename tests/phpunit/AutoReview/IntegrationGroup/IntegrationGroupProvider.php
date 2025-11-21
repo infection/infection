@@ -37,7 +37,7 @@ namespace Infection\Tests\AutoReview\IntegrationGroup;
 
 use function class_exists;
 use Infection\CannotBeInstantiated;
-use Infection\Testing\SourceTestClassNameScheme;
+use Infection\Framework\ClassName;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\Console\E2ETest;
 use Infection\Tests\FileSystem\FileSystemTestCase;
@@ -111,7 +111,7 @@ final class IntegrationGroupProvider
      */
     private static function ioTestCaseTuple(string $className): ?array
     {
-        $testCaseClass = SourceTestClassNameScheme::getTestClassName($className);
+        $testCaseClass = ClassName::getCanonicalTestClassName($className);
 
         if (!class_exists($testCaseClass)) {
             // No test case could be found for this source file

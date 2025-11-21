@@ -44,6 +44,20 @@ use PHPUnit\Framework\TestCase;
  */
 trait MutantAssertions
 {
+    public function assertMutantEquals(
+        Mutant $expected,
+        Mutant $actual,
+    ): void {
+        $this->assertMutantStateIs(
+            mutant: $actual,
+            expectedFilePath: $expected->getFilePath(),
+            expectedMutation: $expected->getMutation(),
+            expectedMutatedCode: $expected->getMutatedCode()->get(),
+            expectedDiff: $expected->getDiff()->get(),
+            expectedPrettyPrintedOriginalCode: $expected->getPrettyPrintedOriginalCode()->get(),
+        );
+    }
+
     public function assertMutantStateIs(
         Mutant $mutant,
         string $expectedFilePath,

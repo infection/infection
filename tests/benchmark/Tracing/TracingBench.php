@@ -33,19 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Benchmark\Tracing;
 
-use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Closure;
+use const PHP_INT_MAX;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Iterations;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(XPathFactory::class)]
-final class XPathFactoryTest extends TestCase
+/**
+ * To execute this test run `make benchmark_tracing`
+ */
+final class TracingBench
 {
-    public function test_it_removes_namespace(): void
-    {
-        $xPath = XPathFactory::createXPath('<?xml version="1.0"?><phpunit xmlns="http://schema.phpunit.de/coverage/1.0"></phpunit>');
+    private Closure $main;
 
-        $this->assertStringNotContainsString('xmlns', $xPath->document->saveXML());
+    private int $count;
+
+    public function setUp(): void
+    {
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX);
+    }
+
+    public function tearDown(): void
+    {
+        Assert::greaterThan(
+            $this->count,
+            0,
+            'No trace was generated.',
+        );
+    }
+
+    #[BeforeMethods('setUp')]
+    #[AfterMethods('tearDown')]
+    #[Iterations(5)]
+    public function benchTracing(): void
+    {
+        $this->count = ($this->main)();
     }
 }

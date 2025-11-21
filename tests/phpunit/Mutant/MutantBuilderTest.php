@@ -33,41 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\Mutant;
 
-use DOMDocument;
-use Infection\CannotBeInstantiated;
-use Infection\TestFramework\SafeDOMXPath;
-use function Safe\preg_replace;
-use Webmozart\Assert\Assert;
+use Infection\Mutant\Mutant;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class XPathFactory
+#[CoversClass(MutantBuilder::class)]
+final class MutantBuilderTest extends TestCase
 {
-    use CannotBeInstantiated;
+    use MutantAssertions;
 
-    public static function createXPath(string $coverageContent): SafeDOMXPath
+    #[DataProvider('mutantBuilder')]
+    public function test_it_can_build_from_existing_mutant(Mutant $mutant): void
     {
-        $document = new DOMDocument();
-        $success = @$document->loadXML(self::removeNamespace($coverageContent));
+        $actual = MutantBuilder::from($mutant)->build();
 
-        Assert::true($success);
-
-        return new SafeDOMXPath($document);
+        $this->assertMutantEquals($mutant, $actual);
     }
 
-    /**
-     * Remove namespace to work with xPath without a headache
-     */
-    private static function removeNamespace(string $xml): string
+    public static function mutantBuilder(): iterable
     {
-        /** @var string $cleanedXml */
-        $cleanedXml = preg_replace('/xmlns=\".*?\"/', '', $xml);
+        yield 'minimal mutant' => [
+            MutantBuilder::withMinimalTestData()->build(),
+        ];
 
-        Assert::string($cleanedXml);
-
-        return $cleanedXml;
+        yield 'complete mutant' => [
+            MutantBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

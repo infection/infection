@@ -46,7 +46,7 @@ use function str_replace;
 
 trait CreateMutantExecutionResult
 {
-    private $id = 0;
+    private int $id = 0;
 
     /**
      * @return MutantExecutionResult[]

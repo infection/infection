@@ -33,36 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\Tests\Mutant;
 
-use Infection\CannotBeInstantiated;
-use function Safe\preg_match;
-use function Safe\preg_replace;
-use function str_contains;
-use function str_replace;
+use Infection\Mutant\MutantExecutionResult;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class SourceTestClassNameScheme
+#[CoversClass(MutantExecutionResultBuilder::class)]
+final class MutantExecutionResultBuilderTest extends TestCase
 {
-    use CannotBeInstantiated;
+    use MutantExecutionResultAssertions;
 
-    public static function getSourceClassName(string $testCaseClassName): string
+    #[DataProvider('executionResultProvider')]
+    public function test_it_can_build_from_existing_result(MutantExecutionResult $result): void
     {
-        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches) === 1) {
-            return str_replace('Infection\\Tests\\', 'Infection\\', $matches[1]);
-        }
+        $actual = MutantExecutionResultBuilder::from($result)->build();
 
-        return $testCaseClassName;
+        $this->assertResultEquals($result, $actual);
     }
 
-    public static function getTestClassName(string $sourceClassName): string
+    public static function executionResultProvider(): iterable
     {
-        if (str_contains($sourceClassName, 'Infection\\Tests')) {
-            return $sourceClassName . 'Test';
-        }
+        yield 'minimal execution result' => [
+            MutantExecutionResultBuilder::withMinimalTestData()->build(),
+        ];
 
-        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
+        yield 'complete execution result' => [
+            MutantExecutionResultBuilder::withCompleteTestData()->build(),
+        ];
     }
 }

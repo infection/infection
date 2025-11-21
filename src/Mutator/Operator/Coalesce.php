@@ -57,8 +57,7 @@ final class Coalesce implements Mutator
             <<<'TXT'
                 Swaps the coalesce operator (`??`) operands,
                 e.g. replaces `$a ?? $b` with `$b ?? $a` or `$a ?? $b ?? $c` with `$b ?? $a ?? $c` and `$a ?? $c ?? $b`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

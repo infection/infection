@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -237,7 +237,7 @@ final class PhpUnitAdapterTest extends TestCase
                 '-d',
                 'memory_limit=-1',
                 '-d',
-                '\\' === DIRECTORY_SEPARATOR ? 'pcov.directory="."' : "pcov.directory='.'",
+                OperatingSystem::isWindows() ? 'pcov.directory="."' : "pcov.directory='.'",
             ], [
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
             ])

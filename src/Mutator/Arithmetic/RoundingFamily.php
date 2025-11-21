@@ -64,8 +64,7 @@ final class RoundingFamily implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces rounding operations. For example `floor()` will be replaced with `ceil()` and `round()`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

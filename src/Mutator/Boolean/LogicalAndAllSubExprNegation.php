@@ -58,8 +58,7 @@ final class LogicalAndAllSubExprNegation extends AbstractAllSubExprNegation
         return new Definition(
             <<<'TXT'
                 Negates all sub-expressions of an AND expression (`&&`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

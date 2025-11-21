@@ -39,36 +39,101 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use DOMXPath;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
- *
- * @property DOMDocument $document
  */
 final readonly class SafeDOMXPath
 {
     private DOMXPath $xPath;
 
     public function __construct(
-        private DOMDocument $document,
+        public DOMDocument $document,
     ) {
         $this->xPath = new DOMXPath($document);
     }
 
-    public function __get(string $property): DOMDocument
-    {
-        return $this->$property;
+    public static function fromFile(
+        string $pathname,
+        ?string $namespace = null,
+    ): self {
+        Assert::file($pathname);
+        Assert::readable($pathname);
+
+        $document = new DOMDocument();
+        $loaded = @$document->load($pathname);
+
+        Assert::true(
+            $loaded,
+            sprintf(
+                'The file "%s" does not contain valid XML.',
+                $pathname,
+            ),
+        );
+
+        $xPath = new self($document);
+
+        if ($namespace !== null) {
+            // Beware that this is not a universal solution: it only works because
+            // of the type of document we handle.
+            // A generic XML can have the namespace at the root or any element...
+            // @phpstan-ignore property.nonObject
+            $namespaceUri = $document->documentElement->namespaceURI;
+            Assert::notNull($namespaceUri, 'Expected the first document element to have a namespace URI. None found.');
+
+            $xPath->registerNamespace($namespace, $namespaceUri);
+        }
+
+        return $xPath;
     }
 
-    public static function fromString(string $content): self
-    {
+    /**
+     * Warning: doing a `file_get_contents()` + `::fromString()` is quite slower
+     * than `::fromFile()`.
+     *
+     * @param bool|null $formatOutput Nicely formats output with indentation and extra space. Has no effect if the document was loaded with preserveWhitespace enabled.
+     *
+     * @see https://php.net/manual/en/class.domdocument.php#domdocument.props.formatoutput
+     */
+    public static function fromString(
+        string $xml,
+        ?string $namespace = null,
+        bool $preserveWhiteSpace = true,
+        ?bool $formatOutput = null,
+    ): self {
         $document = new DOMDocument();
-        $success = @$document->loadXML($content);
+        $document->preserveWhiteSpace = $preserveWhiteSpace;
 
-        Assert::true($success);
+        if ($formatOutput !== null) {
+            $document->formatOutput = $formatOutput;
+        }
 
-        return new self($document);
+        $success = @$document->loadXML($xml);
+
+        Assert::true(
+            $success,
+            sprintf(
+                'The string "%s" is not valid XML.',
+                $xml,
+            ),
+        );
+
+        $xPath = new self($document);
+
+        if ($namespace !== null) {
+            // Beware that this is not a universal solution: it only works because
+            // of the type of document we handle.
+            // A generic XML can have the namespace at the root or any element...
+            // @phpstan-ignore property.nonObject
+            $namespaceUri = $document->documentElement->namespaceURI;
+            Assert::notNull($namespaceUri, 'Expected the first document element to have a namespace URI. None found.');
+
+            $xPath->registerNamespace($namespace, $namespaceUri);
+        }
+
+        return $xPath;
     }
 
     /**
@@ -81,5 +146,11 @@ final readonly class SafeDOMXPath
         Assert::isInstanceOf($nodes, DOMNodeList::class);
 
         return $nodes;
+    }
+
+    private function registerNamespace(string $prefix, string $namespace): void
+    {
+        $result = $this->xPath->registerNamespace($prefix, $namespace);
+        Assert::true($result);
     }
 }

@@ -56,8 +56,7 @@ final class Plus implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an addition operator (`+`) with a subtraction operator (`-`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

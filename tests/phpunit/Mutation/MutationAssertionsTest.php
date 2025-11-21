@@ -33,39 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Tests\Mutation;
 
-use DOMDocument;
-use Infection\TestFramework\SafeDOMXPath;
-use InvalidArgumentException;
+use Infection\Mutation\Mutation;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SafeDOMXPath::class)]
-final class SafeDOMXPathTest extends TestCase
+#[CoversClass(MutationAssertions::class)]
+final class MutationAssertionsTest extends TestCase
 {
-    public function test_it_reads_xml(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+    #[DataProvider('mutationProvider')]
+    public function test_it_can_compare_mutations(
+        Mutation $left,
+        Mutation $right,
+        bool $expected,
+    ): void {
+        try {
+            MutationAssertions::assertEquals($left, $right);
+
+            if (!$expected) {
+                $this->fail('Expected mutations to not be equal.');
+            }
+        } catch (ExpectationFailedException $failure) {
+            // @phpstan-ignore if.alwaysFalse
+            if ($expected) {
+                throw $failure;
+            }
+        }
     }
 
-    public function test_it_fails_on_invalid_query(): void
+    public static function mutationProvider(): iterable
     {
-        $this->expectException(InvalidArgumentException::class);
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $xPath->query('#');
+        yield 'equal' => [
+            MutationBuilder::withMinimalTestData()->build(),
+            MutationBuilder::withMinimalTestData()->build(),
+            true,
+        ];
+
+        yield 'not equal' => [
+            MutationBuilder::withMinimalTestData()->build(),
+            MutationBuilder::withCompleteTestData()->build(),
+            false,
+        ];
+
+        yield 'equal but different states' => [
+            (static function () {
+                $mutation = MutationBuilder::withCompleteTestData()->build();
+
+                self::fetchLazyState($mutation);
+
+                return $mutation;
+            })(),
+            MutationBuilder::withCompleteTestData()->build(),
+            true,
+        ];
     }
 
-    public function test_it_fails_on_invalid_xml(): void
+    private static function fetchLazyState(Mutation $mutation): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
-    }
-
-    public function test_it_has_document_property(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
-        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
+        $mutation->getNominalTestExecutionTime();
+        $mutation->getHash();
     }
 }

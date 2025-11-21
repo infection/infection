@@ -33,44 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Benchmark\MutationGenerator;
 
-use Infection\Testing\SourceTestClassNameScheme;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Closure;
+use const PHP_INT_MAX;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Iterations;
+use Webmozart\Assert\Assert;
 
-#[CoversClass(SourceTestClassNameScheme::class)]
-final class SourceTestClassNameSchemeTest extends TestCase
+/**
+ * To execute this test run `make benchmark_mutation_generator`
+ */
+final class MutationGeneratorBench
 {
-    public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
+    private Closure $main;
+
+    private int $count;
+
+    public function setUp(): void
     {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest'),
+        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX);
+    }
+
+    public function tearDown(): void
+    {
+        Assert::greaterThan(
+            $this->count,
+            0,
+            'No mutation was generated.',
         );
     }
 
-    public function test_it_can_give_the_source_class_name_for_a_source_class(): void
+    #[BeforeMethods('setUp')]
+    #[AfterMethods('tearDown')]
+    #[Iterations(5)]
+    public function benchMutationGeneration(): void
     {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo'),
-        );
-    }
-
-    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
-    {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo'),
-        );
-    }
-
-    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
-    {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo'),
-        );
+        $this->count = ($this->main)();
     }
 }

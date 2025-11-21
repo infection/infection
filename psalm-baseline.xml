@@ -20,11 +20,6 @@
       <code><![CDATA[iterable<string, string>]]></code>
     </InvalidReturnType>
   </file>
-  <file src="src/TestFramework/Factory.php">
-    <InvalidArgument>
-      <code><![CDATA[$this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles())]]></code>
-    </InvalidArgument>
-  </file>
   <file src="src/TestFramework/TestFrameworkExtraOptionsFilter.php">
     <InvalidReturnStatement>
       <code><![CDATA[preg_replace('/\s+/', ' ', trim($actualExtraOptions))]]></code>

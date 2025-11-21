@@ -38,11 +38,8 @@ namespace Infection\Tests\Mutant;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
-use Infection\Mutator\Arithmetic\Plus;
-use Infection\PhpParser\MutatedNode;
-use Infection\Testing\MutatorName;
+use Infection\Tests\Mutation\MutationBuilder;
 use function Later\now;
-use PhpParser\Node;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -60,7 +57,13 @@ final class MutantTest extends TestCase
         string $diff,
         string $originalCode,
     ): void {
-        $mutant = new Mutant($filePath, $mutation, now($mutatedCode), now($diff), now($originalCode));
+        $mutant = new Mutant(
+            mutantFilePath: $filePath,
+            mutation: $mutation,
+            mutatedCode: now($mutatedCode),
+            diff: now($diff),
+            prettyPrintedOriginalCode: now($originalCode),
+        );
 
         $this->assertMutantStateIs(
             $mutant,
@@ -93,24 +96,12 @@ final class MutantTest extends TestCase
 
         $originalCode = '<?php $a = 1';
 
-        yield 'nominal with tests' => [
+        yield 'with tests' => [
             '/path/to/tmp/mutant.Foo.infection.php',
-            new Mutation(
-                '/path/to/acme/Foo.php',
-                [new Node\Stmt\Namespace_(
-                    new Node\Name('Acme'),
-                    [new Node\Scalar\LNumber(0)],
-                )],
-                Plus::class,
-                MutatorName::getName(Plus::class),
-                $nominalAttributes,
-                Node\Scalar\LNumber::class,
-                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-                0,
-                $tests,
-                [],
-                '',
-            ),
+            MutationBuilder::withMinimalTestData()
+                ->withAttributes($nominalAttributes)
+                ->withTests($tests)
+                ->build(),
             'mutated code',
             'diff value',
             $originalCode,
@@ -118,22 +109,10 @@ final class MutantTest extends TestCase
 
         yield 'nominal without tests' => [
             '/path/to/tmp/mutant.Foo.infection.php',
-            new Mutation(
-                '/path/to/acme/Foo.php',
-                [new Node\Stmt\Namespace_(
-                    new Node\Name('Acme'),
-                    [new Node\Scalar\LNumber(0)],
-                )],
-                Plus::class,
-                MutatorName::getName(Plus::class),
-                $nominalAttributes,
-                Node\Scalar\LNumber::class,
-                MutatedNode::wrap(new Node\Scalar\LNumber(1)),
-                0,
-                [],
-                [],
-                '',
-            ),
+            MutationBuilder::withMinimalTestData()
+                ->withAttributes($nominalAttributes)
+                ->withTests([])
+                ->build(),
             'mutated code',
             'diff value',
             $originalCode,

@@ -37,7 +37,6 @@ namespace Infection\Tests\Process\Factory;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Loop\For_;
@@ -47,6 +46,7 @@ use Infection\Testing\MutatorName;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -116,16 +116,12 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
         $eventDispatcher = new EventDispatcherCollector();
 
-        $executionResultMock = $this->createMock(MutantExecutionResult::class);
-        $executionResultMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $executionResult = MutantExecutionResultBuilder::withMinimalTestData()->build();
 
         $resultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
         $resultFactoryMock
             ->method('createFromProcess')
-            ->willReturn($executionResultMock)
+            ->willReturn($executionResult)
         ;
 
         $configuration = ConfigurationBuilder::withMinimalTestData()

@@ -57,8 +57,7 @@ final class Identical implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an identical operator (`===`) with its counterpart the not identical operator (`!==`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

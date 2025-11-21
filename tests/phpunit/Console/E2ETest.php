@@ -38,7 +38,6 @@ namespace Infection\Tests\Console;
 use function array_merge;
 use function basename;
 use Composer\Autoload\ClassLoader;
-use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function function_exists;
@@ -102,7 +101,7 @@ final class E2ETest extends TestCase
      */
     private $previousLoader;
 
-    private static $countFailingComposerInstall = 0;
+    private static int $countFailingComposerInstall = 0;
 
     protected function setUp(): void
     {
@@ -251,7 +250,7 @@ final class E2ETest extends TestCase
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
             } catch (FinderException $e) {
-                if (DIRECTORY_SEPARATOR !== '\\') {
+                if (!OperatingSystem::isWindows()) {
                     throw $e;
                 }
 

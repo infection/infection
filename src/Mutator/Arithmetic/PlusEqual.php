@@ -56,8 +56,7 @@ final class PlusEqual implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an addition assignment operator (`+=`) with a subtraction assignment operator (`-=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

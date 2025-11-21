@@ -58,8 +58,7 @@ final class UnwrapArrayValues extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = [10 => 'Hello!'];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

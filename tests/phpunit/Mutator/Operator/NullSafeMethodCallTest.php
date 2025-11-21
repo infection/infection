@@ -64,8 +64,7 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
                 <?php
 
                 $class?->getName();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -78,8 +77,7 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
                 <?php
 
                 $class?->getName()?->property;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -92,8 +90,7 @@ final class NullSafeMethodCallTest extends BaseMutatorTestCase
                 <?php
 
                 $class?->getObject()?->getName();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

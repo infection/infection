@@ -75,8 +75,7 @@ final class FunctionCall extends AbstractValueToNullReturnValue
                 }
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

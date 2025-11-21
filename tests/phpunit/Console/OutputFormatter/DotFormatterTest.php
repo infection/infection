@@ -41,6 +41,7 @@ use Infection\Framework\Enum\EnumBucket;
 use Infection\Framework\Str;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -235,13 +236,8 @@ final class DotFormatterTest extends TestCase
 
     private function createMutantExecutionResultOfType(DetectionStatus $detectionStatus): MutantExecutionResult
     {
-        $executionResult = $this->createMock(MutantExecutionResult::class);
-        $executionResult
-            ->expects($this->once())
-            ->method('getDetectionStatus')
-            ->willReturn($detectionStatus)
-        ;
-
-        return $executionResult;
+        return MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus($detectionStatus)
+            ->build();
     }
 }

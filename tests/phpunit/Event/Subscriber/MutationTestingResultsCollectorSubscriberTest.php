@@ -39,7 +39,7 @@ use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Metrics\Collector;
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -68,7 +68,7 @@ final class MutationTestingResultsCollectorSubscriberTest extends TestCase
 
         $dispatcher->dispatch(
             new MutantProcessWasFinished(
-                $this->createMock(MutantExecutionResult::class),
+                MutantExecutionResultBuilder::withMinimalTestData()->build(),
             ),
         );
     }
