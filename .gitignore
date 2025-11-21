@@ -31,4 +31,6 @@
 /tests/e2e/SymfonyFlex/tests/.gitignore
 /tests/error.log
 /tests/phpunit/**/*/generated_index.xml
+/var/
+!/var/cache/.gitkeep
 /vendor/

@@ -70,8 +70,8 @@ jobs:
       - name: Collect coverage report
         run: |
           php vendor/phpunit/phpunit/phpunit --stop-on-failure \
-            --coverage-xml=build/logs/coverage-xml \
-            --log-junit=build/logs/junit.xml
+            --coverage-xml=var/logs/coverage-xml \
+            --log-junit=var/logs/junit.xml
 
       - name: Run Infection on the full codebase
         env:
@@ -81,7 +81,7 @@ jobs:
             --skip-initial-tests \
             --min-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
-            --coverage=build/logs \
+            --coverage=var/logs \
             --log-verbosity=none \
             --no-interaction \
             --no-progress

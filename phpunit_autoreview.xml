@@ -11,7 +11,7 @@
          displayDetailsOnPhpunitDeprecations="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
-         cacheDirectory="./build/cache/phpunit-autoreview"
+         cacheDirectory="./var/cache/phpunit-autoreview"
 >
 
     <extensions>

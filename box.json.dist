@@ -1,5 +1,5 @@
 {
-    "output": "build/infection.phar",
+    "output": "var/infection.phar",
 
     "git-version": "package_version",
 
