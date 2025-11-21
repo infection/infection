@@ -248,7 +248,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $hasLoggers = false;
 
         /** @var FileLogger $fileLogger */
-        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->getLoggers()) as $fileLogger) {
+        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->loggers) as $fileLogger) {
             if (!$hasLoggers) {
                 $this->output->writeln(['', 'Generated Reports:']);
             }
@@ -277,7 +277,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         foreach ($allLoggers as $logger) {
             if ($logger instanceof FederatedLogger) {
-                yield from $this->getFileLoggers($logger->getLoggers());
+                yield from $this->getFileLoggers($logger->loggers);
             } elseif ($logger instanceof FileLogger && !str_starts_with($logger->getFilePath(), 'php://')) {
                 yield $logger;
             }
