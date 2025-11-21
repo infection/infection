@@ -36,9 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger;
 
 use function implode;
+use Infection\Framework\Str;
 use Infection\Logger\LineMutationTestingResultsLogger;
-use function Infection\Tests\normalizeLineReturn;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @phpstan-require-extends TestCase
+ */
 trait LineLoggerAssertions
 {
     private function assertLoggedContentIs(
@@ -47,7 +51,7 @@ trait LineLoggerAssertions
     ): void {
         $this->assertSame(
             $expectedContents,
-            normalizeLineReturn(implode("\n", $logger->getLogLines())),
+            Str::toUnixLineEndings(implode("\n", $logger->getLogLines())),
         );
     }
 }

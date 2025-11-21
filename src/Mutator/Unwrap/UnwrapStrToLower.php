@@ -58,8 +58,7 @@ final class UnwrapStrToLower extends AbstractFunctionUnwrapMutator
                 ```php
                 $x = 'Hello!';
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -62,16 +62,15 @@ final class For_Test extends BaseMutatorTestCase
 
                 for($i = 0; $i < count($array); $i++) {
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $array = [1, 2];
+
                 for ($i = 0; false; $i++) {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate the body of the for loop' => [
@@ -84,8 +83,7 @@ final class For_Test extends BaseMutatorTestCase
                         echo '$i is one';
                     }
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -95,8 +93,7 @@ final class For_Test extends BaseMutatorTestCase
                         echo '$i is one';
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }

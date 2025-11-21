@@ -40,6 +40,7 @@ use function array_key_exists;
 use function array_shift;
 use function count;
 use function implode;
+use Infection\Framework\ClassName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -129,7 +130,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
     protected function getTestedMutatorClassName(): string
     {
-        return SourceTestClassNameScheme::getSourceClassName(static::class);
+        return ClassName::getCanonicalSourceClassName(static::class);
     }
 
     /**
@@ -151,7 +152,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
             $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
 
-            $mutants[] = SingletonContainer::getPrinter()->prettyPrintFile($mutatedStatements);
+            $mutants[] = SingletonContainer::getPrinter()->print($mutatedStatements, $mutation);
 
             $traverser->removeVisitor($mutatorVisitor);
         }
@@ -164,13 +165,17 @@ abstract class BaseMutatorTestCase extends TestCase
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
+        $parser = SingletonContainer::getContainer()->getParser();
+        $nodes = $parser->parse($code);
+        $originalFileTokens = $parser->getTokens();
 
         $this->assertNotNull($nodes);
 
         $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
             $this->createMutator($settings),
             $nodes,
+            $originalFileTokens,
+            $code,
         );
 
         // Pre-traverse the nodes to connect them

@@ -66,17 +66,23 @@ final class FileParserTest extends TestCase
             ->with($fileContents)
             ->willReturn($expectedReturnedStatements = []);
 
+        $phpParser
+            ->expects($this->once())
+            ->method('getTokens')
+            ->willReturn($expectedReturnedTokens = []);
+
         $parser = new FileParser($phpParser);
 
-        $returnedStatements = $parser->parse($fileInfo);
+        [$returnedStatements, $returnedTokens] = $parser->parse($fileInfo);
 
         $this->assertSame($expectedReturnedStatements, $returnedStatements);
+        $this->assertSame($expectedReturnedTokens, $returnedTokens);
     }
 
     #[DataProvider('fileToParserProvider')]
     public function test_it_can_parse_a_file(SplFileInfo $fileInfo, string $expectedPrintedParsedContents): void
     {
-        $statements = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);
+        [$statements] = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);
 
         foreach ($statements as $statement) {
             $this->assertInstanceOf(Node::class, $statement);
@@ -135,8 +141,7 @@ final class FileParserTest extends TestCase
             <<<'AST'
                 array(
                 )
-                AST
-            ,
+                AST,
         ];
 
         yield 'empty PHP file' => [

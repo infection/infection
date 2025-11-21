@@ -94,8 +94,7 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
                 Which elements it removes or how many elements it will attempt to remove will depend on its
                 configuration.
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

@@ -35,16 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use const DIRECTORY_SEPARATOR;
 use function explode;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath;
 use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -54,6 +53,7 @@ use function Safe\realpath;
 use function sprintf;
 use function strlen;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @see MockVendor
@@ -134,7 +134,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // The main script must be found from the .bat file
             $expected = realpath('vendor/phpunit/phpunit/phpunit');
         } else {
@@ -142,8 +142,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         }
 
         $this->assertSame(
-            normalizePath($expected),
-            normalizePath($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
+            Path::normalize($expected),
+            Path::normalize($frameworkFinder->find(TestFrameworkTypes::PHPUNIT)),
             'Should return the phpunit path',
         );
 
@@ -173,7 +173,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
             $expected = $mock->getVendorBinBat();
         } else {
@@ -181,8 +181,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         }
 
         $this->assertSame(
-            normalizePath(realpath($expected)),
-            normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
+            Path::canonicalize($expected),
+            Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
             'should return the vendor bin link or .bat',
         );
     }
@@ -200,8 +200,8 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         $this->assertSame(
-            normalizePath(realpath($mock->getPackageScript())),
-            normalizePath(realpath($frameworkFinder->find($mock::PACKAGE))),
+            Path::canonicalize($mock->getPackageScript()),
+            Path::canonicalize($frameworkFinder->find($mock::PACKAGE)),
             'should return the package script from .bat',
         );
     }

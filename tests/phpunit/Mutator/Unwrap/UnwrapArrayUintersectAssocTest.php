@@ -59,15 +59,13 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -81,21 +79,18 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_assoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -104,21 +99,18 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -130,8 +122,7 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 if (array_uintersect_assoc($a, ['baz' => 'bar'], $valueCompareFunc) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -140,8 +131,7 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                     if ($a === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -149,8 +139,7 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                     if (['baz' => 'bar'] === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -159,21 +148,18 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_UiNtErSeCt_AsSoC(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -182,21 +168,18 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_assoc($foo->bar(), $foo->baz(), $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->baz();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -205,21 +188,18 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc));
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['foo' => 'bar']);
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['baz' => 'bar']);
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -228,27 +208,23 @@ final class UnwrapArrayUintersectAssocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_assoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['qux' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 

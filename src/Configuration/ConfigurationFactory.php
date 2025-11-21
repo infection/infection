@@ -37,6 +37,7 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
+use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
@@ -45,6 +46,7 @@ use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\SourceFileCollector;
@@ -66,6 +68,7 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
 
@@ -126,12 +129,12 @@ class ConfigurationFactory
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
-        $configDir = dirname($schema->getFile());
+        $configDir = dirname($schema->file);
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework ??= $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
-        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->getStaticAnalysisTool();
+        $testFramework ??= $schema->testFramework ?? TestFrameworkTypes::PHPUNIT;
+        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->staticAnalysisTool;
 
         $skipCoverage = $existingCoveragePath !== null;
 
@@ -141,31 +144,28 @@ class ConfigurationFactory
             $namespacedTmpDir,
         );
 
-        $this->includeUserBootstrap($schema->getBootstrap());
+        $this->includeUserBootstrap($schema->bootstrap);
 
-        $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
+        $resolvedMutatorsArray = $this->resolveMutators($schema->mutators, $mutatorsInput);
 
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
         return new Configuration(
-            $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
-            $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collectFiles(
-                $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes(),
-            ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
-            $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
+            $schema->timeout ?? self::DEFAULT_TIMEOUT,
+            $schema->source->directories,
+            $this->collectFiles($schema),
+            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->source->directories),
+            $schema->source->excludes,
+            $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
             $this->retrievePhpStan($schema, $configDir),
             $mutators,
             $testFramework,
-            $schema->getBootstrap(),
-            $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
+            $schema->bootstrap,
+            $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
             self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
             self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
             $coverageBasePath,
@@ -237,7 +237,7 @@ class ConfigurationFactory
         SchemaConfiguration $schema,
         string $configDir,
     ): string {
-        $tmpDir = (string) $schema->getTmpDir();
+        $tmpDir = (string) $schema->tmpDir;
 
         if ($tmpDir === '') {
             $tmpDir = sys_get_temp_dir();
@@ -250,36 +250,12 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->getPhpUnit();
-
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
-
-        if ($phpUnitConfigDir === null) {
-            $phpUnit->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir,
-            ));
-        }
-
-        return $phpUnit;
+        return $schema->phpUnit->withAbsolutePaths($configDir);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        $phpStan = clone $schema->getPhpStan();
-
-        $phpStanConfigDir = $phpStan->getConfigDir();
-
-        if ($phpStanConfigDir === null) {
-            $phpStan->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpStanConfigDir)) {
-            $phpStan->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpStanConfigDir,
-            ));
-        }
-
-        return $phpStan;
+        return $schema->phpStan->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(
@@ -302,14 +278,14 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         SchemaConfiguration $schema,
     ): string {
-        return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+        return $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
     }
 
     private static function retrieveStaticAnalysisToolOptions(
         ?string $staticAnalysisToolOptions,
         SchemaConfiguration $schema,
     ): ?string {
-        return $staticAnalysisToolOptions ?? $schema->getStaticAnalysisToolOptions();
+        return $staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions;
     }
 
     private function retrieveNoProgress(bool $noProgress): bool
@@ -321,21 +297,21 @@ class ConfigurationFactory
         ?bool $ignoreMsiWithNoMutations,
         SchemaConfiguration $schema,
     ): bool {
-        return $ignoreMsiWithNoMutations ?? $schema->getIgnoreMsiWithNoMutations() ?? false;
+        return $ignoreMsiWithNoMutations ?? $schema->ignoreMsiWithNoMutations ?? false;
     }
 
     private static function retrieveMinMsi(?float $minMsi, SchemaConfiguration $schema): ?float
     {
-        return $minMsi ?? $schema->getMinMsi();
+        return $minMsi ?? $schema->minMsi;
     }
 
     private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float
     {
-        return $minCoveredMsi ?? $schema->getMinCoveredMsi();
+        return $minCoveredMsi ?? $schema->minCoveredMsi;
     }
 
     /**
-     * @param array<string, mixed[]> $resolvedMutatorsMap
+     * @param array<class-string, mixed[]> $resolvedMutatorsMap
      *
      * @return array<string, array<int, string>>
      */
@@ -354,6 +330,34 @@ class ConfigurationFactory
         }
 
         return $map;
+    }
+
+    /**
+     * @return iterable<string, SplFileInfo>
+     */
+    private function collectFiles(SchemaConfiguration $schema): iterable
+    {
+        $source = $schema->source;
+        $schemaDirname = dirname($schema->file);
+
+        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+            ? $path
+            : Path::join(
+                $schemaDirname,
+                $path,
+            );
+
+        return $this->sourceFileCollector->collectFiles(
+            // We need to make the source file paths absolute, otherwise the
+            // collector will collect the files relative to the current working
+            // directory instead of relative to the location of the configuration
+            // file.
+            array_map(
+                $mapToAbsolutePath(...),
+                $source->directories,
+            ),
+            $source->excludes,
+        );
     }
 
     /**
@@ -447,7 +451,7 @@ class ConfigurationFactory
             return $threadCount;
         }
 
-        $threadsFromSchema = $schema->getThreads();
+        $threadsFromSchema = $schema->threads;
 
         if ($threadsFromSchema === null) {
             return 1;

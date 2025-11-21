@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -65,8 +66,7 @@ final class SpreadRemoval implements Mutator
                 ```php
                 $x = [$collection, 4, 5];
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -87,7 +87,7 @@ final class SpreadRemoval implements Mutator
             $node->value,
             null,
             false,
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
             false,
         );
     }

@@ -60,14 +60,12 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 <?php
 
                 $allPositive = array_all($numbers, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $allPositive = true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with an array' => [
@@ -75,8 +73,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 <?php
 
                 $allPositive = array_all(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -89,8 +86,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 <?php
 
                 $allPositive = array_all(\Class_With_Const::Const, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -103,8 +99,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 <?php
 
                 $allPositive = \array_all(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -137,8 +132,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 if (array_all(['A', 1, 'C'], fn ($number) => $number > 0)) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +147,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_AlL(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +160,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_all($foo->bar(), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -183,8 +175,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 $a = array_all(array_filter(['A', 1, 'C'], function($char): bool {
                     return !is_int($char);
                 }), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -199,8 +190,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
                 $a = 'array_all';
 
                 $b = $a([1, 2, 3], 'is_int');
-                PHP
-            ,
+                PHP,
         ];
 
         if (PHP_VERSION_ID >= 80400) {
@@ -218,8 +208,7 @@ final class ArrayAllTest extends BaseMutatorTestCase
 
                         public bool $allPositive { get => array_all(fn (int $number) => $number > 0); }
                     };
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -230,9 +219,8 @@ final class ArrayAllTest extends BaseMutatorTestCase
                         {
                             $this->numbers = $numbers;
                         }
-                        public bool $allPositive {
-                            get => true;
-                        }
+
+                        public bool $allPositive { get => true; }
                     };
                     PHP,
             ];

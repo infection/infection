@@ -48,17 +48,16 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath as p;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\exec;
 use function Safe\file_get_contents;
-use function Safe\realpath;
 use function Safe\simplexml_load_string;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(MutationConfigBuilder::class)]
@@ -86,7 +85,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->projectPath = p(realpath(self::FIXTURES . '/project-path'));
+        $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
 
         $this->builder = $this->createConfigBuilder(self::FIXTURES . '/phpunit.xml');
     }
@@ -155,8 +154,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents($configurationPath),
         );
     }
@@ -193,8 +191,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents(
                 $this->builder->build(
                     [
@@ -230,8 +227,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                 IncludeInterceptor::enable();
                 require_once '$projectPath/app/autoload2.php';
 
-                PHP
-            ,
+                PHP,
             $phpCode,
         );
 
@@ -263,8 +259,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents(
                 $this->builder->build(
                     [
@@ -300,8 +295,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                 IncludeInterceptor::enable();
                 require_once '$projectPath/app/autoload2.php';
 
-                PHP
-            ,
+                PHP,
             $phpCode,
         );
 

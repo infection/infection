@@ -61,8 +61,7 @@ final class StringNormalizerTest extends TestCase
             <<<'TXT'
 
 
-                TXT
-            ,
+                TXT,
             <<<'TXT'
 
 
@@ -79,8 +78,7 @@ final class StringNormalizerTest extends TestCase
                  foo
                  bar
 
-                TXT
-            ,
+                TXT,
             <<<'TXT'
 
                  foo

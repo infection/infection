@@ -61,14 +61,12 @@ final class FalseValueTest extends BaseMutatorTestCase
                 <?php
 
                 return false;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate the string false to true' => [
@@ -76,8 +74,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 <?php
 
                 return 'false';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate switch(false) to true' => [
@@ -85,8 +82,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 <?php
 
                 switch (false) {}
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate match(false) to true to prevent overlap with MatchArmRemoval' => [
@@ -98,8 +94,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                     $count <= 50 => 'medium',
                     $count > 50 => 'huge',
                 };
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in ternary condition to prevent overlap with TernaryMutator' => [
@@ -107,8 +102,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 <?php
 
                 $x == false ? 'yes' : 'no';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with equal' => [
@@ -118,8 +112,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 if ($x == false) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-equal' => [
@@ -129,8 +122,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 if ($x != false) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with identical' => [
@@ -140,8 +132,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 if ($x === false) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-identical' => [
@@ -151,8 +142,7 @@ final class FalseValueTest extends BaseMutatorTestCase
                 if ($x !== false) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates all caps false to true' => [
@@ -160,14 +150,12 @@ final class FalseValueTest extends BaseMutatorTestCase
                 <?php
 
                 return FALSE;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return true;
-                PHP
-            ,
+                PHP,
         ];
     }
 

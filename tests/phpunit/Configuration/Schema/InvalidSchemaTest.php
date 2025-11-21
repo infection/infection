@@ -37,7 +37,7 @@ namespace Infection\Tests\Configuration\Schema;
 
 use Infection\Configuration\Schema\InvalidSchema;
 use Infection\Configuration\Schema\SchemaConfigurationFile;
-use function Infection\Tests\normalizeLineReturn;
+use Infection\Framework\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ final class InvalidSchemaTest extends TestCase
 
         $this->assertSame(
             $expectedErrorMessage,
-            normalizeLineReturn($exception->getMessage()),
+            Str::toUnixLineEndings($exception->getMessage()),
         );
         $this->assertSame(0, $exception->getCode());
         $this->assertNull($exception->getPrevious());
@@ -83,8 +83,7 @@ final class InvalidSchemaTest extends TestCase
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
                  - Error message
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'multiple errors' => [
@@ -97,8 +96,7 @@ final class InvalidSchemaTest extends TestCase
                 "/path/to/config" does not match the expected JSON schema:
                  - First error message
                  - Second error message
-                ERROR
-            ,
+                ERROR,
         ];
 
         yield 'worst case' => [
@@ -112,8 +110,7 @@ final class InvalidSchemaTest extends TestCase
                 "/path/to/config" does not match the expected JSON schema:
                  - First error message
                  - Second error message
-                ERROR
-            ,
+                ERROR,
         ];
     }
 }

@@ -59,11 +59,43 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
+
+                    $var = !a() || !b();
+                    PHP,
+            ],
+        ];
+
+        yield 'It preserves formatting for non-modified code' => [
+            <<<'PHP'
+                <?php
+
+                class TestFormatPreserving {
+                    // some comment
+                    public function test(): bool { // and comment here
+                        return 1
+
+                          && 2;
+                    }
+                }
+
+                $var = a() || b();
+                PHP,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
+
+                              && 2;
+                        }
+                    }
 
                     $var = !a() || !b();
                     PHP,
@@ -75,8 +107,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b() || c() || d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -91,15 +122,13 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !(a() || !b());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !(!a() || b());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -108,8 +137,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = ($a = 1) || $b;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -124,15 +152,13 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $A > 1 || $this->foo() === false || self::bar() >= 10;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !($A > 1) || $this->foo() === false || !(self::bar() >= 10);
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -141,8 +167,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false || b() === false || $c !== false || d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with first AND' => [
@@ -150,8 +175,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() === false || $c !== false || d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with second AND' => [
@@ -159,8 +183,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false || b() === false && $c !== false || d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with third AND' => [
@@ -168,8 +191,7 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false || b() === false || $c !== false && d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates the only one mutable expression on the left when others are not mutable' => [
@@ -177,15 +199,13 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a || b() === false || $c !== false;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !$a || b() === false || $c !== false;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -194,15 +214,13 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false || b() || $c !== false;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = $a === false || !b() || $c !== false;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -211,15 +229,13 @@ final class LogicalOrAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false || b() === false || $c;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = $a === false || b() === false || !$c;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
     }

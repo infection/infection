@@ -60,15 +60,13 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
 
                 if ($a == $b) {
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if ($a = $b) {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate comparsion to an impossible assignment' => [
@@ -77,8 +75,7 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
 
                 if (1 == $a) {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not try to assign a variable to a class constant' => [
@@ -87,8 +84,7 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
 
                 if (BaseClass::CLASS_CONST == $a) {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not try to assign a variable to a built in constant' => [
@@ -97,9 +93,7 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
 
                 if (PHP_EOL == $a) {
                 }
-                PHP_WRAP
-
-            ,
+                PHP_WRAP,
         ];
 
         yield 'It does not try to assign a scalar to a result of a function call' => [
@@ -108,8 +102,7 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
 
                 if ($x->getFoo() == 1) {
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }

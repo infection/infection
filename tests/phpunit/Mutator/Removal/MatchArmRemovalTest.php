@@ -64,8 +64,7 @@ final class MatchArmRemovalTest extends BaseMutatorTestCase
                     2 => null,
                     default => throw new \Exception(),
                 };
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -125,8 +124,7 @@ final class MatchArmRemovalTest extends BaseMutatorTestCase
                     2 => null,
                     default => throw new \Exception(),
                 };
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

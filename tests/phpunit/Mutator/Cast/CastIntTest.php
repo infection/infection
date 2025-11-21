@@ -59,14 +59,12 @@ final class CastIntTest extends BaseMutatorTestCase
                 <?php
 
                 (int) 1.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to integer' => [
@@ -74,14 +72,12 @@ final class CastIntTest extends BaseMutatorTestCase
                 <?php
 
                 (integer) 1.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to integer in conditions' => [
@@ -91,16 +87,14 @@ final class CastIntTest extends BaseMutatorTestCase
                 if ((int) round()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if (round()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to integer in global return' => [
@@ -108,14 +102,12 @@ final class CastIntTest extends BaseMutatorTestCase
                 <?php
 
                 return (int) round();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return round();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to integer in return of untyped-function' => [

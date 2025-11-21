@@ -60,14 +60,13 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
 
                 foo();
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
+
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes a function call with parameters' => [
@@ -76,14 +75,13 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
 
                 bar(3, 4);
                 $a = 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
+
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes dynamic function calls with string' => [
@@ -94,16 +92,15 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
                 ('foo')();
                 $end = true;
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $start = true;
 
                 $end = true;
-                PHP
-            ,
+
+                PHP,
         ];
 
         yield 'It removes dynamic function call with variable' => [
@@ -114,16 +111,15 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
                 $foo();
                 $end = true;
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $start = true;
 
                 $end = true;
-                PHP
-            ,
+
+                PHP,
         ];
 
         yield 'It does not remove a function call that is assigned to something' => [
@@ -132,8 +128,7 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
 
                 $b = foo();
                 $a = 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not remove a function call within a statement' => [
@@ -147,8 +142,7 @@ final class FunctionCallRemovalTest extends BaseMutatorTestCase
                     $a = 3;
                 }
 
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not remove a function call that is the parameter of another function or method' => [

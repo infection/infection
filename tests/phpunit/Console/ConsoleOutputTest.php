@@ -37,8 +37,8 @@ namespace Infection\Tests\Console;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\ConsoleLogger;
-use function Infection\Tests\normalize_trailing_spaces;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -85,9 +85,8 @@ final class ConsoleOutputTest extends TestCase
                  !        result
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -101,9 +100,8 @@ final class ConsoleOutputTest extends TestCase
                  ! [NOTE] Running infection with an unknown log-verbosity option, falling back to default option
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -115,9 +113,8 @@ final class ConsoleOutputTest extends TestCase
             <<<'TXT'
                 [notice] You are running Infection with foo enabled.
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -132,9 +129,8 @@ final class ConsoleOutputTest extends TestCase
                            It is your responsibility to disable xdebug/phpdbg unless needed.
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -152,9 +148,8 @@ final class ConsoleOutputTest extends TestCase
                  !        MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -172,9 +167,8 @@ final class ConsoleOutputTest extends TestCase
                  !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 }

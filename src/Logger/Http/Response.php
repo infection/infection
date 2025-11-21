@@ -40,7 +40,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class Response
+final readonly class Response
 {
     public const HTTP_OK = 200;
 
@@ -48,11 +48,9 @@ final class Response
 
     public const HTTP_MAX_ERROR_CODE = 599;
 
-    private readonly int $statusCode;
-
     public function __construct(
-        int $statusCode,
-        private readonly string $body,
+        public int $statusCode,
+        public string $body,
     ) {
         Assert::range(
             $statusCode,
@@ -60,17 +58,5 @@ final class Response
             self::HTTP_MAX_ERROR_CODE,
             'Expected an HTTP status code. Got "%s"',
         );
-
-        $this->statusCode = $statusCode;
-    }
-
-    public function getStatusCode(): int
-    {
-        return $this->statusCode;
-    }
-
-    public function getBody(): string
-    {
-        return $this->body;
     }
 }

@@ -58,21 +58,16 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
                 'foo' . 'bar';
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
-
                     'bar';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
-
                     'foo';
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -83,8 +78,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                 $a = 'a';
                 $b = 'b';
                 $a . $b . 'c';
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -92,24 +86,21 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                     $a = 'a';
                     $b = 'b';
                     $b . 'c';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = 'a';
                     $b = 'b';
                     $a . 'c';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = 'a';
                     $b = 'b';
                     $a . $b;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -121,8 +112,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                 $b = 'b';
                 $d = 'd';
                 $a . $b . 'c' . $d . 'e';
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -131,8 +121,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                     $b = 'b';
                     $d = 'd';
                     $b . 'c' . $d . 'e';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -140,8 +129,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                     $b = 'b';
                     $d = 'd';
                     $a . 'c' . $d . 'e';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -149,8 +137,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                     $b = 'b';
                     $d = 'd';
                     $a . $b . $d . 'e';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -158,8 +145,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                     $b = 'b';
                     $d = 'd';
                     $a . $b . 'c' . 'e';
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -167,8 +153,7 @@ final class ConcatOperandRemovalTest extends BaseMutatorTestCase
                     $b = 'b';
                     $d = 'd';
                     $a . $b . 'c' . $d;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
     }

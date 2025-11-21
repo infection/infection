@@ -59,14 +59,12 @@ final class LessThanTest extends BaseMutatorTestCase
                 <?php
 
                 1 < 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1 <= 2;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

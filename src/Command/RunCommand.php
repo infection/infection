@@ -37,6 +37,7 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function implode;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -62,6 +63,7 @@ use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
 
@@ -268,10 +270,10 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 sprintf(
-                    'Name of the formatter to use ("%s")',
-                    implode('", "', FormatterName::ALL),
+                    'Name of the formatter to use (%s)',
+                    FormatterName::quotedCommaSeparatedList(),
                 ),
-                Container::DEFAULT_FORMATTER_NAME,
+                Container::DEFAULT_FORMATTER_NAME->value,
             )
             ->addOption(
                 self::OPTION_GIT_DIFF_FILTER,
@@ -494,44 +496,12 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
-        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
-        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
-
-        if ($isForGitDiffLines && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
-
-        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER && $isForGitDiffLines === Container::DEFAULT_GIT_DIFF_LINES) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
-                    self::OPTION_GIT_DIFF_BASE,
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
-
-        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
-
-        if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
-                    self::OPTION_FILTER,
-                    self::OPTION_GIT_DIFF_FILTER,
-                    self::OPTION_FILTER,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
+        [
+            $filter,
+            $gitDiffFilter,
+            $isForGitDiffLines,
+            $gitDiffBase,
+        ] = self::getSourceFilters($input);
 
         $commandHelper = new RunCommandHelper($input);
 
@@ -546,8 +516,7 @@ final class RunCommand extends BaseCommand
             (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            // TODO: add more type check like we do for the test frameworks
-            trim((string) $input->getOption(self::OPTION_FORMATTER)),
+            self::getFormatterName($input),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             $noProgress,
             $forceProgress,
@@ -596,7 +565,8 @@ final class RunCommand extends BaseCommand
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
         $installationDecider = $container->getAdapterInstallationDecider();
-        $configTestFramework = $container->getConfiguration()->getTestFramework();
+        $configuration = $container->getConfiguration();
+        $configTestFramework = $configuration->testFramework;
 
         $adapterName = trim((string) $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)) ?: $configTestFramework;
 
@@ -656,7 +626,7 @@ final class RunCommand extends BaseCommand
             $container->getStaticAnalysisToolAdapter()->assertMinimumVersionSatisfied();
         }
 
-        $container->getFileSystem()->mkdir($config->getTmpDir());
+        $container->getFileSystem()->mkdir($config->tmpDir);
 
         LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
 
@@ -690,6 +660,101 @@ final class RunCommand extends BaseCommand
             $consoleOutput->logRunningWithDebugger('Xdebug');
         } elseif (extension_loaded('pcov')) {
             $consoleOutput->logRunningWithDebugger('PCOV');
+        }
+    }
+
+    private static function getFormatterName(InputInterface $input): FormatterName
+    {
+        $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
+
+        return FormatterName::from($value);
+    }
+
+    /**
+     * @return array{string, string|null, bool, string|null}
+     */
+    private static function getSourceFilters(InputInterface $input)
+    {
+        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
+
+        [$gitDiffFilter, $isForGitDiffLines, $gitDiffBase] = self::getGitOptions($input);
+
+        self::assertOnlyOneTypeOfFiltering($filter, $gitDiffFilter);
+
+        return [
+            $filter,
+            $gitDiffFilter,
+            $isForGitDiffLines,
+            $gitDiffBase,
+        ];
+    }
+
+    /**
+     * @return array{string|null, bool, string|null}
+     */
+    private static function getGitOptions(InputInterface $input): array
+    {
+        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
+        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+
+        self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
+        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $isForGitDiffLines, $gitDiffBase);
+
+        return [$gitDiffFilter, $isForGitDiffLines, $gitDiffBase];
+    }
+
+    private static function assertOnlyOneTypeOfGitFiltering(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+    ): void {
+        if ($isForGitDiffLines
+            && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
+        }
+    }
+
+    private static function assertGitBaseHasRequiredFilter(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+    ): void {
+        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
+            && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER
+            && $isForGitDiffLines === Container::DEFAULT_GIT_DIFF_LINES
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
+                    self::OPTION_GIT_DIFF_BASE,
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
+        }
+    }
+
+    private static function assertOnlyOneTypeOfFiltering(
+        string $filter,
+        ?string $gitDiffFilter,
+    ): void {
+        if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
+                    self::OPTION_FILTER,
+                    self::OPTION_GIT_DIFF_FILTER,
+                    self::OPTION_FILTER,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
         }
     }
 }

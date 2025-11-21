@@ -74,7 +74,7 @@ class XmlCoverageParser
 
     private static function retrieveTestLocations(SafeDOMXPath $xPath): TestLocations
     {
-        $linesNode = $xPath->query('/phpunit/file/totals/lines')[0];
+        $linesNode = $xPath->query('/p:phpunit/p:file/p:totals/p:lines')[0];
 
         $percentage = $linesNode->getAttribute('percent');
 
@@ -82,16 +82,16 @@ class XmlCoverageParser
             return new TestLocations();
         }
 
-        $coveredLineNodes = $xPath->query('/phpunit/file/coverage/line');
+        $coveredLineNodes = $xPath->query('/p:phpunit/p:file/p:coverage/p:line');
 
         if ($coveredLineNodes->length === 0) {
             return new TestLocations();
         }
 
-        $coveredMethodNodes = $xPath->query('/phpunit/file/class/method');
+        $coveredMethodNodes = $xPath->query('/p:phpunit/p:file/p:class/p:method');
 
         if ($coveredMethodNodes->length === 0) {
-            $coveredMethodNodes = $xPath->query('/phpunit/file/trait/method');
+            $coveredMethodNodes = $xPath->query('/p:phpunit/p:file/p:trait/p:method');
         }
 
         return new TestLocations(

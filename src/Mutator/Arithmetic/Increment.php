@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -57,8 +58,7 @@ final class Increment implements Mutator
             <<<'TXT'
                 Replaces a pre- or post-increment operator (`++`) with the analogue pre- or post-decrement operator
                 (`--`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -76,12 +76,12 @@ final class Increment implements Mutator
     public function mutate(Node $node): iterable
     {
         if ($node instanceof Node\Expr\PreInc) {
-            yield new Node\Expr\PreDec($node->var, $node->getAttributes());
+            yield new Node\Expr\PreDec($node->var, NodeAttributes::getAllExceptOriginalNode($node));
 
             return;
         }
 
-        yield new Node\Expr\PostDec($node->var, $node->getAttributes());
+        yield new Node\Expr\PostDec($node->var, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

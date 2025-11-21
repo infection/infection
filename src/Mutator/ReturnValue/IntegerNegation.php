@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -55,8 +56,7 @@ final class IntegerNegation implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces an integer value with its negated value. For example will replace `-5` with `5`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -74,7 +74,7 @@ final class IntegerNegation implements Mutator
     public function mutate(Node $node): iterable
     {
         yield new Node\Stmt\Return_(
-            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), $node->getAttributes()),
+            new Node\Scalar\LNumber(-1 * $this->getIntegerValueOfNode($node), NodeAttributes::getAllExceptOriginalNode($node)),
         );
     }
 

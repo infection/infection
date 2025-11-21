@@ -59,14 +59,12 @@ final class CloneRemovalTest extends BaseMutatorTestCase
                 <?php
 
                 $class = clone (new stdClass());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $class = new stdClass();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes clone from clone variable' => [
@@ -75,15 +73,13 @@ final class CloneRemovalTest extends BaseMutatorTestCase
 
                 $class = new stdClass();
                 $clonedClass = clone $class;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $class = new stdClass();
                 $clonedClass = $class;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes cloe from direct call object function right after cloning' => [
@@ -92,15 +88,13 @@ final class CloneRemovalTest extends BaseMutatorTestCase
 
                 $datetime = new DateTime();
                 $clonedClass = (clone $datetime)->format('Y');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $datetime = new DateTime();
-                $clonedClass = $datetime->format('Y');
-                PHP
-            ,
+                $clonedClass = ($datetime)->format('Y');
+                PHP,
         ];
     }
 }
