@@ -33,8 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\Framework;
 
+use function end;
+use function explode;
 use Infection\CannotBeInstantiated;
 use function Safe\preg_match;
 use function Safe\preg_replace;
@@ -44,20 +46,33 @@ use function str_replace;
 /**
  * @internal
  */
-final class SourceTestClassNameScheme
+final class ClassName
 {
     use CannotBeInstantiated;
 
-    public static function getSourceClassName(string $testCaseClassName): string
+    /**
+     * @param class-string $className
+     *
+     * @return non-empty-string
+     */
+    public static function getShortClassName(string $className): string
     {
-        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches) === 1) {
+        $parts = explode('\\', $className);
+
+        /** @phpstan-ignore return.type */
+        return end($parts);
+    }
+
+    public static function getCanonicalSourceClassName(string $testClassName): string
+    {
+        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testClassName, $matches) === 1) {
             return str_replace('Infection\\Tests\\', 'Infection\\', $matches[1]);
         }
 
-        return $testCaseClassName;
+        return $testClassName;
     }
 
-    public static function getTestClassName(string $sourceClassName): string
+    public static function getCanonicalTestClassName(string $sourceClassName): string
     {
         if (str_contains($sourceClassName, 'Infection\\Tests')) {
             return $sourceClassName . 'Test';

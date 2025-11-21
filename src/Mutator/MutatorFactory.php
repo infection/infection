@@ -35,8 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use function end;
-use function explode;
+use Infection\Framework\ClassName;
 use function is_a;
 use PhpParser\Node;
 use function sprintf;
@@ -93,11 +92,12 @@ final class MutatorFactory
         return $mutators;
     }
 
+    /**
+     * @param class-string $className
+     */
     public static function getMutatorNameForClassName(string $className): string
     {
-        $parts = explode('\\', $className);
-
-        return end($parts);
+        return ClassName::getShortClassName($className);
     }
 
     /**
