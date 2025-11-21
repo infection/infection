@@ -245,7 +245,7 @@ final class ConfigurationFactoryTest extends TestCase
         );
 
         $defaultConfiguration = new Configuration(
-            timeout: 10,
+            processTimeout: 10,
             sourceDirectories: [],
             sourceFiles: [],
             sourceFilesFilter: 'src/a.php,src/b.php',
@@ -264,7 +264,7 @@ final class ConfigurationFactoryTest extends TestCase
             coveragePath: sys_get_temp_dir() . '/infection',
             skipCoverage: false,
             skipInitialTests: false,
-            debug: false,
+            isDebugEnabled: false,
             withUncovered: false,
             noProgress: false,
             ignoreMsiWithNoMutations: false,
@@ -273,7 +273,7 @@ final class ConfigurationFactoryTest extends TestCase
             minCoveredMsi: null,
             msiPrecision: 2,
             threadCount: 1,
-            dryRun: false,
+            isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
             isForGitDiffLines: false,
@@ -1276,7 +1276,7 @@ final class ConfigurationFactoryTest extends TestCase
             ->method('collectFiles')
             ->willReturnCallback(
                 static function (array $source, array $excludes) use ($schema) {
-                    $schemaSourceDirs = $schema->getSource()->getDirectories();
+                    $schemaSourceDirs = $schema->source->directories;
 
                     // ConfigurationFactory::collectFiles() MUST convert relative paths to absolute paths
                     // relative to the schema file location (e.g., 'src/' → '/path/to/src')

@@ -41,6 +41,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use Infection\Tests\Configuration\Entry\LogsBuilder;
@@ -134,7 +135,7 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->getLogs())
+                        LogsBuilder::from($this->expected->logs)
                             ->withTextLogFilePath($expectedTextFileLogPath)
                             ->build(),
                     )
@@ -163,7 +164,7 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->getLogs())
+                        LogsBuilder::from($this->expected->logs)
                             ->withHtmlLogFilePath($expectedHtmlFileLogPath)
                             ->build(),
                     )
@@ -192,7 +193,7 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->getLogs())
+                        LogsBuilder::from($this->expected->logs)
                             ->withGitlabLogFilePath($expectedGitlabFileLogPath)
                             ->build(),
                     )
@@ -303,7 +304,7 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withLogs(
-                        LogsBuilder::from($this->expected->getLogs())
+                        LogsBuilder::from($this->expected->logs)
                             ->withUseGitHubAnnotationsLogger($useGitHubAnnotationsLogger)
                             ->build(),
                     )
@@ -386,6 +387,11 @@ final class ConfigurationFactoryScenario
             );
     }
 
+    /**
+     * @param TestFrameworkTypes::*|null $configTestFramework
+     * @param TestFrameworkTypes::*|null $inputTestFramework
+     * @param TestFrameworkTypes::* $expectedTestFramework
+     */
     public function forValueForTestFramework(
         ?string $configTestFramework,
         ?string $inputTestFramework,
@@ -409,6 +415,11 @@ final class ConfigurationFactoryScenario
             );
     }
 
+    /**
+     * @param StaticAnalysisToolTypes::*|null $configStaticAnalysisTool
+     * @param StaticAnalysisToolTypes::*|null $inputStaticAnalysisTool
+     * @param StaticAnalysisToolTypes::*|null $expectedStaticAnalysisTool
+     */
     public function forValueForStaticAnalysisTool(
         ?string $configStaticAnalysisTool,
         ?string $inputStaticAnalysisTool,
@@ -452,6 +463,9 @@ final class ConfigurationFactoryScenario
             );
     }
 
+    /**
+     * @param TestFrameworkTypes::* $configTestFramework
+     */
     public function forValueForTestFrameworkExtraOptions(
         string $configTestFramework,
         ?string $configTestFrameworkExtraOptions,
@@ -497,6 +511,9 @@ final class ConfigurationFactoryScenario
             );
     }
 
+    /**
+     * @param TestFrameworkTypes::* $configTestFramework
+     */
     public function forValueForTestFrameworkKey(
         string $configTestFramework,
         string $inputTestFrameworkExtraOptions,
