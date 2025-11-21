@@ -59,8 +59,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_change_key_case(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_change_key_case(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_change_key_case(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 if (array_change_key_case($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_ChAnGe_KeY_cAsE(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_change_key_case($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_change_key_case(['foo' => 'bar']));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_change_key_case(['foo' => 'bar'], $case);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -197,8 +189,7 @@ final class UnwrapArrayChangeKeyCaseTest extends BaseMutatorTestCase
                 $a = 'array_change_key_case';
 
                 $b = $a(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

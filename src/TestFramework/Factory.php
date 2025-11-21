@@ -80,18 +80,18 @@ final readonly class Factory
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
+                    (string) $this->infectionConfig->phpUnit->customPath,
                 ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
-                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
+                $this->infectionConfig->sourceDirectories,
                 $skipCoverage,
-                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
+                $this->infectionConfig->executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
-                $this->infectionConfig->getMapSourceClassToTestStrategy(),
+                $this->infectionConfig->mapSourceClassToTestStrategy,
             );
         }
 
@@ -109,6 +109,8 @@ final readonly class Factory
             $availableTestFrameworks[] = $factory::getAdapterName();
 
             if ($adapterName === $factory::getAdapterName()) {
+                $configuration = $this->infectionConfig;
+
                 return $factory::create(
                     $this->testFrameworkFinder->find($factory::getExecutableName()),
                     $this->tmpDir,
@@ -116,7 +118,7 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $this->infectionConfig->getSourceDirectories(),
+                    $configuration->sourceDirectories,
                     $skipCoverage,
                 );
             }
@@ -140,8 +142,11 @@ final readonly class Factory
             return [];
         }
 
-        /** @var list<SplFileInfo> $files */
-        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
+        /**
+         * @var list<SplFileInfo> $files
+         * @psalm-suppress InvalidArgument
+         */
+        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->sourceFiles));
 
         return $files;
     }

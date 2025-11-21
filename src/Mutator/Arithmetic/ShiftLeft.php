@@ -56,8 +56,7 @@ final class ShiftLeft implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a bitwise shift left operator (`<<`) with a bitwise shift right operator (`>>`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

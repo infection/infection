@@ -59,8 +59,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucfirst('good Afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucfirst(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \ucfirst('good Afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 if (ucfirst($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 <?php
 
                 $a = uCfIrSt('good Afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 <?php
 
                 $a = ucfirst($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -151,8 +145,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 $a = ucfirst(array_reduce($words, function (string $carry, string $item) {
                     return $carry . substr($item, 0, 1);
                 }));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -187,8 +180,7 @@ final class UnwrapUcFirstTest extends BaseMutatorTestCase
                 $a = 'ucfirst';
 
                 $b = $a('FooBar');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

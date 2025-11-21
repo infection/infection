@@ -57,7 +57,7 @@ use PhpParser\Node;
  *
  * @implements ConfigurableMutator<Node\Expr\FuncCall>
  */
-final class MBString implements ConfigurableMutator
+final readonly class MBString implements ConfigurableMutator
 {
     use GetConfigClassName;
     use GetMutatorName;
@@ -65,7 +65,7 @@ final class MBString implements ConfigurableMutator
     /**
      * @var array<string, Closure(Node\Expr\FuncCall): iterable<Node\Expr\FuncCall>>
      */
-    private readonly array $converters;
+    private array $converters;
 
     public function __construct(MBStringConfig $config)
     {
@@ -88,8 +88,7 @@ final class MBString implements ConfigurableMutator
                 ```php
                 $x = strlen($str) < 10;
                 ```
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

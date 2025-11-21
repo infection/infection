@@ -63,8 +63,7 @@ final class While_Test extends BaseMutatorTestCase
                 while ($condition) {
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -83,8 +82,7 @@ final class While_Test extends BaseMutatorTestCase
                 while (true) {
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

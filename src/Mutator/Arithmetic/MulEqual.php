@@ -56,8 +56,7 @@ final class MulEqual implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a multiplication assignment operator (`*=`) with a division assignment operator (`/=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

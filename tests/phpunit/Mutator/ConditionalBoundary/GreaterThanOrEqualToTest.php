@@ -59,14 +59,12 @@ final class GreaterThanOrEqualToTest extends BaseMutatorTestCase
                 <?php
 
                 1 >= 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1 > 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate an arrow' => [
@@ -74,8 +72,7 @@ final class GreaterThanOrEqualToTest extends BaseMutatorTestCase
                 <?php
 
                 [1 => 2];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate a spaceship' => [
@@ -83,8 +80,7 @@ final class GreaterThanOrEqualToTest extends BaseMutatorTestCase
                 <?php
 
                 1 <=> 2;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

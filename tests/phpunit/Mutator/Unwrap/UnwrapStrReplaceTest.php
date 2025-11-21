@@ -59,8 +59,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = str_replace('Afternoon', 'Evening' ,'Good Afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = str_replace('X', 'Y', \Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \str_replace('Afternoon', 'Evening' ,'Good Afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 if (str_replace('Afternoon', 'Evening', $a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = sTr_RepLace('Afternoon', 'Evening' ,'Good Afternoon!');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = str_replace('Afternoon', 'Evening' , $foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -151,8 +145,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 $a = str_replace('Foo', 'Bar', array_reduce($words, function (string $carry, string $item) {
                     return $carry . substr($item, 0, 1);
                 }));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -187,8 +180,7 @@ final class UnwrapStrReplaceTest extends BaseMutatorTestCase
                 $a = 'str_replace';
 
                 $b = $a('Bar', 'Baz', 'FooBar');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

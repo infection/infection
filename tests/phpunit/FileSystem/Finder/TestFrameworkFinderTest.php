@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use const DIRECTORY_SEPARATOR;
 use function explode;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use Infection\Tests\FileSystem\FileSystemTestCase;
@@ -134,7 +134,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // The main script must be found from the .bat file
             $expected = realpath('vendor/phpunit/phpunit/phpunit');
         } else {
@@ -173,7 +173,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // This .bat has no code, so main script will not be found
             $expected = $mock->getVendorBinBat();
         } else {

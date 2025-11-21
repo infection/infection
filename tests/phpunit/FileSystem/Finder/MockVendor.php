@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use function array_filter;
-use const DIRECTORY_SEPARATOR;
 use function implode;
+use Infection\Framework\OperatingSystem;
 use const PHP_EOL;
 use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
@@ -103,7 +103,7 @@ final class MockVendor
     {
         $this->emptyVendorBin();
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             // Use an empty batch script to disable finding the main script
             file_put_contents($this->vendorBinBat, '@ECHO OFF');
         } else {

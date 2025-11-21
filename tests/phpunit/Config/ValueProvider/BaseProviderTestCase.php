@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseProviderTestCase extends TestCase
 {
-    protected static $stty;
+    protected static ?bool $stty = null;
 
     final protected function getQuestionHelper(): QuestionHelper
     {

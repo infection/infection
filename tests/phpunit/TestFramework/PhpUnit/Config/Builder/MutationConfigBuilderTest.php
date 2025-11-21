@@ -154,8 +154,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents($configurationPath),
         );
     }
@@ -192,8 +191,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents(
                 $this->builder->build(
                     [
@@ -229,8 +227,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                 IncludeInterceptor::enable();
                 require_once '$projectPath/app/autoload2.php';
 
-                PHP
-            ,
+                PHP,
             $phpCode,
         );
 
@@ -262,8 +259,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents(
                 $this->builder->build(
                     [
@@ -299,8 +295,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
                 IncludeInterceptor::enable();
                 require_once '$projectPath/app/autoload2.php';
 
-                PHP
-            ,
+                PHP,
             $phpCode,
         );
 

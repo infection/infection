@@ -41,7 +41,10 @@ use Webmozart\Assert\Assert;
 
 final class DummyLogger extends AbstractLogger
 {
-    private $logs = [];
+    /**
+     * @var array<array{string, string, array<mixed>}>
+     */
+    private array $logs = [];
 
     public function log($level, $message, array $context = []): void
     {

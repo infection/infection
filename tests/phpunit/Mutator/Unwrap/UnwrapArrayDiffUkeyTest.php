@@ -59,8 +59,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff_ukey(\Class_With_Const::Const, ['baz' => 'bar'], $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_diff_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 if (array_diff_ukey($a, ['baz' => 'bar'], $keyCompareFunc) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_DiFf_UkEy(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff_ukey($foo->bar(), $foo->baz(), $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -149,8 +143,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_diff_ukey(['foo' => 'bar'], ['baz' => 'bar'], $keyCompareFunc));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -163,8 +156,7 @@ final class UnwrapArrayDiffUkeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_diff_ukey(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

@@ -59,8 +59,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_slice(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_slice(\Class_With_Const::Const, 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_slice(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 if (array_slice($a, 1) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_SlIcE(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_slice($foo->bar(), 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_slice(['foo', 'bar', 'baz'], 1));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_slice(['foo', 'bar', 'baz'], 1, 2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -195,8 +187,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_slice(['foo', 'bar', 'baz'], 1, 2, true);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -211,8 +202,7 @@ final class UnwrapArraySliceTest extends BaseMutatorTestCase
                 $a = 'array_slice';
 
                 $b = $a(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

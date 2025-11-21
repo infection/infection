@@ -79,7 +79,7 @@ final class StrykerDashboardClientTest extends TestCase
     }
 
     #[DataProvider('provideResponseStatusCodes')]
-    public function test_it_can_send_a_report_with_expected_response_status_code(): void
+    public function test_it_can_send_a_report_with_expected_response_status_code(int $statusCode): void
     {
         $this->clientMock
             ->expects($this->once())
@@ -90,7 +90,7 @@ final class StrykerDashboardClientTest extends TestCase
                 self::API_KEY,
                 '{"mutationScore": 80.31}',
             )
-            ->willReturn(new Response(201, 'Report received!'))
+            ->willReturn(new Response($statusCode, 'Report received!'))
         ;
 
         $this->dashboardClient->sendReport(
@@ -157,8 +157,7 @@ final class StrykerDashboardClientTest extends TestCase
                     <<<'EOF'
                         Dashboard response:
                         Report invalid!
-                        EOF
-                    ,
+                        EOF,
                     [],
                 ],
             ],

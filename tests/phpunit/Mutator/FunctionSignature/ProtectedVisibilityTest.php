@@ -72,8 +72,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate final method' => [
@@ -107,8 +106,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate static flag' => [
@@ -126,8 +124,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if parent abstract has same protected method' => [
@@ -150,8 +147,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                 {
                     protected function foo() {}
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if grand parent class has same protected method' => [
@@ -175,8 +171,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                 {
                     protected function foo() {}
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'it does mutate non-inherited methods' => [
@@ -217,8 +212,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         }
                     };
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -267,8 +261,7 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP_WRAP
-            ,
+                PHP_WRAP,
         ];
     }
 }

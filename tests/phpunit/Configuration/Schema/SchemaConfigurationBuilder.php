@@ -48,6 +48,8 @@ final class SchemaConfigurationBuilder
 {
     /**
      * @param array<string, mixed> $mutators
+     * @param TestFrameworkTypes::*|null $testFramework
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     private function __construct(
         private string $file,
@@ -74,24 +76,24 @@ final class SchemaConfigurationBuilder
     public static function from(SchemaConfiguration $schema): self
     {
         return new self(
-            $schema->getFile(),
-            $schema->getTimeout(),
-            $schema->getSource(),
-            $schema->getLogs(),
-            $schema->getTmpDir(),
-            $schema->getPhpUnit(),
-            $schema->getPhpStan(),
-            $schema->getIgnoreMsiWithNoMutations(),
-            $schema->getMinMsi(),
-            $schema->getMinCoveredMsi(),
-            $schema->getMutators(),
-            $schema->getTestFramework(),
-            $schema->getBootstrap(),
-            $schema->getInitialTestsPhpOptions(),
-            $schema->getTestFrameworkExtraOptions(),
-            $schema->getStaticAnalysisToolOptions(),
-            $schema->getThreads(),
-            $schema->getStaticAnalysisTool(),
+            $schema->file,
+            $schema->timeout,
+            $schema->source,
+            $schema->logs,
+            $schema->tmpDir,
+            $schema->phpUnit,
+            $schema->phpStan,
+            $schema->ignoreMsiWithNoMutations,
+            $schema->minMsi,
+            $schema->minCoveredMsi,
+            $schema->mutators,
+            $schema->testFramework,
+            $schema->bootstrap,
+            $schema->initialTestsPhpOptions,
+            $schema->testFrameworkExtraOptions,
+            $schema->staticAnalysisToolOptions,
+            $schema->threads,
+            $schema->staticAnalysisTool,
         );
     }
 
@@ -245,6 +247,9 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param TestFrameworkTypes::*|null $testFramework
+     */
     public function withTestFramework(?string $testFramework): self
     {
         $clone = clone $this;
@@ -293,6 +298,9 @@ final class SchemaConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
+     */
     public function withStaticAnalysisTool(?string $staticAnalysisTool): self
     {
         $clone = clone $this;

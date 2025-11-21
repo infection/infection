@@ -59,8 +59,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 <?php
 
                 $a = substr('Good Afternoon!', 0, -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 <?php
 
                 $a = substr(\Class_With_Const::Const, 0, -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \substr('Good Afternoon!', 0, -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 if (substr($a, 0, -1) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 <?php
 
                 $a = sUbStR('Good Afternoon!', 0, -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 <?php
 
                 $a = substr($foo->bar(), 0, -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -151,8 +145,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 $a = substr(array_reduce($words, function (string $carry, string $item) {
                     return $carry;
                 }), 0, -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -187,8 +180,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 $a = 'substr';
 
                 $b = $a('Bar', 0, -1);
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates correctly complex code with dynamic method name. Related to https://github.com/infection/infection/issues/1799' => [
@@ -196,8 +188,7 @@ final class UnwrapSubstrTest extends BaseMutatorTestCase
                 <?php
 
                 $object->{substr($key, 0, -2)}();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

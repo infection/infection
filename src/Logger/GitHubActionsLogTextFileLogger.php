@@ -33,39 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework;
+namespace Infection\Logger;
 
-use DOMDocument;
-use Infection\TestFramework\SafeDOMXPath;
-use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
+use const PHP_EOL;
+use function sprintf;
+use function trim;
 
-#[CoversClass(SafeDOMXPath::class)]
-final class SafeDOMXPathTest extends TestCase
+/**
+ * Uses the GitHub Actions line grouping feature to make the output more digestable and collapsable.
+ *
+ * @see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#grouping-log-lines
+ *
+ * @internal
+ */
+final readonly class GitHubActionsLogTextFileLogger extends BaseTextFileLogger
 {
-    public function test_it_reads_xml(): void
+    protected function getHeadlineLines(string $headlinePrefix): string
     {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $this->assertSame('Baz', $xPath->query('/foo/bar')[0]->nodeValue);
+        return '';
     }
 
-    public function test_it_fails_on_invalid_query(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><foo><bar>Baz</bar></foo>');
-        $xPath->query('#');
-    }
+    /**
+     * @param MutantExecutionResult[] $executionResults
+     */
+    protected function getResultsLine(
+        array $executionResults,
+        string $headlinePrefix,
+        bool &$separateSections,
+    ): string {
+        $results = trim(parent::getResultsLine($executionResults, $headlinePrefix, $separateSections));
 
-    public function test_it_fails_on_invalid_xml(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        SafeDOMXPath::fromString('<?xml version="1.0"?><foo>');
-    }
+        if ($results === '') {
+            return sprintf('0 %s mutants' . PHP_EOL, $headlinePrefix);
+        }
 
-    public function test_it_has_document_property(): void
-    {
-        $xPath = SafeDOMXPath::fromString('<?xml version="1.0"?><test/>');
-        $this->assertInstanceOf(DOMDocument::class, $xPath->document);
+        return sprintf('::group::%s mutants' . PHP_EOL . '%s' . PHP_EOL . '::endgroup::' . PHP_EOL, $headlinePrefix, $results);
     }
 }

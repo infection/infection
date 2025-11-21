@@ -55,8 +55,7 @@ final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
                 abstract public function shouldBeIgnored($ignored);
             }
 
-            PHP
-            ,
+            PHP,
             $spy = $this->createSpy(),
         );
 

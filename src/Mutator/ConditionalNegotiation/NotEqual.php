@@ -57,8 +57,7 @@ final class NotEqual implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a not equal operator (`!=`) with its counterpart the not equal operator (`==`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
