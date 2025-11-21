@@ -40,6 +40,7 @@ use function array_key_exists;
 use function array_shift;
 use function count;
 use function implode;
+use Infection\Framework\ClassName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -129,7 +130,7 @@ abstract class BaseMutatorTestCase extends TestCase
 
     protected function getTestedMutatorClassName(): string
     {
-        return SourceTestClassNameScheme::getSourceClassName(static::class);
+        return ClassName::getCanonicalSourceClassName(static::class);
     }
 
     /**

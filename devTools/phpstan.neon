@@ -139,15 +139,10 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/benchmark/*/*Bench.php
 
-        # We are testing user input values hence by design they may not fit the specified type
+        # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
-            message: '#\$testFramework#'
             identifier: argument.type
-            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-        -
-            message: '#\$staticAnalysisTool#'
-            identifier: argument.type
-            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+            path: ../tests/phpunit/Framework/ClassNameTest.php
 
     level: 8
     paths:
