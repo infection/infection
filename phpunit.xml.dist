@@ -10,7 +10,7 @@
          displayDetailsOnPhpunitDeprecations="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
-         cacheDirectory="./build/cache/phpunit"
+         cacheDirectory="./var/cache/phpunit"
 >
 
     <php>
