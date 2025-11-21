@@ -43,7 +43,6 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use function Safe\chdir;
 use function Safe\touch;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
@@ -62,21 +61,10 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        // Move to the temporary directory: we want to make sure the setUp closures are executed
-        // there since they do not have access to the tmp yet, so their paths are relative
-        chdir($this->tmp);
-
         $this->locator = new JUnitReportLocator(
             $this->tmp,
             $this->tmp . '/junit.xml',
         );
-    }
-
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
-
-        parent::tearDown();
     }
 
     public function test_it_can_locate_the_default_junit_file(): void
