@@ -138,16 +138,16 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../tests/benchmark/*/*Bench.php
-
-        # We are testing user input values hence by design they may not fit the specified type
-        -
-            message: '#\$testFramework#'
-            identifier: argument.type
-            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-        -
-            message: '#\$staticAnalysisTool#'
-            identifier: argument.type
-            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+#
+#        # We are testing user input values hence by design they may not fit the specified type
+#        -
+#            message: '#\$testFramework#'
+#            identifier: argument.type
+#            path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
+#        -
+#            message: '#\$staticAnalysisTool#'
+#            identifier: argument.type
+#            path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
     level: 8
     paths:
