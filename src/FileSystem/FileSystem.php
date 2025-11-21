@@ -33,44 +33,28 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\FileSystem;
 
-use function dirname;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use function is_dir;
+use function is_file;
+use function is_readable;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Finder\Finder;
 
-/**
- * Provides the traces based on the PHPUnit XML coverage collected.
- *
- * @internal
- * @final
- */
-class PhpUnitXmlCoverageTraceProvider implements TraceProvider
+class FileSystem extends SymfonyFilesystem
 {
-    public function __construct(
-        private readonly ReportLocator $indexLocator,
-        private readonly IndexXmlCoverageParser $indexParser,
-        private readonly XmlCoverageParser $parser,
-    ) {
+    public function isReadableFile(string $path): bool
+    {
+        return is_file($path) && is_readable($path);
     }
 
-    /**
-     * @return iterable<Trace>
-     */
-    public function provideTraces(): iterable
+    public function isReadableDirectory(string $path): bool
     {
-        // The existence of the file should have already been checked. Hence in theory we should not
-        // have to deal with a FileNotFound exception here so we skip any friendly error handling
-        $indexPath = $this->indexLocator->locate();
-        $coverageBasePath = dirname($indexPath);
+        return is_dir($path) && is_readable($path);
+    }
 
-        foreach ($this->indexParser->parse(
-            $indexPath,
-            $coverageBasePath,
-        ) as $infoProvider) {
-            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
-        }
+    public function createFinder(): Finder
+    {
+        return Finder::create();
     }
 }

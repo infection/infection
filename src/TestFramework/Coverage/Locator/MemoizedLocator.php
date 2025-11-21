@@ -33,44 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Coverage\Locator;
 
-use function dirname;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
-
-/**
- * Provides the traces based on the PHPUnit XML coverage collected.
- *
- * @internal
- * @final
- */
-class PhpUnitXmlCoverageTraceProvider implements TraceProvider
+final class MemoizedLocator implements ReportLocator
 {
+    private string $location;
+
+    private string $defaultLocation;
+
     public function __construct(
-        private readonly ReportLocator $indexLocator,
-        private readonly IndexXmlCoverageParser $indexParser,
-        private readonly XmlCoverageParser $parser,
+        private readonly ReportLocator $decoratedLocator,
     ) {
     }
 
-    /**
-     * @return iterable<Trace>
-     */
-    public function provideTraces(): iterable
+    public function locate(): string
     {
-        // The existence of the file should have already been checked. Hence in theory we should not
-        // have to deal with a FileNotFound exception here so we skip any friendly error handling
-        $indexPath = $this->indexLocator->locate();
-        $coverageBasePath = dirname($indexPath);
-
-        foreach ($this->indexParser->parse(
-            $indexPath,
-            $coverageBasePath,
-        ) as $infoProvider) {
-            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
+        if (!isset($this->location)) {
+            $this->location = $this->decoratedLocator->locate();
         }
+
+        return $this->location;
+    }
+
+    public function getDefaultLocation(): string
+    {
+        if (!isset($this->defaultLocation)) {
+            $this->defaultLocation = $this->decoratedLocator->getDefaultLocation();
+        }
+
+        return $this->defaultLocation;
     }
 }

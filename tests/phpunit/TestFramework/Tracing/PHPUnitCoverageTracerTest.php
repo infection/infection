@@ -51,7 +51,7 @@ use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Coverage\XmlReport\Index\IndexReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
@@ -86,7 +86,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
-                new IndexXmlCoverageLocator($coveragePath),
+                new IndexReportLocator($coveragePath),
                 new IndexXmlCoverageParser(isForGitDiffLines: false),
                 new XmlCoverageParser(),
             ),

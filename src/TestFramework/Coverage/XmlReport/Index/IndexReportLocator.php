@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\JUnit;
+namespace Infection\TestFramework\Coverage\XmlReport\Index;
 
 use const DIRECTORY_SEPARATOR;
 use function implode;
@@ -50,23 +50,23 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final readonly class JUnitReportLocator extends BaseReportLocator implements ReportLocator
+final readonly class IndexReportLocator extends BaseReportLocator implements ReportLocator
 {
-    public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
+    public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 
-    private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
+    private const DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
 
     public static function create(
         FileSystem $filesystem,
         string $coverageDirectory,
-        ?string $defaultJUnitPathname = null,
+        ?string $defaultPHPUnitXmlCoverageIndexPathname = null,
     ): self {
         return new self(
             $filesystem,
             $coverageDirectory,
-            $defaultJUnitPathname === null
-                ? self::createPHPUnitDefaultJUnitPathname($coverageDirectory)
-                : Path::canonicalize($defaultJUnitPathname),
+            $defaultPHPUnitXmlCoverageIndexPathname === null
+                ? self::createPHPUnitDefaultCoverageXmlIndexPathname($coverageDirectory)
+                : Path::canonicalize($defaultPHPUnitXmlCoverageIndexPathname),
         );
     }
 
@@ -74,7 +74,7 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     {
         return new InvalidReportSource(
             sprintf(
-                'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
                 $coverageDirectory,
             ),
         );
@@ -86,9 +86,9 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     ): TooManyReportsFound {
         return new TooManyReportsFound(
             sprintf(
-                'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                'Could not find the XML coverage index report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
                 $coverageDirectory,
-                self::JUNIT_FILENAME_REGEX,
+                self::INDEX_FILENAME_REGEX,
                 implode(
                     '", "',
                     $reportPathnames,
@@ -102,9 +102,9 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     {
         return new NoReportFound(
             sprintf(
-                'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
+                'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
                 $coverageDirectory,
-                self::JUNIT_FILENAME_REGEX,
+                self::INDEX_FILENAME_REGEX,
             ),
         );
     }
@@ -113,7 +113,7 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
     {
         // TODO: should the file depth be limited too?
         $finder
-            ->name(self::JUNIT_FILENAME_REGEX)
+            ->name(self::INDEX_FILENAME_REGEX)
             // We sort by name for deterministic results. It has no impact on
             // the happy path as we expect to find only one file.
             // In the other scenario, this gives a more consistent result to the
@@ -122,8 +122,8 @@ final readonly class JUnitReportLocator extends BaseReportLocator implements Rep
             ->sortByName();
     }
 
-    private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string
+    private static function createPHPUnitDefaultCoverageXmlIndexPathname(string $coverageDirectory): string
     {
-        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT_FILENAME);
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_INDEX_RELATIVE_PATHNAME);
     }
 }
