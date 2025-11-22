@@ -42,7 +42,7 @@ final readonly class GitOptions
     public function __construct(
         public ?string $filter,
         public bool $isForDiffLines,
-        public string $baseBranch,
+        public ?string $baseBranch,
     ) {
         if ($filter === null) {
             Assert::true($isForDiffLines);

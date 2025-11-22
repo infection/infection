@@ -39,7 +39,7 @@ final readonly class GitSource
 {
     public function __construct(
         public string $baseBranch,
-        public bool $isForGitDiffLines,
+        public bool   $isForDiffLines,
     ) {
     }
 }

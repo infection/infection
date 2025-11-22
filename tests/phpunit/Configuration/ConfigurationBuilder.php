@@ -36,6 +36,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use Infection\Configuration\Entry\GitSource;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
@@ -57,25 +58,27 @@ final class ConfigurationBuilder
     /**
      * @param string[] $sourceDirectories
      * @param iterable<SplFileInfo> $sourceFiles
+     * @param non-empty-string|null $sourceFilter
      * @param string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     private function __construct(
-        private float $timeout,
-        private array $sourceDirectories,
+        private float    $timeout,
+        private array    $sourceDirectories,
         private iterable $sourceFiles,
-        private string $sourceFilesFilter,
-        private array $sourceFilesExcludes,
-        private Logs $logs,
-        private string $logVerbosity,
-        private string $tmpDir,
-        private PhpUnit $phpUnit,
-        private PhpStan $phpStan,
-        private array $mutators,
-        private string $testFramework,
-        private ?string $bootstrap,
-        private ?string $initialTestsPhpOptions,
+        private ?string   $sourceFilter,
+        private ?GitSource $gitSource,
+        private array    $sourceFilesExcludes,
+        private Logs     $logs,
+        private string   $logVerbosity,
+        private string   $tmpDir,
+        private PhpUnit  $phpUnit,
+        private PhpStan  $phpStan,
+        private array    $mutators,
+        private string   $testFramework,
+        private ?string  $bootstrap,
+        private ?string  $initialTestsPhpOptions,
         private string $testFrameworkExtraOptions,
         private ?string $staticAnalysisToolOptions,
         private string $coveragePath,
@@ -93,8 +96,6 @@ final class ConfigurationBuilder
         private bool $dryRun,
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
-        private bool $isForGitDiffLines,
-        private ?string $gitDiffBase,
         private ?string $mapSourceClassToTestStrategy,
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
@@ -108,7 +109,8 @@ final class ConfigurationBuilder
             $configuration->processTimeout,
             $configuration->sourceDirectories,
             $configuration->sourceFiles,
-            $configuration->sourceFilesFilter,
+            $configuration->sourceFilter,
+            $configuration->gitSource,
             $configuration->sourceFilesExcludes,
             $configuration->logs,
             $configuration->logVerbosity,
@@ -138,8 +140,6 @@ final class ConfigurationBuilder
             $configuration->isDryRun,
             $configuration->ignoreSourceCodeMutatorsMap,
             $configuration->executeOnlyCoveringTestCases,
-            $configuration->isForGitDiffLines,
-            $configuration->gitDiffBase,
             $configuration->mapSourceClassToTestStrategy,
             $configuration->loggerProjectRootDirectory,
             $configuration->staticAnalysisTool,
@@ -153,7 +153,8 @@ final class ConfigurationBuilder
             timeout: 10.0,
             sourceDirectories: [],
             sourceFiles: [],
-            sourceFilesFilter: '',
+            sourceFilter: null,
+            gitSource: null,
             sourceFilesExcludes: [],
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
@@ -181,8 +182,6 @@ final class ConfigurationBuilder
             dryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
-            isForGitDiffLines: false,
-            gitDiffBase: null,
             mapSourceClassToTestStrategy: null,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -199,7 +198,11 @@ final class ConfigurationBuilder
                 new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                 new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
             ],
-            sourceFilesFilter: 'src/Foo.php,src/Bar.php',
+            sourceFilter: 'src/Foo.php,src/Bar.php',
+            gitSource: new GitSource(
+                baseBranch: 'origin/main',
+                isForDiffLines: true,
+            ),
             sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
                 textLogFilePath: 'text.log',
@@ -245,8 +248,6 @@ final class ConfigurationBuilder
                 'Foo\\Bar' => ['.*test.*'],
             ],
             executeOnlyCoveringTestCases: true,
-            isForGitDiffLines: true,
-            gitDiffBase: 'origin/master',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
@@ -281,10 +282,21 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withSourceFilesFilter(string $sourceFilesFilter): self
+    /**
+     * @param non-empty-string|null $sourceFilter
+     */
+    public function withSourceFilter(?string $sourceFilter): self
     {
         $clone = clone $this;
-        $clone->sourceFilesFilter = $sourceFilesFilter;
+        $clone->sourceFilter = $sourceFilter;
+
+        return $clone;
+    }
+
+    public function withGitSource(?GitSource $source): self
+    {
+        $clone = clone $this;
+        $clone->gitSource = $source;
 
         return $clone;
     }
@@ -511,22 +523,6 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withIsForGitDiffLines(bool $isForGitDiffLines): self
-    {
-        $clone = clone $this;
-        $clone->isForGitDiffLines = $isForGitDiffLines;
-
-        return $clone;
-    }
-
-    public function withGitDiffBase(?string $gitDiffBase): self
-    {
-        $clone = clone $this;
-        $clone->gitDiffBase = $gitDiffBase;
-
-        return $clone;
-    }
-
     public function withMapSourceClassToTestStrategy(?string $mapSourceClassToTestStrategy): self
     {
         $clone = clone $this;
@@ -565,7 +561,8 @@ final class ConfigurationBuilder
             $this->timeout,
             $this->sourceDirectories,
             $this->sourceFiles,
-            $this->sourceFilesFilter,
+            $this->sourceFilter,
+            $this->gitSource,
             $this->sourceFilesExcludes,
             $this->logs,
             $this->logVerbosity,
@@ -593,8 +590,6 @@ final class ConfigurationBuilder
             $this->dryRun,
             $this->ignoreSourceCodeMutatorsMap,
             $this->executeOnlyCoveringTestCases,
-            $this->isForGitDiffLines,
-            $this->gitDiffBase,
             $this->mapSourceClassToTestStrategy,
             $this->loggerProjectRootDirectory,
             $this->staticAnalysisTool,

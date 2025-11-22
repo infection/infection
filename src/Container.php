@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Configuration\Entry\GitOptions;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -181,8 +182,6 @@ final class Container extends DIContainer
 
     public const DEFAULT_GIT_DIFF_FILTER = null;
 
-    public const DEFAULT_GIT_DIFF_LINES = false;
-
     public const DEFAULT_GIT_DIFF_BASE = null;
 
     public const DEFAULT_USE_GITHUB_LOGGER = null;
@@ -225,7 +224,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
-    public const DEFAULT_FILTER = '';
+    public const DEFAULT_FILTER = null;
 
     public const DEFAULT_THREAD_COUNT = null;
 
@@ -255,9 +254,9 @@ final class Container extends DIContainer
                 $container->getSourceFileFilter(),
                 $container->getConfiguration()->sourceFiles,
             ),
-            SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
-                $container->getConfiguration()->getSourceFilter(),
-                $container->getConfiguration()->getSourceFilesExcludes(),
+            SourceFileFilter::class => static fn (self $container): SourceFileFilter => SourceFileFilter::create(
+                $container->getConfiguration()->sourceFilter,
+                $container->getConfiguration()->sourceFilesExcludes,
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
@@ -573,6 +572,9 @@ final class Container extends DIContainer
         );
     }
 
+    /**
+     * @param non-empty-string|GitOptions|null $filter
+     */
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,
@@ -595,12 +597,9 @@ final class Container extends DIContainer
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        string $filter = self::DEFAULT_FILTER,
+        string|GitOptions|null $filter = self::DEFAULT_FILTER,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
-        ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
-        bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
-        ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
         ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
@@ -673,9 +672,6 @@ final class Container extends DIContainer
                 $filter,
                 $threadCount,
                 $dryRun,
-                $gitDiffFilter,
-                $isForGitDiffLines,
-                $gitDiffBase,
                 $useGitHubLogger,
                 $gitlabLogFilePath,
                 $htmlLogFilePath,

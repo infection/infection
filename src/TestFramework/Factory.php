@@ -138,7 +138,8 @@ final readonly class Factory
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        if ($this->sourceFileFilter->getFilters() === []) {
+        $sourceFileFilter = $this->sourceFileFilter;
+        if ($sourceFileFilter->filters === []) {
             return [];
         }
 

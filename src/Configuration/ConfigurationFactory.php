@@ -96,6 +96,9 @@ class ConfigurationFactory
     ) {
     }
 
+    /**
+     * @param non-empty-string|GitOptions|null $sourceFilter
+     */
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -156,11 +159,11 @@ class ConfigurationFactory
             $this->collectFiles($schema),
             $this->retrieveFilter(
                 $sourceFilter,
-                $schema->getSource()->getDirectories(),
+                $schema->source->directories,
             ),
             $this->getGitSource($sourceFilter),
-            $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
+            $schema->source->excludes,
+            $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             $logVerbosity,
             $namespacedTmpDir,
             $this->retrievePhpUnit($schema, $configDir),
@@ -362,12 +365,13 @@ class ConfigurationFactory
     }
 
     /**
+     * @param non-empty-string|GitOptions|null $sourceFilter
      * @param string[] $sourceDirectories
      */
     private function retrieveFilter(
         string|GitOptions|null $sourceFilter,
         array $sourceDirectories,
-    ): string {
+    ): ?string {
         return $sourceFilter instanceof GitOptions
             ? $this->retrieveGitFilter($sourceFilter, $sourceDirectories)
             : $sourceFilter;
@@ -375,6 +379,8 @@ class ConfigurationFactory
 
     /**
      * @param string[] $sourceDirectories
+     *
+     * @return non-empty-string|null
      */
     private function retrieveGitFilter(
         GitOptions $options,
@@ -385,7 +391,7 @@ class ConfigurationFactory
             ? 'AM'
             : $options->filter;
 
-        return $this->gitDiffFileProvider->provide($filter, $baseBranch, $sourceDirectories);
+        return $this->gitDiffFileProvider->provide($filter ?? '', $baseBranch, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs

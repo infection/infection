@@ -500,56 +500,56 @@ final class RunCommand extends BaseCommand
         $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
-            $logger,
-            $io->getOutput(),
-            $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
-            trim((string) $input->getOption(self::OPTION_MUTATORS)),
-            $commandHelper->getNumberOfShownMutations(),
-            trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
+            logger: $logger,
+            output: $io->getOutput(),
+            configFile: $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
+            mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
+            numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
+            logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
-            (bool) $input->getOption(self::OPTION_DEBUG),
+            debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
-            (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            self::getFormatterName($input),
+            withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
+            formatterName: self::getFormatterName($input),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
-            $noProgress,
-            $forceProgress,
-            $coverage === ''
+            noProgress: $noProgress,
+            forceProgress: $forceProgress,
+            existingCoveragePath: $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
-            $initialTestsPhpOptions === ''
+            initialTestsPhpOptions: $initialTestsPhpOptions === ''
                 ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
                 : $initialTestsPhpOptions,
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
-            (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
+            skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
-            (bool) $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS),
-            MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
-            MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
-            $msiPrecision,
-            $testFramework === ''
+            ignoreMsiWithNoMutations: (bool) $input->getOption(self::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS),
+            minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
+            minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
+            msiPrecision: $msiPrecision,
+            testFramework: $testFramework === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK
                 : $testFramework,
-            $testFrameworkExtraOptions === ''
+            testFrameworkExtraOptions: $testFrameworkExtraOptions === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
-            $staticAnalysisToolOptions === ''
+            staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            self::getSourceFilter($input),
-            $commandHelper->getThreadCount(),
+            filter: self::getSourceFilter($input),
+            threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
-            (bool) $input->getOption(self::OPTION_DRY_RUN),
-            $commandHelper->getUseGitHubLogger(),
-            $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
-            $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
-            $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
-            (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
-            (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
-            $commandHelper->getMapSourceClassToTest(),
-            $loggerProjectRootDirectory,
-            $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
-            $input->getOption(self::OPTION_MUTANT_ID),
+            dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
+            useGitHubLogger: $commandHelper->getUseGitHubLogger(),
+            gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
+            htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
+            textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
+            executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
+            mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
+            loggerProjectRootDirectory: $loggerProjectRootDirectory,
+            staticAnalysisTool: $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
+            mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
     }
 
@@ -674,6 +674,9 @@ final class RunCommand extends BaseCommand
         return $filter ?? $gitOptions;
     }
 
+    /**
+     * @return non-empty-string|null
+     */
     private static function getFilter(InputInterface $input): ?string
     {
         $value = trim((string) $input->getOption(self::OPTION_FILTER));
@@ -716,7 +719,7 @@ final class RunCommand extends BaseCommand
             ? new GitOptions(
                 $gitDiffFilter,
                 $isForGitDiffLines,
-                $gitDiffBase ?? $filterSourceWithGit,
+                $gitDiffBase,
             )
             : null;
     }

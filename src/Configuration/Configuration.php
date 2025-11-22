@@ -66,6 +66,7 @@ readonly class Configuration
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
+     * @param non-empty-string|null $sourceFilter
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
@@ -73,7 +74,7 @@ readonly class Configuration
         public float $processTimeout,
         public array $sourceDirectories,
         public iterable $sourceFiles,
-        public string $sourceFilter,
+        public string|null $sourceFilter,
         public ?GitSource $gitSource,
         public array $sourceFilesExcludes,
         public Logs $logs,
@@ -115,11 +116,6 @@ readonly class Configuration
         Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
         Assert::nullOrGreaterThanEq($minMsi, 0.);
         Assert::greaterThanEq($threadCount, 0);
-    }
-
-    public function getSourceFilter(): string|GitOptions|null
-    {
-        return $this->sourceFilter;
     }
 
     public function isStaticAnalysisEnabled(): bool

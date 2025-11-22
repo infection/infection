@@ -96,7 +96,9 @@ class GitDiffFileProvider
     /**
      * @param string[] $sourceDirectories
      *
-     * @return string comma-separated list of the relative (to the git root) file paths
+     * @throws NoFilesInDiffToMutate
+     *
+     * @return non-empty-string comma-separated list of the relative (to the git root) file paths
      */
     public function provide(string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string
     {

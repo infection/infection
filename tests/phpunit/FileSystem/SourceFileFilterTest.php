@@ -50,25 +50,29 @@ use Traversable;
 final class SourceFileFilterTest extends TestCase
 {
     /**
-     * @param string[] $expectedFilters
+     * @param non-empty-string|null $filter
+     * @param non-empty-string[] $expected
      */
     #[DataProvider('filterProvider')]
-    public function test_it_can_parse_and_normalize_string_filter(
-        string $filter,
-        array $expectedFilters,
+    public function test_it_can_parse_and_normalize_the_string_filter(
+        ?string $filter,
+        array  $expected,
     ): void {
-        $fileFilter = new SourceFileFilter($filter, []);
+        $fileFilter = SourceFileFilter::create($filter);
 
-        $this->assertSame($expectedFilters, array_values($fileFilter->getFilters()));
+        $actual = $fileFilter->filters;
+
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
-     * @param string[] $filePaths
-     * @param string[] $expectedFilePaths
+     * @param non-empty-string|null $filter
+     * @param non-empty-string[] $filePaths
+     * @param non-empty-string[] $expectedFilePaths
      */
     #[DataProvider('fileListProvider')]
     public function test_it_filters_spl_file_info_files_traversable(
-        string $filter,
+        ?string $filter,
         array $filePaths,
         array $expectedFilePaths,
     ): void {
@@ -78,12 +82,13 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @param string[] $filePaths
-     * @param string[] $expectedFilePaths
+     * @param non-empty-string|null $filter
+     * @param non-empty-string[] $filePaths
+     * @param non-empty-string[] $expectedFilePaths
      */
     #[DataProvider('fileListProvider')]
     public function test_it_filters_traces_traversable(
-        string $filter,
+        ?string $filter,
         array $filePaths,
         array $expectedFilePaths,
     ): void {
@@ -93,12 +98,13 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @param string[] $filePaths
-     * @param string[] $expectedFilePaths
+     * @param non-empty-string|null $filter
+     * @param non-empty-string[] $filePaths
+     * @param non-empty-string[] $expectedFilePaths
      */
     #[DataProvider('fileListProvider')]
     public function test_it_filters_spl_file_info_iterator(
-        string $filter,
+        ?string $filter,
         array $filePaths,
         array $expectedFilePaths,
     ): void {
@@ -110,12 +116,13 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @param string[] $filePaths
-     * @param string[] $expectedFilePaths
+     * @param non-empty-string|null $filter
+     * @param non-empty-string[] $filePaths
+     * @param non-empty-string[] $expectedFilePaths
      */
     #[DataProvider('fileListProvider')]
     public function test_it_filters_trace_iterator(
-        string $filter,
+        ?string $filter,
         array $filePaths,
         array $expectedFilePaths,
     ): void {
@@ -128,7 +135,9 @@ final class SourceFileFilterTest extends TestCase
 
     public static function filterProvider(): iterable
     {
-        yield 'empty' => ['', []];
+        yield 'null' => [null, []];
+
+        yield 'blank' => [', ,', []];
 
         yield 'nominal' => [
             'src/Foo.php, src/Bar.php',
@@ -167,8 +176,8 @@ final class SourceFileFilterTest extends TestCase
             [],
         ];
 
-        yield [
-            '',
+        yield 'no filter' => [
+            null,
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',
@@ -196,15 +205,16 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
+     * @param non-empty-string|null $filter
      * @param iterable<Trace> $input
-     * @param string[] $expectedFilePaths
+     * @param non-empty-string[] $expectedFilePaths
      */
     private function assertFiltersExpectedInput(
-        string $filter,
+        ?string $filter,
         iterable $input,
         array $expectedFilePaths,
     ): void {
-        $actual = (new SourceFileFilter($filter, []))->filter($input);
+        $actual = SourceFileFilter::create($filter)->filter($input);
 
         $actual = take($actual)
             ->map(static fn ($traceOrFileInfo) => $traceOrFileInfo->getRealPath())
@@ -214,7 +224,7 @@ final class SourceFileFilterTest extends TestCase
     }
 
     /**
-     * @param string[] $filePaths
+     * @param non-empty-string[] $filePaths
      *
      * @return Traversable<MockSplFileInfo>
      */
@@ -223,8 +233,6 @@ final class SourceFileFilterTest extends TestCase
         return take($filePaths)
             ->map(static fn (string $realPath): MockSplFileInfo => new MockSplFileInfo([
                 'realPath' => $realPath,
-                'type' => 'file',
-                'mode' => 'r+',
             ]))
         ;
     }
