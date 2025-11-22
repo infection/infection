@@ -2054,7 +2054,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             ];
         }
 
-        foreach (self::PROFILES as $index => $profile) {
+        foreach (self::PROFILES as $profile) {
             yield '[mutators][profile] ' . $profile . ' false' => (static fn (): array => [
                 <<<JSON
                     {

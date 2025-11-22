@@ -38,6 +38,7 @@ use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
+use Rector\DeadCode\Rector\Foreach_\RemoveUnusedForeachKeyRector;
 use Rector\DeadCode\Rector\FunctionLike\NarrowTooWideReturnTypeRector;
 use Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
@@ -54,6 +55,7 @@ return RectorConfig::configure()
         AddCoversClassAttributeRector::class,
         NarrowTooWideReturnTypeRector::class,
         RemoveEmptyClassMethodRector::class,
+        RemoveUnusedForeachKeyRector::class,
         RemoveUnusedPromotedPropertyRector::class,
         RemoveUnusedPublicMethodParameterRector::class,
         RemoveUnusedVariableAssignRector::class,
