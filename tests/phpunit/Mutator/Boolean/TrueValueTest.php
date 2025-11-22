@@ -47,7 +47,7 @@ final class TrueValueTest extends BaseMutatorTestCase
 {
     /**
      * @param string|string[] $expected
-     * @param mixed[] $settings
+     * @param array<string, bool> $settings
      */
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate($input, $expected = [], array $settings = []): void

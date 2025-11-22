@@ -50,6 +50,9 @@ use function range;
 #[CoversClass(LineRangeCalculator::class)]
 final class LineRangeCalculatorTest extends TestCase
 {
+    /**
+     * @param int[] $nodeRange
+     */
     #[DataProvider('provideCodeAndRangeCases')]
     public function test_it_can_find_the_outer_most_array(string $code, array $nodeRange): void
     {

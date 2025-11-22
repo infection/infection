@@ -86,6 +86,9 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         $this->fileSystem->remove($this->workspace);
     }
 
+    /**
+     * @param string[] $dirsInCurrentFolder
+     */
     #[DataProvider('excludeDirsProvider')]
     public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {

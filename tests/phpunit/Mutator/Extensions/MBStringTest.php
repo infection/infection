@@ -52,6 +52,7 @@ final class MBStringTest extends BaseMutatorTestCase
 
     /**
      * @param string|string[]|null $expected
+     * @param array<string, bool> $settings
      */
     #[DataProvider('mutationsProvider')]
     public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
@@ -586,7 +587,7 @@ final class MBStringTest extends BaseMutatorTestCase
         ];
     }
 
-    private static function mutationsProviderForStrSplit()
+    private static function mutationsProviderForStrSplit(): iterable
     {
         yield 'It converts mb_str_split to str_split' => [
             "<?php mb_str_split('test', 2);",

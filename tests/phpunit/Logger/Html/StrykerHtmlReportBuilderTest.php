@@ -70,6 +70,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
 
+    /**
+     * @param array<string, array<string, mixed>|string> $expectedReport
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,

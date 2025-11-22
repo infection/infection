@@ -49,9 +49,14 @@ use function Safe\realpath;
 #[CoversClass(DiffChangedLinesParser::class)]
 final class DiffChangedLinesParserTest extends TestCase
 {
+    /**
+     * @param array<string, array<int, ChangedLinesRange>> $expectedMap
+     */
     #[DataProvider('provideDiffs')]
-    public function test_it_converts_diff_to_files_and_changed_lines_map(string $diff, array $expectedMap): void
-    {
+    public function test_it_converts_diff_to_files_and_changed_lines_map(
+        string $diff,
+        array $expectedMap,
+    ): void {
         $collector = new DiffChangedLinesParser();
 
         $resultMap = $collector->parse($diff);
