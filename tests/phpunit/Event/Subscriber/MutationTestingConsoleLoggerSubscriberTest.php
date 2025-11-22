@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Fidry\FileSystem\NativeFileSystem;
 use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
@@ -62,7 +63,6 @@ use function Safe\stream_get_contents;
 use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
@@ -459,13 +459,13 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 new FederatedLogger(
                     new FileLogger(
                         'relative/path.log',
-                        new Filesystem(),
+                        new NativeFileSystem(),
                         new DummyLineMutationTestingResultsLogger([]),
                         new FakeLogger(),
                     ),
                     new FileLogger(
                         '/absolute/path.html',
-                        new Filesystem(),
+                        new NativeFileSystem(),
                         new DummyLineMutationTestingResultsLogger([]),
                         new FakeLogger(),
                     ),

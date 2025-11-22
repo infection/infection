@@ -37,6 +37,9 @@ namespace Infection;
 
 use function array_filter;
 use DIContainer\Container as DIContainer;
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\NativeFileSystem;
+use Fidry\FileSystem\ReadOnlyFileSystem;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -71,7 +74,6 @@ use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
@@ -154,7 +156,6 @@ use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -555,7 +556,7 @@ final class Container extends DIContainer
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $configuration->isDryRun
-                        ? new DummyFileSystem()
+                        ? new ReadOnlyFileSystem(failOnWrite: false)
                         : $container->getFileSystem(),
                     $container->getDiffSourceCodeMatcher(),
                     $configuration->noProgress,
@@ -564,7 +565,10 @@ final class Container extends DIContainer
                     $configuration->mutantId,
                 );
             },
-            MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            MemoizedComposerExecutableFinder::class => static fn (self $container): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(
+                new ConcreteComposerExecutableFinder($container->getFileSystem()),
+            ),
+            FileSystem::class => static fn (): FileSystem => new NativeFileSystem(),
         ]);
 
         return $container->withValues(
@@ -692,9 +696,9 @@ final class Container extends DIContainer
         return $clone;
     }
 
-    public function getFileSystem(): Filesystem
+    public function getFileSystem(): FileSystem
     {
-        return $this->get(Filesystem::class);
+        return $this->get(FileSystem::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider

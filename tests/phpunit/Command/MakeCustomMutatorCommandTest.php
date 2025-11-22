@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command;
 
+use Fidry\FileSystem\FileSystem;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Console\Application;
 use Infection\Container;
@@ -44,7 +45,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(MakeCustomMutatorCommand::class)]
@@ -162,12 +162,9 @@ final class MakeCustomMutatorCommandTest extends TestCase
         $this->assertStringContainsString('NewMutator.php', $display);
     }
 
-    private function createFileSystemMock(): MockObject
+    private function createFileSystemMock(): MockObject&FileSystem
     {
-        /**
-         * @var Filesystem|MockObject
-         */
-        $fileSystemMock = $this->createMock(Filesystem::class);
+        $fileSystemMock = $this->createMock(FileSystem::class);
 
         $fileSystemMock
             ->expects($this->exactly(2))
@@ -180,7 +177,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     private function createContainer(): Container
     {
         return MockedContainer::createWithServices([
-            Filesystem::class => $this->createFileSystemMock(...),
+            FileSystem::class => $this->createFileSystemMock(...),
         ]);
     }
 }

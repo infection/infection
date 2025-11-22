@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config;
 
 use Closure;
 use const E_ALL;
+use Fidry\FileSystem\NativeFileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\Framework\Str;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
@@ -52,7 +53,6 @@ use function restore_error_handler;
 use function set_error_handler;
 use function sprintf;
 use function str_replace;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -67,7 +67,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
     protected function setUp(): void
     {
         $this->configManipulator = new XmlConfigurationManipulator(
-            new PathReplacer(new Filesystem()),
+            new PathReplacer(new NativeFileSystem()),
             '',
         );
     }
@@ -915,7 +915,7 @@ final class XmlConfigurationManipulatorTest extends TestCase
     public function test_it_uses_the_configured_phpunit_config_dir_to_build_schema_paths(): void
     {
         $configManipulator = new XmlConfigurationManipulator(
-            new PathReplacer(new Filesystem()),
+            new PathReplacer(new NativeFileSystem()),
             __DIR__ . '/../../../../..',
         );
 

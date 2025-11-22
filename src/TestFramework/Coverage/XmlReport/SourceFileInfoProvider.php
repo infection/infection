@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\FS;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
 use function file_exists;
@@ -63,6 +65,7 @@ class SourceFileInfoProvider
         private readonly string $coverageDir,
         private readonly string $relativeCoverageFilePath,
         private readonly string $projectSource,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -123,7 +126,7 @@ class SourceFileInfoProvider
         );
 
         try {
-            $realPath = realpath($path);
+            $realPath = $this->fileSystem->normalizedRealPath($path);
         } catch (FilesystemException) {
             $coverageFilePath = Path::canonicalize(
                 $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath,

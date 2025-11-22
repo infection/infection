@@ -37,10 +37,10 @@ namespace Infection\TestFramework\PhpUnit\Config\Path;
 
 use DOMElement;
 use DOMNode;
+use Fidry\FileSystem\FileSystem;
 use function ltrim;
 use function sprintf;
 use function str_replace;
-use Symfony\Component\Filesystem\Filesystem;
 use function trim;
 
 /**
@@ -49,7 +49,7 @@ use function trim;
 final readonly class PathReplacer
 {
     public function __construct(
-        private Filesystem $filesystem,
+        private FileSystem $filesystem,
         private string $phpUnitConfigDir = '',
     ) {
     }

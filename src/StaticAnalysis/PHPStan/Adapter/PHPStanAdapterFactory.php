@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
+use Fidry\FileSystem\NativeFileSystem;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapterFactory;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\VersionParser;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -58,7 +58,7 @@ final class PHPStanAdapterFactory implements StaticAnalysisToolAdapterFactory
         array $staticAnalysisToolOptions,
     ): StaticAnalysisToolAdapter {
         return new PHPStanAdapter(
-            new Filesystem(),
+            new NativeFileSystem(),
             new PHPStanMutantExecutionResultFactory(),
             $staticAnalysisConfigPath,
             $staticAnalysisToolExecutable,

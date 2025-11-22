@@ -37,6 +37,7 @@ namespace Infection\StaticAnalysis\PHPStan\Adapter;
 
 use function array_merge;
 use function explode;
+use Fidry\FileSystem\FileSystem;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -46,7 +47,6 @@ use Infection\TestFramework\VersionParser;
 use RuntimeException;
 use function sprintf;
 use function str_starts_with;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use function version_compare;
 
@@ -63,7 +63,7 @@ final class PHPStanAdapter implements StaticAnalysisToolAdapter
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly Filesystem $fileSystem,
+        private readonly FileSystem $fileSystem,
         private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
         private readonly string $staticAnalysisConfigPath,
         private readonly string $staticAnalysisToolExecutable,
