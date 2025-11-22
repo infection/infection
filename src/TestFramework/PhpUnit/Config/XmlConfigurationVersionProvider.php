@@ -50,22 +50,22 @@ final class XmlConfigurationVersionProvider
     public function provide(SafeDOMXPath $xPath): string
     {
         // <coverage>
-        if ($xPath->query('/phpunit/coverage')->length > 0) {
+        if ($xPath->queryCount('/phpunit/coverage') > 0) {
             return self::NEXT_MAINSTREAM_VERSION;
         }
 
         // <logging><log type="*">
-        if ($xPath->query('/phpunit/logging/log')->length > 0) {
+        if ($xPath->queryCount('/phpunit/logging/log') > 0) {
             return self::LAST_LEGACY_VERSION;
         }
 
         // <logging><*> where <*> isn't <log>
-        if ($xPath->query('/phpunit/logging/*[name(.) != "log"]')->length > 0) {
+        if ($xPath->queryCount('/phpunit/logging/*[name(.) != "log"]') > 0) {
             return self::NEXT_MAINSTREAM_VERSION;
         }
 
         // <filter><whitelist>
-        if ($xPath->query('/phpunit/filter')->length > 0) {
+        if ($xPath->queryCount('/phpunit/filter') > 0) {
             return self::LAST_LEGACY_VERSION;
         }
 
@@ -73,7 +73,7 @@ final class XmlConfigurationVersionProvider
             'disableCodeCoverageIgnore', // <phpunit disableCodeCoverageIgnore="true">
             'ignoreDeprecatedCodeUnitsFromCodeCoverage', // <phpunit ignoreDeprecatedCodeUnitsFromCodeCoverage="true">
         ] as $legacyAttribute) {
-            if ($xPath->query("/phpunit[@{$legacyAttribute}]")->length > 0) {
+            if ($xPath->queryList("/phpunit[@{$legacyAttribute}]")->length > 0) {
                 return self::LAST_LEGACY_VERSION;
             }
         }
@@ -104,16 +104,12 @@ final class XmlConfigurationVersionProvider
 
     private function getSchemaURI(SafeDOMXPath $xPath): ?string
     {
-        if ($xPath->query('namespace::xsi')->length === 0) {
+        if ($xPath->queryCount('namespace::xsi') === 0) {
             return null;
         }
 
-        $schema = $xPath->query('/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation');
 
-        if ($schema->length === 0) {
-            return null;
-        }
-
-        return $schema[0]->nodeValue;
+        return $schema?->nodeValue;
     }
 }

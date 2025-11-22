@@ -46,7 +46,7 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
+            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:queryList\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
 
@@ -121,6 +121,12 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
+
+        -
+            message: "#queryCount#"
+            identifier: return.type
+            count: 1
+            path: ../src/TestFramework/SafeDOMXPath.php
 
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -

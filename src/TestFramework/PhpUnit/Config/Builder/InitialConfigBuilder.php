@@ -149,11 +149,13 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+        $count = $xPath->queryCount(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length === 0) {
-            $node = $xPath->query('/phpunit')[0];
-            $node->setAttribute($attribute, $value);
+        if ($count === 0) {
+            // @phpstan-ignore method.nonObject
+            $xPath
+                ->queryElement('/phpunit')
+                ->setAttribute($attribute, $value);
 
             return true;
         }
