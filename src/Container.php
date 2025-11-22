@@ -290,10 +290,8 @@ final class Container extends DIContainer
 
                 return new StaticAnalysisToolFactory(
                     $config,
-                    $container->getProjectDir(),
                     $container->getStaticAnalysisToolExecutableFinder(),
                     $container->getStaticAnalysisConfigLocator(),
-                    GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(

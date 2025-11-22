@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
 use Rector\DeadCode\Rector\FunctionLike\NarrowTooWideReturnTypeRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
@@ -49,6 +50,7 @@ return RectorConfig::configure()
     ->withRules([
         AddCoversClassAttributeRector::class,
         NarrowTooWideReturnTypeRector::class,
+        RemoveUnusedPromotedPropertyRector::class,
         RemoveUnusedVariableAssignRector::class,
     ])
     ->withConfiguredRule(
