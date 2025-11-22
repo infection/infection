@@ -1054,7 +1054,7 @@ final class ConfigurationFactoryTest extends TestCase
                             new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                             new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
                         ])
-                        ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                        ->withSourceFilter('src/Foo.php, src/Bar.php')
                         ->withSourceFilesExcludes('vendor/')
                         ->withLogs(Logs::createEmpty())
                         ->build(),
@@ -1082,7 +1082,7 @@ final class ConfigurationFactoryTest extends TestCase
                             new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                             new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
                         ])
-                        ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                        ->withSourceFilter('src/Foo.php, src/Bar.php')
                         ->withSourceFilesExcludes('vendor/')
                         ->withLogs(Logs::createEmpty())
                         ->build(),
@@ -1162,7 +1162,7 @@ final class ConfigurationFactoryTest extends TestCase
                         new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
                         new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
                     ])
-                    ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                    ->withSourceFilter('src/Foo.php, src/Bar.php')
                     ->withSourceFilesExcludes('vendor/')
                     ->withLogs(
                         LogsBuilder::withMinimalTestData()

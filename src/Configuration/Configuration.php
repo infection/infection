@@ -37,6 +37,8 @@ namespace Infection\Configuration;
 
 use function array_map;
 use function explode;
+use Infection\Configuration\Entry\GitOptions;
+use Infection\Configuration\Entry\GitSource;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
@@ -64,6 +66,7 @@ readonly class Configuration
      * @param string[] $sourceDirectories
      * @param string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
+     * @param non-empty-string|null $sourceFilter
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
@@ -71,7 +74,8 @@ readonly class Configuration
         public float $processTimeout,
         public array $sourceDirectories,
         public iterable $sourceFiles,
-        public string $sourceFilesFilter,
+        public string|null $sourceFilter,
+        public ?GitSource $gitSource,
         public array $sourceFilesExcludes,
         public Logs $logs,
         public string $logVerbosity,
@@ -99,8 +103,6 @@ readonly class Configuration
         public bool $isDryRun,
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
-        public bool $isForGitDiffLines,
-        public ?string $gitDiffBase,
         public ?string $mapSourceClassToTestStrategy,
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
@@ -136,6 +138,20 @@ readonly class Configuration
     public function mutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
+    }
+
+    public function isForGitDiffLines(): bool
+    {
+        return $this->sourceFilter instanceof GitOptions
+            ? $this->sourceFilter->isForDiffLines
+            : false;
+    }
+
+    public function getGitDiffBase(): ?string
+    {
+        return $this->sourceFilter instanceof GitOptions
+            ? $this->sourceFilter->baseBranch
+            : null;
     }
 
     /**

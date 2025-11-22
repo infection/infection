@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use Infection\Configuration\Entry\GitOptions;
 use function array_filter;
 use function array_map;
 use function explode;
@@ -43,41 +44,50 @@ use Infection\TestFramework\Coverage\Trace;
 use Iterator;
 use SplFileInfo;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
+use function trim;
 
 /**
  * @internal
  * @final
  */
-class SourceFileFilter implements FileFilter
+readonly class SourceFileFilter implements FileFilter
 {
     /**
-     * @var string[]
-     */
-    private readonly array $filters;
-
-    /**
+     * @param non-empty-string[] $filters
      * @param string[] $excludeDirectories
      */
     public function __construct(
-        string $filter,
-        private readonly array $excludeDirectories,
+        public array $filters,
+        private array $excludeDirectories,
     ) {
-        $this->filters = array_filter(array_map(
-            'trim',
-            explode(',', $filter),
-        ));
     }
 
     /**
-     * Returns a filter array to be used in tests.
-     *
-     * TODO Good candidate to be refactored into a class.
-     *
-     * @return string[]
+     * @param non-empty-string|null $filter
+     * @param string[] $excludeDirectories
      */
-    public function getFilters(): array
+    public static function create(
+        string|null $filter = null,
+        array $excludeDirectories = [],
+    ): self
     {
-        return $this->filters;
+        return new self(
+            self::normalizeFilter($filter ?? ''),
+            $excludeDirectories,
+        );
+    }
+
+    /**
+     * @return non-empty-string[]
+     */
+    private static function normalizeFilter(string $filter): array
+    {
+        return array_filter(
+            array_map(
+                trim(...),
+                explode(',', $filter),
+            ),
+        );
     }
 
     public function filter(iterable $input): iterable

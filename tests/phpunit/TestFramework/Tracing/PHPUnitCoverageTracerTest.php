@@ -102,10 +102,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 ),
             ),
             new BufferedSourceFileFilter(
-                new SourceFileFilter(
-                    filter: '',
-                    excludeDirectories: [],
-                ),
+                SourceFileFilter::create(),
                 Finder::create()
                     ->files()
                     ->depth(0)
