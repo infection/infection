@@ -36,6 +36,7 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\FunctionLike\NarrowTooWideReturnTypeRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
@@ -51,6 +52,7 @@ return RectorConfig::configure()
         AddCoversClassAttributeRector::class,
         NarrowTooWideReturnTypeRector::class,
         RemoveUnusedPromotedPropertyRector::class,
+        RemoveUnusedPublicMethodParameterRector::class,
         RemoveUnusedVariableAssignRector::class,
     ])
     ->withConfiguredRule(
@@ -65,5 +67,9 @@ return RectorConfig::configure()
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
+        ],
+        RemoveUnusedPublicMethodParameterRector::class => [
+            __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
+            __DIR__ . '/tests/phpunit/Fixtures/',
         ],
     ]);
