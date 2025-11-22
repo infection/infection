@@ -36,7 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Framework;
 
 use Closure;
+use Exception;
+use Infection\Console\Application;
 use Infection\Framework\ClassName;
+use Infection\Framework\Enum\EnumBucket;
+use Infection\Tests\Framework\Enum\EnumBucket\EnumBucketTest;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -80,35 +85,200 @@ final class ClassNameTest extends TestCase
         ];
     }
 
-    public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
-    {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            ClassName::getCanonicalSourceClassName('Infection\Tests\Acme\FooTest'),
-        );
+    /**
+     * @param class-string $sourceClassName
+     * @param Exception|class-string[] $expected
+     */
+    #[DataProvider('sourceClassNamesProvider')]
+    public function test_it_gives_the_canonical_test_class_names_for_a_source_class(
+        string $sourceClassName,
+        array|Exception $expected,
+    ): void {
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
+        $actual = ClassName::getCanonicalTestClassNames($sourceClassName);
+
+        if (!($expected instanceof Exception)) {
+            $this->assertSame($expected, $actual);
+        }
     }
 
-    public function test_it_can_give_the_source_class_name_for_a_source_class(): void
+    public static function sourceClassNamesProvider(): iterable
     {
-        $this->assertSame(
-            'Infection\Acme\Foo',
-            ClassName::getCanonicalSourceClassName('Infection\Acme\Foo'),
-        );
+        yield 'nominal' => [
+            Application::class,
+            [
+                'Infection\Tests\Console\ApplicationTest',
+                'Infection\Tests\Console\Application\ApplicationTest',
+            ],
+        ];
+
+        yield 'source with "Infection" mentioned multiple times' => [
+            'Infection\Framework\Infection\InfectionReport',
+            [
+                'Infection\Tests\Framework\Infection\InfectionReportTest',
+                'Infection\Tests\Framework\Infection\InfectionReport\InfectionReportTest',
+            ],
+        ];
+
+        yield 'source located in tests' => [
+            'Infection\Tests\Console\Application',
+            [
+                'Infection\Tests\Console\ApplicationTest',
+                'Infection\Tests\Console\Application\ApplicationTest',
+            ],
+        ];
+
+        // This is most likely incorrect, but there is no case for it neither
+        // is it clear that it is a case want to support.
+        // Nonetheless, we have this test case to pin this scenario.
+        yield 'already a test' => [
+            'Infection\Tests\Console\ApplicationTest',
+            [
+                'Infection\Tests\Console\ApplicationTestTest',
+                'Infection\Tests\Console\ApplicationTest\ApplicationTestTest',
+            ],
+        ];
+
+        yield 'third-party code' => [
+            \Symfony\Component\Console\Application::class,
+            new InvalidArgumentException(
+                'Expected source fully-qualified class name to be a source file from Infection. Got "Symfony\Component\Console\Application".',
+            ),
+        ];
     }
 
-    public function test_it_can_give_the_test_case_class_name_for_a_source_class(): void
-    {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            ClassName::getCanonicalTestClassName('Infection\Acme\Foo'),
-        );
+    /**
+     * @param class-string $sourceClassName
+     * @param class-string|string $expected
+     */
+    #[DataProvider('sourceClassNameProvider')]
+    public function test_it_gives_the_canonical_test_class_name(
+        string $sourceClassName,
+        ?string $expected,
+    ): void {
+        $actual = ClassName::getCanonicalTestClassName($sourceClassName);
+
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_can_give_the_test_case_class_name_for_a_test_source_class(): void
+    public static function sourceClassNameProvider(): iterable
     {
-        $this->assertSame(
-            'Infection\Tests\Acme\FooTest',
-            ClassName::getCanonicalTestClassName('Infection\Tests\Acme\Foo'),
-        );
+        // !! Beware !!
+        // For the sake of keeping this test simple, we use real classes.
+        // This means this test may break due to unrelated refactorings.
+        // It should, however, be trivial to update.
+
+        yield 'matching test case is the first candidate' => [
+            ClassName::class,
+            self::class,
+        ];
+
+        yield 'matching test case is the second candidate' => [
+            EnumBucket::class,
+            EnumBucketTest::class,
+        ];
+
+        yield 'non-existent test case' => [
+            'Infection\Unknown\UnknownClass',
+            null,
+        ];
+    }
+
+    /**
+     * @param class-string $testClassName
+     * @param Exception|class-string[] $expected
+     */
+    #[DataProvider('notTestClassNamesProvider')]
+    public function test_it_gives_the_canonical_source_class_names_for_a_test_class(
+        string $testClassName,
+        array|Exception $expected,
+    ): void {
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
+        $actual = ClassName::getCanonicalSourceClassNames($testClassName);
+
+        if (!($expected instanceof Exception)) {
+            $this->assertSame($expected, $actual);
+        }
+    }
+
+    public static function notTestClassNamesProvider(): iterable
+    {
+        yield 'non-ambiguous case' => [
+            'Infection\Tests\Console\ApplicationTest',
+            [Application::class],
+        ];
+
+        yield '2nd test canonical form' => [
+            'Infection\Tests\Console\Application\ApplicationTest',
+            [
+                Application::class,
+                'Infection\Console\Application\Application',
+            ],
+        ];
+
+        yield 'test located in source' => [
+            'Infection\Console\ApplicationTest',
+            [Application::class],
+        ];
+
+        // This is most likely incorrect, but there is no case for it neither
+        // is it clear that it is a case want to support.
+        // Nonetheless, we have this test case to pin this scenario.
+        yield 'not a test' => [
+            'Infection\Tests\Console\Application',
+            new InvalidArgumentException(
+                'Expected test fully-qualified class name to follow the PHPUnit test naming convention, i.e. to have the suffix "Test". Got "Infection\Tests\Console\Application".',
+            ),
+        ];
+
+        yield 'third-party code' => [
+            'Symfony\Component\Console\ApplicationTest',
+            new InvalidArgumentException(
+                'Expected test fully-qualified class name to be a test file from Infection. Got "Symfony\Component\Console\ApplicationTest"',
+            ),
+        ];
+    }
+
+    /**
+     * @param class-string $testClassName
+     * @param class-string|string $expected
+     */
+    #[DataProvider('notTestClassNameProvider')]
+    public function test_it_gives_the_canonical_source_class_name(
+        string $testClassName,
+        ?string $expected,
+    ): void {
+        $actual = ClassName::getCanonicalSourceClassName($testClassName);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function notTestClassNameProvider(): iterable
+    {
+        // !! Beware !!
+        // For the sake of keeping this test simple, we use real classes.
+        // This means this test may break due to unrelated refactorings.
+        // It should, however, be trivial to update.
+
+        yield 'matching test case is the first candidate' => [
+            self::class,
+            ClassName::class,
+        ];
+
+        yield 'matching test case is the second candidate' => [
+            EnumBucketTest::class,
+            EnumBucket::class,
+        ];
+
+        yield 'non-existent test case' => [
+            'Infection\Tests\Unknown\UnknownClassTest',
+            null,
+        ];
     }
 }

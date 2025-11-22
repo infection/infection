@@ -1507,6 +1507,24 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
 
 		-
+			message: '#getCanonicalTestClassName#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
+
+		-
+			message: '#getCanonicalTestClassName#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#getCanonicalTestClassName#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
+
+		-
 			message: '#getShortClassName#'
 			identifier: argument.type
 			count: 1

@@ -90,6 +90,10 @@ final class EnvTestCasesProvider
     {
         $testCaseClass = ClassName::getCanonicalTestClassName($className);
 
+        if ($testCaseClass === null) {
+            return null;
+        }
+
         if (!class_exists($testCaseClass)) {
             // No test case could be find for this source file
             return null;
