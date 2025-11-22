@@ -34,6 +34,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\FunctionLike\NarrowTooWideReturnTypeRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
@@ -46,6 +47,7 @@ return RectorConfig::configure()
     ->withPhpSets(php82: true)
     ->withRules([
         AddCoversClassAttributeRector::class,
+        NarrowTooWideReturnTypeRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,
