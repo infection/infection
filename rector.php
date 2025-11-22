@@ -33,16 +33,14 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
-use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
-use Rector\DeadCode\Rector\Foreach_\RemoveUnusedForeachKeyRector;
-use Rector\DeadCode\Rector\FunctionLike\NarrowTooWideReturnTypeRector;
-use Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector;
+use Rector\DeadCode\Rector\ConstFetch\RemovePhpVersionIdCheckRector;
+use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
+use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
@@ -53,17 +51,11 @@ return RectorConfig::configure()
         __DIR__ . '/tests/phpunit',
     ])
     ->withPhpSets(php82: true)
+    ->withPreparedSets(
+        deadCode: true,
+    )
     ->withRules([
         AddCoversClassAttributeRector::class,
-        NarrowTooWideReturnTypeRector::class,
-        RemoveEmptyClassMethodRector::class,
-        RemoveUnusedForeachKeyRector::class,
-        RemoveUnusedPromotedPropertyRector::class,
-        RemoveUnusedPublicMethodParameterRector::class,
-        RemoveUnusedVariableAssignRector::class,
-        RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
-        RemoveUselessParamTagRector::class,
-        RemoveUselessReturnTagRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,
@@ -78,8 +70,24 @@ return RectorConfig::configure()
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
         ],
+        RemoveAlwaysTrueIfConditionRector::class => [
+            __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        RemoveDuplicatedCaseInSwitchRector::class => [
+            __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        RemovePhpVersionIdCheckRector::class => true,
+        RemoveUnusedConstructorParamRector::class => [
+            __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        RemoveUnusedPrivateMethodParameterRector::class => [
+            __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
         RemoveUnusedPublicMethodParameterRector::class => [
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
             __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        SimplifyUselessVariableRector::class => [
+            __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
         ],
     ]);
