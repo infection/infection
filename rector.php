@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\FunctionLike\NarrowTooWideReturnTypeRector;
@@ -51,6 +52,7 @@ return RectorConfig::configure()
     ->withRules([
         AddCoversClassAttributeRector::class,
         NarrowTooWideReturnTypeRector::class,
+        RemoveEmptyClassMethodRector::class,
         RemoveUnusedPromotedPropertyRector::class,
         RemoveUnusedPublicMethodParameterRector::class,
         RemoveUnusedVariableAssignRector::class,
