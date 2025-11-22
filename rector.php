@@ -60,6 +60,7 @@ use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFrom
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForArrayDimAssignedObjectRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForCommonObjectDenominatorRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForJsonArrayRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\DocblockGetterReturnArrayFromPropertyDocblockVarRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -81,6 +82,7 @@ return RectorConfig::configure()
         AddParamArrayDocblockFromDimFetchAccessRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
         DisallowedEmptyRuleFixerRector::class,
+        DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,

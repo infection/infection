@@ -571,12 +571,6 @@ parameters:
 			path: ../tests/phpunit/Logger/ConsoleLoggerTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\DummyLogger\:\:getLogs\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/DummyLogger.php
-
-		-
 			message: '#^Method Infection\\Tests\\Logger\\FileLoggerFactoryTest\:\:assertRegisteredLoggersAre\(\) has parameter \$expectedLoggerClasses with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
