@@ -45,11 +45,10 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\SourceCollection\SourceCollector;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\Tracing\Tracer;
+use function iter\map;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
-use function iter\map;
 
 /**
  * @internal

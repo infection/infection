@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -141,6 +142,7 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use OndraM\CiDetector\CiDetector;
+use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -149,14 +151,12 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
-use function array_filter;
-use function php_ini_loaded_file;
-use function sprintf;
 
 /**
  * @internal
@@ -571,24 +571,24 @@ final class Container extends DIContainer
         string $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
-        ?string                $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
-        ?string                $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-        bool                   $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
-        bool                   $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
-        ?float                 $minMsi = self::DEFAULT_MIN_MSI,
-        ?float                 $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
-        int                    $msiPrecision = self::DEFAULT_MSI_PRECISION,
-        ?string                $testFramework = self::DEFAULT_TEST_FRAMEWORK,
-        ?string                $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-        ?string                $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
+        ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
+        ?string $initialTestsPhpOptions = self::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
+        bool $skipInitialTests = self::DEFAULT_SKIP_INITIAL_TESTS,
+        bool $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
+        ?float $minMsi = self::DEFAULT_MIN_MSI,
+        ?float $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
+        int $msiPrecision = self::DEFAULT_MSI_PRECISION,
+        ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
+        ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+        ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
         string|GitOptions|null $sourceFilter = self::DEFAULT_SOURCE_FILTER,
-        ?int                   $threadCount = self::DEFAULT_THREAD_COUNT,
-        bool                   $dryRun = self::DEFAULT_DRY_RUN,
-        ?bool                  $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
-        ?string                $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
-        ?string                $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
-        bool                   $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
-        bool                   $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
+        ?int $threadCount = self::DEFAULT_THREAD_COUNT,
+        bool $dryRun = self::DEFAULT_DRY_RUN,
+        ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
+        ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
+        ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
+        bool $useNoopMutators = self::DEFAULT_USE_NOOP_MUTATORS,
+        bool $executeOnlyCoveringTestCases = self::DEFAULT_EXECUTE_ONLY_COVERING_TEST_CASES,
         ?string $mapSourceClassToTestStrategy = self::DEFAULT_MAP_SOURCE_CLASS_TO_TEST_STRATEGY,
         ?string $loggerProjectRootDirectory = self::DEFAULT_LOGGER_PROJECT_ROOT_DIRECTORY,
         ?string $staticAnalysisTool = self::DEFAULT_STATIC_ANALYSIS_TOOL,

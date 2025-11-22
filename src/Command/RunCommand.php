@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Configuration\Entry\GitOptions;
-use Symfony\Component\Console\Input\InputInterface;
 use function extension_loaded;
 use function implode;
+use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -64,6 +63,7 @@ use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
 
@@ -663,16 +663,15 @@ final class RunCommand extends BaseCommand
     {
         $value = trim((string) $input->getOption(self::OPTION_FILTER));
 
-        return '' === $value ? null : $value;
+        return $value === '' ? null : $value;
     }
 
     private static function assertOnlyOneTypeOfGitFiltering(
         ?string $gitDiffFilter,
         bool $isForGitDiffLines,
-    ): void
-    {
+    ): void {
         if (
-            null !== $gitDiffFilter
+            $gitDiffFilter !== null
             && $isForGitDiffLines
         ) {
             throw new InvalidArgumentException(
@@ -694,9 +693,9 @@ final class RunCommand extends BaseCommand
         self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
         self::assertGitBaseHasRequiredFilter($gitDiffFilter, $isForGitDiffLines, $gitDiffBase);
 
-        $filterSourceWithGit = null !== $gitDiffFilter
+        $filterSourceWithGit = $gitDiffFilter !== null
             || $isForGitDiffLines
-            || null !== $gitDiffBase;
+            || $gitDiffBase !== null;
 
         return $filterSourceWithGit
             ? new GitOptions(
@@ -711,16 +710,15 @@ final class RunCommand extends BaseCommand
         ?string $gitDiffFilter,
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
-    ): void
-    {
+    ): void {
         // TODO: previously was $gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
         //  I do not understand the point of those default values if the default is not using git
         //  If we provide a default there, then the requirement is still valid, as a base requires a filter.
-        if (null === $gitDiffBase) {
+        if ($gitDiffBase === null) {
             return;
         }
 
-        $hasFilter = null !== $gitDiffFilter || $isForGitDiffLines;
+        $hasFilter = $gitDiffFilter !== null || $isForGitDiffLines;
 
         if ($hasFilter) {
             return;
@@ -740,13 +738,12 @@ final class RunCommand extends BaseCommand
     }
 
     private static function assertOnlyOneTypeOfFiltering(
-        ?string     $filter,
+        ?string $filter,
         ?GitOptions $gitOptions,
-    ): void
-    {
+    ): void {
         if (
-            null !== $filter
-            && null !== $gitOptions
+            $filter !== null
+            && $gitOptions !== null
         ) {
             throw new InvalidArgumentException(
                 sprintf(

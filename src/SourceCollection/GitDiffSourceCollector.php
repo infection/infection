@@ -35,17 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\SourceCollection;
 
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use function array_filter;
 use function array_merge;
-use function array_slice;
-use function count;
 use function explode;
 use function implode;
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
-use RuntimeException;
-use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 // TODO: partially copied from Infection\Logger\GitHub\GitDiffSourceCollector.
@@ -64,9 +59,6 @@ final readonly class GitDiffSourceCollector implements SourceCollector
     ) {
     }
 
-    /**
-     * @param string[] $sourceDirectories
-     */
     public function collect(): iterable
     {
         $referenceCommit = $this->findReferenceCommit($this->gitDiffBase);

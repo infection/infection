@@ -35,6 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use function array_fill_keys;
+use function array_key_exists;
+use function array_unique;
+use function array_values;
+use function dirname;
+use function file_exists;
+use function in_array;
 use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
@@ -50,26 +57,18 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\SourceCollection\SchemaSourceCollector;
 use Infection\SourceCollection\SourceCollectorFactory;
 use Infection\TestFramework\TestFrameworkTypes;
+use function is_numeric;
+use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
-use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
-use function array_fill_keys;
-use function array_key_exists;
-use function array_unique;
-use function array_values;
-use function dirname;
-use function file_exists;
-use function in_array;
-use function is_numeric;
-use function max;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
 use function sys_get_temp_dir;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -83,13 +82,13 @@ class ConfigurationFactory
     private const DEFAULT_TIMEOUT = 10;
 
     public function __construct(
-        private readonly TmpDirProvider         $tmpDirProvider,
-        private readonly MutatorResolver        $mutatorResolver,
-        private readonly MutatorFactory         $mutatorFactory,
-        private readonly MutatorParser          $mutatorParser,
+        private readonly TmpDirProvider $tmpDirProvider,
+        private readonly MutatorResolver $mutatorResolver,
+        private readonly MutatorFactory $mutatorFactory,
+        private readonly MutatorParser $mutatorParser,
         private readonly SourceCollectorFactory $sourceCollectorFactory,
-        private readonly CiDetectorInterface    $ciDetector,
-        private readonly GitDiffFileProvider    $gitDiffFileProvider,
+        private readonly CiDetectorInterface $ciDetector,
+        private readonly GitDiffFileProvider $gitDiffFileProvider,
     ) {
     }
 
@@ -104,27 +103,27 @@ class ConfigurationFactory
         string $logVerbosity,
         bool $debug,
         bool $withUncovered,
-        bool                   $noProgress,
-        ?bool                  $ignoreMsiWithNoMutations,
-        ?float                 $minMsi,
-        ?int                   $numberOfShownMutations,
-        ?float                 $minCoveredMsi,
-        int                    $msiPrecision,
-        string                 $mutatorsInput,
-        ?string                $testFramework,
-        ?string                $testFrameworkExtraOptions,
-        ?string                $staticAnalysisToolOptions,
+        bool $noProgress,
+        ?bool $ignoreMsiWithNoMutations,
+        ?float $minMsi,
+        ?int $numberOfShownMutations,
+        ?float $minCoveredMsi,
+        int $msiPrecision,
+        string $mutatorsInput,
+        ?string $testFramework,
+        ?string $testFrameworkExtraOptions,
+        ?string $staticAnalysisToolOptions,
         string|GitOptions|null $sourceFilter,
-        ?int                   $threadCount,
-        bool                   $dryRun,
-        ?bool                  $useGitHubLogger,
-        ?string                $gitlabLogFilePath,
-        ?string                $htmlLogFilePath,
-        bool                   $useNoopMutators,
-        bool                   $executeOnlyCoveringTestCases,
-        ?string                $mapSourceClassToTestStrategy,
-        ?string                $loggerProjectRootDirectory,
-        ?string                $staticAnalysisTool,
+        ?int $threadCount,
+        bool $dryRun,
+        ?bool $useGitHubLogger,
+        ?string $gitlabLogFilePath,
+        ?string $htmlLogFilePath,
+        bool $useNoopMutators,
+        bool $executeOnlyCoveringTestCases,
+        ?string $mapSourceClassToTestStrategy,
+        ?string $loggerProjectRootDirectory,
+        ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
         $configDir = dirname($schema->getFile());

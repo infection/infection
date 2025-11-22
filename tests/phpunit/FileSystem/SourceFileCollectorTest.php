@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use Infection\SourceCollection\SchemaSourceCollector;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Path;
 use function array_keys;
 use function array_map;
 use function array_values;
 use function count;
+use Infection\SourceCollection\SchemaSourceCollector;
 use function natcasesort;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function range;
+use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(SchemaSourceCollector::class)]
 final class SourceFileCollectorTest extends TestCase

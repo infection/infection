@@ -36,11 +36,9 @@ declare(strict_types=1);
 namespace Infection\SourceCollection;
 
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * TODO: extract the rename in a separate PR
- * @final
  *
  * @internal
  */
@@ -62,7 +60,8 @@ final readonly class SchemaSourceCollector implements SourceCollector
     //  - git diff uses the sources for further filter but doesn't account for the excluded directories neither the user filter (but the git diff filter)
     //  - the schema source collector does not account for the user filter
     //  - traces don't account for either, we decorate them with the source filter
-    public function collect(): iterable {
+    public function collect(): iterable
+    {
         if ($this->sourceDirectories === []) {
             return [];
         }
