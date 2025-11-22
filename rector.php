@@ -50,7 +50,16 @@ use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamFromLocalCallsRector;
+use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromGetterReturnRector;
+use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromPropertyDefaultsRector;
+use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarFromParamDocblockInConstructorRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockBasedOnArrayMapRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromAssignsParamToParamReferenceRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDataProviderRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDimFetchAccessRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForArrayDimAssignedObjectRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForCommonObjectDenominatorRector;
+use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddReturnDocblockForJsonArrayRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -63,9 +72,18 @@ return RectorConfig::configure()
     )
     ->withRules([
         AddCoversClassAttributeRector::class,
+        AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
+        AddReturnDocblockForArrayDimAssignedObjectRector::class,
+        AddReturnDocblockForCommonObjectDenominatorRector::class,
+        AddReturnDocblockForJsonArrayRector::class,
+        AddParamArrayDocblockBasedOnArrayMapRector::class,
+        AddParamArrayDocblockFromDimFetchAccessRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
         DisallowedEmptyRuleFixerRector::class,
+        DocblockVarArrayFromGetterReturnRector::class,
+        DocblockVarArrayFromPropertyDefaultsRector::class,
+        DocblockVarFromParamDocblockInConstructorRector::class,
         FlipNegatedTernaryInstanceofRector::class,
         InlineIsAInstanceOfRector::class,
         PrivatizeFinalClassMethodRector::class,
