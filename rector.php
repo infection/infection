@@ -46,6 +46,8 @@ use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
+use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
+use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 
 return RectorConfig::configure()
@@ -62,6 +64,8 @@ return RectorConfig::configure()
         DisallowedEmptyRuleFixerRector::class,
         FlipNegatedTernaryInstanceofRector::class,
         InlineIsAInstanceOfRector::class,
+        PrivatizeFinalClassMethodRector::class,
+        PrivatizeFinalClassPropertyRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,
