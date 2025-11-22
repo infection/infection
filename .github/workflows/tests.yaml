@@ -26,7 +26,7 @@ jobs:
         php-version: [ '8.2', '8.3', '8.4', '8.5' ]
         dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
-        symfony-version: [ '6.4.*', '7.*.*' ]
+        symfony-version: [ '6.4.*', '7.*.*', '^8.0.0-BETA-1' ]
         include:
           - operating-system: windows-latest
             php-version: '8.2'
@@ -36,6 +36,10 @@ jobs:
         exclude:
           - dependencies: 'locked'
             symfony-version: '7.*.*'
+          - php-version: '8.2'
+            symfony-version: '^8.0.0-BETA-1'
+          - php-version: '8.3'
+            symfony-version: '^8.0.0-BETA-1'
 
     name: Tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}; Symfony ${{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
 
@@ -59,6 +63,10 @@ jobs:
         if: "matrix.php-version >= '8.4'"
         run: |
           composer config platform.php 8.4.99
+
+      - name: Configure Composer minimum-stability to dev
+        if: "contains(matrix.symfony-version, '-BETA-')"
+        run: composer config minimum-stability dev
 
       - name: Enforce the Symfony version used
         if: matrix.dependencies != 'locked'
