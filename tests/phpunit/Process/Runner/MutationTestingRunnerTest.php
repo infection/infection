@@ -797,6 +797,9 @@ final class MutationTestingRunnerTest extends TestCase
         });
     }
 
+    /**
+     * @param MutantProcessContainer[] $expected
+     */
     private function iterableContaining(array $expected): Callback
     {
         return $this->someIterable(static function (iterable $subject) use ($expected): bool {

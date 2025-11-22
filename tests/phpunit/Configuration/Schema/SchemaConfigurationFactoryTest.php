@@ -2645,6 +2645,9 @@ final class SchemaConfigurationFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @param array<array<string, mixed>, mixed> $args
+     */
     private static function createConfig(array $args): SchemaConfiguration
     {
         $defaultArgs = [

@@ -54,7 +54,7 @@ final class SummaryJsonLoggerTest extends TestCase
     use CreateMetricsCalculator;
 
     /**
-     * @param mixed[] $expectedContents
+     * @param array<string, array<string, int|float>> $expectedContents
      */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
@@ -150,7 +150,7 @@ final class SummaryJsonLoggerTest extends TestCase
     }
 
     /**
-     * @param mixed[] $expectedJson
+     * @param array<string, array<string, float|int>> $expectedJson
      */
     private function assertLoggedContentIs(array $expectedJson, SummaryJsonLogger $logger): void
     {

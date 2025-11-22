@@ -49,6 +49,7 @@ use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
+use Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamFromLocalCallsRector;
 use Rector\TypeDeclarationDocblocks\Rector\ClassMethod\AddParamArrayDocblockFromDataProviderRector;
 
 return RectorConfig::configure()
@@ -63,6 +64,7 @@ return RectorConfig::configure()
     ->withRules([
         AddCoversClassAttributeRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
+        ClassMethodArrayDocblockParamFromLocalCallsRector::class,
         DisallowedEmptyRuleFixerRector::class,
         FlipNegatedTernaryInstanceofRector::class,
         InlineIsAInstanceOfRector::class,

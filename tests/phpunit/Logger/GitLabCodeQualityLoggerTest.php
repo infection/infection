@@ -72,7 +72,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
     }
 
     /**
-     * @param mixed[] $expectedContents
+     * @param array<int, array<string, string|array<int|string, array<string, int>|string>>> $expectedContents
      */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
@@ -180,7 +180,7 @@ final class GitLabCodeQualityLoggerTest extends TestCase
     }
 
     /**
-     * @param mixed[] $expectedJson
+     * @param array<int, array<string, array<int|string, array<string, int>|string>|string>> $expectedJson
      */
     private function assertLoggedContentIs(array $expectedJson, GitLabCodeQualityLogger $logger): void
     {

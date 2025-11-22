@@ -367,12 +367,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\Schema\\SchemaConfigurationFactoryTest\:\:createConfig\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php
-
-		-
 			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
@@ -385,20 +379,8 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
 
 		-
-			message: '#^Method Infection\\Tests\\Console\\E2ETest\:\:runInfection\(\) has parameter \$argvExtra with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Console\\E2ETest\:\:runOnE2EFixture\(\) has parameter \$path with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
-			message: '#^Parameter \#1 \$argv of class Symfony\\Component\\Console\\Input\\ArgvInput constructor expects list\<string\>\|null, non\-empty\-array given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Console/E2ETest.php
 
@@ -419,12 +401,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Differ/DiffChangedLinesParserTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Differ\\FilesDiffChangedLinesTest\:\:prepareServices\(\) has parameter \$returnedFilesDiffChangedLinesMap with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Differ/FilesDiffChangedLinesTest.php
 
 		-
 			message: '#^Parameter \#1 \$environment of method Infection\\Environment\\StrykerApiKeyResolver\:\:resolve\(\) expects array\<string, string\>, array\<string, int\|stdClass\|string\> given\.$#'
@@ -667,30 +643,6 @@ parameters:
 			path: ../tests/phpunit/Metrics/SortableMutantExecutionResultsTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvides\(\) has parameter \$actual with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvides\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvidesExcluding\(\) has parameter \$actual with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvidesExcluding\(\) has parameter \$excluding with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\MockedContainer\:\:createWithServices\(\) has parameter \$values with no value type specified in iterable type array\<class\-string\<object\>, mixed\>\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -784,24 +736,6 @@ parameters:
 			message: '#^Cannot call method isPublic\(\) on ReflectionClassConstant\|false\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\MutatorCategoryTest\:\:assertAllDoesNotHaveDuplicatedValues\(\) has parameter \$constants with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\MutatorCategoryTest\:\:assertAllListTheExposedConstants\(\) has parameter \$constants with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\MutatorCategoryTest\:\:assertExposedConstantsArePublic\(\) has parameter \$constants with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
 			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
 
 		-
@@ -1021,12 +955,6 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:iterableContaining\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:iterableContaining\(\) return type with generic class PHPUnit\\Framework\\Constraint\\Callback does not specify its types\: CallbackInput$#'
 			identifier: missingType.generics
 			count: 1
@@ -1195,20 +1123,8 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilderTest\:\:createConfigBuilder\(\) has parameter \$filteredSourceFilesToMutate with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilderTest\:\:queryXpath\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
-
-		-
-			message: '#^Parameter \#6 \$filteredSourceFilesToMutate of class Infection\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilder constructor expects list\<string\>, array given\.$#'
-			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
 

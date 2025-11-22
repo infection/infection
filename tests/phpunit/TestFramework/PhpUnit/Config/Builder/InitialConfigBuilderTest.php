@@ -571,6 +571,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
     }
 
+    /**
+     * @param list<string> $filteredSourceFilesToMutate
+     */
     private function createConfigBuilder(
         ?string $originalPhpUnitXmlConfigPath = null,
         array $filteredSourceFilesToMutate = [],

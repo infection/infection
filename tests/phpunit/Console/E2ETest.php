@@ -331,6 +331,9 @@ final class E2ETest extends TestCase
          */
     }
 
+    /**
+     * @param list<string> $argvExtra
+     */
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
         if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {

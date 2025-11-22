@@ -189,6 +189,7 @@ final class FilesDiffChangedLinesTest extends TestCase
     }
 
     /**
+     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
      * @return array{0: DiffChangedLinesParser, 1: GitDiffFileProvider}
      */
     private function prepareServices(array $returnedFilesDiffChangedLinesMap): array
