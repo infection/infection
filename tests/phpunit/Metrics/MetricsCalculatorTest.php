@@ -65,27 +65,27 @@ final class MetricsCalculatorTest extends TestCase
     {
         $calculator = new MetricsCalculator(2);
 
-        $expectedKilledResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::KILLED_BY_TESTS,
             7,
         );
-        $expectedErrorResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::ERROR,
             2,
         );
-        $expectedEscapedResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::ESCAPED,
             2,
         );
-        $expectedTimedOutResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::TIMED_OUT,
             2,
         );
-        $expectedNotCoveredResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::NOT_COVERED,
             1,
@@ -113,7 +113,7 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(0.0, $calculator->getCoverageRate());
         $this->assertSame(0.0, $calculator->getCoveredCodeMutationScoreIndicator());
 
-        $expectedKilledResults = $this->addMutantExecutionResult(
+        $this->addMutantExecutionResult(
             $calculator,
             DetectionStatus::KILLED_BY_TESTS,
             1,
