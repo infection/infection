@@ -56,6 +56,7 @@ use Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRec
 use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertComparisonToSpecificMethodRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\FlipAssertRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveExpectAnyFromMockRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWillMethodRector;
@@ -102,6 +103,7 @@ return RectorConfig::configure()
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,
+        FlipAssertRector::class,
         FlipNegatedTernaryInstanceofRector::class,
         NarrowUnusedSetUpDefinedPropertyRector::class,
         NarrowIdenticalWithConsecutiveRector::class,
