@@ -52,15 +52,12 @@ use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
-use Rector\PHPUnit\CodeQuality\Rector\Foreach_\SimplifyForeachInstanceOfRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertComparisonToSpecificMethodRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\FlipAssertRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveExpectAnyFromMockRector;
-use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWillMethodRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveDataProviderParamKeysRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
+use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\DataProviderArrayItemsNewLinedRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCompareOnCountableWithMethodToAssertCountRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
@@ -86,6 +83,7 @@ return RectorConfig::configure()
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,
+        phpunitCodeQuality: true,
     )
     ->withRules([
         AddCoversClassAttributeRector::class,
@@ -96,24 +94,15 @@ return RectorConfig::configure()
         AddReturnDocblockForJsonArrayRector::class,
         AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
-        AssertComparisonToSpecificMethodRector::class,
-        AssertEqualsToSameRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
         DisallowedEmptyRuleFixerRector::class,
         DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,
-        FlipAssertRector::class,
         FlipNegatedTernaryInstanceofRector::class,
-        NarrowUnusedSetUpDefinedPropertyRector::class,
-        NarrowIdenticalWithConsecutiveRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
-        RemoveExpectAnyFromMockRector::class,
-        SimplifyForeachInstanceOfRector::class,
-        UseSpecificWillMethodRector::class,
-        YieldDataProviderRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,
@@ -125,6 +114,11 @@ return RectorConfig::configure()
     )
     ->withSkip([
         AbsolutizeRequireAndIncludePathRector::class,
+        AddInstanceofAssertForNullableInstanceRector::class,
+        AssertCompareOnCountableWithMethodToAssertCountRector::class,
+        AssertEmptyNullableObjectToAssertInstanceofRector::class,
+        AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
+        DataProviderArrayItemsNewLinedRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
         ReadOnlyPropertyRector::class => [
@@ -134,6 +128,7 @@ return RectorConfig::configure()
         RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
+        RemoveDataProviderParamKeysRector::class,
         RemoveDuplicatedCaseInSwitchRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
