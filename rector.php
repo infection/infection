@@ -53,6 +53,7 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveExpectAnyFromMockRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWillMethodRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
@@ -102,6 +103,7 @@ return RectorConfig::configure()
         PrivatizeFinalClassPropertyRector::class,
         RemoveExpectAnyFromMockRector::class,
         UseSpecificWillMethodRector::class,
+        YieldDataProviderRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,

@@ -211,11 +211,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
-    public static function providesMockSetup(): array
+    public static function providesMockSetup(): iterable
     {
-        return [
-            'composer-bat' => ['setUpComposerBatchTest'],
-            'project-bat' => ['setUpProjectBatchTest'],
-        ];
+        yield 'composer-bat' => ['setUpComposerBatchTest'];
+
+        yield 'project-bat' => ['setUpProjectBatchTest'];
     }
 }

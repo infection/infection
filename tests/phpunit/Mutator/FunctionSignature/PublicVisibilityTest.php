@@ -54,20 +54,27 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         $this->assertMutatesInput($code);
     }
 
-    public static function blacklistedProvider(): array
+    public static function blacklistedProvider(): iterable
     {
-        return [
-            ['__construct'],
-            ['__invoke'],
-            ['__call'],
-            ['__callStatic'],
-            ['__get'],
-            ['__set'],
-            ['__isset'],
-            ['__unset'],
-            ['__toString'],
-            ['__debugInfo'],
-        ];
+        yield ['__construct'];
+
+        yield ['__invoke'];
+
+        yield ['__call'];
+
+        yield ['__callStatic'];
+
+        yield ['__get'];
+
+        yield ['__set'];
+
+        yield ['__isset'];
+
+        yield ['__unset'];
+
+        yield ['__toString'];
+
+        yield ['__debugInfo'];
     }
 
     /**
