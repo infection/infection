@@ -37,6 +37,7 @@ use Rector\CodeQuality\Rector\Class_\RemoveReadonlyPropertyVisibilityOnReadonlyC
 use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
 use Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
+use Rector\CodeQuality\Rector\If_\ShortenElseIfRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
@@ -94,6 +95,7 @@ return RectorConfig::configure()
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
         RemoveReadonlyPropertyVisibilityOnReadonlyClassRector::class,
+        ShortenElseIfRector::class,
         SimplifyIfReturnBoolRector::class,
         UnusedForeachValueToArrayKeysRector::class,
     ])
