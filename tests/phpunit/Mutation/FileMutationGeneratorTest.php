@@ -135,9 +135,7 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutations = iterator_to_array($mutations, false);
 
-        foreach ($mutations as $mutation) {
-            $this->assertInstanceOf(Mutation::class, $mutation);
-        }
+        $this->assertContainsOnlyInstancesOf(Mutation::class, $mutations);
 
         $this->assertCount(1, $mutations);
         $this->assertArrayHasKey(0, $mutations);
