@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Class_\RemoveReadonlyPropertyVisibilityOnReadonlyClassRector;
-use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
-use Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector;
+use Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector;
+use Rector\CodeQuality\Rector\ClassConstFetch\VariableConstFetchToClassConstFetchRector;
+use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
-use Rector\CodeQuality\Rector\If_\CombineIfRector;
-use Rector\CodeQuality\Rector\If_\ShortenElseIfRector;
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
+use Rector\CodeQuality\Rector\Include_\AbsolutizeRequireAndIncludePathRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
@@ -75,6 +76,7 @@ return RectorConfig::configure()
     ->withPhpSets(php82: true)
     ->withPreparedSets(
         deadCode: true,
+        codeQuality: true,
     )
     ->withRules([
         AddCoversClassAttributeRector::class,
@@ -86,20 +88,14 @@ return RectorConfig::configure()
         AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
-        CombineIfRector::class,
         DisallowedEmptyRuleFixerRector::class,
         DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
         DocblockVarArrayFromGetterReturnRector::class,
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,
         FlipNegatedTernaryInstanceofRector::class,
-        InlineIsAInstanceOfRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
-        RemoveReadonlyPropertyVisibilityOnReadonlyClassRector::class,
-        ShortenElseIfRector::class,
-        SimplifyIfReturnBoolRector::class,
-        UnusedForeachValueToArrayKeysRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,
@@ -110,6 +106,9 @@ return RectorConfig::configure()
         ],
     )
     ->withSkip([
+        AbsolutizeRequireAndIncludePathRector::class,
+        FlipTypeControlToUseExclusiveTypeRector::class,
+        LocallyCalledStaticMethodToNonStaticRector::class,
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
             __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
@@ -131,10 +130,13 @@ return RectorConfig::configure()
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
+        SimplifyDeMorganBinaryRector::class,
+        SimplifyIfElseToTernaryRector::class,
         SimplifyIfReturnBoolRector::class => [
             __DIR__ . '/src/Process/OriginalPhpProcess.php',
         ],
         SimplifyUselessVariableRector::class => [
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
         ],
+        VariableConstFetchToClassConstFetchRector::class,
     ]);
