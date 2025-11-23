@@ -33,6 +33,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\Class_\RemoveReadonlyPropertyVisibilityOnReadonlyClassRector;
 use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
 use Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
@@ -92,6 +93,7 @@ return RectorConfig::configure()
         InlineIsAInstanceOfRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
+        RemoveReadonlyPropertyVisibilityOnReadonlyClassRector::class,
         SimplifyIfReturnBoolRector::class,
         UnusedForeachValueToArrayKeysRector::class,
     ])
