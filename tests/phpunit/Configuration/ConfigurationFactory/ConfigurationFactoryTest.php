@@ -1283,27 +1283,23 @@ final class ConfigurationFactoryTest extends TestCase
                     // Absolute paths should be passed through unchanged
 
                     // For relative paths like ['src/'], expect transformation to ['/path/to/src']
-                    if ($schemaSourceDirs === ['src/']) {
-                        if ($source !== ['/path/to/src']) {
-                            throw new LogicException(
-                                sprintf(
-                                    'Expected source directories to be transformed to absolute paths. Expected: ["/path/to/src"], got: %s',
-                                    var_export($source, true),
-                                ),
-                            );
-                        }
+                    if ($schemaSourceDirs === ['src/'] && $source !== ['/path/to/src']) {
+                        throw new LogicException(
+                            sprintf(
+                                'Expected source directories to be transformed to absolute paths. Expected: ["/path/to/src"], got: %s',
+                                var_export($source, true),
+                            ),
+                        );
                     }
 
                     // For absolute paths like ['/absolute/src/'], expect no transformation
-                    if ($schemaSourceDirs === ['/absolute/src/']) {
-                        if ($source !== ['/absolute/src/']) {
-                            throw new LogicException(
-                                sprintf(
-                                    'Expected absolute source directories to be passed through unchanged. Expected: ["/absolute/src/"], got: %s',
-                                    var_export($source, true),
-                                ),
-                            );
-                        }
+                    if ($schemaSourceDirs === ['/absolute/src/'] && $source !== ['/absolute/src/']) {
+                        throw new LogicException(
+                            sprintf(
+                                'Expected absolute source directories to be passed through unchanged. Expected: ["/absolute/src/"], got: %s',
+                                var_export($source, true),
+                            ),
+                        );
                     }
 
                     if ($excludes === ['vendor/']) {

@@ -136,13 +136,11 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
 
         $parent = ParentConnector::findParent($node);
 
-        if ($parent instanceof Node\Expr\Assign) {
-            if (
-                $parent->var instanceof Node\Expr\List_
-                && count($parent->var->items) >= count($node->items)
-            ) {
-                return false;
-            }
+        if ($parent instanceof Node\Expr\Assign
+            && $parent->var instanceof Node\Expr\List_
+            && count($parent->var->items) >= count($node->items)
+        ) {
+            return false;
         }
 
         if ($parent instanceof Node\Arg) {

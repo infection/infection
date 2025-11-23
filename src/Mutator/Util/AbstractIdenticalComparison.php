@@ -336,11 +336,10 @@ abstract class AbstractIdenticalComparison implements Mutator
 
             foreach ($returnType->getTypes() as $type) {
                 if ($type instanceof ReflectionNamedType) {
-                    if ($type->getName() === 'false') {
-                        // non-falsy value eliminates bool-false
-                        if ($exprValue) { // @phpstan-ignore if.condNotBoolean
-                            continue;
-                        }
+                    // non-falsy value eliminates bool-false
+                    // @phpstan-ignore-next-line if.condNotBoolean
+                    if ($type->getName() === 'false' && $exprValue) {
+                        continue;
                     }
 
                     $remainingType[] = $type->getName();
