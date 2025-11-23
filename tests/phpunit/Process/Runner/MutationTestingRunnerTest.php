@@ -262,7 +262,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturnOnConsecutiveCalls(
+            ->willReturn(
                 $mutant0 = MutantBuilder::materialize(
                     '/path/to/mutant0',
                     $mutation0,
@@ -284,7 +284,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
             ))
-            ->willReturnOnConsecutiveCalls(
+            ->willReturn(
                 $process0 = $this->buildCoveredMutantProcessContainer(),
             )
         ;
@@ -420,7 +420,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturnOnConsecutiveCalls($mutant)
+            ->willReturn($mutant)
         ;
 
         $this->fileSystemMock
@@ -485,7 +485,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturnOnConsecutiveCalls($mutant)
+            ->willReturn($mutant)
         ;
 
         $this->fileSystemMock

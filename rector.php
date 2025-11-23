@@ -55,6 +55,7 @@ use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\NarrowUnusedSetUpDefinedPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertComparisonToSpecificMethodRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\RemoveExpectAnyFromMockRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWillMethodRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
@@ -101,6 +102,7 @@ return RectorConfig::configure()
         DocblockVarFromParamDocblockInConstructorRector::class,
         FlipNegatedTernaryInstanceofRector::class,
         NarrowUnusedSetUpDefinedPropertyRector::class,
+        NarrowIdenticalWithConsecutiveRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
         RemoveExpectAnyFromMockRector::class,
