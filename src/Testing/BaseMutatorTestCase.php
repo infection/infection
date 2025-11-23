@@ -196,8 +196,9 @@ abstract class BaseMutatorTestCase extends TestCase
         try {
             $tokens = token_get_all($realMutatedCode, TOKEN_PARSE);
 
-            $this->assertTrue(
-                $tokens !== [],
+            $this->assertNotSame(
+                [],
+                $tokens,
                 sprintf(
                     'Mutator %s produces invalid code: %s',
                     $this->mutator->getName(),
