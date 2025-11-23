@@ -229,11 +229,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return true;
         }
 
-        if ($node instanceof Node\Expr\Closure) {
-            return true;
-        }
-
-        return false;
+        return $node instanceof Node\Expr\Closure;
     }
 
     private function getClassReflectionForNode(Node\Stmt\ClassLike $node): ClassReflection

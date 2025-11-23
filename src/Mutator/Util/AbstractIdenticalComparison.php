@@ -98,23 +98,17 @@ abstract class AbstractIdenticalComparison implements Mutator
             return true;
         }
 
-        if (
-            (
-                $comparison->right instanceof Expr\FuncCall
-                || $comparison->right instanceof Expr\StaticCall
-                || $comparison->right instanceof Expr\ConstFetch
-            )
+        return (
+            $comparison->right instanceof Expr\FuncCall
+            || $comparison->right instanceof Expr\StaticCall
+            || $comparison->right instanceof Expr\ConstFetch
+        )
             && ($comparison->left instanceof Node\Scalar
-                || $comparison->left instanceof Expr\ConstFetch
-                || $comparison->left instanceof Expr\ClassConstFetch
-                || $comparison->left instanceof Expr\Array_
+            || $comparison->left instanceof Expr\ConstFetch
+            || $comparison->left instanceof Expr\ClassConstFetch
+            || $comparison->left instanceof Expr\Array_
             )
-            && $this->isSameTypeFuncCall($comparison->right, $comparison->left)
-        ) {
-            return true;
-        }
-
-        return false;
+            && $this->isSameTypeFuncCall($comparison->right, $comparison->left);
     }
 
     private function isSameTypeFuncCall(Expr\FuncCall|Expr\StaticCall|Expr\ConstFetch $call, Node\Scalar|Expr\ConstFetch|Expr\ClassConstFetch|Expr\FuncCall|Expr\Array_ $expr): bool

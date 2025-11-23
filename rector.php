@@ -36,6 +36,7 @@ declare(strict_types=1);
 use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
 use Rector\CodeQuality\Rector\FuncCall\InlineIsAInstanceOfRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
+use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
@@ -91,6 +92,7 @@ return RectorConfig::configure()
         InlineIsAInstanceOfRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
+        SimplifyIfReturnBoolRector::class,
         UnusedForeachValueToArrayKeysRector::class,
     ])
     ->withConfiguredRule(
@@ -122,6 +124,9 @@ return RectorConfig::configure()
         RemoveUnusedPublicMethodParameterRector::class => [
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
             __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        SimplifyIfReturnBoolRector::class => [
+            __DIR__ . '/src/Process/OriginalPhpProcess.php',
         ],
         SimplifyUselessVariableRector::class => [
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',

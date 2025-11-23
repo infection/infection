@@ -96,10 +96,6 @@ final class LogicalAndNegation implements Mutator
             return false;
         }
 
-        if ($parent instanceof Node\Expr\BooleanNot) {
-            return false;
-        }
-
-        return true;
+        return !$parent instanceof Node\Expr\BooleanNot;
     }
 }

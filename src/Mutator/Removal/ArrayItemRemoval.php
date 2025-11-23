@@ -162,11 +162,7 @@ final readonly class ArrayItemRemoval implements ConfigurableMutator
         }
 
         // Don't mutate destructured values in foreach loops
-        if ($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node) {
-            return false;
-        }
-
-        return true;
+        return !($parent instanceof Node\Stmt\Foreach_ && $parent->valueVar === $node);
     }
 
     /**
