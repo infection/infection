@@ -48,7 +48,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
 {
     #[DataProvider('provideMutationCases')]
-    public function test_mutator($input, $expected = null): void
+    public function test_mutator(string $input, ?string $expected = null): void
     {
         $this->assertMutatesInput($input, $expected);
     }

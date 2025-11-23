@@ -385,12 +385,6 @@ parameters:
 			path: ../tests/phpunit/Console/E2ETest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Console\\LogVerbosityTest\:\:test_it_converts_int_version_to_string_version_of_verbosity\(\) has parameter \$inputVerbosity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Console/LogVerbosityTest.php
-
-		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -673,12 +667,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Boolean/TrueValueConfigTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\Boolean\\TrueValueTest\:\:test_it_can_mutate\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Boolean/TrueValueTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Mutator\\DefinitionTest\:\:test_it_must_define_remedies\(\) has parameter \$mutator with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
@@ -869,42 +857,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveCaretTest\:\:test_mutator\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveCaretTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveCaretTest\:\:test_mutator\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveCaretTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveDollarTest\:\:test_mutator\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveDollarTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveDollarTest\:\:test_mutator\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveDollarTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveFlagsTest\:\:test_mutator\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveFlagsTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveFlagsTest\:\:test_mutator\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveFlagsTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:invokeMethod\(\) has no return type specified\.$#'
@@ -1169,3 +1121,15 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
+
+		-
+			message: '#has parameter \$node with no value type specified in iterable type array#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
+
+		-
+			message: '#Node is not subtype of native type#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php

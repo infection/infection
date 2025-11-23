@@ -76,7 +76,7 @@ final class LogVerbosityTest extends TestCase
 
     #[DataProvider('convertedLogVerbosityProvider')]
     public function test_it_converts_int_version_to_string_version_of_verbosity(
-        $inputVerbosity,
+        int|string $inputVerbosity,
         string $output,
     ): void {
         $this->setInputExpectationsWhenItDoesChange($inputVerbosity, $output);

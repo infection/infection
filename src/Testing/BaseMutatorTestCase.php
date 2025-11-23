@@ -69,8 +69,12 @@ abstract class BaseMutatorTestCase extends TestCase
      * @param string|string[]|null $expectedCode
      * @param mixed[] $settings
      */
-    final protected function assertMutatesInput(string $inputCode, string|array|null $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
-    {
+    final protected function assertMutatesInput(
+        string $inputCode,
+        string|array|null $expectedCode = [],
+        array $settings = [],
+        bool $allowInvalidCode = false,
+    ): void {
         $expectedCodeSamples = (array) $expectedCode;
 
         $inputCode = StringNormalizer::normalizeString($inputCode);

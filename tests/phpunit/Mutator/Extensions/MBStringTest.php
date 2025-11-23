@@ -55,7 +55,7 @@ final class MBStringTest extends BaseMutatorTestCase
      * @param array<string, bool> $settings
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = [], array $settings = []): void
     {
         $this->assertMutatesInput($input, $expected, $settings);
     }
