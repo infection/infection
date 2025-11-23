@@ -1099,18 +1099,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$initialConfigBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$mutationConfigBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$pcovDirectoryProvider has no type specified\.$#'
 			identifier: missingType.property
 			count: 1

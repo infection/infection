@@ -53,11 +53,6 @@ final class MutantProcessTest extends TestCase
      */
     private $processMock;
 
-    /**
-     * @var MockObject|TestFrameworkMutantExecutionResultFactory
-     */
-    private $mutantExecutionResultFactory;
-
     private Mutant $mutant;
 
     /**
@@ -69,12 +64,12 @@ final class MutantProcessTest extends TestCase
     {
         $this->processMock = $this->createMock(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $this->mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
+        $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processMock,
             $this->mutant,
-            $this->mutantExecutionResultFactory,
+            $mutantExecutionResultFactory,
         );
     }
 
