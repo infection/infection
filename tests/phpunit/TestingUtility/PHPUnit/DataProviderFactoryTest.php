@@ -56,6 +56,6 @@ final class DataProviderFactoryTest extends TestCase
 
         $actual = take(DataProviderFactory::fromIterable($input))->toAssoc();
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 }
