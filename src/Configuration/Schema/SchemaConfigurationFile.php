@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Configuration\Schema;
 
 use ColinODell\Json5\SyntaxError;
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\FS;
 use function is_file;
 use function is_readable;
 use function json5_decode;

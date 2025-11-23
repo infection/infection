@@ -36,9 +36,8 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Locator;
 
 use const DIRECTORY_SEPARATOR;
-use function is_file;
+use Fidry\FileSystem\FileSystem;
 use function Safe\realpath;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -52,7 +51,7 @@ final readonly class RootsFileLocator implements Locator
      */
     public function __construct(
         private array $roots,
-        private Filesystem $filesystem,
+        private FileSystem $fileSystem,
     ) {
         Assert::allString($roots);
     }
@@ -61,11 +60,9 @@ final readonly class RootsFileLocator implements Locator
     {
         $canonicalFileName = Path::canonicalize($fileName);
 
-        if ($this->filesystem->isAbsolutePath($canonicalFileName)) {
-            if ($this->filesystem->exists($canonicalFileName)
-                && is_file($canonicalFileName)
-            ) {
-                return realpath($canonicalFileName);
+        if ($this->fileSystem->isAbsolutePath($canonicalFileName)) {
+            if ($this->fileSystem->isReadableFile($canonicalFileName)) {
+                return $this->fileSystem->normalizedRealPath($canonicalFileName);
             }
 
             throw FileNotFound::fromFileName($canonicalFileName, $this->roots);
@@ -74,8 +71,8 @@ final readonly class RootsFileLocator implements Locator
         foreach ($this->roots as $path) {
             $file = $path . DIRECTORY_SEPARATOR . $canonicalFileName;
 
-            if ($this->filesystem->exists($file) && is_file($file)) {
-                return realpath($file);
+            if ($this->fileSystem->isReadableFile($file)) {
+                return $this->fileSystem->normalizedRealPath($file);
             }
         }
 

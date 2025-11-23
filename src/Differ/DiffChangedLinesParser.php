@@ -38,9 +38,9 @@ namespace Infection\Differ;
 use function array_map;
 use function count;
 use function explode;
+use Fidry\FileSystem\FileSystem;
 use function Safe\preg_match;
 use function Safe\preg_split;
-use function Safe\realpath;
 use function sprintf;
 use function str_starts_with;
 use Webmozart\Assert\Assert;
@@ -52,6 +52,11 @@ use Webmozart\Assert\Assert;
 class DiffChangedLinesParser
 {
     private const MATCH_INDEX = 1;
+
+    public function __construct(
+        private readonly FileSystem $fileSystem,
+    ) {
+    }
 
     /**
      * Returned result example:
@@ -82,7 +87,7 @@ class DiffChangedLinesParser
                     sprintf('Source file can not be found in the following diff line: "%s"', $line),
                 );
 
-                $filePath = realpath($matches[self::MATCH_INDEX]);
+                $filePath = $this->fileSystem->normalizedRealPath($matches[self::MATCH_INDEX]);
             } elseif (str_starts_with((string) $line, '@@ ')) {
                 Assert::string($filePath, sprintf('Real path for file from diff can not be calculated. Diff: %s', $unifiedGreppedDiff));
 

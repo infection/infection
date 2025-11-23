@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
+use Fidry\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function Safe\getcwd;
-use function Safe\realpath;
 use function sprintf;
 use function str_contains;
 use Symfony\Component\Process\ExecutableFinder;
@@ -48,11 +48,23 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 final readonly class ConcreteComposerExecutableFinder implements ComposerExecutableFinder
 {
+    public function __construct(
+        private FileSystem $fileSystem,
+    ) {
+    }
+
     public function find(): string
     {
         $probable = ['composer', 'composer.phar'];
         $finder = new ExecutableFinder();
-        $immediatePaths = [getcwd(), realpath(getcwd() . '/../'), realpath(getcwd() . '/../../')];
+
+        $cwd = getcwd();
+
+        $immediatePaths = [
+            $cwd,
+            $this->fileSystem->realPath($cwd . '/../'),
+            $this->fileSystem->realPath($cwd . '/../../'),
+        ];
 
         foreach ($probable as $name) {
             $path = $finder->find($name, null, $immediatePaths);
@@ -70,7 +82,7 @@ final readonly class ConcreteComposerExecutableFinder implements ComposerExecuta
          * Check for options without execute permissions and prefix the PHP
          * executable instead.
          */
-        $nonExecutableFinder = new NonExecutableFinder();
+        $nonExecutableFinder = new NonExecutableFinder($this->fileSystem);
         $path = $nonExecutableFinder->searchNonExecutables($probable, $immediatePaths);
 
         if ($path !== null) {

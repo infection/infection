@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Fidry\FileSystem\FileSystem;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @internal
@@ -45,7 +45,7 @@ final readonly class CleanUpAfterMutationTestingFinishedSubscriberFactory implem
 {
     public function __construct(
         private bool $debug,
-        private Filesystem $fileSystem,
+        private FileSystem $fileSystem,
         private string $tmpDir,
     ) {
     }
