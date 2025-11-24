@@ -48,6 +48,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -90,6 +91,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->backupEnvironmentVariables();
 
         parent::setUp();
+
+        // This test relies on the current working directory to be the project
+        // root.
+        chdir(__DIR__ . '/../../../../');
 
         $this->fileSystem = new Filesystem();
 

@@ -37,6 +37,7 @@ namespace Infection\Tests\FileSystem;
 
 use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\TestCase;
+use function Safe\chdir;
 use function Safe\getcwd;
 use function Safe\realpath;
 use function str_replace;
@@ -59,10 +60,14 @@ abstract class FileSystemTestCase extends TestCase
                 $this->getTmpDirPrefix(),
             ),
         );
+
+        chdir($this->tmp);
     }
 
     protected function tearDown(): void
     {
+        chdir($this->cwd);
+
         (new Filesystem())->remove($this->tmp);
     }
 
