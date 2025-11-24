@@ -768,7 +768,8 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         ];
     }
 
-    private function queryXpath(string $xml, string $query)
+    // TODO: at this point it is better to use the SafeDOMXPath...
+    private function queryXpath(string $xml, string $query): DOMNodeList
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml);

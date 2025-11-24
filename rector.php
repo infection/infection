@@ -65,6 +65,7 @@ use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromCreateMockAssignRector
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProviderRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamFromLocalCallsRector;
@@ -111,6 +112,7 @@ return RectorConfig::configure()
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
         ReturnTypeFromMockObjectRector::class,
+        ReturnTypeFromStrictNativeCallRector::class,
         ReturnTypeFromReturnNewRector::class,
         TypedPropertyFromAssignsRector::class,
         TypedPropertyFromCreateMockAssignRector::class,

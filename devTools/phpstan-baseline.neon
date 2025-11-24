@@ -1039,8 +1039,14 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilderTest\:\:queryXpath\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#InitialConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
+
+		-
+			message: '#InitialConfigBuilderTest::queryXpath.* should return DOMNodeList#'
+			identifier: return.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
 
@@ -1051,8 +1057,20 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\MutationConfigBuilderTest\:\:queryXpath\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#\$callback of function array_map expects#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			message: '#MutationConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			message: '#MutationConfigBuilderTest::queryXpath.* should return DOMNodeList#'
+			identifier: return.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
