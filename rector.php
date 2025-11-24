@@ -64,6 +64,7 @@ use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromCreateMockAssignRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProviderRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnParentClassMethodRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
@@ -106,6 +107,7 @@ return RectorConfig::configure()
         AddReturnTypeDeclarationFromYieldsRector::class,
         AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
+        AddVoidReturnTypeWhereNoReturnRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
         DisallowedEmptyRuleFixerRector::class,
         DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
