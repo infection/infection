@@ -66,6 +66,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\AddMethodCallBasedStrictParamTypeR
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProviderRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnParentClassMethodRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ParamTypeByMethodCallTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
@@ -119,6 +120,7 @@ return RectorConfig::configure()
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,
         FlipNegatedTernaryInstanceofRector::class,
+        ParamTypeByMethodCallTypeRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
         ReturnTypeFromMockObjectRector::class,
