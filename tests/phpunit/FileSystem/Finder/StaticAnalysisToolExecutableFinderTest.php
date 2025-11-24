@@ -49,6 +49,7 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
@@ -71,7 +72,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
 
     private Filesystem $fileSystem;
 
-    private ComposerExecutableFinder $composerFinder;
+    private ComposerExecutableFinder&MockObject $composerFinder;
 
     /**
      * Saves the current environment
