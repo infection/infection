@@ -72,6 +72,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRec
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
@@ -129,6 +130,7 @@ return RectorConfig::configure()
         ReturnTypeFromReturnDirectArrayRector::class,
         ReturnTypeFromReturnNewRector::class,
         ReturnTypeFromStrictTypedCallRector::class,
+        StringReturnTypeFromStrictStringReturnsRector::class,
         TypedPropertyFromAssignsRector::class,
         TypedPropertyFromCreateMockAssignRector::class,
         TypedPropertyFromStrictConstructorRector::class,

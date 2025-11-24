@@ -451,18 +451,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getComposerBatProxy\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getProjectBatProxy\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
 			message: '#^Only booleans are allowed in a ternary operator condition, string\|false given\.$#'
 			identifier: ternary.condNotBoolean
 			count: 1
