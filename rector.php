@@ -66,6 +66,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProv
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
+use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamFromLocalCallsRector;
@@ -100,6 +101,7 @@ return RectorConfig::configure()
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
         AddReturnDocblockForCommonObjectDenominatorRector::class,
         AddReturnDocblockForJsonArrayRector::class,
+        AddReturnTypeDeclarationFromYieldsRector::class,
         AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,

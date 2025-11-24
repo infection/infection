@@ -463,12 +463,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\Iterator\\RealPathFilterIteratorTest\:\:providesFinders\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getComposerBatProxy\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -579,12 +573,6 @@ parameters:
 		-
 			message: '#^Method Infection\\Tests\\Logger\\Html\\StrykerHtmlReportBuilderTest\:\:assertJsonDocumentMatchesSchema\(\) has parameter \$report with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\Html\\StrykerHtmlReportBuilderTest\:\:metricsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
 
@@ -1085,36 +1073,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:configurationsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:legacyConfigurationsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:mainlineConfigurationsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
-
-		-
-			message: '#^Unable to resolve the template type TKey in call to function Pipeline\\take$#'
-			identifier: argument.templateType
-			count: 2
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
-
-		-
-			message: '#^Unable to resolve the template type TTake in call to function Pipeline\\take$#'
-			identifier: argument.templateType
-			count: 2
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
 
 		-
 			message: '#getShortClassName#'

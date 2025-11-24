@@ -85,7 +85,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $this->assertJsonDocumentMatchesSchema($report);
     }
 
-    public static function metricsProvider()
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),

@@ -53,7 +53,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
         $this->versionProvider = new XmlConfigurationVersionProvider();
     }
 
-    public static function configurationsProvider()
+    public static function configurationsProvider(): iterable
     {
         yield from take(self::legacyConfigurationsProvider())
             ->map(static function (string $xml): iterable {
@@ -80,7 +80,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
         $this->assertSame($mainline, version_compare($version, '9.3', '>='));
     }
 
-    private static function legacyConfigurationsProvider()
+    private static function legacyConfigurationsProvider(): iterable
     {
         yield <<<'XML'
             <?xml version="1.0" encoding="UTF-8"?>
@@ -175,7 +175,7 @@ final class XmlConfigurationVersionProviderTest extends TestCase
             XML_WRAP;
     }
 
-    private static function mainlineConfigurationsProvider()
+    private static function mainlineConfigurationsProvider(): iterable
     {
         yield <<<'XML_WRAP'
             <?xml version="1.0" encoding="UTF-8"?>
