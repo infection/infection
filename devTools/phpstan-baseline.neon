@@ -991,8 +991,8 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\LineRangeCalculatorTest\:\:createSpyTraverser\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#NodeVisitor::\$range#'
+			identifier: property.notFound
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/LineRangeCalculatorTest.php
 

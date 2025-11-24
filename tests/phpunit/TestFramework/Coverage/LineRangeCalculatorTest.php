@@ -40,6 +40,7 @@ use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -65,6 +66,7 @@ final class LineRangeCalculatorTest extends TestCase
         $traverser->addVisitor($spy);
         $traverser->traverse($nodes);
 
+        // TODO: fix this; it is out of the contract of NodeVisitor...
         $range = $spy->range;
 
         $this->assertSame($nodeRange, $range);
@@ -155,7 +157,7 @@ final class LineRangeCalculatorTest extends TestCase
         ];
     }
 
-    private function createSpyTraverser()
+    private function createSpyTraverser(): NodeVisitor
     {
         return new class extends NodeVisitorAbstract {
             /**
