@@ -63,6 +63,7 @@ use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromCreateMockAssignRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProviderRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnParentClassMethodRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
@@ -101,6 +102,7 @@ return RectorConfig::configure()
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
         AddReturnDocblockForCommonObjectDenominatorRector::class,
         AddReturnDocblockForJsonArrayRector::class,
+        AddReturnTypeDeclarationBasedOnParentClassMethodRector::class,
         AddReturnTypeDeclarationFromYieldsRector::class,
         AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
@@ -131,6 +133,9 @@ return RectorConfig::configure()
     ->withSkip([
         AbsolutizeRequireAndIncludePathRector::class,
         AddInstanceofAssertForNullableInstanceRector::class,
+        AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
+            __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
+        ],
         AssertCompareOnCountableWithMethodToAssertCountRector::class,
         AssertEmptyNullableObjectToAssertInstanceofRector::class,
         AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
