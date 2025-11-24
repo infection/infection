@@ -68,6 +68,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnPar
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ParamTypeByMethodCallTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
@@ -125,6 +126,7 @@ return RectorConfig::configure()
         PrivatizeFinalClassPropertyRector::class,
         ReturnTypeFromMockObjectRector::class,
         ReturnTypeFromStrictNativeCallRector::class,
+        ReturnTypeFromReturnDirectArrayRector::class,
         ReturnTypeFromReturnNewRector::class,
         ReturnTypeFromStrictTypedCallRector::class,
         TypedPropertyFromAssignsRector::class,
