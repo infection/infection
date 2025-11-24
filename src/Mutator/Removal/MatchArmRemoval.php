@@ -125,6 +125,7 @@ final class MatchArmRemoval implements Mutator
                 foreach (array_keys($armConds) as $j) {
                     $conds = $armConds;
 
+                    /** @psalm-suppress InvalidArrayOffset */
                     unset($conds[$j]);
 
                     $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, NodeAttributes::getAllExceptOriginalNode($node));
