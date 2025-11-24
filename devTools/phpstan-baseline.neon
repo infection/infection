@@ -823,12 +823,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:invokeMethod\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:\$testSubject with generic class Infection\\Mutator\\Util\\AbstractValueToNullReturnValue does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1

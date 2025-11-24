@@ -69,6 +69,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRect
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
 use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
@@ -123,6 +124,7 @@ return RectorConfig::configure()
         ReturnTypeFromMockObjectRector::class,
         ReturnTypeFromStrictNativeCallRector::class,
         ReturnTypeFromReturnNewRector::class,
+        ReturnTypeFromStrictTypedCallRector::class,
         TypedPropertyFromAssignsRector::class,
         TypedPropertyFromCreateMockAssignRector::class,
         TypedPropertyFromStrictConstructorRector::class,
