@@ -20,36 +20,19 @@
       <code><![CDATA[iterable<string, string>]]></code>
     </InvalidReturnType>
   </file>
-  <file src="src/TestFramework/Coverage/XmlReport/SourceFileInfoProvider.php">
-    <UndefinedMethod>
-      <code>getAttribute</code>
-      <code>getAttribute</code>
-    </UndefinedMethod>
-  </file>
   <file src="src/TestFramework/Coverage/XmlReport/XmlCoverageParser.php">
     <InvalidTemplateParam>
       <code><![CDATA[DOMNodeList<DOMNode|DOMNameSpaceNode>]]></code>
       <code><![CDATA[DOMNodeList<DOMNode|DOMNameSpaceNode>]]></code>
     </InvalidTemplateParam>
-    <UndefinedMethod>
-      <code>getAttribute</code>
-    </UndefinedMethod>
-  </file>
-  <file src="src/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilder.php">
-    <UndefinedMethod>
-      <code>setAttribute</code>
-    </UndefinedMethod>
   </file>
   <file src="src/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilder.php">
     <InaccessibleProperty>
-      <code><![CDATA[$bootstrap[0]->nodeValue]]></code>
+      <code><![CDATA[$bootstrap->nodeValue]]></code>
     </InaccessibleProperty>
     <InvalidTemplateParam>
       <code><![CDATA[DOMNodeList<DOMNameSpaceNode|DOMNode>]]></code>
     </InvalidTemplateParam>
-    <UndefinedMethod>
-      <code>setAttribute</code>
-    </UndefinedMethod>
   </file>
   <file src="src/TestFramework/PhpUnit/Config/Path/PathReplacer.php">
     <InaccessibleProperty>
@@ -58,7 +41,7 @@
   </file>
   <file src="src/TestFramework/PhpUnit/Config/XmlConfigurationManipulator.php">
     <InaccessibleProperty>
-      <code><![CDATA[$nodeList[0]->nodeValue]]></code>
+      <code><![CDATA[$node->nodeValue]]></code>
     </InaccessibleProperty>
     <InvalidReturnStatement>
       <code>$node[0]</code>
@@ -66,10 +49,6 @@
     <InvalidReturnType>
       <code>DOMElement</code>
     </InvalidReturnType>
-    <UndefinedMethod>
-      <code>setAttribute</code>
-      <code>setAttribute</code>
-    </UndefinedMethod>
   </file>
   <file src="src/TestFramework/SafeDOMXPath.php">
     <InvalidTemplateParam>
