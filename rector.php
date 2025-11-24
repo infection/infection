@@ -61,23 +61,10 @@ use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatPa
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
-use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromCreateMockAssignRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddMethodCallBasedStrictParamTypeRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProviderRector;
+use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnParentClassMethodRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ParamTypeByMethodCallTypeRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ParamTypeByParentCallTypeRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromMockObjectRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
-use Rector\TypeDeclaration\Rector\FunctionLike\AddReturnTypeDeclarationFromYieldsRector;
+use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\ClassMethodArrayDocblockParamFromLocalCallsRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromGetterReturnRector;
 use Rector\TypeDeclarationDocblocks\Rector\Class_\DocblockVarArrayFromPropertyDefaultsRector;
@@ -101,21 +88,17 @@ return RectorConfig::configure()
         deadCode: true,
         codeQuality: true,
         phpunitCodeQuality: true,
+        typeDeclarations: true,
     )
     ->withRules([
         AddCoversClassAttributeRector::class,
-        AddMethodCallBasedStrictParamTypeRector::class,
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
-        AddParamTypeBasedOnPHPUnitDataProviderRector::class,
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
         AddReturnDocblockForCommonObjectDenominatorRector::class,
         AddReturnDocblockForJsonArrayRector::class,
-        AddReturnTypeDeclarationBasedOnParentClassMethodRector::class,
-        AddReturnTypeDeclarationFromYieldsRector::class,
         AddParamArrayDocblockBasedOnArrayMapRector::class,
         AddParamArrayDocblockFromDimFetchAccessRector::class,
-        AddVoidReturnTypeWhereNoReturnRector::class,
         ClassMethodArrayDocblockParamFromLocalCallsRector::class,
         DisallowedEmptyRuleFixerRector::class,
         DocblockGetterReturnArrayFromPropertyDocblockVarRector::class,
@@ -123,20 +106,9 @@ return RectorConfig::configure()
         DocblockVarArrayFromPropertyDefaultsRector::class,
         DocblockVarFromParamDocblockInConstructorRector::class,
         FlipNegatedTernaryInstanceofRector::class,
-        ParamTypeByMethodCallTypeRector::class,
-        ParamTypeByParentCallTypeRector::class,
         PrivatizeFinalClassMethodRector::class,
         PrivatizeFinalClassPropertyRector::class,
-        ReturnTypeFromMockObjectRector::class,
-        ReturnTypeFromStrictNativeCallRector::class,
-        ReturnTypeFromReturnDirectArrayRector::class,
-        ReturnTypeFromReturnNewRector::class,
-        ReturnTypeFromStrictTypedCallRector::class,
-        StringReturnTypeFromStrictStringReturnsRector::class,
         TypedPropertyFromAssignsRector::class,
-        TypedPropertyFromCreateMockAssignRector::class,
-        TypedPropertyFromStrictConstructorRector::class,
-        TypedPropertyFromStrictSetUpRector::class,
     ])
     ->withConfiguredRule(
         ClassPropertyAssignToConstructorPromotionRector::class,
@@ -148,6 +120,7 @@ return RectorConfig::configure()
     )
     ->withSkip([
         AbsolutizeRequireAndIncludePathRector::class,
+        AddArrowFunctionReturnTypeRector::class,
         AddInstanceofAssertForNullableInstanceRector::class,
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
@@ -155,6 +128,7 @@ return RectorConfig::configure()
         AssertCompareOnCountableWithMethodToAssertCountRector::class,
         AssertEmptyNullableObjectToAssertInstanceofRector::class,
         AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
+        ClosureReturnTypeRector::class,
         DataProviderArrayItemsNewLinedRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
