@@ -68,30 +68,15 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
-    /**
-     * @var OutputFormatter|MockObject
-     */
-    private $outputFormatter;
+    private MockObject&OutputFormatter $outputFormatter;
 
-    /**
-     * @var MetricsCalculator|MockObject
-     */
-    private $metricsCalculator;
+    private MockObject&MetricsCalculator $metricsCalculator;
 
-    /**
-     * @var ResultsCollector|MockObject
-     */
-    private $resultsCollector;
+    private MockObject&ResultsCollector $resultsCollector;
 
-    /**
-     * @var DiffColorizer|MockObject
-     */
-    private $diffColorizer;
+    private MockObject&DiffColorizer $diffColorizer;
 
     protected function setUp(): void
     {

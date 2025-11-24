@@ -71,15 +71,9 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     private const MUTATED_FILE_PATH = '/mutated/file/path';
 
-    /**
-     * @var string
-     */
-    private $projectPath;
+    private string $projectPath;
 
-    /**
-     * @var MutationConfigBuilder
-     */
-    private $builder;
+    private MutationConfigBuilder $builder;
 
     protected function setUp(): void
     {

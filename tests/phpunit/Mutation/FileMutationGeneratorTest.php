@@ -69,22 +69,13 @@ final class FileMutationGeneratorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
 
-    /**
-     * @var FileParser&MockObject
-     */
-    private $fileParserMock;
+    private MockObject&FileParser $fileParserMock;
 
-    /**
-     * @var NodeTraverserFactory&MockObject
-     */
-    private $traverserFactoryMock;
+    private MockObject&NodeTraverserFactory $traverserFactoryMock;
 
     private FileMutationGenerator $mutationGenerator;
 
-    /**
-     * @var FilesDiffChangedLines&MockObject
-     */
-    private $filesDiffChangedLines;
+    private MockObject&FilesDiffChangedLines $filesDiffChangedLines;
 
     protected function setUp(): void
     {
@@ -390,15 +381,12 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    /**
-     * @return Trace|MockObject
-     */
     private function createTraceMock(
         string $file,
         string $relativePath,
         string $relativePathname,
         ?bool $hasTests = null,
-    ): Trace {
+    ): Trace&MockObject {
         $splFileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
 
         $proxyTraceMock = $this->createMock(Trace::class);

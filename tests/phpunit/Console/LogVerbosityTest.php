@@ -46,15 +46,9 @@ use Symfony\Component\Console\Input\InputInterface;
 #[CoversClass(LogVerbosity::class)]
 final class LogVerbosityTest extends TestCase
 {
-    /**
-     * @var InputInterface|MockObject
-     */
-    private $inputMock;
+    private MockObject&InputInterface $inputMock;
 
-    /**
-     * @var ConsoleOutput|MockObject
-     */
-    private $consoleOutputMock;
+    private MockObject&ConsoleOutput $consoleOutputMock;
 
     protected function setUp(): void
     {

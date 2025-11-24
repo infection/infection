@@ -42,40 +42,25 @@ use const PHP_EOL;
 use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class MockVendor
+final readonly class MockVendor
 {
     public const VENDOR = 'phptester';
 
     public const PACKAGE = 'awesome-php-tester';
 
-    /**
-     * @var string
-     */
-    private $packageScript;
+    private string $packageScript;
 
-    /**
-     * @var string
-     */
-    private $scriptPath;
+    private string $scriptPath;
 
-    /**
-     * @var string
-     */
-    private $vendorBinDir;
+    private string $vendorBinDir;
 
-    /**
-     * @var string
-     */
-    private $vendorBinLink;
+    private string $vendorBinLink;
 
-    /**
-     * @var string
-     */
-    private $vendorBinBat;
+    private string $vendorBinBat;
 
     public function __construct(
-        private readonly string $tmpDir,
-        private readonly Filesystem $fileSystem,
+        private string $tmpDir,
+        private Filesystem $fileSystem,
     ) {
         $vendorDir = $this->tmpDir . '/vendor';
         $this->vendorBinDir = $vendorDir . '/bin';

@@ -66,15 +66,9 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;
 
-    /**
-     * @var string
-     */
-    private static $pathName;
+    private static string $pathName;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private Filesystem $fileSystem;
 
     private ComposerExecutableFinder $composerFinder;
 

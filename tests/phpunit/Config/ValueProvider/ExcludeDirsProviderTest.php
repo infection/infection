@@ -52,20 +52,11 @@ use function sys_get_temp_dir;
 #[CoversClass(ExcludeDirsProvider::class)]
 final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var string
-     */
-    private $workspace;
+    private string $workspace;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private Filesystem $fileSystem;
 
-    /**
-     * @var ExcludeDirsProvider
-     */
-    private $provider;
+    private ExcludeDirsProvider $provider;
 
     protected function setUp(): void
     {

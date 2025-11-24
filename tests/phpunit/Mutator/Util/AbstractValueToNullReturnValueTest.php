@@ -47,10 +47,7 @@ use stdClass;
 #[CoversClass(AbstractValueToNullReturnValue::class)]
 final class AbstractValueToNullReturnValueTest extends TestCase
 {
-    /**
-     * @var AbstractValueToNullReturnValue&MockObject
-     */
-    private MockObject $testSubject;
+    private MockObject&AbstractValueToNullReturnValue $testSubject;
 
     protected function setUp(): void
     {
@@ -125,9 +122,8 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         );
     }
 
-    private function mockNode($returnValue): Node
+    private function mockNode($returnValue): Node&MockObject
     {
-        /** @var Node&MockObject $mockNode */
         $mockNode = $this->createMock(Node::class);
 
         $mockNode->method('getAttribute')
@@ -136,9 +132,8 @@ final class AbstractValueToNullReturnValueTest extends TestCase
         return $mockNode;
     }
 
-    private function mockFunction($returnValue): Function_
+    private function mockFunction($returnValue): Function_&MockObject
     {
-        /** @var Function_|MockObject $mockFunction */
         $mockFunction = $this->getMockBuilder(Function_::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getReturnType'])

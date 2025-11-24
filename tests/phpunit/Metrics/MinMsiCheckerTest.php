@@ -51,15 +51,9 @@ use Symfony\Component\Console\Terminal;
 #[CoversClass(MinMsiChecker::class)]
 final class MinMsiCheckerTest extends TestCase
 {
-    /**
-     * @var BufferedOutput
-     */
-    private $output;
+    private BufferedOutput $output;
 
-    /**
-     * @var ConsoleOutput
-     */
-    private $consoleOutput;
+    private ConsoleOutput $consoleOutput;
 
     protected function setUp(): void
     {

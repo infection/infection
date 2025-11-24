@@ -61,15 +61,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
 
-    /**
-     * @var string
-     */
-    private $projectPath;
+    private string $projectPath;
 
-    /**
-     * @var InitialConfigBuilder
-     */
-    private $builder;
+    private InitialConfigBuilder $builder;
 
     protected function setUp(): void
     {

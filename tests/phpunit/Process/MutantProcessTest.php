@@ -48,17 +48,11 @@ use Symfony\Component\Process\Process;
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    /**
-     * @var MockObject|Process
-     */
-    private $processMock;
+    private MockObject&Process $processMock;
 
     private Mutant $mutant;
 
-    /**
-     * @var MutantProcess
-     */
-    private $mutantProcess;
+    private MutantProcess $mutantProcess;
 
     protected function setUp(): void
     {

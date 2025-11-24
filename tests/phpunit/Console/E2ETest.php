@@ -91,15 +91,9 @@ final class E2ETest extends TestCase
 
     private const EXPECT_SUCCESS = 0;
 
-    /**
-     * @var string
-     */
-    private $cwd;
+    private string $cwd;
 
-    /**
-     * @var ClassLoader|null
-     */
-    private $previousLoader;
+    private ?ClassLoader $previousLoader = null;
 
     private static int $countFailingComposerInstall = 0;
 

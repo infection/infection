@@ -84,7 +84,7 @@ final class ConfigurationFactoryTest extends TestCase
     /**
      * @var array<string, Mutator>|null
      */
-    private static $mutators;
+    private static ?array $mutators = null;
 
     public static function tearDownAfterClass(): void
     {

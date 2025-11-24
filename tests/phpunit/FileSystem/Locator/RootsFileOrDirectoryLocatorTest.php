@@ -54,10 +54,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {

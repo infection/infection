@@ -10,7 +10,7 @@ use PhpParser\NodeVisitorAbstract;
 
 final class ParentConnectorSpyVisitor extends NodeVisitorAbstract
 {
-    private $nodes;
+    private ?array $nodes = null;
 
     public function beforeTraverse(array $nodes): void
     {

@@ -1039,24 +1039,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$cliArgumentsBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$commandLineBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$pcovDirectoryProvider has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilderTest\:\:queryXpath\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1133,3 +1115,8 @@ parameters:
 			identifier: parameter.phpDocType
 			count: 1
 			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
+
+		-
+			message: '#with true will always evaluate to true.#'
+			identifier: method.alreadyNarrowedType
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php

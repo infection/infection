@@ -52,15 +52,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(PhpUnitCustomExecutablePathProvider::class)]
 final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var MockObject|TestFrameworkFinder
-     */
-    private $finderMock;
+    private MockObject&TestFrameworkFinder $finderMock;
 
-    /**
-     * @var PhpUnitCustomExecutablePathProvider
-     */
-    private $provider;
+    private PhpUnitCustomExecutablePathProvider $provider;
 
     protected function setUp(): void
     {

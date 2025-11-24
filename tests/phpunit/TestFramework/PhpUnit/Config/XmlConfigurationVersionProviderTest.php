@@ -46,10 +46,7 @@ use function version_compare;
 #[CoversClass(XmlConfigurationVersionProvider::class)]
 final class XmlConfigurationVersionProviderTest extends TestCase
 {
-    /**
-     * @var XmlConfigurationVersionProvider
-     */
-    private $versionProvider;
+    private XmlConfigurationVersionProvider $versionProvider;
 
     protected function setUp(): void
     {

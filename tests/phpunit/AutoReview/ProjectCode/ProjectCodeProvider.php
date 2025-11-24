@@ -191,17 +191,17 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
-    private static $sourceClasses;
+    private static ?array $sourceClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $sourceClassesToCheckForPublicProperties;
+    private static ?array $sourceClassesToCheckForPublicProperties = null;
 
     /**
      * @var string[]|null
      */
-    private static $testClasses;
+    private static ?array $testClasses = null;
 
     public static function provideSourceClasses(): iterable
     {

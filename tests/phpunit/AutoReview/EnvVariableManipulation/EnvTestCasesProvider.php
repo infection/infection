@@ -55,7 +55,7 @@ final class EnvTestCasesProvider
     /**
      * @var string[][]|null
      */
-    private static $envTestCaseClassesTuple;
+    private static ?array $envTestCaseClassesTuple = null;
 
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now

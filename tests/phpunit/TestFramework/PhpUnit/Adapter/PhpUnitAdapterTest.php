@@ -46,21 +46,19 @@ use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
-    /**
-     * @var PhpUnitAdapter
-     */
-    private $adapter;
+    private PhpUnitAdapter $adapter;
 
-    private $pcovDirectoryProvider;
+    private MockObject&PCOVDirectoryProvider $pcovDirectoryProvider;
 
-    private $cliArgumentsBuilder;
+    private MockObject&CommandLineArgumentsAndOptionsBuilder $cliArgumentsBuilder;
 
-    private $commandLineBuilder;
+    private MockObject&CommandLineBuilder $commandLineBuilder;
 
     protected function setUp(): void
     {

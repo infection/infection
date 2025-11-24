@@ -76,40 +76,19 @@ final class MutationTestingRunnerTest extends TestCase
 {
     private const TIMEOUT = 100.0;
 
-    /**
-     * @var MutantProcessContainerFactory|MockObject
-     */
-    private $processFactoryMock;
+    private MockObject&MutantProcessContainerFactory $processFactoryMock;
 
-    /**
-     * @var MutantFactory|MockObject
-     */
-    private $mutantFactoryMock;
+    private MockObject&MutantFactory $mutantFactoryMock;
 
-    /**
-     * @var ProcessRunner|MockObject
-     */
-    private $processRunnerMock;
+    private MockObject&ProcessRunner $processRunnerMock;
 
-    /**
-     * @var EventDispatcherCollector
-     */
-    private $eventDispatcher;
+    private EventDispatcherCollector $eventDispatcher;
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
-    /**
-     * @var DiffSourceCodeMatcher|MockObject
-     */
-    private $diffSourceCodeMatcher;
+    private MockObject&DiffSourceCodeMatcher $diffSourceCodeMatcher;
 
-    /**
-     * @var MutationTestingRunner
-     */
-    private $runner;
+    private MutationTestingRunner $runner;
 
     protected function setUp(): void
     {

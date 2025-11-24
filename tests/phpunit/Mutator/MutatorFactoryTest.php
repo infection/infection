@@ -61,10 +61,7 @@ use stdClass;
 #[CoversClass(MutatorFactory::class)]
 final class MutatorFactoryTest extends TestCase
 {
-    /**
-     * @var MutatorFactory
-     */
-    private $mutatorFactory;
+    private MutatorFactory $mutatorFactory;
 
     protected function setUp(): void
     {
