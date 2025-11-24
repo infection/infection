@@ -62,6 +62,7 @@ use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromCreateMockAssignRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddMethodCallBasedStrictParamTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeBasedOnPHPUnitDataProviderRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddReturnTypeDeclarationBasedOnParentClassMethodRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
@@ -98,6 +99,7 @@ return RectorConfig::configure()
     )
     ->withRules([
         AddCoversClassAttributeRector::class,
+        AddMethodCallBasedStrictParamTypeRector::class,
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
         AddParamTypeBasedOnPHPUnitDataProviderRector::class,

@@ -188,7 +188,7 @@ final class E2ETest extends TestCase
         }
     }
 
-    private function runOnE2EFixture($path): string
+    private function runOnE2EFixture(string $path): string
     {
         $this->assertDirectoryExists($path);
         chdir($path);

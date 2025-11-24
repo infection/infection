@@ -145,7 +145,7 @@ final readonly class MockVendor
         $this->fileSystem->remove($files);
     }
 
-    private function getComposerBatProxy($binaryPath)
+    private function getComposerBatProxy(string $binaryPath)
     {
         // As per Composer proxy code (BinaryInstaller::generateWindowsProxyCode)
         $code = [
@@ -158,7 +158,7 @@ final readonly class MockVendor
         return implode(PHP_EOL, $code) . PHP_EOL;
     }
 
-    private function getProjectBatProxy($binaryPath)
+    private function getProjectBatProxy(string $binaryPath)
     {
         // Basic proxy
         $code = [

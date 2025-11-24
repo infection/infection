@@ -379,12 +379,6 @@ parameters:
 			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
 
 		-
-			message: '#^Method Infection\\Tests\\Console\\E2ETest\:\:runOnE2EFixture\(\) has parameter \$path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -469,20 +463,8 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getComposerBatProxy\(\) has parameter \$binaryPath with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
 			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getProjectBatProxy\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getProjectBatProxy\(\) has parameter \$binaryPath with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
 
@@ -569,12 +551,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Logger/FileLoggerFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\Html\\StrykerHtmlReportBuilderTest\:\:assertJsonDocumentMatchesSchema\(\) has parameter \$report with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
 
 		-
 			message: '#^Parameter \#2 \$processOutput of class Infection\\Mutant\\MutantExecutionResult constructor expects string, string\|null given\.$#'
@@ -849,18 +825,6 @@ parameters:
 		-
 			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:invokeMethod\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:mockFunction\(\) has parameter \$returnValue with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:mockNode\(\) has parameter \$returnValue with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
 

@@ -120,10 +120,7 @@ final class LogVerbosityTest extends TestCase
         ];
     }
 
-    /**
-     * @param string|int $inputVerbosity
-     */
-    private function setInputExpectationsWhenItDoesNotChange($inputVerbosity): void
+    private function setInputExpectationsWhenItDoesNotChange(string|int $inputVerbosity): void
     {
         $this->inputMock
             ->expects($this->once())
@@ -133,10 +130,7 @@ final class LogVerbosityTest extends TestCase
         ;
     }
 
-    /**
-     * @param string|int $inputVerbosity
-     */
-    private function setInputExpectationsWhenItDoesChange($inputVerbosity, string $output): void
+    private function setInputExpectationsWhenItDoesChange(int|string $inputVerbosity, string $output): void
     {
         $this->setInputExpectationsWhenItDoesNotChange($inputVerbosity);
 

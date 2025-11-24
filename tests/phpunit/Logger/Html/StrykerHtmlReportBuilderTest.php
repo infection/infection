@@ -261,7 +261,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         return $collector;
     }
 
-    private function assertJsonDocumentMatchesSchema($report): void
+    private function assertJsonDocumentMatchesSchema(mixed $report): void
     {
         $resultReport = json_decode(json_encode($report));
 
