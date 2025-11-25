@@ -33,16 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport\Index;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
-use Infection\TestFramework\Coverage\XmlReport\Index\IndexReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,12 +49,12 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
-#[CoversClass(IndexReportLocator::class)]
-final class IndexReportLocatorTest extends FileSystemTestCase
+#[CoversClass(IndexXmlCoverageLocator::class)]
+final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
     private FileSystem $filesystem;
 
-    private IndexReportLocator $locator;
+    private IndexXmlCoverageLocator $locator;
 
     protected function setUp(): void
     {
@@ -63,20 +62,51 @@ final class IndexReportLocatorTest extends FileSystemTestCase
 
         $this->filesystem = new FileSystem();
 
-        $this->locator = IndexReportLocator::create(
+        $this->locator = IndexXmlCoverageLocator::create(
             $this->filesystem,
             $this->tmp,
             $this->tmp . '/coverage-xml/index.xml',
         );
     }
 
-    public function test_it_infers_a_default_pathname_from_the_coverage_directory(): void
-    {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/coverage/coverage-xml/index.xml';
+    #[DataProvider('defaultLocationProvider')]
+    public function test_it_exposes_the_default_location_used(
+        string $defaultLocation,
+        string $expected,
+    ): void {
+        $coverageDirectory = '/path/to/random-coverage';
 
-        $locator = IndexReportLocator::create(
-            new FakeFileSystem(),
+        $locator = IndexXmlCoverageLocator::create(
+            $this->filesystem,
+            $coverageDirectory,
+            defaultPHPUnitXmlCoverageIndexPathname: $defaultLocation,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultLocationProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage/default-index.xml',
+            '/path/to/coverage/default-index.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/../default-index.xml',
+            '/path/to/coverage/default-index.xml',
+        ];
+    }
+
+    #[DataProvider('defaultCovergageDirectoryProvider')]
+    public function test_it_infers_a_default_pathname_from_the_coverage_directory(
+        string $coverageDirectory,
+        string $expected,
+    ): void {
+        $locator = IndexXmlCoverageLocator::create(
+            $this->filesystem,
             $coverageDirectory,
         );
 
@@ -85,27 +115,24 @@ final class IndexReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_picks_the_default_pathname_given(): void
+    public static function defaultCovergageDirectoryProvider(): iterable
     {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/another-coverage/default-junit.xml';
+        yield 'canonical pathname' => [
+            '/path/to/coverage',
+            '/path/to/coverage/coverage-xml/index.xml',
+        ];
 
-        $locator = IndexReportLocator::create(
-            new FakeFileSystem(),
-            $coverageDirectory,
-            defaultPHPUnitXmlCoverageIndexPathname: $expected,
-        );
-
-        $actual = $locator->getDefaultLocation();
-
-        $this->assertSame($expected, $actual);
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/..',
+            '/path/to/coverage/coverage-xml/index.xml',
+        ];
     }
 
     public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void
     {
         $unknownDir = $this->tmp . '/unknown-dir';
 
-        $locator = IndexReportLocator::create(
+        $locator = IndexXmlCoverageLocator::create(
             $this->filesystem,
             $unknownDir,
             '/path/to/unknown-file',
@@ -145,7 +172,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
                 sprintf(
                     'Could not find the XML coverage index report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
                     $this->tmp,
-                    IndexReportLocator::INDEX_FILENAME_REGEX,
+                    IndexXmlCoverageLocator::INDEX_FILENAME_REGEX,
                     $expectedReportsPathnames[0],
                     $expectedReportsPathnames[1],
                 ),
@@ -161,7 +188,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
                 sprintf(
                     'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
                     $this->tmp,
-                    IndexReportLocator::INDEX_FILENAME_REGEX,
+                    IndexXmlCoverageLocator::INDEX_FILENAME_REGEX,
                 ),
             ),
         );
@@ -216,7 +243,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
                 sprintf(
                     'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
                     $this->tmp,
-                    IndexReportLocator::INDEX_FILENAME_REGEX,
+                    IndexXmlCoverageLocator::INDEX_FILENAME_REGEX,
                 ),
             ),
         );

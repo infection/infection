@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -46,7 +45,6 @@ use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function Safe\chdir;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
@@ -69,8 +67,6 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
             $this->tmp . '/junit.xml',
         );
     }
-
-
 
     #[DataProvider('defaultLocationProvider')]
     public function test_it_exposes_the_default_location_used(

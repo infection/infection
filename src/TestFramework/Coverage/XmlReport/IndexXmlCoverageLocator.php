@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport\Index;
+namespace Infection\TestFramework\Coverage\XmlReport;
 
 use const DIRECTORY_SEPARATOR;
 use function implode;
@@ -50,7 +50,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final readonly class IndexReportLocator extends BaseReportLocator implements ReportLocator
+final readonly class IndexXmlCoverageLocator extends BaseReportLocator implements ReportLocator
 {
     public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 

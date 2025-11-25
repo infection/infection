@@ -138,7 +138,7 @@ use Infection\TestFramework\Coverage\Locator\MemoizedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\Index\IndexReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
@@ -262,8 +262,8 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            IndexReportLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
-                IndexReportLocator::create(
+            IndexXmlCoverageLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
+                IndexXmlCoverageLocator::create(
                     $container->getFileSystem(),
                     $container->getConfiguration()->coveragePath,
                 ),
@@ -1133,9 +1133,9 @@ final class Container extends DIContainer
         return $this->get(CoveredTraceProvider::class);
     }
 
-    private function getIndexXmlCoverageLocator(): IndexReportLocator
+    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
     {
-        return $this->get(IndexReportLocator::class);
+        return $this->get(IndexXmlCoverageLocator::class);
     }
 
     private function getProjectDir(): string
