@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
+use function sprintf;
 use Webmozart\Assert\Assert;
 
 /**
@@ -55,6 +56,7 @@ class IndexXmlCoverageParser
      * needed to parse general coverage data. Note that this data is likely incomplete an will
      * need to be enriched to contain all the desired data.
      *
+     * @throws InvalidCoverage
      * @throws NoLineExecuted
      *
      * @return iterable<SourceFileInfoProvider>
@@ -71,6 +73,8 @@ class IndexXmlCoverageParser
     }
 
     /**
+     * @throws InvalidCoverage
+     *
      * @return iterable<SourceFileInfoProvider>
      */
     private function parseNodes(
@@ -78,7 +82,7 @@ class IndexXmlCoverageParser
         string $coverageBasePath,
         SafeDOMXPath $xPath,
     ): iterable {
-        $projectSource = self::getProjectSource($xPath);
+        $projectSource = self::getProjectSource($coverageIndexPath, $xPath);
 
         foreach ($xPath->query('//p:file') as $node) {
             Assert::isInstanceOf($node, DOMElement::class);
@@ -112,24 +116,29 @@ class IndexXmlCoverageParser
         }
     }
 
-    private static function getProjectSource(SafeDOMXPath $xPath): string
+    /**
+     * @throws InvalidCoverage
+     */
+    private static function getProjectSource(string $pathname, SafeDOMXPath $xPath): string
     {
-        // PHPUnit >= 6
-        $sourceNodes = $xPath->query('//p:project/@source');
+        $sourceQueries = [
+            '//p:project/@source',  // PHPUnit >= 6
+            '//p:project/@name',    // PHPUnit < 6
+        ];
 
-        if ($sourceNodes->length > 0) {
-            $node = $sourceNodes->item(0);
-            Assert::notNull($node);
+        foreach ($sourceQueries as $sourceQuery) {
+            $source = $xPath->query($sourceQuery)->item(0)?->nodeValue;
 
-            // @phpstan-ignore return.type
-            return $node->nodeValue;
+            if ($source !== null) {
+                return $source;
+            }
         }
 
-        // PHPUnit < 6
-        $node = $xPath->query('//p:project/@name')->item(0);
-        Assert::notNull($node);
-
-        // @phpstan-ignore return.type
-        return $node->nodeValue;
+        throw new InvalidCoverage(
+            sprintf(
+                'Could not find the source attribute for the project in the file "%s".',
+                $pathname,
+            ),
+        );
     }
 }
