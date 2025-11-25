@@ -197,11 +197,11 @@ final readonly class XmlConfigurationManipulator
             return true;
         }
 
-        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue;
+        $schema = $xPath->queryList('/phpunit/@xsi:noNamespaceSchemaLocation');
 
         $original = libxml_use_internal_errors(true);
 
-        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
+        if ($schema->length > 0 && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString(),
@@ -388,10 +388,10 @@ final readonly class XmlConfigurationManipulator
 
     private function getOrCreateNode(SafeDOMXPath $xPath, DOMDocument $dom, string $nodeName): DOMElement
     {
-        $node = $xPath->queryElement(sprintf('/phpunit/%s', $nodeName));
+        $node = $xPath->queryList(sprintf('/phpunit/%s', $nodeName));
 
-        if ($node !== null) {
-            return $node;
+        if ($node->length > 0) {
+            return $node[0];
         }
 
         return $this->createNode($dom, $nodeName);

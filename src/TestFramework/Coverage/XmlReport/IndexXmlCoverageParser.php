@@ -127,7 +127,7 @@ class IndexXmlCoverageParser
         ];
 
         foreach ($sourceQueries as $sourceQuery) {
-            $source = $xPath->queryAttribute($sourceQuery)?->nodeValue;
+            $source = $xPath->queryList($sourceQuery)->item(0)?->nodeValue;
 
             if ($source !== null) {
                 return $source;

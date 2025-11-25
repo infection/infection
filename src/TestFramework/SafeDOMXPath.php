@@ -210,7 +210,7 @@ final readonly class SafeDOMXPath
 
         $node = $nodes->item(0);
 
-        if (null !== $node) {
+        if ($node !== null) {
             Assert::isInstanceOf(
                 $node,
                 DOMElement::class,
