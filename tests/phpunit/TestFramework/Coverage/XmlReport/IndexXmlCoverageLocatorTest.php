@@ -63,19 +63,59 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->locator = IndexXmlCoverageLocator::create($this->tmp);
     }
 
-    public function test_it_picks_the_default_pathname_given(): void
-    {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/another-coverage/default-junit.xml';
+    #[DataProvider('defaultLocationProvider')]
+    public function test_it_exposes_the_default_location_used(
+        string $defaultLocation,
+        string $expected,
+    ): void {
+        $coverageDirectory = '/path/to/random-coverage';
 
         $locator = IndexXmlCoverageLocator::create(
             $coverageDirectory,
-            defaultPHPUnitXmlCoverageIndexPathname: $expected,
+            defaultPHPUnitXmlCoverageIndexPathname: $defaultLocation,
         );
 
         $actual = $locator->getDefaultLocation();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultLocationProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage/default-index.xml',
+            '/path/to/coverage/default-index.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/../default-index.xml',
+            '/path/to/coverage/default-index.xml',
+        ];
+    }
+
+    #[DataProvider('defaultCovergageDirectoryProvider')]
+    public function test_it_infers_a_default_pathname_from_the_coverage_directory(
+        string $coverageDirectory,
+        string $expected,
+    ): void {
+        $locator = IndexXmlCoverageLocator::create($coverageDirectory);
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultCovergageDirectoryProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage',
+            '/path/to/coverage/coverage-xml/index.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/..',
+            '/path/to/coverage/coverage-xml/index.xml',
+        ];
     }
 
     public function test_it_can_locate_the_default_index_file(): void
