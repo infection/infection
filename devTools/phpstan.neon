@@ -46,11 +46,6 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
-            count: 1
-            path: ../src/TestFramework/SafeDOMXPath.php
-
-        -
             message: "#Do not use magic number (.*)#"
             count: 5
             path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php

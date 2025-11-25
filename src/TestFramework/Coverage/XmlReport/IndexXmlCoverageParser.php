@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -84,6 +85,8 @@ class IndexXmlCoverageParser
         $projectSource = self::getProjectSource($coverageIndexPath, $xPath);
 
         foreach ($xPath->query('//p:file') as $node) {
+            Assert::isInstanceOf($node, DOMElement::class);
+
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(

@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework;
 
 use DOMDocument;
-use DOMElement;
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNodeList;
 use DOMXPath;
 use function sprintf;
@@ -137,7 +138,7 @@ final readonly class SafeDOMXPath
     }
 
     /**
-     * @return DOMNodeList<DOMElement>
+     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
      */
     public function query(string $query): DOMNodeList
     {

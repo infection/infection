@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use DOMElement;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
@@ -152,7 +153,9 @@ class InitialConfigBuilder implements ConfigBuilder
         $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
 
         if ($nodeList->length === 0) {
-            $node = $xPath->query('/phpunit')[0];
+            $node = $xPath->query('/phpunit')->item(0);
+            Assert::isInstanceOf($node, DOMElement::class);
+
             $node->setAttribute($attribute, $value);
 
             return true;
