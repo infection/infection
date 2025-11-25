@@ -47,7 +47,6 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
-use function Safe\chdir;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
@@ -209,8 +208,7 @@ final class IndexReportLocatorTest extends FileSystemTestCase
     #[DataProvider('invalidIndexPathnameProvider')]
     public function test_it_cannot_find_index_files_with_invalid_names(
         string $relativeIndexPathname,
-    ): void
-    {
+    ): void {
         $this->filesystem->dumpFile($relativeIndexPathname, '');
 
         $this->expectExceptionObject(

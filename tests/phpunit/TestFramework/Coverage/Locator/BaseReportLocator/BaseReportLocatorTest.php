@@ -44,7 +44,6 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use function Safe\chdir;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 

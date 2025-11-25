@@ -39,7 +39,10 @@ use DomainException;
 use Symfony\Component\Finder\Finder;
 use Traversable;
 
-class FakeFileSystem extends FileSystem
+/**
+ * @internal
+ */
+final class FakeFileSystem extends FileSystem
 {
     public function dumpFile(string $filename, $content = ''): void
     {

@@ -41,6 +41,9 @@ use function is_readable;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * @internal
+ */
 class FileSystem extends SymfonyFilesystem
 {
     public function isReadableFile(string $path): bool
