@@ -37,12 +37,14 @@ namespace Infection\TestFramework\Coverage\Locator;
 
 use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 
 interface ReportLocator
 {
     /**
      * @throws NoReportFound
      * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
      */
     public function locate(): string;
 

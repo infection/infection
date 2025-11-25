@@ -62,8 +62,6 @@ final class IndexReportLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        chdir($this->tmp);
-
         $this->filesystem = new FileSystem();
 
         $this->locator = IndexReportLocator::create(
@@ -71,13 +69,6 @@ final class IndexReportLocatorTest extends FileSystemTestCase
             $this->tmp,
             $this->tmp . '/coverage-xml/index.xml',
         );
-    }
-
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
-
-        parent::tearDown();
     }
 
     public function test_it_infers_a_default_pathname_from_the_coverage_directory(): void
@@ -215,19 +206,27 @@ final class IndexReportLocatorTest extends FileSystemTestCase
         yield 'all caps in sub-directory' => ['sub-dir/INDEX.xml'];
     }
 
-    #[DataProvider('invalidJunitPathnameProvider')]
-    public function test_it_cannot_find_junit_files_with_invalid_names(string $relativeJUnitPathname): void
+    #[DataProvider('invalidIndexPathnameProvider')]
+    public function test_it_cannot_find_index_files_with_invalid_names(
+        string $relativeIndexPathname,
+    ): void
     {
-        $this->filesystem->dumpFile($relativeJUnitPathname, '');
+        $this->filesystem->dumpFile($relativeIndexPathname, '');
 
-        $this->expectException(NoReportFound::class);
+        $this->expectExceptionObject(
+            new NoReportFound(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
+                    $this->tmp,
+                    IndexReportLocator::INDEX_FILENAME_REGEX,
+                ),
+            ),
+        );
 
-        $actual = $this->locator->locate();
-
-        $this->assertSame([], $actual);
+        $this->locator->locate();
     }
 
-    public static function invalidJunitPathnameProvider(): iterable
+    public static function invalidIndexPathnameProvider(): iterable
     {
         yield 'with the wrong file ending' => ['junit.xml.dist'];
     }

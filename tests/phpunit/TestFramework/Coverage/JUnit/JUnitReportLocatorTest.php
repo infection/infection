@@ -225,11 +225,17 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         $this->filesystem->dumpFile($relativeJUnitPathname, '');
 
-        $this->expectException(NoReportFound::class);
+        $this->expectExceptionObject(
+            new NoReportFound(
+                sprintf(
+                    'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
+                    $this->tmp,
+                    JUnitReportLocator::JUNIT_FILENAME_REGEX,
+                ),
+            ),
+        );
 
-        $actual = $this->locator->locate();
-
-        $this->assertSame([], $actual);
+        $this->locator->locate();
     }
 
     public static function invalidJunitPathnameProvider(): iterable

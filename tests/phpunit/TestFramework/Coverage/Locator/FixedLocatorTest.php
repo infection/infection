@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\DevTools\TestFramework\Coverage\Locator;
+namespace Infection\Tests\TestFramework\Coverage\Locator;
 
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -61,8 +61,6 @@ final class BaseReportLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        chdir($this->tmp);
-
         $this->filesystem = new FileSystem();
 
         $this->locator = new DemoReportLocator(
@@ -70,13 +68,6 @@ final class BaseReportLocatorTest extends FileSystemTestCase
             $this->tmp,
             '/path/to/unknown-file',
         );
-    }
-
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
-
-        parent::tearDown();
     }
 
     public function test_it_returns_the_default_path_if_it_exists(): void

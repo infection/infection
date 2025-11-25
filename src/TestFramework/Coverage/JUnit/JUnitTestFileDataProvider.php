@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use DOMElement;
-use DOMNodeList;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;

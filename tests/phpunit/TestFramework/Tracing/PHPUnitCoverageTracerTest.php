@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use function count;
 use function file_exists;
 use function implode;
@@ -86,18 +87,15 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
-                new IndexReportLocator($coveragePath),
-                new IndexXmlCoverageParser(isForGitDiffLines: false),
-                new XmlCoverageParser(),
+                indexLocator: new FixedLocator($coveragePath.'/xml/index.xml'),
+                indexParser: new IndexXmlCoverageParser(isForGitDiffLines: false),
+                parser: new XmlCoverageParser(),
             ),
             new JUnitTestExecutionInfoAdder(
                 $testFrameworkAdapterStub,
                 new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider(
-                        new JUnitReportLocator(
-                            coveragePath: $coveragePath,
-                            defaultJUnitPath: 'junit.xml',
-                        ),
+                        new FixedLocator($coveragePath.'/junit.xml'),
                     ),
                 ),
             ),
