@@ -344,13 +344,12 @@ final readonly class XmlConfigurationManipulator
     private function setAttributeValue(SafeDOMXPath $xPath, string $name, string $value): void
     {
         $node = $xPath
-            ->queryList(
+            ->queryAttribute(
                 sprintf(
                     '/phpunit/@%s',
                     $name,
                 ),
-            )
-            ->item(0);
+            );
 
         if ($node !== null) {
             $node->nodeValue = $value;
@@ -399,16 +398,16 @@ final readonly class XmlConfigurationManipulator
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->queryList(sprintf('/phpunit/@%s', $attribute));
+        $node = $xPath->queryAttribute(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length === 0) {
-            $xPath
-                ->getElement('/phpunit')
-                ->setAttribute($attribute, $value);
-
-            return true;
+        if ($node !== null) {
+            return false;
         }
 
-        return false;
+        $xPath
+            ->getElement('/phpunit')
+            ->setAttribute($attribute, $value);
+
+        return true;
     }
 }
