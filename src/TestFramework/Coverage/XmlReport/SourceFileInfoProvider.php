@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
-use DOMElement;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
@@ -49,7 +48,6 @@ use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -97,8 +95,7 @@ class SourceFileInfoProvider
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->queryList('/p:phpunit/p:file')->item(0);
-        Assert::isInstanceOf($fileNode, DOMElement::class);
+        $fileNode = $xPath->getElement('/p:phpunit/p:file');
 
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');

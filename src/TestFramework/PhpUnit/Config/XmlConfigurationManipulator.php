@@ -197,11 +197,11 @@ final readonly class XmlConfigurationManipulator
             return true;
         }
 
-        $schema = $xPath->queryList('/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation')?->nodeValue;
 
         $original = libxml_use_internal_errors(true);
 
-        if ($schema->length > 0 && !$xPath->document->schemaValidate($this->buildSchemaPath($schema[0]->nodeValue))) {
+        if ($schema !== null && !$xPath->document->schemaValidate($this->buildSchemaPath($schema))) {
             throw InvalidPhpUnitConfiguration::byXsdSchema(
                 $configPath,
                 $this->getXmlErrorsString(),
@@ -344,13 +344,12 @@ final readonly class XmlConfigurationManipulator
     private function setAttributeValue(SafeDOMXPath $xPath, string $name, string $value): void
     {
         $node = $xPath
-            ->queryList(
+            ->queryAttribute(
                 sprintf(
                     '/phpunit/@%s',
                     $name,
                 ),
-            )
-            ->item(0);
+            );
 
         if ($node !== null) {
             $node->nodeValue = $value;
@@ -388,10 +387,10 @@ final readonly class XmlConfigurationManipulator
 
     private function getOrCreateNode(SafeDOMXPath $xPath, DOMDocument $dom, string $nodeName): DOMElement
     {
-        $node = $xPath->queryList(sprintf('/phpunit/%s', $nodeName));
+        $node = $xPath->queryElement(sprintf('/phpunit/%s', $nodeName));
 
-        if ($node->length > 0) {
-            return $node[0];
+        if ($node !== null) {
+            return $node;
         }
 
         return $this->createNode($dom, $nodeName);
@@ -399,16 +398,16 @@ final readonly class XmlConfigurationManipulator
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->queryList(sprintf('/phpunit/@%s', $attribute));
+        $node = $xPath->queryAttribute(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length === 0) {
-            $xPath
-                ->getElement('/phpunit')
-                ->setAttribute($attribute, $value);
-
-            return true;
+        if ($node !== null) {
+            return false;
         }
 
-        return false;
+        $xPath
+            ->getElement('/phpunit')
+            ->setAttribute($attribute, $value);
+
+        return true;
     }
 }

@@ -108,12 +108,8 @@ final class XmlConfigurationVersionProvider
             return null;
         }
 
-        $schema = $xPath->queryList('/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation');
 
-        if ($schema->length === 0) {
-            return null;
-        }
-
-        return $schema[0]->nodeValue;
+        return $schema?->nodeValue;
     }
 }
