@@ -37,10 +37,10 @@ namespace Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator;
 
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
-use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

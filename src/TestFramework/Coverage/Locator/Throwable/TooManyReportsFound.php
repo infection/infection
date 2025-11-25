@@ -35,11 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\Locator\Throwable;
 
+use function implode;
 use RuntimeException;
+use function sprintf;
+use Throwable;
 
-/**
- * @internal
- */
-final class TooManyReportsFound extends RuntimeException implements ReportLocationThrowable
+final class TooManyReportsFound extends RuntimeException
 {
+    public function __construct(
+        string $message = '',
+        int $code = 0,
+        ?Throwable $previous = null,
+        /**
+         * @var list<string>
+         */
+        public readonly ?array $reportPathnames = null,
+    ) {
+        parent::__construct($message, $code, $previous);
+    }
+
+    /**
+     * @param list<string> $reportPathnames
+     */
+    public static function create(array $reportPathnames): self
+    {
+        return new self(
+            sprintf(
+                'Found "%s".',
+                implode(
+                    '", "',
+                    $reportPathnames,
+                ),
+            ),
+            reportPathnames: $reportPathnames,
+        );
+    }
 }
