@@ -61,8 +61,6 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        chdir($this->tmp);
-
         $this->filesystem = new FileSystem();
 
         $this->locator = JUnitReportLocator::create(
@@ -72,20 +70,46 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         );
     }
 
-    protected function tearDown(): void
-    {
-        chdir($this->cwd);
 
-        parent::tearDown();
-    }
 
-    public function test_it_infers_a_default_pathname_from_the_coverage_directory(): void
-    {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/coverage/junit.xml';
+    #[DataProvider('defaultLocationProvider')]
+    public function test_it_exposes_the_default_location_used(
+        string $defaultLocation,
+        string $expected,
+    ): void {
+        $coverageDirectory = '/path/to/random-coverage';
 
         $locator = JUnitReportLocator::create(
-            new FakeFileSystem(),
+            $this->filesystem,
+            $coverageDirectory,
+            defaultJUnitPathname: $defaultLocation,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultLocationProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage/default-junit.xml',
+            '/path/to/coverage/default-junit.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/../default-junit.xml',
+            '/path/to/coverage/default-junit.xml',
+        ];
+    }
+
+    #[DataProvider('defaultCovergageDirectoryProvider')]
+    public function test_it_infers_a_default_pathname_from_the_coverage_directory(
+        string $coverageDirectory,
+        string $expected,
+    ): void {
+        $locator = JUnitReportLocator::create(
+            $this->filesystem,
             $coverageDirectory,
         );
 
@@ -94,20 +118,17 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_picks_the_default_pathname_given(): void
+    public static function defaultCovergageDirectoryProvider(): iterable
     {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/another-coverage/default-junit.xml';
+        yield 'canonical pathname' => [
+            '/path/to/coverage',
+            '/path/to/coverage/junit.xml',
+        ];
 
-        $locator = JUnitReportLocator::create(
-            new FakeFileSystem(),
-            $coverageDirectory,
-            defaultJUnitPathname: $expected,
-        );
-
-        $actual = $locator->getDefaultLocation();
-
-        $this->assertSame($expected, $actual);
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/..',
+            '/path/to/coverage/junit.xml',
+        ];
     }
 
     public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void
