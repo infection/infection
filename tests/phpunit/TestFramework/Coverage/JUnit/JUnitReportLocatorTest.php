@@ -121,6 +121,17 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         ];
     }
 
+    public function test_it_can_locate_the_default_junit_file(): void
+    {
+        touch('junit.xml');
+
+        $expected = Path::canonicalize($this->tmp . '/junit.xml');
+
+        $this->assertSame($expected, $this->locator->locate());
+        // Call second time to check the cached result
+        $this->assertSame($expected, $this->locator->locate());
+    }
+
     public function test_it_can_locate_the_default_junit_file_with_the_wrong_case(): void
     {
         if (!OperatingSystem::isMacOs()) {
