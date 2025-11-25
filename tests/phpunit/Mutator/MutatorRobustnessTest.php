@@ -58,7 +58,7 @@ final class MutatorRobustnessTest extends TestCase
     /**
      * @var string[][]|null
      */
-    private static $files;
+    private static ?array $files = null;
 
     /**
      * This test only proves that the mutators do not crash on more 'exotic' code. It does not care

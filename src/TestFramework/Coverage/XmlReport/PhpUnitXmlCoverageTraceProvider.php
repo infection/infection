@@ -55,6 +55,9 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
     }
 
     /**
+     * @throws InvalidCoverage
+     * @throws NoLineExecuted
+     *
      * @return iterable<Trace>
      */
     public function provideTraces(): iterable

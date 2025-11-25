@@ -86,7 +86,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
             ->method('getName')
             ->willReturn('PHPStan');
         $staticAnalysisToolAdapter->method('getVersion')
-            ->will($this->throwException(new InvalidArgumentException()));
+            ->willThrowException(new InvalidArgumentException());
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));

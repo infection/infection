@@ -38,6 +38,7 @@ namespace Infection\Tests\FileSystem;
 use function getenv;
 use function Infection\Tests\make_tmp_dir;
 use PHPUnit\Framework\TestCase;
+use function Safe\chdir;
 use function Safe\getcwd;
 use function Safe\realpath;
 use function sprintf;
@@ -71,10 +72,14 @@ abstract class FileSystemTestCase extends TestCase
 
         $this->cwd = getcwd();
         $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
+
+        chdir($this->tmp);
     }
 
     protected function tearDown(): void
     {
+        chdir($this->cwd);
+
         (new Filesystem())->remove($this->tmp);
     }
 

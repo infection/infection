@@ -91,15 +91,9 @@ final class E2ETest extends TestCase
 
     private const EXPECT_SUCCESS = 0;
 
-    /**
-     * @var string
-     */
-    private $cwd;
+    private string $cwd;
 
-    /**
-     * @var ClassLoader|null
-     */
-    private $previousLoader;
+    private ?ClassLoader $previousLoader = null;
 
     private static int $countFailingComposerInstall = 0;
 
@@ -194,7 +188,7 @@ final class E2ETest extends TestCase
         }
     }
 
-    private function runOnE2EFixture($path): string
+    private function runOnE2EFixture(string $path): string
     {
         $this->assertDirectoryExists($path);
         chdir($path);
@@ -331,6 +325,9 @@ final class E2ETest extends TestCase
          */
     }
 
+    /**
+     * @param list<string> $argvExtra
+     */
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
         if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {

@@ -46,31 +46,23 @@ use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
-    /**
-     * @var PhpUnitAdapter
-     */
-    private $adapter;
+    private PhpUnitAdapter $adapter;
 
-    private $pcovDirectoryProvider;
+    private MockObject&PCOVDirectoryProvider $pcovDirectoryProvider;
 
-    private $initialConfigBuilder;
+    private MockObject&CommandLineArgumentsAndOptionsBuilder $cliArgumentsBuilder;
 
-    private $mutationConfigBuilder;
-
-    private $cliArgumentsBuilder;
-
-    private $commandLineBuilder;
+    private MockObject&CommandLineBuilder $commandLineBuilder;
 
     protected function setUp(): void
     {
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
-        $this->initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
-        $this->mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
 
@@ -79,8 +71,8 @@ final class PhpUnitAdapterTest extends TestCase
             '/tmp',
             '/tmp/infection/junit.xml',
             $this->pcovDirectoryProvider,
-            $this->initialConfigBuilder,
-            $this->mutationConfigBuilder,
+            $this->createMock(InitialConfigBuilder::class),
+            $this->createMock(MutationConfigBuilder::class),
             $this->cliArgumentsBuilder,
             new VersionParser(),
             $this->commandLineBuilder,

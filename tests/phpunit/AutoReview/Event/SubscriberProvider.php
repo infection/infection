@@ -51,7 +51,7 @@ final class SubscriberProvider
     /**
      * @var string[]|null
      */
-    private static $subscriberClasses;
+    private static ?array $subscriberClasses = null;
 
     public static function provideSubscriberClasses(): iterable
     {

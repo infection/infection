@@ -48,15 +48,10 @@ use function sprintf;
  */
 final readonly class StaticAnalysisToolFactory
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
     public function __construct(
         private Configuration $infectionConfig,
-        private string $projectDir,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
         private StaticAnalysisConfigLocator $staticAnalysisConfigLocator,
-        private array $installedExtensions,
     ) {
     }
 

@@ -60,20 +60,11 @@ use Symfony\Component\Process\Process;
 #[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
-    /**
-     * @var InitialTestsRunProcessFactory|MockObject
-     */
-    private $processFactoryMock;
+    private MockObject&InitialTestsRunProcessFactory $processFactoryMock;
 
-    /**
-     * @var EventDispatcherCollector
-     */
-    private $eventDispatcher;
+    private EventDispatcherCollector $eventDispatcher;
 
-    /**
-     * @var InitialTestsRunner
-     */
-    private $runner;
+    private InitialTestsRunner $runner;
 
     protected function setUp(): void
     {

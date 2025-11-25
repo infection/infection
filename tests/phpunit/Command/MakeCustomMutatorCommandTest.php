@@ -165,7 +165,7 @@ final class MakeCustomMutatorCommandTest extends TestCase
     private function createFileSystemMock(): MockObject
     {
         /**
-         * @var Filesystem|MockObject
+         * @var Filesystem&MockObject
          */
         $fileSystemMock = $this->createMock(Filesystem::class);
 

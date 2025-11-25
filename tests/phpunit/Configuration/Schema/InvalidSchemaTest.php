@@ -45,6 +45,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InvalidSchema::class)]
 final class InvalidSchemaTest extends TestCase
 {
+    /**
+     * @param string[] $errors
+     */
     #[DataProvider('configWithErrorsProvider')]
     public function test_it_can_be_instantiated(
         SchemaConfigurationFile $config,

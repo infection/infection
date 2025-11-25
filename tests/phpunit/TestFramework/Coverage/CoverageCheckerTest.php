@@ -64,15 +64,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private static $coveragePath;
+    private static string $coveragePath;
 
-    /**
-     * @var string
-     */
-    private static $jUnit;
+    private static string $jUnit;
 
     public static function setUpBeforeClass(): void
     {
@@ -523,10 +517,7 @@ final class CoverageCheckerTest extends TestCase
         }
     }
 
-    /**
-     * @return IndexXmlCoverageLocator|MockObject
-     */
-    private function createFakeIndexLocatorMock(): IndexXmlCoverageLocator
+    private function createFakeIndexLocatorMock(): IndexXmlCoverageLocator&MockObject
     {
         $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
         $indexLocatorMock
@@ -537,10 +528,7 @@ final class CoverageCheckerTest extends TestCase
         return $indexLocatorMock;
     }
 
-    /**
-     * @return JUnitReportLocator|MockObject
-     */
-    private function createFakeJUnitReportLocatorMock(): JUnitReportLocator
+    private function createFakeJUnitReportLocatorMock(): JUnitReportLocator&MockObject
     {
         $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
         $jUnitLocatorMock
@@ -551,10 +539,7 @@ final class CoverageCheckerTest extends TestCase
         return $jUnitLocatorMock;
     }
 
-    /**
-     * @return IndexXmlCoverageLocator|MockObject
-     */
-    private function createInvalidIndexLocatorMock(): IndexXmlCoverageLocator
+    private function createInvalidIndexLocatorMock(): IndexXmlCoverageLocator&MockObject
     {
         $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
         $indexLocatorMock
@@ -565,10 +550,7 @@ final class CoverageCheckerTest extends TestCase
         return $indexLocatorMock;
     }
 
-    /**
-     * @return IndexXmlCoverageLocator|MockObject
-     */
-    private function createIndexLocatorMock(string $indexPath): IndexXmlCoverageLocator
+    private function createIndexLocatorMock(string $indexPath): IndexXmlCoverageLocator&MockObject
     {
         $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
         $indexLocatorMock
@@ -579,10 +561,7 @@ final class CoverageCheckerTest extends TestCase
         return $indexLocatorMock;
     }
 
-    /**
-     * @return JUnitReportLocator|MockObject
-     */
-    private function createInvalidJUnitReportLocatorMock(): JUnitReportLocator
+    private function createInvalidJUnitReportLocatorMock(): JUnitReportLocator&MockObject
     {
         $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
         $jUnitLocatorMock
@@ -593,10 +572,7 @@ final class CoverageCheckerTest extends TestCase
         return $jUnitLocatorMock;
     }
 
-    /**
-     * @return JUnitReportLocator|MockObject
-     */
-    private function createJUnitReportLocatorMock(): JUnitReportLocator
+    private function createJUnitReportLocatorMock(): JUnitReportLocator&MockObject
     {
         $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
         $jUnitLocatorMock
