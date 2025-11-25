@@ -52,10 +52,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(IndexXmlCoverageLocator::class)]
 final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
-    /**
-     * @var IndexXmlCoverageLocator
-     */
-    private $locator;
+    private IndexXmlCoverageLocator $locator;
 
     protected function setUp(): void
     {

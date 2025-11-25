@@ -679,7 +679,7 @@ final class RunCommand extends BaseCommand
     /**
      * @return array{string, string|null, bool, string|null}
      */
-    private static function getSourceFilters(InputInterface $input)
+    private static function getSourceFilters(InputInterface $input): array
     {
         $filter = trim((string) $input->getOption(self::OPTION_FILTER));
 

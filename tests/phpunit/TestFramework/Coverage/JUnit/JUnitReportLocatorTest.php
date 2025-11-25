@@ -52,10 +52,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(JUnitReportLocator::class)]
 final class JUnitReportLocatorTest extends FileSystemTestCase
 {
-    /**
-     * @var JUnitReportLocator
-     */
-    private $locator;
+    private JUnitReportLocator $locator;
 
     protected function setUp(): void
     {

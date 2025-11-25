@@ -51,10 +51,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(PerformanceLoggerSubscriber::class)]
 final class PerformanceLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
     protected function setUp(): void
     {

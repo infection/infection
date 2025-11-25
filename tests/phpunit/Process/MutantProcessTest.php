@@ -48,33 +48,22 @@ use Symfony\Component\Process\Process;
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessTest extends TestCase
 {
-    /**
-     * @var MockObject|Process
-     */
-    private $processMock;
-
-    /**
-     * @var MockObject|TestFrameworkMutantExecutionResultFactory
-     */
-    private $mutantExecutionResultFactory;
+    private MockObject&Process $processMock;
 
     private Mutant $mutant;
 
-    /**
-     * @var MutantProcess
-     */
-    private $mutantProcess;
+    private MutantProcess $mutantProcess;
 
     protected function setUp(): void
     {
         $this->processMock = $this->createMock(Process::class);
         $this->mutant = MutantBuilder::withMinimalTestData()->build();
-        $this->mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
+        $mutantExecutionResultFactory = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $this->mutantProcess = new MutantProcess(
             $this->processMock,
             $this->mutant,
-            $this->mutantExecutionResultFactory,
+            $mutantExecutionResultFactory,
         );
     }
 

@@ -158,10 +158,10 @@ final class MutantProcessContainerFactoryTest extends TestCase
 
     public static function timeoutDataProvider(): iterable
     {
-        return [
-            'minimum timeout on a fast test' => [5.05, 0.01, 90],
-            'allows 5x more time than test-execution' => [30.0, 5.0, 90],
-            'slow tests do not get more time than factory-timeout' => [40.0, 10.0, 40],
-        ];
+        yield 'minimum timeout on a fast test' => [5.05, 0.01, 90];
+
+        yield 'allows 5x more time than test-execution' => [30.0, 5.0, 90];
+
+        yield 'slow tests do not get more time than factory-timeout' => [40.0, 10.0, 40];
     }
 }

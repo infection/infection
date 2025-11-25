@@ -44,8 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DiffSourceCodeMatcher::class)]
 final class DiffSourceCodeMatcherTest extends TestCase
 {
-    /** @var DiffSourceCodeMatcher */
-    private $diffSourceCodeMatcher;
+    private DiffSourceCodeMatcher $diffSourceCodeMatcher;
 
     protected function setUp(): void
     {

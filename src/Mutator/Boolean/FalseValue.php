@@ -100,15 +100,11 @@ final class FalseValue implements Mutator
             return false;
         }
 
-        if (
+        return !(
             $parentNode instanceof Node\Expr\BinaryOp\Equal
             || $parentNode instanceof Node\Expr\BinaryOp\NotEqual
             || $parentNode instanceof Node\Expr\BinaryOp\Identical
             || $parentNode instanceof Node\Expr\BinaryOp\NotIdentical
-        ) {
-            return false;
-        }
-
-        return true;
+        );
     }
 }

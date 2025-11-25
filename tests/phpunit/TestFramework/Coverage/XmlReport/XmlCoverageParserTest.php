@@ -172,10 +172,7 @@ final class XmlCoverageParserTest extends TestCase
         }
     }
 
-    /**
-     * @return SourceFileInfoProvider|MockObject
-     */
-    private function createSourceFileInfoProvider(string $xml)
+    private function createSourceFileInfoProvider(string $xml): SourceFileInfoProvider&MockObject
     {
         $xPath = SafeDOMXPath::fromString($xml, 'p');
 

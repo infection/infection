@@ -42,6 +42,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PHPDocParser::class)]
 final class PHPDocParserTest extends TestCase
 {
+    /**
+     * @param string[] $expected
+     */
     #[DataProvider('phpDocProvider')]
     public function test_it_can_parse_phpdoc(string $phpDoc, array $expected): void
     {

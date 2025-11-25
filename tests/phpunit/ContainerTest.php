@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_keys;
 use Error;
 use Infection\Container;
 use Infection\FileSystem\Locator\FileNotFound;
@@ -140,7 +141,7 @@ final class ContainerTest extends TestCase
             SingletonContainer::getContainer(),
         );
 
-        foreach ($reflection->getFactories() as $id => $factory) {
+        foreach (array_keys($reflection->getFactories()) as $id) {
             yield $id => [$id];
         }
     }

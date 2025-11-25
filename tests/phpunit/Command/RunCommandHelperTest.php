@@ -48,10 +48,7 @@ use Symfony\Component\Console\Input\InputInterface;
 #[CoversClass(RunCommandHelper::class)]
 final class RunCommandHelperTest extends TestCase
 {
-    /**
-     * @var InputInterface&MockObject
-     */
-    private InputInterface $inputMock;
+    private InputInterface&MockObject $inputMock;
 
     protected function setUp(): void
     {

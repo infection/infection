@@ -54,10 +54,6 @@ use Webmozart\Assert\Assert;
  */
 class XmlCoverageParser
 {
-    public function __construct()
-    {
-    }
-
     public function parse(SourceFileInfoProvider $provider): Trace
     {
         return new ProxyTrace(
