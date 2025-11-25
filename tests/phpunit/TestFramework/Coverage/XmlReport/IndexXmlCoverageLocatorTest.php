@@ -60,7 +60,22 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->locator = new IndexXmlCoverageLocator($this->tmp);
+        $this->locator = IndexXmlCoverageLocator::create($this->tmp);
+    }
+
+    public function test_it_picks_the_default_pathname_given(): void
+    {
+        $coverageDirectory = '/path/to/coverage';
+        $expected = '/path/to/another-coverage/default-junit.xml';
+
+        $locator = IndexXmlCoverageLocator::create(
+            $coverageDirectory,
+            defaultPHPUnitXmlCoverageIndexPathname: $expected,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_locate_the_default_index_file(): void
@@ -145,7 +160,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     {
         $unknownDir = $this->tmp . '/unknown-dir';
 
-        $this->locator = new IndexXmlCoverageLocator($unknownDir);
+        $this->locator = IndexXmlCoverageLocator::create($unknownDir);
 
         $this->expectExceptionObject(
             new InvalidReportSource(
@@ -164,7 +179,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $file = $this->tmp . '/file';
         touch($file);
 
-        $locator = new IndexXmlCoverageLocator($file);
+        $locator = IndexXmlCoverageLocator::create($file);
 
         $this->expectExceptionObject(
             new InvalidReportSource(

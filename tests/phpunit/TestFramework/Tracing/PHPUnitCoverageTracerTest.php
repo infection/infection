@@ -86,7 +86,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
-                new IndexXmlCoverageLocator($coveragePath),
+                IndexXmlCoverageLocator::create($coveragePath),
                 new IndexXmlCoverageParser(isForGitDiffLines: false),
                 new XmlCoverageParser(),
             ),
