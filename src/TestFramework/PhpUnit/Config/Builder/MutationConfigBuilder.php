@@ -169,13 +169,13 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function setCustomBootstrapPath(string $customAutoloadFilePath, SafeDOMXPath $xPath): void
     {
-        $bootstrap = $xPath->queryAttribute('/phpunit/@bootstrap')->item(0);
+        $bootstrap = $xPath->queryList('/phpunit/@bootstrap')->item(0);
 
         if ($bootstrap !== null) {
             $bootstrap->nodeValue = $customAutoloadFilePath;
         } else {
             $xPath
-                ->queryElement('/phpunit')
+                ->getElement('/phpunit')
                 ->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
@@ -252,7 +252,7 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getOriginalBootstrapFilePath(SafeDOMXPath $xPath): string
     {
-        $bootstrap = $xPath->queryAttribute('/phpunit/@bootstrap')?->nodeValue;
+        $bootstrap = $xPath->queryList('/phpunit/@bootstrap')->item(0)?->nodeValue;
 
         if ($bootstrap !== null) {
             return $bootstrap;

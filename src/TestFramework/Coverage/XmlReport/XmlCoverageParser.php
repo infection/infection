@@ -77,7 +77,7 @@ class XmlCoverageParser
     private static function retrieveTestLocations(SafeDOMXPath $xPath): TestLocations
     {
         $percentage = $xPath
-            ->queryElement('/p:phpunit/p:file/p:totals/p:lines')
+            ->getElement('/p:phpunit/p:file/p:totals/p:lines')
             ->getAttribute('percent');
 
         if (self::percentageToFloat($percentage) === .0) {

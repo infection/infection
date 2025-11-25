@@ -335,7 +335,7 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstBook = $xPath->queryList('//book')->item(0);
         // Sanity check
-        $this->assertNotNull($firstBook);
+        $this->assertInstanceOf(DOMNode::class, $firstBook);
 
         $titlesInFirstBook = $xPath->queryList('.//title', $firstBook);
         $titlesCountInFirstBook = $xPath->queryCount('.//title', $firstBook);
@@ -443,12 +443,14 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstBook = $xPath->queryList('//book')->item(0);
         // Sanity check
-        $this->assertNotNull($firstBook);
+        $this->assertInstanceOf(DOMNode::class, $firstBook);
 
         $expected = $xPath->queryList('//book/title[1]')->item(0);
         $actual = $xPath->queryElement('.//title', $firstBook);
+        $anotherActual = $xPath->getElement('.//title', $firstBook);
 
         $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $anotherActual);
     }
 
     public function test_it_returns_null_if_the_element_could_not_be_found(): void
@@ -458,6 +460,19 @@ final class SafeDOMXPathTest extends TestCase
         $element = $xPath->queryElement('//book[10]');
 
         $this->assertNull($element);
+    }
+
+    public function test_it_throws_if_it_cannot_get_a_dom_element(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the query "//book[10]" to return a "DOMElement" node. None found.',
+            ),
+        );
+
+        $xPath->getElement('//book[10]');
     }
 
     public function test_it_cannot_query_an_element_for_which_there_is_more_than_one_item(): void
@@ -471,6 +486,21 @@ final class SafeDOMXPathTest extends TestCase
         );
 
         $element = $xPath->queryElement('//book');
+
+        $this->assertNull($element);
+    }
+
+    public function test_it_cannot_query_a_non_dom_element(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the query "//book[1]/@category" to return a "DOMElement" node. Got "DOMAttr".',
+            ),
+        );
+
+        $element = $xPath->queryElement('//book[1]/@category');
 
         $this->assertNull($element);
     }
@@ -537,7 +567,7 @@ final class SafeDOMXPathTest extends TestCase
 
         $firstBook = $xPath->queryList('//book')->item(0);
         // Sanity check
-        $this->assertNotNull($firstBook);
+        $this->assertInstanceOf(DOMNode::class, $firstBook);
 
         $expected = $xPath
             ->queryList('//book/title[1]')

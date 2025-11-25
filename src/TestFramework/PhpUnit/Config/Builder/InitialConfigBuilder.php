@@ -153,7 +153,7 @@ class InitialConfigBuilder implements ConfigBuilder
 
         if ($count === 0) {
             $xPath
-                ->queryElement('/phpunit')
+                ->getElement('/phpunit')
                 ->setAttribute($attribute, $value);
 
             return true;

@@ -37,8 +37,8 @@ namespace Infection\TestFramework;
 
 use DOMAttr;
 use DOMDocument;
+use DOMElement;
 use DOMNameSpaceNode;
-use DOMNode;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
@@ -208,7 +208,38 @@ final readonly class SafeDOMXPath
             ),
         );
 
-        return $nodes[0] ?? null;
+        $node = $nodes->item(0);
+
+        if (null !== $node) {
+            Assert::isInstanceOf(
+                $node,
+                DOMElement::class,
+                sprintf(
+                    'Expected the query "%s" to return a "%s" node. Got "%s".',
+                    $query,
+                    DOMElement::class,
+                    $node::class,
+                ),
+            );
+        }
+
+        return $node;
+    }
+
+    public function getElement(string $query, ?DOMNode $contextNode = null): DOMElement
+    {
+        $node = $this->queryElement($query, $contextNode);
+
+        Assert::notNull(
+            $node,
+            sprintf(
+                'Expected the query "%s" to return a "%s" node. None found.',
+                $query,
+                DOMElement::class,
+            ),
+        );
+
+        return $node;
     }
 
     private function registerNamespace(string $prefix, string $namespace): void
