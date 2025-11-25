@@ -117,6 +117,12 @@ parameters:
             count: 1
             path: ../tests/phpunit/MockedContainer.php
 
+        -
+            message: "#queryCount#"
+            identifier: return.type
+            count: 1
+            path: ../src/TestFramework/SafeDOMXPath.php
+
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -
             message: '#::profile\(\) should return int but returns int\|null#'

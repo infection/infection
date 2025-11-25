@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use DOMElement;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
@@ -150,13 +149,12 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+        $count = $xPath->queryCount(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length === 0) {
-            $node = $xPath->query('/phpunit')->item(0);
-            Assert::isInstanceOf($node, DOMElement::class);
-
-            $node->setAttribute($attribute, $value);
+        if ($count === 0) {
+            $xPath
+                ->getElement('/phpunit')
+                ->setAttribute($attribute, $value);
 
             return true;
         }

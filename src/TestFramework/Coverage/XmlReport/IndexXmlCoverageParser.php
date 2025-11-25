@@ -84,7 +84,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $projectSource = self::getProjectSource($coverageIndexPath, $xPath);
 
-        foreach ($xPath->query('//p:file') as $node) {
+        foreach ($xPath->queryList('//p:file') as $node) {
             Assert::isInstanceOf($node, DOMElement::class);
 
             $relativeCoverageFilePath = $node->getAttribute('href');
@@ -103,10 +103,10 @@ class IndexXmlCoverageParser
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
-        $lineCoverage = $xPath->query('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines')->item(0);
+        $lineCoverage = $xPath->queryElement('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines');
 
         if (
-            !$lineCoverage instanceof DOMElement
+            $lineCoverage === null
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
@@ -127,7 +127,7 @@ class IndexXmlCoverageParser
         ];
 
         foreach ($sourceQueries as $sourceQuery) {
-            $source = $xPath->query($sourceQuery)->item(0)?->nodeValue;
+            $source = $xPath->queryList($sourceQuery)->item(0)?->nodeValue;
 
             if ($source !== null) {
                 return $source;

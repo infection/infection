@@ -97,7 +97,7 @@ class SourceFileInfoProvider
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->query('/p:phpunit/p:file')->item(0);
+        $fileNode = $xPath->queryList('/p:phpunit/p:file')->item(0);
         Assert::isInstanceOf($fileNode, DOMElement::class);
 
         $fileName = $fileNode->getAttribute('name');
