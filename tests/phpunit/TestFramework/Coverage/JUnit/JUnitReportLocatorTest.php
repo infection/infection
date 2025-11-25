@@ -66,6 +66,61 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         );
     }
 
+    #[DataProvider('defaultLocationProvider')]
+    public function test_it_exposes_the_default_location_used(
+        string $defaultLocation,
+        string $expected,
+    ): void {
+        $coverageDirectory = '/path/to/random-coverage';
+
+        $locator = JUnitReportLocator::create(
+            $coverageDirectory,
+            defaultJUnitPathname: $defaultLocation,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultLocationProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage/default-junit.xml',
+            '/path/to/coverage/default-junit.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/../default-junit.xml',
+            '/path/to/coverage/default-junit.xml',
+        ];
+    }
+
+    #[DataProvider('defaultCovergageDirectoryProvider')]
+    public function test_it_infers_a_default_pathname_from_the_coverage_directory(
+        string $coverageDirectory,
+        string $expected,
+    ): void {
+        $locator = JUnitReportLocator::create($coverageDirectory);
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultCovergageDirectoryProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage',
+            '/path/to/coverage/junit.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/..',
+            '/path/to/coverage/junit.xml',
+        ];
+    }
+
     public function test_it_can_locate_the_default_junit_file(): void
     {
         touch('junit.xml');

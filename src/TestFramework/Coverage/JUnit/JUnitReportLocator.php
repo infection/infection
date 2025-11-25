@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function array_map;
 use function count;
 use function current;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
@@ -59,15 +60,31 @@ class JUnitReportLocator
 {
     public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
-    private readonly string $defaultJUnitPath;
+    private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
     private ?string $jUnitPath = null;
 
     public function __construct(
         private readonly string $coveragePath,
-        string $defaultJUnitPath,
+        private readonly string $defaultJUnitPath,
     ) {
-        $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
+    }
+
+    public static function create(
+        string $coverageDirectory,
+        ?string $defaultJUnitPathname = null,
+    ): self {
+        return new self(
+            $coverageDirectory,
+            $defaultJUnitPathname === null
+                ? self::createPHPUnitDefaultJUnitPathname($coverageDirectory)
+                : Path::canonicalize($defaultJUnitPathname),
+        );
+    }
+
+    public function getDefaultLocation(): string
+    {
+        return $this->defaultJUnitPath;
     }
 
     /**
@@ -141,5 +158,10 @@ class JUnitReportLocator
                 self::JUNIT_FILENAME_REGEX,
             ),
         );
+    }
+
+    private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string
+    {
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT_FILENAME);
     }
 }

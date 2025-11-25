@@ -38,6 +38,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function array_map;
 use function count;
 use function current;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
@@ -59,14 +60,31 @@ class IndexXmlCoverageLocator
 {
     public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 
-    private readonly string $defaultIndexPath;
+    private const DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
 
     private ?string $indexPath = null;
 
     public function __construct(
         private readonly string $coveragePath,
+        private readonly string $defaultIndexPath,
     ) {
-        $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
+    }
+
+    public static function create(
+        string $coverageDirectory,
+        ?string $defaultPHPUnitXmlCoverageIndexPathname = null,
+    ): self {
+        return new self(
+            $coverageDirectory,
+            $defaultPHPUnitXmlCoverageIndexPathname === null
+                ? self::createPHPUnitDefaultCoverageXmlIndexPathname($coverageDirectory)
+                : Path::canonicalize($defaultPHPUnitXmlCoverageIndexPathname),
+        );
+    }
+
+    public function getDefaultLocation(): string
+    {
+        return $this->defaultIndexPath;
     }
 
     /**
@@ -140,5 +158,10 @@ class IndexXmlCoverageLocator
                 self::INDEX_FILENAME_REGEX,
             ),
         );
+    }
+
+    private static function createPHPUnitDefaultCoverageXmlIndexPathname(string $coverageDirectory): string
+    {
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_INDEX_RELATIVE_PATHNAME);
     }
 }
