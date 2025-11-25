@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\SafeDOMXPath;
-use RuntimeException;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
