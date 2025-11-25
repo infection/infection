@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\ProxyTrace;
@@ -74,7 +76,6 @@ class XmlCoverageParser
 
     private static function retrieveTestLocations(SafeDOMXPath $xPath): TestLocations
     {
-        // @phpstan-ignore method.nonObject
         $percentage = $xPath
             ->queryElement('/p:phpunit/p:file/p:totals/p:lines')
             ->getAttribute('percent');
@@ -112,7 +113,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList<DOMElement> $coveredLineNodes
+     * @param DOMNodeList<DOMNode|DOMNameSpaceNode> $coveredLineNodes
      *
      * @return array<int, array<int, TestLocation>>
      */
@@ -121,19 +122,22 @@ class XmlCoverageParser
         $data = [];
 
         foreach ($coveredLineNodes as $lineNode) {
+            Assert::isInstanceOf($lineNode, DOMElement::class);
+
             $lineNumber = $lineNode->getAttribute('nr');
 
             Assert::integerish($lineNumber);
 
             $lineNumber = (int) $lineNumber;
 
-            /** @phpstan-var DOMNodeList<DOMElement> $coveredNodes */
             $coveredNodes = $lineNode->childNodes;
 
             foreach ($coveredNodes as $coveredNode) {
                 if ($coveredNode->nodeName !== 'covered') {
                     continue;
                 }
+
+                Assert::isInstanceOf($coveredNode, DOMElement::class);
 
                 $data[$lineNumber][] = TestLocation::forTestMethod(
                     $coveredNode->getAttribute('by'),
@@ -145,7 +149,7 @@ class XmlCoverageParser
     }
 
     /**
-     * @param DOMNodeList<DOMElement> $methodsCoverageNodes
+     * @param DOMNodeList<DOMNode|DOMNameSpaceNode> $methodsCoverageNodes
      *
      * @return SourceMethodLineRange[]
      */
@@ -154,6 +158,8 @@ class XmlCoverageParser
         $methodsCoverage = [];
 
         foreach ($methodsCoverageNodes as $methodsCoverageNode) {
+            Assert::isInstanceOf($methodsCoverageNode, DOMElement::class);
+
             if ((int) $methodsCoverageNode->getAttribute('coverage') === 0) {
                 continue;
             }

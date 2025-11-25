@@ -37,6 +37,8 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\SafeDOMXPath;
 use RuntimeException;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -54,6 +56,7 @@ class IndexXmlCoverageParser
      * needed to parse general coverage data. Note that this data is likely incomplete an will
      * need to be enriched to contain all the desired data.
      *
+     * @throws InvalidCoverage
      * @throws NoLineExecuted
      *
      * @return iterable<SourceFileInfoProvider>
@@ -70,6 +73,8 @@ class IndexXmlCoverageParser
     }
 
     /**
+     * @throws InvalidCoverage
+     *
      * @return iterable<SourceFileInfoProvider>
      */
     private function parseNodes(
@@ -77,9 +82,11 @@ class IndexXmlCoverageParser
         string $coverageBasePath,
         SafeDOMXPath $xPath,
     ): iterable {
-        $projectSource = self::getProjectSource($xPath);
+        $projectSource = self::getProjectSource($coverageIndexPath, $xPath);
 
         foreach ($xPath->queryList('//p:file') as $node) {
+            Assert::isInstanceOf($node, DOMElement::class);
+
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(
@@ -109,7 +116,10 @@ class IndexXmlCoverageParser
         }
     }
 
-    private static function getProjectSource(SafeDOMXPath $xPath): string
+    /**
+     * @throws InvalidCoverage
+     */
+    private static function getProjectSource(string $pathname, SafeDOMXPath $xPath): string
     {
         $sourceQueries = [
             '//p:project/@source',  // PHPUnit >= 6
@@ -124,6 +134,11 @@ class IndexXmlCoverageParser
             }
         }
 
-        throw new RuntimeException('Could not find the source attribute for the project');
+        throw new InvalidCoverage(
+            sprintf(
+                'Could not find the source attribute for the project in the file "%s".',
+                $pathname,
+            ),
+        );
     }
 }

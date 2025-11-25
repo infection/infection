@@ -37,7 +37,8 @@ namespace Infection\TestFramework;
 
 use DOMAttr;
 use DOMDocument;
-use DOMElement;
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
@@ -149,7 +150,7 @@ final readonly class SafeDOMXPath
     }
 
     /**
-     * @return DOMNodeList<DOMElement> Note that technically we are lying... This could be DOMNode which is not a DOMElement.
+     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
      */
     public function queryList(string $query, ?DOMNode $contextNode = null): DOMNodeList
     {

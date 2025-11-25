@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use DOMElement;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
@@ -152,7 +153,6 @@ class InitialConfigBuilder implements ConfigBuilder
         $count = $xPath->queryCount(sprintf('/phpunit/@%s', $attribute));
 
         if ($count === 0) {
-            // @phpstan-ignore method.nonObject
             $xPath
                 ->queryElement('/phpunit')
                 ->setAttribute($attribute, $value);

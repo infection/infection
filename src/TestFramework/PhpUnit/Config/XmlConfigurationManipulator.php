@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit\Config;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use const FILTER_VALIDATE_URL;
 use function filter_var;
 use function implode;
@@ -84,10 +85,12 @@ final readonly class XmlConfigurationManipulator
     public function removeExistingLoggers(SafeDOMXPath $xPath): void
     {
         foreach ($xPath->queryList('/phpunit/logging') as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
             $node->parentNode?->removeChild($node);
         }
 
         foreach ($xPath->queryList('/phpunit/coverage/report') as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
             $node->parentNode?->removeChild($node);
         }
     }
@@ -340,15 +343,18 @@ final readonly class XmlConfigurationManipulator
 
     private function setAttributeValue(SafeDOMXPath $xPath, string $name, string $value): void
     {
-        $nodeList = $xPath->queryList(sprintf(
-            '/phpunit/@%s',
-            $name,
-        ));
+        $node = $xPath
+            ->queryList(
+                sprintf(
+                    '/phpunit/@%s',
+                    $name,
+                ),
+            )
+            ->item(0);
 
-        if ($nodeList->length > 0) {
-            $nodeList[0]->nodeValue = $value;
+        if ($node !== null) {
+            $node->nodeValue = $value;
         } else {
-            // @phpstan-ignore method.nonObject
             $xPath
                 ->queryElement('/phpunit')
                 ->setAttribute($name, $value);
@@ -375,6 +381,7 @@ final readonly class XmlConfigurationManipulator
     private function removeCoverageChildNode(SafeDOMXPath $xPath, string $nodeQuery): void
     {
         foreach ($xPath->queryList($nodeQuery) as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
             $node->parentNode?->removeChild($node);
         }
     }
@@ -395,7 +402,6 @@ final readonly class XmlConfigurationManipulator
         $nodeList = $xPath->queryList(sprintf('/phpunit/@%s', $attribute));
 
         if ($nodeList->length === 0) {
-            // @phpstan-ignore method.nonObject
             $xPath
                 ->queryElement('/phpunit')
                 ->setAttribute($attribute, $value);
