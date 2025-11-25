@@ -66,15 +66,31 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         );
     }
 
-    public function test_it_can_locate_the_default_junit_file(): void
+    public function test_it_infers_a_default_pathname_from_the_coverage_directory(): void
     {
-        touch('junit.xml');
+        $coverageDirectory = '/path/to/coverage';
+        $expected = '/path/to/coverage/junit.xml';
 
-        $expected = Path::canonicalize($this->tmp . '/junit.xml');
+        $locator = JUnitReportLocator::create($coverageDirectory);
 
-        $this->assertSame($expected, $this->locator->locate());
-        // Call second time to check the cached result
-        $this->assertSame($expected, $this->locator->locate());
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_picks_the_default_pathname_given(): void
+    {
+        $coverageDirectory = '/path/to/coverage';
+        $expected = '/path/to/another-coverage/default-junit.xml';
+
+        $locator = JUnitReportLocator::create(
+            $coverageDirectory,
+            defaultJUnitPathname: $expected,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_locate_the_default_junit_file_with_the_wrong_case(): void

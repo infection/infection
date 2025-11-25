@@ -94,10 +94,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 $testFrameworkAdapterStub,
                 new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider(
-                        new JUnitReportLocator(
-                            coveragePath: $coveragePath,
-                            defaultJUnitPath: 'junit.xml',
-                        ),
+                        JUnitReportLocator::create($coveragePath),
                     ),
                 ),
             ),
