@@ -8,7 +8,7 @@ use PhpParser\NodeVisitorAbstract;
 
 final class RecordedVisitor extends NodeVisitorAbstract
 {
-    private $records;
+    private ?array $records = null;
 
     public function __construct(array &$records)
     {

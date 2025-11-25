@@ -52,20 +52,11 @@ final class StrykerDashboardClientTest extends TestCase
 {
     private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
 
-    /**
-     * @var StrykerCurlClient|MockObject
-     */
-    private $clientMock;
+    private MockObject&StrykerCurlClient $clientMock;
 
-    /**
-     * @var DummyLogger
-     */
-    private $logger;
+    private DummyLogger $logger;
 
-    /**
-     * @var StrykerDashboardClient
-     */
-    private $dashboardClient;
+    private StrykerDashboardClient $dashboardClient;
 
     protected function setUp(): void
     {

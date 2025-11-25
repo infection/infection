@@ -51,7 +51,7 @@ final class EnvManipulatorCodeDetector
     /**
      * @var string[]|null
      */
-    private static $statements;
+    private static ?array $statements = null;
 
     public static function codeManipulatesEnvVariables(string $code): bool
     {

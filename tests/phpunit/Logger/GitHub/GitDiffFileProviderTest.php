@@ -69,7 +69,7 @@ final class GitDiffFileProviderTest extends TestCase
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
 
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willReturnCallback(
                 fn (array $command): string => match ($command) {
@@ -127,7 +127,7 @@ final class GitDiffFileProviderTest extends TestCase
             EOF;
         $expectedUnifiedReturn = Str::toSystemLineEndings($expectedUnifiedReturn);
 
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willReturnCallback(
                 fn (array $command): string => match ($command) {
@@ -155,7 +155,7 @@ final class GitDiffFileProviderTest extends TestCase
     public function test_it_provides_the_fallback_when_no_origin_upstream_defined(string $expectedBase, string $executorReturn): void
     {
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willReturn($executorReturn);
 
@@ -173,7 +173,7 @@ final class GitDiffFileProviderTest extends TestCase
     public function test_it_provides_the_fallback_when_executor_throws(): void
     {
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willThrowException(new RuntimeException('ref refs/remotes/origin/HEAD is not a symbolic ref'));
 

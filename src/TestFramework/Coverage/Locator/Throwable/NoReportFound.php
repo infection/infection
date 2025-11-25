@@ -33,36 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Testing;
+namespace Infection\TestFramework\Coverage\Locator\Throwable;
 
-use Infection\CannotBeInstantiated;
-use function Safe\preg_match;
-use function Safe\preg_replace;
-use function str_contains;
-use function str_replace;
+use RuntimeException;
 
 /**
  * @internal
  */
-final class SourceTestClassNameScheme
+final class NoReportFound extends RuntimeException implements ReportLocationThrowable
 {
-    use CannotBeInstantiated;
-
-    public static function getSourceClassName(string $testCaseClassName): string
-    {
-        if (preg_match('/(Infection\\\\Tests\\\\.*)Test$/', $testCaseClassName, $matches) === 1) {
-            return str_replace('Infection\\Tests\\', 'Infection\\', $matches[1]);
-        }
-
-        return $testCaseClassName;
-    }
-
-    public static function getTestClassName(string $sourceClassName): string
-    {
-        if (str_contains($sourceClassName, 'Infection\\Tests')) {
-            return $sourceClassName . 'Test';
-        }
-
-        return preg_replace('/Infection/', 'Infection\\Tests', $sourceClassName, 1) . 'Test';
-    }
 }

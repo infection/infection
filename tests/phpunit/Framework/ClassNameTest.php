@@ -33,20 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\AutoReview;
+namespace Infection\Tests\Framework;
 
-use Infection\Testing\SourceTestClassNameScheme;
+use Closure;
+use Infection\Framework\ClassName;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SourceTestClassNameScheme::class)]
-final class SourceTestClassNameSchemeTest extends TestCase
+#[CoversClass(ClassName::class)]
+final class ClassNameTest extends TestCase
 {
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('classNameProvider')]
+    public function test_it_can_get_a_class_short_name(
+        string $className,
+        string $expectedShortName,
+    ): void {
+        $actual = ClassName::getShortClassName($className);
+
+        $this->assertSame($expectedShortName, $actual);
+    }
+
+    public static function classNameProvider(): iterable
+    {
+        yield 'nominal' => [
+            ClassName::class,
+            'ClassName',
+        ];
+
+        yield 'UTF-8' => [
+            'Webmozarts\ClassName\Ütf8',
+            'Ütf8',
+        ];
+
+        yield 'emoji' => [
+            'Webmozarts\ClassName\Special😋Class',
+            'Special😋Class',
+        ];
+
+        yield 'root namespace' => [
+            Closure::class,
+            'Closure',
+        ];
+    }
+
     public function test_it_can_give_the_source_class_name_for_a_test_case_class(): void
     {
         $this->assertSame(
             'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Tests\Acme\FooTest'),
+            ClassName::getCanonicalSourceClassName('Infection\Tests\Acme\FooTest'),
         );
     }
 
@@ -54,7 +92,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Acme\Foo',
-            SourceTestClassNameScheme::getSourceClassName('Infection\Acme\Foo'),
+            ClassName::getCanonicalSourceClassName('Infection\Acme\Foo'),
         );
     }
 
@@ -62,7 +100,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Acme\Foo'),
+            ClassName::getCanonicalTestClassName('Infection\Acme\Foo'),
         );
     }
 
@@ -70,7 +108,7 @@ final class SourceTestClassNameSchemeTest extends TestCase
     {
         $this->assertSame(
             'Infection\Tests\Acme\FooTest',
-            SourceTestClassNameScheme::getTestClassName('Infection\Tests\Acme\Foo'),
+            ClassName::getCanonicalTestClassName('Infection\Tests\Acme\Foo'),
         );
     }
 }

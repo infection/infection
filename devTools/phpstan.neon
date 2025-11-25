@@ -46,11 +46,6 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
-            count: 1
-            path: ../src/TestFramework/SafeDOMXPath.php
-
-        -
             message: "#Do not use magic number (.*)#"
             count: 5
             path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
@@ -122,6 +117,17 @@ parameters:
             count: 1
             path: ../tests/phpunit/MockedContainer.php
 
+        -
+            message: "#queryCount#"
+            identifier: return.type
+            count: 1
+            path: ../src/TestFramework/SafeDOMXPath.php
+
+        # We are explicitly testing the guards here
+        -
+            identifier: argument.type
+            path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
+
         # We are not too interested in making the FakeFileSystem correct typewise.
         -
             message: "#Do not use magic number as default parameter#"
@@ -147,15 +153,10 @@ parameters:
             identifier: shipmonk.deadMethod
             path: ../tests/benchmark/*/*Bench.php
 
-        # We are testing user input values hence by design they may not fit the specified type
+        # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
-            message: '#\$testFramework#'
             identifier: argument.type
-            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-        -
-            message: '#\$staticAnalysisTool#'
-            identifier: argument.type
-            path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+            path: ../tests/phpunit/Framework/ClassNameTest.php
 
     level: 8
     paths:

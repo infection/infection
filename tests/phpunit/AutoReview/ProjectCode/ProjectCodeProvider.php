@@ -42,6 +42,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
+use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
@@ -77,6 +78,9 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -91,7 +95,6 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
 use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\SourceTestClassNameScheme;
 use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
@@ -119,6 +122,7 @@ final class ProjectCodeProvider
         Application::class,
         ProgressFormatter::class,
         ConcreteComposerExecutableFinder::class,
+        InvalidReportSource::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         NodeMutationGenerator::class,
@@ -136,15 +140,16 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutantExecutionResult::class,
         MutatorName::class,
+        NoReportFound::class,
         BaseMutatorTestCase::class,
         OperatingSystem::class,
         SchemaConfiguration::class,
         SimpleMutation::class,
         StringNormalizer::class,
         Source::class,
-        SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+        TooManyReportsFound::class,
     ];
 
     /**
@@ -153,6 +158,7 @@ final class ProjectCodeProvider
      * For example, test cases that are in a child directory.
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
+        ConfigurationFactory::class,
         IndexXmlCoverageParser::class,
         FilterBuilder::class,
         SafeDOMXPath::class,
@@ -191,17 +197,17 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
-    private static $sourceClasses;
+    private static ?array $sourceClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $sourceClassesToCheckForPublicProperties;
+    private static ?array $sourceClassesToCheckForPublicProperties = null;
 
     /**
      * @var string[]|null
      */
-    private static $testClasses;
+    private static ?array $testClasses = null;
 
     public static function provideSourceClasses(): iterable
     {

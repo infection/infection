@@ -88,7 +88,7 @@ readonly class Configuration
         public bool $skipCoverage,
         public bool $skipInitialTests,
         public bool $isDebugEnabled,
-        private readonly bool $withUncovered,
+        private bool $withUncovered,
         public bool $noProgress,
         public bool $ignoreMsiWithNoMutations,
         public ?float $minMsi,

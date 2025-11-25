@@ -64,12 +64,12 @@ final class ProfileListProvider
     /**
      * @var array<int, array<int, string>>|null
      */
-    private static $mutators;
+    private static ?array $mutators = null;
 
     /**
      * @var array<string,string[]>|null
      */
-    private static $profileConstants;
+    private static ?array $profileConstants = null;
 
     public static function mutatorNameAndClassProvider(): iterable
     {

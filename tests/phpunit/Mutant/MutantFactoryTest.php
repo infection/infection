@@ -51,20 +51,11 @@ final class MutantFactoryTest extends TestCase
 {
     use MutantAssertions;
 
-    /**
-     * @var MutantCodeFactory|MockObject
-     */
-    private $codeFactoryMock;
+    private MockObject&MutantCodeFactory $codeFactoryMock;
 
-    /**
-     * @var Differ|MockObject
-     */
-    private $differMock;
+    private MockObject&Differ $differMock;
 
-    /**
-     * @var MutantFactory
-     */
-    private $mutantFactory;
+    private MutantFactory $mutantFactory;
 
     protected function setUp(): void
     {

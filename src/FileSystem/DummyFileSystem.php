@@ -88,7 +88,7 @@ final class DummyFileSystem extends FileSystem
     {
     }
 
-    public function readlink(string $path, bool $canonicalize = false): ?string
+    public function readlink(string $path, bool $canonicalize = false): string
     {
         return '';
     }

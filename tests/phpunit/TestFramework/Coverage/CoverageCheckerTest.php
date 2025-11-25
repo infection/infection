@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function extension_loaded;
-use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -65,15 +65,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private static $coveragePath;
+    private static string $coveragePath;
 
-    /**
-     * @var string
-     */
-    private static $jUnit;
+    private static string $jUnit;
 
     public static function setUpBeforeClass(): void
     {
@@ -198,7 +192,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -227,7 +221,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -256,7 +250,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -302,7 +296,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -337,7 +331,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -366,7 +360,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -436,7 +430,7 @@ final class CoverageCheckerTest extends TestCase
             ```
 
             Issue(s):
-            - The file "index.xml" could not be found: No index file found
+            - The file "index.xml" could not be found: Could not locate the index.xml coverage report for some reasons!
             TXT
         );
 
@@ -472,7 +466,7 @@ final class CoverageCheckerTest extends TestCase
             ```
 
             Issue(s):
-            - The JUnit file could not be found: No JUnit file found
+            - The JUnit file could not be found: Could not locate the JUnit coverage report for some reasons!
             TXT
         );
 
@@ -529,7 +523,7 @@ final class CoverageCheckerTest extends TestCase
         $indexLocatorMock = $this->createMock(ReportLocator::class);
         $indexLocatorMock
             ->method('locate')
-            ->willThrowException(new FileNotFound('No index file found'))
+            ->willThrowException(UnknownReportLocatorException::create('index.xml'))
         ;
 
         return $indexLocatorMock;
@@ -540,7 +534,7 @@ final class CoverageCheckerTest extends TestCase
         $jUnitLocatorMock = $this->createMock(ReportLocator::class);
         $jUnitLocatorMock
             ->method('locate')
-            ->willThrowException(new FileNotFound('No JUnit file found'))
+            ->willThrowException(UnknownReportLocatorException::create('JUnit'))
         ;
 
         return $jUnitLocatorMock;

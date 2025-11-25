@@ -47,8 +47,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(PregMatchRemoveFlags::class)]
 final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
 {
+    /**
+     * @param string|string[]|null $expected
+     */
     #[DataProvider('provideMutationCases')]
-    public function test_mutator($input, $expected = null): void
+    public function test_mutator(string $input, string|array|null $expected = null): void
     {
         $this->assertMutatesInput($input, $expected);
     }

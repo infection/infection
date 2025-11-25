@@ -50,15 +50,9 @@ use function stripos;
 #[CoversClass(SourceDirsProvider::class)]
 final class SourceDirsProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var SourceDirsProvider
-     */
-    private $provider;
+    private SourceDirsProvider $provider;
 
-    /**
-     * @var MockObject|SourceDirGuesser
-     */
-    private $sourceDirGuesser;
+    private MockObject&SourceDirGuesser $sourceDirGuesser;
 
     protected function setUp(): void
     {

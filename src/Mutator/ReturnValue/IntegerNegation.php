@@ -94,11 +94,7 @@ final class IntegerNegation implements Mutator
             return false;
         }
 
-        if ($expr->value === 0) {
-            return false;
-        }
-
-        return true;
+        return $expr->value !== 0;
     }
 
     /**
