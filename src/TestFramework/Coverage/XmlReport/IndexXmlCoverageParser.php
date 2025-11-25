@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -80,6 +81,8 @@ class IndexXmlCoverageParser
         $projectSource = self::getProjectSource($xPath);
 
         foreach ($xPath->query('//p:file') as $node) {
+            Assert::isInstanceOf($node, DOMElement::class);
+
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(
@@ -115,10 +118,18 @@ class IndexXmlCoverageParser
         $sourceNodes = $xPath->query('//p:project/@source');
 
         if ($sourceNodes->length > 0) {
-            return $sourceNodes[0]->nodeValue;
+            $node = $sourceNodes->item(0);
+            Assert::notNull($node);
+
+            // @phpstan-ignore return.type
+            return $node->nodeValue;
         }
 
         // PHPUnit < 6
-        return $xPath->query('//p:project/@name')[0]->nodeValue;
+        $node = $xPath->query('//p:project/@name')->item(0);
+        Assert::notNull($node);
+
+        // @phpstan-ignore return.type
+        return $node->nodeValue;
     }
 }

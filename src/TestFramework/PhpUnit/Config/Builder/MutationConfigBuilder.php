@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use DOMElement;
+use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -168,12 +170,14 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function setCustomBootstrapPath(string $customAutoloadFilePath, SafeDOMXPath $xPath): void
     {
-        $bootstrap = $xPath->query('/phpunit/@bootstrap');
+        $bootstrap = $xPath->query('/phpunit/@bootstrap')->item(0);
 
-        if ($bootstrap->length > 0) {
-            $bootstrap[0]->nodeValue = $customAutoloadFilePath;
+        if ($bootstrap !== null) {
+            $bootstrap->nodeValue = $customAutoloadFilePath;
         } else {
-            $node = $xPath->query('/phpunit')[0];
+            $node = $xPath->query('/phpunit')->item(0);
+            Assert::isInstanceOf($node, DOMElement::class);
+
             $node->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
@@ -201,11 +205,13 @@ class MutationConfigBuilder extends ConfigBuilder
     }
 
     /**
-     * @param DOMNodeList<DOMNode> $testSuites
+     * @param DOMNodeList<DOMNameSpaceNode|DOMNode> $testSuites
      */
     private function removeExistingTestSuiteNodes(DOMNodeList $testSuites): void
     {
         foreach ($testSuites as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
+
             $parent = $node->parentNode;
 
             Assert::isInstanceOf($parent, DOMNode::class);
