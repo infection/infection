@@ -43,9 +43,11 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
+use function strtoupper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
@@ -53,6 +55,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(JUnitReportLocator::class)]
 final class JUnitReportLocatorTest extends FileSystemTestCase
 {
+    // Must not match the default pattern we are looking for. This allows us
+    // to distinguish the case when the locator is looking for the default
+    // location provided and when it is looking for the file.
     private const TEST_DEFAULT_JUNIT = 'test-junit.xml';
 
     private Filesystem $filesystem;
@@ -69,6 +74,19 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
             $this->tmp,
             $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_JUNIT,
         );
+    }
+
+    // This is a sanity check to ensure we have the test correctly configured.
+    #[CoversNothing]
+    public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
+    {
+        $this->filesystem->touch(self::TEST_DEFAULT_JUNIT);
+
+        $locator = JUnitReportLocator::create($this->tmp);
+
+        $this->expectException(NoReportFound::class);
+
+        $locator->locate();
     }
 
     #[DataProvider('defaultLocationProvider')]
@@ -190,28 +208,32 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         yield 'all caps in sub-directory' => ['sub-dir/JUNIT.XML'];
     }
 
-    public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
+    public function test_it_can_locate_the_default_report_with_the_wrong_case_on_a_case_insensitive_system(): void
     {
-        $this->filesystem->dumpFile(
-            'JUNIT.XML',
-            '',
-        );
+        if (!OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-insensitive system.');
+        }
 
-        $expected = Path::normalize(
-            sprintf(
-                '%s/%s',
-                $this->tmp,
-                OperatingSystem::isMacOs()
-                    // On a case-insensitive system, since we check the file existence
-                    // first, we will have the case of the requested path.
-                    ? 'junit.xml'
-                    : 'JUNIT.XML',
-            ),
-        );
+        $this->filesystem->dumpFile(strtoupper(self::TEST_DEFAULT_JUNIT), '');
+
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_JUNIT);
 
         $actual = $this->locator->locate();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system(): void
+    {
+        if (OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-sensitive system.');
+        }
+
+        $this->filesystem->dumpFile(strtoupper(self::TEST_DEFAULT_JUNIT), '');
+
+        $this->expectException(NoReportFound::class);
+
+        $this->locator->locate();
     }
 
     public function test_it_can_locate_the_report_with_the_wrong_case(): void

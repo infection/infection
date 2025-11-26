@@ -45,6 +45,7 @@ use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
@@ -56,7 +57,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(IndexXmlCoverageLocator::class)]
 final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
-    private const TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/index.xml';
+    private const TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/test-index.xml';
 
     private Filesystem $filesystem;
 
@@ -72,6 +73,19 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
             $this->tmp,
             $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME,
         );
+    }
+
+    // This is a sanity check to ensure we have the test correctly configured.
+    #[CoversNothing]
+    public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
+    {
+        $this->filesystem->dumpFile(self::TEST_DEFAULT_RELATIVE_PATHNAME, '');
+
+        $locator = IndexXmlCoverageLocator::create($this->tmp);
+
+        $this->expectException(NoReportFound::class);
+
+        $locator->locate();
     }
 
     #[DataProvider('defaultLocationProvider')]
@@ -181,8 +195,6 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     public static function reportPathnameProvider(): iterable
     {
         yield 'exact match with the default location' => [self::TEST_DEFAULT_RELATIVE_PATHNAME];
-
-        yield 'exact filename match but in a directory outside of the default location' => [basename(self::TEST_DEFAULT_RELATIVE_PATHNAME)];
 
         yield 'in sub-directory' => ['sub-dir/index.xml'];
 
