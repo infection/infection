@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -45,7 +44,6 @@ use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use function sprintf;
 use function strtoupper;
 use Symfony\Component\Filesystem\Filesystem;
@@ -192,14 +190,8 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         yield 'all caps in sub-directory' => ['sub-dir/JUNIT.XML'];
     }
 
-    // Requires a case-insensitive system
-    #[RequiresOperatingSystemFamily('Darwin')]
     public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
     {
-        if (!OperatingSystem::isMacOs()) {
-            $this->markTestSkipped('Requires a case-insensitive system.');
-        }
-
         $this->filesystem->dumpFile(strtoupper(self::DEFAULT_JUNIT), '');
 
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT);
@@ -209,17 +201,19 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_cannot_locate_the_default_report_with_the_wrong_case(): void
+    public function test_it_can_locate_the_report_with_the_wrong_case(): void
     {
-        if (OperatingSystem::isMacOs()) {
-            $this->markTestSkipped('Requires a case-sensitive system.');
-        }
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_JUNIT));
+        $this->filesystem->dumpFile($expected, '');
 
-        $this->filesystem->dumpFile(strtoupper(self::DEFAULT_JUNIT), '');
+        $locator = JUnitReportLocator::create(
+            $this->tmp,
+            $this->tmp . '/unknown-file.xml',
+        );
 
-        $this->expectException(NoReportFound::class);
+        $actual = $locator->locate();
 
-        $this->locator->locate();
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void

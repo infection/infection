@@ -190,10 +190,6 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
     {
-        if (!OperatingSystem::isMacOs()) {
-            $this->markTestSkipped('Requires a case-insensitive system.');
-        }
-
         $this->filesystem->dumpFile(strtoupper(self::DEFAULT_RELATIVE_PATHNAME), '');
 
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::DEFAULT_RELATIVE_PATHNAME);
@@ -203,17 +199,19 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_cannot_locate_the_default_report_with_the_wrong_case(): void
+    public function test_it_can_locate_the_report_with_the_wrong_case(): void
     {
-        if (OperatingSystem::isMacOs()) {
-            $this->markTestSkipped('Requires a case-sensitive system.');
-        }
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_RELATIVE_PATHNAME));
+        $this->filesystem->dumpFile($expected, '');
 
-        $this->filesystem->dumpFile(strtoupper(self::DEFAULT_RELATIVE_PATHNAME), '');
+        $locator = IndexXmlCoverageLocator::create(
+            $this->tmp,
+            $this->tmp . '/unknown-file.xml',
+        );
 
-        $this->expectException(NoReportFound::class);
+        $actual = $locator->locate();
 
-        $this->locator->locate();
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void
