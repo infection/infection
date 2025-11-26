@@ -201,27 +201,36 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         yield 'all caps in sub-directory' => ['sub-dir/INDEX.xml'];
     }
 
-    public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
+    public function test_it_can_locate_the_default_report_with_the_wrong_case_on_a_case_insensitive_system(): void
     {
+        if (!OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-insensitive system.');
+        }
+
         $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
 
         $this->filesystem->dumpFile($relativePathname, '');
 
-        $expected = Path::normalize(
-            sprintf(
-                '%s/%s',
-                $this->tmp,
-                OperatingSystem::isMacOs()
-                    // On a case-insensitive system, since we check the file existence
-                    // first, we will have the case of the requested path.
-                    ? self::TEST_DEFAULT_RELATIVE_PATHNAME
-                    : $relativePathname,
-            ),
-        );
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME);
 
         $actual = $this->locator->locate();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system(): void
+    {
+        if (OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-sensitive system.');
+        }
+
+        $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
+
+        $this->filesystem->dumpFile($relativePathname, '');
+
+        $this->expectException(NoReportFound::class);
+
+        $this->locator->locate();
     }
 
     public function test_it_can_locate_the_report_with_the_wrong_case(): void
