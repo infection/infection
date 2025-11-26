@@ -61,6 +61,7 @@ final class JUnitReportLocator extends BaseReportLocator implements ReportLocato
         string $coverageDirectory,
         ?string $defaultJUnitPathname = null,
     ): self {
+        // TODO: ensure the default path is in the coverage dir or make the path absolute?
         return new self(
             $filesystem,
             $coverageDirectory,

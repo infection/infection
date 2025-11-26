@@ -222,7 +222,7 @@ final class BaseReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    public function test_it_cannot_find_the_report_not_suitable_file_was_found(): void
+    public function test_it_cannot_find_the_report_no_suitable_file_was_found(): void
     {
         $this->fileSystem->touch('not-a-matching-file.txt');
 
