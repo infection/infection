@@ -194,7 +194,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
     {
         $this->filesystem->dumpFile(
-            strtoupper(self::TEST_DEFAULT_JUNIT),
+            'JUNIT.XML',
             '',
         );
 
@@ -205,8 +205,8 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
                 OperatingSystem::isMacOs()
                     // On a case-insensitive system, since we check the file existence
                     // first, we will have the case of the requested path.
-                    ? self::TEST_DEFAULT_JUNIT
-                    : strtoupper(self::TEST_DEFAULT_JUNIT),
+                    ? 'junit.xml'
+                    : 'JUNIT.XML',
             ),
         );
 
