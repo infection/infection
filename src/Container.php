@@ -134,8 +134,6 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\Locator\MemoizedLocator;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -262,11 +260,9 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            IndexXmlCoverageLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
-                IndexXmlCoverageLocator::create(
-                    $container->getFileSystem(),
-                    $container->getConfiguration()->coveragePath,
-                ),
+            IndexXmlCoverageLocator::class => static fn (self $container) => IndexXmlCoverageLocator::create(
+                $container->getFileSystem(),
+                $container->getConfiguration()->coveragePath,
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
                 [$container->getProjectDir()],
@@ -353,11 +349,9 @@ final class Container extends DIContainer
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
-            JUnitReportLocator::class => static fn (self $container): ReportLocator => new MemoizedLocator(
-                JUnitReportLocator::create(
-                    $container->getFileSystem(),
-                    $container->getConfiguration()->coveragePath,
-                ),
+            JUnitReportLocator::class => static fn (self $container) => JUnitReportLocator::create(
+                $container->getFileSystem(),
+                $container->getConfiguration()->coveragePath,
             ),
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();

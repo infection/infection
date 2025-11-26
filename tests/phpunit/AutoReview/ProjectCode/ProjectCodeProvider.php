@@ -78,6 +78,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
@@ -150,6 +151,7 @@ final class ProjectCodeProvider
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
         TooManyReportsFound::class,
+        FakeLocator::class,
     ];
 
     /**

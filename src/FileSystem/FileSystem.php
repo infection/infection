@@ -46,14 +46,14 @@ use Symfony\Component\Finder\Finder;
  */
 class FileSystem extends SymfonyFilesystem
 {
-    public function isReadableFile(string $path): bool
+    public function isReadableFile(string $filename): bool
     {
-        return is_file($path) && is_readable($path);
+        return is_file($filename) && is_readable($filename);
     }
 
-    public function isReadableDirectory(string $path): bool
+    public function isReadableDirectory(string $filename): bool
     {
-        return is_dir($path) && is_readable($path);
+        return is_dir($filename) && is_readable($filename);
     }
 
     public function createFinder(): Finder

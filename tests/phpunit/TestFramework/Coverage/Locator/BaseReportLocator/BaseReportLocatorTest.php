@@ -193,6 +193,8 @@ final class BaseReportLocatorTest extends FileSystemTestCase
 
         try {
             $this->locator->locate();
+
+            $this->fail('Expected an exception to be thrown.');
         } catch (TooManyReportsFound $exception) {
             $this->assertEqualsCanonicalizing($expectedReportsPathnames, $exception->reportPathnames);
             $this->assertSame(

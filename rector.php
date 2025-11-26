@@ -121,6 +121,9 @@ return RectorConfig::configure()
     ->withSkip([
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
+        AddCoversClassAttributeRector::class => [
+            __DIR__ . '/tests/phpunit/FileSystem/FileSystemTestCase.php',
+        ],
         AddInstanceofAssertForNullableInstanceRector::class,
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',

@@ -38,7 +38,10 @@ namespace Infection\TestFramework\Coverage\Locator\Throwable;
 use RuntimeException;
 use function sprintf;
 
-final class InvalidReportSource extends RuntimeException
+/**
+ * @internal
+ */
+final class InvalidReportSource extends RuntimeException implements ReportLocationThrowable
 {
     public static function create(string $pathname): self
     {

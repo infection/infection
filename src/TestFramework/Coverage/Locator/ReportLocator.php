@@ -39,6 +39,9 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 
+/**
+ * @internal
+ */
 interface ReportLocator
 {
     /**

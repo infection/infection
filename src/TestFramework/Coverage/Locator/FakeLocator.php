@@ -37,6 +37,9 @@ namespace Infection\TestFramework\Coverage\Locator;
 
 use DomainException;
 
+/**
+ * @internal
+ */
 final class FakeLocator implements ReportLocator
 {
     public function locate(): string

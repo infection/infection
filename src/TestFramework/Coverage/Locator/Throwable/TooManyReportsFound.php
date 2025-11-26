@@ -40,14 +40,17 @@ use RuntimeException;
 use function sprintf;
 use Throwable;
 
-final class TooManyReportsFound extends RuntimeException
+/**
+ * @internal
+ */
+final class TooManyReportsFound extends RuntimeException implements ReportLocationThrowable
 {
     public function __construct(
         string $message = '',
         int $code = 0,
         ?Throwable $previous = null,
         /**
-         * @var list<string>
+         * @var list<string>|null
          */
         public readonly ?array $reportPathnames = null,
     ) {

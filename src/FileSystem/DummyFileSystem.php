@@ -125,12 +125,12 @@ final class DummyFileSystem extends FileSystem
         return '';
     }
 
-    public function isReadableFile(string $path): bool
+    public function isReadableFile(string $filename): bool
     {
         return false;
     }
 
-    public function isReadableDirectory(string $path): bool
+    public function isReadableDirectory(string $filename): bool
     {
         return false;
     }
