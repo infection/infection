@@ -60,6 +60,7 @@ use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\FakeFileSystem;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -154,6 +155,7 @@ final class ProjectCodeProvider
         TooManyReportsFound::class,
         FakeFileSystem::class,
         FakeLocator::class,
+        FileSystem::class,
     ];
 
     /**
@@ -182,6 +184,7 @@ final class ProjectCodeProvider
         MetricsCalculator::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
+        FileSystem::class,
     ];
 
     /**

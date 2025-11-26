@@ -42,7 +42,6 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 
 /**
- * @final
  * @internal
  */
 class FileSystem extends SymfonyFilesystem
