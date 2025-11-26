@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
@@ -44,13 +43,22 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
+use function strtoupper;
 use Symfony\Component\Filesystem\Path;
 
+#[Group('integration')]
 #[CoversClass(JUnitReportLocator::class)]
 final class JUnitReportLocatorTest extends FileSystemTestCase
 {
+    // Must not match the default pattern we are looking for. This allows us
+    // to distinguish the case when the locator is looking for the default
+    // location provided and when it is looking for the file.
+    private const TEST_DEFAULT_JUNIT = 'test-junit.xml';
+
     private FileSystem $filesystem;
 
     private JUnitReportLocator $locator;
@@ -59,13 +67,24 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->filesystem = new FileSystem();
-
         $this->locator = JUnitReportLocator::create(
             $this->filesystem,
             $this->tmp,
-            $this->tmp . '/junit.xml',
+            $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_JUNIT,
         );
+    }
+
+    // This is a sanity check to ensure we have the test correctly configured.
+    #[CoversNothing]
+    public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
+    {
+        $this->filesystem->touch(self::TEST_DEFAULT_JUNIT);
+
+        $locator = JUnitReportLocator::create($this->tmp);
+
+        $this->expectException(NoReportFound::class);
+
+        $locator->locate();
     }
 
     #[DataProvider('defaultLocationProvider')]
@@ -76,7 +95,6 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $coverageDirectory = '/path/to/random-coverage';
 
         $locator = JUnitReportLocator::create(
-            $this->filesystem,
             $coverageDirectory,
             defaultJUnitPathname: $defaultLocation,
         );
@@ -104,10 +122,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         string $coverageDirectory,
         string $expected,
     ): void {
-        $locator = JUnitReportLocator::create(
-            $this->filesystem,
-            $coverageDirectory,
-        );
+        $locator = JUnitReportLocator::create($coverageDirectory);
 
         $actual = $locator->getDefaultLocation();
 
@@ -127,26 +142,112 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         ];
     }
 
-    public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void
+    public function test_it_returns_the_default_path_if_it_exists(): void
     {
-        $unknownDir = $this->tmp . '/unknown-dir';
+        $default = $this->filesystem->tempnam($this->tmp, 'default-');
+
+        $locator = new JUnitReportLocator(
+            '/path/to/unknown-dir',
+            $default,
+        );
+
+        // Note that here we can't really check that we do not use the FS
+        // since we use `file_exists()` directly.
+        $actual = $locator->locate();
+
+        $this->assertSame($default, $actual);
+    }
+
+    public function test_it_caches_the_result_found(): void
+    {
+        $default = $this->filesystem->tempnam($this->tmp, 'default-');
+
+        $this->locator = new JUnitReportLocator(
+            '/path/to/unknown-dir',
+            $default,
+        );
+
+        // Note that here we can't really check that we do not use a Filesystem
+        // object which we could mock.
+        $actual1 = $this->locator->locate();
+        $actual2 = $this->locator->locate();
+
+        $this->assertSame($default, $actual1);
+        $this->assertSame($default, $actual2);
+    }
+
+    #[DataProvider('reportPathnameProvider')]
+    public function test_it_can_find_a_report_pathname(
+        string $relativePathname,
+        ?string $expectedRelativePathname = null,
+    ): void {
+        $expectedRelativePathname ??= $relativePathname;
+
+        $this->filesystem->dumpFile($relativePathname, '');
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . $expectedRelativePathname);
+
+        $actual = $this->locator->locate();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function reportPathnameProvider(): iterable
+    {
+        yield 'outdated doc' => ['phpunit.junit.xml'];
+
+        yield 'non conventional name' => ['foo2.junit.xml'];
+
+        yield 'in sub-directory' => ['sub-dir/junit.xml'];
+
+        yield 'outdated doc in sub-directory' => ['sub-dir/phpunit.junit.xml'];
+
+        yield 'non conventional name in sub-directory' => ['sub-dir/foo2.junit.xml'];
+
+        yield 'all caps in sub-directory' => ['sub-dir/JUNIT.XML'];
+    }
+
+    public function test_it_can_locate_the_default_report_with_the_wrong_case_on_a_case_insensitive_system(): void
+    {
+        if (!OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-insensitive system.');
+        }
+
+        $this->filesystem->dumpFile(strtoupper(self::TEST_DEFAULT_JUNIT), '');
+
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_JUNIT);
+
+        $actual = $this->locator->locate();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system(): void
+    {
+        if (OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-sensitive system.');
+        }
+
+        $this->filesystem->dumpFile(strtoupper(self::TEST_DEFAULT_JUNIT), '');
+
+        $this->expectException(NoReportFound::class);
+
+        $this->locator->locate();
+    }
+
+    public function test_it_can_locate_the_report_with_the_wrong_case(): void
+    {
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'JUNIT.XML');
+
+        $this->filesystem->dumpFile($expected, '');
 
         $locator = JUnitReportLocator::create(
-            $this->filesystem,
-            $unknownDir,
-            '/path/to/unknown-file',
+            $this->tmp,
+            $this->tmp . '/unknown-file.xml',
         );
 
-        $this->expectExceptionObject(
-            new InvalidReportSource(
-                sprintf(
-                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
-                    $unknownDir,
-                ),
-            ),
-        );
+        $actual = $locator->locate();
 
-        $locator->locate();
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void
@@ -159,13 +260,8 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
             Path::normalize($this->tmp . '/phpunit.junit.xml'),
         ];
 
-        try {
-            $this->locator->locate();
-
-            $this->fail('Expected an exception to be thrown.');
-        } catch (TooManyReportsFound $exception) {
-            $this->assertEqualsCanonicalizing($expectedReportsPathnames, $exception->reportPathnames);
-            $this->assertSame(
+        $this->expectExceptionObject(
+            new TooManyReportsFound(
                 sprintf(
                     'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
                     $this->tmp,
@@ -173,9 +269,10 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
                     $expectedReportsPathnames[0],
                     $expectedReportsPathnames[1],
                 ),
-                $exception->getMessage(),
-            );
-        }
+            ),
+        );
+
+        $this->locator->locate();
     }
 
     public function test_it_cannot_find_the_report_if_no_file_was_found(): void
@@ -193,54 +290,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    #[DataProvider('jUnitPathnameProvider')]
-    public function test_it_can_find_a_report_pathname(
-        string $relativePathname,
-        ?string $expectedRelativePathname = null,
-    ): void {
-        $expectedRelativePathname ??= $relativePathname;
-
-        $this->filesystem->dumpFile($relativePathname, '');
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . $expectedRelativePathname);
-
-        $actual = $this->locator->locate();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public static function jUnitPathnameProvider(): iterable
+    public function test_it_cannot_find_the_report_no_suitable_file_was_found(): void
     {
-        yield 'default name' => ['junit.xml'];
-
-        yield 'all caps default name' => [
-            'JUNIT.XML',
-            // On macOS (or case-insensitive systems), the default path will
-            // match hence will be picked; Hence the case of the default path
-            // is picked over the actual case of the file.
-            OperatingSystem::isMacOs()
-                ? 'junit.xml'
-                : 'JUNIT.XML',
-        ];
-
-        yield 'from outdated documentation' => ['phpunit.junit.xml'];
-
-        yield 'from outdated documentation in all caps' => ['PHPUNIT.JUNIT.XML'];
-
-        yield 'non conventional name' => ['foo2.junit.xml'];
-
-        yield 'in sub-directory' => ['sub-dir/junit.xml'];
-
-        yield 'outdated doc in sub-directory' => ['sub-dir/phpunit.junit.xml'];
-
-        yield 'non conventional name in sub-directory' => ['sub-dir/foo2.junit.xml'];
-
-        yield 'all caps in sub-directory' => ['sub-dir/JUNIT.XML'];
-    }
-
-    #[DataProvider('invalidJunitPathnameProvider')]
-    public function test_it_cannot_find_junit_files_with_invalid_names(string $relativeJUnitPathname): void
-    {
-        $this->filesystem->dumpFile($relativeJUnitPathname, '');
+        $this->filesystem->touch('not-a-matching-file.txt');
 
         $this->expectExceptionObject(
             new NoReportFound(
@@ -255,8 +307,45 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    public static function invalidJunitPathnameProvider(): iterable
+    public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void
     {
-        yield 'with the wrong file ending' => ['junit.xml.dist'];
+        $unknownDir = $this->tmp . '/unknown-dir';
+
+        $locator = new JUnitReportLocator(
+            $unknownDir,
+            $this->tmp . '/junit.xml',
+        );
+
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    $unknownDir,
+                ),
+            ),
+        );
+
+        $locator->locate();
+    }
+
+    public function test_it_cannot_locate_the_report_if_the_source_directory_is_not_a_directory(): void
+    {
+        $file = $this->filesystem->tempnam($this->tmp, 'default-');
+
+        $locator = new JUnitReportLocator(
+            $file,
+            $this->tmp . '/junit.xml',
+        );
+
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    $file,
+                ),
+            ),
+        );
+
+        $locator->locate();
     }
 }
