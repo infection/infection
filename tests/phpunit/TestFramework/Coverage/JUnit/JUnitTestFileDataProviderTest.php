@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use InvalidArgumentException;

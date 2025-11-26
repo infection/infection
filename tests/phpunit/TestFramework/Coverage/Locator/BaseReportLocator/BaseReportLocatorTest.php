@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -73,15 +74,15 @@ final class BaseReportLocatorTest extends FileSystemTestCase
     {
         $default = Path::canonicalize('/path/to/default-file');
 
-        $filesystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock = $this->createMock(FileSystem::class);
 
-        $filesystemMock
+        $fileSystemMock
             ->expects($this->once())
             ->method('isReadableFile')
             ->willReturn(true);
 
         $this->locator = new DemoReportLocator(
-            $filesystemMock,
+            $fileSystemMock,
             '/path/to/unknown-dir',
             $default,
         );
@@ -89,6 +90,30 @@ final class BaseReportLocatorTest extends FileSystemTestCase
         $actual = $this->locator->locate();
 
         $this->assertSame($default, $actual);
+    }
+
+    public function test_it_caches_the_result_found(): void
+    {
+        $default = $this->fileSystem->tempnam($this->tmp, 'default-');
+
+        $fileSystemMock = $this->createMock(FileSystem::class);
+
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableFile')
+            ->willReturn(true);
+
+        $locator = new IndexXmlCoverageLocator(
+            $fileSystemMock,
+            '/path/to/unknown-dir',
+            $default,
+        );
+
+        $actual1 = $locator->locate();
+        $actual2 = $locator->locate();
+
+        $this->assertSame($default, $actual1);
+        $this->assertSame($default, $actual2);
     }
 
     public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void

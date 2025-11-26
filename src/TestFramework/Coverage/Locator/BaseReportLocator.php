@@ -55,7 +55,7 @@ use Symfony\Component\Finder\Finder;
  */
 abstract readonly class BaseReportLocator implements ReportLocator
 {
-    protected function __construct(
+    public function __construct(
         private FileSystem $filesystem,
         private string $sourceDirectory,
         private string $defaultPathname,
