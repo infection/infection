@@ -42,7 +42,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final readonly class DemoReportLocator extends BaseReportLocator
+final class DemoReportLocator extends BaseReportLocator
 {
     public const FILENAME_REGEX = '/^.+\.demo$/';
 
