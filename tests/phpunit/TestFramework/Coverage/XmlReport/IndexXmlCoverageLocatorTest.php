@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use function basename;
 use const DIRECTORY_SEPARATOR;
+use function dirname;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -55,7 +56,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(IndexXmlCoverageLocator::class)]
 final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
-    private const DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
+    private const TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/index.xml';
 
     private Filesystem $filesystem;
 
@@ -69,7 +70,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
         $this->locator = IndexXmlCoverageLocator::create(
             $this->tmp,
-            $this->tmp . DIRECTORY_SEPARATOR . self::DEFAULT_RELATIVE_PATHNAME,
+            $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME,
         );
     }
 
@@ -179,9 +180,9 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public static function reportPathnameProvider(): iterable
     {
-        yield 'exact match with the default location' => [self::DEFAULT_RELATIVE_PATHNAME];
+        yield 'exact match with the default location' => [self::TEST_DEFAULT_RELATIVE_PATHNAME];
 
-        yield 'exact filename match but in a directory outside of the default location' => [basename(self::DEFAULT_RELATIVE_PATHNAME)];
+        yield 'exact filename match but in a directory outside of the default location' => [basename(self::TEST_DEFAULT_RELATIVE_PATHNAME)];
 
         yield 'in sub-directory' => ['sub-dir/index.xml'];
 
@@ -190,9 +191,21 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
     {
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_RELATIVE_PATHNAME));
+        $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
 
-        $this->filesystem->dumpFile($expected, '');
+        $this->filesystem->dumpFile($relativePathname, '');
+
+        $expected = Path::normalize(
+            sprintf(
+                '%s/%s',
+                $this->tmp,
+                OperatingSystem::isMacOs()
+                    // On a case-insensitive system, since we check the file existence
+                    // first, we will have the case of the requested path.
+                    ? self::TEST_DEFAULT_RELATIVE_PATHNAME
+                    : $relativePathname,
+            ),
+        );
 
         $actual = $this->locator->locate();
 
@@ -201,7 +214,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_report_with_the_wrong_case(): void
     {
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_RELATIVE_PATHNAME));
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'INDEX.xml');
         $this->filesystem->dumpFile($expected, '');
 
         $locator = IndexXmlCoverageLocator::create(

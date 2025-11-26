@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -53,7 +54,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(JUnitReportLocator::class)]
 final class JUnitReportLocatorTest extends FileSystemTestCase
 {
-    private const DEFAULT_JUNIT = 'test-junit.xml';
+    private const TEST_DEFAULT_JUNIT = 'test-junit.xml';
 
     private Filesystem $filesystem;
 
@@ -67,7 +68,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
         $this->locator = JUnitReportLocator::create(
             $this->tmp,
-            $this->tmp . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT,
+            $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_JUNIT,
         );
     }
 
@@ -192,9 +193,24 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
     {
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_JUNIT));
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::TEST_DEFAULT_JUNIT));
 
-        $this->filesystem->dumpFile($expected, '');
+        $this->filesystem->dumpFile(
+            strtoupper(self::TEST_DEFAULT_JUNIT),
+            '',
+        );
+
+        $expected = Path::normalize(
+            sprintf(
+                '%s/%s',
+                $this->tmp,
+                OperatingSystem::isMacOs()
+                    // On a case-insensitive system, since we check the file existence
+                    // first, we will have the case of the requested path.
+                    ? self::TEST_DEFAULT_JUNIT
+                    : strtoupper(self::TEST_DEFAULT_JUNIT),
+            ),
+        );
 
         $actual = $this->locator->locate();
 
@@ -203,7 +219,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_report_with_the_wrong_case(): void
     {
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_JUNIT));
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'JUNIT.XML');
 
         $this->filesystem->dumpFile($expected, '');
 
