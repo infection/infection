@@ -190,9 +190,9 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_can_locate_the_default_report_with_the_wrong_case(): void
     {
-        $this->filesystem->dumpFile(strtoupper(self::DEFAULT_RELATIVE_PATHNAME), '');
+        $expected = Path::normalize(strtoupper($this->tmp . DIRECTORY_SEPARATOR . self::DEFAULT_RELATIVE_PATHNAME));
 
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::DEFAULT_RELATIVE_PATHNAME);
+        $this->filesystem->dumpFile($expected, '');
 
         $actual = $this->locator->locate();
 
@@ -221,7 +221,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         }
 
         $this->filesystem->touch('index.xml');
-        $this->filesystem->touch('INDEX.xml');
+        $this->filesystem->dumpFile('/sub-dir/index.xml', '');
 
         $expectedReportsPathnames = [
             Path::normalize($this->tmp . '/index.xml'),

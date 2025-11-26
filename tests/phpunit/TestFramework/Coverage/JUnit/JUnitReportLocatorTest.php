@@ -204,6 +204,7 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
     public function test_it_can_locate_the_report_with_the_wrong_case(): void
     {
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . strtoupper(self::DEFAULT_JUNIT));
+
         $this->filesystem->dumpFile($expected, '');
 
         $locator = JUnitReportLocator::create(
