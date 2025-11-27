@@ -141,11 +141,7 @@ final class MutationGeneratorTest extends TestCase
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock
             ->expects($this->exactly(2))
-            ->method('generate')
-            ->willReturnOnConsecutiveCalls(
-                [],
-                [],
-            )
+            ->method('generate')->willReturn([])
         ;
 
         $traceProviderMock = $this->createMock(TraceProvider::class);
@@ -200,11 +196,7 @@ final class MutationGeneratorTest extends TestCase
         $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
         $fileMutationGeneratorMock
             ->expects($this->exactly(2))
-            ->method('generate')
-            ->willReturnOnConsecutiveCalls(
-                [],
-                [],
-            )
+            ->method('generate')->willReturn([])
         ;
 
         $traceProviderMock = $this->createMock(TraceProvider::class);

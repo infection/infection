@@ -89,8 +89,18 @@ final readonly class Engine
      */
     public function execute(): void
     {
-        $this->runInitialTestSuite();
+        $initialTestSuiteOutput = $this->runInitialTestSuite();
         $this->runInitialStaticAnalysis();
+
+        /*
+         * Limit the memory used for the mutation processes based on the memory
+         * used for the initial test run.
+         * This is done AFTER static analysis to avoid restricting PHPStan's memory.
+         */
+        if ($initialTestSuiteOutput !== null) {
+            $this->memoryLimiter->limitMemory($initialTestSuiteOutput, $this->adapter);
+        }
+
         $this->runMutationAnalysis();
 
         try {
@@ -105,19 +115,19 @@ final readonly class Engine
         }
     }
 
-    private function runInitialTestSuite(): void
+    private function runInitialTestSuite(): ?string
     {
-        if ($this->config->shouldSkipInitialTests()) {
+        if ($this->config->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
 
-            return;
+            return null;
         }
 
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->config->getTestFrameworkExtraOptions(),
+            $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
-            $this->config->shouldSkipCoverage(),
+            $this->config->skipCoverage,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
@@ -129,11 +139,7 @@ final readonly class Engine
             $initialTestSuiteProcess->getOutput(),
         );
 
-        /*
-         * Limit the memory used for the mutation processes based on the memory
-         * used for the initial test run.
-         */
-        $this->memoryLimiter->limitMemory($initialTestSuiteProcess->getOutput(), $this->adapter);
+        return $initialTestSuiteProcess->getOutput();
     }
 
     /**
@@ -177,7 +183,7 @@ final readonly class Engine
      */
     private function getInitialTestsPhpOptionsArray(): array
     {
-        return explode(' ', (string) $this->config->getInitialTestsPhpOptions());
+        return explode(' ', (string) $this->config->initialTestsPhpOptions);
     }
 
     private function runMutationAnalysis(): void
@@ -209,11 +215,11 @@ final readonly class Engine
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
             return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->getTestFrameworkExtraOptions(),
+                $this->config->testFrameworkExtraOptions,
                 $this->adapter->getInitialRunOnlyOptions(),
             );
         }
 
-        return $this->config->getTestFrameworkExtraOptions();
+        return $this->config->testFrameworkExtraOptions;
     }
 }

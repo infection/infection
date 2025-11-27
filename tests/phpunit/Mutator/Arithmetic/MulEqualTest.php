@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class MulEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -60,15 +60,13 @@ final class MulEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a *= 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a /= 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate normal multiply' => [
@@ -76,8 +74,7 @@ final class MulEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 10 * 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate multiply by 1 to avoid an equivalent mutation' => [
@@ -86,8 +83,7 @@ final class MulEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a *= 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate multiply by -1 to avoid an equivalent mutation' => [
@@ -96,8 +92,7 @@ final class MulEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a *= -1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate multiply by 1.0 to avoid an equivalent mutation' => [
@@ -106,8 +101,7 @@ final class MulEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a *= 1.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate multiply by -1.0 to avoid an equivalent mutation' => [
@@ -116,8 +110,7 @@ final class MulEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a *= -1.0;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

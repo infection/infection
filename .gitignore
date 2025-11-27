@@ -6,6 +6,8 @@
 /.box_dump/
 /.ci/keys.asc
 /.composer/
+/.direnv/
+/.envrc.local
 /.idea
 /.php_cs.cache
 /.tools/
@@ -28,4 +30,5 @@
 /tests/e2e/SymfonyFlex/symfony.lock
 /tests/e2e/SymfonyFlex/tests/.gitignore
 /tests/error.log
+/tests/phpunit/**/*/generated_index.xml
 /vendor/

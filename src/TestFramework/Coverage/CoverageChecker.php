@@ -39,8 +39,8 @@ use Composer\XdebugHandler\XdebugHandler;
 use function count;
 use function extension_loaded;
 use function implode;
-use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use function ini_get as ini_get_unsafe;
 use const PHP_EOL;
@@ -113,7 +113,7 @@ class CoverageChecker
 
         try {
             $this->indexXmlCoverageLocator->locate();
-        } catch (FileNotFound $exception) {
+        } catch (ReportLocationThrowable $exception) {
             $errors[] = sprintf(
                 '- The file "index.xml" could not be found: %s',
                 $exception->getMessage(),
@@ -123,7 +123,7 @@ class CoverageChecker
         if ($this->jUnitReport) {
             try {
                 $this->jUnitReportLocator->locate();
-            } catch (FileNotFound $exception) {
+            } catch (ReportLocationThrowable $exception) {
                 $errors[] = sprintf(
                     '- The JUnit file could not be found: %s',
                     $exception->getMessage(),
@@ -146,8 +146,7 @@ class CoverageChecker
 
             Issue(s):
             %s
-            TXT
-            ,
+            TXT,
             'https://github.com/infection/infection',
             $initialTestSuiteCommandLine,
             $initialTestSuiteOutput,
@@ -190,7 +189,7 @@ class CoverageChecker
             $this->indexXmlCoverageLocator->locate();
 
             return;
-        } catch (FileNotFound $exception) {
+        } catch (ReportLocationThrowable $exception) {
             // Continue
         }
 
@@ -223,7 +222,7 @@ class CoverageChecker
             $this->jUnitReportLocator->locate();
 
             return;
-        } catch (FileNotFound $exception) {
+        } catch (ReportLocationThrowable $exception) {
             // Continue
         }
 

@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class SpreadOneItemTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...[1, 2, 3], 4];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [[...[1, 2, 3]][0], 4];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread one item for a variable' => [
@@ -74,14 +72,12 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...$collection, 4];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [[...$collection][0], 4];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread one item for a function call' => [
@@ -89,14 +85,12 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...getCollection(), 4];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [[...getCollection()][0], 4];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread one item for a method call' => [
@@ -104,14 +98,12 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...$object->getCollection(), 4];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [[...$object->getCollection()][0], 4];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread one item for a new iterator object' => [
@@ -119,14 +111,12 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...new ArrayIterator(['a', 'b', 'c'])];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [[...new ArrayIterator(['a', 'b', 'c'])][0]];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate argument unpacking' => [
@@ -134,8 +124,7 @@ final class SpreadOneItemTest extends BaseMutatorTestCase
                 <?php
 
                 function foo(...$array) {}
-                PHP
-            ,
+                PHP,
         ];
     }
 }

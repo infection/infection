@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\PhpUnit\Adapter;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
+use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\CommandLineBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -46,31 +46,23 @@ use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
-    /**
-     * @var PhpUnitAdapter
-     */
-    private $adapter;
+    private PhpUnitAdapter $adapter;
 
-    private $pcovDirectoryProvider;
+    private MockObject&PCOVDirectoryProvider $pcovDirectoryProvider;
 
-    private $initialConfigBuilder;
+    private MockObject&CommandLineArgumentsAndOptionsBuilder $cliArgumentsBuilder;
 
-    private $mutationConfigBuilder;
-
-    private $cliArgumentsBuilder;
-
-    private $commandLineBuilder;
+    private MockObject&CommandLineBuilder $commandLineBuilder;
 
     protected function setUp(): void
     {
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
-        $this->initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
-        $this->mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
 
@@ -79,8 +71,8 @@ final class PhpUnitAdapterTest extends TestCase
             '/tmp',
             '/tmp/infection/junit.xml',
             $this->pcovDirectoryProvider,
-            $this->initialConfigBuilder,
-            $this->mutationConfigBuilder,
+            $this->createMock(InitialConfigBuilder::class),
+            $this->createMock(MutationConfigBuilder::class),
             $this->cliArgumentsBuilder,
             new VersionParser(),
             $this->commandLineBuilder,
@@ -237,7 +229,7 @@ final class PhpUnitAdapterTest extends TestCase
                 '-d',
                 'memory_limit=-1',
                 '-d',
-                '\\' === DIRECTORY_SEPARATOR ? 'pcov.directory="."' : "pcov.directory='.'",
+                OperatingSystem::isWindows() ? 'pcov.directory="."' : "pcov.directory='.'",
             ], [
                 '--group=default', '--coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
             ])
@@ -303,5 +295,42 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['Memory: 68.00 MB', 68.0];
 
         yield ['Time: 2.51 seconds', -1.0];
+    }
+
+    #[DataProvider('executionOrderProvider')]
+    public function test_supports_execution_order_defects_random(bool $expected, string $version): void
+    {
+        $this->assertSame($expected, PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version));
+    }
+
+    public static function executionOrderProvider(): iterable
+    {
+        yield [false, '10.0'];
+
+        yield [false, '10.5.47'];
+
+        yield [true, '10.5.48'];
+
+        yield [true, '10.5.999'];
+
+        yield [false, '11.0'];
+
+        yield [false, '11.5.26'];
+
+        yield [true, '11.5.27'];
+
+        yield [true, '11.5.599'];
+
+        yield [false, '12.0'];
+
+        yield [false, '12.1'];
+
+        yield [false, '12.2.6'];
+
+        yield [true, '12.2.7'];
+
+        yield [true, '12.2.99'];
+
+        yield [true, '13.0'];
     }
 }

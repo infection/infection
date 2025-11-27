@@ -46,10 +46,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class EqualIdenticalTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -61,14 +61,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 $a == $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a === $b;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a cast' => [
@@ -76,14 +74,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 (int) $c == 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 (int) $c === 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a constant' => [
@@ -91,14 +87,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 $d == null;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $d === null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates with a function' => [
@@ -106,14 +100,12 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 <?php
 
                 false == strpos();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 false === strpos();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates equal operator into identical operator for maybe same type operations (string)' => [
@@ -385,6 +377,7 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
                 }
                 doFoo() === doFoo();
                 doFoo() === doFoo();
+
                 PHP,
         ];
 

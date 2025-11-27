@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutant;
 
 use Infection\Mutation\Mutation;
-use Infection\PhpParser\Visitor\CloneVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
 use PhpParser\NodeTraverser;
-use PhpParser\PrettyPrinterAbstract;
+use PhpParser\NodeVisitor\CloningVisitor;
 
 /**
  * @internal
@@ -48,7 +47,7 @@ use PhpParser\PrettyPrinterAbstract;
 class MutantCodeFactory
 {
     public function __construct(
-        private readonly PrettyPrinterAbstract $printer,
+        private readonly MutantCodePrinter $mutatedCodePrinter,
     ) {
     }
 
@@ -56,11 +55,14 @@ class MutantCodeFactory
     {
         $traverser = new NodeTraverser();
 
-        $traverser->addVisitor(new CloneVisitor());
+        $traverser->addVisitor(new CloningVisitor());
+
+        $newStatements = $traverser->traverse($mutation->getOriginalFileAst());
+
         $traverser->addVisitor(new MutatorVisitor($mutation));
 
-        $mutatedStatements = $traverser->traverse($mutation->getOriginalFileAst());
+        $mutatedStatements = $traverser->traverse($newStatements);
 
-        return $this->printer->prettyPrintFile($mutatedStatements);
+        return $this->mutatedCodePrinter->print($mutatedStatements, $mutation);
     }
 }

@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $array[0] || $array[1];
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -80,8 +79,7 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $foo || $bar;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -101,8 +99,7 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $this->foo() || $bar->baz();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -122,21 +119,18 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = self::foo() || static::bar() || Test::baz();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !self::foo() || static::bar() || Test::baz();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $var = self::foo() || !static::bar() || Test::baz();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -150,15 +144,13 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = self::FOO || self::BAR;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !self::FOO || self::BAR;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -172,15 +164,13 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $foo() || $bar();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !$foo() || $bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -194,15 +184,13 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = ($this->foo)() || ($this->bar)();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !($this->foo)() || ($this->bar)();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -216,8 +204,7 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -237,27 +224,23 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b() || c() || d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !a() || b() || c() || d();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $var = a() || !b() || c() || d();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $var = a() || b() || !c() || d();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -287,15 +270,13 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !(a() || !b());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !(!a() || !b());
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -304,13 +285,59 @@ final class LogicalOrSingleSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() || b() && c();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !a() || b() && c();
+                    PHP,
+            ],
+        ];
+
+        yield 'It preserves formatting for non-modified code' => [
+            <<<'PHP'
+                <?php
+
+                class TestFormatPreserving {
+                    // some comment
+                    public function test(): bool { // and comment here
+                        return 1
+
+                          && 2;
+                    }
+                }
+
+                $var = a() || b();
+                PHP,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
+
+                              && 2;
+                        }
+                    }
+
+                    $var = !a() || b();
+                    PHP,
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
+
+                              && 2;
+                        }
+                    }
+
+                    $var = a() || !b();
                     PHP,
             ],
         ];

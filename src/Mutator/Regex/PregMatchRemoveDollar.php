@@ -63,8 +63,7 @@ final class PregMatchRemoveDollar extends AbstractPregMatch
                 preg_match('/^test/', $string);
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

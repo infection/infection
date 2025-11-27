@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayPadTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapArrayPadTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_pad(['a'], 2, 'a');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayPadTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_pad(\Class_With_Const::Const, 1, 'a');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayPadTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_pad(['a'], 2, 'a');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +118,7 @@ final class UnwrapArrayPadTest extends BaseMutatorTestCase
                 $a = 'array_pad';
 
                 $b = $a([], 1, 'foo');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

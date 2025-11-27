@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\Http;
 
 use Generator;
+use Infection\Framework\Str;
 use Infection\Logger\Http\Response;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Tests\Logger\DummyLogger;
-use function Infection\Tests\normalizeLineReturn;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -52,20 +52,11 @@ final class StrykerDashboardClientTest extends TestCase
 {
     private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
 
-    /**
-     * @var StrykerCurlClient|MockObject
-     */
-    private $clientMock;
+    private MockObject&StrykerCurlClient $clientMock;
 
-    /**
-     * @var DummyLogger
-     */
-    private $logger;
+    private DummyLogger $logger;
 
-    /**
-     * @var StrykerDashboardClient
-     */
-    private $dashboardClient;
+    private StrykerDashboardClient $dashboardClient;
 
     protected function setUp(): void
     {
@@ -79,7 +70,7 @@ final class StrykerDashboardClientTest extends TestCase
     }
 
     #[DataProvider('provideResponseStatusCodes')]
-    public function test_it_can_send_a_report_with_expected_response_status_code(): void
+    public function test_it_can_send_a_report_with_expected_response_status_code(int $statusCode): void
     {
         $this->clientMock
             ->expects($this->once())
@@ -90,7 +81,7 @@ final class StrykerDashboardClientTest extends TestCase
                 self::API_KEY,
                 '{"mutationScore": 80.31}',
             )
-            ->willReturn(new Response(201, 'Report received!'))
+            ->willReturn(new Response($statusCode, 'Report received!'))
         ;
 
         $this->dashboardClient->sendReport(
@@ -104,10 +95,11 @@ final class StrykerDashboardClientTest extends TestCase
             [
                 [
                     LogLevel::NOTICE,
-                    normalizeLineReturn(<<<'EOF'
-                        Dashboard response:
-                        Report received!
-                        EOF
+                    Str::toUnixLineEndings(
+                        <<<'EOF'
+                            Dashboard response:
+                            Report received!
+                            EOF,
                     ),
                     [],
                 ],
@@ -156,8 +148,7 @@ final class StrykerDashboardClientTest extends TestCase
                     <<<'EOF'
                         Dashboard response:
                         Report invalid!
-                        EOF
-                    ,
+                        EOF,
                     [],
                 ],
             ],

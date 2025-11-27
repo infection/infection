@@ -45,10 +45,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class CastBoolTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -60,14 +60,12 @@ final class CastBoolTest extends BaseMutatorTestCase
                 <?php
 
                 (bool) 1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to bool with "boolean"' => [
@@ -75,14 +73,12 @@ final class CastBoolTest extends BaseMutatorTestCase
                 <?php
 
                 (boolean) 1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to bool in conditions' => [
@@ -92,16 +88,14 @@ final class CastBoolTest extends BaseMutatorTestCase
                 if ((bool) preg_match()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if (preg_match()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to bool in global return' => [
@@ -109,14 +103,12 @@ final class CastBoolTest extends BaseMutatorTestCase
                 <?php
 
                 return (bool) preg_match();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return preg_match();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to bool in return of untyped-function' => [

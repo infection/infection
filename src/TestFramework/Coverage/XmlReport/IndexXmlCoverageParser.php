@@ -37,6 +37,8 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
 use Infection\TestFramework\SafeDOMXPath;
+use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -54,16 +56,16 @@ class IndexXmlCoverageParser
      * needed to parse general coverage data. Note that this data is likely incomplete an will
      * need to be enriched to contain all the desired data.
      *
+     * @throws InvalidCoverage
      * @throws NoLineExecuted
      *
      * @return iterable<SourceFileInfoProvider>
      */
     public function parse(
         string $coverageIndexPath,
-        string $xmlIndexCoverageContent,
         string $coverageBasePath,
     ): iterable {
-        $xPath = XPathFactory::createXPath($xmlIndexCoverageContent);
+        $xPath = SafeDOMXPath::fromFile($coverageIndexPath, 'p');
 
         self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
 
@@ -71,6 +73,8 @@ class IndexXmlCoverageParser
     }
 
     /**
+     * @throws InvalidCoverage
+     *
      * @return iterable<SourceFileInfoProvider>
      */
     private function parseNodes(
@@ -78,9 +82,11 @@ class IndexXmlCoverageParser
         string $coverageBasePath,
         SafeDOMXPath $xPath,
     ): iterable {
-        $projectSource = self::getProjectSource($xPath);
+        $projectSource = self::getProjectSource($coverageIndexPath, $xPath);
 
-        foreach ($xPath->query('//file') as $node) {
+        foreach ($xPath->queryList('//p:file') as $node) {
+            Assert::isInstanceOf($node, DOMElement::class);
+
             $relativeCoverageFilePath = $node->getAttribute('href');
 
             yield new SourceFileInfoProvider(
@@ -97,10 +103,10 @@ class IndexXmlCoverageParser
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
-        $lineCoverage = $xPath->query('/phpunit/project/directory[1]/totals/lines')->item(0);
+        $lineCoverage = $xPath->queryElement('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines');
 
         if (
-            !$lineCoverage instanceof DOMElement
+            $lineCoverage === null
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
@@ -110,16 +116,29 @@ class IndexXmlCoverageParser
         }
     }
 
-    private static function getProjectSource(SafeDOMXPath $xPath): string
+    /**
+     * @throws InvalidCoverage
+     */
+    private static function getProjectSource(string $pathname, SafeDOMXPath $xPath): string
     {
-        // PHPUnit >= 6
-        $sourceNodes = $xPath->query('//project/@source');
+        $sourceQueries = [
+            '//p:project/@source',  // PHPUnit >= 6
+            '//p:project/@name',    // PHPUnit < 6
+        ];
 
-        if ($sourceNodes->length > 0) {
-            return $sourceNodes[0]->nodeValue;
+        foreach ($sourceQueries as $sourceQuery) {
+            $source = $xPath->queryAttribute($sourceQuery)?->nodeValue;
+
+            if ($source !== null) {
+                return $source;
+            }
         }
 
-        // PHPUnit < 6
-        return $xPath->query('//project/@name')[0]->nodeValue;
+        throw new InvalidCoverage(
+            sprintf(
+                'Could not find the source attribute for the project in the file "%s".',
+                $pathname,
+            ),
+        );
     }
 }

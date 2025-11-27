@@ -35,25 +35,26 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_search;
 use function count;
 use DuoClock\TimeSpy;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Process\Runner\ParallelProcessRunner;
+use Infection\Process\Runner\ProcessQueue;
 use Infection\Tests\Fixtures\Process\DummyMutantProcess;
-use Iterator;
+use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use function iterator_count;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use SplQueue;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
@@ -131,213 +132,46 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->runWithAllKindsOfProcesses($threadCount);
     }
 
-    public function test_fill_bucket_once_with_exhausted_generator_does_not_continue(): void
+    public function test_initial_enqueue_from_is_called_before_loop(): void
     {
-        $runner = new ParallelProcessRunner(1, 0, new TimeSpy());
+        // This test verifies that enqueueFrom is called before the do-while loop starts
+        // to pre-load the first process, buying time during setup
 
-        $iterator = $this->createMock(Iterator::class);
-        $iterator->expects($this->once())
-            ->method('valid')
-            ->willReturn(false);
+        $queueMock = $this->createMock(ProcessQueue::class);
 
-        $iterator->expects($this->never())
-            ->method('current');
-
-        $reflection = new ReflectionClass($runner);
-        $fillBucketOnceMethod = $reflection->getMethod('fillBucketOnce');
-        $result = $fillBucketOnceMethod->invokeArgs($runner, [new SplQueue(), $iterator, 1]);
-
-        // Should return 0 immediately when generator is not valid
-        $this->assertSame(0, $result);
-    }
-
-    public function test_initial_fill_bucket_once_called_with_one_using_mock(): void
-    {
-        // This test uses a partial mock to verify fillBucketOnce is called with 1
-        // This will kill the IncrementInteger mutation
-
-        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([4, 0, new TimeSpy()])
-            ->onlyMethods(['fillBucketOnce'])
-            ->getMock();
-
-        // Create one process
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('start');
-        $process->expects($this->any())->method('isRunning')->willReturn(false);
-
-        $mutantProcess = new DummyMutantProcess(
-            $process,
-            $this->createMock(Mutant::class),
-            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
-            false,
-        );
-
-        $container = new MutantProcessContainer($mutantProcess, []);
-
-        // Expect fillBucketOnce to be called with exactly 1 as the third parameter
-        $runner->expects($this->atLeastOnce())
-            ->method('fillBucketOnce')
-            ->with(
-                $this->isInstanceOf(SplQueue::class),
-                $this->isInstanceOf(Iterator::class),
-                $this->identicalTo(1), // Must be exactly 1, not 2
-            )
-            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) {
-                if ($iterator->valid() && count($bucket) < $threadCount) {
-                    $bucket->enqueue($iterator->current());
-                    $iterator->next();
-                }
-
-                return 0;
-            });
-
-        // Run the process
-        iterator_count($runner->run([$container]));
-    }
-
-    public function test_fill_bucket_once_called_with_one_using_mock(): void
-    {
-        // This test verifies the fillBucketOnce call uses hardcoded 1
-        // This will kill the IncrementInteger mutation
-
-        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new TimeSpy()])
-            ->onlyMethods(['fillBucketOnce'])
-            ->getMock();
-
-        // Create multiple processes
-        $processes = [];
-
-        for ($i = 0; $i < 3; ++$i) {
-            $process = $this->createMock(Process::class);
-            $process->expects($this->once())->method('start');
-            $process->expects($this->any())->method('isRunning')->willReturn(false);
-
-            $mutantProcess = new DummyMutantProcess(
-                $process,
-                $this->createMock(Mutant::class),
-                $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
-                false,
-            );
-
-            $processes[] = new MutantProcessContainer($mutantProcess, []);
-        }
-
-        $callCount = 0;
-
-        // Expect all fillBucketOnce calls to use 1 as the third parameter
-        $runner->expects($this->atLeastOnce())
-            ->method('fillBucketOnce')
-            ->with(
-                $this->isInstanceOf(SplQueue::class),
-                $this->isInstanceOf(Iterator::class),
-                $this->identicalTo(1), // Must be exactly 1, not 2
-            )
-            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) use (&$callCount) {
-                ++$callCount;
-
-                if ($iterator->valid() && count($bucket) < $threadCount) {
-                    $bucket->enqueue($iterator->current());
-                    $iterator->next();
-
-                    return self::SIMULATED_TIME_MICROSECONDS; // Some time taken
-                }
-
-                return 0;
-            });
-
-        // Run the processes
-        iterator_count($runner->run($processes));
-
-        // Verify fillBucketOnce was called multiple times with 1
-        $this->assertGreaterThan(1, $callCount, 'fillBucketOnce should be called multiple times');
-    }
-
-    public function test_initial_fill_bucket_once_method_call_is_required(): void
-    {
-        // This test uses a partial mock to verify the initial fillBucketOnce is called
-        // before any other operations in the run() method.
-
-        $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([1, 0, new TimeSpy()])
-            ->onlyMethods(['fillBucketOnce', 'hasProcessesThatCouldBeFreed'])
-            ->getMock();
-
-        // Track the sequence of method calls
-        /** @var array<int, array{method: string, threadCount?: int}> */
+        /** @var list<string> */
         $callSequence = [];
 
-        // fillBucketOnce should be called at least twice:
-        // 1. Initial call before the loop
-        // 2. Inside the loop
-        $runner->expects($this->atLeast(2))
-            ->method('fillBucketOnce')
-            ->willReturnCallback(static function ($bucket, $generator, $threadCount) use (&$callSequence) {
-                $callSequence[] = ['method' => 'fillBucketOnce', 'threadCount' => $threadCount];
-
-                // Simulate the real behavior
-                if ($generator->valid() && count($bucket) < $threadCount) {
-                    $bucket->enqueue($generator->current());
-                    $generator->next();
-                }
+        // enqueueFrom should be called before any isEmpty checks
+        $queueMock->expects($this->atLeastOnce())
+            ->method('enqueueFrom')
+            ->willReturnCallback(static function () use (&$callSequence) {
+                $callSequence[] = 'enqueueFrom';
 
                 return 0;
             });
 
-        // hasProcessesThatCouldBeFreed is called after processes start
-        $runner->expects($this->any())
-            ->method('hasProcessesThatCouldBeFreed')
+        $queueMock->expects($this->atLeastOnce())
+            ->method('isEmpty')
             ->willReturnCallback(static function () use (&$callSequence) {
-                $callSequence[] = ['method' => 'hasProcessesThatCouldBeFreed'];
+                $callSequence[] = 'isEmpty';
 
-                return false; // Return false to avoid the while loop
+                return true; // Exit loop immediately
             });
 
-        // Create a single process
-        $process = $this->createMock(Process::class);
-        $process->expects($this->once())->method('start')
-            ->willReturnCallback(static function () use (&$callSequence): void {
-                $callSequence[] = ['method' => 'process.start'];
-            });
-        $process->expects($this->any())->method('checkTimeout');
-        $process->expects($this->any())->method('isRunning')->willReturn(false);
+        $runner = new ParallelProcessRunner(2, 0, new TimeSpy(), $queueMock);
 
-        $mutant = new DummyMutantProcess(
-            $process,
-            $this->createMock(Mutant::class),
-            $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
-            false,
-        );
+        iterator_count($runner->run([]));
 
-        $container = new MutantProcessContainer($mutant, []);
-        iterator_count($runner->run([$container]));
-
-        // Verify the sequence:
-        // 1. First fillBucketOnce MUST happen before process.start
+        // Verify enqueueFrom was called before the first isEmpty check
         $this->assertNotEmpty($callSequence, 'Call sequence must be tracked');
-        $this->assertSame('fillBucketOnce', $callSequence[0]['method'], 'First call must be fillBucketOnce');
-        $this->assertArrayHasKey('threadCount', $callSequence[0], 'First call must have threadCount');
-        $this->assertSame(1, $callSequence[0]['threadCount'], 'Initial fillBucketOnce must use threadCount=1');
+        $this->assertSame('enqueueFrom', $callSequence[0], 'First call must be enqueueFrom (pre-loading)');
+        $this->assertContains('isEmpty', $callSequence, 'isEmpty must be called during loop');
 
-        // Find process.start in the sequence
-        $processStartIndex = null;
-
-        foreach ($callSequence as $index => $call) {
-            if ($call['method'] === 'process.start') {
-                $processStartIndex = $index;
-
-                break;
-            }
-        }
-
-        $this->assertNotNull($processStartIndex, 'Process must start');
-        $this->assertGreaterThan(0, $processStartIndex, 'Process must start AFTER initial fillBucketOnce');
-
-        // This test fails if the initial fillBucketOnce is removed because:
-        // - The bucket would be empty at the start of the loop
-        // - The process wouldn't start until after the loop fills the bucket
-        // - This would change the call sequence
+        // Find the first isEmpty call
+        $firstIsEmptyIndex = array_search('isEmpty', $callSequence, true);
+        $this->assertNotFalse($firstIsEmptyIndex, 'isEmpty must be called');
+        $this->assertGreaterThan(0, $firstIsEmptyIndex, 'enqueueFrom must be called before isEmpty');
     }
 
     public static function threadCountProvider(): iterable
@@ -392,71 +226,6 @@ final class ParallelProcessRunnerTest extends TestCase
         $this->assertFalse($method->invokeArgs($runner, [2]), 'Should return false when count < threadCount');
     }
 
-    public function test_fill_bucket_once_greater_than_or_equal_to_behavior(): void
-    {
-        // This test kills the GreaterThanOrEqualTo mutation
-        // Original: count($bucket) >= $threadCount
-        // Mutated: count($bucket) > $threadCount
-
-        $runner = new ParallelProcessRunner(2, 0, new TimeSpy());
-
-        $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('fillBucketOnce');
-
-        // Test when bucket count equals threadCount
-        $bucket = new SplQueue();
-        $bucket->enqueue('item1');
-        $bucket->enqueue('item2');
-
-        $iterator = $this->createMock(Iterator::class);
-        $iterator->expects($this->never())->method('valid'); // Should not be called when bucket >= threadCount
-        $iterator->expects($this->never())->method('current'); // Should not be called
-
-        $result = $method->invokeArgs($runner, [$bucket, $iterator, 2]);
-
-        // Should return 0 immediately when bucket count >= threadCount
-        $this->assertSame(0, $result, 'Should return 0 when bucket count equals threadCount');
-
-        // Test when bucket count > threadCount
-        $bucket->enqueue('item3');
-
-        $iterator2 = $this->createMock(Iterator::class);
-        $iterator2->expects($this->never())->method('valid'); // Should not be called when bucket > threadCount
-        $iterator2->expects($this->never())->method('current'); // Should not be called
-
-        $result2 = $method->invokeArgs($runner, [$bucket, $iterator2, 2]);
-
-        // Should return 0 immediately when bucket count > threadCount
-        $this->assertSame(0, $result2, 'Should return 0 when bucket count > threadCount');
-    }
-
-    public function test_fill_bucket_once_time_calculation_with_minus_mutation(): void
-    {
-        $clockMock = $this->createMock(TimeSpy::class);
-        $runner = new ParallelProcessRunner(2, 0, $clockMock);
-
-        $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('fillBucketOnce');
-
-        $bucket = new SplQueue();
-
-        $iterator = $this->createMock(Iterator::class);
-        $iterator->expects($this->once())->method('valid')->willReturn(true);
-        $iterator->expects($this->once())->method('current')->willReturn('item');
-        $iterator->expects($this->once())->method('next');
-
-        // Mock two sequential calls to microtime()
-        $clockMock->expects($this->exactly(2))
-            ->method('microtime')
-            ->willReturnOnConsecutiveCalls(1000.0, 1001.0); // start = 1000.0, end = 1001.0 (1 second difference)
-
-        $result = $method->invokeArgs($runner, [$bucket, $iterator, 2]);
-
-        // With original code: (1001.0 - 1000.0) * 1000000 = 1000000
-        // With mutated code: (1001.0 + 1000.0) * 1000000 = 2001000000
-        $this->assertSame(1000000, $result, 'Time calculation should use subtraction, not addition');
-    }
-
     public function test_wait_method_with_decrement_integer_mutation(): void
     {
         // This test kills the DecrementInteger mutation
@@ -467,7 +236,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         // Test scenario where poll - timeSpentDoingWork would be negative
         $timeSpentDoingWork = 15000; // 15ms, more than poll time
@@ -491,7 +260,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 10000, $clockMock); // 10ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         // Test scenario where poll - timeSpentDoingWork would be exactly 0
         $timeSpentDoingWork = 10000; // Exactly poll time
@@ -515,7 +284,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         $timeSpentDoingWork = 2000; // 2ms
 
@@ -538,7 +307,7 @@ final class ParallelProcessRunnerTest extends TestCase
         $runner = new ParallelProcessRunner(2, 5000, $clockMock); // 5ms poll time
 
         $reflection = new ReflectionClass($runner);
-        $method = $reflection->getMethod('wait');
+        $method = $reflection->getMethod('sleepRemaining');
 
         $timeSpentDoingWork = 1000; // 1ms
 
@@ -591,10 +360,9 @@ final class ParallelProcessRunnerTest extends TestCase
         $availableThreadIndexes->setValue($runner, []);
 
         $method = $reflection->getMethod('tryToFreeNotRunningProcess');
-        $bucket = new SplQueue();
 
         // This should call markAsTimedOut on the mutant process
-        iterator_count($method->invokeArgs($runner, [$bucket]));
+        iterator_count($method->invokeArgs($runner, []));
     }
 
     public function test_mark_as_finished_method_call_removal_mutation(): void
@@ -637,10 +405,9 @@ final class ParallelProcessRunnerTest extends TestCase
         $availableThreadIndexes->setValue($runner, []);
 
         $method = $reflection->getMethod('tryToFreeNotRunningProcess');
-        $bucket = new SplQueue();
 
         // This should call markAsFinished on the mutant process
-        iterator_count($method->invokeArgs($runner, [$bucket]));
+        iterator_count($method->invokeArgs($runner, []));
     }
 
     public function test_while_loop_condition_with_while_mutation(): void
@@ -650,8 +417,8 @@ final class ParallelProcessRunnerTest extends TestCase
         // Mutated: while (false)
 
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new TimeSpy()])
-            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce'])
+            ->setConstructorArgs([2, 0, new TimeSpy(), new ProcessQueue()])
+            ->onlyMethods(['hasProcessesThatCouldBeFreed'])
             ->getMock();
 
         $callCount = 0;
@@ -665,30 +432,17 @@ final class ParallelProcessRunnerTest extends TestCase
                 return $callCount <= 2; // Return true twice, then false
             });
 
-        // fillBucketOnce should be called in the while loop
-        $runner->expects($this->atLeastOnce())
-            ->method('fillBucketOnce')
-            ->willReturnCallback(static function ($bucket, $iterator, $threadCount) {
-                // Simulate adding processes to bucket
-                if ($iterator->valid() && count($bucket) < $threadCount) {
-                    $bucket->enqueue($iterator->current());
-                    $iterator->next();
-                }
-
-                return 0;
-            });
-
         // Create processes
         $processes = [];
 
         for ($i = 0; $i < 3; ++$i) {
             $process = $this->createMock(Process::class);
             $process->expects($this->once())->method('start');
-            $process->expects($this->any())->method('isRunning')->willReturn(false);
+            $process->method('isRunning')->willReturn(false);
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
@@ -706,12 +460,21 @@ final class ParallelProcessRunnerTest extends TestCase
     public function test_while_loop_wait_call_with_method_call_removal_mutation(): void
     {
         // This test kills the MethodCallRemoval mutation
-        // Original: $this->wait($this->fillBucketOnce($bucket, $generator, $threadCount));
+        // Original: $this->sleepRemaining(timeSpentDoingWork: $this->queue->enqueueFrom(...));
         // Mutated: (empty)
 
+        $queueMock = $this->createMock(ProcessQueue::class);
+        $queueMock->expects($this->atLeastOnce())
+            ->method('enqueueFrom')
+            ->willReturn(self::SIMULATED_TIME_MICROSECONDS); // Return 1000 microseconds
+
+        $queueMock->expects($this->atLeastOnce())
+            ->method('isEmpty')
+            ->willReturn(false, false, false, true); // Need processes to run, then stop
+
         $runner = $this->getMockBuilder(ParallelProcessRunner::class)
-            ->setConstructorArgs([2, 0, new TimeSpy()])
-            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'fillBucketOnce', 'wait'])
+            ->setConstructorArgs([2, 0, new TimeSpy(), $queueMock])
+            ->onlyMethods(['hasProcessesThatCouldBeFreed', 'sleepRemaining'])
             ->getMock();
 
         $callCount = 0;
@@ -725,27 +488,22 @@ final class ParallelProcessRunnerTest extends TestCase
                 return $callCount <= 1; // Return true once, then false
             });
 
-        // fillBucketOnce should be called and return some time value
+        // sleepRemaining should be called with the return value from enqueueFrom
         $runner->expects($this->atLeastOnce())
-            ->method('fillBucketOnce')
-            ->willReturn(self::SIMULATED_TIME_MICROSECONDS); // Return 1000 microseconds
-
-        // wait should be called with the return value from fillBucketOnce
-        $runner->expects($this->atLeastOnce())
-            ->method('wait')
-            ->with($this->identicalTo(self::SIMULATED_TIME_MICROSECONDS)); // Must be called with the fillBucketOnce return value
+            ->method('sleepRemaining')
+            ->with($this->identicalTo(self::SIMULATED_TIME_MICROSECONDS)); // Must be called with the enqueueFrom return value
 
         // Create processes
         $processes = [];
 
         for ($i = 0; $i < 2; ++$i) {
             $process = $this->createMock(Process::class);
-            $process->expects($this->any())->method('start'); // May or may not be called depending on mock behavior
-            $process->expects($this->any())->method('isRunning')->willReturn(false);
+            $process->method('start'); // May or may not be called depending on mock behavior
+            $process->method('isRunning')->willReturn(false);
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             );
@@ -753,7 +511,13 @@ final class ParallelProcessRunnerTest extends TestCase
             $processes[] = new MutantProcessContainer($mutantProcess, []);
         }
 
-        // Run the processes - wait should be called with the fillBucketOnce return value
+        // Setup queue mock to return the processes
+        $container = $processes[0];
+        $queueMock->expects($this->atLeastOnce())
+            ->method('dequeue')
+            ->willReturn($container);
+
+        // Run the processes - sleepRemaining should be called with the enqueueFrom return value
         iterator_count($runner->run($processes));
     }
 
@@ -800,7 +564,7 @@ final class ParallelProcessRunnerTest extends TestCase
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 false,
             ),
@@ -848,32 +612,29 @@ final class ParallelProcessRunnerTest extends TestCase
             ->willReturn(false)
         ;
 
-        $mutantExecutionResultMock = $this->createMock(MutantExecutionResult::class);
-
-        $mutantExecutionResultMock
-            ->expects($this->once())
-            ->method('getDetectionStatus')
-            ->willReturn(DetectionStatus::ESCAPED);
+        $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::ESCAPED)
+            ->build();
 
         $mutantExecutionResultFactoryMock = $this->createMock(TestFrameworkMutantExecutionResultFactory::class);
 
         $mutantExecutionResultFactoryMock
             ->expects($this->once())
             ->method('createFromProcess')
-            ->willReturn($mutantExecutionResultMock);
+            ->willReturn($mutantExecutionResult);
 
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $phpUnitProcessMock,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $mutantExecutionResultFactoryMock,
                 false,
             ),
             [
                 new class($this->createMock(TestFrameworkMutantExecutionResultFactory::class), $nextProcessMock) implements LazyMutantProcessFactory {
                     public function __construct(
-                        private TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
-                        private Process $nextProcessMock,
+                        private readonly TestFrameworkMutantExecutionResultFactory $mutantExecutionResultFactory,
+                        private readonly Process $nextProcessMock,
                     ) {
                     }
 
@@ -911,7 +672,7 @@ final class ParallelProcessRunnerTest extends TestCase
         return new MutantProcessContainer(
             new DummyMutantProcess(
                 $processMock,
-                $this->createMock(Mutant::class),
+                MutantBuilder::withMinimalTestData()->build(),
                 $this->createMock(TestFrameworkMutantExecutionResultFactory::class),
                 true,
             ),

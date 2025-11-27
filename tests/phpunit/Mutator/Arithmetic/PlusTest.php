@@ -47,10 +47,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class PlusTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -62,14 +62,12 @@ final class PlusTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 10 + 3;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 10 - 3;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate plus equals' => [
@@ -78,8 +76,7 @@ final class PlusTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a += 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate increment' => [
@@ -88,8 +85,7 @@ final class PlusTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a++;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does mutate a fake increment' => [
@@ -98,15 +94,13 @@ final class PlusTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a + +1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a - +1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate additon of arrays' => [
@@ -116,8 +110,7 @@ final class PlusTest extends BaseMutatorTestCase
                 $a = [0 => 1] + [1 => 3];
                 $b = 1 + [1 => 3];
                 $c = [1 => 1] + 3;
-                PHP
-            ,
+                PHP,
         ];
     }
 

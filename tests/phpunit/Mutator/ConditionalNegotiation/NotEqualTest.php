@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class NotEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class NotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 1 != 1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 1 == 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate strict comparison' => [
@@ -74,8 +72,7 @@ final class NotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 1 !== 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate normal equals comparison' => [
@@ -83,8 +80,7 @@ final class NotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 1 == 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate inside ternary to prevent overlap with TernaryMutator' => [
@@ -92,8 +88,7 @@ final class NotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $x != false ? 'yes' : 'no';
-                PHP
-            ,
+                PHP,
         ];
     }
 }

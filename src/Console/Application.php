@@ -100,7 +100,7 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
-        $commands = array_merge(
+        return array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
@@ -109,8 +109,6 @@ final class Application extends BaseApplication
                 new MakeCustomMutatorCommand(),
             ],
         );
-
-        return $commands;
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output): void

@@ -38,7 +38,6 @@ namespace Infection\Tests\Console;
 use function array_merge;
 use function basename;
 use Composer\Autoload\ClassLoader;
-use const DIRECTORY_SEPARATOR;
 use function extension_loaded;
 use function file_exists;
 use function function_exists;
@@ -49,9 +48,10 @@ use Infection\Console\Application;
 use Infection\Console\E2E;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
+use Infection\Framework\OperatingSystem;
+use Infection\Framework\Str;
 use Infection\Testing\SingletonContainer;
 use function is_readable;
-use const PHP_EOL;
 use const PHP_OS;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -67,7 +67,6 @@ use function Safe\getcwd;
 use function Safe\ini_get;
 use function sprintf;
 use function str_contains;
-use function str_replace;
 use function str_starts_with;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -92,17 +91,11 @@ final class E2ETest extends TestCase
 
     private const EXPECT_SUCCESS = 0;
 
-    /**
-     * @var string
-     */
-    private $cwd;
+    private string $cwd;
 
-    /**
-     * @var ClassLoader|null
-     */
-    private $previousLoader;
+    private ?ClassLoader $previousLoader = null;
 
-    private static $countFailingComposerInstall = 0;
+    private static int $countFailingComposerInstall = 0;
 
     protected function setUp(): void
     {
@@ -195,7 +188,7 @@ final class E2ETest extends TestCase
         }
     }
 
-    private function runOnE2EFixture($path): string
+    private function runOnE2EFixture(string $path): string
     {
         $this->assertDirectoryExists($path);
         chdir($path);
@@ -213,7 +206,7 @@ final class E2ETest extends TestCase
         }
 
         $expected = file_get_contents('expected-output.txt');
-        $expected = str_replace("\n", PHP_EOL, $expected);
+        $expected = Str::toSystemLineEndings($expected);
 
         $this->assertStringEqualsFile('infection.log', $expected, sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
 
@@ -251,7 +244,7 @@ final class E2ETest extends TestCase
                 ++self::$countFailingComposerInstall;
                 $this->markTestSkipped($e->getMessage());
             } catch (FinderException $e) {
-                if (DIRECTORY_SEPARATOR !== '\\') {
+                if (!OperatingSystem::isWindows()) {
                     throw $e;
                 }
 
@@ -332,13 +325,16 @@ final class E2ETest extends TestCase
          */
     }
 
+    /**
+     * @param list<string> $argvExtra
+     */
     private function runInfection(int $expectedExitCode, array $argvExtra = []): string
     {
         if (!extension_loaded('xdebug') && PHP_SAPI !== 'phpdbg') {
             $this->markTestSkipped("Infection from within PHPUnit won't run without Xdebug or PHPDBG");
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (OperatingSystem::isWindows()) {
             $this->markTestSkipped('This test can be unstable on Windows');
         }
 

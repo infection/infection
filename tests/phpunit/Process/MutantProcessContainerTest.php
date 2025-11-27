@@ -37,10 +37,11 @@ namespace Infection\Tests\Process;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\Mutant;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Process\Factory\LazyMutantProcessFactory;
 use Infection\Process\MutantProcess;
 use Infection\Process\MutantProcessContainer;
+use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -49,30 +50,15 @@ use Symfony\Component\Process\Process;
 #[CoversClass(MutantProcessContainer::class)]
 final class MutantProcessContainerTest extends TestCase
 {
-    /**
-     * @var MutantProcess|MockObject
-     */
-    private $phpUnitMutantProcess;
+    private MockObject&MutantProcess $phpUnitMutantProcess;
 
-    /**
-     * @var Mutant|MockObject
-     */
-    private $mutant;
+    private Mutant $mutant;
 
-    /**
-     * @var MutantExecutionResult|MockObject
-     */
-    private $mutantExecutionResult;
-
-    /**
-     * @var LazyMutantProcessFactory|MockObject
-     */
-    private $lazyMutantProcessCreator;
+    private MockObject&LazyMutantProcessFactory $lazyMutantProcessCreator;
 
     protected function setUp(): void
     {
-        $this->mutant = $this->createMock(Mutant::class);
-        $this->mutantExecutionResult = $this->createMock(MutantExecutionResult::class);
+        $this->mutant = MutantBuilder::withMinimalTestData()->build();
         $this->phpUnitMutantProcess = $this->createMock(MutantProcess::class);
         $this->lazyMutantProcessCreator = $this->createMock(LazyMutantProcessFactory::class);
     }
@@ -99,15 +85,14 @@ final class MutantProcessContainerTest extends TestCase
             ->method('getMutant')
             ->willReturn($this->mutant);
 
+        $mutantExecutionResult = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withDetectionStatus(DetectionStatus::ESCAPED)
+            ->build();
+
         $this->phpUnitMutantProcess
             ->expects($this->once())
             ->method('getMutantExecutionResult')
-            ->willReturn($this->mutantExecutionResult);
-
-        $this->mutantExecutionResult
-            ->expects($this->once())
-            ->method('getDetectionStatus')
-            ->willReturn(DetectionStatus::ESCAPED);
+            ->willReturn($mutantExecutionResult);
 
         $this->lazyMutantProcessCreator
             ->expects($this->once())

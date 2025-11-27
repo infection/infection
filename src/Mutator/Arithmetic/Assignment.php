@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -56,8 +57,7 @@ final class Assignment implements Mutator
             <<<'TXT'
                 Replaces examples of augmented or compound (shorter way to apply an arithmetic or bitwise operation)
                 assignment operators, i.e. `+=`, `*=`, `.=`, etc., with a plain assignment operator `=`.
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -74,7 +74,11 @@ final class Assignment implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\Assign($node->var, $node->expr, $node->getAttributes());
+        yield new Node\Expr\Assign(
+            $node->var,
+            $node->expr,
+            NodeAttributes::getAllExceptOriginalNode($node),
+        );
     }
 
     public function canMutate(Node $node): bool

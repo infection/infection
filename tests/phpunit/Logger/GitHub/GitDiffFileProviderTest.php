@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\GitHub;
 
 use function implode;
+use Infection\Framework\Str;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
@@ -44,7 +45,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use function str_replace;
 
 #[CoversClass(GitDiffFileProvider::class)]
 final class GitDiffFileProviderTest extends TestCase
@@ -69,18 +69,17 @@ final class GitDiffFileProviderTest extends TestCase
 
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
 
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
-            ->willReturnCallback(function (array $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine): string {
-                switch ($command) {
-                    case $expectedMergeBaseCommandLine:
-                        return '0ABCMERGE_BASE_342';
-                    case $expectedDiffCommandLine:
-                        return 'app/A.php' . PHP_EOL . 'my lib/B.php';
-                    default:
-                        $this->fail('Unexpected shell command: ' . implode(' ', $command));
-                }
-            });
+            ->willReturnCallback(
+                fn (array $command): string => match ($command) {
+                    $expectedMergeBaseCommandLine => '0ABCMERGE_BASE_342',
+                    $expectedDiffCommandLine => 'app/A.php' . PHP_EOL . 'my lib/B.php',
+                    default => $this->fail(
+                        'Unexpected shell command: ' . implode(' ', $command),
+                    ),
+                },
+            );
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
         $filter = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
@@ -116,7 +115,7 @@ final class GitDiffFileProviderTest extends TestCase
             +        $strrev = \strrev($encryptedMessage);
 
             EOF;
-        $gitUnifiedOutput = str_replace("\n", PHP_EOL, $gitUnifiedOutput);
+        $gitUnifiedOutput = Str::toSystemLineEndings($gitUnifiedOutput);
 
         $expectedUnifiedReturn = <<<'EOF'
             diff --git a/tests/FooTest.php b/tests/FooTest.php
@@ -126,20 +125,19 @@ final class GitDiffFileProviderTest extends TestCase
             @@ -21 +31,4 @@ final class Bar
 
             EOF;
-        $expectedUnifiedReturn = str_replace("\n", PHP_EOL, $expectedUnifiedReturn);
+        $expectedUnifiedReturn = Str::toSystemLineEndings($expectedUnifiedReturn);
 
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
-            ->willReturnCallback(function (array $command) use ($expectedDiffCommandLine, $expectedMergeBaseCommandLine, $gitUnifiedOutput): string {
-                switch ($command) {
-                    case $expectedMergeBaseCommandLine:
-                        return '0ABCMERGE_BASE_342';
-                    case $expectedDiffCommandLine:
-                        return $gitUnifiedOutput;
-                    default:
-                        $this->fail('Unexpected shell command: ' . implode(' ', $command));
-                }
-            });
+            ->willReturnCallback(
+                fn (array $command): string => match ($command) {
+                    $expectedMergeBaseCommandLine => '0ABCMERGE_BASE_342',
+                    $expectedDiffCommandLine => $gitUnifiedOutput,
+                    default => $this->fail(
+                        'Unexpected shell command: ' . implode(' ', $command),
+                    ),
+                },
+            );
 
         $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
         $filter = $diffProvider->provideWithLines('master');
@@ -157,7 +155,7 @@ final class GitDiffFileProviderTest extends TestCase
     public function test_it_provides_the_fallback_when_no_origin_upstream_defined(string $expectedBase, string $executorReturn): void
     {
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willReturn($executorReturn);
 
@@ -175,7 +173,7 @@ final class GitDiffFileProviderTest extends TestCase
     public function test_it_provides_the_fallback_when_executor_throws(): void
     {
         $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor->expects($this->any())
+        $shellCommandLineExecutor
             ->method('execute')
             ->willThrowException(new RuntimeException('ref refs/remotes/origin/HEAD is not a symbolic ref'));
 

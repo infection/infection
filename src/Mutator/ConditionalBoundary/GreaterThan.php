@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -55,8 +56,7 @@ final class GreaterThan implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a greater-than operator (`>`) with the greater-than-or-equal-to operator (`>=`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_ADDITION,
             <<<'TXT'
                 This mutator shifts the compared values highlighting an untested boundary.
@@ -75,7 +75,7 @@ final class GreaterThan implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\GreaterOrEqual($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\GreaterOrEqual($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

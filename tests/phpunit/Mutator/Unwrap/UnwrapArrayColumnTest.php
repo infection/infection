@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayColumnTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_column([['foo' => 'bar']], 'foo');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_column(\Class_With_Const::Const, 'foo');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_column([['foo' => 'bar']], 'foo');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 if (array_column($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_CoLuMn([['foo' => 'bar']], 'foo');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_column($foo->bar(), 'foo');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_column([['foo' => 'bar']], 'foo'));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_column([['foo' => 'bar']], 'foo', $indexKey);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -197,8 +189,7 @@ final class UnwrapArrayColumnTest extends BaseMutatorTestCase
                 $a = 'array_column';
 
                 $b = $a([['foo' => 'bar']], 'foo');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

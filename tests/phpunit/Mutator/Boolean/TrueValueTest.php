@@ -47,10 +47,10 @@ final class TrueValueTest extends BaseMutatorTestCase
 {
     /**
      * @param string|string[] $expected
-     * @param mixed[] $settings
+     * @param array<string, bool> $settings
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate($input, $expected = [], array $settings = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = [], array $settings = []): void
     {
         $this->assertMutatesInput($input, $expected, $settings);
     }
@@ -119,8 +119,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                 <?php
 
                 $x == true ? 'yes' : 'no';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with equal' => [
@@ -130,8 +129,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                 if ($x == true) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-equal' => [
@@ -141,8 +139,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                 if ($x != true) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with identical' => [
@@ -152,8 +149,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                 if ($x === true) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in conditions to prevent overlap with not-identical' => [
@@ -163,8 +159,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                 if ($x !== true) {
                 } else {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate match(true) to prevent overlap with MatchArmRemoval' => [
@@ -176,8 +171,7 @@ final class TrueValueTest extends BaseMutatorTestCase
                     $count <= 50 => 'medium',
                     $count > 50 => 'huge',
                 };
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates all caps true to false' => [

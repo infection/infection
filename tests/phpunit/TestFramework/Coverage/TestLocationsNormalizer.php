@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
+use function array_map;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\CannotBeInstantiated;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
@@ -95,13 +96,10 @@ final class TestLocationsNormalizer
         }
 
         if (is_array($mixed)) {
-            $convertedArray = [];
-
-            foreach ($mixed as $key => $value) {
-                $convertedArray[$key] = self::serializeValue($value);
-            }
-
-            return $convertedArray;
+            return array_map(
+                self::serializeValue(...),
+                $mixed,
+            );
         }
 
         return self::serializeValue((array) $mixed);

@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $a !== $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a != $b;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates not identical operator into not equal operator with type casting' => [
@@ -74,14 +72,12 @@ final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 (int) $c !== 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 (int) $c != 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates not identical operator into not equal operator with variable and null' => [
@@ -89,14 +85,12 @@ final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $d !== null;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $d != null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates not identical operator into not equal operator with boolean and function call' => [
@@ -104,14 +98,12 @@ final class NotIdenticalNotEqualTest extends BaseMutatorTestCase
                 <?php
 
                 false !== strpos();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 false != strpos();
-                PHP
-            ,
+                PHP,
         ];
     }
 }

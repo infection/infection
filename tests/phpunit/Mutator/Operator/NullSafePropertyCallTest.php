@@ -48,7 +48,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
      * @param string|string[] $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
         if (PHP_VERSION_ID < 80000) {
             $this->markTestSkipped('Null Safe operator is available only in PHP 8 or higher');
@@ -64,8 +64,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
                 <?php
 
                 $class?->property;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -78,8 +77,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
                 <?php
 
                 $class?->getName()?->property;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -92,8 +90,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
                 <?php
 
                 $class?->property?->nextProperty;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -130,6 +127,7 @@ final class NullSafePropertyCallTest extends BaseMutatorTestCase
                 PHP,
             <<<'PHP'
                 <?php
+
 
                 $class->{$property};
                 PHP,

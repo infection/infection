@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Foreach_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -61,16 +61,14 @@ final class Foreach_Test extends BaseMutatorTestCase
                 $array = [1, 2];
                 foreach ($array as $value) {
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $array = [1, 2];
                 foreach ([] as $value) {
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not change whether items were passed by reference' => [
@@ -81,8 +79,7 @@ final class Foreach_Test extends BaseMutatorTestCase
                 foreach ($array as $key => &$value) {
                     echo $value;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

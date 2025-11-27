@@ -40,7 +40,7 @@ use function array_values;
 use Infection\CannotBeInstantiated;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
-use function Infection\Tests\generator_to_phpunit_data_provider;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
 use ReflectionClass;
 
@@ -51,7 +51,7 @@ final class SubscriberProvider
     /**
      * @var string[]|null
      */
-    private static $subscriberClasses;
+    private static ?array $subscriberClasses = null;
 
     public static function provideSubscriberClasses(): iterable
     {
@@ -72,6 +72,6 @@ final class SubscriberProvider
 
     public static function subscriberClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideSubscriberClasses());
+        yield from DataProviderFactory::fromIterable(self::provideSubscriberClasses());
     }
 }

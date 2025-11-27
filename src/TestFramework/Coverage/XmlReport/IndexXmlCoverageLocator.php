@@ -38,9 +38,14 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function array_map;
 use function count;
 use function current;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
-use Infection\FileSystem\Locator\FileNotFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use function is_dir;
+use function is_readable;
 use function iterator_to_array;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -53,18 +58,39 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class IndexXmlCoverageLocator
 {
-    private readonly string $defaultIndexPath;
+    public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
+
+    private const DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
 
     private ?string $indexPath = null;
 
     public function __construct(
         private readonly string $coveragePath,
+        private readonly string $defaultIndexPath,
     ) {
-        $this->defaultIndexPath = Path::canonicalize($coveragePath . '/coverage-xml/index.xml');
+    }
+
+    public static function create(
+        string $coverageDirectory,
+        ?string $defaultPHPUnitXmlCoverageIndexPathname = null,
+    ): self {
+        return new self(
+            $coverageDirectory,
+            $defaultPHPUnitXmlCoverageIndexPathname === null
+                ? self::createPHPUnitDefaultCoverageXmlIndexPathname($coverageDirectory)
+                : Path::canonicalize($defaultPHPUnitXmlCoverageIndexPathname),
+        );
+    }
+
+    public function getDefaultLocation(): string
+    {
+        return $this->defaultIndexPath;
     }
 
     /**
-     * @throws FileNotFound
+     * @throws InvalidReportSource
+     * @throws TooManyReportsFound
+     * @throws NoReportFound
      */
     public function locate(): string
     {
@@ -79,34 +105,44 @@ class IndexXmlCoverageLocator
             return $this->indexPath = $this->defaultIndexPath;
         }
 
-        if (!file_exists($this->coveragePath)) {
-            throw new FileNotFound(sprintf(
-                'Could not find any "index.xml" file in "%s"',
-                $this->coveragePath,
-            ));
+        if (!file_exists($this->coveragePath)
+            || !is_readable($this->coveragePath)
+            || !is_dir($this->coveragePath)
+        ) {
+            throw new InvalidReportSource(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
+                    $this->coveragePath,
+                ),
+            );
         }
 
         $files = iterator_to_array(
             Finder::create()
                 ->files()
                 ->in($this->coveragePath)
-                ->name('/^index\.xml$/i')
+                ->name(self::INDEX_FILENAME_REGEX)
                 ->sortByName(),
             false,
         );
 
         if (count($files) > 1) {
-            throw new FileNotFound(sprintf(
-                'Could not locate the XML coverage index file. More than one file has been '
-                . 'found: "%s"',
-                implode(
-                    '", "',
-                    array_map(
-                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
-                        $files,
+            $reportPathnames = array_map(
+                static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
+                $files,
+            );
+
+            throw new TooManyReportsFound(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                    $this->coveragePath,
+                    self::INDEX_FILENAME_REGEX,
+                    implode(
+                        '", "',
+                        $reportPathnames,
                     ),
                 ),
-            ));
+            );
         }
 
         $indexFileInfo = current($files);
@@ -115,9 +151,17 @@ class IndexXmlCoverageLocator
             return $this->indexPath = Path::canonicalize($indexFileInfo->getPathname());
         }
 
-        throw new FileNotFound(sprintf(
-            'Could not find any "index.xml" file in "%s"',
-            $this->coveragePath,
-        ));
+        throw new NoReportFound(
+            sprintf(
+                'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
+                $this->coveragePath,
+                self::INDEX_FILENAME_REGEX,
+            ),
+        );
+    }
+
+    private static function createPHPUnitDefaultCoverageXmlIndexPathname(string $coverageDirectory): string
+    {
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_INDEX_RELATIVE_PATHNAME);
     }
 }

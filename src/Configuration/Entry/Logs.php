@@ -42,7 +42,7 @@ namespace Infection\Configuration\Entry;
 class Logs
 {
     public function __construct(
-        private readonly ?string $textLogFilePath,
+        private ?string $textLogFilePath,
         private ?string $htmlLogFilePath,
         private readonly ?string $summaryLogFilePath,
         private readonly ?string $jsonLogFilePath,
@@ -89,6 +89,11 @@ class Logs
     public function setHtmlLogFilePath(string $htmlLogFilePath): void
     {
         $this->htmlLogFilePath = $htmlLogFilePath;
+    }
+
+    public function setTextLogFilePath(string $textLogFilePath): void
+    {
+        $this->textLogFilePath = $textLogFilePath;
     }
 
     public function getSummaryLogFilePath(): ?string

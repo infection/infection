@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapStrToUpperTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 <?php
 
                 $a = strtoupper('infection');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 <?php
 
                 $a = strtoupper(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \strtoupper('infection');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 if (strtoupper($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 <?php
 
                 $a = StrToUpper('infection');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 <?php
 
                 $a = strtoupper($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtoupper', strtoupper('infection'));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -182,8 +175,7 @@ final class UnwrapStrToUpperTest extends BaseMutatorTestCase
 
                  $a = 'strtoupper';
                  $b = $a('infection');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

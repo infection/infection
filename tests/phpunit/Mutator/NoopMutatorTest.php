@@ -49,15 +49,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(NoopMutator::class)]
 final class NoopMutatorTest extends TestCase
 {
-    /**
-     * @var MockObject&Mutator
-     */
-    private $mutatorMock;
+    private MockObject&Mutator $mutatorMock;
 
-    /**
-     * @var MockObject&Node
-     */
-    private $nodeMock;
+    private MockObject&Node $nodeMock;
 
     protected function setUp(): void
     {

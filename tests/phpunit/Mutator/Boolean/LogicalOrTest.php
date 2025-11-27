@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class LogicalOrTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 true || false;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 true && false;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate logical lower or' => [
@@ -74,8 +72,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 true or false;
-                PHP
-            ,
+                PHP,
         ];
 
         yield from self::equalityMutationsProvider();
@@ -96,8 +93,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar === 'hello' || $myVar === 'world';
-                PHP
-            ,
+                PHP,
         ];
 
         // TODO : improve this to mutate only if checking for falsy values on both sides.
@@ -106,8 +102,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar == 'hello' || $myVar == 'world';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -120,8 +115,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar === 'hello' || $myVar == 'world';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -134,8 +128,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar === 'hello' || 'world' === $myVar;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate logical or if same variable is tested against "Identical" (mirrored #2).' => [
@@ -143,8 +136,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 'world' === $myVar || $myVar === 'hello';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates logical or if variables names are different' => [
@@ -152,14 +144,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar === true || $myOtherVar === false;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $myVar === true && $myOtherVar === false;
-                PHP
-            ,
+                PHP,
         ];
     }
 
@@ -301,8 +291,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10 || $myVar > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -315,8 +304,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10 || $myVar > 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -329,8 +317,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10.1 || $myVar > 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -343,8 +330,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10.1 || $myVar > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -357,8 +343,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10 || $myVar >= 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -371,8 +356,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10 || $myVar >= 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -385,8 +369,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10.1 || $myVar >= 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -399,8 +382,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar < 10.1 || $myVar >= 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -413,8 +395,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10 || $myVar >= 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -427,8 +408,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10 || $myVar >= 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -441,8 +421,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10.1 || $myVar >= 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -455,8 +434,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10.1 || $myVar >= 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -469,8 +447,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10 || $myVar > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -483,8 +460,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10 || $myVar > 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -497,8 +473,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10.1 || $myVar > 5.5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -511,8 +486,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 10.1 || $myVar > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -525,8 +499,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= $other || $myVar > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -539,8 +512,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 5 || $myVar > $other;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -554,8 +526,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
 
                 $s = 'other';
                 $myVar <= ${$s} || $myVar > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -570,8 +541,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
 
                 $s = 'other';
                 $myVar <= 5 || $myVar > ${$s};
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -620,8 +590,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar <= 5 || $myVar >= 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -634,8 +603,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $myVar >= 5 || $myVar <= 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -667,14 +635,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node instanceof Node\Expr\PostDec || $node instanceof Infection\Tests\Mutant\MutantAssertions;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node instanceof Node\Expr\PostDec && $node instanceof Infection\Tests\Mutant\MutantAssertions;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates negated instanceof with 1 concrete class and 1 interface' => [
@@ -682,14 +648,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node instanceof \Countable || $node instanceof Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node instanceof \Countable && $node instanceof Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates negated instanceof with 1 concrete class and 1 interface (inverse)' => [
@@ -697,14 +661,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node instanceof Node\Expr\PostDec || $node instanceof \Countable;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node instanceof Node\Expr\PostDec && $node instanceof \Countable;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates negated instanceof with 2 concrete classes (different variables)' => [
@@ -712,14 +674,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node1 instanceof PhpParser\Node\Expr\PreDec || $node2 instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node1 instanceof PhpParser\Node\Expr\PreDec && $node2 instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates variable instanceof' => [
@@ -728,15 +688,13 @@ final class LogicalOrTest extends BaseMutatorTestCase
 
                 $class = PhpParser\Node\Expr\PreDec::class;
                 $var = $node1 instanceof $class || $node1 instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $class = PhpParser\Node\Expr\PreDec::class;
                 $var = $node1 instanceof $class && $node1 instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate negated instanceof with 2 concrete classes (same variable)' => [
@@ -744,8 +702,7 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node instanceof PhpParser\Node\Expr\PreDec || $node instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates left-side instanceof or non-instanceof expression' => [
@@ -753,14 +710,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $node instanceof \Countable || $i > 5;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node instanceof \Countable && $i > 5;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates right-side instanceof or non-instanceof expression' => [
@@ -768,14 +723,12 @@ final class LogicalOrTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $i > 5 || $node instanceof \Countable;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $i > 5 && $node instanceof \Countable;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

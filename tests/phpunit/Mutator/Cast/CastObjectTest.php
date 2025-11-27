@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class CastObjectTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class CastObjectTest extends BaseMutatorTestCase
                 <?php
 
                 (object) ['test' => 1];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 ['test' => 1];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to object in conditions' => [
@@ -76,16 +74,14 @@ final class CastObjectTest extends BaseMutatorTestCase
                 if ((object) implode()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if (implode()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to object in global return' => [
@@ -93,14 +89,12 @@ final class CastObjectTest extends BaseMutatorTestCase
                 <?php
 
                 return (object) implode();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return implode();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to object in return of untyped-function' => [

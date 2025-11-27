@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Locator;
 
-use function defined;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
-use function Infection\Tests\normalizePath as p;
+use Infection\Framework\OperatingSystem;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,6 +46,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(RootsFileOrDirectoryLocator::class)]
@@ -54,10 +54,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {
@@ -69,9 +66,15 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
     {
         $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locate($file);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(
+            Path::normalize($expected),
+            Path::normalize($path),
+        );
     }
 
+    /**
+     * @param string[] $roots
+     */
     #[DataProvider('invalidPathsProvider')]
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
@@ -91,6 +94,10 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         }
     }
 
+    /**
+     * @param string[] $roots
+     * @param string[] $files
+     */
     #[DataProvider('multiplePathsProvider')]
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
@@ -99,9 +106,16 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
     ): void {
         $path = (new RootsFileOrDirectoryLocator($roots, $this->filesystem))->locateOneOf($files);
 
-        $this->assertSame(p($expected), p($path));
+        $this->assertSame(
+            Path::normalize($expected),
+            Path::normalize($path),
+        );
     }
 
+    /**
+     * @param string[] $roots
+     * @param string[] $files
+     */
     #[DataProvider('multipleInvalidPathsProvider')]
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,
@@ -264,7 +278,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
             }
         };
 
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (!OperatingSystem::isWindows()) {
             $generators[] = static function () use ($root): iterable {
                 $title = 'one root';
                 $case = 'locate symlinked file';
@@ -318,7 +332,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
 
         $fixturesDir = realpath(self::FIXTURES_DIR);
 
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if (!OperatingSystem::isWindows()) {
             yield [
                 [$fixturesDir],
                 'broken-symlink',

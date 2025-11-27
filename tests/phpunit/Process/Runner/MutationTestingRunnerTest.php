@@ -76,40 +76,19 @@ final class MutationTestingRunnerTest extends TestCase
 {
     private const TIMEOUT = 100.0;
 
-    /**
-     * @var MutantProcessContainerFactory|MockObject
-     */
-    private $processFactoryMock;
+    private MockObject&MutantProcessContainerFactory $processFactoryMock;
 
-    /**
-     * @var MutantFactory|MockObject
-     */
-    private $mutantFactoryMock;
+    private MockObject&MutantFactory $mutantFactoryMock;
 
-    /**
-     * @var ProcessRunner|MockObject
-     */
-    private $processRunnerMock;
+    private MockObject&ProcessRunner $processRunnerMock;
 
-    /**
-     * @var EventDispatcherCollector
-     */
-    private $eventDispatcher;
+    private EventDispatcherCollector $eventDispatcher;
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
-    /**
-     * @var DiffSourceCodeMatcher|MockObject
-     */
-    private $diffSourceCodeMatcher;
+    private MockObject&DiffSourceCodeMatcher $diffSourceCodeMatcher;
 
-    /**
-     * @var MutationTestingRunner
-     */
-    private $runner;
+    private MutationTestingRunner $runner;
 
     protected function setUp(): void
     {
@@ -174,20 +153,20 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation3],
             ))
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = MutantBuilder::build(
+                $mutant0 = MutantBuilder::materialize(
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
                 ),
-                $mutant1 = MutantBuilder::build(
+                $mutant1 = MutantBuilder::materialize(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
                 ),
-                MutantBuilder::build(
+                MutantBuilder::materialize(
                     mutation: $mutation2,
                 ),
-                MutantBuilder::build(
+                MutantBuilder::materialize(
                     mutation: $mutation3,
                 ),
             )
@@ -262,8 +241,8 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturnOnConsecutiveCalls(
-                $mutant0 = MutantBuilder::build(
+            ->willReturn(
+                $mutant0 = MutantBuilder::materialize(
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
@@ -284,7 +263,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutant0, $testFrameworkExtraOptions],
             ))
-            ->willReturnOnConsecutiveCalls(
+            ->willReturn(
                 $process0 = $this->buildCoveredMutantProcessContainer(),
             )
         ;
@@ -337,12 +316,12 @@ final class MutationTestingRunnerTest extends TestCase
                 [$mutation1],
             ))
             ->willReturnOnConsecutiveCalls(
-                $mutant0 = MutantBuilder::build(
+                $mutant0 = MutantBuilder::materialize(
                     '/path/to/mutant0',
                     $mutation0,
                     'mutated code 0',
                 ),
-                $mutant1 = MutantBuilder::build(
+                $mutant1 = MutantBuilder::materialize(
                     '/path/to/mutant1',
                     $mutation1,
                     'mutated code 1',
@@ -408,7 +387,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             '/path/to/mutant0',
             $mutation0,
             'mutated code 0',
@@ -420,7 +399,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturnOnConsecutiveCalls($mutant)
+            ->willReturn($mutant)
         ;
 
         $this->fileSystemMock
@@ -473,7 +452,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $testFrameworkExtraOptions = '--filter=acme/FooTest.php';
 
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             '/path/to/mutant0',
             $mutation0,
             'mutated code 0',
@@ -485,7 +464,7 @@ final class MutationTestingRunnerTest extends TestCase
             ->with(...WithConsecutive::create(
                 [$mutation0],
             ))
-            ->willReturnOnConsecutiveCalls($mutant)
+            ->willReturn($mutant)
         ;
 
         $this->fileSystemMock
@@ -553,7 +532,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $mutation = $this->createMutation(0);
 
-        $mutant = MutantBuilder::build(
+        $mutant = MutantBuilder::materialize(
             mutation: $mutation,
             mutatedCode: 'mutated code 0',
         );
@@ -635,7 +614,7 @@ final class MutationTestingRunnerTest extends TestCase
     {
         $mutation = $this->createMutation(0, coveredByTests: false);
 
-        $mutant = MutantBuilder::build(mutation: $mutation);
+        $mutant = MutantBuilder::materialize(mutation: $mutation);
 
         $result = $this->invokeMethod('uncoveredByTest', $mutant);
 
@@ -772,9 +751,7 @@ final class MutationTestingRunnerTest extends TestCase
 
     private function buildCoveredMutantProcessContainer(): MutantProcessContainer
     {
-        $mutantProcessContainer = $this->createMock(MutantProcessContainer::class);
-
-        return $mutantProcessContainer;
+        return $this->createMock(MutantProcessContainer::class);
     }
 
     private function someIterable(?callable $callback = null): Callback
@@ -799,6 +776,9 @@ final class MutationTestingRunnerTest extends TestCase
         });
     }
 
+    /**
+     * @param MutantProcessContainer[] $expected
+     */
     private function iterableContaining(array $expected): Callback
     {
         return $this->someIterable(static function (iterable $subject) use ($expected): bool {
@@ -837,6 +817,8 @@ final class MutationTestingRunnerTest extends TestCase
                     $time,
                 ),
             ] : [],
+            [],
+            '',
         );
     }
 }

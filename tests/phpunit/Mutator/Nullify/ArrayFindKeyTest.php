@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class ArrayFindKeyTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = array_find_key($numbers, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $positive = null;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with an array' => [
@@ -74,8 +72,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = array_find_key(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -88,8 +85,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = array_find_key(\Class_With_Const::Const, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -102,8 +98,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $positive = \array_find_key(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -136,8 +131,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 if (array_find_key(['A', 1, 'C'], fn ($number) => $number > 0)) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -152,8 +146,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRray_Find_kEy(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -166,8 +159,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_find_key($foo->bar(), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -182,8 +174,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 $a = array_find_key(array_filter(['A', 1, 'C'], function($char): bool {
                     return !is_int($char);
                 }), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -198,8 +189,7 @@ final class ArrayFindKeyTest extends BaseMutatorTestCase
                 $a = 'array_find';
 
                 $b = $a([1, 2, 3], 'is_int');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

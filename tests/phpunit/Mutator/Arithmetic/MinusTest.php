@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class MinusTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class MinusTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 1 - 1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1 + 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate minus equals' => [
@@ -75,8 +73,7 @@ final class MinusTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a -= 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate decrement' => [
@@ -85,8 +82,7 @@ final class MinusTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a--;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does mutate a fake decrement' => [
@@ -95,15 +91,13 @@ final class MinusTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a - -1;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a + -1;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

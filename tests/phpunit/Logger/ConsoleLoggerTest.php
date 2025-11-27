@@ -37,8 +37,8 @@ namespace Infection\Tests\Logger;
 
 use DateTimeImmutable as UnsafeDateTimeImmutable;
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\ConsoleLogger;
-use function Infection\Tests\normalize_trailing_spaces;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -138,9 +138,8 @@ final class ConsoleLoggerTest extends TestCase
                  ! [NOTE] message
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($output->fetch()),
+                TXT,
+            Str::rTrimLines($output->fetch()),
         );
 
         $logger->log(LogLevel::WARNING, 'message', ['block' => true]);
@@ -150,9 +149,8 @@ final class ConsoleLoggerTest extends TestCase
                  [WARNING] message
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($output->fetch()),
+                TXT,
+            Str::rTrimLines($output->fetch()),
         );
 
         $logger->log(LogLevel::ERROR, 'message', ['block' => true]);
@@ -162,9 +160,8 @@ final class ConsoleLoggerTest extends TestCase
                  [ERROR] message
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($output->fetch()),
+                TXT,
+            Str::rTrimLines($output->fetch()),
         );
     }
 

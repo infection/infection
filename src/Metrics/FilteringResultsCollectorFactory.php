@@ -57,7 +57,7 @@ final readonly class FilteringResultsCollectorFactory
             return null;
         }
 
-        if (count($targetDetectionStatuses) === count(DetectionStatus::ALL)) {
+        if (count($targetDetectionStatuses) === count(DetectionStatus::cases())) {
             // No need to filter anything at all.
             return $targetCollector;
         }

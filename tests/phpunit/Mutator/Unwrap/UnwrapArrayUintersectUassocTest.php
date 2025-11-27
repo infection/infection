@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,21 +59,18 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -82,21 +79,18 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_uassoc(\Class_With_Const::Const, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -105,21 +99,18 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_uintersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -131,8 +122,7 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 if (array_uintersect_uassoc($a, ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -141,8 +131,7 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                     if ($a === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -150,8 +139,7 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                     if (['baz' => 'bar'] === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -160,21 +148,18 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_UiNtErSeCt_UaSsOc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -183,21 +168,18 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_uassoc($foo->bar(), $foo->baz(), $valueCompareFunc, $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->baz();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -206,21 +188,18 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_uintersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], $valueCompareFunc, $keyCompareFunc));
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['foo' => 'bar']);
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['baz' => 'bar']);
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -229,27 +208,23 @@ final class UnwrapArrayUintersectUassocTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_uintersect_uassoc(['foo' => 'bar'], ['baz' => 'bar'], ['qux' => 'bar'], $valueCompareFunc, $keyCompareFunc);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['baz' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['qux' => 'bar'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 

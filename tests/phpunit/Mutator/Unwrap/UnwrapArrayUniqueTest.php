@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_unique(['foo', 'bar', 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_unique(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_unique(['foo', 'bar', 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 if (array_unique($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_UnIqUe(['foo', 'bar', 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_unique($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_unique(['foo', 'bar', 'bar']));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_unique(['foo', 'bar', 'bar'], $sortFlags);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -197,8 +189,7 @@ final class UnwrapArrayUniqueTest extends BaseMutatorTestCase
                 $a = 'array_unique';
 
                 $b = $a(['foo', 'bar', 'bar']);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

@@ -68,30 +68,15 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
-    /**
-     * @var OutputFormatter|MockObject
-     */
-    private $outputFormatter;
+    private MockObject&OutputFormatter $outputFormatter;
 
-    /**
-     * @var MetricsCalculator|MockObject
-     */
-    private $metricsCalculator;
+    private MockObject&MetricsCalculator $metricsCalculator;
 
-    /**
-     * @var ResultsCollector|MockObject
-     */
-    private $resultsCollector;
+    private MockObject&ResultsCollector $resultsCollector;
 
-    /**
-     * @var DiffColorizer|MockObject
-     */
-    private $diffColorizer;
+    private MockObject&DiffColorizer $diffColorizer;
 
     protected function setUp(): void
     {
@@ -175,30 +160,36 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $dispatcher->dispatch(new MutationTestingWasFinished());
     }
 
-    public function test_it_outputs_escaped_mutants_when_mutation_testing_is_finished(): void
+    public function test_it_outputs_escaped_and_uncovered_mutants_when_mutation_testing_is_finished(): void
     {
         $output = new StreamOutput(fopen('php://memory', 'w'));
 
-        $executionResult = $this->createMock(MutantExecutionResult::class);
-        $executionResult->expects($this->once())
+        $escapedExecutionResult = $this->createMock(MutantExecutionResult::class);
+        $escapedExecutionResult->expects($this->once())
             ->method('getOriginalFilePath')
             ->willReturn('/original/filePath');
 
-        $executionResult->expects($this->once())
+        $escapedExecutionResult->expects($this->once())
             ->method('getOriginalStartingLine')
             ->willReturn(10);
 
-        $executionResult->expects($this->once())
+        $escapedExecutionResult->expects($this->once())
             ->method('getMutatorName')
             ->willReturn('Plus');
 
-        $executionResult->expects($this->once())
+        $escapedExecutionResult->expects($this->once())
             ->method('getMutantHash')
             ->willReturn('h4sh');
 
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
-            ->willReturn([$executionResult]);
+            ->willReturn([$escapedExecutionResult]);
+
+        $notCoveredExecutionResult = $this->createMock(MutantExecutionResult::class);
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getNotCoveredExecutionResults')
+            ->willReturn([$notCoveredExecutionResult]);
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -214,19 +205,26 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
 
+        $resultOutput = $this->getDisplay($output);
+
         $this->assertStringContainsString(
             "\nEscaped mutants:\n================\n",
-            $this->getDisplay($output),
+            $resultOutput,
         );
 
         $this->assertStringContainsString(
             "\n\n\n1) /original/filePath:10    [M] Plus [ID] h4sh\n",
-            $this->getDisplay($output),
+            $resultOutput,
         );
 
         $this->assertStringContainsString(
             "\n\n" . 'Please note that some mutants will inevitably be harmless (i.e. false positives).',
-            $this->getDisplay($output),
+            $resultOutput,
+        );
+
+        $this->assertStringContainsString(
+            "\nNot covered mutants:\n====================\n",
+            $resultOutput,
         );
     }
 
@@ -238,32 +236,32 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByTestsCount')
             ->willReturn(0);
         // less important metrics, only rendered when > 0
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getIgnoredCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getNotTestedCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getEscapedCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getErrorCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSyntaxErrorCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getTimedOutCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSkippedCount')
             ->willReturn(0);
 
@@ -340,32 +338,32 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByTestsCount')
             ->willReturn(2);
         // less important metrics, only rendered when > 0
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn(3);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getIgnoredCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getNotTestedCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getEscapedCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getErrorCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSyntaxErrorCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getTimedOutCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSkippedCount')
             ->willReturn(1);
 
@@ -472,8 +470,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
                 Generated Reports:
                          - relative/path.log
                          - /absolute/path.html
-                TEXT
-            ,
+                TEXT,
             $output,
         );
         $this->assertStringNotContainsString(
@@ -614,9 +611,6 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
     public function test_it_reacts_on_mutation_testing_finished_and_show_mutations_on(): void
     {
-        $this->output->expects($this->once())
-            ->method('getVerbosity');
-
         $this->outputFormatter
             ->expects($this->once())
             ->method('finish');

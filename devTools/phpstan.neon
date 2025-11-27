@@ -46,11 +46,6 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNode\\>\\.$#"
-            count: 1
-            path: ../src/TestFramework/SafeDOMXPath.php
-
-        -
             message: "#Do not use magic number (.*)#"
             count: 5
             path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
@@ -69,17 +64,6 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../src/Testing
-        # ProxyTrace::getRelativePathname() is used implicitly by PathFilterIterator
-        -
-            message: '#^Unused Infection\\TestFramework\\Coverage\\ProxyTrace\:\:getRelativePathname$#'
-            identifier: shipmonk.deadMethod
-            count: 1
-            path: ../src/TestFramework/Coverage/ProxyTrace.php
-        -
-            message: '#^Unused Infection\\TestFramework\\Coverage\\Trace\:\:getRelativePathname$#'
-            identifier: shipmonk.deadMethod
-            count: 1
-            path: ../src/TestFramework/Coverage/Trace.php
         # While it's not used yet, left for consistency as we have ending column passed and used
         -
             message: '#^Unused Infection\\Mutant\\MutantExecutionResult\:\:getOriginalStartingColumn$#'
@@ -96,7 +80,7 @@ parameters:
                 - ../tests/*
         -
             message: "#^Instantiated class Infection\\\\Tests\\\\Fixtures\\\\Console\\\\FakeOutput not found\\.$#"
-            count: 12
+            count: 11
             path:  ../tests/*
         -
             message: '#^Call to method PHPUnit\\Framework\\Assert::assertNotFalse\(\) with SimpleXMLElement and ''Expected dumped…'' will always evaluate to true\.$#'
@@ -132,13 +116,45 @@ parameters:
             message: "#^PHPDoc tag @param for parameter \\$values contains unresolvable type\\.$#"
             count: 1
             path: ../tests/phpunit/MockedContainer.php
+
         -
-            message: '#Call to function iterator_.* on a separate line has no effect#'
-            path: ../tests/*
+            message: "#queryCount#"
+            identifier: return.type
+            count: 1
+            path: ../src/TestFramework/SafeDOMXPath.php
+
+        # We are explicitly testing the guards here
+        -
+            identifier: argument.type
+            path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
+
+        # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
+        -
+            message: '#::profile\(\) should return int but returns int\|null#'
+            path: ../tests/benchmark/BlackfireInstrumentor.php
+        -
+            message: '#::profile\(\) should return int but returns int.*\|null#'
+            path: ../tests/benchmark/DummyInstrumentor.php
+
+        # Test builders provide fluent API methods that may not be used immediately
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/phpunit/**/*Builder.php
+        # PHPBench benchmarks are not meant to be exposed.
+        -
+            identifier: shipmonk.deadMethod
+            path: ../tests/benchmark/*/*Bench.php
+
+        # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
+        -
+            identifier: argument.type
+            path: ../tests/phpunit/Framework/ClassNameTest.php
+
     level: 8
     paths:
         - ../src
         - ../tests/phpunit
+        - ../tests/benchmark
         - ./PHPStan/
     excludePaths:
         - %currentWorkingDirectory%/src/FileSystem/DummyFileSystem.php
@@ -148,6 +164,10 @@ parameters:
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
+        - ../tests/benchmark/MutationGenerator/sources (?)
+        - ../tests/benchmark/Tracing/coverage (?)
+        - ../tests/benchmark/Tracing/sources (?)
+        - ../tests/benchmark/Tracing/benchmark-source (?)
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false

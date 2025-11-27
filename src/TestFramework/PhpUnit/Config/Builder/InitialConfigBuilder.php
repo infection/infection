@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
-use DOMDocument;
 use Infection\TestFramework\Config\InitialConfigBuilder as ConfigBuilder;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\TestFramework\SafeDOMXPath;
@@ -75,14 +75,11 @@ class InitialConfigBuilder implements ConfigBuilder
     {
         $path = $this->buildPath();
 
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $success = @$dom->loadXML($this->originalXmlConfigContent);
-
-        Assert::true($success);
-
-        $xPath = new SafeDOMXPath($dom);
+        $xPath = SafeDOMXPath::fromString(
+            $this->originalXmlConfigContent,
+            preserveWhiteSpace: false,
+            formatOutput: true,
+        );
 
         $this->configManipulator->validate($path, $xPath);
 
@@ -97,7 +94,7 @@ class InitialConfigBuilder implements ConfigBuilder
         $this->configManipulator->removeExistingLoggers($xPath);
         $this->configManipulator->removeExistingPrinters($xPath);
 
-        file_put_contents($path, $dom->saveXML());
+        file_put_contents($path, $xPath->document->saveXML());
 
         return $path;
     }
@@ -139,22 +136,25 @@ class InitialConfigBuilder implements ConfigBuilder
 
     private function addRandomTestsOrderAttributesIfNotSet(string $version, SafeDOMXPath $xPath): void
     {
-        if (version_compare($version, '7.2', '<')) {
-            return;
-        }
-
-        if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
-            $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+        if (PhpUnitAdapter::supportsExecutionOrderDefectsRandom($version)) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'defects,random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
+        } elseif (version_compare($version, '7.2', '>=')) {
+            if ($this->addAttributeIfNotSet('executionOrder', 'random', $xPath)) {
+                $this->addAttributeIfNotSet('resolveDependencies', 'true', $xPath);
+            }
         }
     }
 
     private function addAttributeIfNotSet(string $attribute, string $value, SafeDOMXPath $xPath): bool
     {
-        $nodeList = $xPath->query(sprintf('/phpunit/@%s', $attribute));
+        $count = $xPath->queryCount(sprintf('/phpunit/@%s', $attribute));
 
-        if ($nodeList->length === 0) {
-            $node = $xPath->query('/phpunit')[0];
-            $node->setAttribute($attribute, $value);
+        if ($count === 0) {
+            $xPath
+                ->getElement('/phpunit')
+                ->setAttribute($attribute, $value);
 
             return true;
         }

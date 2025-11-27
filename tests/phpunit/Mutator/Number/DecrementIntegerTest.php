@@ -47,10 +47,10 @@ use function sprintf;
 final class DecrementIntegerTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -65,8 +65,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if ($foo < 10) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of count()' => [
@@ -76,8 +75,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) === 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero with yoda style when it is being compared as identical with result of count()' => [
@@ -87,8 +85,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (0 === count($a)) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero with when it is being compared as identical with result of cOunT()' => [
@@ -98,8 +95,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (cOunT($a) === 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as identical with result of sizeOf()' => [
@@ -109,8 +105,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (sizeOf($a) === 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is being compared as not identical with result of count()' => [
@@ -120,8 +115,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) !== 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as equal with result of count()' => [
@@ -131,8 +125,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) == 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as not equal with result of count()' => [
@@ -142,8 +135,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) != 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as more than count()' => [
@@ -153,8 +145,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) > 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as less than count() on the right side' => [
@@ -164,8 +155,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (0 < count($a)) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as less than or equal to count() on the right side' => [
@@ -175,8 +165,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (0 <= count($a)) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as equal to count() on the right side' => [
@@ -186,8 +175,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (0 == count($a)) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not decrement zero when it is compared as greater than count() on the right side' => [
@@ -207,8 +195,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) >= 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It doest not decrement zero when it is compared as less than count()' => [
@@ -218,8 +205,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) < 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does decrement when compared against a variable function' => [
@@ -229,16 +215,14 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if ($foo === 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if ($foo === -1) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It decrements zero when it is compared any other, not count() function' => [
@@ -248,16 +232,14 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (abs($a) === 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if (abs($a) === -1) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It doest not decrements zero when it is compared as less or equal than count()' => [
@@ -267,8 +249,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if (count($a) <= 0) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It decrements zero' => [
@@ -276,14 +257,12 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = -1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It decrements a negative integer' => [
@@ -293,16 +272,14 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 if ($foo === -10) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if ($foo === -11) {
                     echo 'bar';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It decrements an assignment' => [
@@ -310,8 +287,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 $foo = 10;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -324,8 +300,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 $foo = 0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -445,8 +420,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 preg_split('//', 'string', 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -459,8 +433,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
                 <?php
 
                 preg_split('//', 'string', -1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -501,8 +474,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if ($nodes->someProperty === -1) {
-                }
+                if ($nodes->someProperty === -1) {}
                 PHP,
         ];
 
@@ -515,8 +487,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (-1 === $nodes->someProperty) {
-                }
+                if (-1 === $nodes->someProperty) {}
                 PHP,
         ];
 
@@ -529,8 +500,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if ($nodes->someMethod() === -1) {
-                }
+                if ($nodes->someMethod() === -1) {}
                 PHP,
         ];
 
@@ -543,8 +513,7 @@ final class DecrementIntegerTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                if (-1 === $nodes->someMethod()) {
-                }
+                if (-1 === $nodes->someMethod()) {}
                 PHP,
         ];
 

@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Finally_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -65,8 +65,7 @@ final class Finally_Test extends BaseMutatorTestCase
                 } finally {
                     $a = 3;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -75,8 +74,7 @@ final class Finally_Test extends BaseMutatorTestCase
                 } catch (\Exception $e) {
                     $a = 2;
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate when no catch() blocks are present' => [
@@ -88,8 +86,7 @@ final class Finally_Test extends BaseMutatorTestCase
                 } finally {
                     $a = 2;
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }

@@ -47,6 +47,9 @@ use TypeError;
 #[CoversClass(ArrayItemRemovalConfig::class)]
 final class ArrayItemRemovalConfigTest extends TestCase
 {
+    /**
+     * @param array<mixed> $settings
+     */
     #[DataProvider('settingsProvider')]
     public function test_it_can_create_a_config(
         array $settings,

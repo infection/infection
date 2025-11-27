@@ -37,10 +37,10 @@ namespace Infection\Tests\Metrics;
 
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
+use Infection\Framework\Str;
 use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use function Infection\Tests\normalize_trailing_spaces;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -51,15 +51,9 @@ use Symfony\Component\Console\Terminal;
 #[CoversClass(MinMsiChecker::class)]
 final class MinMsiCheckerTest extends TestCase
 {
-    /**
-     * @var BufferedOutput
-     */
-    private $output;
+    private BufferedOutput $output;
 
-    /**
-     * @var ConsoleOutput
-     */
-    private $consoleOutput;
+    private ConsoleOutput $consoleOutput;
 
     protected function setUp(): void
     {
@@ -125,9 +119,8 @@ final class MinMsiCheckerTest extends TestCase
                  !        MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -144,9 +137,8 @@ final class MinMsiCheckerTest extends TestCase
                  !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 
@@ -166,9 +158,8 @@ final class MinMsiCheckerTest extends TestCase
                  !        increasing the required Covered Code MSI percentage the next time you run Infection.
 
 
-                TXT
-            ,
-            normalize_trailing_spaces($this->output->fetch()),
+                TXT,
+            Str::rTrimLines($this->output->fetch()),
         );
     }
 

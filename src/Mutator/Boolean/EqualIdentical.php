@@ -38,6 +38,7 @@ namespace Infection\Mutator\Boolean;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\Util\AbstractIdenticalComparison;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
@@ -57,8 +58,7 @@ final class EqualIdentical extends AbstractIdenticalComparison
             <<<'TXT'
                 Replaces a loose comparison (using the equal operator (`==`)) with a strict comparison (using the
                 identical operator (`===`)).
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'
@@ -75,7 +75,7 @@ final class EqualIdentical extends AbstractIdenticalComparison
      */
     public function mutate(Node $node): iterable
     {
-        yield new Expr\BinaryOp\Identical($node->left, $node->right, $node->getAttributes());
+        yield new Expr\BinaryOp\Identical($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

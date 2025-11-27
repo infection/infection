@@ -37,6 +37,7 @@ namespace Infection\PhpParser;
 
 use PhpParser\Node\Stmt;
 use PhpParser\Parser;
+use PhpParser\Token;
 use Symfony\Component\Finder\SplFileInfo;
 use Throwable;
 
@@ -54,12 +55,15 @@ class FileParser
     /**
      * @throws UnparsableFile
      *
-     * @return Stmt[]
+     * @return array{Stmt[], Token[]}
      */
     public function parse(SplFileInfo $fileInfo): array
     {
         try {
-            return $this->parser->parse($fileInfo->getContents()) ?? [];
+            return [
+                $this->parser->parse($fileInfo->getContents()) ?? [],
+                $this->parser->getTokens(),
+            ];
         } catch (Throwable $throwable) {
             $filePath = $fileInfo->getRealPath() === false
                 ? $fileInfo->getPathname()

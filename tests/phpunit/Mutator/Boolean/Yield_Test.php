@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Yield_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -61,13 +61,12 @@ final class Yield_Test extends BaseMutatorTestCase
                 $a = function () {
                     (yield $a => $b);
                 };
-                PHP
-            ,
+                PHP,
             (static fn () => <<<'PHP'
                 <?php
 
                 $a = function () {
-                    yield $a > $b;
+                    (yield $a > $b);
                 };
                 PHP)(),
         ];
@@ -79,8 +78,7 @@ final class Yield_Test extends BaseMutatorTestCase
                 $a = function () {
                     (yield $b);
                 };
-                PHP
-            ,
+                PHP,
         ];
     }
 }

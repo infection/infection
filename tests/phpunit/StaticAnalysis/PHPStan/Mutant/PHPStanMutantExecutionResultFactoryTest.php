@@ -84,7 +84,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::build(
+            MutantBuilder::materialize(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -103,6 +103,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                     MutatedNode::wrap(new Nop()),
                     0,
                     [],
+                    [],
+                    '',
                 ),
                 'notCovered#0',
                 $mutantDiff = <<<'DIFF'
@@ -158,7 +160,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::build(
+            MutantBuilder::materialize(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -183,6 +185,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'errored#0',
                 $mutantDiff = <<<'DIFF'
@@ -236,7 +240,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::build(
+            MutantBuilder::materialize(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -261,6 +265,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'escaped#0',
                 $mutantDiff = <<<'DIFF'
@@ -315,7 +321,7 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
 
         $mutantProcess = new MutantProcess(
             $processMock,
-            MutantBuilder::build(
+            MutantBuilder::materialize(
                 '/path/to/mutant',
                 new Mutation(
                     $originalFilePath = 'path/to/Foo.php',
@@ -340,6 +346,8 @@ final class PHPStanMutantExecutionResultFactoryTest extends TestCase
                             0.01,
                         ),
                     ],
+                    [],
+                    '',
                 ),
                 'killed#0',
                 $mutantDiff = <<<'DIFF'

@@ -48,20 +48,11 @@ use ReflectionClass;
 #[CoversClass(SchemaConfigurationLoader::class)]
 final class SchemaConfigurationLoaderTest extends TestCase
 {
-    /**
-     * @var Locator|MockObject
-     */
-    private $locatorStub;
+    private MockObject&Locator $locatorStub;
 
-    /**
-     * @var SchemaConfigurationFileLoader|MockObject
-     */
-    private $configFileLoaderStub;
+    private MockObject&SchemaConfigurationFileLoader $configFileLoaderStub;
 
-    /**
-     * @var SchemaConfigurationLoader
-     */
-    private $loader;
+    private SchemaConfigurationLoader $loader;
 
     protected function setUp(): void
     {

@@ -35,13 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
-use function Infection\Tests\normalizeLineReturn;
+use Infection\Framework\Str;
 use Psr\Log\AbstractLogger;
 use Webmozart\Assert\Assert;
 
 final class DummyLogger extends AbstractLogger
 {
-    private $logs = [];
+    /**
+     * @var array<array{string, string, array<mixed>}>
+     */
+    private array $logs = [];
 
     public function log($level, $message, array $context = []): void
     {
@@ -50,11 +53,14 @@ final class DummyLogger extends AbstractLogger
 
         $this->logs[] = [
             $level,
-            normalizeLineReturn($message),
+            Str::toUnixLineEndings($message),
             $context,
         ];
     }
 
+    /**
+     * @return array<array{string, string, array<mixed>}>
+     */
     public function getLogs(): array
     {
         return $this->logs;

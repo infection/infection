@@ -55,7 +55,7 @@ final class MutatorFixturesProvider
     /**
      * @var array<string, string>
      */
-    private static $testCaseFixtureDirMapping = [];
+    private static array $testCaseFixtureDirMapping = [];
 
     public static function getFixtureFileContent(string $class, string $file): string
     {

@@ -59,20 +59,11 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     private const JUNIT_CODECEPTION_CEST_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_codeception_cest.xml';
 
-    /**
-     * @var JUnitReportLocator|MockObject
-     */
-    private $jUnitLocatorMock;
+    private MockObject&JUnitReportLocator $jUnitLocatorMock;
 
-    /**
-     * @var JUnitTestFileDataProvider
-     */
-    private $provider;
+    private JUnitTestFileDataProvider $provider;
 
-    /**
-     * @var string
-     */
-    private $tempfile;
+    private string $tempfile;
 
     protected function setUp(): void
     {

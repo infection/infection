@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class CastFloatTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class CastFloatTest extends BaseMutatorTestCase
                 <?php
 
                 (float) '1.1';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 '1.1';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to double' => [
@@ -74,14 +72,12 @@ final class CastFloatTest extends BaseMutatorTestCase
                 <?php
 
                 (double) '1.1';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 '1.1';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to real' => [
@@ -89,14 +85,12 @@ final class CastFloatTest extends BaseMutatorTestCase
                 <?php
 
                 (real) '1.1';
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 '1.1';
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to float in conditions' => [
@@ -106,16 +100,14 @@ final class CastFloatTest extends BaseMutatorTestCase
                 if ((float) random_int()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 if (random_int()) {
                     echo 'Hello';
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to float in global return' => [
@@ -123,14 +115,12 @@ final class CastFloatTest extends BaseMutatorTestCase
                 <?php
 
                 return (float) random_int();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 return random_int();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It removes casting to float in return of untyped-function' => [

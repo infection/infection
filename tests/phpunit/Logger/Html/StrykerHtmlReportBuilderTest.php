@@ -38,6 +38,7 @@ namespace Infection\Tests\Logger\Html;
 use function array_map;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Framework\Str;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Metrics\Collector;
 use Infection\Metrics\MetricsCalculator;
@@ -49,7 +50,6 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Removal\ArrayItemRemoval;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\Testing\MutatorName;
-use function Infection\Tests\normalize_trailing_spaces;
 use JsonSchema\Validator;
 use function Later\now;
 use const PHP_EOL;
@@ -70,6 +70,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
 
+    /**
+     * @param array<string, array<string, mixed>|string> $expectedReport
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
@@ -82,7 +85,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $this->assertJsonDocumentMatchesSchema($report);
     }
 
-    public static function metricsProvider()
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -258,7 +261,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         return $collector;
     }
 
-    private function assertJsonDocumentMatchesSchema($report): void
+    private function assertJsonDocumentMatchesSchema(mixed $report): void
     {
         $resultReport = json_decode(json_encode($report));
 
@@ -451,7 +454,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
      * @param array<int, TestLocation> $testLocations
      */
     private static function createMutantExecutionResult(
-        string $detectionStatus,
+        DetectionStatus $detectionStatus,
         string $diff,
         string $mutantHash,
         string $mutatorClassName,
@@ -468,7 +471,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
             'bin/phpunit --configuration infection-tmp-phpunit.xml --filter "tests/Acme/FooTest.php"',
             $processOutput,
             $detectionStatus,
-            now(normalize_trailing_spaces($diff)),
+            now(Str::rTrimLines($diff)),
             $mutantHash,
             $mutatorClassName,
             $mutatorName ?? MutatorName::getName($mutatorClassName),

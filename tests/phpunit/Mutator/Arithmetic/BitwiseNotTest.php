@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class BitwiseNotTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class BitwiseNotTest extends BaseMutatorTestCase
                 <?php
 
                 ~2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 2;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

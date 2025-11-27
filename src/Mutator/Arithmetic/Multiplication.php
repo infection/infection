@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use function is_string;
@@ -58,8 +59,7 @@ final class Multiplication implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a multiplication operator (`*`) with a division assignment operator (`/`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -76,7 +76,7 @@ final class Multiplication implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\Div($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\Div($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

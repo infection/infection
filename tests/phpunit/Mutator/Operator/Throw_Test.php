@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Throw_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class Throw_Test extends BaseMutatorTestCase
                 <?php
 
                 throw new \Exception();
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 new \Exception();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates throw in match non-default arm' => [
@@ -77,8 +75,7 @@ final class Throw_Test extends BaseMutatorTestCase
                     0 => throw new \Exception(),
                     default => '',
                 };
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -96,8 +93,7 @@ final class Throw_Test extends BaseMutatorTestCase
                 match ($x) {
                     default => throw new \Exception(),
                 };
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates throw in switch non-default case' => [
@@ -110,8 +106,7 @@ final class Throw_Test extends BaseMutatorTestCase
                     default:
                         $s = '';
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -132,8 +127,7 @@ final class Throw_Test extends BaseMutatorTestCase
                     case true: $s = ''; break;
                     default: throw new \Exception();
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }

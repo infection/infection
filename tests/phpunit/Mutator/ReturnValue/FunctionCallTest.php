@@ -47,10 +47,10 @@ use PHPUnit\Framework\Attributes\Group;
 final class FunctionCallTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -80,6 +80,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
+
                 PHP,
         ];
 
@@ -150,7 +151,7 @@ final class FunctionCallTest extends BaseMutatorTestCase
         $code = MutatorFixturesProvider::getFixtureFileContent(self::class, 'fc-contains-another-func-and-null-allowed.php');
         $mutations = $this->mutate($code);
 
-        $expectedMutatedCode = <<<"PHP"
+        $expectedMutatedCode = <<<'PHP'
             <?php
 
             namespace FunctionCall_ContainsAnotherFunctionAndNullAllowed;
@@ -159,8 +160,8 @@ final class FunctionCallTest extends BaseMutatorTestCase
             {
                 function test()
                 {
-                    \$a = function (\$element): ?int {
-                        return \$element;
+                    $a = function ($element) : ?int {
+                        return $element;
                     };
                     count([]);
                     return null;
