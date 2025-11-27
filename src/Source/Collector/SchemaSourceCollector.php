@@ -33,25 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\SourceCollection;
+namespace Infection\Source\Collector;
 
-use Infection\Tracing\Tracer;
+use Symfony\Component\Finder\Finder;
 
-final readonly class CoveredSourceCollector implements SourceCollector
+/**
+ * TODO: extract the rename in a separate PR
+ *
+ * @internal
+ */
+final readonly class SchemaSourceCollector implements SourceCollector
 {
+    /**
+     * @param string[] $sourceDirectories
+     * @param string[] $excludedDirectoriesOrFiles
+     */
     public function __construct(
-        private SourceCollector $decoratedSourceCollector,
-        private Tracer $tracer,
+        private array $sourceDirectories,
+        private array $excludedDirectoriesOrFiles,
     ) {
     }
 
+    // TODO: I think the file/glob based filter could be applied here directly.
+    //  For performance reasons, most collectors already apply a filtering of some kind
+    //  e.g. the git diff. So currently if feels we are a bit in-between for all of them:
+    //  - git diff uses the sources for further filter but doesn't account for the excluded directories neither the user filter (but the git diff filter)
+    //  - the schema source collector does not account for the user filter
+    //  - traces don't account for either, we decorate them with the source filter
     public function collect(): iterable
     {
-        // TODO: preserve the key?
-        foreach ($this->decoratedSourceCollector->collect() as $source) {
-            if ($this->tracer->hasTrace($source)) {
-                yield $source;
-            }
+        if ($this->sourceDirectories === []) {
+            return [];
         }
+
+        // TODO: to use the filesystem factory method as per the PoC
+        return Finder::create()
+            ->in($this->sourceDirectories)
+            ->exclude($this->excludedDirectoriesOrFiles)
+            ->notPath($this->excludedDirectoriesOrFiles)
+            ->files()
+            ->name('*.php')
+        ;
     }
 }

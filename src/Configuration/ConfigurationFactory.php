@@ -35,19 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use function array_fill_keys;
-use function array_key_exists;
-use function array_map;
-use function array_unique;
-use function array_values;
-use function dirname;
-use function file_exists;
-use function in_array;
 use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
@@ -59,19 +50,27 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\SourceCollection\SourceCollectorFactory;
+use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\TestFramework\TestFrameworkTypes;
-use function is_numeric;
-use function max;
 use OndraM\CiDetector\CiDetector;
 use OndraM\CiDetector\CiDetectorInterface;
 use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
-use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
-use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
+use function array_fill_keys;
+use function array_key_exists;
+use function array_map;
+use function array_unique;
+use function array_values;
+use function dirname;
+use function file_exists;
+use function in_array;
+use function is_numeric;
+use function max;
+use function sprintf;
+use function sys_get_temp_dir;
 
 /**
  * @internal

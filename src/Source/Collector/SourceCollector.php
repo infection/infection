@@ -33,46 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\SourceCollection;
+namespace Infection\Source\Collector;
 
-use Symfony\Component\Finder\Finder;
+use SplFileInfo;
 
-/**
- * TODO: extract the rename in a separate PR
- *
- * @internal
- */
-final readonly class SchemaSourceCollector implements SourceCollector
+interface SourceCollector
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedDirectoriesOrFiles
+     * @return iterable<SplFileInfo>
      */
-    public function __construct(
-        private array $sourceDirectories,
-        private array $excludedDirectoriesOrFiles,
-    ) {
-    }
-
-    // TODO: I think the file/glob based filter could be applied here directly.
-    //  For performance reasons, most collectors already apply a filtering of some kind
-    //  e.g. the git diff. So currently if feels we are a bit in-between for all of them:
-    //  - git diff uses the sources for further filter but doesn't account for the excluded directories neither the user filter (but the git diff filter)
-    //  - the schema source collector does not account for the user filter
-    //  - traces don't account for either, we decorate them with the source filter
-    public function collect(): iterable
-    {
-        if ($this->sourceDirectories === []) {
-            return [];
-        }
-
-        // TODO: to use the filesystem factory method as per the PoC
-        return Finder::create()
-            ->in($this->sourceDirectories)
-            ->exclude($this->excludedDirectoriesOrFiles)
-            ->notPath($this->excludedDirectoriesOrFiles)
-            ->files()
-            ->name('*.php')
-        ;
-    }
+    public function collect(): iterable;
 }

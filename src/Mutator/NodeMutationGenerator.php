@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Infection\FileSystem\FileFilter;
+use Infection\Source\SourceLineFilter;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\FilesDiffChangedLines;
@@ -74,17 +76,17 @@ class NodeMutationGenerator
      * @param Token[] $originalFileTokens
      */
     public function __construct(
-        array $mutators,
-        private readonly string $filePath,
-        private readonly array $fileNodes,
-        private readonly Trace $trace,
-        private readonly bool $onlyCovered,
-        private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
+        array                                $mutators,
+        private readonly string              $filePath,
+        private readonly array               $fileNodes,
+        private readonly Trace               $trace,
+        private readonly bool                $onlyCovered,
+        private readonly bool                $isForGitDiffLines,
+        private readonly ?string             $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly array $originalFileTokens,
-        private readonly string $originalFileContent,
+        private readonly SourceLineFilter    $lineFilter,
+        private readonly array               $originalFileTokens,
+        private readonly string              $originalFileContent,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 
@@ -107,7 +109,13 @@ class NodeMutationGenerator
             return;
         }
 
-        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine(), $this->gitDiffBase)) {
+        $isNodeAModifiedLine = $this->lineFilter->contains(
+            $this->filePath,
+            $node->getStartLine(),
+            $node->getEndLine(),
+        );
+
+        if (!$isNodeAModifiedLine) {
             return;
         }
 

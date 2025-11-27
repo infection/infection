@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\SourceCollection;
+namespace Infection\Source\Collector;
 
 use Infection\Configuration\Entry\GitOptions;
 use Infection\Git\Git;

@@ -33,15 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\SourceCollection;
+namespace Infection\Source\Collector;
 
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
+use Infection\Process\ShellCommandLineExecutor;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use function array_merge;
 use function explode;
 use function implode;
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 // TODO: partially copied from Infection\Logger\GitHub\GitDiffSourceCollector.
 //  did not move it entirely as it seems to be used elsewhere too.

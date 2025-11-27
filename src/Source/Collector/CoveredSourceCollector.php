@@ -33,14 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\SourceCollection;
+namespace Infection\Source\Collector;
 
-use SplFileInfo;
+use Infection\Tracing\Tracer;
 
-interface SourceCollector
+final readonly class CoveredSourceCollector implements SourceCollector
 {
-    /**
-     * @return iterable<SplFileInfo>
-     */
-    public function collect(): iterable;
+    public function __construct(
+        private SourceCollector $decoratedSourceCollector,
+        private Tracer $tracer,
+    ) {
+    }
+
+    public function collect(): iterable
+    {
+        // TODO: preserve the key?
+        foreach ($this->decoratedSourceCollector->collect() as $source) {
+            if ($this->tracer->hasTrace($source)) {
+                yield $source;
+            }
+        }
+    }
 }

@@ -35,22 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
-use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileFilter;
-use Infection\SourceCollection\SourceCollector;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
+use SplFileInfo;
+use Webmozart\Assert\Assert;
+use function implode;
 use function is_a;
 use function iter\toArray;
 use function iterator_to_array;
-use SplFileInfo;
 use function sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
