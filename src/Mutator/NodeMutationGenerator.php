@@ -81,8 +81,6 @@ class NodeMutationGenerator
         private readonly array               $fileNodes,
         private readonly Trace               $trace,
         private readonly bool                $onlyCovered,
-        private readonly bool                $isForGitDiffLines,
-        private readonly ?string             $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineFilter    $lineFilter,
         private readonly array               $originalFileTokens,

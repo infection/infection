@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\FileSystem\FileFilter;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 
 /**
@@ -46,9 +47,9 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 final readonly class CoveredTraceProvider implements TraceProvider
 {
     public function __construct(
-        private TraceProvider $primaryTraceProvider,
+        private TraceProvider               $primaryTraceProvider,
         private JUnitTestExecutionInfoAdder $testFileDataAdder,
-        private FileFilter $bufferedFilter,
+        private SourceCollector             $sourceCollector,
     ) {
     }
 
@@ -58,7 +59,7 @@ final readonly class CoveredTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         /** @var iterable<Trace> $filteredTraces */
-        $filteredTraces = $this->bufferedFilter->filter(
+        $filteredTraces = $this->sourceCollector->filter(
             $this->primaryTraceProvider->provideTraces(),
         );
 

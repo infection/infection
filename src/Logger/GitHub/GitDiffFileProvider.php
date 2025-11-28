@@ -48,6 +48,7 @@ use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
+ * TODO: this should implement SourceLineFilter, not sure if merged in a collector or decorate one yet.
  * @final
  *
  * @internal

@@ -138,7 +138,7 @@ final class ConfigurationBuilder
             $configuration->isDryRun,
             $configuration->ignoreSourceCodeMutatorsMap,
             $configuration->executeOnlyCoveringTestCases,
-            $configuration->isForGitDiffLines,
+            $configuration->isForFilteredSources,
             $configuration->gitDiffBase,
             $configuration->mapSourceClassToTestStrategy,
             $configuration->loggerProjectRootDirectory,

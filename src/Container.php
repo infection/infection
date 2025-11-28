@@ -118,6 +118,7 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\SchemaSourceCollector;
+use Infection\Source\Collector\SourceCollector;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -236,7 +237,7 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                $container->getConfiguration()->isForGitDiffLines,
+                $container->get(SourceCollector::class)->isFiltered(),
             ),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
@@ -447,7 +448,7 @@ final class Container extends DIContainer
                     $container->getNodeTraverserFactory(),
                     $container->getLineRangeCalculator(),
                     $container->getFilesDiffChangedLines(),
-                    $configuration->isForGitDiffLines,
+                    $configuration->isForFilteredSources,
                     $configuration->gitDiffBase,
                 );
             },

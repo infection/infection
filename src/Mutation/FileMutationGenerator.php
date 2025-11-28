@@ -43,6 +43,7 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\Source\SourceLineFilter;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use PhpParser\Node;
@@ -55,12 +56,10 @@ use Webmozart\Assert\Assert;
 class FileMutationGenerator
 {
     public function __construct(
-        private readonly FileParser $parser,
-        private readonly NodeTraverserFactory $traverserFactory,
-        private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
+        private readonly FileParser            $parser,
+        private readonly NodeTraverserFactory  $traverserFactory,
+        private readonly LineRangeCalculator   $lineRangeCalculator,
+        private readonly SourceLineFilter $lineFilter,
     ) {
     }
 
@@ -99,10 +98,8 @@ class FileMutationGenerator
                 $initialStatements,
                 $trace,
                 $onlyCovered,
-                $this->isForGitDiffLines,
-                $this->gitDiffBase,
                 $this->lineRangeCalculator,
-                $this->filesDiffChangedLines,
+                $this->lineFilter,
                 $originalFileTokens,
                 $sourceFile->getContents(),
             ),

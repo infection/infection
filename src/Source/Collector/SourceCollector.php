@@ -36,9 +36,19 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use SplFileInfo;
+use Infection\FileSystem\FileFilter;
 
-interface SourceCollector
+// TODO: I do not think FileFilter should be necessary here. To check how to phase it out.
+interface SourceCollector extends FileFilter
 {
+    /**
+     * TODO: find a better method name
+     *
+     * Whether the collector collects all the project source files or if they are filtered, e.g.
+     * to match a user input filter or to git added/modified files.
+     */
+    public function isFiltered(): bool;
+
     /**
      * @return iterable<SplFileInfo>
      */
