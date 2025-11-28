@@ -107,7 +107,7 @@ final class MutantProcessContainerFactoryTest extends TestCase
             ->with(
                 $tests,
                 $mutantFilePath,
-                $this->isType('string'),
+                $this->isString(),
                 $originalFilePath,
                 $testFrameworkExtraOptions,
             )
