@@ -83,7 +83,7 @@
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-webmozart-assert": "^2.0",
-        "phpunit/phpunit": "^11.5.27",
+        "phpunit/phpunit": "^11.5.27 || ^12.4",
         "rector/rector": "^2.2.4",
         "shipmonk/dead-code-detector": "^0.12.0",
         "shipmonk/name-collision-detector": "^2.1",
