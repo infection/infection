@@ -5,6 +5,7 @@
          colors="true"
          executionOrder="defects,random"
          failOnWarning="true"
+         failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
          displayDetailsOnPhpunitDeprecations="true"
