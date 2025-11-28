@@ -248,7 +248,7 @@ final class ConfigurationFactoryTest extends TestCase
             processTimeout: 10,
             sourceDirectories: [],
             sourceFiles: [],
-            sourceFilesFilter: 'src/a.php,src/b.php',
+            sourceFilter: 'src/a.php,src/b.php',
             sourceFilesExcludes: [],
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use Infection\Configuration\Entry\GitOptions;
+use Infection\Configuration\Entry\Source;
 use Infection\Git\Git;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Tracing\Tracer;
@@ -55,8 +56,7 @@ final readonly class SourceCollectorFactory
      * @param non-empty-string|GitOptions|null $sourceFilter E.g. "src/Service/Mailer.php", "Mailer.php", "src/Service/", "Mailer.php,Sender.php", etc.
      */
     public function create(
-        array $sourceDirectories,
-        array $excludedDirectoriesOrFiles,
+        Source $source,
         string|GitOptions|null $sourceFilter,
         bool $mutateOnlyCoveredCode,
     ): SourceCollector {

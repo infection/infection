@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use function array_map;
 use function explode;
 use Infection\Configuration\Entry\Logs;
@@ -68,20 +70,18 @@ readonly class Configuration
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        public float $processTimeout,
-        public array $sourceDirectories,
-        public iterable $sourceFiles,
-        public string $sourceFilesFilter,
-        public array $sourceFilesExcludes,
-        public Logs $logs,
-        public string $logVerbosity,
-        public string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public array $mutators,
-        public string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
+        public float         $processTimeout,
+        public Source $source,
+        public ?SourceFilter $sourceFilter,
+        public Logs          $logs,
+        public string        $logVerbosity,
+        public string        $tmpDir,
+        public PhpUnit       $phpUnit,
+        public PhpStan       $phpStan,
+        public array         $mutators,
+        public string        $testFramework,
+        public ?string       $bootstrap,
+        public ?string       $initialTestsPhpOptions,
         public string $testFrameworkExtraOptions,
         public ?string $staticAnalysisToolOptions,
         public string $coveragePath,
@@ -133,7 +133,7 @@ readonly class Configuration
         return $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions);
     }
 
-    public function mutateOnlyCoveredCode(): bool
+    public function shouldMutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
     }

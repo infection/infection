@@ -40,6 +40,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Logger\FileLogger;
@@ -160,10 +161,8 @@ class ConfigurationFactory
 
         return new Configuration(
             processTimeout: $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
-            sourceDirectories: $schema->getSource()->getDirectories(),
-            sourceFiles: $sourceCollector->collect(),
-            sourceFilesFilter: $this->retrieveFilter($sourceFilter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
-            sourceFilesExcludes: $schema->getSource()->getExcludes(),
+            source: $schema->source,
+            sourceFilter: $this->retrieveFilter($sourceFilter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
             logs: $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
@@ -370,7 +369,7 @@ class ConfigurationFactory
     /**
      * @param string[] $sourceDirectories
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): ?SourceFilter
     {
         // TODO: I do not understand this return here
         if ($gitDiffFilter === null && !$isForGitDiffLines) {

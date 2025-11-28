@@ -119,6 +119,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\SchemaSourceCollector;
 use Infection\Source\Collector\SourceCollector;
+use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -247,14 +248,14 @@ final class Container extends DIContainer
             UnionTraceProvider::class => static fn (self $container): UnionTraceProvider => new UnionTraceProvider(
                 $container->getCoveredTraceProvider(),
                 $container->getUncoveredTraceProvider(),
-                $container->getConfiguration()->mutateOnlyCoveredCode(),
+                $container->getConfiguration()->shouldMutateOnlyCoveredCode(),
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
                 $container->getSourceFileFilter(),
                 $container->getConfiguration()->sourceFiles,
             ),
             SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
-                $container->getConfiguration()->sourceFilesFilter,
+                $container->getConfiguration()->sourceFilter,
                 $container->getConfiguration()->sourceFilesExcludes,
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
@@ -431,7 +432,7 @@ final class Container extends DIContainer
                     $federatedMutationTestingResultsLogger,
                     $config->numberOfShownMutations,
                     $container->getOutputFormatter(),
-                    !$config->mutateOnlyCoveredCode(),
+                    !$config->shouldMutateOnlyCoveredCode(),
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
@@ -461,7 +462,7 @@ final class Container extends DIContainer
                     $container->getFileSystem(),
                     $config->logVerbosity,
                     $config->isDebugEnabled,
-                    $config->mutateOnlyCoveredCode(),
+                    $config->shouldMutateOnlyCoveredCode(),
                     $container->getLogger(),
                     $container->getStrykerHtmlReportBuilder(),
                     $config->loggerProjectRootDirectory,
@@ -482,7 +483,7 @@ final class Container extends DIContainer
                 return new TargetDetectionStatusesProvider(
                     $config->logs,
                     $config->logVerbosity,
-                    $config->mutateOnlyCoveredCode(),
+                    $config->shouldMutateOnlyCoveredCode(),
                     $config->numberOfShownMutations,
                 );
             },
@@ -560,6 +561,17 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            //SourceCollectorFactory::class => static fn (): SourceCollectorFactory => new SourceCollectorFactory(),
+            SourceCollector::class => static function (self $container): SourceCollector {
+                $factory = $container->get(SourceCollectorFactory::class);
+                $config = $container->getConfiguration();
+
+                return $factory->create(
+                    $config->source,
+                    $config->sourceFilter,
+                    $config->shouldMutateOnlyCoveredCode(),
+                );
+            },
         ]);
 
         return $container->withValues(
