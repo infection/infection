@@ -66,18 +66,7 @@ final class PhpUnitAdapterTest extends TestCase
         $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
 
-        $this->adapter = new PhpUnitAdapter(
-            '/path/to/phpunit',
-            '/tmp',
-            '/tmp/infection/junit.xml',
-            $this->pcovDirectoryProvider,
-            $this->createMock(InitialConfigBuilder::class),
-            $this->createMock(MutationConfigBuilder::class),
-            $this->cliArgumentsBuilder,
-            new VersionParser(),
-            $this->commandLineBuilder,
-            '9.0',
-        );
+        $this->adapter = $this->getPHPUnitAdapter();
     }
 
     public function test_it_has_a_name(): void
@@ -332,5 +321,21 @@ final class PhpUnitAdapterTest extends TestCase
         yield [true, '12.2.99'];
 
         yield [true, '13.0'];
+    }
+
+    private function getPHPUnitAdapter(string $version = '9.0'): PhpUnitAdapter
+    {
+        return new PhpUnitAdapter(
+            '/path/to/phpunit',
+            '/tmp',
+            '/tmp/infection/junit.xml',
+            $this->pcovDirectoryProvider,
+            $this->createMock(InitialConfigBuilder::class),
+            $this->createMock(MutationConfigBuilder::class),
+            $this->cliArgumentsBuilder,
+            new VersionParser(),
+            $this->commandLineBuilder,
+            $version,
+        );
     }
 }
