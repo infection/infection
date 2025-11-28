@@ -200,6 +200,60 @@ final class PhpUnitAdapterTest extends TestCase
     }
 
     #[Group('integration')]
+    public function test_it_provides_initial_test_run_command_line_with_fast_path_when_coverage_report_is_requested(): void
+    {
+        $this->adapter = $this->getPHPUnitAdapter('12.5');
+
+        $this->cliArgumentsBuilder
+            ->expects($this->once())
+            ->method('buildForInitialTestsRun')
+            ->with('', '--group=default --exclude-source-from-xml-coverage --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
+            ->willReturn([
+                '--group=default', '--exclude-source-from-xml-coverage --coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpunit', ['-d', 'memory_limit=-1'], [
+                '--group=default', '--exclude-source-from-xml-coverage --coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+            ->willReturn([
+                '/path/to/phpunit',
+                '--group=default',
+                '--exclude-source-from-xml-coverage',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('shallProvide')
+            ->willReturn(false)
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method('getDirectory')
+        ;
+
+        $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
+
+        $this->assertSame(
+            [
+                '/path/to/phpunit',
+                '--group=default',
+                '--exclude-source-from-xml-coverage',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ],
+            $initialTestRunCommandLine,
+        );
+    }
+
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested_and_pcov_is_in_use(): void
     {
         $this->cliArgumentsBuilder
@@ -319,6 +373,23 @@ final class PhpUnitAdapterTest extends TestCase
         yield [true, '12.2.7'];
 
         yield [true, '12.2.99'];
+
+        yield [true, '13.0'];
+    }
+
+    #[DataProvider('coverageWithoutSourceProvider')]
+    public function test_supports_coverage_without_source(bool $expected, string $version): void
+    {
+        $this->assertSame($expected, PhpUnitAdapter::supportsCoverageWithoutSourceFastPath($version));
+    }
+
+    public static function coverageWithoutSourceProvider(): iterable
+    {
+        yield [false, '11.5.599'];
+
+        yield [false, '12.0'];
+
+        yield [true, '12.5'];
 
         yield [true, '13.0'];
     }
