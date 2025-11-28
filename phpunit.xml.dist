@@ -31,7 +31,7 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
         </include>
