@@ -87,7 +87,7 @@ final class ProfileListTest extends TestCase
         );
     }
 
-    #[DataProviderExternal(ProfileListProvider::class, 'implementedMutatorProvider')]
+    #[DataProviderExternal(ProfileListProvider::class, 'implementedMutatorProvider', validateArgumentCount: false)]
     public function test_all_mutators_are_listed_by_at_least_one_profile(
         string $mutatorFilePath,
         string $mutatorClassName,

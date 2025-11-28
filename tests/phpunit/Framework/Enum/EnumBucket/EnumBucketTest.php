@@ -103,7 +103,7 @@ final class EnumBucketTest extends TestCase
     /**
      * @param class-string<BackedEnum> $enumClassName
      */
-    #[DataProvider('enumProvider')]
+    #[DataProvider('enumProvider', validateArgumentCount: false)]
     public function test_taking_all_values_removes_values_from_the_bucket(
         string $enumClassName,
     ): void {
@@ -118,7 +118,7 @@ final class EnumBucketTest extends TestCase
     /**
      * @param class-string<BackedEnum> $enumClassName
      */
-    #[DataProvider('enumProvider')]
+    #[DataProvider('enumProvider', validateArgumentCount: false)]
     public function test_it_is_empty_after_taking_all_values(
         string $enumClassName,
     ): void {

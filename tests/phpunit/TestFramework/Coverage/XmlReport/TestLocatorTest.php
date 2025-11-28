@@ -84,7 +84,7 @@ final class TestLocatorTest extends TestCase
         $this->assertSame($expectedTests, TestLocationsNormalizer::normalize($tests));
     }
 
-    #[DataProvider('rangeProvider')]
+    #[DataProvider('rangeProvider', validateArgumentCount: false)]
     public function test_it_cannot_locate_any_tests_executing_the_given_range_if_no_tests_are_found(
         NodeLineRangeData $range,
         bool $onFunctionSignature,

@@ -117,7 +117,7 @@ final class MutantCodeFactoryTest extends TestCase
         $this->assertSame($expectedMutantCode, $mutantCode);
     }
 
-    #[DataProvider('mutationProvider')]
+    #[DataProvider('mutationProvider', validateArgumentCount: false)]
     public function test_it_creates_the_mutant_code_without_altering_the_original_nodes(
         Mutation $mutation,
     ): void {

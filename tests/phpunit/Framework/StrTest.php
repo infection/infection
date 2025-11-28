@@ -102,7 +102,7 @@ final class StrTest extends TestCase
         ];
     }
 
-    #[DataProvider('trimLinesProvider')]
+    #[DataProvider('trimLinesProvider', validateArgumentCount: false)]
     public function test_it_trims_the_lines_and_replace_the_line_endings_by_the_unix_line_ending(
         string $input,
         string $expected,
