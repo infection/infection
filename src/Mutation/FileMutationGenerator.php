@@ -94,17 +94,17 @@ class FileMutationGenerator
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                $mutators,
-                $trace->getRealPath(),
-                $initialStatements,
-                $trace,
-                $onlyCovered,
-                $this->isForGitDiffLines,
-                $this->gitDiffBase,
-                $this->lineRangeCalculator,
-                $this->filesDiffChangedLines,
-                $originalFileTokens,
-                $sourceFile->getContents(),
+                mutators: $mutators,
+                filePath: $trace->getRealPath(),
+                fileNodes: $initialStatements,
+                trace: $trace,
+                onlyCovered: $onlyCovered,
+                isForGitDiffLines: $this->isForGitDiffLines,
+                gitDiffBase: $this->gitDiffBase,
+                lineRangeCalculator: $this->lineRangeCalculator,
+                filesDiffChangedLines: $this->filesDiffChangedLines,
+                originalFileTokens: $originalFileTokens,
+                originalFileContent: $sourceFile->getContents(),
             ),
         );
 
