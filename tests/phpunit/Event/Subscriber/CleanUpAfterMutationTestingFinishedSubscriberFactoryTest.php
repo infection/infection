@@ -49,10 +49,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(CleanUpAfterMutationTestingFinishedSubscriberFactory::class)]
 final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
     protected function setUp(): void
     {

@@ -80,7 +80,7 @@ final class FakeNode implements Node
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function getAttribute(string $key, $default = null)
+    public function getAttribute(string $key, $default = null): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }

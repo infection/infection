@@ -68,6 +68,9 @@ final class SimpleMutation extends Mutation
         return $this->mutator;
     }
 
+    /**
+     * @return Node[]
+     */
     public function getOriginalFileAst(): array
     {
         return $this->originalFileAst;

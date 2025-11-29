@@ -53,20 +53,11 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(MemoryLimiter::class)]
 final class MemoryLimiterTest extends FileSystemTestCase
 {
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $adapterMock;
+    private MockObject&AbstractTestFrameworkAdapter $adapterMock;
 
-    /**
-     * @var MemoryLimiterEnvironment|MockObject
-     */
-    private $environmentMock;
+    private MockObject&MemoryLimiterEnvironment $environmentMock;
 
     protected function setUp(): void
     {

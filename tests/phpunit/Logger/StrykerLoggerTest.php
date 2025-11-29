@@ -57,15 +57,9 @@ final class StrykerLoggerTest extends TestCase
 {
     use BacksUpEnvironmentVariables;
 
-    /**
-     * @var StrykerDashboardClient&MockObject
-     */
-    private $strykerDashboardClient;
+    private MockObject&StrykerDashboardClient $strykerDashboardClient;
 
-    /**
-     * @var MetricsCalculator&MockObject
-     */
-    private $metricsCalculatorMock;
+    private MockObject&MetricsCalculator $metricsCalculatorMock;
 
     private ConfigurableEnv $ciDetectorEnv;
 

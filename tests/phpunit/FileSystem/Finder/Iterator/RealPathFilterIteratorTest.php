@@ -64,7 +64,7 @@ final class RealPathFilterIteratorTest extends TestCase
         }
     }
 
-    public static function providesFinders()
+    public static function providesFinders(): iterable
     {
         yield 'RealPathFileIterator' => [
             MockRealPathFinder::class,

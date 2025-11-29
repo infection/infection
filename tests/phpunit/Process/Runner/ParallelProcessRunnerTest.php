@@ -438,7 +438,7 @@ final class ParallelProcessRunnerTest extends TestCase
         for ($i = 0; $i < 3; ++$i) {
             $process = $this->createMock(Process::class);
             $process->expects($this->once())->method('start');
-            $process->expects($this->any())->method('isRunning')->willReturn(false);
+            $process->method('isRunning')->willReturn(false);
 
             $mutantProcess = new DummyMutantProcess(
                 $process,
@@ -498,8 +498,8 @@ final class ParallelProcessRunnerTest extends TestCase
 
         for ($i = 0; $i < 2; ++$i) {
             $process = $this->createMock(Process::class);
-            $process->expects($this->any())->method('start'); // May or may not be called depending on mock behavior
-            $process->expects($this->any())->method('isRunning')->willReturn(false);
+            $process->method('start'); // May or may not be called depending on mock behavior
+            $process->method('isRunning')->willReturn(false);
 
             $mutantProcess = new DummyMutantProcess(
                 $process,

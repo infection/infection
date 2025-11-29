@@ -54,10 +54,7 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {
@@ -75,6 +72,9 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         );
     }
 
+    /**
+     * @param string[] $roots
+     */
     #[DataProvider('invalidPathsProvider')]
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
@@ -94,6 +94,10 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         }
     }
 
+    /**
+     * @param string[] $roots
+     * @param string[] $files
+     */
     #[DataProvider('multiplePathsProvider')]
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
@@ -108,6 +112,10 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
         );
     }
 
+    /**
+     * @param string[] $roots
+     * @param string[] $files
+     */
     #[DataProvider('multipleInvalidPathsProvider')]
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,

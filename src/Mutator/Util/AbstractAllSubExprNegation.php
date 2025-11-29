@@ -81,11 +81,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
             return false;
         }
 
-        if ($this->allSubConditionsAreNotMutable($node->left, $node->right)) {
-            return false;
-        }
-
-        return true;
+        return !$this->allSubConditionsAreNotMutable($node->left, $node->right);
     }
 
     /**
@@ -95,11 +91,7 @@ abstract class AbstractAllSubExprNegation implements Mutator
 
     protected function isSubConditionMutable(Node\Expr $node): bool
     {
-        if ($this->isIdenticalComparisonWithBoolean($node)) {
-            return false;
-        }
-
-        return true;
+        return !$this->isIdenticalComparisonWithBoolean($node);
     }
 
     private function negateEverySubExpression(Node\Expr|Node\Expr\BinaryOp\BooleanOr $node): Node\Expr

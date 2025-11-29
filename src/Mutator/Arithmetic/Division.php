@@ -88,11 +88,7 @@ final class Division implements Mutator
             return false;
         }
 
-        if ($node->right instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->right->expr)) {
-            return false;
-        }
-
-        return true;
+        return !($node->right instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->right->expr));
     }
 
     private function isNumericOne(Node $node): bool

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\SafeDOMXPath;
 
 use DOMDocument;
+use DOMNode;
 use Infection\TestFramework\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -103,7 +104,7 @@ final class SafeDOMXPathTest extends TestCase
         // This is done by doing a query that _should_ return a result but does
         // not because the XML is namespaced but not the XPath.
         $expectedNodeCount = $expectedDocumentNamespace === null ? 1 : 0;
-        $phpunitNodes = $xPath->query('/phpunit');
+        $phpunitNodes = $xPath->queryList('/phpunit');
         $this->assertCount($expectedNodeCount, $phpunitNodes);
     }
 
@@ -130,7 +131,7 @@ final class SafeDOMXPathTest extends TestCase
         );
 
         // Check that no namespace was registered.
-        $phpunitNodes = $xPath->query('/p:phpunit');
+        $phpunitNodes = $xPath->queryList('/p:phpunit');
         $this->assertCount(1, $phpunitNodes);
     }
 
@@ -208,7 +209,7 @@ final class SafeDOMXPathTest extends TestCase
         // Check that no namespace was registered.
         // This is done by doing a query that _should_ return a result but does
         // not because the XML is namespaced but not the XPath.
-        $phpunitNodes = $xPath->query('/phpunit');
+        $phpunitNodes = $xPath->queryList('/phpunit');
         $this->assertCount(0, $phpunitNodes);
 
         // Check that whitespaces are _not_ preserved
@@ -253,7 +254,7 @@ final class SafeDOMXPathTest extends TestCase
 
         // Since no namespace is registered and the document has no namespace,
         // the query must return a result.
-        $phpunitNodes = $xPath->query('/phpunit');
+        $phpunitNodes = $xPath->queryList('/phpunit');
         $this->assertCount(1, $phpunitNodes);
     }
 
@@ -265,7 +266,7 @@ final class SafeDOMXPathTest extends TestCase
         );
 
         // Check that no namespace was registered.
-        $phpunitNodes = $xPath->query('/p:phpunit');
+        $phpunitNodes = $xPath->queryList('/p:phpunit');
         $this->assertCount(1, $phpunitNodes);
     }
 
@@ -323,18 +324,327 @@ final class SafeDOMXPathTest extends TestCase
     {
         $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
 
-        $books = $xPath->query('//book');
-
+        $books = $xPath->queryList('//book');
         $this->assertCount(2, $books);
+
+        $booksCount = $xPath->queryCount('//book');
+        $this->assertSame(2, $booksCount);
     }
 
-    public function test_it_fails_on_invalid_query(): void
+    public function test_it_can_query_elements_relative_to_another_node(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-
         $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
 
-        $xPath->query('#');
+        $firstBook = $xPath->queryList('//book')->item(0);
+        // Sanity check
+        $this->assertInstanceOf(DOMNode::class, $firstBook);
+
+        $titlesInFirstBook = $xPath->queryList('.//title', $firstBook);
+        $titlesCountInFirstBook = $xPath->queryCount('.//title', $firstBook);
+        $titles = $xPath->queryList('.//title');
+        $titlesCount = $xPath->queryCount('.//title');
+
+        $this->assertCount(1, $titlesInFirstBook);
+        $this->assertSame(1, $titlesCountInFirstBook);
+        // Sanity check
+        $this->assertCount(2, $titles);
+        $this->assertSame(2, $titlesCount);
+    }
+
+    public function test_it_cannot_query_with_an_invalid_query(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The query "#" is invalid.',
+            ),
+        );
+
+        $xPath->queryList('#');
+    }
+
+    public function test_it_cannot_query_the_count_with_an_invalid_query(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The query "#" is invalid.',
+            ),
+        );
+
+        $xPath->queryCount('#');
+    }
+
+    public function test_it_cannot_query_with_a_query_with_a_dom_node_that_cannot_be_fetched(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book" is invalid.',
+            ),
+        );
+
+        $xPath->queryList('//book', new DOMNode());
+    }
+
+    public function test_it_cannot_query_the_count_with_a_query_with_a_dom_node_that_cannot_be_fetched(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book" is invalid.',
+            ),
+        );
+
+        $xPath->queryCount('//book', new DOMNode());
+    }
+
+    public function test_it_cannot_query_with_a_query_with_an_invalid_context_node(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book" is invalid.',
+            ),
+        );
+
+        $xPath->queryList('//book', new DOMNode());
+    }
+
+    public function test_it_cannot_query_count_with_a_query_with_an_invalid_context_node(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book" is invalid.',
+            ),
+        );
+
+        $xPath->queryCount('//book', new DOMNode());
+    }
+
+    public function test_it_can_query_an_element(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $expected = $xPath->queryList('//book')->item(0);
+        $actual = $xPath->queryElement('///book[1]');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_can_query_an_element_relative_to_another_node(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $firstBook = $xPath->queryList('//book')->item(0);
+        // Sanity check
+        $this->assertInstanceOf(DOMNode::class, $firstBook);
+
+        $expected = $xPath->queryList('//book/title[1]')->item(0);
+        $actual = $xPath->queryElement('.//title', $firstBook);
+        $anotherActual = $xPath->getElement('.//title', $firstBook);
+
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $anotherActual);
+    }
+
+    public function test_it_returns_null_if_the_element_could_not_be_found(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $element = $xPath->queryElement('//book[10]');
+
+        $this->assertNull($element);
+    }
+
+    public function test_it_throws_if_it_cannot_get_a_dom_element(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the query "//book[10]" to return a "DOMElement" node. None found.',
+            ),
+        );
+
+        $xPath->getElement('//book[10]');
+    }
+
+    public function test_it_cannot_query_an_element_for_which_there_is_more_than_one_item(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the query "//book" to return a "DOMNodeList" with no or one node. Got "2".',
+            ),
+        );
+
+        $element = $xPath->queryElement('//book');
+
+        $this->assertNull($element);
+    }
+
+    public function test_it_cannot_query_a_non_dom_element(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the query "//book[1]/@category" to return a "DOMElement" node. Got "DOMAttr".',
+            ),
+        );
+
+        $element = $xPath->queryElement('//book[1]/@category');
+
+        $this->assertNull($element);
+    }
+
+    public function test_it_cannot_query_an_element_with_an_invalid_query(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The query "#" is invalid.',
+            ),
+        );
+
+        $xPath->queryElement('#');
+    }
+
+    public function test_it_cannot_query_an_element_with_a_dom_node_that_cannot_be_fetched(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book" is invalid.',
+            ),
+        );
+
+        $xPath->queryElement('//book', new DOMNode());
+    }
+
+    public function test_it_cannot_query_an_element_with_an_invalid_context_node(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book" is invalid.',
+            ),
+        );
+
+        $xPath->queryElement('//book', new DOMNode());
+    }
+
+    public function test_it_can_query_an_attribute(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $expected = $xPath
+            ->queryList('//book')
+            ->item(0)
+            ?->attributes
+            ?->getNamedItem('category');
+        // Sanity check
+        $this->assertNotNull($expected);
+
+        $actual = $xPath->queryAttribute('///book[1]/@category');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_can_query_an_attribute_relative_to_another_node(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $firstBook = $xPath->queryList('//book')->item(0);
+        // Sanity check
+        $this->assertInstanceOf(DOMNode::class, $firstBook);
+
+        $expected = $xPath
+            ->queryList('//book/title[1]')
+            ->item(0)
+            ?->attributes
+            ?->getNamedItem('lang');
+        // Sanity check
+        $this->assertNotNull($expected);
+
+        $actual = $xPath->queryAttribute('.//title/@lang', $firstBook);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_returns_null_if_the_attribute_could_not_be_found(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $attribute = $xPath->queryAttribute('/@unknown');
+
+        $this->assertNull($attribute);
+    }
+
+    public function test_it_cannot_query_an_attribute_for_which_there_is_more_than_one_item(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'Expected the query "//book/@category" to return a "DOMNodeList" with no or one node. Got "2".',
+            ),
+        );
+
+        $element = $xPath->queryAttribute('//book/@category');
+
+        $this->assertNull($element);
+    }
+
+    public function test_it_cannot_query_an_attribute_with_an_invalid_query(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The query "#" is invalid.',
+            ),
+        );
+
+        $xPath->queryAttribute('#');
+    }
+
+    public function test_it_cannot_query_an_attribute_with_a_dom_node_that_cannot_be_fetched(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book/@category" is invalid.',
+            ),
+        );
+
+        $xPath->queryAttribute('//book/@category', new DOMNode());
+    }
+
+    public function test_it_cannot_query_an_attribute_with_an_invalid_context_node(): void
+    {
+        $xPath = SafeDOMXPath::fromString(self::BOOKSTORE_XML);
+
+        $this->expectExceptionObject(
+            new InvalidArgumentException(
+                'The context node passed for the query "//book/@category" is invalid.',
+            ),
+        );
+
+        $xPath->queryAttribute('//book/@category', new DOMNode());
     }
 
     public function test_it_has_document_property(): void

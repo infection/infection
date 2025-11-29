@@ -132,7 +132,7 @@ class GitDiffFileProvider
             '--diff-filter=AM',
         ]);
         $lines = explode(PHP_EOL, $filter);
-        $lines = array_filter($lines, static fn ($line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
+        $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
 
         return implode(PHP_EOL, $lines);
     }

@@ -70,6 +70,9 @@ final class StrykerHtmlReportBuilderTest extends TestCase
 {
     private const SCHEMA_FILE = 'file://' . __DIR__ . '/../../../../resources/mutation-testing-report-schema.json';
 
+    /**
+     * @param array<string, array<string, mixed>|string> $expectedReport
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         MetricsCalculator $metricsCalculator,
@@ -82,7 +85,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         $this->assertJsonDocumentMatchesSchema($report);
     }
 
-    public static function metricsProvider()
+    public static function metricsProvider(): iterable
     {
         yield 'no mutations' => [
             new MetricsCalculator(2),
@@ -258,7 +261,7 @@ final class StrykerHtmlReportBuilderTest extends TestCase
         return $collector;
     }
 
-    private function assertJsonDocumentMatchesSchema($report): void
+    private function assertJsonDocumentMatchesSchema(mixed $report): void
     {
         $resultReport = json_decode(json_encode($report));
 

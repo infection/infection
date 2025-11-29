@@ -159,4 +159,16 @@ final readonly class RunCommandHelper
 
         return null; // unlimited mutations
     }
+
+    public function getIgnoreMsiWithNoMutations(): ?bool
+    {
+        $ignoreMsiWithNoMutations = $this->input->getOption(RunCommand::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS);
+
+        // OPTION_VALUE_NOT_PROVIDED means the option was not provided at all -> return null to preserve config value
+        // `null` or any other value means the option was provided -> return true to enable it
+        return match ($ignoreMsiWithNoMutations) {
+            RunCommand::OPTION_VALUE_NOT_PROVIDED => null,
+            default => true,
+        };
+    }
 }

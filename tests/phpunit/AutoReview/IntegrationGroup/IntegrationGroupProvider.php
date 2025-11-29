@@ -62,7 +62,7 @@ final class IntegrationGroupProvider
     /**
      * @var string[][]|null
      */
-    private static $ioTestCaseClassesTuple;
+    private static ?array $ioTestCaseClassesTuple = null;
 
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now

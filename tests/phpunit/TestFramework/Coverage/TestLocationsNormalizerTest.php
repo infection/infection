@@ -45,6 +45,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TestLocationsNormalizer::class)]
 final class TestLocationsNormalizerTest extends TestCase
 {
+    /**
+     * @param array<string, TestLocations> $value
+     * @param array<string, array<string, array<int|string, array<int|string, array<string, float|string>|int>>>> $expected
+     */
     #[DataProvider('locationsProvider')]
     public function test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values(
         array $value,

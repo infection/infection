@@ -69,8 +69,12 @@ abstract class BaseMutatorTestCase extends TestCase
      * @param string|string[]|null $expectedCode
      * @param mixed[] $settings
      */
-    final protected function assertMutatesInput(string $inputCode, string|array|null $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
-    {
+    final protected function assertMutatesInput(
+        string $inputCode,
+        string|array|null $expectedCode = [],
+        array $settings = [],
+        bool $allowInvalidCode = false,
+    ): void {
         $expectedCodeSamples = (array) $expectedCode;
 
         $inputCode = StringNormalizer::normalizeString($inputCode);
@@ -210,8 +214,9 @@ abstract class BaseMutatorTestCase extends TestCase
         try {
             $tokens = token_get_all($realMutatedCode, TOKEN_PARSE);
 
-            $this->assertTrue(
-                $tokens !== [],
+            $this->assertNotSame(
+                [],
+                $tokens,
                 sprintf(
                     'Mutator %s produces invalid code: %s',
                     $this->mutator->getName(),

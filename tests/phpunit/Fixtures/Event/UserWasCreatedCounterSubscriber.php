@@ -8,7 +8,7 @@ use Infection\Event\Subscriber\EventSubscriber;
 
 final class UserWasCreatedCounterSubscriber implements EventSubscriber
 {
-    private $count = 0;
+    private int $count = 0;
 
     public function __construct(UserWasCreated $event)
     {

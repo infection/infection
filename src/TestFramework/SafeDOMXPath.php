@@ -35,10 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use DOMAttr;
 use DOMDocument;
 use DOMElement;
+use DOMNameSpaceNode;
+use DOMNode;
 use DOMNodeList;
 use DOMXPath;
+use Error;
+use InvalidArgumentException;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -137,15 +142,104 @@ final readonly class SafeDOMXPath
     }
 
     /**
-     * @return DOMNodeList<DOMElement>
+     * @return int<0,max>
      */
-    public function query(string $query): DOMNodeList
+    public function queryCount(string $query, ?DOMNode $contextNode = null): int
     {
-        $nodes = @$this->xPath->query($query);
+        return $this->queryList($query, $contextNode)->length;
+    }
 
-        Assert::isInstanceOf($nodes, DOMNodeList::class);
+    /**
+     * @return DOMNodeList<DOMNameSpaceNode|DOMNode>
+     */
+    public function queryList(string $query, ?DOMNode $contextNode = null): DOMNodeList
+    {
+        try {
+            $nodes = @$this->xPath->query($query, $contextNode);
+        } catch (Error) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The context node passed for the query "%s" is invalid.',
+                    $query,
+                ),
+            );
+        }
+
+        Assert::isInstanceOf(
+            $nodes,
+            DOMNodeList::class,
+            sprintf(
+                'The query "%s" is invalid.',
+                $query,
+            ),
+        );
 
         return $nodes;
+    }
+
+    public function queryAttribute(string $query, ?DOMNode $contextNode = null): ?DOMAttr
+    {
+        $nodes = $this->queryList($query, $contextNode);
+
+        Assert::true(
+            $nodes->length <= 1,
+            sprintf(
+                'Expected the query "%s" to return a "%s" with no or one node. Got "%s".',
+                $query,
+                DOMNodeList::class,
+                $nodes->length,
+            ),
+        );
+
+        return $nodes[0] ?? null;
+    }
+
+    public function queryElement(string $query, ?DOMNode $contextNode = null): ?DOMElement
+    {
+        $nodes = $this->queryList($query, $contextNode);
+
+        Assert::true(
+            $nodes->length <= 1,
+            sprintf(
+                'Expected the query "%s" to return a "%s" with no or one node. Got "%s".',
+                $query,
+                DOMNodeList::class,
+                $nodes->length,
+            ),
+        );
+
+        $node = $nodes->item(0);
+
+        if ($node !== null) {
+            Assert::isInstanceOf(
+                $node,
+                DOMElement::class,
+                sprintf(
+                    'Expected the query "%s" to return a "%s" node. Got "%s".',
+                    $query,
+                    DOMElement::class,
+                    $node::class,
+                ),
+            );
+        }
+
+        return $node;
+    }
+
+    public function getElement(string $query, ?DOMNode $contextNode = null): DOMElement
+    {
+        $node = $this->queryElement($query, $contextNode);
+
+        Assert::notNull(
+            $node,
+            sprintf(
+                'Expected the query "%s" to return a "%s" node. None found.',
+                $query,
+                DOMElement::class,
+            ),
+        );
+
+        return $node;
     }
 
     private function registerNamespace(string $prefix, string $namespace): void

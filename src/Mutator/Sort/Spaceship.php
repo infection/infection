@@ -83,11 +83,7 @@ final class Spaceship implements Mutator
             return false;
         }
 
-        if ($this->isCompareWithZero($node)) {
-            return false;
-        }
-
-        return true;
+        return !$this->isCompareWithZero($node);
     }
 
     private function isCompareWithZero(Node\Expr\BinaryOp\Spaceship $node): bool
@@ -115,11 +111,8 @@ final class Spaceship implements Mutator
             return true;
         }
 
-        if ($node->left instanceof Node\Scalar\LNumber && $node->left->value === 0) {
-            return true;
-        }
-
-        return false;
+        return $node->left instanceof Node\Scalar\LNumber
+            && $node->left->value === 0;
     }
 
     private function isEqualToZero(Node\Expr\BinaryOp\Equal $node): bool
@@ -144,14 +137,8 @@ final class Spaceship implements Mutator
             return true;
         }
 
-        if (
-            $node->left instanceof Node\Scalar\String_
+        return $node->left instanceof Node\Scalar\String_
             && is_numeric($node->left->value)
-            && ($node->left->value === '0' || $node->left->value === '0.0')
-        ) {
-            return true;
-        }
-
-        return false;
+            && ($node->left->value === '0' || $node->left->value === '0.0');
     }
 }

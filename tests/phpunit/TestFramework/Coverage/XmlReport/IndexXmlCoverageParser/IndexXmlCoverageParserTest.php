@@ -37,6 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParse
 
 use function array_diff;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
 use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
@@ -209,6 +210,53 @@ final class IndexXmlCoverageParserTest extends TestCase
             </phpunit>
             XML
         ];
+    }
+
+    public function test_it_errors_when_no_phpunit_project_source_could_be_found(): void
+    {
+        $xml = <<<'XML'
+            <?xml version="1.0"?>
+                <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                    <driver name="xdebug" version="2.5.1"/>
+                  </build>
+                  <project>
+                    <tests>
+                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                    </tests>
+                    <directory name="/">
+                      <totals>
+                        <lines total="913" comments="130" code="783" executable="348" executed="24" percent="6.90"/>
+                      </totals>
+                    </directory>
+                  </project>
+                  <!-- The rest of the file has been removed for this test-->
+                </phpunit>
+            XML;
+
+        $filename = __DIR__ . '/generated_index.xml';
+        $this->filesystem->dumpFile($filename, $xml);
+
+        // Note that the result is lazy, hence the exception is not thrown (yet).
+        $sources = $this->parser->parse(
+            $filename,
+            __DIR__,
+        );
+
+        $this->expectExceptionObject(
+            new InvalidCoverage(
+                sprintf(
+                    'Could not find the source attribute for the project in the file "%s".',
+                    $filename,
+                ),
+            ),
+        );
+
+        foreach ($sources as $source) {
+            return;
+        }
     }
 
     private static function getFixturesXmlFileName(): string

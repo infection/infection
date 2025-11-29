@@ -75,6 +75,9 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\NodeLineRangeData;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
@@ -114,6 +117,7 @@ final class ProjectCodeProvider
         Application::class,
         ProgressFormatter::class,
         ConcreteComposerExecutableFinder::class,
+        InvalidReportSource::class,
         StrykerCurlClient::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         NodeMutationGenerator::class,
@@ -131,6 +135,7 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutantExecutionResult::class,
         MutatorName::class,
+        NoReportFound::class,
         BaseMutatorTestCase::class,
         OperatingSystem::class,
         SchemaConfiguration::class,
@@ -139,6 +144,7 @@ final class ProjectCodeProvider
         Source::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+        TooManyReportsFound::class,
     ];
 
     /**
@@ -181,17 +187,17 @@ final class ProjectCodeProvider
     /**
      * @var string[]|null
      */
-    private static $sourceClasses;
+    private static ?array $sourceClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $sourceClassesToCheckForPublicProperties;
+    private static ?array $sourceClassesToCheckForPublicProperties = null;
 
     /**
      * @var string[]|null
      */
-    private static $testClasses;
+    private static ?array $testClasses = null;
 
     public static function provideSourceClasses(): iterable
     {
@@ -298,7 +304,6 @@ final class ProjectCodeProvider
             ->files()
             ->name('*.php')
             ->in(__DIR__ . '/../../../../tests')
-            ->notName('Helpers.php')
             ->notName('DummySymfony5FileSystem.php')
             ->notName('DummySymfony6FileSystem.php')
             ->exclude([

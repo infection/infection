@@ -85,7 +85,7 @@ final class InitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->method('getName')
             ->willReturn('PHPUnit');
         $testFramework->method('getVersion')
-            ->will($this->throwException(new InvalidArgumentException()));
+            ->willThrowException(new InvalidArgumentException());
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialTestsConsoleLoggerSubscriber($output, $testFramework, false));

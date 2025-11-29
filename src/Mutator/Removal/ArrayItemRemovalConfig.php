@@ -55,7 +55,7 @@ final readonly class ArrayItemRemovalConfig implements MutatorConfig
     private int $limit;
 
     /**
-     * @param array{remove: string|null, limit: int|null} $settings
+     * @param array{remove?: string|null, limit?: int|null} $settings
      */
     public function __construct(array $settings)
     {

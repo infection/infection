@@ -38,9 +38,14 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function array_map;
 use function count;
 use function current;
+use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function implode;
-use Infection\FileSystem\Locator\FileNotFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use function is_dir;
+use function is_readable;
 use function iterator_to_array;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -53,19 +58,39 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class JUnitReportLocator
 {
-    private readonly string $defaultJUnitPath;
+    public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
+
+    private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
     private ?string $jUnitPath = null;
 
     public function __construct(
         private readonly string $coveragePath,
-        string $defaultJUnitPath,
+        private readonly string $defaultJUnitPath,
     ) {
-        $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
+    }
+
+    public static function create(
+        string $coverageDirectory,
+        ?string $defaultJUnitPathname = null,
+    ): self {
+        return new self(
+            $coverageDirectory,
+            $defaultJUnitPathname === null
+                ? self::createPHPUnitDefaultJUnitPathname($coverageDirectory)
+                : Path::canonicalize($defaultJUnitPathname),
+        );
+    }
+
+    public function getDefaultLocation(): string
+    {
+        return $this->defaultJUnitPath;
     }
 
     /**
-     * @throws FileNotFound
+     * @throws InvalidReportSource
+     * @throws TooManyReportsFound
+     * @throws NoReportFound
      */
     public function locate(): string
     {
@@ -80,34 +105,44 @@ class JUnitReportLocator
             return $this->jUnitPath = $this->defaultJUnitPath;
         }
 
-        if (!file_exists($this->coveragePath)) {
-            throw new FileNotFound(sprintf(
-                'Could not find any file with the pattern "*.junit.xml" in "%s"',
-                $this->coveragePath,
-            ));
+        if (!file_exists($this->coveragePath)
+            || !is_readable($this->coveragePath)
+            || !is_dir($this->coveragePath)
+        ) {
+            throw new InvalidReportSource(
+                sprintf(
+                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                    $this->coveragePath,
+                ),
+            );
         }
 
         $files = iterator_to_array(
             Finder::create()
                 ->files()
                 ->in($this->coveragePath)
-                ->name('/^(.+\.)?junit\.xml$/i')
+                ->name(self::JUNIT_FILENAME_REGEX)
                 ->sortByName(),
             false,
         );
 
         if (count($files) > 1) {
-            throw new FileNotFound(sprintf(
-                'Could not locate the JUnit file: more than one file has been found with the'
-                . ' pattern "*.junit.xml": "%s"',
-                implode(
-                    '", "',
-                    array_map(
-                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
-                        $files,
+            $pathnames = array_map(
+                static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
+                $files,
+            );
+
+            throw new TooManyReportsFound(
+                sprintf(
+                    'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                    $this->coveragePath,
+                    self::JUNIT_FILENAME_REGEX,
+                    implode(
+                        '", "',
+                        $pathnames,
                     ),
                 ),
-            ));
+            );
         }
 
         $junitFileInfo = current($files);
@@ -116,9 +151,17 @@ class JUnitReportLocator
             return $this->jUnitPath = Path::canonicalize($junitFileInfo->getPathname());
         }
 
-        throw new FileNotFound(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->coveragePath,
-        ));
+        throw new NoReportFound(
+            sprintf(
+                'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
+                $this->coveragePath,
+                self::JUNIT_FILENAME_REGEX,
+            ),
+        );
+    }
+
+    private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string
+    {
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT_FILENAME);
     }
 }
