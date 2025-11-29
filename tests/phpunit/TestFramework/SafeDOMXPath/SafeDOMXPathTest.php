@@ -47,6 +47,7 @@ use function Safe\file_get_contents;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
+#[Group('integration')]
 #[CoversClass(SafeDOMXPath::class)]
 final class SafeDOMXPathTest extends TestCase
 {
