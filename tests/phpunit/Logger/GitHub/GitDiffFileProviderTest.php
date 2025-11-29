@@ -35,12 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\GitHub;
 
+use Exception;
 use function implode;
 use Infection\Framework\Str;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
-use const PHP_EOL;
+use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -52,134 +53,172 @@ final class GitDiffFileProviderTest extends TestCase
 {
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
             ->method('execute')
             ->willReturn('');
 
-        $this->expectException(NoFilesInDiffToMutate::class);
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
 
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $this->expectException(NoFilesInDiffToMutate::class);
         $diffProvider->provide('AM', 'master', ['src/']);
     }
 
-    public function test_it_executes_diff_and_returns_filter_as_a_string(): void
+    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
     {
         $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $expectedDiffCommandLine = ['git', 'diff', '0ABCMERGE_BASE_342', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'];
+        $mergeBaseCommandLineOutput = '0ABCMERGE_BASE_342';
 
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $expectedDiffCommandLine = ['git', 'diff', $mergeBaseCommandLineOutput, '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'];
+        $diffCommandLineOutput = Str::toSystemLineEndings(
+            <<<'EOF'
+                app/A.php
+                my lib/B.php
+                EOF,
+        );
 
-        $shellCommandLineExecutor
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
             ->method('execute')
             ->willReturnCallback(
                 fn (array $command): string => match ($command) {
-                    $expectedMergeBaseCommandLine => '0ABCMERGE_BASE_342',
-                    $expectedDiffCommandLine => 'app/A.php' . PHP_EOL . 'my lib/B.php',
+                    $expectedMergeBaseCommandLine => $mergeBaseCommandLineOutput,
+                    $expectedDiffCommandLine => $diffCommandLineOutput,
                     default => $this->fail(
                         'Unexpected shell command: ' . implode(' ', $command),
                     ),
                 },
             );
 
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $filter = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
 
-        $this->assertSame('app/A.php,my lib/B.php', $filter);
+        $expected = 'app/A.php,my lib/B.php';
+
+        $actual = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+
+        $this->assertSame($expected, $actual);
     }
 
     public function test_it_provides_lines_filter_as_a_string(): void
     {
         $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $expectedDiffCommandLine = ['git', 'diff', '0ABCMERGE_BASE_342', '--unified=0', '--diff-filter=AM'];
+        $mergeBaseCommandLineOutput = '0ABCMERGE_BASE_342';
 
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
+        $expectedDiffCommandLine = ['git', 'diff', $mergeBaseCommandLineOutput, '--unified=0', '--diff-filter=AM'];
+        $diffCommandLineOutput = Str::toSystemLineEndings(
+            <<<'EOF'
+                diff --git a/tests/FooTest.php b/tests/FooTest.php
+                index 2a9e281..01cbf04 100644
+                --- a/tests/FooTest.php
+                +++ b/tests/FooTest.php
+                @@ -73 +73 @@ final class FooTest
+                -            return false === \strpos($sql, 'doctrine_migrations');
+                +            return ! \str_contains($sql, 'doctrine_migrations');
+                diff --git a/Bar.php b/Bar.php
+                index f97971a..1ef35a5 100644
+                --- a/Bar.php
+                +++ b/Bar.php
+                @@ -10,0 +11,3 @@ final class Bar
+                +    /**
+                +     * @var null|non-empty-string
+                +     */
+                @@ -21 +31,4 @@ final class Bar
+                -        return $this->foo = \strrev($encryptedMessage);
+                +        $strrev = \strrev($encryptedMessage);
 
-        $gitUnifiedOutput = <<<'EOF'
-            diff --git a/tests/FooTest.php b/tests/FooTest.php
-            index 2a9e281..01cbf04 100644
-            --- a/tests/FooTest.php
-            +++ b/tests/FooTest.php
-            @@ -73 +73 @@ final class FooTest
-            -            return false === \strpos($sql, 'doctrine_migrations');
-            +            return ! \str_contains($sql, 'doctrine_migrations');
-            diff --git a/Bar.php b/Bar.php
-            index f97971a..1ef35a5 100644
-            --- a/Bar.php
-            +++ b/Bar.php
-            @@ -10,0 +11,3 @@ final class Bar
-            +    /**
-            +     * @var null|non-empty-string
-            +     */
-            @@ -21 +31,4 @@ final class Bar
-            -        return $this->foo = \strrev($encryptedMessage);
-            +        $strrev = \strrev($encryptedMessage);
+                EOF,
+        );
 
-            EOF;
-        $gitUnifiedOutput = Str::toSystemLineEndings($gitUnifiedOutput);
-
-        $expectedUnifiedReturn = <<<'EOF'
-            diff --git a/tests/FooTest.php b/tests/FooTest.php
-            @@ -73 +73 @@ final class FooTest
-            diff --git a/Bar.php b/Bar.php
-            @@ -10,0 +11,3 @@ final class Bar
-            @@ -21 +31,4 @@ final class Bar
-
-            EOF;
-        $expectedUnifiedReturn = Str::toSystemLineEndings($expectedUnifiedReturn);
-
-        $shellCommandLineExecutor
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
             ->method('execute')
             ->willReturnCallback(
                 fn (array $command): string => match ($command) {
-                    $expectedMergeBaseCommandLine => '0ABCMERGE_BASE_342',
-                    $expectedDiffCommandLine => $gitUnifiedOutput,
+                    $expectedMergeBaseCommandLine => $mergeBaseCommandLineOutput,
+                    $expectedDiffCommandLine => $diffCommandLineOutput,
                     default => $this->fail(
                         'Unexpected shell command: ' . implode(' ', $command),
                     ),
                 },
             );
 
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $filter = $diffProvider->provideWithLines('master');
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
 
-        $this->assertSame($expectedUnifiedReturn, $filter);
+        $expected = Str::toSystemLineEndings(
+            <<<'EOF'
+                diff --git a/tests/FooTest.php b/tests/FooTest.php
+                @@ -73 +73 @@ final class FooTest
+                diff --git a/Bar.php b/Bar.php
+                @@ -10,0 +11,3 @@ final class Bar
+                @@ -21 +31,4 @@ final class Bar
+
+                EOF,
+        );
+
+        $actual = $diffProvider->provideWithLines('master');
+
+        $this->assertSame($expected, $actual);
     }
 
     #[Group('integration')]
     public function test_it_can_get_this_project_default_base_branch(): void
     {
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
-        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+
+        $this->assertSame('origin/master', $diffProvider->getDefaultBaseBranch());
     }
 
-    #[DataProvider('provideGitDefaultBaseExecutions')]
-    public function test_it_provides_the_fallback_when_no_origin_upstream_defined(string $expectedBase, string $executorReturn): void
-    {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
-            ->method('execute')
-            ->willReturn($executorReturn);
+    #[DataProvider('defaultBaseBranchProvider')]
+    public function test_it_gets_the_default_base_branch(
+        string|Exception $shellOutputOrException,
+        string $expected,
+    ): void {
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
 
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $this->assertSame($expectedBase, $diffProvider->provideDefaultBase());
+        if (is_string($shellOutputOrException)) {
+            $commandLineMock
+                ->method('execute')
+                ->willReturn($shellOutputOrException);
+        } else {
+            $commandLineMock
+                ->method('execute')
+                ->willThrowException($shellOutputOrException);
+        }
+
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
+
+        $actual = $diffProvider->getDefaultBaseBranch();
+
+        $this->assertSame($expected, $actual);
     }
 
-    public static function provideGitDefaultBaseExecutions(): iterable
+    public static function defaultBaseBranchProvider(): iterable
     {
-        yield ['origin/master', ''];
+        yield 'nominal' => [
+            'refs/remotes/origin/main',
+            'origin/main',
+        ];
 
-        yield ['origin/master', 'something/unexpected'];
-    }
+        yield 'invalid output (this is possible but not with the options we pass)' => [
+            'upstream/main',
+            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+        ];
 
-    public function test_it_provides_the_fallback_when_executor_throws(): void
-    {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
-            ->method('execute')
-            ->willThrowException(new RuntimeException('ref refs/remotes/origin/HEAD is not a symbolic ref'));
+        yield 'invalid output (not understandable)' => [
+            'something-unexpected',
+            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+        ];
 
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+        yield 'invalid output (empty)' => [
+            '',
+            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+        ];
+
+        yield 'the git command failed due to the name not being a valid symbolic ref' => [
+            new RuntimeException(
+                'fatal: ref testBranch is not a symbolic ref',
+            ),
+            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+        ];
     }
 }

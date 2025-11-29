@@ -1399,7 +1399,7 @@ final class ConfigurationFactoryTest extends TestCase
 
         $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
         $gitDiffFilesProviderMock
-            ->method('provideDefaultBase')
+            ->method('getDefaultBaseBranch')
             ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
         $gitDiffFilesProviderMock
             ->method('provide')
