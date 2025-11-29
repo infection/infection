@@ -1404,7 +1404,7 @@ final class ConfigurationFactoryTest extends TestCase
         $gitDiffFilesProviderMock
             ->method('provide')
             ->willReturnCallback(
-                static fn ($gitDiffFilter, $gitDiffBase, $sourceDirectories) => sprintf(
+                static fn (string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string => sprintf(
                     'f(%s, %s, [%s]) = %s',
                     $gitDiffFilter ?? 'null',
                     $gitDiffBase ?? 'null',
