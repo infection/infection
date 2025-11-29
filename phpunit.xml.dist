@@ -5,6 +5,7 @@
          colors="true"
          executionOrder="defects,random"
          failOnWarning="true"
+         failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
          displayDetailsOnPhpunitDeprecations="true"
@@ -30,7 +31,7 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
         </include>
