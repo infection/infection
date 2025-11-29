@@ -230,10 +230,8 @@ final class LogicalOr implements Mutator
         ) {
             if ($this->seenVariabeName === null) {
                 $this->seenVariabeName = $node->expr->name;
-            } else {
-                if ($this->seenVariabeName !== $node->expr->name) {
-                    return true;
-                }
+            } elseif ($this->seenVariabeName !== $node->expr->name) {
+                return true;
             }
 
             $resolvedName = NameResolver::resolveName($node->class);

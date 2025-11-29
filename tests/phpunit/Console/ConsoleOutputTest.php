@@ -49,15 +49,9 @@ use Symfony\Component\Console\Terminal;
 #[CoversClass(ConsoleOutput::class)]
 final class ConsoleOutputTest extends TestCase
 {
-    /**
-     * @var BufferedOutput
-     */
-    private $output;
+    private BufferedOutput $output;
 
-    /**
-     * @var ConsoleOutput
-     */
-    private $consoleOutput;
+    private ConsoleOutput $consoleOutput;
 
     protected function setUp(): void
     {

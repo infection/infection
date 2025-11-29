@@ -46,11 +46,6 @@ parameters:
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
 
         -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
-            count: 1
-            path: ../src/TestFramework/SafeDOMXPath.php
-
-        -
             message: "#Do not use magic number (.*)#"
             count: 5
             path: ../src/TestFramework/Coverage/JUnit/TestLocationBucketSorter.php
@@ -123,10 +118,21 @@ parameters:
             path: ../tests/phpunit/MockedContainer.php
 
         -
+            message: "#queryCount#"
+            identifier: return.type
+            count: 1
+            path: ../src/TestFramework/SafeDOMXPath.php
+
+        -
             message: "#FS::tmpFile#"
             identifier: shipmonk.deadMethod
             count: 1
             path: ../tests/phpunit/TestingUtility/FS.php
+
+        # We are explicitly testing the guards here
+        -
+            identifier: argument.type
+            path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
 
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -

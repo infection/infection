@@ -58,6 +58,9 @@ final class DummyLogger extends AbstractLogger
         ];
     }
 
+    /**
+     * @return array<array{string, string, array<mixed>}>
+     */
     public function getLogs(): array
     {
         return $this->logs;

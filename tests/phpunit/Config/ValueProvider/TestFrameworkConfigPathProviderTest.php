@@ -50,20 +50,11 @@ use Symfony\Component\Console\Input\StringInput;
 #[CoversClass(TestFrameworkConfigPathProvider::class)]
 final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
 {
-    /**
-     * @var TestFrameworkConfigPathProvider
-     */
-    private $provider;
+    private TestFrameworkConfigPathProvider $provider;
 
-    /**
-     * @var MockObject|TestFrameworkConfigLocatorInterface
-     */
-    private $locatorMock;
+    private MockObject&TestFrameworkConfigLocatorInterface $locatorMock;
 
-    /**
-     * @var MockObject|ConsoleHelper
-     */
-    private $consoleMock;
+    private MockObject&ConsoleHelper $consoleMock;
 
     protected function setUp(): void
     {

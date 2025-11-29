@@ -50,10 +50,7 @@ use function usleep;
 #[CoversClass(Stopwatch::class)]
 final class StopwatchTest extends TestCase
 {
-    /**
-     * @var Stopwatch
-     */
-    private $stopwatch;
+    private Stopwatch $stopwatch;
 
     protected function setUp(): void
     {

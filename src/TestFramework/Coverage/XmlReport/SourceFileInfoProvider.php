@@ -48,7 +48,6 @@ use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -96,9 +95,7 @@ class SourceFileInfoProvider
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->query('/p:phpunit/p:file')[0];
-
-        Assert::notNull($fileNode);
+        $fileNode = $xPath->getElement('/p:phpunit/p:file');
 
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');

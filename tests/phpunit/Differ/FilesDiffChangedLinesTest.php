@@ -64,6 +64,9 @@ final class FilesDiffChangedLinesTest extends TestCase
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
     }
 
+    /**
+     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
+     */
     #[DataProvider('provideLines')]
     public function test_it_finds_line_in_changed_lines_from_diff(
         bool $expectedIsFound,
@@ -186,6 +189,7 @@ final class FilesDiffChangedLinesTest extends TestCase
     }
 
     /**
+     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
      * @return array{0: DiffChangedLinesParser, 1: GitDiffFileProvider}
      */
     private function prepareServices(array $returnedFilesDiffChangedLinesMap): array

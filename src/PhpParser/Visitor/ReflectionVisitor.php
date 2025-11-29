@@ -88,10 +88,11 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\DeclareItem) {
-            if ($node->key->name === 'strict_types') {
-                $this->isDeclareStrictTypes = $node->value instanceof Node\Scalar\Int_ && $node->value->value === 1;
-            }
+        if ($node instanceof Node\DeclareItem
+            && $node->key->name === 'strict_types'
+        ) {
+            $this->isDeclareStrictTypes = $node->value instanceof Node\Scalar\Int_
+                && $node->value->value === 1;
         }
 
         if ($node instanceof Node\Stmt\Function_) {
@@ -229,11 +230,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
             return true;
         }
 
-        if ($node instanceof Node\Expr\Closure) {
-            return true;
-        }
-
-        return false;
+        return $node instanceof Node\Expr\Closure;
     }
 
     private function getClassReflectionForNode(Node\Stmt\ClassLike $node): ClassReflection

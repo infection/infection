@@ -92,10 +92,6 @@ final class Decrement implements Mutator
 
         $parentNode = ParentConnector::findParent($node);
 
-        if ($parentNode instanceof Node\Stmt\For_) {
-            return false;
-        }
-
-        return true;
+        return !$parentNode instanceof Node\Stmt\For_;
     }
 }

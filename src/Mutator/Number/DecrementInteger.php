@@ -187,11 +187,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        if ($this->isCountOrLengthExpression($parentNode->right)) {
-            return false;
-        }
-
-        return true;
+        return !$this->isCountOrLengthExpression($parentNode->right);
     }
 
     private function isCountOrLengthExpression(Node\Expr $expr): bool
@@ -230,11 +226,7 @@ final class DecrementInteger extends AbstractNumberMutator
             return false;
         }
 
-        if (ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch) {
-            return true;
-        }
-
-        return false;
+        return ParentConnector::getParent($node) instanceof Node\Expr\ArrayDimFetch;
     }
 
     private function isPregSplitLimitZeroOrMinusOneArgument(Node\Scalar\LNumber $node): bool

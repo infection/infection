@@ -44,12 +44,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class PregMatchMatchesTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $output
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $output = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
-        $this->assertMutatesInput($input, $output);
+        $this->assertMutatesInput($input, $expected);
     }
 
     public static function mutationsProvider(): iterable

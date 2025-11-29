@@ -86,7 +86,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
-                new IndexXmlCoverageLocator($coveragePath),
+                IndexXmlCoverageLocator::create($coveragePath),
                 new IndexXmlCoverageParser(isForGitDiffLines: false),
                 new XmlCoverageParser(),
             ),
@@ -94,10 +94,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 $testFrameworkAdapterStub,
                 new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider(
-                        new JUnitReportLocator(
-                            coveragePath: $coveragePath,
-                            defaultJUnitPath: 'junit.xml',
-                        ),
+                        JUnitReportLocator::create($coveragePath),
                     ),
                 ),
             ),

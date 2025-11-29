@@ -92,7 +92,7 @@ phpstan-baseline: vendor $(PHPSTAN)
 
 .PHONY: psalm-baseline
 psalm-baseline: vendor
-	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
+	$(PSALM) --threads=max --set-baseline=devTools/psalm-baseline.xml
 
 .PHONY: detect-collisions
 detect-collisions: vendor $(PHPSTAN)
@@ -100,7 +100,7 @@ detect-collisions: vendor $(PHPSTAN)
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
-	$(PSALM) --threads=max
+	$(PSALM) --threads=max --use-baseline=devTools/psalm-baseline.xml
 
 .PHONY: rector
 rector: vendor $(RECTOR)

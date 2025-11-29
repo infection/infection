@@ -31,9 +31,6 @@ class FakeAwareAdapter extends AbstractTestFrameworkAdapter implements MemoryUsa
     /**
      * Reports memory used by a test suite.
      *
-     * @param string $output
-     *
-     * @return float
      */
     public function getMemoryUsed(string $output): float
     {

@@ -122,6 +122,9 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @param string[] $testCases
+     */
     #[DataProvider('provideTestCases')]
     public function test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant(
         bool $executeOnlyCoveringTestCases,

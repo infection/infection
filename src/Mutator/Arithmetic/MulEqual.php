@@ -86,11 +86,7 @@ final class MulEqual implements Mutator
             return false;
         }
 
-        if ($node->expr instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->expr->expr)) {
-            return false;
-        }
-
-        return true;
+        return !($node->expr instanceof Node\Expr\UnaryMinus && $this->isNumericOne($node->expr->expr));
     }
 
     private function isNumericOne(Node $node): bool
