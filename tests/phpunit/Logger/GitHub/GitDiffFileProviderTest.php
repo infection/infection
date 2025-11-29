@@ -165,7 +165,7 @@ final class GitDiffFileProviderTest extends TestCase
     {
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
 
-        $this->assertSame('origin/master', $diffProvider->getDefaultBaseBranch());
+        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
     }
 
     #[DataProvider('defaultBaseBranchProvider')]
@@ -187,7 +187,7 @@ final class GitDiffFileProviderTest extends TestCase
 
         $diffProvider = new GitDiffFileProvider($commandLineMock);
 
-        $actual = $diffProvider->getDefaultBaseBranch();
+        $actual = $diffProvider->provideDefaultBase();
 
         $this->assertSame($expected, $actual);
     }

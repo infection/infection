@@ -81,7 +81,7 @@ class GitDiffFileProvider
      * - 'origin/main'
      * - 'origin/master'
      */
-    public function getDefaultBaseBranch(): string
+    public function provideDefaultBase(): string
     {
         if ($this->defaultBase !== null) {
             return $this->defaultBase;

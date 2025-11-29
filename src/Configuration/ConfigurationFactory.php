@@ -370,7 +370,7 @@ class ConfigurationFactory
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->getDefaultBaseBranch();
+        $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
 
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
