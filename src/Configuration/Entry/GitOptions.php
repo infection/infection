@@ -33,48 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Configuration\Entry;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;
 
-/**
- * @internal
- */
-final readonly class SchemaConfiguration
+final readonly class GitOptions
 {
+    private const GIT_DIFF_LINE_FILTER = 'AM';
+
     /**
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
+     * @param non-empty-string $filter
+     * @param non-empty-string|null $baseBranch
      */
     public function __construct(
-        public string $file,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
+        public string $filter,
+        public ?string $baseBranch,
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    }
+
+    public static function tryCreate(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+    ) {
+        if ($gitDiffBase === null && $isForGitDiffLines === false) {
+            return null;
+        }
+
+        if ($gitDiffFilter === null) {
+            Assert::true($isForGitDiffLines);
+        } else {
+            Assert::false($isForGitDiffLines);
+        }
+
+        return new self(
+            $gitDiffFilter ?? self::GIT_DIFF_LINE_FILTER,
+            $gitDiffBase,
+        );
     }
 }

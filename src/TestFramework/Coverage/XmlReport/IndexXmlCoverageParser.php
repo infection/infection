@@ -47,7 +47,7 @@ use Webmozart\Assert\Assert;
 class IndexXmlCoverageParser
 {
     public function __construct(
-        private readonly bool $isForGitDiffLines,
+        private readonly bool $areSourcesFiltered,
     ) {
     }
 
@@ -67,7 +67,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $xPath = SafeDOMXPath::fromFile($coverageIndexPath, 'p');
 
-        self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
+        self::assertHasExecutedLines($xPath, $this->areSourcesFiltered);
 
         return $this->parseNodes($coverageIndexPath, $coverageBasePath, $xPath);
     }

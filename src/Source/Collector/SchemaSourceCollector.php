@@ -33,51 +33,73 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem;
+namespace Infection\Source\Collector;
 
 use function array_filter;
 use function array_map;
+use function count;
 use function explode;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\Trace;
 use Iterator;
 use SplFileInfo;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 /**
  * @internal
- * @final
  */
-class SourceFileFilter implements FileFilter
+final readonly class SchemaSourceCollector implements SourceCollector
 {
     /**
-     * @var string[]
-     */
-    private readonly array $filters;
-
-    /**
-     * @param string[] $excludeDirectories
+     * @param non-empty-string[] $filters
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedDirectoriesOrFiles
      */
     public function __construct(
-        string $filter,
-        private readonly array $excludeDirectories,
+        public array $filters,
+        private array $sourceDirectories,
+        private array $excludedDirectoriesOrFiles,
     ) {
-        $this->filters = array_filter(array_map(
-            'trim',
-            explode(',', $filter),
-        ));
     }
 
     /**
-     * Returns a filter array to be used in tests.
-     *
-     * TODO Good candidate to be refactored into a class.
-     *
-     * @return string[]
+     * @param non-empty-string|null $filter
+     * @param string[] $sourceDirectories
+     * @param string[] $excludedDirectoriesOrFiles
      */
-    public function getFilters(): array
+    public static function create(
+        ?string $filter,
+        array $sourceDirectories,
+        array $excludedDirectoriesOrFiles,
+    ): self {
+        return new self(
+            self::createFilters($filter),
+            $sourceDirectories,
+            $excludedDirectoriesOrFiles,
+        );
+    }
+
+    // TODO: I think the file/glob based filter could be applied here directly.
+    //  For performance reasons, most collectors already apply a filtering of some kind
+    //  e.g. the git diff. So currently if feels we are a bit in-between for all of them:
+    //  - git diff uses the sources for further filter but doesn't account for the excluded directories neither the user filter (but the git diff filter)
+    //  - the schema source collector does not account for the user filter
+    //  - traces don't account for either, we decorate them with the source filter
+    public function collect(): iterable
     {
-        return $this->filters;
+        if ($this->sourceDirectories === []) {
+            return [];
+        }
+
+        // TODO: to use the filesystem factory method as per the PoC
+        return Finder::create()
+            ->in($this->sourceDirectories)
+            ->exclude($this->excludedDirectoriesOrFiles)
+            ->notPath($this->excludedDirectoriesOrFiles)
+            ->files()
+            ->name('*.php')
+        ;
     }
 
     public function filter(iterable $input): iterable
@@ -92,11 +114,34 @@ class SourceFileFilter implements FileFilter
             );
         }
 
-        if ($this->excludeDirectories !== []) {
-            $iterator = new PathFilterIterator($iterator, [], $this->excludeDirectories);
+        if ($this->excludedDirectoriesOrFiles !== []) {
+            $iterator = new PathFilterIterator(
+                $iterator,
+                [],
+                $this->excludedDirectoriesOrFiles,
+            );
         }
 
         return $iterator;
+    }
+
+    public function isFiltered(): bool
+    {
+        return count($this->filters) === 0;
+    }
+
+    /**
+     * @param non-empty-string|null $filter
+     * @return non-empty-string[]
+     */
+    private static function createFilters(?string $filter): array
+    {
+        return array_filter(
+            array_map(
+                trim(...),
+                explode(',', $filter ?? ''),
+            ),
+        );
     }
 
     /**

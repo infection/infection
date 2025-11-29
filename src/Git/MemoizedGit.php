@@ -33,48 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Git;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- */
-final readonly class SchemaConfiguration
+// TODO: maybe we don't want memoized results for everything...
+final class MemoizedGit implements Git
 {
-    /**
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
-     */
+    private string $defaultBase;
+
+    private string $defaultBaseFilter;
+
     public function __construct(
-        public string $file,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
+        private readonly Git $decoratedGit,
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    }
+
+    public function reset(): void
+    {
+        unset($this->defaultBase);
+        unset($this->defaultBaseFilter);
+    }
+
+    public function getDefaultBaseBranch(): string
+    {
+        if (!isset($this->defaultBase)) {
+            $this->defaultBase = $this->decoratedGit->getDefaultBaseBranch();
+        }
+
+        return $this->defaultBase;
+    }
+
+    public function getDefaultBaseFilter(): string
+    {
+        if (!isset($this->defaultBaseFilter)) {
+            $this->defaultBaseFilter = $this->decoratedGit->getDefaultBaseFilter();
+        }
+
+        return $this->defaultBaseFilter;
     }
 }

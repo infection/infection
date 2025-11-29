@@ -33,48 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Source\Collector;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\Git\Git;
+use Infection\Process\ShellCommandLineExecutor;
+use const true;
 
-/**
- * @internal
- */
-final readonly class SchemaConfiguration
+final readonly class SourceCollectorFactory
 {
-    /**
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
-     */
     public function __construct(
-        public string $file,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
+        private Git $git,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    }
+
+    /**
+     * @param non-empty-string|GitOptions|null $sourceFilter E.g. "src/Service/Mailer.php", "Mailer.php", "src/Service/", "Mailer.php,Sender.php", etc.
+     */
+    public function create(
+        Source $source,
+        string|GitOptions|null $sourceFilter,
+    ): SourceCollector {
+        return match (true) {
+            $sourceFilter instanceof GitOptions => new GitDiffSourceCollector(
+                $this->shellCommandLineExecutor,
+                $sourceFilter->baseBranch,
+                $source->directories,
+                $source->excludes,
+            ),
+            default => new SchemaSourceCollector(
+                $sourceDirectories,
+                $excludedDirectoriesOrFiles,
+            ),
+        };
     }
 }

@@ -40,9 +40,9 @@ use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\Source;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
@@ -248,7 +248,7 @@ final class ConfigurationFactoryTest extends TestCase
             processTimeout: 10,
             sourceDirectories: [],
             sourceFiles: [],
-            sourceFilesFilter: 'src/a.php,src/b.php',
+            sourceFilter: 'src/a.php,src/b.php',
             sourceFilesExcludes: [],
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
@@ -276,7 +276,7 @@ final class ConfigurationFactoryTest extends TestCase
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
-            isForGitDiffLines: false,
+            isForFilteredSources: false,
             gitDiffBase: 'master',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: null,

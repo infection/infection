@@ -1,0 +1,4 @@
+- instead of evaluating the git filter in ConfigurationFactory, we give it as is (potentially completed with the branch source) to the Configuration
+- instead of collecting the sources to give to the configuration, we do not.
+
+

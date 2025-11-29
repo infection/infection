@@ -33,48 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Git;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
-
-/**
- * @internal
- */
-final readonly class SchemaConfiguration
+interface Git
 {
+    public function getDefaultBaseBranch(): string;
+
+    public function getDefaultBaseFilter(): string;
+
     /**
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
+     * git merge-base finds the best common ancestor(s) between two commits to use in a three-way merge. One common ancestor is better than
+     * another common ancestor if the latter is an ancestor of the former. A common ancestor that does not have any better common ancestor is
+     * a best common ancestor, i.e. a merge base. Note that there can be more than one merge base for a pair of commits.
      */
-    public function __construct(
-        public string $file,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
-    ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
-    }
+    public function findReferenceCommit(string $reference): string;
+
+    /**
+     * @param string[] $paths
+     */
+    public function diff(string $commit, string $filter, array $paths): string;
 }

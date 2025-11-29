@@ -41,11 +41,13 @@ use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileFilter;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
 use function iterator_to_array;
+use function Pipeline\take;
 use SplFileInfo;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -67,12 +69,17 @@ final readonly class Factory
         private Configuration $infectionConfig,
         private SourceFileFilter $sourceFileFilter,
         private array $installedExtensions,
+        private SourceCollector $sourceCollector,
     ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
+        // TODO: to dig deeper how this is used.
+        //  this looks a bit fishy as we may have a different config here than what the user
+        //  configured in their phpunit.xml for example.
+        //  likewise depending of the state, what files are considered for mutations changes.
+        $filteredSourceFilesToMutate = take($this->sourceCollector->collect())->toList();
 
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
