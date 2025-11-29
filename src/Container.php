@@ -72,6 +72,7 @@ use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
@@ -153,7 +154,6 @@ use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
 
 /**
@@ -260,7 +260,8 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            IndexXmlCoverageLocator::class => static fn (self $container): IndexXmlCoverageLocator => IndexXmlCoverageLocator::create(
+            IndexXmlCoverageLocator::class => static fn (self $container) => IndexXmlCoverageLocator::create(
+                $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
@@ -348,7 +349,8 @@ final class Container extends DIContainer
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
-            JUnitReportLocator::class => static fn (self $container): JUnitReportLocator => JUnitReportLocator::create(
+            JUnitReportLocator::class => static fn (self $container) => JUnitReportLocator::create(
+                $container->getFileSystem(),
                 $container->getConfiguration()->coveragePath,
             ),
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
@@ -685,9 +687,9 @@ final class Container extends DIContainer
         return $clone;
     }
 
-    public function getFileSystem(): Filesystem
+    public function getFileSystem(): FileSystem
     {
-        return $this->get(Filesystem::class);
+        return $this->get(FileSystem::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider

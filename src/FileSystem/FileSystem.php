@@ -35,104 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function is_dir;
+use function is_file;
+use function is_readable;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
-use Traversable;
 
 /**
  * @internal
  */
-final class DummyFileSystem extends FileSystem
+class FileSystem extends SymfonyFilesystem
 {
-    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
-    {
-    }
-
-    public function mkdir($dirs, int $mode = 0777): void
-    {
-    }
-
-    public function exists(string|iterable $files): bool
-    {
-        return false;
-    }
-
-    public function touch($files, ?int $time = null, ?int $atime = null): void
-    {
-    }
-
-    public function remove($files): void
-    {
-    }
-
-    public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): void
-    {
-    }
-
-    public function chown($files, $user, bool $recursive = false): void
-    {
-    }
-
-    public function chgrp($files, $group, bool $recursive = false): void
-    {
-    }
-
-    public function rename(string $origin, string $target, bool $overwrite = false): void
-    {
-    }
-
-    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
-    {
-    }
-
-    public function hardlink(string $originFile, $targetFiles): void
-    {
-    }
-
-    public function readlink(string $path, bool $canonicalize = false): string
-    {
-        return '';
-    }
-
-    public function makePathRelative(string $endPath, string $startPath): string
-    {
-        return '';
-    }
-
-    public function mirror(string $originDir, string $targetDir, ?Traversable $iterator = null, array $options = []): void
-    {
-    }
-
-    public function isAbsolutePath(string $file): bool
-    {
-        return true;
-    }
-
-    public function tempnam(string $dir, string $prefix, string $suffix = ''): string
-    {
-        return '';
-    }
-
-    public function dumpFile(string $filename, $content): void
-    {
-    }
-
-    public function appendToFile(string $filename, $content, bool $lock = false): void
-    {
-    }
-
-    public function readFile(string $filename): string
-    {
-        return '';
-    }
-
     public function isReadableFile(string $filename): bool
     {
-        return false;
+        return is_file($filename) && is_readable($filename);
     }
 
     public function isReadableDirectory(string $filename): bool
     {
-        return false;
+        return is_dir($filename) && is_readable($filename);
     }
 
     public function createFinder(): Finder

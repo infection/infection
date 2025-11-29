@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_replace;
 use function sprintf;
@@ -48,7 +49,7 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     private ?SafeDOMXPath $xPath = null;
 
     public function __construct(
-        private readonly JUnitReportLocator $jUnitLocator,
+        private readonly ReportLocator $jUnitLocator,
     ) {
     }
 

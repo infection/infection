@@ -58,6 +58,8 @@ use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\DummyFileSystem;
+use Infection\FileSystem\FakeFileSystem;
+use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
@@ -75,6 +77,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
+use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
@@ -145,6 +148,9 @@ final class ProjectCodeProvider
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
         TooManyReportsFound::class,
+        FakeFileSystem::class,
+        FakeLocator::class,
+        FileSystem::class,
     ];
 
     /**
@@ -168,6 +174,7 @@ final class ProjectCodeProvider
         MetricsCalculator::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
+        FileSystem::class,
     ];
 
     /**

@@ -33,47 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\Locator;
 
-use function dirname;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Provides the traces based on the PHPUnit XML coverage collected.
- *
- * @internal
- * @final
- */
-class PhpUnitXmlCoverageTraceProvider implements TraceProvider
+#[CoversClass(FixedLocator::class)]
+final class FixedLocatorTest extends TestCase
 {
-    public function __construct(
-        private readonly ReportLocator $indexLocator,
-        private readonly IndexXmlCoverageParser $indexParser,
-        private readonly XmlCoverageParser $parser,
-    ) {
+    public function test_it_can_be_instantiated_without_a_default_location(): void
+    {
+        $location = '/path/to/file';
+
+        $locator = new FixedLocator($location);
+
+        $this->assertSame($location, $locator->locate());
+        $this->assertSame($location, $locator->getDefaultLocation());
     }
 
-    /**
-     * @throws InvalidCoverage
-     * @throws NoLineExecuted
-     *
-     * @return iterable<Trace>
-     */
-    public function provideTraces(): iterable
+    public function test_it_can_be_instantiated_with_a_default_location(): void
     {
-        // The existence of the file should have already been checked. Hence in theory we should not
-        // have to deal with a FileNotFound exception here so we skip any friendly error handling
-        $indexPath = $this->indexLocator->locate();
-        $coverageBasePath = dirname($indexPath);
+        $location = '/path/to/file';
+        $defaultLocation = '/path/to/default-file';
 
-        foreach ($this->indexParser->parse(
-            $indexPath,
-            $coverageBasePath,
-        ) as $infoProvider) {
-            // TODO It might be beneficial to filter files at this stage, rather than later. SourceFileDataFactory does that.
-            yield $this->parser->parse($infoProvider);
-        }
+        $locator = new FixedLocator($location, $defaultLocation);
+
+        $this->assertSame($location, $locator->locate());
+        $this->assertSame($defaultLocation, $locator->getDefaultLocation());
     }
 }
