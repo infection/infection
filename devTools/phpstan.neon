@@ -156,6 +156,19 @@ parameters:
             identifier: argument.type
             path: ../tests/phpunit/Framework/ClassNameTest.php
 
+        # Those magic numbers are related to the class name manipulation, they are not very interesting
+        # to extract into named constants.
+        -
+            message: '#Do not use magic number as a function argument.#'
+            path: ../src/Framework/ClassName.php
+        # Those cannot be avoided as ClassName does some class-string manipulation.
+        -
+            message: '#should return .*class-string.* but returns .*string#'
+            path: ../src/Framework/ClassName.php
+        -
+            message: '#expects class-string, string given#'
+            path: ../src/Framework/ClassName.php
+
     level: 8
     paths:
         - ../src
