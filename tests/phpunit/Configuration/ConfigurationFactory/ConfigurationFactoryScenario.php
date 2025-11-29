@@ -588,4 +588,30 @@ final class ConfigurationFactoryScenario
                     ->build(),
             );
     }
+
+    public function forFilter(
+        string $filter,
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+        string $expectedSourceFilesFilter,
+        bool $expectedIsForGitDiffLines,
+        ?string $expectedDiffBase,
+    ): self {
+        return $this
+            ->withInput(
+                $this->inputBuilder
+                ->withFilter($filter)
+                ->withGitDiffFilter($gitDiffFilter)
+                ->withIsForGitDiffLines($isForGitDiffLines)
+                ->withGitDiffBase($gitDiffBase),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withSourceFilesFilter($expectedSourceFilesFilter)
+                    ->withIsForGitDiffLines($expectedIsForGitDiffLines)
+                    ->withGitDiffBase($expectedDiffBase)
+                    ->build(),
+            );
+    }
 }
