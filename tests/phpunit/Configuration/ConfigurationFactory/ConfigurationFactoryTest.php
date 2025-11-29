@@ -1102,7 +1102,7 @@ final class ConfigurationFactoryTest extends TestCase
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'f(AD, test/default, []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: false,
-                    expectedDiffBase: null,
+                    expectedDiffBase: 'test/default',
                 ),
         ];
 
@@ -1128,7 +1128,7 @@ final class ConfigurationFactoryTest extends TestCase
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'f(AM, test/default, []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
-                    expectedDiffBase: null,
+                    expectedDiffBase: 'test/default',
                 ),
         ];
 
