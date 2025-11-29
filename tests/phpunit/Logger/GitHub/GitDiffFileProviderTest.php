@@ -117,7 +117,7 @@ final class GitDiffFileProviderTest extends TestCase
         $commandLineMock
             ->method('execute')
             ->willReturnCallback(
-                fn (array $command) => match ($command) {
+                fn (array $command): string => match ($command) {
                     $expectedMergeBaseCommandLine => throw $mergeBaseCommandLineException,
                     $expectedDiffCommandLine => $diffCommandLineOutput,
                     default => $this->failForUnexpectedShellCommand($command),
@@ -233,7 +233,7 @@ final class GitDiffFileProviderTest extends TestCase
         $commandLineMock
             ->method('execute')
             ->willReturnCallback(
-                fn (array $command) => match ($command) {
+                fn (array $command): string => match ($command) {
                     $expectedMergeBaseCommandLine => throw $mergeBaseCommandLineException,
                     $expectedDiffCommandLine => $diffCommandLineOutput,
                     default => $this->failForUnexpectedShellCommand($command),
