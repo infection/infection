@@ -369,11 +369,8 @@ class ConfigurationFactory
             return $filter;
         }
 
+        $gitDiffFilter ??= 'AM';
         $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
-
-        if ($isForGitDiffLines) {
-            return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);
-        }
 
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
