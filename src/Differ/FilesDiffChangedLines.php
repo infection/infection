@@ -52,10 +52,10 @@ class FilesDiffChangedLines
     ) {
     }
 
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, ?string $gitDiffBase): bool
+    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
     {
         $this->memoizedFilesChangedLinesMap ??= $this->diffChangedLinesParser->parse(
-            $this->diffFileProvider->provideWithLines($gitDiffBase ?? $this->diffFileProvider->provideDefaultBase()),
+            $this->diffFileProvider->provideWithLines($gitDiffBase),
         );
 
         foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
