@@ -183,7 +183,7 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForGitDiffLines: $isForGitDiffLines,
+            isForGitDiffLines: $isForGitDiffLines || $gitDiffFilter !== null,
             gitDiffBase: $gitDiffBase,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
