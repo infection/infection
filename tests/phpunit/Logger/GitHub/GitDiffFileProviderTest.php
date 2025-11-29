@@ -43,6 +43,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -145,7 +146,8 @@ final class GitDiffFileProviderTest extends TestCase
         $this->assertSame($expectedUnifiedReturn, $filter);
     }
 
-    public function test_it_provides_the_infections_own_git_default_base(): void
+    #[Group('integration')]
+    public function test_it_can_get_this_project_default_base_branch(): void
     {
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
         $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
