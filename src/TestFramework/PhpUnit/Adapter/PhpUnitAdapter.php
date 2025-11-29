@@ -92,7 +92,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
-            if (self::supportsCoverageWithoutSourceFastPath($this->getVersion())) {
+            if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
                 $extraOptions = trim(sprintf(
                     '%s --exclude-source-from-xml-coverage --coverage-xml=%s --log-junit=%s',
                     $extraOptions,
@@ -186,7 +186,10 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         return $recommendations;
     }
 
-    public static function supportsCoverageWithoutSourceFastPath(string $version): bool
+    /**
+     * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element which from the XML report which contained the list of tokens of the source code file.
+     */
+    public static function supportsExcludingSourceFromCoverage(string $version): bool
     {
         return version_compare($version, '12.5', '>=');
     }

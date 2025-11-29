@@ -380,7 +380,7 @@ final class PhpUnitAdapterTest extends TestCase
     #[DataProvider('coverageWithoutSourceProvider')]
     public function test_supports_coverage_without_source(bool $expected, string $version): void
     {
-        $this->assertSame($expected, PhpUnitAdapter::supportsCoverageWithoutSourceFastPath($version));
+        $this->assertSame($expected, PhpUnitAdapter::supportsExcludingSourceFromCoverage($version));
     }
 
     public static function coverageWithoutSourceProvider(): iterable
