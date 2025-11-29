@@ -47,6 +47,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use function sprintf;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
 #[CoversClass(GitDiffFileProvider::class)]
 final class GitDiffFileProviderTest extends TestCase
@@ -84,9 +87,7 @@ final class GitDiffFileProviderTest extends TestCase
                 fn (array $command): string => match ($command) {
                     $expectedMergeBaseCommandLine => $mergeBaseCommandLineOutput,
                     $expectedDiffCommandLine => $diffCommandLineOutput,
-                    default => $this->fail(
-                        'Unexpected shell command: ' . implode(' ', $command),
-                    ),
+                    default => $this->failForUnexpectedShellCommand($command),
                 },
             );
 
@@ -99,7 +100,58 @@ final class GitDiffFileProviderTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_provides_lines_filter_as_a_string(): void
+    public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed(): void
+    {
+        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
+        $mergeBaseCommandLineException = $this->createMock(ProcessFailedException::class);
+
+        $expectedDiffCommandLine = ['git', 'diff', 'master', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'];
+        $diffCommandLineOutput = Str::toSystemLineEndings(
+            <<<'EOF'
+                app/A.php
+                my lib/B.php
+                EOF,
+        );
+
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
+            ->method('execute')
+            ->willReturnCallback(
+                fn (array $command) => match ($command) {
+                    $expectedMergeBaseCommandLine => throw $mergeBaseCommandLineException,
+                    $expectedDiffCommandLine => $diffCommandLineOutput,
+                    default => $this->failForUnexpectedShellCommand($command),
+                },
+            );
+
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
+
+        $expected = 'app/A.php,my lib/B.php';
+
+        $actual = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
+    {
+        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
+        $mergeBaseCommandLineException = new SymfonyProcessRuntimeException('fatal: Not a valid object name randomName');
+
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
+            ->method('execute')
+            ->with($expectedMergeBaseCommandLine)
+            ->willThrowException($mergeBaseCommandLineException);
+
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
+
+        $this->expectExceptionObject($mergeBaseCommandLineException);
+
+        $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+    }
+
+    public function test_it_get_the_changed_lines_as_a_string(): void
     {
         $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
         $mergeBaseCommandLineOutput = '0ABCMERGE_BASE_342';
@@ -136,9 +188,7 @@ final class GitDiffFileProviderTest extends TestCase
                 fn (array $command): string => match ($command) {
                     $expectedMergeBaseCommandLine => $mergeBaseCommandLineOutput,
                     $expectedDiffCommandLine => $diffCommandLineOutput,
-                    default => $this->fail(
-                        'Unexpected shell command: ' . implode(' ', $command),
-                    ),
+                    default => $this->failForUnexpectedShellCommand($command),
                 },
             );
 
@@ -158,6 +208,69 @@ final class GitDiffFileProviderTest extends TestCase
         $actual = $diffProvider->provideWithLines('master');
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_changed_lines_if_getting_the_merge_base_failed(): void
+    {
+        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
+        $mergeBaseCommandLineException = $this->createMock(ProcessFailedException::class);
+
+        $expectedDiffCommandLine = ['git', 'diff', 'master', '--unified=0', '--diff-filter=AM'];
+        $diffCommandLineOutput = Str::toSystemLineEndings(
+            <<<'EOF'
+                diff --git a/tests/FooTest.php b/tests/FooTest.php
+                index 2a9e281..01cbf04 100644
+                --- a/tests/FooTest.php
+                +++ b/tests/FooTest.php
+                @@ -73 +73 @@ final class FooTest
+                -            return false === \strpos($sql, 'doctrine_migrations');
+                +            return ! \str_contains($sql, 'doctrine_migrations');
+
+                EOF,
+        );
+
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
+            ->method('execute')
+            ->willReturnCallback(
+                fn (array $command) => match ($command) {
+                    $expectedMergeBaseCommandLine => throw $mergeBaseCommandLineException,
+                    $expectedDiffCommandLine => $diffCommandLineOutput,
+                    default => $this->failForUnexpectedShellCommand($command),
+                },
+            );
+
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
+
+        $expected = Str::toSystemLineEndings(
+            <<<'EOF'
+                diff --git a/tests/FooTest.php b/tests/FooTest.php
+                @@ -73 +73 @@ final class FooTest
+
+                EOF,
+        );
+
+        $actual = $diffProvider->provideWithLines('master');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
+    {
+        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
+        $mergeBaseCommandLineException = new SymfonyProcessRuntimeException('fatal: Not a valid object name randomName');
+
+        $commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $commandLineMock
+            ->method('execute')
+            ->with($expectedMergeBaseCommandLine)
+            ->willThrowException($mergeBaseCommandLineException);
+
+        $diffProvider = new GitDiffFileProvider($commandLineMock);
+
+        $this->expectExceptionObject($mergeBaseCommandLineException);
+
+        $diffProvider->provideWithLines('master');
     }
 
     #[Group('integration')]
@@ -220,5 +333,18 @@ final class GitDiffFileProviderTest extends TestCase
             ),
             GitDiffFileProvider::FALLBACK_BASE_BRANCH,
         ];
+    }
+
+    /**
+     * @param string[] $command
+     */
+    private function failForUnexpectedShellCommand(array $command): never
+    {
+        $this->fail(
+            sprintf(
+                'Unexpected shell command: %s',
+                implode(' ', $command),
+            ),
+        );
     }
 }
