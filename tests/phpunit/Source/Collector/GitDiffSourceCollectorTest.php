@@ -33,21 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\GitHub;
+namespace Infection\Tests\Source\Collector;
 
 use function implode;
 use Infection\Framework\Str;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Git\CommandLineGit;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Collector\GitDiffSourceCollector;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-#[CoversClass(GitDiffFileProvider::class)]
-final class GitDiffFileProviderTest extends TestCase
+#[CoversClass(GitDiffSourceCollector::class)]
+final class GitDiffSourceCollectorTest extends TestCase
 {
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
@@ -58,7 +58,7 @@ final class GitDiffFileProviderTest extends TestCase
 
         $this->expectException(NoFilesInDiffToMutate::class);
 
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
+        $diffProvider = new CommandLineGit($shellCommandLineExecutor);
         $diffProvider->provide('AM', 'master', ['src/']);
     }
 
@@ -149,25 +149,6 @@ final class GitDiffFileProviderTest extends TestCase
     {
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
         $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
-    }
-
-    #[DataProvider('provideGitDefaultBaseExecutions')]
-    public function test_it_provides_the_fallback_when_no_origin_upstream_defined(string $expectedBase, string $executorReturn): void
-    {
-        $shellCommandLineExecutor = $this->createMock(ShellCommandLineExecutor::class);
-        $shellCommandLineExecutor
-            ->method('execute')
-            ->willReturn($executorReturn);
-
-        $diffProvider = new GitDiffFileProvider($shellCommandLineExecutor);
-        $this->assertSame($expectedBase, $diffProvider->provideDefaultBase());
-    }
-
-    public static function provideGitDefaultBaseExecutions(): iterable
-    {
-        yield ['origin/master', ''];
-
-        yield ['origin/master', 'something/unexpected'];
     }
 
     public function test_it_provides_the_fallback_when_executor_throws(): void

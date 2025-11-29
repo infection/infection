@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use function array_merge;
 use function array_slice;
 use function count;
 use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use RuntimeException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 final readonly class CommandLineGit implements Git
 {
@@ -54,7 +56,7 @@ final readonly class CommandLineGit implements Git
     ) {
     }
 
-    public function getDefaultBase(): string
+    public function getDefaultBaseBranch(): string
     {
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
@@ -84,5 +86,41 @@ final readonly class CommandLineGit implements Git
     public function getDefaultBaseFilter(): string
     {
         return 'AM';
+    }
+
+    public function findReferenceCommit(string $reference): string
+    {
+        try {
+            return $this->shellCommandLineExecutor->execute([
+                'git',
+                'merge-base',
+                $reference,
+                'HEAD',
+            ]);
+        } catch (ProcessFailedException) {
+            /**
+             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+             * Fall back to direct diff
+             */
+            return $reference;
+        }
+    }
+
+    public function diff(string $commit, string $filter, array $paths): string
+    {
+        return $this->shellCommandLineExecutor->execute(
+            array_merge(
+                [
+                    'git',
+                    'diff',
+                    $commit,
+                    '--diff-filter',
+                    $filter,
+                    '--name-only',
+                    '--',
+                ],
+                $paths,
+            ),
+        );
     }
 }

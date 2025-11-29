@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\FileSystem\FileFilter;
 use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 
@@ -47,9 +46,9 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 final readonly class CoveredTraceProvider implements TraceProvider
 {
     public function __construct(
-        private TraceProvider               $primaryTraceProvider,
+        private TraceProvider $primaryTraceProvider,
         private JUnitTestExecutionInfoAdder $testFileDataAdder,
-        private SourceCollector             $sourceCollector,
+        private SourceCollector $sourceCollector,
     ) {
     }
 
@@ -65,7 +64,7 @@ final readonly class CoveredTraceProvider implements TraceProvider
 
         /*
          * Looking up test executing timings is not a free operation. We even had to memoize it to help speed things up.
-         * Therefore we add test execution info only after applying filter to the files feed. Adding this step above the
+         * Therefore, we add test execution info only after applying filter to the files feed. Adding this step above the
          * filter will negatively affect performance. The greater the junit.xml report size, the more.
          */
         return $this->testFileDataAdder->addTestExecutionInfo(

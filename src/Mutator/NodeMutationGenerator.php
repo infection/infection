@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
-use Infection\FileSystem\FileFilter;
-use Infection\Source\SourceLineFilter;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\SourceLineFilter;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
@@ -76,15 +74,15 @@ class NodeMutationGenerator
      * @param Token[] $originalFileTokens
      */
     public function __construct(
-        array                                $mutators,
-        private readonly string              $filePath,
-        private readonly array               $fileNodes,
-        private readonly Trace               $trace,
-        private readonly bool                $onlyCovered,
+        array $mutators,
+        private readonly string $filePath,
+        private readonly array $fileNodes,
+        private readonly Trace $trace,
+        private readonly bool $onlyCovered,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineFilter    $lineFilter,
-        private readonly array               $originalFileTokens,
-        private readonly string              $originalFileContent,
+        private readonly SourceLineFilter $lineFilter,
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
 

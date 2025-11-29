@@ -35,13 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
-use Webmozart\Assert\Assert;
-
 final readonly class GitFilter implements SourceFilter
 {
     public function __construct(
         public string $filter,
-        public string  $base,
+        public string $baseBranch,
     ) {
     }
 }

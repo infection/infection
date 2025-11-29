@@ -35,19 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use Infection\Configuration\Entry\Source;
-use Infection\Configuration\SourceFilter\SourceFilter;
 use function array_map;
 use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -63,25 +61,22 @@ readonly class Configuration
     ];
 
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $sourceFilesExcludes
-     * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      */
     public function __construct(
-        public float         $processTimeout,
+        public float $processTimeout,
         public Source $source,
         public ?SourceFilter $sourceFilter,
-        public Logs          $logs,
-        public string        $logVerbosity,
-        public string        $tmpDir,
-        public PhpUnit       $phpUnit,
-        public PhpStan       $phpStan,
-        public array         $mutators,
-        public string        $testFramework,
-        public ?string       $bootstrap,
-        public ?string       $initialTestsPhpOptions,
+        public Logs $logs,
+        public string $logVerbosity,
+        public string $tmpDir,
+        public PhpUnit $phpUnit,
+        public PhpStan $phpStan,
+        public array $mutators,
+        public string $testFramework,
+        public ?string $bootstrap,
+        public ?string $initialTestsPhpOptions,
         public string $testFrameworkExtraOptions,
         public ?string $staticAnalysisToolOptions,
         public string $coveragePath,
@@ -89,25 +84,22 @@ readonly class Configuration
         public bool $skipInitialTests,
         public bool $isDebugEnabled,
         private bool $withUncovered,
-        public bool    $noProgress,
-        public bool    $ignoreMsiWithNoMutations,
-        public ?float  $minMsi,
-        public ?int    $numberOfShownMutations,
-        public ?float  $minCoveredMsi,
-        public int     $msiPrecision,
-        public int     $threadCount,
-        public bool    $isDryRun,
-        public array   $ignoreSourceCodeMutatorsMap,
-        public bool    $executeOnlyCoveringTestCases,
-        public bool    $isForFilteredSources,
-        public ?string $gitDiffBase,
+        public bool $noProgress,
+        public bool $ignoreMsiWithNoMutations,
+        public ?float $minMsi,
+        public ?int $numberOfShownMutations,
+        public ?float $minCoveredMsi,
+        public int $msiPrecision,
+        public int $threadCount,
+        public bool $isDryRun,
+        public array $ignoreSourceCodeMutatorsMap,
+        public bool $executeOnlyCoveringTestCases,
         public ?string $mapSourceClassToTestStrategy,
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
-        Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());

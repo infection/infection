@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use SplFileInfo;
 use Infection\FileSystem\FileFilter;
+use SplFileInfo;
 
 // TODO: I do not think FileFilter should be necessary here. To check how to phase it out.
 interface SourceCollector extends FileFilter

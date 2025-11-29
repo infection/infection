@@ -43,12 +43,10 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Coverage\Trace;
-use Infection\Tracing\Tracer;
+use Infection\TestFramework\Coverage\TraceProvider;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
-use function iter\map;
 
 /**
  * @internal
@@ -63,8 +61,7 @@ class MutationGenerator
      * @param Mutator<Node>[] $mutators
      */
     public function __construct(
-        private readonly SourceCollector $sourceCollector,
-        private readonly Tracer $tracer,
+        private readonly TraceProvider $traceProvider,
         array $mutators,
         private readonly EventDispatcher $eventDispatcher,
         private readonly FileMutationGenerator $fileMutationGenerator,
@@ -84,12 +81,7 @@ class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $sources = $this->sourceCollector->collect();
-
-        $traces = map(
-            $this->tracer->trace(...),
-            $sources,
-        );
+        $traces = $this->traceProvider->provideTraces();
 
         $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($traces, $this->runConcurrently);
 

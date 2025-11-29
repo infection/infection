@@ -39,15 +39,36 @@ use Webmozart\Assert\Assert;
 
 final readonly class GitOptions
 {
+    private const GIT_DIFF_LINE_FILTER = 'AM';
+
+    /**
+     * @param non-empty-string $filter
+     * @param non-empty-string|null $baseBranch
+     */
     public function __construct(
-        public ?string $gitDiffFilter,
-        public bool $isForGitDiffLines,
-        public ?string $gitDiffBase,
+        public string $filter,
+        public ?string $baseBranch,
     ) {
+    }
+
+    public static function tryCreate(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+        ?string $gitDiffBase,
+    ) {
+        if ($gitDiffBase === null && $isForGitDiffLines === false) {
+            return null;
+        }
+
         if ($gitDiffFilter === null) {
             Assert::true($isForGitDiffLines);
         } else {
             Assert::false($isForGitDiffLines);
         }
+
+        return new self(
+            $gitDiffFilter ?? self::GIT_DIFF_LINE_FILTER,
+            $gitDiffBase,
+        );
     }
 }

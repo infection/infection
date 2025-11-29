@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -56,9 +55,9 @@ use Webmozart\Assert\Assert;
 class FileMutationGenerator
 {
     public function __construct(
-        private readonly FileParser            $parser,
-        private readonly NodeTraverserFactory  $traverserFactory,
-        private readonly LineRangeCalculator   $lineRangeCalculator,
+        private readonly FileParser $parser,
+        private readonly NodeTraverserFactory $traverserFactory,
+        private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineFilter $lineFilter,
     ) {
     }
@@ -93,15 +92,15 @@ class FileMutationGenerator
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                $mutators,
-                $trace->getRealPath(),
-                $initialStatements,
-                $trace,
-                $onlyCovered,
-                $this->lineRangeCalculator,
-                $this->lineFilter,
-                $originalFileTokens,
-                $sourceFile->getContents(),
+                mutators: $mutators,
+                filePath: $trace->getRealPath(),
+                fileNodes: $initialStatements,
+                trace: $trace,
+                onlyCovered: $onlyCovered,
+                lineRangeCalculator: $this->lineRangeCalculator,
+                lineFilter: $this->lineFilter,
+                originalFileTokens: $originalFileTokens,
+                originalFileContent: $sourceFile->getContents(),
             ),
         );
 

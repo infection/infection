@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Configuration;
 
 use Webmozart\Assert\Assert;
 

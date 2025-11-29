@@ -33,25 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Collector;
+namespace Infection\Tests\Git;
 
-use Infection\Tracing\Tracer;
+use Infection\Git\CommandLineGit;
+use Infection\Git\Git;
+use Infection\Process\ShellCommandLineExecutor;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final readonly class CoveredSourceCollector implements SourceCollector
+#[CoversClass(CommandLineGit::class)]
+final class CommandLineGitTest extends TestCase
 {
-    public function __construct(
-        private SourceCollector $decoratedSourceCollector,
-        private Tracer $tracer,
-    ) {
+    private ShellCommandLineExecutor&MockObject $shellCommandLineExecutorMock;
+
+    private Git $git;
+
+    protected function setUp(): void
+    {
+        $this->shellCommandLineExecutorMock = $this->createMock(ShellCommandLineExecutor::class);
+
+        $this->git = new CommandLineGit(
+            $this->shellCommandLineExecutorMock,
+        );
     }
 
-    public function collect(): iterable
+    #[DataProvider('provideGitDefaultBaseExecutions')]
+    public function test_it_provides_the_fallback_when_no_origin_upstream_defined(
+        string $commandResult,
+        string $expected,
+    ): void {
+        $this->shellCommandLineExecutorMock
+            ->method('execute')
+            ->willReturn($commandResult);
+
+        $actual = $this->git->getDefaultBaseBranch();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function provideGitDefaultBaseExecutions(): iterable
     {
-        // TODO: preserve the key?
-        foreach ($this->decoratedSourceCollector->collect() as $source) {
-            if ($this->tracer->hasTrace($source)) {
-                yield $source;
-            }
-        }
+        yield ['', 'origin/master'];
+
+        yield ['refs/remotes/origin/master', 'origin/master'];
+
+        yield ['something/unexpected', 'origin/master'];
     }
 }

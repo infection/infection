@@ -37,7 +37,19 @@ namespace Infection\Git;
 
 interface Git
 {
-    public function getDefaultBase(): string;
+    public function getDefaultBaseBranch(): string;
 
     public function getDefaultBaseFilter(): string;
+
+    /**
+     * git merge-base finds the best common ancestor(s) between two commits to use in a three-way merge. One common ancestor is better than
+     * another common ancestor if the latter is an ancestor of the former. A common ancestor that does not have any better common ancestor is
+     * a best common ancestor, i.e. a merge base. Note that there can be more than one merge base for a pair of commits.
+     */
+    public function findReferenceCommit(string $reference): string;
+
+    /**
+     * @param string[] $paths
+     */
+    public function diff(string $commit, string $filter, array $paths): string;
 }

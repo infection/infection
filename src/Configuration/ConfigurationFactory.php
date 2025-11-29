@@ -35,31 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
-use Infection\Configuration\Entry\GitOptions;
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Configuration\SourceFilter\SourceFilter;
-use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\FileLogger;
-use Infection\Logger\GitHub\GitDiffFileProvider;
-use Infection\Mutator\ConfigurableMutator;
-use Infection\Mutator\Mutator;
-use Infection\Mutator\MutatorFactory;
-use Infection\Mutator\MutatorParser;
-use Infection\Mutator\MutatorResolver;
-use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\Source\Collector\SourceCollectorFactory;
-use Infection\TestFramework\TestFrameworkTypes;
-use OndraM\CiDetector\CiDetector;
-use OndraM\CiDetector\CiDetectorInterface;
-use OndraM\CiDetector\Exception\CiNotDetectedException;
-use PhpParser\Node;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 use function array_fill_keys;
 use function array_key_exists;
 use function array_map;
@@ -68,16 +43,42 @@ use function array_values;
 use function dirname;
 use function file_exists;
 use function in_array;
+use Infection\Configuration\Entry\GitOptions;
+use Infection\Configuration\Entry\Logs;
+use Infection\Configuration\Entry\PhpStan;
+use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\GitFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Configuration\SourceFilter\UserFilter;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
+use Infection\FileSystem\TmpDirProvider;
+use Infection\Git\Git;
+use Infection\Logger\FileLogger;
+use Infection\Mutator\ConfigurableMutator;
+use Infection\Mutator\Mutator;
+use Infection\Mutator\MutatorFactory;
+use Infection\Mutator\MutatorParser;
+use Infection\Mutator\MutatorResolver;
+use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
+use function is_string;
 use function max;
+use OndraM\CiDetector\CiDetector;
+use OndraM\CiDetector\CiDetectorInterface;
+use OndraM\CiDetector\Exception\CiNotDetectedException;
+use PhpParser\Node;
 use function sprintf;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class ConfigurationFactory
+final readonly class ConfigurationFactory
 {
     /**
      * Default allowed timeout (on a test basis) in seconds
@@ -85,13 +86,12 @@ class ConfigurationFactory
     private const DEFAULT_TIMEOUT = 10;
 
     public function __construct(
-        private readonly TmpDirProvider $tmpDirProvider,
-        private readonly MutatorResolver $mutatorResolver,
-        private readonly MutatorFactory $mutatorFactory,
-        private readonly MutatorParser $mutatorParser,
-        private readonly SourceCollectorFactory $sourceCollectorFactory,
-        private readonly CiDetectorInterface $ciDetector,
-        private readonly GitDiffFileProvider $gitDiffFileProvider,
+        private TmpDirProvider $tmpDirProvider,
+        private MutatorResolver $mutatorResolver,
+        private MutatorFactory $mutatorFactory,
+        private MutatorParser $mutatorParser,
+        private CiDetectorInterface $ciDetector,
+        private Git $git,
     ) {
     }
 
@@ -152,18 +152,11 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $sourceCollector = $this->sourceCollectorFactory->create(
-            $schema->getSource()->getDirectories(),
-            $schema->getSource()->getExcludes(),
-            $sourceFilter,
-            mutateOnlyCoveredCode: true,    // TODO
-        );
-
         return new Configuration(
-            processTimeout: $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
+            processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
-            sourceFilter: $this->retrieveFilter($sourceFilter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
-            logs: $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
+            sourceFilter: $this->retrieveFilter($sourceFilter),
+            logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
             phpUnit: $this->retrievePhpUnit($schema, $configDir),
@@ -189,8 +182,6 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForFilteredSources: $isForGitDiffLines,
-            gitDiffBase: $gitDiffBase,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
@@ -338,49 +329,53 @@ class ConfigurationFactory
         return $map;
     }
 
+    //    /**
+    //     * @return iterable<string, SplFileInfo>
+    //     */
+    //    private function collectFiles(SchemaConfiguration $schema): iterable
+    //    {
+    //        $source = $schema->source;
+    //        $schemaDirname = dirname($schema->file);
+    //
+    //        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+    //            ? $path
+    //            : Path::join(
+    //                $schemaDirname,
+    //                $path,
+    //            );
+    //
+    //        return $this->sourceFileCollector->collectFiles(
+    //            // We need to make the source file paths absolute, otherwise the
+    //            // collector will collect the files relative to the current working
+    //            // directory instead of relative to the location of the configuration
+    //            // file.
+    //            array_map(
+    //                $mapToAbsolutePath(...),
+    //                $source->directories,
+    //            ),
+    //            $source->excludes,
+    //        );
+    //    }
+
     /**
-     * @return iterable<string, SplFileInfo>
+     * @param non-empty-string|GitOptions|null $filter
      */
-    private function collectFiles(SchemaConfiguration $schema): iterable
+    private function retrieveFilter(string|GitOptions|null $filter): ?SourceFilter
     {
-        $source = $schema->source;
-        $schemaDirname = dirname($schema->file);
-
-        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
-            ? $path
-            : Path::join(
-                $schemaDirname,
-                $path,
-            );
-
-        return $this->sourceFileCollector->collectFiles(
-            // We need to make the source file paths absolute, otherwise the
-            // collector will collect the files relative to the current working
-            // directory instead of relative to the location of the configuration
-            // file.
-            array_map(
-                $mapToAbsolutePath(...),
-                $source->directories,
-            ),
-            $source->excludes,
-        );
-    }
-
-    /**
-     * @param string[] $sourceDirectories
-     */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): ?SourceFilter
-    {
-        // TODO: I do not understand this return here
-        if ($gitDiffFilter === null && !$isForGitDiffLines) {
-            return $filter;
+        if ($filter === null) {
+            return null;
         }
 
-        $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
-        // TODO:
-        $gitDiffFilter = $isForGitDiffLines ? 'AM' : $gitDiffFilter;
+        if (is_string($filter)) {
+            return new UserFilter($filter);
+        }
 
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
+        $baseBranch = $filter->baseBranch ?? $this->git->getDefaultBaseBranch();
+
+        return new GitFilter(
+            $filter->filter,
+            $baseBranch,
+        );
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs

@@ -35,23 +35,49 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use function array_filter;
+use function array_map;
+use function count;
+use function explode;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\TestFramework\Coverage\Trace;
+use Iterator;
+use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 /**
- * TODO: extract the rename in a separate PR
- *
  * @internal
  */
 final readonly class SchemaSourceCollector implements SourceCollector
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedDirectoriesOrFiles
+     * @param non-empty-string[] $filters
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedDirectoriesOrFiles
      */
     public function __construct(
+        public array $filters,
         private array $sourceDirectories,
         private array $excludedDirectoriesOrFiles,
     ) {
+    }
+
+    /**
+     * @param non-empty-string|null $filter
+     * @param string[] $sourceDirectories
+     * @param string[] $excludedDirectoriesOrFiles
+     */
+    public static function create(
+        ?string $filter,
+        array $sourceDirectories,
+        array $excludedDirectoriesOrFiles,
+    ): self {
+        return new self(
+            self::createFilters($filter),
+            $sourceDirectories,
+            $excludedDirectoriesOrFiles,
+        );
     }
 
     // TODO: I think the file/glob based filter could be applied here directly.
@@ -74,5 +100,74 @@ final readonly class SchemaSourceCollector implements SourceCollector
             ->files()
             ->name('*.php')
         ;
+    }
+
+    public function filter(iterable $input): iterable
+    {
+        $iterator = $this->iterableToIterator($input);
+
+        if ($this->filters !== []) {
+            $iterator = new RealPathFilterIterator(
+                $iterator,
+                $this->filters,
+                [],
+            );
+        }
+
+        if ($this->excludedDirectoriesOrFiles !== []) {
+            $iterator = new PathFilterIterator(
+                $iterator,
+                [],
+                $this->excludedDirectoriesOrFiles,
+            );
+        }
+
+        return $iterator;
+    }
+
+    public function isFiltered(): bool
+    {
+        return count($this->filters) === 0;
+    }
+
+    /**
+     * @param non-empty-string|null $filter
+     * @return non-empty-string[]
+     */
+    private static function createFilters(?string $filter): array
+    {
+        return array_filter(
+            array_map(
+                trim(...),
+                explode(',', $filter ?? ''),
+            ),
+        );
+    }
+
+    /**
+     * @param iterable<SplFileInfo|Trace> $input
+     *
+     * @return Iterator<SplFileInfo|Trace>
+     */
+    private function iterableToIterator(iterable $input): Iterator
+    {
+        if ($input instanceof Iterator) {
+            // Generator is an iterator, means most of the time we're done right here.
+            return $input;
+        }
+
+        /*
+         * Clause for all other cases, e.g. when testing.
+         *
+         * RealPathFilterIterator wants an iterator, not just any iterable or traversable.
+         * But not any Traversable is an Iterator. But since we know most of the time we're
+         * dealing with Generators, which are instances of an Iterator, we can jump them
+         * through. But we may want to use other types of iterables, e.g. arrays in tests,
+         * and that last clause is to covert them, or any other non-Iterator object, to
+         * a Generator which is an Iterator. Traversable types are complicated, right.
+         */
+        return (static function () use ($input): Iterator {
+            yield from $input;
+        })();
     }
 }

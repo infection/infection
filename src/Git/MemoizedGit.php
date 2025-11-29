@@ -53,10 +53,10 @@ final class MemoizedGit implements Git
         unset($this->defaultBaseFilter);
     }
 
-    public function getDefaultBase(): string
+    public function getDefaultBaseBranch(): string
     {
         if (!isset($this->defaultBase)) {
-            $this->defaultBase = $this->decoratedGit->getDefaultBase();
+            $this->defaultBase = $this->decoratedGit->getDefaultBaseBranch();
         }
 
         return $this->defaultBase;

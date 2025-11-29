@@ -507,58 +507,56 @@ final class RunCommand extends BaseCommand
         $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
-            $logger,
-            $io->getOutput(),
-            $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
-            trim((string) $input->getOption(self::OPTION_MUTATORS)),
-            $commandHelper->getNumberOfShownMutations(),
-            trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
+            logger: $logger,
+            output: $io->getOutput(),
+            configFile: $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
+            mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
+            numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
+            logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
             // To keep in sync with Container::DEFAULT_DEBUG
-            (bool) $input->getOption(self::OPTION_DEBUG),
+            debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
-            (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            self::getFormatterName($input),
+            withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
+            formatterName: self::getFormatterName($input),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
-            $noProgress,
-            $forceProgress,
-            $coverage === ''
+            noProgress: $noProgress,
+            forceProgress: $forceProgress,
+            existingCoveragePath: $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
-            $initialTestsPhpOptions === ''
+            initialTestsPhpOptions: $initialTestsPhpOptions === ''
                 ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
                 : $initialTestsPhpOptions,
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
-            (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
+            skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
-            $commandHelper->getIgnoreMsiWithNoMutations(),
-            MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
-            MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
-            $msiPrecision,
-            $testFramework === ''
+            ignoreMsiWithNoMutations: $commandHelper->getIgnoreMsiWithNoMutations(),
+            minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
+            minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
+            msiPrecision: $msiPrecision,
+            testFramework: $testFramework === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK
                 : $testFramework,
-            $testFrameworkExtraOptions === ''
+            testFrameworkExtraOptions: $testFrameworkExtraOptions === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
                 : $testFrameworkExtraOptions,
-            $staticAnalysisToolOptions === ''
+            staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            // TODO: I think it much better, from a cognitive load perspective, to have this "processing"
-            //  done here. There is no more carrying over 4 different options in several places.
-            self::getSourceFilter($input),
-            $commandHelper->getThreadCount(),
+            sourceFilter: self::getSourceFilters($input),
+            threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
-            (bool) $input->getOption(self::OPTION_DRY_RUN),
-            $commandHelper->getUseGitHubLogger(),
-            $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
-            $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
-            $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
-            (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
-            (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
-            $commandHelper->getMapSourceClassToTest(),
-            $loggerProjectRootDirectory,
-            $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
-            $input->getOption(self::OPTION_MUTANT_ID),
+            dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
+            useGitHubLogger: $commandHelper->getUseGitHubLogger(),
+            gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
+            htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
+            textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
+            executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
+            mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
+            loggerProjectRootDirectory: $loggerProjectRootDirectory,
+            staticAnalysisTool: $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
+            mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
     }
 
@@ -663,42 +661,31 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    /**
-     * @return non-empty-string|GitOptions|null
-     */
-    private static function getSourceFilter(InputInterface $input): string|GitOptions|null
+    private static function getFormatterName(InputInterface $input): FormatterName
     {
-        $gitOptions = self::getGitOptions($input);
+        $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
+
+        return FormatterName::from($value);
+    }
+
+    private static function getSourceFilters(InputInterface $input): string|GitOptions|null
+    {
         $filter = self::getFilter($input);
+        $gitOptions = self::getGitOptions($input);
 
         self::assertOnlyOneTypeOfFiltering($filter, $gitOptions);
 
         return $filter ?? $gitOptions;
     }
 
+    /**
+     * @return non-empty-string|null
+     */
     private static function getFilter(InputInterface $input): ?string
     {
-        $value = trim((string) $input->getOption(self::OPTION_FILTER));
+        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
 
-        return $value === '' ? null : $value;
-    }
-
-    private static function assertOnlyOneTypeOfGitFiltering(
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-    ): void {
-        if (
-            $gitDiffFilter !== null
-            && $isForGitDiffLines
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass both "--%s" and "--%s" options: only one type of filtering is allowed.',
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
+        return $filter === '' ? null : $filter;
     }
 
     private static function getGitOptions(InputInterface $input): ?GitOptions
@@ -710,17 +697,28 @@ final class RunCommand extends BaseCommand
         self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
         self::assertGitBaseHasRequiredFilter($gitDiffFilter, $isForGitDiffLines, $gitDiffBase);
 
-        $filterSourceWithGit = $gitDiffFilter !== null
-            || $isForGitDiffLines
-            || $gitDiffBase !== null;
+        return GitOptions::tryCreate(
+            $gitDiffFilter,
+            $isForGitDiffLines,
+            $gitDiffBase,
+        );
+    }
 
-        return $filterSourceWithGit
-            ? new GitOptions(
-                $gitDiffFilter,
-                $isForGitDiffLines,
-                $gitDiffBase,
-            )
-            : null;
+    private static function assertOnlyOneTypeOfGitFiltering(
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+    ): void {
+        if ($isForGitDiffLines
+            && $gitDiffFilter !== null
+        ) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
+                    self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
+        }
     }
 
     private static function assertGitBaseHasRequiredFilter(
@@ -728,44 +726,36 @@ final class RunCommand extends BaseCommand
         bool $isForGitDiffLines,
         ?string $gitDiffBase,
     ): void {
-        // TODO: previously was $gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
-        //  I do not understand the point of those default values if the default is not using git
-        //  If we provide a default there, then the requirement is still valid, as a base requires a filter.
-        if ($gitDiffBase === null) {
-            return;
-        }
-
-        $hasFilter = $gitDiffFilter !== null || $isForGitDiffLines;
-
-        if ($hasFilter) {
-            return;
-        }
-
-        // TODO: seems like you can pass DEFAULT_GIT_DIFF_LINES instead of DEFAULT_GIT_DIFF_FILTER
-        //  too thought?
-        // TODO: port the improve message
-        throw new InvalidArgumentException(
-            sprintf(
-                'The option "--%s" cannot be used without the option "--%s" or "--%s".',
-                self::OPTION_GIT_DIFF_BASE,
-                self::OPTION_GIT_DIFF_LINES,
-                self::OPTION_GIT_DIFF_FILTER,
-            ),
-        );
-    }
-
-    private static function assertOnlyOneTypeOfFiltering(
-        ?string $filter,
-        ?GitOptions $gitOptions,
-    ): void {
-        if (
-            $filter !== null
-            && $gitOptions !== null
+        if ($gitDiffBase !== null
+            && $gitDiffFilter === null
+            && $isForGitDiffLines === false
         ) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'Cannot pass both "--%s" and "--%s" options: only one type of filtering is allowed.',
+                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
+                    self::OPTION_GIT_DIFF_BASE,
                     self::OPTION_GIT_DIFF_LINES,
+                    self::OPTION_GIT_DIFF_FILTER,
+                ),
+            );
+        }
+    }
+
+    /**
+     * @param non-empty-string|null $filter
+     */
+    private static function assertOnlyOneTypeOfFiltering(
+        ?string $filter,
+        ?GitOptions $gitFilter,
+    ): void {
+        if ($filter !== null && $gitFilter !== null) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    // TODO: the message is incorrect as it can be --git-diff-filter or --git-diff-lines
+                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
+                    self::OPTION_FILTER,
+                    self::OPTION_GIT_DIFF_FILTER,
+                    self::OPTION_FILTER,
                     self::OPTION_GIT_DIFF_FILTER,
                 ),
             );

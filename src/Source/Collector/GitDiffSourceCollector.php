@@ -35,46 +35,77 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use Infection\Process\ShellCommandLineExecutor;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use function array_merge;
 use function explode;
 use function implode;
+use Infection\Git\Git;
+use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use const PHP_EOL;
 
-// TODO: partially copied from Infection\Logger\GitHub\GitDiffSourceCollector.
-//  did not move it entirely as it seems to be used elsewhere too.
 /**
  * @internal
  */
-final readonly class GitDiffSourceCollector implements SourceCollector
+final class GitDiffSourceCollector implements SourceCollector
 {
+    private ?SourceCollector $innerCollector = null;
+
+    /**
+     * @param non-empty-string $filter
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedDirectoriesOrFiles
+     */
     public function __construct(
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
-        private string $gitDiffFilter,
-        private string $gitDiffBase,
-        private array $sourceDirectories,
-        // TODO: prob need the exclude too?
+        private readonly Git $git,
+        private readonly string $filter,
+        private readonly string $baseBranch,
+        private readonly array $sourceDirectories,
+        private readonly array $excludedDirectoriesOrFiles,
     ) {
     }
 
     public function collect(): iterable
     {
-        $referenceCommit = $this->findReferenceCommit($this->gitDiffBase);
+        return $this->getInnerCollector()->collect();
+    }
 
-        $filter = $this->shellCommandLineExecutor->execute(array_merge(
-            [
-                'git',
-                'diff',
-                $referenceCommit,
-                '--diff-filter',
-                $this->gitDiffFilter,
-                '--name-only',
-                '--',
-            ],
+    public function filter(iterable $input): iterable
+    {
+        return $this->getInnerCollector()->filter($input);
+    }
+
+    public function isFiltered(): bool
+    {
+        return true;
+    }
+
+    private function getInnerCollector(): SourceCollector
+    {
+        if ($this->innerCollector === null) {
+            $filter = $this->getFilter();
+
+            $this->innerCollector = SchemaSourceCollector::create(
+                $filter,
+                $this->sourceDirectories,
+                $this->excludedDirectoriesOrFiles,
+            );
+        }
+
+        return $this->innerCollector;
+    }
+
+    /**
+     * @throws NoFilesInDiffToMutate
+     *
+     * @return non-empty-string
+     */
+    private function getFilter(): string
+    {
+        $referenceCommit = $this->git->findReferenceCommit($this->baseBranch);
+
+        $filter = $this->git->diff(
+            $referenceCommit,
+            $this->filter,
             $this->sourceDirectories,
-        ));
+        );
 
         if ($filter === '') {
             throw NoFilesInDiffToMutate::create();
@@ -84,25 +115,5 @@ final readonly class GitDiffSourceCollector implements SourceCollector
             ',',
             explode(PHP_EOL, $filter),
         );
-    }
-
-    private function findReferenceCommit(string $gitDiffBase): string
-    {
-        try {
-            $comparisonCommit = $this->shellCommandLineExecutor->execute([
-                'git',
-                'merge-base',
-                $gitDiffBase,
-                'HEAD',
-            ]);
-        } catch (ProcessFailedException) {
-            /**
-             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-             * Fall back to direct diff
-             */
-            $comparisonCommit = $gitDiffBase;
-        }
-
-        return $comparisonCommit;
     }
 }

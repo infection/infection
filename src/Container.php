@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -120,6 +121,7 @@ use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\SchemaSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
+use Infection\Source\SourceLineFilter;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -144,6 +146,7 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use OndraM\CiDetector\CiDetector;
+use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -156,8 +159,6 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\Assert\Assert;
-use function array_filter;
-use function php_ini_loaded_file;
 
 /**
  * @internal
@@ -441,18 +442,12 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
-                $configuration = $container->getConfiguration();
-
-                return new FileMutationGenerator(
-                    $container->getFileParser(),
-                    $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator(),
-                    $container->getFilesDiffChangedLines(),
-                    $configuration->isForFilteredSources,
-                    $configuration->gitDiffBase,
-                );
-            },
+            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
+                $container->getFileParser(),
+                $container->getNodeTraverserFactory(),
+                $container->getLineRangeCalculator(),
+                $container->get(SourceLineFilter::class),
+            ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
@@ -561,15 +556,14 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
-            //SourceCollectorFactory::class => static fn (): SourceCollectorFactory => new SourceCollectorFactory(),
+            // SourceCollectorFactory::class => static fn (): SourceCollectorFactory => new SourceCollectorFactory(),
             SourceCollector::class => static function (self $container): SourceCollector {
                 $factory = $container->get(SourceCollectorFactory::class);
-                $config = $container->getConfiguration();
+                $configuration = $container->getConfiguration();
 
                 return $factory->create(
-                    $config->source,
-                    $config->sourceFilter,
-                    $config->shouldMutateOnlyCoveredCode(),
+                    $configuration->source,
+                    $configuration->sourceFilter,
                 );
             },
         ]);
@@ -580,6 +574,9 @@ final class Container extends DIContainer
         );
     }
 
+    /**
+     * @param non-empty-string|GitOptions|null $sourceFilter
+     */
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,
@@ -602,7 +599,7 @@ final class Container extends DIContainer
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        string|GitOptions|null $sourceFilter = self::DEFAULT_SOURCE_FILTER,
+        string|GitOptions|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
