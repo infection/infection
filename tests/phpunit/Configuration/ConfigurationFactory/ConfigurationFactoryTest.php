@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use function count;
+use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -81,6 +83,10 @@ use function var_export;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
+    private const GIT_DEFAULT_BASE_BRANCH = 'test/default';
+
+    private const GIT_DIFF_FILTER_PROVIDER_RESULT = 'src/a.php,src/b.php';
+
     /**
      * @var array<string, Mutator>|null
      */
@@ -248,7 +254,7 @@ final class ConfigurationFactoryTest extends TestCase
             processTimeout: 10,
             sourceDirectories: [],
             sourceFiles: [],
-            sourceFilesFilter: 'src/a.php,src/b.php',
+            sourceFilesFilter: 'f(AM, master, []) = src/a.php,src/b.php',
             sourceFilesExcludes: [],
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
@@ -1061,6 +1067,84 @@ final class ConfigurationFactoryTest extends TestCase
                 ),
         ];
 
+        yield 'without any filters' => [
+            $defaultScenario
+                ->forFilter(
+                    filter: '',
+                    gitDiffFilter: null,
+                    isForGitDiffLines: false,
+                    gitDiffBase: null,
+                    expectedSourceFilesFilter: '',
+                    expectedIsForGitDiffLines: false,
+                    expectedDiffBase: null,
+                ),
+        ];
+
+        yield 'without source files filters' => [
+            $defaultScenario
+                ->forFilter(
+                    filter: 'src/Foo.php, src/Bar.php',
+                    gitDiffFilter: null,
+                    isForGitDiffLines: false,
+                    gitDiffBase: null,
+                    expectedSourceFilesFilter: 'src/Foo.php, src/Bar.php',
+                    expectedIsForGitDiffLines: false,
+                    expectedDiffBase: null,
+                ),
+        ];
+
+        yield 'with git filters' => [
+            $defaultScenario
+                ->forFilter(
+                    filter: '',
+                    gitDiffFilter: 'AD',
+                    isForGitDiffLines: false,
+                    gitDiffBase: null,
+                    expectedSourceFilesFilter: 'f(AD, test/default, []) = src/a.php,src/b.php',
+                    expectedIsForGitDiffLines: false,
+                    expectedDiffBase: null,
+                ),
+        ];
+
+        yield 'with git filters and base branch' => [
+            $defaultScenario
+                ->forFilter(
+                    filter: '',
+                    gitDiffFilter: 'AD',
+                    isForGitDiffLines: false,
+                    gitDiffBase: 'upstream/main',
+                    expectedSourceFilesFilter: 'f(AD, upstream/main, []) = src/a.php,src/b.php',
+                    expectedIsForGitDiffLines: false,
+                    expectedDiffBase: 'upstream/main',
+                ),
+        ];
+
+        yield 'with is for git diff lines' => [
+            $defaultScenario
+                ->forFilter(
+                    filter: '',
+                    gitDiffFilter: null,
+                    isForGitDiffLines: true,
+                    gitDiffBase: null,
+                    expectedSourceFilesFilter: 'f(AM, test/default, []) = src/a.php,src/b.php',
+                    expectedIsForGitDiffLines: true,
+                    expectedDiffBase: null,
+                ),
+        ];
+
+        yield 'with is for git diff lines and base branch' => [
+            $defaultScenario
+                ->forFilter(
+                    filter: '',
+                    gitDiffFilter: null,
+                    isForGitDiffLines: true,
+                    gitDiffBase: 'upstream/main',
+                    expectedSourceFilesFilter: 'f(AM, upstream/main, []) = src/a.php,src/b.php',
+                    expectedIsForGitDiffLines: true,
+                    expectedDiffBase: 'upstream/main',
+                ),
+        ];
+
         yield 'with absolute source directory paths' => [
             $defaultScenario
                 ->withSchema(
@@ -1314,7 +1398,22 @@ final class ConfigurationFactoryTest extends TestCase
             );
 
         $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
-        $gitDiffFilesProviderMock->method('provide')->willReturn('src/a.php,src/b.php');
+        $gitDiffFilesProviderMock
+            ->method('provideDefaultBase')
+            ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
+        $gitDiffFilesProviderMock
+            ->method('provide')
+            ->willReturnCallback(
+                static fn ($gitDiffFilter, $gitDiffBase, $sourceDirectories) => sprintf(
+                    'f(%s, %s, [%s]) = %s',
+                    $gitDiffFilter ?? 'null',
+                    $gitDiffBase ?? 'null',
+                    count($sourceDirectories) === 0
+                        ? ''
+                        : implode(', ', $sourceDirectories),
+                    self::GIT_DIFF_FILTER_PROVIDER_RESULT,
+                ),
+            );
 
         return new ConfigurationFactory(
             new TmpDirProvider(),
