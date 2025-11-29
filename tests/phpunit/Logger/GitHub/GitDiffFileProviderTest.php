@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger\GitHub;
 
 use function implode;
 use Infection\Framework\Str;
+use Infection\Git\CommandLineGit;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
@@ -147,8 +148,15 @@ final class GitDiffFileProviderTest extends TestCase
 
     public function test_it_provides_the_infections_own_git_default_base(): void
     {
-        $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
-        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+        $diffProvider = new GitDiffFileProvider(
+            new CommandLineGit(
+                new ShellCommandLineExecutor(),
+            ),
+        );
+
+        $actual = $diffProvider->provideDefaultBase();
+
+        $this->assertSame('origin/master', $actual);
     }
 
     #[DataProvider('provideGitDefaultBaseExecutions')]

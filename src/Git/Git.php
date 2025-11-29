@@ -33,27 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection\Process;
-
-use RuntimeException;
-use Symfony\Component\Process\Process;
-use function trim;
+namespace Infection\Git;
 
 /**
  * @internal
  *
- * @final
+ * Defines the contract for interacting with Git.
+ *
+ * This interface abstracts away the underlying Git implementation, whether it is spawning
+ * git processes, using a native library or mocking.
+ *
+ * This aims at highlighting what API we use from git and allow the code to be more expressive and usable.
  */
-class ShellCommandLineExecutor
+interface Git
 {
+    public const FALLBACK_BASE_BRANCH = 'origin/master';
+
     /**
-     * TODO: check if there is no more accurate exception...
-     * @param string[] $command
+     * Retrieves the default base branch name for the repository.
      *
-     * @throws RuntimeException
+     * Examples of output:
+     * - 'origin/main'
+     * - 'origin/master'
      */
-    public function execute(array $command): string
-    {
-        return trim((new Process($command))->mustRun()->getOutput());
-    }
+    public function getDefaultBaseBranch(): string;
+
+    /**
+     * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
+     * compared to the base branch used and matching the given filter.
+     *
+     * @param non-empty-string $diffFilter E.g. 'AM'.
+     * @param non-empty-string $baseBranch E.g. 'origin.main'.
+     * @param non-empty-string[] $sourceDirectories
+     *
+     * @return list<string>
+     */
+    public function getChangedFileRelativePaths(
+        string $diffFilter,
+        string $baseBranch,
+        array $sourceDirectories,
+    ): array;
+
+    /**
+     * Gets the modifications with their line numbers of the files that changed compared to the base branch used and
+     * matching the given filter.
+     */
+    public function diffLines(string $baseBranch): string;
 }
