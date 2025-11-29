@@ -1406,8 +1406,8 @@ final class ConfigurationFactoryTest extends TestCase
             ->willReturnCallback(
                 static fn (string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string => sprintf(
                     'f(%s, %s, [%s]) = %s',
-                    $gitDiffFilter ?? 'null',
-                    $gitDiffBase ?? 'null',
+                    $gitDiffFilter,
+                    $gitDiffBase,
                     count($sourceDirectories) === 0
                         ? ''
                         : implode(', ', $sourceDirectories),
