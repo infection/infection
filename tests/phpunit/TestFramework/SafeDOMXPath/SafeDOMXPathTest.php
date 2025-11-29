@@ -41,6 +41,7 @@ use Infection\TestFramework\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function sprintf;
