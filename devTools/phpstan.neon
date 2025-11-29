@@ -123,6 +123,12 @@ parameters:
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
 
+        -
+            message: "#FS::tmpFile#"
+            identifier: shipmonk.deadMethod
+            count: 1
+            path: ../tests/phpunit/TestingUtility/FS.php
+
         # We are explicitly testing the guards here
         -
             identifier: argument.type
