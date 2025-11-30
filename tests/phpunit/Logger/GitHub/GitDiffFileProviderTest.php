@@ -278,7 +278,7 @@ final class GitDiffFileProviderTest extends TestCase
     {
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
 
-        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+        $this->assertSame('refs/remotes/origin/master', $diffProvider->provideDefaultBase());
     }
 
     #[DataProvider('defaultBaseBranchProvider')]
@@ -309,22 +309,15 @@ final class GitDiffFileProviderTest extends TestCase
     {
         yield 'nominal' => [
             'refs/remotes/origin/main',
-            'origin/main',
+            'refs/remotes/origin/main',
         ];
 
-        yield 'invalid output (this is possible but not with the options we pass)' => [
-            'upstream/main',
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
-        ];
-
-        yield 'invalid output (not understandable)' => [
+        yield 'invalid output' => [
             'something-unexpected',
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
-        ];
-
-        yield 'invalid output (empty)' => [
-            '',
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+            // We leave it alone, it is likely more correct than our fallback. in the measure
+            // that if the git command couldn't figure it out, it will fail the process, so whatever
+            // is returned is most likely correct.
+            'something-unexpected',
         ];
 
         yield 'the git command failed due to the name not being a valid symbolic ref' => [
