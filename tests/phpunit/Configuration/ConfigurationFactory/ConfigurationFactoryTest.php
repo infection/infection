@@ -48,7 +48,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Git\Git;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -1401,12 +1401,12 @@ final class ConfigurationFactoryTest extends TestCase
                 },
             );
 
-        $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
-        $gitDiffFilesProviderMock
-            ->method('provideDefaultBase')
+        $gitMock = $this->createMock(Git::class);
+        $gitMock
+            ->method('getDefaultBaseBranch')
             ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
-        $gitDiffFilesProviderMock
-            ->method('provide')
+        $gitMock
+            ->method('getChangedFileRelativePaths')
             ->willReturnCallback(
                 static fn (string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string => sprintf(
                     'f(%s, %s, [%s]) = %s',
@@ -1426,7 +1426,7 @@ final class ConfigurationFactoryTest extends TestCase
             new MutatorParser(),
             $sourceFilesCollector,
             new DummyCiDetector($ciDetected, $githubActionsDetected),
-            $gitDiffFilesProviderMock,
+            $gitMock,
         );
     }
 }

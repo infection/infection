@@ -33,37 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
+namespace Infection\Tests\Git;
 
-use Infection\Git\Git;
+use Infection\Git\NoFilesInDiffToMutate;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- * @final
- */
-class FilesDiffChangedLines
+#[CoversClass(NoFilesInDiffToMutate::class)]
+final class NoFilesInDiffToMutateTest extends TestCase
 {
-    /** @var array<string, ChangedLinesRange[]> */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
-    public function __construct(
-        private readonly DiffChangedLinesParser $diffChangedLinesParser,
-        private readonly Git $git,
-    ) {
-    }
-
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
+    public function test_composer_not_found_exception(): void
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->diffChangedLinesParser->parse(
-            $this->git->provideWithLines($gitDiffBase),
+        $exception = NoFilesInDiffToMutate::create();
+
+        $this->assertInstanceOf(NoFilesInDiffToMutate::class, $exception);
+        $this->assertSame(
+            'No files in diff found, skipping mutation analysis.',
+            $exception->getMessage(),
         );
-
-        foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
-            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

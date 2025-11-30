@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
+namespace Infection\Git;
 
 use Exception;
 

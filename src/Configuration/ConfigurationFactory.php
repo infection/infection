@@ -46,13 +46,12 @@ use function in_array;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Git\Git;
 use Infection\Logger\FileLogger;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
@@ -90,7 +89,7 @@ class ConfigurationFactory
         private readonly MutatorParser $mutatorParser,
         private readonly SourceFileCollector $sourceFileCollector,
         private readonly CiDetectorInterface $ciDetector,
-        private readonly GitDiffFileProvider $gitDiffFileProvider,
+        private readonly Git $git,
     ) {
     }
 
@@ -370,9 +369,9 @@ class ConfigurationFactory
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch ??= $this->gitDiffFileProvider->provideDefaultBase();
+        $baseBranch ??= $this->git->getDefaultBaseBranch();
 
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
+        return $this->git->getChangedFileRelativePaths($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
