@@ -25,7 +25,7 @@ RECTOR=./vendor/bin/rector
 COLLISION_DETECTOR=./vendor/bin/detect-collisions
 
 PSALM=./.tools/psalm
-PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
+PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.26.1/psalm.phar"
 
 PHPUNIT=vendor/phpunit/phpunit/phpunit
 PARATEST=vendor/bin/paratest
