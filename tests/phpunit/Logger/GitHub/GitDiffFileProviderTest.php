@@ -41,6 +41,7 @@ use Infection\Framework\Str;
 use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Tests\TestingUtility\TestCIDetector;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -278,7 +279,13 @@ final class GitDiffFileProviderTest extends TestCase
     {
         $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
 
-        $this->assertSame('refs/remotes/origin/master', $diffProvider->provideDefaultBase());
+        $expected = TestCIDetector::isCIDetected()
+            ? 'origin/master'
+            : 'refs/remotes/origin/master';
+
+        $actual = $diffProvider->provideDefaultBase();
+
+        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('defaultBaseBranchProvider')]
