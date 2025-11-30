@@ -37,8 +37,6 @@ namespace Infection\Logger\GitHub;
 
 use function array_filter;
 use function array_merge;
-use function array_slice;
-use function count;
 use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
@@ -56,14 +54,6 @@ class GitDiffFileProvider
 {
     public const FALLBACK_BASE_BRANCH = 'origin/master';
 
-    // A branch may have two forms:
-    // - full path: refs/remotes/origin/HEAD
-    // - shorthand: origin/HEAD
-    //
-    // The order that git uses to resolve a shorthand notation is defined here:
-    // https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
-    private const BRANCH_SHORTHAND_NOTATION_PART_COUNT = 2;
-
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
@@ -78,8 +68,18 @@ class GitDiffFileProvider
      * Retrieves the default base branch name for the repository.
      *
      * Examples of output:
+     * - 'refs/remotes/origin/main'
      * - 'origin/main'
      * - 'origin/master'
+     *
+     * A branch may have two forms:
+     * - full path: refs/remotes/origin/HEAD
+     * - shorthand: origin/HEAD
+     *
+     * The order that git uses to resolve a shorthand notation is defined here:
+     * https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
+     *
+     * Preferably, this method returns the full path which is less ambiguous. However, this is not always possible.
      */
     public function provideDefaultBase(): string
     {
@@ -89,18 +89,11 @@ class GitDiffFileProvider
 
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
-            $reference = $this->shellCommandLineExecutor->execute([
+            return $this->shellCommandLineExecutor->execute([
                 'git',
                 'symbolic-ref',
                 self::DEFAULT_SYMBOLIC_REFERENCE,
             ]);
-
-            $parts = explode('/', $reference);
-
-            if (count($parts) > self::BRANCH_SHORTHAND_NOTATION_PART_COUNT) {
-                // extract origin/branch from a string like 'refs/remotes/origin/master'
-                return $this->defaultBase = implode('/', array_slice($parts, -self::BRANCH_SHORTHAND_NOTATION_PART_COUNT));
-            }
         } catch (RuntimeException) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
             // TODO: we could log the failure to figure it out somewhere...
