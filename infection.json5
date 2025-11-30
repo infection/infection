@@ -27,8 +27,14 @@
             "Assert::.*"
         ],
         "@default": true,
+
+        "ArrayItemRemoval": {
+            "ignore": [
+                "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
+            ]
+        },
         "ProtectedVisibility": {
-            ignore: [
+            "ignore": [
                 // The mutations are not covered because this would require more tweaks in the
                 // BaseReportLocatorTest and its DemoReportLocator implementation.
                 // However, it is a tested extension point already hence making those tests more

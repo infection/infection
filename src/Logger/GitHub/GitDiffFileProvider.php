@@ -54,9 +54,18 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
  */
 class GitDiffFileProvider
 {
-    private const NUM_ORIGIN_AND_BRANCH_PARTS = 2;
+    public const FALLBACK_BASE_BRANCH = 'origin/master';
 
-    private const DEFAULT_BASE = 'origin/master';
+    // A branch may have two forms:
+    // - full path: refs/remotes/origin/HEAD
+    // - shorthand: origin/HEAD
+    //
+    // The order that git uses to resolve a shorthand notation is defined here:
+    // https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
+    private const BRANCH_SHORTHAND_NOTATION_PART_COUNT = 2;
+
+    // https://github.com/infection/infection/issues/2611
+    private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
     private ?string $defaultBase = null;
 
@@ -65,6 +74,13 @@ class GitDiffFileProvider
     ) {
     }
 
+    /**
+     * Retrieves the default base branch name for the repository.
+     *
+     * Examples of output:
+     * - 'origin/main'
+     * - 'origin/master'
+     */
     public function provideDefaultBase(): string
     {
         if ($this->defaultBase !== null) {
@@ -73,24 +89,25 @@ class GitDiffFileProvider
 
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
-            $gitRefs = $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandLineExecutor->execute([
                 'git',
                 'symbolic-ref',
-                'refs/remotes/origin/HEAD',
+                self::DEFAULT_SYMBOLIC_REFERENCE,
             ]);
 
-            $parts = explode('/', $gitRefs);
+            $parts = explode('/', $reference);
 
-            if (count($parts) > self::NUM_ORIGIN_AND_BRANCH_PARTS) {
+            if (count($parts) > self::BRANCH_SHORTHAND_NOTATION_PART_COUNT) {
                 // extract origin/branch from a string like 'refs/remotes/origin/master'
-                return $this->defaultBase = implode('/', array_slice($parts, -self::NUM_ORIGIN_AND_BRANCH_PARTS));
+                return $this->defaultBase = implode('/', array_slice($parts, -self::BRANCH_SHORTHAND_NOTATION_PART_COUNT));
             }
         } catch (RuntimeException) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
+            // TODO: we could log the failure to figure it out somewhere...
         }
 
         // unable to figure it out, return the default
-        return $this->defaultBase = self::DEFAULT_BASE;
+        return $this->defaultBase = self::FALLBACK_BASE_BRANCH;
     }
 
     /**
