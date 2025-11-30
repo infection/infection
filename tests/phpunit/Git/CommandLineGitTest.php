@@ -33,13 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\GitHub;
+namespace Infection\Tests\Git;
 
 use Exception;
 use function implode;
 use Infection\Framework\Str;
-use Infection\Logger\GitHub\GitDiffFileProvider;
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
+use Infection\Git\CommandLineGit;
+use Infection\Git\Git;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,8 +52,8 @@ use function sprintf;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
-#[CoversClass(GitDiffFileProvider::class)]
-final class GitDiffFileProviderTest extends TestCase
+#[CoversClass(CommandLineGit::class)]
+final class CommandLineGitTest extends TestCase
 {
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
     {
@@ -61,10 +62,10 @@ final class GitDiffFileProviderTest extends TestCase
             ->method('execute')
             ->willReturn('');
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $this->expectException(NoFilesInDiffToMutate::class);
-        $diffProvider->provide('AM', 'master', ['src/']);
+        $diffProvider->getChangedFileRelativePaths('AM', 'master', ['src/']);
     }
 
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
@@ -91,11 +92,11 @@ final class GitDiffFileProviderTest extends TestCase
                 },
             );
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $expected = 'app/A.php,my lib/B.php';
 
-        $actual = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+        $actual = $diffProvider->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
 
         $this->assertSame($expected, $actual);
     }
@@ -124,11 +125,11 @@ final class GitDiffFileProviderTest extends TestCase
                 },
             );
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $expected = 'app/A.php,my lib/B.php';
 
-        $actual = $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+        $actual = $diffProvider->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
 
         $this->assertSame($expected, $actual);
     }
@@ -144,11 +145,11 @@ final class GitDiffFileProviderTest extends TestCase
             ->with($expectedMergeBaseCommandLine)
             ->willThrowException($mergeBaseCommandLineException);
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $this->expectExceptionObject($mergeBaseCommandLineException);
 
-        $diffProvider->provide('AM', 'master', ['app/', 'my lib/']);
+        $diffProvider->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
     }
 
     public function test_it_get_the_changed_lines_as_a_string(): void
@@ -192,7 +193,7 @@ final class GitDiffFileProviderTest extends TestCase
                 },
             );
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $expected = Str::toSystemLineEndings(
             <<<'EOF'
@@ -240,7 +241,7 @@ final class GitDiffFileProviderTest extends TestCase
                 },
             );
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $expected = Str::toSystemLineEndings(
             <<<'EOF'
@@ -266,7 +267,7 @@ final class GitDiffFileProviderTest extends TestCase
             ->with($expectedMergeBaseCommandLine)
             ->willThrowException($mergeBaseCommandLineException);
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
         $this->expectExceptionObject($mergeBaseCommandLineException);
 
@@ -276,9 +277,9 @@ final class GitDiffFileProviderTest extends TestCase
     #[Group('integration')]
     public function test_it_can_get_this_project_default_base_branch(): void
     {
-        $diffProvider = new GitDiffFileProvider(new ShellCommandLineExecutor());
+        $diffProvider = new CommandLineGit(new ShellCommandLineExecutor());
 
-        $this->assertSame('origin/master', $diffProvider->provideDefaultBase());
+        $this->assertSame('origin/master', $diffProvider->getDefaultBaseBranch());
     }
 
     #[DataProvider('defaultBaseBranchProvider')]
@@ -298,9 +299,9 @@ final class GitDiffFileProviderTest extends TestCase
                 ->willThrowException($shellOutputOrException);
         }
 
-        $diffProvider = new GitDiffFileProvider($commandLineMock);
+        $diffProvider = new CommandLineGit($commandLineMock);
 
-        $actual = $diffProvider->provideDefaultBase();
+        $actual = $diffProvider->getDefaultBaseBranch();
 
         $this->assertSame($expected, $actual);
     }
@@ -314,24 +315,24 @@ final class GitDiffFileProviderTest extends TestCase
 
         yield 'invalid output (this is possible but not with the options we pass)' => [
             'upstream/main',
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+            Git::FALLBACK_BASE_BRANCH,
         ];
 
         yield 'invalid output (not understandable)' => [
             'something-unexpected',
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+            Git::FALLBACK_BASE_BRANCH,
         ];
 
         yield 'invalid output (empty)' => [
             '',
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+            Git::FALLBACK_BASE_BRANCH,
         ];
 
         yield 'the git command failed due to the name not being a valid symbolic ref' => [
             new RuntimeException(
                 'fatal: ref testBranch is not a symbolic ref',
             ),
-            GitDiffFileProvider::FALLBACK_BASE_BRANCH,
+            Git::FALLBACK_BASE_BRANCH,
         ];
     }
 
