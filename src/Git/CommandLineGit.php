@@ -50,7 +50,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 /**
  * @internal
  *
- * Implementation of the Git contract leveraging the git binary via processes
+ * Implementation of the Git contract leveraging the git binary via processes.
  */
 final class CommandLineGit implements Git
 {
