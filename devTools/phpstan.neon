@@ -6,7 +6,7 @@ rules:
     - Infection\DevTools\PHPStan\Rules\InfectionContainerRule
 
 parameters:
-    tmpDir: ../build/cache/phpstan-src
+    tmpDir: ../var/cache/phpstan-src
     inferPrivatePropertyTypeFromConstructor: true
     sidzIgnoreMagicNumbers: [0, 0.0, 1, -1, 1.0, -1.0, 100]
     sidzIgnoreNumericStrings: true
