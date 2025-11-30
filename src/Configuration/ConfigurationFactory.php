@@ -183,7 +183,7 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForGitDiffLines: $isForGitDiffLines,
+            isForGitDiffLines: $isForGitDiffLines || $gitDiffFilter !== null,
             gitDiffBase: $gitDiffBase,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
@@ -363,14 +363,14 @@ class ConfigurationFactory
     /**
      * @param string[] $sourceDirectories
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string &$baseBranch, array $sourceDirectories): string
     {
         if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
+        $baseBranch ??= $this->gitDiffFileProvider->provideDefaultBase();
 
         return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
