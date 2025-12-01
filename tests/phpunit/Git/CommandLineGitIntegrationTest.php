@@ -173,15 +173,22 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     public function test_it_can_get_this_project_default_git_base(): void
     {
-        $git = new CommandLineGit(new ShellCommandLineExecutor());
-
         $expected = TestCIDetector::isCIDetected()
             ? 'origin/master'
             : 'refs/remotes/origin/master';
 
-        $actual = $git->getDefaultBase();
+        $actual = $this->git->getDefaultBase();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_can_refine_the_base_used(): void
+    {
+        $originalBase = $this->git->getDefaultBase();
+
+        $refinedBase = $this->git->getBaseReference($originalBase);
+
+        $this->assertNotSame($originalBase, $refinedBase);
     }
 
     private static function checkIfCommitReferenceExists(): bool
