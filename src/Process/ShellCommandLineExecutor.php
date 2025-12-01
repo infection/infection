@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
@@ -54,6 +55,7 @@ class ShellCommandLineExecutor
      *
      * @throws ProcessTimedOutException
      * @throws ProcessFailedException
+     * @throws ProcessException
      */
     public function execute(array $command): string
     {

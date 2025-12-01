@@ -42,7 +42,7 @@ use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
 use function Safe\preg_match;
-use Symfony\Component\Process\Exception\ExceptionInterface;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 
 /**
  * @internal
@@ -74,7 +74,7 @@ final class CommandLineGit implements Git
                 'symbolic-ref',
                 self::DEFAULT_SYMBOLIC_REFERENCE,
             ]);
-        } catch (ExceptionInterface) {
+        } catch (ProcessException) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
             // TODO: we could log the failure to figure it out somewhere...
         }
@@ -133,7 +133,7 @@ final class CommandLineGit implements Git
                 $gitDiffBase,
                 'HEAD',
             ]);
-        } catch (ExceptionInterface) {
+        } catch (ProcessException) {
             // TODO: could do some logging here...
 
             /**
