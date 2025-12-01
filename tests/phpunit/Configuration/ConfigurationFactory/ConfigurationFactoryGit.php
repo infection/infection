@@ -49,7 +49,7 @@ final readonly class ConfigurationFactoryGit implements Git
     ) {
     }
 
-    public function getDefaultBaseBranch(): string
+    public function getDefaultBase(): string
     {
         return $this->defaultBaseBranch;
     }
@@ -73,5 +73,10 @@ final readonly class ConfigurationFactoryGit implements Git
     public function provideWithLines(string $baseBranch): string
     {
         throw new DomainException('Not implemented.');
+    }
+
+    public function getBaseReference(string $base): string
+    {
+        return sprintf('reference(%s)', $base);
     }
 }

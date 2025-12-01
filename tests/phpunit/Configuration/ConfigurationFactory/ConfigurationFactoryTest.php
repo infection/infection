@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
-use function count;
-use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -48,7 +46,6 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Git\Git;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -1404,30 +1401,6 @@ final class ConfigurationFactoryTest extends TestCase
                 },
             );
 
-        $gitMock = $this->createMock(Git::class);
-        $gitMock
-            ->expects($this->atMost(1))
-            ->method('getDefaultBase')
-            ->willReturn(self::GIT_DEFAULT_BASE);
-        $gitMock
-            ->method('getBaseReference')
-            ->willReturnCallback(
-                static fn (string $base): string => sprintf('reference(%s)', $base),
-            );
-        $gitMock
-            ->method('getChangedFileRelativePaths')
-            ->willReturnCallback(
-                static fn (string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string => sprintf(
-                    'f(%s, %s, [%s]) = %s',
-                    $gitDiffFilter,
-                    $gitDiffBase,
-                    count($sourceDirectories) === 0
-                        ? ''
-                        : implode(', ', $sourceDirectories),
-                    self::GIT_DIFF_MODIFIED_FILES,
-                ),
-            );
-
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
@@ -1436,7 +1409,7 @@ final class ConfigurationFactoryTest extends TestCase
             $sourceFilesCollector,
             new DummyCiDetector($ciDetected, $githubActionsDetected),
             new ConfigurationFactoryGit(
-                self::GIT_DEFAULT_BASE_BRANCH,
+                self::GIT_DEFAULT_BASE,
                 self::GIT_DIFF_MODIFIED_FILES,
             ),
         );
