@@ -153,22 +153,17 @@ class ConfigurationFactory
         $useGitDiff = $isForGitDiffLines || $gitDiffFilter !== null;
         $refinedGitBase = self::refineGitBase($gitDiffBase, $useGitDiff);
 
-        // This needs to be executed before `::refineGitBase()` as otherwise
-        // we could have `gitDiffBase=null` when we actually fetched the base
-        // for the git filter.
-        $sourceFilesFilter = $this->retrieveFilter(
-            $filter,
-            $gitDiffFilter,
-            $isForGitDiffLines,
-            $refinedGitBase,
-            $schema->source->directories,
-        );
-
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             sourceDirectories: $schema->source->directories,
             sourceFiles: $this->collectFiles($schema),
-            sourceFilesFilter: $sourceFilesFilter,
+            sourceFilesFilter: $this->retrieveFilter(
+                $filter,
+                $gitDiffFilter,
+                $isForGitDiffLines,
+                $refinedGitBase,
+                $schema->source->directories,
+            ),
             sourceFilesExcludes: $schema->source->excludes,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
