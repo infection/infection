@@ -283,7 +283,7 @@ final class ConfigurationFactoryTest extends TestCase
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
             isForGitDiffLines: true,
-            gitDiffBase: 'master',
+            gitDiffBase: 'reference(master)',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -1104,7 +1104,7 @@ final class ConfigurationFactoryTest extends TestCase
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'f(AD, test/default, []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'test/default',
+                    expectedDiffBase: 'reference(test/default)',
                 ),
         ];
 
@@ -1117,7 +1117,7 @@ final class ConfigurationFactoryTest extends TestCase
                     gitDiffBase: 'upstream/main',
                     expectedSourceFilesFilter: 'f(AD, upstream/main, []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'upstream/main',
+                    expectedDiffBase: 'reference(upstream/main)',
                 ),
         ];
 
@@ -1130,7 +1130,7 @@ final class ConfigurationFactoryTest extends TestCase
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'f(AM, test/default, []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'test/default',
+                    expectedDiffBase: 'reference(test/default)',
                 ),
         ];
 
@@ -1143,7 +1143,7 @@ final class ConfigurationFactoryTest extends TestCase
                     gitDiffBase: 'upstream/main',
                     expectedSourceFilesFilter: 'f(AM, upstream/main, []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'upstream/main',
+                    expectedDiffBase: 'reference(upstream/main)',
                 ),
         ];
 
@@ -1294,7 +1294,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withIgnoreSourceCodeMutatorsMap([])
                     ->withExecuteOnlyCoveringTestCases(false)
                     ->withIsForGitDiffLines(false)
-                    ->withGitDiffBase('master')
+                    ->withGitDiffBase('reference(master)')
                     ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                     ->withLoggerProjectRootDirectory(null)
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
@@ -1403,8 +1403,13 @@ final class ConfigurationFactoryTest extends TestCase
 
         $gitMock = $this->createMock(Git::class);
         $gitMock
-            ->method('getDefaultBaseBranch')
+            ->method('getDefaultBase')
             ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
+        $gitMock
+            ->method('getBaseReference')
+            ->willReturnCallback(
+                static fn (string $base): string => sprintf('reference(%s)', $base),
+            );
         $gitMock
             ->method('getChangedFileRelativePaths')
             ->willReturnCallback(

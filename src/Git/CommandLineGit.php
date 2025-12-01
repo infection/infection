@@ -61,7 +61,7 @@ final class CommandLineGit implements Git
     ) {
     }
 
-    public function getDefaultBaseBranch(): string
+    public function getDefaultBase(): string
     {
         if ($this->defaultBase !== null) {
             return $this->defaultBase;
@@ -83,15 +83,13 @@ final class CommandLineGit implements Git
         return $this->defaultBase = Git::FALLBACK_BASE_BRANCH;
     }
 
-    public function getChangedFileRelativePaths(string $diffFilter, string $baseBranch, array $sourceDirectories): string
+    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
     {
-        $referenceCommit = $this->getBaseReference($baseBranch);
-
         $filter = $this->shellCommandLineExecutor->execute(array_merge(
             [
                 'git',
                 'diff',
-                $referenceCommit,
+                $base,
                 '--diff-filter',
                 $diffFilter,
                 '--name-only',
@@ -107,14 +105,12 @@ final class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function provideWithLines(string $baseBranch): string
+    public function provideWithLines(string $base): string
     {
-        $referenceCommit = $this->getBaseReference($baseBranch);
-
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
-            $referenceCommit,
+            $base,
             '--unified=0',
             '--diff-filter=AM',
         ]);

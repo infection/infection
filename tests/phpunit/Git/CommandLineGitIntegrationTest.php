@@ -179,7 +179,7 @@ final class CommandLineGitIntegrationTest extends TestCase
             ? 'origin/master'
             : 'refs/remotes/origin/master';
 
-        $actual = $git->getDefaultBaseBranch();
+        $actual = $git->getDefaultBase();
 
         $this->assertSame($expected, $actual);
     }

@@ -66,7 +66,7 @@ interface Git
      *
      * Preferably, this method returns the full path which is less ambiguous. However, this is not always possible.
      */
-    public function getDefaultBaseBranch(): string;
+    public function getDefaultBase(): string;
 
     /**
      * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
@@ -75,14 +75,14 @@ interface Git
      * Returns a comma-separated list of the relative paths.
      *
      * @param string $diffFilter E.g. 'AM'.
-     * @param string $baseBranch E.g. 'origin.main'.
+     * @param string $base E.g. 'origin.main'.
      * @param string[] $sourceDirectories
      *
      * @throws NoFilesInDiffToMutate
      */
     public function getChangedFileRelativePaths(
         string $diffFilter,
-        string $baseBranch,
+        string $base,
         array $sourceDirectories,
     ): string;
 
@@ -90,7 +90,7 @@ interface Git
      * Gets the modifications with their line numbers of the files that changed compared to the base branch used and
      * matching the given filter.
      */
-    public function provideWithLines(string $baseBranch): string;
+    public function provideWithLines(string $base): string;
 
     /**
      * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.

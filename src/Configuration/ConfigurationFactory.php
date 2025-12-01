@@ -150,33 +150,22 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        // When the user gives a base, we need to try to refine it.
-        // For example, if the user created their feature branch:
-        //
-        //  main:     A --- B --- C
-        //                         \
-        //  feature:                D --- E  (user changes)
-        //
-        // Later, after others push to main
-        //
-        //  main:     A --- B --- C --- F --- G --- H
-        //                         \
-        //  feature:                D --- E  (user changes)
-        //
-        // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
-        // touch code the user did not touch.
-        //
-        // To prevent this, we try to find the best common ancestor, here C.
-        // As a result, we would do `git diff C HEAD` which would give (D,E).
-        $baseReference = null === $gitDiffBase
-            ? null
-            : $this->git->getBaseReference($gitDiffBase);
+        // This needs to be executed before `::refineGitBase()` as otherwise
+        // we could have `gitDiffBase=null` when we actually fetched the base
+        // for the git filter.
+        $sourceFilesFilter = $this->retrieveFilter(
+            $filter,
+            $gitDiffFilter,
+            $isForGitDiffLines,
+            $gitDiffBase,
+            $schema->source->directories,
+        );
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             sourceDirectories: $schema->source->directories,
             sourceFiles: $this->collectFiles($schema),
-            sourceFilesFilter: $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->source->directories),
+            sourceFilesFilter: $sourceFilesFilter,
             sourceFilesExcludes: $schema->source->excludes,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
@@ -205,7 +194,7 @@ class ConfigurationFactory
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
             isForGitDiffLines: $isForGitDiffLines || $gitDiffFilter !== null,
-            gitDiffBase: $gitDiffBase,
+            gitDiffBase: self::refineGitBase($gitDiffBase),
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
@@ -391,7 +380,7 @@ class ConfigurationFactory
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch ??= $this->git->getDefaultBaseBranch();
+        $baseBranch ??= $this->git->getDefaultBase();
 
         return $this->git->getChangedFileRelativePaths($gitDiffFilter, $baseBranch, $sourceDirectories);
     }
@@ -485,5 +474,33 @@ class ConfigurationFactory
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    /**
+     * @return ($base is null ? null : string)
+     */
+    private function refineGitBase(?string $base): ?string
+    {
+        // When the user gives a base, we need to try to refine it.
+        // For example, if the user created their feature branch:
+        //
+        //  main:     A --- B --- C
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Later, after others push to main
+        //
+        //  main:     A --- B --- C --- F --- G --- H
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
+        // touch code the user did not touch.
+        //
+        // To prevent this, we try to find the best common ancestor, here C.
+        // As a result, we would do `git diff C HEAD` which would give (D,E).
+        return $base === null
+            ? null
+            : $this->git->getBaseReference($base);
     }
 }
