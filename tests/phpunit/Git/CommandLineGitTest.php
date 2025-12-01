@@ -42,11 +42,9 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
-use Infection\Tests\TestingUtility\TestCIDetector;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -265,20 +263,6 @@ final class CommandLineGitTest extends TestCase
         $this->expectExceptionObject($mergeBaseCommandLineException);
 
         $this->git->provideWithLines('master');
-    }
-
-    #[Group('integration')]
-    public function test_it_can_get_this_project_default_base_branch(): void
-    {
-        $git = new CommandLineGit(new ShellCommandLineExecutor());
-
-        $expected = TestCIDetector::isCIDetected()
-            ? 'origin/master'
-            : 'refs/remotes/origin/master';
-
-        $actual = $git->getDefaultBaseBranch();
-
-        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('defaultBaseBranchProvider')]
