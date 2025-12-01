@@ -150,6 +150,9 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        $useGitDiff = $isForGitDiffLines || $gitDiffFilter !== null;
+        $refinedGitBase = self::refineGitBase($gitDiffBase, $useGitDiff);
+
         // This needs to be executed before `::refineGitBase()` as otherwise
         // we could have `gitDiffBase=null` when we actually fetched the base
         // for the git filter.
@@ -157,7 +160,7 @@ class ConfigurationFactory
             $filter,
             $gitDiffFilter,
             $isForGitDiffLines,
-            $gitDiffBase,
+            $refinedGitBase,
             $schema->source->directories,
         );
 
@@ -193,8 +196,8 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForGitDiffLines: $isForGitDiffLines || $gitDiffFilter !== null,
-            gitDiffBase: self::refineGitBase($gitDiffBase),
+            isForGitDiffLines: $useGitDiff,
+            gitDiffBase: $refinedGitBase,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
@@ -373,16 +376,16 @@ class ConfigurationFactory
     /**
      * @param string[] $sourceDirectories
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string &$baseBranch, array $sourceDirectories): string
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitBase, array $sourceDirectories): string
     {
         if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch ??= $this->git->getDefaultBase();
+        Assert::notNull($gitBase);
 
-        return $this->git->getChangedFileRelativePaths($gitDiffFilter, $baseBranch, $sourceDirectories);
+        return $this->git->getChangedFileRelativePaths($gitDiffFilter, $gitBase, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
@@ -477,9 +480,9 @@ class ConfigurationFactory
     }
 
     /**
-     * @return ($base is null ? null : string)
+     * @return ($useGitDiff is false ? string|null : string)
      */
-    private function refineGitBase(?string $base): ?string
+    private function refineGitBase(?string $base, bool $useGitDiff): ?string
     {
         // When the user gives a base, we need to try to refine it.
         // For example, if the user created their feature branch:
@@ -499,8 +502,8 @@ class ConfigurationFactory
         //
         // To prevent this, we try to find the best common ancestor, here C.
         // As a result, we would do `git diff C HEAD` which would give (D,E).
-        return $base === null
-            ? null
-            : $this->git->getBaseReference($base);
+        return $useGitDiff
+            ? $this->git->getBaseReference($base ?? $this->git->getDefaultBase())
+            : null;
     }
 }
