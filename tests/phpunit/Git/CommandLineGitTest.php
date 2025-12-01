@@ -63,10 +63,10 @@ final class CommandLineGitTest extends TestCase
             ->method('execute')
             ->willReturn('');
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $this->expectException(NoFilesInDiffToMutate::class);
-        $diffProvider->getChangedFileRelativePaths('AM', 'master', ['src/']);
+        $git->getChangedFileRelativePaths('AM', 'master', ['src/']);
     }
 
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
@@ -93,11 +93,11 @@ final class CommandLineGitTest extends TestCase
                 },
             );
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $expected = 'app/A.php,my lib/B.php';
 
-        $actual = $diffProvider->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
+        $actual = $git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
 
         $this->assertSame($expected, $actual);
     }
@@ -126,11 +126,11 @@ final class CommandLineGitTest extends TestCase
                 },
             );
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $expected = 'app/A.php,my lib/B.php';
 
-        $actual = $diffProvider->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
+        $actual = $git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
 
         $this->assertSame($expected, $actual);
     }
@@ -146,11 +146,11 @@ final class CommandLineGitTest extends TestCase
             ->with($expectedMergeBaseCommandLine)
             ->willThrowException($mergeBaseCommandLineException);
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $this->expectExceptionObject($mergeBaseCommandLineException);
 
-        $diffProvider->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
+        $git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
     }
 
     public function test_it_get_the_changed_lines_as_a_string(): void
@@ -194,7 +194,7 @@ final class CommandLineGitTest extends TestCase
                 },
             );
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $expected = Str::toSystemLineEndings(
             <<<'EOF'
@@ -207,7 +207,7 @@ final class CommandLineGitTest extends TestCase
                 EOF,
         );
 
-        $actual = $diffProvider->provideWithLines('master');
+        $actual = $git->provideWithLines('master');
 
         $this->assertSame($expected, $actual);
     }
@@ -242,7 +242,7 @@ final class CommandLineGitTest extends TestCase
                 },
             );
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $expected = Str::toSystemLineEndings(
             <<<'EOF'
@@ -252,7 +252,7 @@ final class CommandLineGitTest extends TestCase
                 EOF,
         );
 
-        $actual = $diffProvider->provideWithLines('master');
+        $actual = $git->provideWithLines('master');
 
         $this->assertSame($expected, $actual);
     }
@@ -268,23 +268,23 @@ final class CommandLineGitTest extends TestCase
             ->with($expectedMergeBaseCommandLine)
             ->willThrowException($mergeBaseCommandLineException);
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
         $this->expectExceptionObject($mergeBaseCommandLineException);
 
-        $diffProvider->provideWithLines('master');
+        $git->provideWithLines('master');
     }
 
     #[Group('integration')]
     public function test_it_can_get_this_project_default_base_branch(): void
     {
-        $diffProvider = new CommandLineGit(new ShellCommandLineExecutor());
+        $git = new CommandLineGit(new ShellCommandLineExecutor());
 
         $expected = TestCIDetector::isCIDetected()
             ? 'origin/master'
             : 'refs/remotes/origin/master';
 
-        $actual = $diffProvider->getDefaultBaseBranch();
+        $actual = $git->getDefaultBaseBranch();
 
         $this->assertSame($expected, $actual);
     }
@@ -306,9 +306,9 @@ final class CommandLineGitTest extends TestCase
                 ->willThrowException($shellOutputOrException);
         }
 
-        $diffProvider = new CommandLineGit($commandLineMock);
+        $git = new CommandLineGit($commandLineMock);
 
-        $actual = $diffProvider->getDefaultBaseBranch();
+        $actual = $git->getDefaultBaseBranch();
 
         $this->assertSame($expected, $actual);
     }

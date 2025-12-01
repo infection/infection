@@ -51,11 +51,11 @@ final class FilesDiffChangedLinesTest extends TestCase
 {
     public function test_it_memoizes_parsed_results(): void
     {
-        [$parser, $diffProvider] = $this->prepareServices([]);
+        [$parser, $git] = $this->prepareServices([]);
 
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $parser,
-            $diffProvider,
+            $git,
         );
 
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
