@@ -85,7 +85,7 @@ final class ConfigurationFactoryTest extends TestCase
 {
     private const GIT_DEFAULT_BASE_BRANCH = 'test/default';
 
-    private const GIT_DIFF_FILTER_PROVIDER_RESULT = 'src/a.php,src/b.php';
+    private const GIT_DIFF_MODIFIED_FILES = 'src/a.php,src/b.php';
 
     /**
      * @var array<string, Mutator>|null
@@ -1415,7 +1415,7 @@ final class ConfigurationFactoryTest extends TestCase
                     count($sourceDirectories) === 0
                         ? ''
                         : implode(', ', $sourceDirectories),
-                    self::GIT_DIFF_FILTER_PROVIDER_RESULT,
+                    self::GIT_DIFF_MODIFIED_FILES,
                 ),
             );
 
@@ -1426,7 +1426,10 @@ final class ConfigurationFactoryTest extends TestCase
             new MutatorParser(),
             $sourceFilesCollector,
             new DummyCiDetector($ciDetected, $githubActionsDetected),
-            $gitMock,
+            new ConfigurationFactoryGit(
+                self::GIT_DEFAULT_BASE_BRANCH,
+                self::GIT_DIFF_MODIFIED_FILES,
+            ),
         );
     }
 }
