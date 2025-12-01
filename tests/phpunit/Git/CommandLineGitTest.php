@@ -42,15 +42,13 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Tests\Process\Exception\GenericProcessException;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use function sprintf;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Exception\RuntimeException as SymfonyProcessRuntimeException;
 
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
@@ -110,7 +108,7 @@ final class CommandLineGitTest extends TestCase
     public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed(): void
     {
         $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineException = $this->createMock(ProcessFailedException::class);
+        $mergeBaseCommandLineException = new GenericProcessException('fatal!');
 
         $expectedDiffCommandLine = ['git', 'diff', 'master', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'];
         $diffCommandLineOutput = Str::toSystemLineEndings(
@@ -135,21 +133,6 @@ final class CommandLineGitTest extends TestCase
         $actual = $this->git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
 
         $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_fails_at_getting_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed_unexpectedly(): void
-    {
-        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineException = new SymfonyProcessRuntimeException('fatal: Not a valid object name randomName');
-
-        $this->commandLineMock
-            ->method('execute')
-            ->with($expectedMergeBaseCommandLine)
-            ->willThrowException($mergeBaseCommandLineException);
-
-        $this->expectExceptionObject($mergeBaseCommandLineException);
-
-        $this->git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
     }
 
     public function test_it_get_the_changed_lines_as_a_string(): void
@@ -211,7 +194,7 @@ final class CommandLineGitTest extends TestCase
     public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_changed_lines_if_getting_the_merge_base_failed(): void
     {
         $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineException = $this->createMock(ProcessFailedException::class);
+        $mergeBaseCommandLineException = new GenericProcessException('fatal!');
 
         $expectedDiffCommandLine = ['git', 'diff', 'master', '--unified=0', '--diff-filter=AM'];
         $diffCommandLineOutput = Str::toSystemLineEndings(
@@ -248,23 +231,7 @@ final class CommandLineGitTest extends TestCase
         $actual = $this->git->provideWithLines('master');
 
         $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
-    {
-        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineException = new SymfonyProcessRuntimeException('fatal: Not a valid object name randomName');
-
-        $this->commandLineMock
-            ->method('execute')
-            ->with($expectedMergeBaseCommandLine)
-            ->willThrowException($mergeBaseCommandLineException);
-
-        $this->expectExceptionObject($mergeBaseCommandLineException);
-
-        $this->git->provideWithLines('master');
-    }
-
+        153dsqw<cvbfgdsxw
     #[DataProvider('defaultBaseBranchProvider')]
     public function test_it_gets_the_default_base_branch(
         string|Exception $shellOutputOrException,
@@ -301,7 +268,7 @@ final class CommandLineGitTest extends TestCase
         ];
 
         yield 'the git command failed due to the name not being a valid symbolic ref' => [
-            new RuntimeException(
+            new GenericProcessException(
                 'fatal: ref testBranch is not a symbolic ref',
             ),
             Git::FALLBACK_BASE_BRANCH,

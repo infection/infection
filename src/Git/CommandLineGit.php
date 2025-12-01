@@ -41,9 +41,8 @@ use function explode;
 use function implode;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
-use RuntimeException;
 use function Safe\preg_match;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ExceptionInterface;
 
 /**
  * @internal
@@ -75,7 +74,7 @@ final class CommandLineGit implements Git
                 'symbolic-ref',
                 self::DEFAULT_SYMBOLIC_REFERENCE,
             ]);
-        } catch (RuntimeException) {
+        } catch (ExceptionInterface) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
             // TODO: we could log the failure to figure it out somewhere...
         }
@@ -134,7 +133,9 @@ final class CommandLineGit implements Git
                 $gitDiffBase,
                 'HEAD',
             ]);
-        } catch (ProcessFailedException) {
+        } catch (ExceptionInterface) {
+            // TODO: could do some logging here...
+
             /**
              * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
              * Fall back to direct diff
