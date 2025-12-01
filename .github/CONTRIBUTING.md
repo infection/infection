@@ -50,7 +50,7 @@ Some end-to-end tests are called "non-standard" as in they have their own script
 ```shell
 ./tests/e2e_tests <infection-executable> [<e2e-test>]
 
-# <infection-executable>: bin/infection or bin/infection.phar
+# <infection-executable>: defaults to bin/infection, or use build/infection.phar
 # [<e2e-test>]: optional grep pattern to filter tests, e.g. Adapter_Installer
 ```
 
