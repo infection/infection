@@ -42,6 +42,7 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Tests\TestingUtility\TestCIDetector;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -279,7 +280,13 @@ final class CommandLineGitTest extends TestCase
     {
         $git = new CommandLineGit(new ShellCommandLineExecutor());
 
-        $this->assertSame('origin/master', $git->getDefaultBaseBranch());
+        $expected = TestCIDetector::isCIDetected()
+            ? 'origin/master'
+            : 'refs/remotes/origin/master';
+
+        $actual = $git->getDefaultBaseBranch();
+
+        $this->assertSame($expected, $actual);
     }
 
     #[DataProvider('defaultBaseBranchProvider')]
@@ -310,22 +317,15 @@ final class CommandLineGitTest extends TestCase
     {
         yield 'nominal' => [
             'refs/remotes/origin/main',
-            'origin/main',
+            'refs/remotes/origin/main',
         ];
 
-        yield 'invalid output (this is possible but not with the options we pass)' => [
-            'upstream/main',
-            Git::FALLBACK_BASE_BRANCH,
-        ];
-
-        yield 'invalid output (not understandable)' => [
+        yield 'invalid output' => [
             'something-unexpected',
-            Git::FALLBACK_BASE_BRANCH,
-        ];
-
-        yield 'invalid output (empty)' => [
-            '',
-            Git::FALLBACK_BASE_BRANCH,
+            // We leave it alone, it is likely more correct than our fallback. in the measure
+            // that if the git command couldn't figure it out, it will fail the process, so whatever
+            // is returned is most likely correct.
+            'something-unexpected',
         ];
 
         yield 'the git command failed due to the name not being a valid symbolic ref' => [
