@@ -297,7 +297,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_GIT_DIFF_BASE,
                 null,
                 InputOption::VALUE_REQUIRED,
-                sprintf('Base branch for <comment>"--%1$s"</comment> option. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
+                sprintf('Base for <comment>"--%1$s"</comment> option. Can be the git branch short name, full name or a commit hash. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
                 Container::DEFAULT_GIT_DIFF_BASE,
             )
             ->addOption(
