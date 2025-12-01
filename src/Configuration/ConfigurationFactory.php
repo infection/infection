@@ -150,6 +150,28 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        // When the user gives a base, we need to try to refine it.
+        // For example, if the user created their feature branch:
+        //
+        //  main:     A --- B --- C
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Later, after others push to main
+        //
+        //  main:     A --- B --- C --- F --- G --- H
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
+        // touch code the user did not touch.
+        //
+        // To prevent this, we try to find the best common ancestor, here C.
+        // As a result, we would do `git diff C HEAD` which would give (D,E).
+        $baseReference = null === $gitDiffBase
+            ? null
+            : $this->git->getBaseReference($gitDiffBase);
+
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             sourceDirectories: $schema->source->directories,

@@ -85,7 +85,7 @@ final class CommandLineGit implements Git
 
     public function getChangedFileRelativePaths(string $diffFilter, string $baseBranch, array $sourceDirectories): string
     {
-        $referenceCommit = $this->findReferenceCommit($baseBranch);
+        $referenceCommit = $this->getBaseReference($baseBranch);
 
         $filter = $this->shellCommandLineExecutor->execute(array_merge(
             [
@@ -109,7 +109,7 @@ final class CommandLineGit implements Git
 
     public function provideWithLines(string $baseBranch): string
     {
-        $referenceCommit = $this->findReferenceCommit($baseBranch);
+        $referenceCommit = $this->getBaseReference($baseBranch);
 
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
@@ -124,25 +124,23 @@ final class CommandLineGit implements Git
         return implode(PHP_EOL, $lines);
     }
 
-    private function findReferenceCommit(string $gitDiffBase): string
+    public function getBaseReference(string $base): string
     {
         try {
-            $comparisonCommit = $this->shellCommandLineExecutor->execute([
+            return $this->shellCommandLineExecutor->execute([
                 'git',
                 'merge-base',
-                $gitDiffBase,
+                $base,
                 'HEAD',
             ]);
         } catch (ProcessException) {
             // TODO: could do some logging here...
-
-            /**
-             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-             * Fall back to direct diff
-             */
-            $comparisonCommit = $gitDiffBase;
         }
 
-        return $comparisonCommit;
+        /**
+         * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+         * Fall back to direct diff
+         */
+        return $base;
     }
 }

@@ -75,6 +75,32 @@ final class CommandLineGitTest extends TestCase
         $this->git->getChangedFileRelativePaths('AM', 'master', ['src/']);
     }
 
+    public function test_it_gets_the_merge_base(): void
+    {
+        $expected = 'af25a159143aadacf4d875a3114014e99053430';
+
+        $this->commandLineMock
+            ->method('execute')
+            ->with(['git', 'merge-base', 'main', 'HEAD'])
+            ->willReturn($expected);
+
+        $actual = $this->git->getBaseReference('main');
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_falls_back_to_the_given_branch_when_no_merge_base_could_be_found(): void
+    {
+        $this->commandLineMock
+            ->method('execute')
+            ->with(['git', 'merge-base', 'main', 'HEAD'])
+            ->willThrowException(new GenericProcessException('fatal!'));
+
+        $actual = $this->git->getBaseReference('main');
+
+        $this->assertSame('main', $actual);
+    }
+
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
     {
         $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
