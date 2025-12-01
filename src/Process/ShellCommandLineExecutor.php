@@ -35,7 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Process;
 
-use RuntimeException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 use function trim;
 
@@ -43,13 +44,16 @@ use function trim;
  * @internal
  *
  * @final
+ *
+ * Tiny wrapper around the Symfony Process component to easily get the output of a command.
  */
 class ShellCommandLineExecutor
 {
     /**
      * @param string[] $command
      *
-     * @throws RuntimeException
+     * @throws ProcessTimedOutException
+     * @throws ProcessFailedException
      */
     public function execute(array $command): string
     {
