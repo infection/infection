@@ -73,7 +73,6 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -130,7 +129,6 @@ final class ProjectCodeProvider
         XdebugHandler::class,
         NullSubscriber::class,
         FormatterName::class,
-        ShellCommandLineExecutor::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         StopInfectionOnSigintSignalSubscriber::class,
