@@ -71,6 +71,8 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     private const BAD_COMMIT_REFERENCE = '40d08afda22d5fe6d0d87ffb95fd609dcb01992a40d08afda22d5fe6d0d87ffb95fd609dcb01992a';
 
+    private static bool $commitReferenceExists;
+
     private Git $git;
 
     public static function setUpBeforeClass(): void
@@ -89,6 +91,8 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
     {
+        $this->skipIfCommitReferenceIsNotAvailable();
+
         $output = $this->git->getChangedFileRelativePaths(
             'AM',
             self::COMMIT_REFERENCE,
@@ -141,6 +145,8 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     public function test_it_get_the_changed_lines_as_a_string(): void
     {
+        $this->skipIfCommitReferenceIsNotAvailable();
+
         $actual = $this->git->provideWithLines(self::COMMIT_REFERENCE);
 
         $this->assertStringContainsString(PHP_EOL . 'diff --git a/src/Git/Git.php b/src/Git/Git.php' . PHP_EOL, $actual);
@@ -182,6 +188,17 @@ final class CommandLineGitIntegrationTest extends TestCase
         $actual = $git->getDefaultBaseBranch();
 
         $this->assertSame($expected, $actual);
+    }
+
+    private function skipIfCommitReferenceIsNotAvailable(): void
+    {
+        if (!isset(self::$commitReferenceExists)) {
+            self::$commitReferenceExists = self::checkIfCommitReferenceExists();
+        }
+
+        if (!self::$commitReferenceExists) {
+            $this->markTestSkipped('Commit reference not found. It may require more history.');
+        }
     }
 
     private static function checkIfCommitReferenceExists(): bool
