@@ -33,23 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\GitHub;
+namespace Infection\Git;
 
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(NoFilesInDiffToMutate::class)]
-final class NoFilesInDiffToMutateTest extends TestCase
+/**
+ * @internal
+ *
+ * Defines the contract for interacting with Git.
+ *
+ * This interface abstracts away the underlying Git implementation, whether it is spawning
+ * git processes, using a native library or mocking.
+ *
+ * This aims at highlighting what API we use from git and allow the code to be more expressive and usable.
+ */
+interface Git
 {
-    public function test_composer_not_found_exception(): void
-    {
-        $exception = NoFilesInDiffToMutate::create();
+    public const FALLBACK_BASE_BRANCH = 'origin/master';
 
-        $this->assertInstanceOf(NoFilesInDiffToMutate::class, $exception);
-        $this->assertSame(
-            'No files in diff found, skipping mutation analysis.',
-            $exception->getMessage(),
-        );
-    }
+    /**
+     * Retrieves the default base branch name for the repository.
+     *
+     * Examples of output:
+     * - 'origin/main'
+     * - 'origin/master'
+     */
+    public function getDefaultBaseBranch(): string;
+
+    /**
+     * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
+     * compared to the base branch used and matching the given filter.
+     *
+     * Returns a comma-separated list of the relative paths.
+     *
+     * @param string $diffFilter E.g. 'AM'.
+     * @param string $baseBranch E.g. 'origin.main'.
+     * @param string[] $sourceDirectories
+     *
+     * @throws NoFilesInDiffToMutate
+     */
+    public function getChangedFileRelativePaths(
+        string $diffFilter,
+        string $baseBranch,
+        array $sourceDirectories,
+    ): string;
+
+    /**
+     * Gets the modifications with their line numbers of the files that changed compared to the base branch used and
+     * matching the given filter.
+     */
+    public function provideWithLines(string $baseBranch): string;
 }

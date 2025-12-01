@@ -83,9 +83,10 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
+use Infection\Git\CommandLineGit;
+use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
@@ -560,6 +561,7 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            Git::class => static fn (): Git => new CommandLineGit(new ShellCommandLineExecutor()),
         ]);
 
         return $container->withValues(
@@ -977,9 +979,9 @@ final class Container extends DIContainer
         return $this->get(ShellCommandLineExecutor::class);
     }
 
-    public function getGitDiffFileProvider(): GitDiffFileProvider
+    public function getGit(): Git
     {
-        return $this->get(GitDiffFileProvider::class);
+        return $this->get(Git::class);
     }
 
     public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder

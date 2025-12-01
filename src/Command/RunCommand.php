@@ -37,7 +37,6 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function implode;
-use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -51,8 +50,8 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\ConsoleLogger;
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
