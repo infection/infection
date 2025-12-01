@@ -9,6 +9,7 @@
          failOnRisky="true"
          requireCoverageMetadata="true"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnSkippedTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          cacheDirectory="./build/cache/phpunit"
