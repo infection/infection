@@ -53,8 +53,18 @@ interface Git
      * Retrieves the default base branch name for the repository.
      *
      * Examples of output:
+     * - 'refs/remotes/origin/main'
      * - 'origin/main'
      * - 'origin/master'
+     *
+     * A branch may have two forms:
+     * - full path: refs/remotes/origin/HEAD
+     * - shorthand: origin/HEAD
+     *
+     * The order that git uses to resolve a shorthand notation is defined here:
+     * https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
+     *
+     * Preferably, this method returns the full path which is less ambiguous. However, this is not always possible.
      */
     public function getDefaultBaseBranch(): string;
 
