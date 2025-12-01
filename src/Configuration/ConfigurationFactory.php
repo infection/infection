@@ -150,11 +150,20 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        $useGitDiff = $isForGitDiffLines || $gitDiffFilter !== null;
+        $refinedGitBase = self::refineGitBase($gitDiffBase, $useGitDiff);
+
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             sourceDirectories: $schema->source->directories,
             sourceFiles: $this->collectFiles($schema),
-            sourceFilesFilter: $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->source->directories),
+            sourceFilesFilter: $this->retrieveFilter(
+                $filter,
+                $gitDiffFilter,
+                $isForGitDiffLines,
+                $refinedGitBase,
+                $schema->source->directories,
+            ),
             sourceFilesExcludes: $schema->source->excludes,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
@@ -182,8 +191,8 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForGitDiffLines: $isForGitDiffLines || $gitDiffFilter !== null,
-            gitDiffBase: $gitDiffBase,
+            isForGitDiffLines: $useGitDiff,
+            gitDiffBase: $refinedGitBase,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
@@ -362,16 +371,16 @@ class ConfigurationFactory
     /**
      * @param string[] $sourceDirectories
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string &$baseBranch, array $sourceDirectories): string
+    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitBase, array $sourceDirectories): string
     {
         if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch ??= $this->git->getDefaultBaseBranch();
+        Assert::notNull($gitBase);
 
-        return $this->git->getChangedFileRelativePaths($gitDiffFilter, $baseBranch, $sourceDirectories);
+        return $this->git->getChangedFileRelativePaths($gitDiffFilter, $gitBase, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
@@ -463,5 +472,33 @@ class ConfigurationFactory
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    /**
+     * @return ($useGitDiff is false ? string|null : string)
+     */
+    private function refineGitBase(?string $base, bool $useGitDiff): ?string
+    {
+        // When the user gives a base, we need to try to refine it.
+        // For example, if the user created their feature branch:
+        //
+        //  main:     A --- B --- C
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Later, after others push to main
+        //
+        //  main:     A --- B --- C --- F --- G --- H
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
+        // touch code the user did not touch.
+        //
+        // To prevent this, we try to find the best common ancestor, here C.
+        // As a result, we would do `git diff C HEAD` which would give (D,E).
+        return $useGitDiff
+            ? $this->git->getBaseReference($base ?? $this->git->getDefaultBase())
+            : null;
     }
 }

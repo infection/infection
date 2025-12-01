@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Git;
 
 use Exception;
-use function implode;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
@@ -48,7 +47,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
@@ -75,72 +73,58 @@ final class CommandLineGitTest extends TestCase
         $this->git->getChangedFileRelativePaths('AM', 'master', ['src/']);
     }
 
-    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
+    public function test_it_gets_the_merge_base(): void
     {
-        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineOutput = '0ABCMERGE_BASE_342';
-
-        $expectedDiffCommandLine = ['git', 'diff', $mergeBaseCommandLineOutput, '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'];
-        $diffCommandLineOutput = Str::toSystemLineEndings(
-            <<<'EOF'
-                app/A.php
-                my lib/B.php
-                EOF,
-        );
+        $expected = 'af25a159143aadacf4d875a3114014e99053430';
 
         $this->commandLineMock
             ->method('execute')
-            ->willReturnCallback(
-                fn (array $command): string => match ($command) {
-                    $expectedMergeBaseCommandLine => $mergeBaseCommandLineOutput,
-                    $expectedDiffCommandLine => $diffCommandLineOutput,
-                    default => $this->failForUnexpectedShellCommand($command),
-                },
-            );
+            ->with(['git', 'merge-base', 'main', 'HEAD'])
+            ->willReturn($expected);
 
-        $expected = 'app/A.php,my lib/B.php';
-
-        $actual = $this->git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
+        $actual = $this->git->getBaseReference('main');
 
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed(): void
+    public function test_it_falls_back_to_the_given_branch_when_no_merge_base_could_be_found(): void
     {
-        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineException = new GenericProcessException('fatal!');
-
-        $expectedDiffCommandLine = ['git', 'diff', 'master', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'];
-        $diffCommandLineOutput = Str::toSystemLineEndings(
-            <<<'EOF'
-                app/A.php
-                my lib/B.php
-                EOF,
-        );
-
         $this->commandLineMock
             ->method('execute')
-            ->willReturnCallback(
-                fn (array $command): string => match ($command) {
-                    $expectedMergeBaseCommandLine => throw $mergeBaseCommandLineException,
-                    $expectedDiffCommandLine => $diffCommandLineOutput,
-                    default => $this->failForUnexpectedShellCommand($command),
-                },
+            ->with(['git', 'merge-base', 'main', 'HEAD'])
+            ->willThrowException(new GenericProcessException('fatal!'));
+
+        $actual = $this->git->getBaseReference('main');
+
+        $this->assertSame('main', $actual);
+    }
+
+    public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
+    {
+        $this->commandLineMock
+            ->method('execute')
+            ->with(
+                ['git', 'diff', 'main', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'],
+            )
+            ->willReturn(
+                Str::toSystemLineEndings(
+                    <<<'EOF'
+                        app/A.php
+                        my lib/B.php
+                        EOF,
+                ),
             );
 
         $expected = 'app/A.php,my lib/B.php';
 
-        $actual = $this->git->getChangedFileRelativePaths('AM', 'master', ['app/', 'my lib/']);
+        $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/']);
 
         $this->assertSame($expected, $actual);
     }
 
     public function test_it_get_the_changed_lines_as_a_string(): void
     {
-        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineOutput = '0ABCMERGE_BASE_342';
-
-        $expectedDiffCommandLine = ['git', 'diff', $mergeBaseCommandLineOutput, '--unified=0', '--diff-filter=AM'];
+        $expectedDiffCommandLine = ['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'];
         $diffCommandLineOutput = Str::toSystemLineEndings(
             <<<'EOF'
                 diff --git a/tests/FooTest.php b/tests/FooTest.php
@@ -167,13 +151,8 @@ final class CommandLineGitTest extends TestCase
 
         $this->commandLineMock
             ->method('execute')
-            ->willReturnCallback(
-                fn (array $command): string => match ($command) {
-                    $expectedMergeBaseCommandLine => $mergeBaseCommandLineOutput,
-                    $expectedDiffCommandLine => $diffCommandLineOutput,
-                    default => $this->failForUnexpectedShellCommand($command),
-                },
-            );
+            ->with($expectedDiffCommandLine)
+            ->willReturn($diffCommandLineOutput);
 
         $expected = Str::toSystemLineEndings(
             <<<'EOF'
@@ -186,55 +165,13 @@ final class CommandLineGitTest extends TestCase
                 EOF,
         );
 
-        $actual = $this->git->provideWithLines('master');
+        $actual = $this->git->provideWithLines('main');
 
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_changed_lines_if_getting_the_merge_base_failed(): void
-    {
-        $expectedMergeBaseCommandLine = ['git', 'merge-base', 'master', 'HEAD'];
-        $mergeBaseCommandLineException = new GenericProcessException('fatal!');
-
-        $expectedDiffCommandLine = ['git', 'diff', 'master', '--unified=0', '--diff-filter=AM'];
-        $diffCommandLineOutput = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                index 2a9e281..01cbf04 100644
-                --- a/tests/FooTest.php
-                +++ b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-                -            return false === \strpos($sql, 'doctrine_migrations');
-                +            return ! \str_contains($sql, 'doctrine_migrations');
-
-                EOF,
-        );
-
-        $this->commandLineMock
-            ->method('execute')
-            ->willReturnCallback(
-                fn (array $command): string => match ($command) {
-                    $expectedMergeBaseCommandLine => throw $mergeBaseCommandLineException,
-                    $expectedDiffCommandLine => $diffCommandLineOutput,
-                    default => $this->failForUnexpectedShellCommand($command),
-                },
-            );
-
-        $expected = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-
-                EOF,
-        );
-
-        $actual = $this->git->provideWithLines('master');
-
-        $this->assertSame($expected, $actual);
-    }
-
-    #[DataProvider('defaultBaseBranchProvider')]
-    public function test_it_gets_the_default_base_branch(
+    #[DataProvider('defaultGitBaseProvider')]
+    public function test_it_gets_the_default_git_base(
         string|Exception $shellOutputOrException,
         string $expected,
     ): void {
@@ -248,12 +185,12 @@ final class CommandLineGitTest extends TestCase
                 ->willThrowException($shellOutputOrException);
         }
 
-        $actual = $this->git->getDefaultBaseBranch();
+        $actual = $this->git->getDefaultBase();
 
         $this->assertSame($expected, $actual);
     }
 
-    public static function defaultBaseBranchProvider(): iterable
+    public static function defaultGitBaseProvider(): iterable
     {
         yield 'nominal' => [
             'refs/remotes/origin/main',
@@ -272,20 +209,7 @@ final class CommandLineGitTest extends TestCase
             new GenericProcessException(
                 'fatal: ref testBranch is not a symbolic ref',
             ),
-            Git::FALLBACK_BASE_BRANCH,
+            Git::FALLBACK_BASE,
         ];
-    }
-
-    /**
-     * @param string[] $command
-     */
-    private function failForUnexpectedShellCommand(array $command): never
-    {
-        $this->fail(
-            sprintf(
-                'Unexpected shell command: %s',
-                implode(' ', $command),
-            ),
-        );
     }
 }

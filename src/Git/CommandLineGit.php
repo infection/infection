@@ -61,7 +61,7 @@ final class CommandLineGit implements Git
     ) {
     }
 
-    public function getDefaultBaseBranch(): string
+    public function getDefaultBase(): string
     {
         if ($this->defaultBase !== null) {
             return $this->defaultBase;
@@ -80,18 +80,16 @@ final class CommandLineGit implements Git
         }
 
         // unable to figure it out, return the default
-        return $this->defaultBase = Git::FALLBACK_BASE_BRANCH;
+        return $this->defaultBase = Git::FALLBACK_BASE;
     }
 
-    public function getChangedFileRelativePaths(string $diffFilter, string $baseBranch, array $sourceDirectories): string
+    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
     {
-        $referenceCommit = $this->findReferenceCommit($baseBranch);
-
         $filter = $this->shellCommandLineExecutor->execute(array_merge(
             [
                 'git',
                 'diff',
-                $referenceCommit,
+                $base,
                 '--diff-filter',
                 $diffFilter,
                 '--name-only',
@@ -107,14 +105,12 @@ final class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function provideWithLines(string $baseBranch): string
+    public function provideWithLines(string $base): string
     {
-        $referenceCommit = $this->findReferenceCommit($baseBranch);
-
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
-            $referenceCommit,
+            $base,
             '--unified=0',
             '--diff-filter=AM',
         ]);
@@ -124,43 +120,23 @@ final class CommandLineGit implements Git
         return implode(PHP_EOL, $lines);
     }
 
-    // When the user gives a base, we need to try to refine it.
-    // For example, if the user created their feature branch:
-    //
-    //  main:     A --- B --- C
-    //                         \
-    //  feature:                D --- E  (user changes)
-    //
-    // Later, after others push to main
-    //
-    //  main:     A --- B --- C --- F --- G --- H
-    //                         \
-    //  feature:                D --- E  (user changes)
-    //
-    // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
-    // touch code the user did not touch.
-    //
-    // To prevent this, we try to find the best common ancestor, here C.
-    // As a result, we would do `git diff C HEAD` which would give (D,E).
-    private function findReferenceCommit(string $gitDiffBase): string
+    public function getBaseReference(string $base): string
     {
         try {
-            $comparisonCommit = $this->shellCommandLineExecutor->execute([
+            return $this->shellCommandLineExecutor->execute([
                 'git',
                 'merge-base',
-                $gitDiffBase,
+                $base,
                 'HEAD',
             ]);
         } catch (ProcessException) {
             // TODO: could do some logging here...
-
-            /**
-             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-             * Fall back to direct diff
-             */
-            $comparisonCommit = $gitDiffBase;
         }
 
-        return $comparisonCommit;
+        /**
+         * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+         * Fall back to direct diff
+         */
+        return $base;
     }
 }
