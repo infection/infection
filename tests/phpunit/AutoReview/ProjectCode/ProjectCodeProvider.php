@@ -116,41 +116,41 @@ final class ProjectCodeProvider
      * reasons. This list should never be added to, only removed from.
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
-        ConfigureCommand::class,
-        Application::class,
-        ProgressFormatter::class,
-        ConcreteComposerExecutableFinder::class,
-        InvalidReportSource::class,
-        StrykerCurlClient::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
-        NodeMutationGenerator::class,
-        NonExecutableFinder::class,
         AdapterInstaller::class,
-        DummyFileSystem::class,
-        XdebugHandler::class,
-        NullSubscriber::class,
-        FormatterName::class,
-        ShellCommandLineExecutor::class,
+        Application::class,
+        BaseMutatorTestCase::class,
+        ConcreteComposerExecutableFinder::class,
+        ConfigureCommand::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
-        StopInfectionOnSigintSignalSubscriber::class,
-        Logs::class,
-        MapSourceClassToTestStrategy::class, // no need to test 1 const for now
-        MutantExecutionResult::class,
-        MutatorName::class,
-        NoReportFound::class,
-        BaseMutatorTestCase::class,
-        OperatingSystem::class,
-        SchemaConfiguration::class,
-        SimpleMutation::class,
-        StringNormalizer::class,
-        Source::class,
-        SimpleMutationsCollectorVisitor::class,
-        SingletonContainer::class,
-        TooManyReportsFound::class,
+        DummyFileSystem::class,
         FakeFileSystem::class,
         FakeLocator::class,
         FileSystem::class,
+        FormatterName::class,
+        InvalidReportSource::class,
+        Logs::class,
+        MapSourceClassToTestStrategy::class, // no need to test 1 const for now
+        MutantExecutionResult::class,
+        MutationGeneratingConsoleLoggerSubscriber::class,
+        MutatorName::class,
+        NodeMutationGenerator::class,
+        NoReportFound::class,
+        NonExecutableFinder::class,
+        NullSubscriber::class,
+        OperatingSystem::class,
+        ProgressFormatter::class,
+        SchemaConfiguration::class,
+        ShellCommandLineExecutor::class,
+        SimpleMutation::class,
+        SimpleMutationsCollectorVisitor::class,
+        SingletonContainer::class,
+        Source::class,
+        StopInfectionOnSigintSignalSubscriber::class,
+        StringNormalizer::class,
+        StrykerCurlClient::class,
+        TooManyReportsFound::class,
+        XdebugHandler::class,
     ];
 
     /**
@@ -168,27 +168,27 @@ final class ProjectCodeProvider
      */
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
-        SourceDirGuesser::class,
-        TestFrameworkFinder::class,
-        StrykerDashboardClient::class,
+        FileSystem::class,
         MetricsCalculator::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        FileSystem::class,
+        SourceDirGuesser::class,
+        StrykerDashboardClient::class,
+        TestFrameworkFinder::class,
     ];
 
     /**
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
+        BaseMutatorTestCase::class,
+        Definition::class,
+        Mutator::class,
+        MutatorCategory::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
-        Mutator::class,
-        Definition::class,
-        MutatorCategory::class,
-        BaseMutatorTestCase::class,
     ];
 
     /**
