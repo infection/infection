@@ -231,7 +231,8 @@ final class CommandLineGitTest extends TestCase
         $actual = $this->git->provideWithLines('master');
 
         $this->assertSame($expected, $actual);
-        153dsqw<cvbfgdsxw
+    }
+
     #[DataProvider('defaultBaseBranchProvider')]
     public function test_it_gets_the_default_base_branch(
         string|Exception $shellOutputOrException,
