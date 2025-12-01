@@ -73,6 +73,13 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     private Git $git;
 
+    public static function setUpBeforeClass(): void
+    {
+        if (!self::checkIfCommitReferenceExists()) {
+            self::markTestSkipped('Commit reference not found. It may require more history.');
+        }
+    }
+
     protected function setUp(): void
     {
         $this->git = new CommandLineGit(
@@ -175,5 +182,21 @@ final class CommandLineGitIntegrationTest extends TestCase
         $actual = $git->getDefaultBaseBranch();
 
         $this->assertSame($expected, $actual);
+    }
+
+    private static function checkIfCommitReferenceExists(): bool
+    {
+        try {
+            (new ShellCommandLineExecutor())->execute([
+                'git',
+                'cat-file',
+                '-e',
+                self::COMMIT_REFERENCE,
+            ]);
+
+            return true;
+        } catch (ProcessFailedException) {
+            return false;
+        }
     }
 }
