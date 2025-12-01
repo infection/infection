@@ -51,7 +51,6 @@ use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -83,9 +82,10 @@ use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
+use Infection\Git\Git;
+use Infection\Git\GitBuilder;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
@@ -449,6 +449,14 @@ final class Container extends DIContainer
                     $container->getLineRangeCalculator(),
                     $container->getFilesDiffChangedLines(),
                     $configuration->isForGitDiffLines,
+                );
+            },
+            Git::class => GitBuilder::class,
+            GitBuilder::class => static function (self $container): GitBuilder {
+                $configuration = $container->getConfiguration();
+
+                return new GitBuilder(
+                    $container->getShellCommandLineExecutor(),
                     $configuration->gitDiffBase,
                 );
             },
@@ -907,9 +915,9 @@ final class Container extends DIContainer
         return $this->get(FilesDiffChangedLines::class);
     }
 
-    public function getDiffChangedLinesParser(): DiffChangedLinesParser
+    public function getGit(): Git
     {
-        return $this->get(DiffChangedLinesParser::class);
+        return $this->get(Git::class);
     }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder
@@ -977,9 +985,9 @@ final class Container extends DIContainer
         return $this->get(ShellCommandLineExecutor::class);
     }
 
-    public function getGitDiffFileProvider(): GitDiffFileProvider
+    public function getGitBuilder(): GitBuilder
     {
-        return $this->get(GitDiffFileProvider::class);
+        return $this->get(GitBuilder::class);
     }
 
     public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder

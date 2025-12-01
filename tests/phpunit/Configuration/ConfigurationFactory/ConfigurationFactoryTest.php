@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use function array_slice;
 use function count;
 use function implode;
 use Infection\Configuration\Configuration;
@@ -48,7 +49,6 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\LogVerbosity;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -59,6 +59,7 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\NoopMutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -1401,22 +1402,40 @@ final class ConfigurationFactoryTest extends TestCase
                 },
             );
 
-        $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
-        $gitDiffFilesProviderMock
-            ->method('provideDefaultBase')
-            ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
-        $gitDiffFilesProviderMock
-            ->method('provide')
+        $shellCommandLineExecutorMock = $this->createMock(ShellCommandLineExecutor::class);
+        $shellCommandLineExecutorMock
+            ->method('execute')
             ->willReturnCallback(
-                static fn (string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string => sprintf(
-                    'f(%s, %s, [%s]) = %s',
-                    $gitDiffFilter,
-                    $gitDiffBase,
-                    count($sourceDirectories) === 0
-                        ? ''
-                        : implode(', ', $sourceDirectories),
-                    self::GIT_DIFF_FILTER_PROVIDER_RESULT,
-                ),
+                static function (array $command): string {
+                    // Handle git symbolic-ref for default base branch
+                    if ($command[1] === 'symbolic-ref') {
+                        return 'refs/remotes/' . self::GIT_DEFAULT_BASE_BRANCH;
+                    }
+
+                    // Handle git merge-base for reference commit
+                    if ($command[1] === 'merge-base') {
+                        return $command[2]; // Return the base branch as-is
+                    }
+
+                    // Handle git diff for file list or changed lines
+                    if ($command[1] === 'diff') {
+                        $gitDiffFilter = $command[4] ?? 'AM';
+                        $gitDiffBase = $command[2];
+                        $sourceDirectories = array_slice($command, 7);
+
+                        return sprintf(
+                            'f(%s, %s, [%s]) = %s',
+                            $gitDiffFilter,
+                            $gitDiffBase,
+                            count($sourceDirectories) === 0
+                                ? ''
+                                : implode(', ', $sourceDirectories),
+                            self::GIT_DIFF_FILTER_PROVIDER_RESULT,
+                        );
+                    }
+
+                    return '';
+                },
             );
 
         return new ConfigurationFactory(
@@ -1426,7 +1445,7 @@ final class ConfigurationFactoryTest extends TestCase
             new MutatorParser(),
             $sourceFilesCollector,
             new DummyCiDetector($ciDetected, $githubActionsDetected),
-            $gitDiffFilesProviderMock,
+            $shellCommandLineExecutorMock,
         );
     }
 }

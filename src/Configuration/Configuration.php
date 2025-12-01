@@ -40,6 +40,7 @@ use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Git\BaseBranchProvider;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -52,7 +53,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  */
-readonly class Configuration
+readonly class Configuration implements BaseBranchProvider
 {
     private const LOG_VERBOSITY = [
         'all',
@@ -136,6 +137,11 @@ readonly class Configuration
     public function mutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
+    }
+
+    public function getBaseBranch(): ?string
+    {
+        return $this->gitDiffBase;
     }
 
     /**

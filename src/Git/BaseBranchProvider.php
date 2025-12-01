@@ -33,35 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
-
-use Infection\Git\ChangedLinesRange;
-use Infection\Git\Git;
+namespace Infection\Git;
 
 /**
+ * Provides the base branch for git diff operations.
+ *
  * @internal
- * @final
  */
-class FilesDiffChangedLines
+interface BaseBranchProvider
 {
-    /** @var array<string, ChangedLinesRange[]>|null */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
-    public function __construct(
-        private readonly Git $git,
-    ) {
-    }
-
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
-    {
-        $this->memoizedFilesChangedLinesMap ??= $this->git->getChangedLinesMap();
-
-        foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
-            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    public function getBaseBranch(): ?string;
 }

@@ -33,35 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
+namespace Infection\Git;
 
-use Infection\Git\ChangedLinesRange;
-use Infection\Git\Git;
+use Exception;
 
 /**
  * @internal
- * @final
  */
-class FilesDiffChangedLines
+final class NoFilesInDiffToMutate extends Exception
 {
-    /** @var array<string, ChangedLinesRange[]>|null */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
-    public function __construct(
-        private readonly Git $git,
-    ) {
-    }
-
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
+    public static function create(): self
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->git->getChangedLinesMap();
-
-        foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
-            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
-                return true;
-            }
-        }
-
-        return false;
+        return new self('No files in diff found, skipping mutation analysis.');
     }
 }

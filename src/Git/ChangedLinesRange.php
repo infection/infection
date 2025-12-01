@@ -33,35 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
-
-use Infection\Git\ChangedLinesRange;
-use Infection\Git\Git;
+namespace Infection\Git;
 
 /**
  * @internal
- * @final
  */
-class FilesDiffChangedLines
+final readonly class ChangedLinesRange
 {
-    /** @var array<string, ChangedLinesRange[]>|null */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
     public function __construct(
-        private readonly Git $git,
+        private int $startLine,
+        private int $endLine,
     ) {
     }
 
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
+    public function getStartLine(): int
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->git->getChangedLinesMap();
+        return $this->startLine;
+    }
 
-        foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
-            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
-                return true;
-            }
-        }
-
-        return false;
+    public function getEndLine(): int
+    {
+        return $this->endLine;
     }
 }

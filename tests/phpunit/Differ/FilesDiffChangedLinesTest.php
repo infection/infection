@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Differ;
 
 use Generator;
-use Infection\Differ\ChangedLinesRange;
-use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Git\ChangedLinesRange;
+use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -51,17 +50,14 @@ final class FilesDiffChangedLinesTest extends TestCase
 {
     public function test_it_memoizes_parsed_results(): void
     {
-        [$parser, $diffProvider] = $this->prepareServices([]);
+        $git = $this->createGitMock([]);
 
-        $filesDiffChangedLines = new FilesDiffChangedLines(
-            $parser,
-            $diffProvider,
-        );
+        $filesDiffChangedLines = new FilesDiffChangedLines($git);
 
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
     }
 
     /**
@@ -74,14 +70,11 @@ final class FilesDiffChangedLinesTest extends TestCase
         int $mutationStartLine,
         int $mutationEndLine,
     ): void {
-        [$parser, $diffProvider] = $this->prepareServices($returnedFilesDiffChangedLinesMap);
+        $git = $this->createGitMock($returnedFilesDiffChangedLinesMap);
 
-        $filesDiffChangedLines = new FilesDiffChangedLines(
-            $parser,
-            $diffProvider,
-        );
+        $filesDiffChangedLines = new FilesDiffChangedLines($git);
 
-        $isLineFoundInDiff = $filesDiffChangedLines->contains('/path/to/File.php', $mutationStartLine, $mutationEndLine, 'master');
+        $isLineFoundInDiff = $filesDiffChangedLines->contains('/path/to/File.php', $mutationStartLine, $mutationEndLine);
 
         $this->assertSame($expectedIsFound, $isLineFoundInDiff, sprintf('Line %d was not found in diff', $mutationStartLine));
     }
@@ -190,25 +183,17 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     /**
      * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
-     * @return array{0: DiffChangedLinesParser, 1: GitDiffFileProvider}
+     *
+     * @return Git&MockObject
      */
-    private function prepareServices(array $returnedFilesDiffChangedLinesMap): array
+    private function createGitMock(array $returnedFilesDiffChangedLinesMap): Git
     {
-        /** @var DiffChangedLinesParser&MockObject $parser */
-        $parser = $this->createMock(DiffChangedLinesParser::class);
-        $parser
+        $git = $this->createMock(Git::class);
+        $git
             ->expects($this->once())
-            ->method('parse')
+            ->method('getChangedLinesMap')
             ->willReturn($returnedFilesDiffChangedLinesMap);
 
-        /** @var GitDiffFileProvider&MockObject $diffProvider */
-        $diffProvider = $this->createMock(GitDiffFileProvider::class);
-        $diffProvider
-            ->expects($this->once())
-            ->method('provideWithLines')
-            ->with('master')
-            ->willReturn('');
-
-        return [$parser, $diffProvider];
+        return $git;
     }
 }

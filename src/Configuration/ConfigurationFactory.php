@@ -51,13 +51,14 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Git\GitBuilder;
 use Infection\Logger\FileLogger;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
+use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
@@ -90,7 +91,7 @@ class ConfigurationFactory
         private readonly MutatorParser $mutatorParser,
         private readonly SourceFileCollector $sourceFileCollector,
         private readonly CiDetectorInterface $ciDetector,
-        private readonly GitDiffFileProvider $gitDiffFileProvider,
+        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
@@ -370,9 +371,13 @@ class ConfigurationFactory
         }
 
         $gitDiffFilter ??= 'AM';
-        $baseBranch ??= $this->gitDiffFileProvider->provideDefaultBase();
 
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
+        $gitBuilder = new GitBuilder($this->shellCommandLineExecutor, $baseBranch);
+        $baseBranch ??= $gitBuilder->getDefaultBaseBranch();
+
+        $git = (new GitBuilder($this->shellCommandLineExecutor, $baseBranch))->build();
+
+        return $git->getChangedFileRelativePaths($gitDiffFilter, $sourceDirectories);
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
