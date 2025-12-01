@@ -47,7 +47,9 @@ namespace Infection\Git;
  */
 interface Git
 {
-    public const FALLBACK_BASE_BRANCH = 'origin/master';
+    // The default git base used. It can be a short branch name, full name or a
+    // commit reference.
+    public const FALLBACK_BASE = 'origin/master';
 
     /**
      * Retrieves the default base branch name for the repository.

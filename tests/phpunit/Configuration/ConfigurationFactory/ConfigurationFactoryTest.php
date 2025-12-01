@@ -83,7 +83,7 @@ use function var_export;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
-    private const GIT_DEFAULT_BASE_BRANCH = 'test/default';
+    private const GIT_DEFAULT_BASE = 'test/default';
 
     private const GIT_DIFF_FILTER_PROVIDER_RESULT = 'src/a.php,src/b.php';
 
@@ -1408,7 +1408,7 @@ final class ConfigurationFactoryTest extends TestCase
         $gitMock
             ->expects($this->atMost(1))
             ->method('getDefaultBase')
-            ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
+            ->willReturn(self::GIT_DEFAULT_BASE);
         $gitMock
             ->method('getBaseReference')
             ->willReturnCallback(

@@ -171,7 +171,7 @@ final class CommandLineGitIntegrationTest extends TestCase
         $this->git->provideWithLines($badCommitReference);
     }
 
-    public function test_it_can_get_this_project_default_base_branch(): void
+    public function test_it_can_get_this_project_default_git_base(): void
     {
         $git = new CommandLineGit(new ShellCommandLineExecutor());
 

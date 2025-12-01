@@ -122,29 +122,6 @@ final class CommandLineGitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_relative_paths_of_the_changed_files_if_getting_the_merge_base_failed(): void
-    {
-        $this->commandLineMock
-            ->method('execute')
-            ->with(
-                ['git', 'diff', 'main', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'],
-            )
-            ->willReturn(
-                Str::toSystemLineEndings(
-                    <<<'EOF'
-                        app/A.php
-                        my lib/B.php
-                        EOF,
-                ),
-            );
-
-        $expected = 'app/A.php,my lib/B.php';
-
-        $actual = $this->git->getChangedFileRelativePaths('AM', 'main', ['app/', 'my lib/']);
-
-        $this->assertSame($expected, $actual);
-    }
-
     public function test_it_get_the_changed_lines_as_a_string(): void
     {
         $expectedDiffCommandLine = ['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'];
@@ -193,41 +170,8 @@ final class CommandLineGitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_uses_the_base_branch_passed_as_the_reference_commit_when_gets_the_changed_lines_if_getting_the_merge_base_failed(): void
-    {
-        $this->commandLineMock
-            ->method('execute')
-            ->with(['git', 'diff', 'master', '--unified=0', '--diff-filter=AM'])
-            ->willReturn(
-                Str::toSystemLineEndings(
-                    <<<'EOF'
-                        diff --git a/tests/FooTest.php b/tests/FooTest.php
-                        index 2a9e281..01cbf04 100644
-                        --- a/tests/FooTest.php
-                        +++ b/tests/FooTest.php
-                        @@ -73 +73 @@ final class FooTest
-                        -            return false === \strpos($sql, 'doctrine_migrations');
-                        +            return ! \str_contains($sql, 'doctrine_migrations');
-
-                        EOF,
-                ),
-            );
-
-        $expected = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-
-                EOF,
-        );
-
-        $actual = $this->git->provideWithLines('master');
-
-        $this->assertSame($expected, $actual);
-    }
-
-    #[DataProvider('defaultBaseBranchProvider')]
-    public function test_it_gets_the_default_base_branch(
+    #[DataProvider('defaultGitBaseProvider')]
+    public function test_it_gets_the_default_git_base(
         string|Exception $shellOutputOrException,
         string $expected,
     ): void {
@@ -246,7 +190,7 @@ final class CommandLineGitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public static function defaultBaseBranchProvider(): iterable
+    public static function defaultGitBaseProvider(): iterable
     {
         yield 'nominal' => [
             'refs/remotes/origin/main',
@@ -265,7 +209,7 @@ final class CommandLineGitTest extends TestCase
             new GenericProcessException(
                 'fatal: ref testBranch is not a symbolic ref',
             ),
-            Git::FALLBACK_BASE_BRANCH,
+            Git::FALLBACK_BASE,
         ];
     }
 }

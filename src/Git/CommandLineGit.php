@@ -80,7 +80,7 @@ final class CommandLineGit implements Git
         }
 
         // unable to figure it out, return the default
-        return $this->defaultBase = Git::FALLBACK_BASE_BRANCH;
+        return $this->defaultBase = Git::FALLBACK_BASE;
     }
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
