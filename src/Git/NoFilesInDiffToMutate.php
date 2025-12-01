@@ -33,23 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\GitHub;
+namespace Infection\Git;
 
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Exception;
 
-#[CoversClass(NoFilesInDiffToMutate::class)]
-final class NoFilesInDiffToMutateTest extends TestCase
+/**
+ * @internal
+ */
+final class NoFilesInDiffToMutate extends Exception
 {
-    public function test_composer_not_found_exception(): void
+    public static function create(): self
     {
-        $exception = NoFilesInDiffToMutate::create();
-
-        $this->assertInstanceOf(NoFilesInDiffToMutate::class, $exception);
-        $this->assertSame(
-            'No files in diff found, skipping mutation analysis.',
-            $exception->getMessage(),
-        );
+        return new self('No files in diff found, skipping mutation analysis.');
     }
 }

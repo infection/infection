@@ -39,7 +39,7 @@ use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -190,7 +190,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     /**
      * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
-     * @return array{0: DiffChangedLinesParser, 1: GitDiffFileProvider}
+     * @return array{0: DiffChangedLinesParser, 1: Git}
      */
     private function prepareServices(array $returnedFilesDiffChangedLinesMap): array
     {
@@ -201,14 +201,14 @@ final class FilesDiffChangedLinesTest extends TestCase
             ->method('parse')
             ->willReturn($returnedFilesDiffChangedLinesMap);
 
-        /** @var GitDiffFileProvider&MockObject $diffProvider */
-        $diffProvider = $this->createMock(GitDiffFileProvider::class);
-        $diffProvider
+        /** @var Git&MockObject $git */
+        $git = $this->createMock(Git::class);
+        $git
             ->expects($this->once())
             ->method('provideWithLines')
             ->with('master')
             ->willReturn('');
 
-        return [$parser, $diffProvider];
+        return [$parser, $git];
     }
 }

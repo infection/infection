@@ -151,6 +151,8 @@ return (new Config())
         'phpdoc_align' => [
             'align' => 'left',
         ],
+        // This rule is buggy and does not only apply to phpdoc annotation...
+        'phpdoc_annotation_without_dot' => false,
         // Allow inline Psalm suppress statements
         'phpdoc_to_comment' => false,
         'php_unit_dedicate_assert' => true,

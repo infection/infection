@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\Git\Git;
 
 /**
  * @internal
@@ -48,14 +48,14 @@ class FilesDiffChangedLines
 
     public function __construct(
         private readonly DiffChangedLinesParser $diffChangedLinesParser,
-        private readonly GitDiffFileProvider $diffFileProvider,
+        private readonly Git $git,
     ) {
     }
 
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
     {
         $this->memoizedFilesChangedLinesMap ??= $this->diffChangedLinesParser->parse(
-            $this->diffFileProvider->provideWithLines($gitDiffBase),
+            $this->git->provideWithLines($gitDiffBase),
         );
 
         foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {

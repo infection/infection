@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\GitHub;
+namespace Infection\Git;
 
 use function array_filter;
 use function array_merge;
@@ -46,14 +46,12 @@ use function Safe\preg_match;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
- * @final
- *
  * @internal
+ *
+ * Implementation of the Git contract leveraging the git binary via processes.
  */
-class GitDiffFileProvider
+final class CommandLineGit implements Git
 {
-    public const FALLBACK_BASE_BRANCH = 'origin/master';
-
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
@@ -64,24 +62,7 @@ class GitDiffFileProvider
     ) {
     }
 
-    /**
-     * Retrieves the default base branch name for the repository.
-     *
-     * Examples of output:
-     * - 'refs/remotes/origin/main'
-     * - 'origin/main'
-     * - 'origin/master'
-     *
-     * A branch may have two forms:
-     * - full path: refs/remotes/origin/HEAD
-     * - shorthand: origin/HEAD
-     *
-     * The order that git uses to resolve a shorthand notation is defined here:
-     * https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
-     *
-     * Preferably, this method returns the full path which is less ambiguous. However, this is not always possible.
-     */
-    public function provideDefaultBase(): string
+    public function getDefaultBaseBranch(): string
     {
         if ($this->defaultBase !== null) {
             return $this->defaultBase;
@@ -100,15 +81,12 @@ class GitDiffFileProvider
         }
 
         // unable to figure it out, return the default
-        return $this->defaultBase = self::FALLBACK_BASE_BRANCH;
+        return $this->defaultBase = Git::FALLBACK_BASE_BRANCH;
     }
 
-    /**
-     * @param string[] $sourceDirectories
-     */
-    public function provide(string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string
+    public function getChangedFileRelativePaths(string $diffFilter, string $baseBranch, array $sourceDirectories): string
     {
-        $referenceCommit = $this->findReferenceCommit($gitDiffBase);
+        $referenceCommit = $this->findReferenceCommit($baseBranch);
 
         $filter = $this->shellCommandLineExecutor->execute(array_merge(
             [
@@ -116,7 +94,7 @@ class GitDiffFileProvider
                 'diff',
                 $referenceCommit,
                 '--diff-filter',
-                $gitDiffFilter,
+                $diffFilter,
                 '--name-only',
                 '--',
             ],
@@ -130,9 +108,9 @@ class GitDiffFileProvider
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function provideWithLines(string $gitDiffBase): string
+    public function provideWithLines(string $baseBranch): string
     {
-        $referenceCommit = $this->findReferenceCommit($gitDiffBase);
+        $referenceCommit = $this->findReferenceCommit($baseBranch);
 
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
