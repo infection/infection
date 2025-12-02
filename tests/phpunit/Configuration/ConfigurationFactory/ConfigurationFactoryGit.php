@@ -56,13 +56,13 @@ final readonly class ConfigurationFactoryGit implements Git
 
     public function getChangedFileRelativePaths(
         string $diffFilter,
-        string $baseBranch,
+        string $base,
         array $sourceDirectories,
     ): string {
         return sprintf(
             'f(%s, %s, [%s]) = %s',
             $diffFilter,
-            $baseBranch,
+            $base,
             count($sourceDirectories) === 0
                 ? ''
                 : implode(', ', $sourceDirectories),
@@ -70,7 +70,7 @@ final readonly class ConfigurationFactoryGit implements Git
         );
     }
 
-    public function provideWithLines(string $baseBranch): string
+    public function getChangedLinesRangesByFileRelativePaths(string $base): never
     {
         throw new DomainException('Not implemented.');
     }

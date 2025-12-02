@@ -37,7 +37,6 @@ namespace Infection\Tests\Differ;
 
 use Generator;
 use Infection\Differ\ChangedLinesRange;
-use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
@@ -64,11 +63,8 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     public function test_it_memoizes_parsed_results(): void
     {
-        [$parser, $git] = $this->prepareServices([]);
-
         $filesDiffChangedLines = new FilesDiffChangedLines(
-            $parser,
-            $git,
+            $this->createGitStub([]),
             $this->fileSystemStub,
         );
 
@@ -89,11 +85,8 @@ final class FilesDiffChangedLinesTest extends TestCase
         int $mutationEndLine,
         bool $expected,
     ): void {
-        [$parser, $diffProvider] = $this->prepareServices($changedLinesRangesByFilePathname);
-
         $filesDiffChangedLines = new FilesDiffChangedLines(
-            $parser,
-            $diffProvider,
+            $this->createGitStub($changedLinesRangesByFilePathname),
             $this->fileSystemStub,
         );
 
@@ -246,26 +239,17 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     /**
      * @param array<string, list<ChangedLinesRange>> $changedLinesRangesByFilePathname
-     *
-     * @return array{DiffChangedLinesParser, Git}
      */
-    private function prepareServices(array $changedLinesRangesByFilePathname): array
+    private function createGitStub(array $changedLinesRangesByFilePathname): Git&MockObject
     {
-        /** @var DiffChangedLinesParser&MockObject $parser */
-        $parser = $this->createMock(DiffChangedLinesParser::class);
-        $parser
-            ->expects($this->once())
-            ->method('parse')
-            ->willReturn($changedLinesRangesByFilePathname);
-
         /** @var Git&MockObject $git */
         $git = $this->createMock(Git::class);
         $git
             ->expects($this->once())
-            ->method('provideWithLines')
+            ->method('getChangedLinesRangesByFileRelativePaths')
             ->with('main')
-            ->willReturn('');
+            ->willReturn($changedLinesRangesByFilePathname);
 
-        return [$parser, $git];
+        return $git;
     }
 }

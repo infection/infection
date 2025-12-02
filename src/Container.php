@@ -51,7 +51,6 @@ use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -907,11 +906,6 @@ final class Container extends DIContainer
     public function getFilesDiffChangedLines(): FilesDiffChangedLines
     {
         return $this->get(FilesDiffChangedLines::class);
-    }
-
-    public function getDiffChangedLinesParser(): DiffChangedLinesParser
-    {
-        return $this->get(DiffChangedLinesParser::class);
     }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder

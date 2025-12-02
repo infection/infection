@@ -48,7 +48,6 @@ class FilesDiffChangedLines
     private ?array $memoizedFilesChangedLinesMap = null;
 
     public function __construct(
-        private readonly DiffChangedLinesParser $diffChangedLinesParser,
         private readonly Git $git,
         private readonly FileSystem $filesystem,
     ) {
@@ -80,9 +79,7 @@ class FilesDiffChangedLines
      */
     private function getFilesChangedLinesRanges(string $gitBase): array
     {
-        $changedLinesByRelativePaths = $this->diffChangedLinesParser->parse(
-            $this->git->provideWithLines($gitBase),
-        );
+        $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths($gitBase);
 
         $changedLinesByAbsolutePaths = [];
 

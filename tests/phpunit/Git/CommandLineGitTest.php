@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Git;
 
 use Exception;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
@@ -122,52 +123,223 @@ final class CommandLineGitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_get_the_changed_lines_as_a_string(): void
-    {
-        $expectedDiffCommandLine = ['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'];
-        $diffCommandLineOutput = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                index 2a9e281..01cbf04 100644
-                --- a/tests/FooTest.php
-                +++ b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-                -            return false === \strpos($sql, 'doctrine_migrations');
-                +            return ! \str_contains($sql, 'doctrine_migrations');
-                diff --git a/Bar.php b/Bar.php
-                index f97971a..1ef35a5 100644
-                --- a/Bar.php
-                +++ b/Bar.php
-                @@ -10,0 +11,3 @@ final class Bar
-                +    /**
-                +     * @var null|non-empty-string
-                +     */
-                @@ -21 +31,4 @@ final class Bar
-                -        return $this->foo = \strrev($encryptedMessage);
-                +        $strrev = \strrev($encryptedMessage);
-
-                EOF,
-        );
-
+    /**
+     * @param array<string, array<int, ChangedLinesRange>> $expected
+     */
+    #[DataProvider('gitChangedLinesRangesProvider')]
+    public function test_it_get_the_changed_lines_ranges_by_files_relative_paths(
+        string $diff,
+        array $expected,
+    ): void {
         $this->commandLineMock
             ->method('execute')
-            ->with($expectedDiffCommandLine)
-            ->willReturn($diffCommandLineOutput);
+            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'])
+            ->willReturn($diff);
 
-        $expected = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-                diff --git a/Bar.php b/Bar.php
-                @@ -10,0 +11,3 @@ final class Bar
-                @@ -21 +31,4 @@ final class Bar
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('main');
 
-                EOF,
-        );
+        $this->assertEquals($expected, $actual);
+    }
 
-        $actual = $this->git->provideWithLines('main');
+    public static function gitChangedLinesRangesProvider(): iterable
+    {
+        yield 'empty diff' => [
+            '',
+            [],
+        ];
 
-        $this->assertSame($expected, $actual);
+        yield 'one file with added lines in different places' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                DIFF,
+            [
+                'src/Container.php' => [
+                    new ChangedLinesRange(38, 38),
+                    new ChangedLinesRange(534, 535),
+                    new ChangedLinesRange(538, 540),
+                    new ChangedLinesRange(1213, 1217),
+                ],
+            ],
+        ];
+
+        yield 'two files, second one is new created' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                diff --git a/src/Differ/FilesDiffChangedLines.php b/src/Differ/FilesDiffChangedLines.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Differ/FilesDiffChangedLines.php
+                +++ b/src/Differ/FilesDiffChangedLines.php
+                new file mode 100644
+                @@ -0,0 +1,18 @@
+                DIFF,
+            [
+                'src/Container.php' => [
+                    new ChangedLinesRange(38, 38),
+                    new ChangedLinesRange(534, 535),
+                    new ChangedLinesRange(538, 540),
+                    new ChangedLinesRange(1213, 1217),
+                ],
+                'src/Differ/FilesDiffChangedLines.php' => [
+                    new ChangedLinesRange(1, 18),
+                ],
+            ],
+        ];
+
+        yield 'single line modification simple format' => [
+            <<<'DIFF'
+                diff --git a/src/Git/Git.php b/src/Git/Git.php
+                index abc123..def456 100644
+                --- a/src/Git/Git.php
+                +++ b/src/Git/Git.php
+                @@ -50 +51 @@ interface Git
+                DIFF,
+            [
+                'src/Git/Git.php' => [
+                    new ChangedLinesRange(51, 51),
+                ],
+            ],
+        ];
+
+        yield 'addition at start of file' => [
+            <<<'DIFF'
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                new file mode 100644
+                index 0000000..abc1234
+                --- /dev/null
+                +++ b/src/Git/CommandLineGit.php
+                @@ -0,0 +1,5 @@
+                DIFF,
+            [
+                'src/Git/CommandLineGit.php' => [
+                    new ChangedLinesRange(1, 5),
+                ],
+            ],
+        ];
+
+        yield 'large line numbers' => [
+            <<<'DIFF'
+                diff --git a/tests/phpunit/Git/CommandLineGitTest.php b/tests/phpunit/Git/CommandLineGitTest.php
+                index abc123..def456 100644
+                --- a/tests/phpunit/Git/CommandLineGitTest.php
+                +++ b/tests/phpunit/Git/CommandLineGitTest.php
+                @@ -10000 +10001,3 @@ namespace Infection\Tests\Git;
+                @@ -15234,0 +15238,10 @@ final class CommandLineGitTest
+                DIFF,
+            [
+                'tests/phpunit/Git/CommandLineGitTest.php' => [
+                    new ChangedLinesRange(10001, 10003),
+                    new ChangedLinesRange(15238, 15247),
+                ],
+            ],
+        ];
+
+        yield 'three files' => [
+            <<<'DIFF'
+                diff --git a/src/Git/Git.php b/src/Git/Git.php
+                index abc123..def456 100644
+                --- a/src/Git/Git.php
+                +++ b/src/Git/Git.php
+                @@ -10 +11,2 @@ namespace Infection\Git;
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                index 111222..333444 100644
+                --- a/src/Git/CommandLineGit.php
+                +++ b/src/Git/CommandLineGit.php
+                @@ -20,0 +21,5 @@ final class CommandLineGit
+                diff --git a/tests/phpunit/Git/CommandLineGitTest.php b/tests/phpunit/Git/CommandLineGitTest.php
+                index aaa111..bbb222 100644
+                --- a/tests/phpunit/Git/CommandLineGitTest.php
+                +++ b/tests/phpunit/Git/CommandLineGitTest.php
+                @@ -100 +101 @@ final class CommandLineGitTest
+                @@ -200 +202,3 @@ final class CommandLineGitTest
+                DIFF,
+            [
+                'src/Git/Git.php' => [
+                    new ChangedLinesRange(11, 12),
+                ],
+                'src/Git/CommandLineGit.php' => [
+                    new ChangedLinesRange(21, 25),
+                ],
+                'tests/phpunit/Git/CommandLineGitTest.php' => [
+                    new ChangedLinesRange(101, 101),
+                    new ChangedLinesRange(202, 204),
+                ],
+            ],
+        ];
+
+        yield 'multiple single-line changes in one file' => [
+            <<<'DIFF'
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                index abc123..def456 100644
+                --- a/src/Git/CommandLineGit.php
+                +++ b/src/Git/CommandLineGit.php
+                @@ -5 +6 @@ namespace Infection\Git;
+                @@ -12 +14 @@ use Infection\Process\ShellCommandLineExecutor;
+                @@ -25 +28 @@ final class CommandLineGit
+                @@ -50 +54 @@ final class CommandLineGit
+                DIFF,
+            [
+                'src/Git/CommandLineGit.php' => [
+                    new ChangedLinesRange(6, 6),
+                    new ChangedLinesRange(14, 14),
+                    new ChangedLinesRange(28, 28),
+                    new ChangedLinesRange(54, 54),
+                ],
+            ],
+        ];
+
+        yield 'file with only one hunk' => [
+            <<<'DIFF'
+                diff --git a/src/Git/Git.php b/src/Git/Git.php
+                index abc123..def456 100644
+                --- a/src/Git/Git.php
+                +++ b/src/Git/Git.php
+                @@ -42,0 +43,8 @@ interface Git
+                DIFF,
+            [
+                'src/Git/Git.php' => [
+                    new ChangedLinesRange(43, 50),
+                ],
+            ],
+        ];
+
+        yield 'mixed format hunks with ranges and single lines' => [
+            <<<'DIFF'
+                diff --git a/tests/phpunit/Git/CommandLineGitTest.php b/tests/phpunit/Git/CommandLineGitTest.php
+                index abc123..def456 100644
+                --- a/tests/phpunit/Git/CommandLineGitTest.php
+                +++ b/tests/phpunit/Git/CommandLineGitTest.php
+                @@ -10 +11 @@ namespace Infection\Tests\Git;
+                @@ -20,0 +22,3 @@ use PHPUnit\Framework\TestCase;
+                @@ -30 +34,5 @@ final class CommandLineGitTest
+                @@ -45,2 +51 @@ final class CommandLineGitTest
+                @@ -60 +66 @@ final class CommandLineGitTest
+                @@ -75,0 +82,10 @@ final class CommandLineGitTest
+                DIFF,
+            [
+                'tests/phpunit/Git/CommandLineGitTest.php' => [
+                    new ChangedLinesRange(11, 11),
+                    new ChangedLinesRange(22, 24),
+                    new ChangedLinesRange(34, 38),
+                    new ChangedLinesRange(51, 51),
+                    new ChangedLinesRange(66, 66),
+                    new ChangedLinesRange(82, 91),
+                ],
+            ],
+        ];
     }
 
     #[DataProvider('defaultGitBaseProvider')]
