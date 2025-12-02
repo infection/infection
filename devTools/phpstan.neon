@@ -184,6 +184,12 @@ parameters:
             message: '#expects class-string, string given#'
             path: ../src/Framework/ClassName.php
 
+        # This is a valid case of magic number
+        -
+            message: "#Do not use magic number as a function argument. Move to constant with a suitable name.#"
+            count: 1
+            path: ../src/Git/CommandLineGit.php
+
     level: 8
     paths:
         - ../src

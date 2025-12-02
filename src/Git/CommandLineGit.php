@@ -169,12 +169,25 @@ final class CommandLineGit implements Git
 
                 $lineParts = array_map(intval(...), explode(',', $linesText));
 
-                Assert::minCount($lineParts, 1);
+                Assert::countBetween($lineParts, 1, 2);
 
-                $startLine = $lineParts[0];
-                $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
+                if (count($lineParts) === 1) {
+                    [$line] = $lineParts;
 
-                $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
+                    $changedLinesRange = new ChangedLinesRange($line, $line);
+                } else {
+                    [$startLine, $newCount] = $lineParts;
+
+                    if ($newCount === 0) {
+                        continue;
+                    }
+
+                    $endLine = $startLine + $newCount - 1;
+
+                    $changedLinesRange = new ChangedLinesRange($startLine, $endLine);
+                }
+
+                $resultMap[$filePath][] = $changedLinesRange;
             }
         }
 
