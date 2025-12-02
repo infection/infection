@@ -39,6 +39,7 @@ use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
+use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -49,6 +50,18 @@ use function sprintf;
 #[CoversClass(FilesDiffChangedLines::class)]
 final class FilesDiffChangedLinesTest extends TestCase
 {
+    private FileSystem&MockObject $fileSystemStub;
+
+    protected function setUp(): void
+    {
+        $this->fileSystemStub = $this->createMock(FileSystem::class);
+        $this->fileSystemStub
+            ->method('realPath')
+            ->willReturnCallback(
+                static fn (string $path): string => '/path/to/' . $path,
+            );
+    }
+
     public function test_it_memoizes_parsed_results(): void
     {
         [$parser, $git] = $this->prepareServices([]);
@@ -56,6 +69,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $parser,
             $git,
+            $this->fileSystemStub,
         );
 
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
@@ -79,9 +93,15 @@ final class FilesDiffChangedLinesTest extends TestCase
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $parser,
             $diffProvider,
+            $this->fileSystemStub,
         );
 
-        $isLineFoundInDiff = $filesDiffChangedLines->contains('/path/to/File.php', $mutationStartLine, $mutationEndLine, 'master');
+        $isLineFoundInDiff = $filesDiffChangedLines->contains(
+            '/path/to/File.php',
+            $mutationStartLine,
+            $mutationEndLine,
+            'master',
+        );
 
         $this->assertSame($expectedIsFound, $isLineFoundInDiff, sprintf('Line %d was not found in diff', $mutationStartLine));
     }
@@ -91,7 +111,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'not found line in one-line range before' => [
             false,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'File.php' => [new ChangedLinesRange(3, 3)],
             ],
             1,
             1,
@@ -100,7 +120,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'not found line in one-line range after' => [
             false,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'File.php' => [new ChangedLinesRange(3, 3)],
             ],
             5,
             5,
@@ -109,7 +129,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'line in one-line range' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'File.php' => [new ChangedLinesRange(3, 3)],
             ],
             3,
             3,
@@ -118,7 +138,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'line in multi-line range in the beginning' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 5)],
+                'File.php' => [new ChangedLinesRange(3, 5)],
             ],
             3,
             3,
@@ -127,7 +147,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'line in multi-line range in the middle' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 5)],
+                'File.php' => [new ChangedLinesRange(1, 5)],
             ],
             3,
             3,
@@ -136,7 +156,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'line in multi-line range in the end' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 3)],
+                'File.php' => [new ChangedLinesRange(1, 3)],
             ],
             3,
             3,
@@ -145,7 +165,10 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'line in the second range' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 1), new ChangedLinesRange(3, 5)],
+                'File.php' => [
+                    new ChangedLinesRange(1, 1),
+                    new ChangedLinesRange(3, 5),
+                ],
             ],
             4,
             4,
@@ -154,7 +177,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'mutation range in one-line range, around' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'File.php' => [new ChangedLinesRange(3, 3)],
             ],
             1,
             4,
@@ -163,7 +186,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'mutation range in one-line range, before' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'File.php' => [new ChangedLinesRange(3, 3)],
             ],
             1,
             3,
@@ -172,7 +195,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'mutation range in one-line range, after' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'File.php' => [new ChangedLinesRange(3, 3)],
             ],
             3,
             5,
@@ -181,7 +204,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'mutation range in one-line range, inside' => [
             true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 30)],
+                'File.php' => [new ChangedLinesRange(1, 30)],
             ],
             3,
             5,

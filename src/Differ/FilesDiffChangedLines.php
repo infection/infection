@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
 
 /**
@@ -49,21 +50,46 @@ class FilesDiffChangedLines
     public function __construct(
         private readonly DiffChangedLinesParser $diffChangedLinesParser,
         private readonly Git $git,
+        private readonly FileSystem $filesystem,
     ) {
     }
 
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->diffChangedLinesParser->parse(
-            $this->git->provideWithLines($gitDiffBase),
-        );
-
-        foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
+        foreach ($this->getChangedLinesRanges($fileRealPath, $gitDiffBase) as $changedLinesRange) {
             if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @return list<ChangedLinesRange>
+     */
+    private function getChangedLinesRanges(string $fileRealPath, string $gitBase): array
+    {
+        $this->memoizedFilesChangedLinesMap ??= $this->getFilesChangedLinesRanges($gitBase);
+
+        return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
+    }
+
+    /**
+     * @return array<string, list<ChangedLinesRange>>
+     */
+    private function getFilesChangedLinesRanges(string $gitBase): array
+    {
+        $changedLinesByRelativePaths = $this->diffChangedLinesParser->parse(
+            $this->git->provideWithLines($gitBase),
+        );
+
+        $changedLinesByAbsolutePaths = [];
+
+        foreach ($changedLinesByRelativePaths as $relativeFilePath => $changedLines) {
+            $changedLinesByAbsolutePaths[$this->filesystem->realPath($relativeFilePath)] = $changedLines;
+        }
+
+        return $changedLinesByAbsolutePaths;
     }
 }

@@ -59,6 +59,11 @@ final class FakeFileSystem extends FileSystem
         throw new DomainException('Unexpected call.');
     }
 
+    public function realPath(string $filename): string
+    {
+        throw new DomainException('Unexpected call.');
+    }
+
     public function isReadableDirectory(string $filename): bool
     {
         throw new DomainException('Unexpected call.');

@@ -40,11 +40,8 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\DiffChangedLinesParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\realpath;
 
-#[Group('integration')]
 #[CoversClass(DiffChangedLinesParser::class)]
 final class DiffChangedLinesParserTest extends TestCase
 {
@@ -79,7 +76,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -1207,0 +1213,5 @@ final class Container
                 DIFF,
             [
-                realpath('src/Container.php') => [
+                'src/Container.php' => [
                     new ChangedLinesRange(38, 38),
                     new ChangedLinesRange(534, 535),
                     new ChangedLinesRange(538, 540),
@@ -100,13 +97,13 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -0,0 +1,18 @@
                 DIFF,
             [
-                realpath('src/Container.php') => [
+                'src/Container.php' => [
                     new ChangedLinesRange(38, 38),
                     new ChangedLinesRange(534, 535),
                     new ChangedLinesRange(538, 540),
                     new ChangedLinesRange(1213, 1217),
                 ],
-                realpath('src/Differ/FilesDiffChangedLines.php') => [
+                'src/Differ/FilesDiffChangedLines.php' => [
                     new ChangedLinesRange(1, 18),
                 ],
             ],
@@ -121,7 +118,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -50 +51 @@ interface Git
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../src/Git/Git.php') => [
+                'src/Git/Git.php' => [
                     new ChangedLinesRange(51, 51),
                 ],
             ],
@@ -137,7 +134,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -0,0 +1,5 @@
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                'src/Git/CommandLineGit.php' => [
                     new ChangedLinesRange(1, 5),
                 ],
             ],
@@ -153,7 +150,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -15234,0 +15238,10 @@ final class CommandLineGitTest
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../tests/phpunit/Git/CommandLineGitTest.php') => [
+                'tests/phpunit/Git/CommandLineGitTest.php' => [
                     new ChangedLinesRange(10001, 10003),
                     new ChangedLinesRange(15238, 15247),
                 ],
@@ -180,13 +177,13 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -200 +202,3 @@ final class CommandLineGitTest
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../src/Git/Git.php') => [
+                'src/Git/Git.php' => [
                     new ChangedLinesRange(11, 12),
                 ],
-                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                'src/Git/CommandLineGit.php' => [
                     new ChangedLinesRange(21, 25),
                 ],
-                realpath(__DIR__ . '/../../../tests/phpunit/Git/CommandLineGitTest.php') => [
+                'tests/phpunit/Git/CommandLineGitTest.php' => [
                     new ChangedLinesRange(101, 101),
                     new ChangedLinesRange(202, 204),
                 ],
@@ -205,7 +202,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -50 +54 @@ final class CommandLineGit
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                'src/Git/CommandLineGit.php' => [
                     new ChangedLinesRange(6, 6),
                     new ChangedLinesRange(14, 14),
                     new ChangedLinesRange(28, 28),
@@ -223,7 +220,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -42,0 +43,8 @@ interface Git
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../src/Git/Git.php') => [
+                'src/Git/Git.php' => [
                     new ChangedLinesRange(43, 50),
                 ],
             ],
@@ -243,7 +240,7 @@ final class DiffChangedLinesParserTest extends TestCase
                 @@ -75,0 +82,10 @@ final class CommandLineGitTest
                 DIFF,
             [
-                realpath(__DIR__ . '/../../../tests/phpunit/Git/CommandLineGitTest.php') => [
+                'tests/phpunit/Git/CommandLineGitTest.php' => [
                     new ChangedLinesRange(11, 11),
                     new ChangedLinesRange(22, 24),
                     new ChangedLinesRange(34, 38),
