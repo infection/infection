@@ -105,7 +105,7 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('execute')
             ->with(
-                ['git', 'diff', 'main', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'],
+                ['git', 'diff', 'main', '--diff-filter=AM', '--name-only', '--', 'app/', 'my lib/'],
             )
             ->willReturn(
                 Str::toSystemLineEndings(
