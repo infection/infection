@@ -56,13 +56,13 @@ class DiffChangedLinesParser
     /**
      * Returned result example:
      *   [
-     *       src/File1.php => [ChangedLinesRange(1, 2)]
-     *       src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33),]
+     *       /path/to/src/File1.php => [ChangedLinesRange(1, 2)]
+     *       /path/to/src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33),]
      *   ]
      *
      * Diff provided by command line: `git diff --unified=0 --diff-filter=AM master | grep -v -e '^[+-]' -e '^index'`
      *
-     * @return array<string, array<int, ChangedLinesRange>>
+     * @return array<string, list<ChangedLinesRange>>
      */
     public function parse(string $unifiedGreppedDiff): array
     {

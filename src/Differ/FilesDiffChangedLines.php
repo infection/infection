@@ -43,7 +43,7 @@ use Infection\Git\Git;
  */
 class FilesDiffChangedLines
 {
-    /** @var array<string, ChangedLinesRange[]> */
+    /** @var array<string, list<ChangedLinesRange>> */
     private ?array $memoizedFilesChangedLinesMap = null;
 
     public function __construct(

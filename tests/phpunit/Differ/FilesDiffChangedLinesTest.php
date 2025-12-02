@@ -65,16 +65,16 @@ final class FilesDiffChangedLinesTest extends TestCase
     }
 
     /**
-     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
+     * @param array<string, list<ChangedLinesRange>> $changedLinesRangesByFilePathname
      */
     #[DataProvider('provideLines')]
     public function test_it_finds_line_in_changed_lines_from_diff(
         bool $expectedIsFound,
-        array $returnedFilesDiffChangedLinesMap,
+        array $changedLinesRangesByFilePathname,
         int $mutationStartLine,
         int $mutationEndLine,
     ): void {
-        [$parser, $diffProvider] = $this->prepareServices($returnedFilesDiffChangedLinesMap);
+        [$parser, $diffProvider] = $this->prepareServices($changedLinesRangesByFilePathname);
 
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $parser,
@@ -189,17 +189,18 @@ final class FilesDiffChangedLinesTest extends TestCase
     }
 
     /**
-     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
-     * @return array{0: DiffChangedLinesParser, 1: Git}
+     * @param array<string, list<ChangedLinesRange>> $changedLinesRangesByFilePathname
+     *
+     * @return array{DiffChangedLinesParser, Git}
      */
-    private function prepareServices(array $returnedFilesDiffChangedLinesMap): array
+    private function prepareServices(array $changedLinesRangesByFilePathname): array
     {
         /** @var DiffChangedLinesParser&MockObject $parser */
         $parser = $this->createMock(DiffChangedLinesParser::class);
         $parser
             ->expects($this->once())
             ->method('parse')
-            ->willReturn($returnedFilesDiffChangedLinesMap);
+            ->willReturn($changedLinesRangesByFilePathname);
 
         /** @var Git&MockObject $git */
         $git = $this->createMock(Git::class);
