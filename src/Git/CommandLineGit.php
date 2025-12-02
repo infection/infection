@@ -36,13 +36,20 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use function array_filter;
+use function array_map;
 use function array_merge;
-use function explode;
+use function count;
+use function explode as explode1;
 use function implode;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
+use function preg_match as preg_match1;
 use function Safe\preg_match;
+use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -53,6 +60,8 @@ final class CommandLineGit implements Git
 {
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
+
+    private const MATCH_INDEX = 1;
 
     private ?string $defaultBase = null;
 
@@ -102,10 +111,10 @@ final class CommandLineGit implements Git
             throw NoFilesInDiffToMutate::create();
         }
 
-        return implode(',', explode(PHP_EOL, $filter));
+        return implode(',', explode1(PHP_EOL, $filter));
     }
 
-    public function provideWithLines(string $base): string
+    public function getChangedLinesRangesByFileRelativePaths(string $base): array
     {
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
@@ -114,10 +123,59 @@ final class CommandLineGit implements Git
             '--unified=0',
             '--diff-filter=AM',
         ]);
-        $lines = explode(PHP_EOL, $filter);
+
+        $lines = explode1(PHP_EOL, $filter);
         $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
 
-        return implode(PHP_EOL, $lines);
+        $filePath = null;
+        $resultMap = [];
+
+        foreach ($lines as $line) {
+            if (str_starts_with((string) $line, 'diff ')) {
+                preg_match1('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
+
+                Assert::keyExists(
+                    $matches,
+                    self::MATCH_INDEX,
+                    sprintf('Source file can not be found in the following diff line: "%s"', $line),
+                );
+
+                $filePath = $matches[self::MATCH_INDEX];
+            } elseif (str_starts_with((string) $line, '@@ ')) {
+                Assert::string(
+                    $filePath,
+                    sprintf(
+                        'Real path for file from diff can not be calculated. Diff: %s',
+                        implode(PHP_EOL, $lines),
+                    ),
+                );
+
+                preg_match1('/\s\+(.*)\s@/', $line, $matches);
+
+                Assert::keyExists(
+                    $matches,
+                    self::MATCH_INDEX,
+                    sprintf(
+                        'Added/modified lines can not be found in the following diff line: "%s"',
+                        $line,
+                    ),
+                );
+
+                // can be "523,12", meaning from 523 lines new 12 are added; or just "532"
+                $linesText = $matches[self::MATCH_INDEX];
+
+                $lineParts = array_map('\intval', explode1(',', $linesText));
+
+                Assert::minCount($lineParts, 1);
+
+                $startLine = $lineParts[0];
+                $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
+
+                $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
+            }
+        }
+
+        return $resultMap;
     }
 
     public function getBaseReference(string $base): string

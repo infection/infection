@@ -70,7 +70,7 @@ final readonly class ConfigurationFactoryGit implements Git
         );
     }
 
-    public function provideWithLines(string $baseBranch): string
+    public function getChangedLinesRangesByFileRelativePaths(string $baseBranch): string
     {
         throw new DomainException('Not implemented.');
     }

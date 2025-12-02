@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use Infection\Differ\ChangedLinesRange;
+
 /**
  * @internal
  *
@@ -91,8 +93,19 @@ interface Git
     /**
      * Gets the modifications with their line numbers of the files that changed compared to the base branch used and
      * matching the given filter.
+     *
+     * Returned result example:
+     *
+     * ```php
+     * [
+     *     src/File1.php => [ChangedLinesRange(1, 2)],
+     *     src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
+     * ]
+     * ```
+     *
+     * @return array<string, list<ChangedLinesRange>>
      */
-    public function provideWithLines(string $base): string;
+    public function getChangedLinesRangesByFileRelativePaths(string $base): array;
 
     /**
      * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.

@@ -42,7 +42,6 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Tests\TestingUtility\TestCIDetector;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -147,10 +146,9 @@ final class CommandLineGitIntegrationTest extends TestCase
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
-        $actual = $this->git->provideWithLines(self::COMMIT_REFERENCE);
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(self::COMMIT_REFERENCE);
 
-        $this->assertStringContainsString(PHP_EOL . 'diff --git a/src/Git/Git.php b/src/Git/Git.php' . PHP_EOL, $actual);
-        $this->assertMatchesRegularExpression('/\n@@ [\-\+,\.\s\d]+ @@ interface Git\n/', $actual);
+        $this->assertArrayHasKey('src/Git/Git.php', $actual);
     }
 
     public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
@@ -174,7 +172,7 @@ final class CommandLineGitIntegrationTest extends TestCase
             ),
         );
 
-        $this->git->provideWithLines($badCommitReference);
+        $this->git->getChangedLinesRangesByFileRelativePaths($badCommitReference);
     }
 
     public function test_it_can_get_this_project_default_git_base(): void
