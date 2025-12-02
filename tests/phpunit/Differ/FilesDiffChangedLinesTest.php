@@ -72,10 +72,10 @@ final class FilesDiffChangedLinesTest extends TestCase
             $this->fileSystemStub,
         );
 
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'main');
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'main');
     }
 
     /**
@@ -83,10 +83,11 @@ final class FilesDiffChangedLinesTest extends TestCase
      */
     #[DataProvider('provideLines')]
     public function test_it_finds_line_in_changed_lines_from_diff(
-        bool $expectedIsFound,
         array $changedLinesRangesByFilePathname,
+        string $fileRealPath,
         int $mutationStartLine,
         int $mutationEndLine,
+        bool $expected,
     ): void {
         [$parser, $diffProvider] = $this->prepareServices($changedLinesRangesByFilePathname);
 
@@ -96,118 +97,150 @@ final class FilesDiffChangedLinesTest extends TestCase
             $this->fileSystemStub,
         );
 
-        $isLineFoundInDiff = $filesDiffChangedLines->contains(
-            '/path/to/File.php',
+        $actual = $filesDiffChangedLines->contains(
+            $fileRealPath,
             $mutationStartLine,
             $mutationEndLine,
-            'master',
+            'main',
         );
 
-        $this->assertSame($expectedIsFound, $isLineFoundInDiff, sprintf('Line %d was not found in diff', $mutationStartLine));
+        $this->assertSame(
+            $expected,
+            $actual,
+            sprintf('Line %d was not found in diff', $mutationStartLine),
+        );
     }
 
     public static function provideLines(): Generator
     {
         yield 'not found line in one-line range before' => [
-            false,
             [
-                'File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             1,
             1,
+            false,
         ];
 
         yield 'not found line in one-line range after' => [
-            false,
             [
-                'File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             5,
             5,
+            false,
         ];
 
         yield 'line in one-line range' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in multi-line range in the beginning' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(3, 5)],
+                'src/File.php' => [new ChangedLinesRange(3, 5)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in multi-line range in the middle' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(1, 5)],
+                'src/File.php' => [new ChangedLinesRange(1, 5)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in multi-line range in the end' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(1, 3)],
+                'src/File.php' => [new ChangedLinesRange(1, 3)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in the second range' => [
-            true,
             [
-                'File.php' => [
+                'src/File.php' => [
                     new ChangedLinesRange(1, 1),
                     new ChangedLinesRange(3, 5),
                 ],
             ],
+            '/path/to/src/File.php',
             4,
             4,
+            true,
         ];
 
         yield 'mutation range in one-line range, around' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             1,
             4,
+            true,
         ];
 
         yield 'mutation range in one-line range, before' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             1,
             3,
+            true,
         ];
 
         yield 'mutation range in one-line range, after' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             3,
             5,
+            true,
         ];
 
         yield 'mutation range in one-line range, inside' => [
-            true,
             [
-                'File.php' => [new ChangedLinesRange(1, 30)],
+                'src/File.php' => [new ChangedLinesRange(1, 30)],
             ],
+            '/path/to/src/File.php',
             3,
             5,
+            true,
+        ];
+
+        yield 'mutation in range with diff with multiple files' => [
+            [
+                'src/File1.php' => [
+                    new ChangedLinesRange(10, 10),
+                    new ChangedLinesRange(30, 50),
+                ],
+                'src/File2.php' => [
+                    new ChangedLinesRange(1, 1),
+                    new ChangedLinesRange(3, 5),
+                ],
+            ],
+            '/path/to/src/File2.php',
+            4,
+            4,
+            true,
         ];
     }
 
@@ -230,7 +263,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $git
             ->expects($this->once())
             ->method('provideWithLines')
-            ->with('master')
+            ->with('main')
             ->willReturn('');
 
         return [$parser, $git];
