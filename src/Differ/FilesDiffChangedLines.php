@@ -47,16 +47,13 @@ class FilesDiffChangedLines
     private ?array $memoizedFilesChangedLinesMap = null;
 
     public function __construct(
-        private readonly DiffChangedLinesParser $diffChangedLinesParser,
         private readonly Git $git,
     ) {
     }
 
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->diffChangedLinesParser->parse(
-            $this->git->provideWithLines($gitDiffBase),
-        );
+        $this->memoizedFilesChangedLinesMap ??= $this->git->provideWithLines($gitDiffBase);
 
         foreach ($this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [] as $changedLinesRange) {
             if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {

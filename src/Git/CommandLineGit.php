@@ -36,14 +36,20 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use function array_filter;
+use function array_map;
 use function array_merge;
+use function count;
 use function explode;
 use function implode;
-use Infection\Differ\DiffChangedLinesParser;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
 use function Safe\preg_match;
+use function Safe\realpath;
+use function sprintf;
+use function str_starts_with;
 use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -108,19 +114,56 @@ final class CommandLineGit implements Git
 
     public function provideWithLines(string $base): array
     {
-        $filter = $this->shellCommandLineExecutor->execute([
+        $diff = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
             '--unified=0',
             '--diff-filter=AM',
         ]);
-        $lines = explode(PHP_EOL, $filter);
-        $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
 
-        $value = implode(PHP_EOL, $lines);
+        $lines = explode(PHP_EOL, $diff);
+        $filePath = null;
+        $resultMap = [];
 
-        return (new DiffChangedLinesParser())->parse($value);
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'diff ')) {
+                preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
+
+                Assert::keyExists(
+                    $matches,
+                    1,
+                    sprintf('Source file can not be found in the following diff line: "%s"', $line),
+                );
+
+                $filePath = realpath($matches[1]);
+            } elseif (str_starts_with($line, '@@ ')) {
+                Assert::string(
+                    $filePath,
+                    sprintf('Real path for file from diff can not be calculated. Diff: %s', $diff),
+                );
+
+                preg_match('/\s\+(.*)\s@/', $line, $matches);
+
+                Assert::keyExists(
+                    $matches,
+                    1,
+                    sprintf('Added/modified lines can not be found in the following diff line: "%s"', $line),
+                );
+
+                $linesText = $matches[1];
+                $lineParts = array_map('\intval', explode(',', $linesText));
+
+                Assert::minCount($lineParts, 1);
+
+                $startLine = $lineParts[0];
+                $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
+
+                $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
+            }
+        }
+
+        return $resultMap;
     }
 
     public function getBaseReference(string $base): string
