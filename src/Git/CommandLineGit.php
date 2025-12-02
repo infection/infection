@@ -44,7 +44,6 @@ use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
-use function preg_match as preg_match1;
 use function Safe\preg_match;
 use function sprintf;
 use function str_starts_with;
@@ -132,7 +131,7 @@ final class CommandLineGit implements Git
 
         foreach ($lines as $line) {
             if (str_starts_with((string) $line, 'diff ')) {
-                preg_match1('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
+                preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
 
                 Assert::keyExists(
                     $matches,
@@ -150,7 +149,7 @@ final class CommandLineGit implements Git
                     ),
                 );
 
-                preg_match1('/\s\+(.*)\s@/', $line, $matches);
+                preg_match('/\s\+(.*)\s@/', $line, $matches);
 
                 Assert::keyExists(
                     $matches,
