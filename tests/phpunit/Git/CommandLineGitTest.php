@@ -194,6 +194,153 @@ final class CommandLineGitTest extends TestCase
                 ],
             ],
         ];
+
+        yield 'empty diff' => [
+            '',
+            [],
+        ];
+
+        yield 'single line modification simple format' => [
+            <<<'DIFF'
+                diff --git a/src/Git/Git.php b/src/Git/Git.php
+                index abc123..def456 100644
+                --- a/src/Git/Git.php
+                +++ b/src/Git/Git.php
+                @@ -50 +51 @@ interface Git
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../src/Git/Git.php') => [
+                    new ChangedLinesRange(51, 51),
+                ],
+            ],
+        ];
+
+        yield 'addition at start of file' => [
+            <<<'DIFF'
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                new file mode 100644
+                index 0000000..abc1234
+                --- /dev/null
+                +++ b/src/Git/CommandLineGit.php
+                @@ -0,0 +1,5 @@
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                    new ChangedLinesRange(1, 5),
+                ],
+            ],
+        ];
+
+        yield 'large line numbers' => [
+            <<<'DIFF'
+                diff --git a/tests/phpunit/Git/CommandLineGitTest.php b/tests/phpunit/Git/CommandLineGitTest.php
+                index abc123..def456 100644
+                --- a/tests/phpunit/Git/CommandLineGitTest.php
+                +++ b/tests/phpunit/Git/CommandLineGitTest.php
+                @@ -10000 +10001,3 @@ namespace Infection\Tests\Git;
+                @@ -15234,0 +15238,10 @@ final class CommandLineGitTest
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../tests/phpunit/Git/CommandLineGitTest.php') => [
+                    new ChangedLinesRange(10001, 10003),
+                    new ChangedLinesRange(15238, 15247),
+                ],
+            ],
+        ];
+
+        yield 'three files' => [
+            <<<'DIFF'
+                diff --git a/src/Git/Git.php b/src/Git/Git.php
+                index abc123..def456 100644
+                --- a/src/Git/Git.php
+                +++ b/src/Git/Git.php
+                @@ -10 +11,2 @@ namespace Infection\Git;
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                index 111222..333444 100644
+                --- a/src/Git/CommandLineGit.php
+                +++ b/src/Git/CommandLineGit.php
+                @@ -20,0 +21,5 @@ final class CommandLineGit
+                diff --git a/tests/phpunit/Git/CommandLineGitTest.php b/tests/phpunit/Git/CommandLineGitTest.php
+                index aaa111..bbb222 100644
+                --- a/tests/phpunit/Git/CommandLineGitTest.php
+                +++ b/tests/phpunit/Git/CommandLineGitTest.php
+                @@ -100 +101 @@ final class CommandLineGitTest
+                @@ -200 +202,3 @@ final class CommandLineGitTest
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../src/Git/Git.php') => [
+                    new ChangedLinesRange(11, 12),
+                ],
+                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                    new ChangedLinesRange(21, 25),
+                ],
+                realpath(__DIR__ . '/../../../tests/phpunit/Git/CommandLineGitTest.php') => [
+                    new ChangedLinesRange(101, 101),
+                    new ChangedLinesRange(202, 204),
+                ],
+            ],
+        ];
+
+        yield 'multiple single-line changes in one file' => [
+            <<<'DIFF'
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                index abc123..def456 100644
+                --- a/src/Git/CommandLineGit.php
+                +++ b/src/Git/CommandLineGit.php
+                @@ -5 +6 @@ namespace Infection\Git;
+                @@ -12 +14 @@ use Infection\Process\ShellCommandLineExecutor;
+                @@ -25 +28 @@ final class CommandLineGit
+                @@ -50 +54 @@ final class CommandLineGit
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                    new ChangedLinesRange(6, 6),
+                    new ChangedLinesRange(14, 14),
+                    new ChangedLinesRange(28, 28),
+                    new ChangedLinesRange(54, 54),
+                ],
+            ],
+        ];
+
+        yield 'file with only one hunk' => [
+            <<<'DIFF'
+                diff --git a/src/Git/Git.php b/src/Git/Git.php
+                index abc123..def456 100644
+                --- a/src/Git/Git.php
+                +++ b/src/Git/Git.php
+                @@ -42,0 +43,8 @@ interface Git
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../src/Git/Git.php') => [
+                    new ChangedLinesRange(43, 50),
+                ],
+            ],
+        ];
+
+        yield 'mixed format hunks with ranges and single lines' => [
+            <<<'DIFF'
+                diff --git a/tests/phpunit/Git/CommandLineGitTest.php b/tests/phpunit/Git/CommandLineGitTest.php
+                index abc123..def456 100644
+                --- a/tests/phpunit/Git/CommandLineGitTest.php
+                +++ b/tests/phpunit/Git/CommandLineGitTest.php
+                @@ -10 +11 @@ namespace Infection\Tests\Git;
+                @@ -20,0 +22,3 @@ use PHPUnit\Framework\TestCase;
+                @@ -30 +34,5 @@ final class CommandLineGitTest
+                @@ -45,2 +51 @@ final class CommandLineGitTest
+                @@ -60 +66 @@ final class CommandLineGitTest
+                @@ -75,0 +82,10 @@ final class CommandLineGitTest
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../tests/phpunit/Git/CommandLineGitTest.php') => [
+                    new ChangedLinesRange(11, 11),
+                    new ChangedLinesRange(22, 24),
+                    new ChangedLinesRange(34, 38),
+                    new ChangedLinesRange(51, 51),
+                    new ChangedLinesRange(66, 66),
+                    new ChangedLinesRange(82, 91),
+                ],
+            ],
+        ];
     }
 
     #[DataProvider('defaultGitBaseProvider')]
