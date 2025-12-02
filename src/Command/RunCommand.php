@@ -705,11 +705,12 @@ final class RunCommand extends BaseCommand
         $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
 
         self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
-        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $isForGitDiffLines, $gitDiffBase);
 
         if ($isForGitDiffLines) {
             $gitDiffFilter = Git::DEFAULT_GIT_DIFF_FILTER;
         }
+
+        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
 
         return [$gitDiffFilter, $gitDiffBase];
     }
@@ -733,12 +734,10 @@ final class RunCommand extends BaseCommand
 
     private static function assertGitBaseHasRequiredFilter(
         ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
         ?string $gitDiffBase,
     ): void {
         if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
             && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER
-            && $isForGitDiffLines
         ) {
             throw new InvalidArgumentException(
                 sprintf(

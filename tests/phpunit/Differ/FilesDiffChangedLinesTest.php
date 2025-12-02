@@ -249,7 +249,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('main')
+            ->with('AM', 'main')
             ->willReturn($changedLinesRangesByFilePathname);
 
         return $git;
