@@ -61,6 +61,9 @@ final class CommandLineGit implements Git
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
+    private const DIFF_FILE_PATH_PATTERN = '/diff.*a\/.*\sb\/(.*)$/';
+    private const DIFF_LINE_RANGE_PATTERN = '/\s\+(.*)\s@/';
+
     private ?string $defaultBase = null;
 
     public function __construct(
@@ -122,48 +125,24 @@ final class CommandLineGit implements Git
             '--diff-filter=AM',
         ]);
 
-        $lines = explode(PHP_EOL, $diff);
-        $filePath = null;
-        $resultMap = [];
+        $diffLines = explode(PHP_EOL, $diff);
+        $currentFilePath = null;
+        $changedLinesMap = [];
 
-        foreach ($lines as $line) {
+        foreach ($diffLines as $line) {
             if (str_starts_with($line, 'diff ')) {
-                preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
-
-                Assert::keyExists(
-                    $matches,
-                    1,
-                    sprintf('Source file can not be found in the following diff line: "%s"', $line),
-                );
-
-                $filePath = realpath($matches[1]);
+                $currentFilePath = $this->parseFilePathFromDiffLine($line, $diff);
             } elseif (str_starts_with($line, '@@ ')) {
                 Assert::string(
-                    $filePath,
+                    $currentFilePath,
                     sprintf('Real path for file from diff can not be calculated. Diff: %s', $diff),
                 );
 
-                preg_match('/\s\+(.*)\s@/', $line, $matches);
-
-                Assert::keyExists(
-                    $matches,
-                    1,
-                    sprintf('Added/modified lines can not be found in the following diff line: "%s"', $line),
-                );
-
-                $linesText = $matches[1];
-                $lineParts = array_map('\intval', explode(',', $linesText));
-
-                Assert::minCount($lineParts, 1);
-
-                $startLine = $lineParts[0];
-                $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
-
-                $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
+                $changedLinesMap[$currentFilePath][] = $this->parseChangedLinesRange($line);
             }
         }
 
-        return $resultMap;
+        return $changedLinesMap;
     }
 
     public function getBaseReference(string $base): string
@@ -184,5 +163,39 @@ final class CommandLineGit implements Git
          * Fall back to direct diff
          */
         return $base;
+    }
+
+    private function parseFilePathFromDiffLine(string $diffLine, string $fullDiff): string
+    {
+        preg_match(self::DIFF_FILE_PATH_PATTERN, $diffLine, $matches);
+
+        Assert::keyExists(
+            $matches,
+            1,
+            sprintf('Source file can not be found in the following diff line: "%s"', $diffLine),
+        );
+
+        return realpath($matches[1]);
+    }
+
+    private function parseChangedLinesRange(string $rangeLine): ChangedLinesRange
+    {
+        preg_match(self::DIFF_LINE_RANGE_PATTERN, $rangeLine, $matches);
+
+        Assert::keyExists(
+            $matches,
+            1,
+            sprintf('Added/modified lines can not be found in the following diff line: "%s"', $rangeLine),
+        );
+
+        $linesText = $matches[1];
+        $lineParts = array_map('\intval', explode(',', $linesText));
+
+        Assert::minCount($lineParts, 1);
+
+        $startLine = $lineParts[0];
+        $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
+
+        return new ChangedLinesRange($startLine, $endLine);
     }
 }
