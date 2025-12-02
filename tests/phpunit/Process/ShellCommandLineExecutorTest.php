@@ -116,4 +116,15 @@ final class ShellCommandLineExecutorTest extends TestCase
             'fwrite(STDOUT, "stdout output"); fwrite(STDERR, "stderr output"); exit(1);',
         ]);
     }
+
+    public function test_it_does_not_provide_interactive_input(): void
+    {
+        $output = $this->executor->execute([
+            'php',
+            '-r',
+            'echo fgets(STDIN) ?: "no input";',
+        ]);
+
+        $this->assertSame('no input', $output);
+    }
 }
