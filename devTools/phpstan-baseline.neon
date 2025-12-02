@@ -379,12 +379,6 @@ parameters:
 			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Differ\\DiffChangedLinesParserTest\:\:convertToArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Differ/DiffChangedLinesParserTest.php
-
-		-
 			message: '#^Parameter \#1 \$environment of method Infection\\Environment\\StrykerApiKeyResolver\:\:resolve\(\) expects array\<string, string\>, array\<string, int\|stdClass\|string\> given\.$#'
 			identifier: argument.type
 			count: 1
