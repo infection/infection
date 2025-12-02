@@ -40,7 +40,6 @@ use function count;
 use function explode;
 use function Safe\preg_match;
 use function Safe\preg_split;
-use function Safe\realpath;
 use function sprintf;
 use function str_starts_with;
 use Webmozart\Assert\Assert;
@@ -56,8 +55,8 @@ class DiffChangedLinesParser
     /**
      * Returned result example:
      *   [
-     *       /path/to/src/File1.php => [ChangedLinesRange(1, 2)]
-     *       /path/to/src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33),]
+     *       src/File1.php => [ChangedLinesRange(1, 2)]
+     *       src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33),]
      *   ]
      *
      * Diff provided by command line: `git diff --unified=0 --diff-filter=AM master | grep -v -e '^[+-]' -e '^index'`
@@ -82,7 +81,7 @@ class DiffChangedLinesParser
                     sprintf('Source file can not be found in the following diff line: "%s"', $line),
                 );
 
-                $filePath = realpath($matches[self::MATCH_INDEX]);
+                $filePath = $matches[self::MATCH_INDEX];
             } elseif (str_starts_with((string) $line, '@@ ')) {
                 Assert::string($filePath, sprintf('Real path for file from diff can not be calculated. Diff: %s', $unifiedGreppedDiff));
 

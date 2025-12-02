@@ -38,6 +38,7 @@ namespace Infection\FileSystem;
 use function is_dir;
 use function is_file;
 use function is_readable;
+use function Safe\realpath;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -54,6 +55,11 @@ class FileSystem extends SymfonyFilesystem
     public function isReadableDirectory(string $filename): bool
     {
         return is_dir($filename) && is_readable($filename);
+    }
+
+    public function realPath(string $filename): string
+    {
+        return realpath($filename);
     }
 
     public function createFinder(): Finder
