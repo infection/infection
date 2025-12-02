@@ -39,11 +39,12 @@ use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
-use function explode as explode1;
+use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
+use function preg_split;
 use function Safe\preg_match;
 use function sprintf;
 use function str_starts_with;
@@ -110,7 +111,7 @@ final class CommandLineGit implements Git
             throw NoFilesInDiffToMutate::create();
         }
 
-        return implode(',', explode1(PHP_EOL, $filter));
+        return implode(',', explode(PHP_EOL, $filter));
     }
 
     public function getChangedLinesRangesByFileRelativePaths(string $base): array
@@ -123,13 +124,16 @@ final class CommandLineGit implements Git
             '--diff-filter=AM',
         ]);
 
-        $lines = explode1(PHP_EOL, $filter);
+        $lines = explode(PHP_EOL, $filter);
         $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
+        $linesWithoutIndex = implode(PHP_EOL, $lines);
+
+        $splitLines = preg_split('/\n|\r\n?/', $linesWithoutIndex);
 
         $filePath = null;
         $resultMap = [];
 
-        foreach ($lines as $line) {
+        foreach ($splitLines as $line) {
             if (str_starts_with((string) $line, 'diff ')) {
                 preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
 
@@ -145,7 +149,7 @@ final class CommandLineGit implements Git
                     $filePath,
                     sprintf(
                         'Real path for file from diff can not be calculated. Diff: %s',
-                        implode(PHP_EOL, $lines),
+                        $linesWithoutIndex,
                     ),
                 );
 
@@ -163,7 +167,7 @@ final class CommandLineGit implements Git
                 // can be "523,12", meaning from 523 lines new 12 are added; or just "532"
                 $linesText = $matches[self::MATCH_INDEX];
 
-                $lineParts = array_map('\intval', explode1(',', $linesText));
+                $lineParts = array_map(intval(...), explode(',', $linesText));
 
                 Assert::minCount($lineParts, 1);
 
