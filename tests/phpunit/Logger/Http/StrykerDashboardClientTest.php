@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\Http;
 
-use Generator;
 use Infection\Framework\Str;
 use Infection\Logger\Http\Response;
 use Infection\Logger\Http\StrykerCurlClient;
@@ -108,7 +107,7 @@ final class StrykerDashboardClientTest extends TestCase
         );
     }
 
-    public static function provideResponseStatusCodes(): Generator
+    public static function provideResponseStatusCodes(): iterable
     {
         yield '200 OK' => [Response::HTTP_OK];
 
