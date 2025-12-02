@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
-use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
@@ -43,6 +42,7 @@ use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
+use InvalidArgumentException;
 use const PHP_EOL;
 use function Safe\preg_match;
 use function Safe\preg_split;
@@ -63,6 +63,14 @@ final class CommandLineGit implements Git
 
     private const MATCH_INDEX = 1;
 
+    private const DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
+
+    private const DIFF_LINE_PATH_KEY = 'filePath';
+
+    private const DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
+
+    private const DIFF_LINE_RANGE_KEY = 'range';
+
     private ?string $defaultBase = null;
 
     public function __construct(
@@ -72,24 +80,11 @@ final class CommandLineGit implements Git
 
     public function getDefaultBase(): string
     {
-        if ($this->defaultBase !== null) {
-            return $this->defaultBase;
+        if ($this->defaultBase === null) {
+            $this->defaultBase = $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
         }
 
-        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
-        try {
-            return $this->shellCommandLineExecutor->execute([
-                'git',
-                'symbolic-ref',
-                self::DEFAULT_SYMBOLIC_REFERENCE,
-            ]);
-        } catch (ProcessException) {
-            // e.g. no symbolic ref might be configured for a remote named "origin"
-            // TODO: we could log the failure to figure it out somewhere...
-        }
-
-        // unable to figure it out, return the default
-        return $this->defaultBase = Git::FALLBACK_BASE;
+        return $this->defaultBase;
     }
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
@@ -116,7 +111,17 @@ final class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $base): array
     {
-        $filter = $this->shellCommandLineExecutor->execute([
+        return self::parsedChangedLines(
+            $this->diffLines($base),
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    public function diffLines(string $base): array
+    {
+        $result = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
@@ -124,61 +129,7 @@ final class CommandLineGit implements Git
             '--diff-filter=AM',
         ]);
 
-        $lines = explode(PHP_EOL, $filter);
-        $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
-        $linesWithoutIndex = implode(PHP_EOL, $lines);
-
-        $splitLines = preg_split('/\n|\r\n?/', $linesWithoutIndex);
-
-        $filePath = null;
-        $resultMap = [];
-
-        foreach ($splitLines as $line) {
-            if (str_starts_with((string) $line, 'diff ')) {
-                preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
-
-                Assert::keyExists(
-                    $matches,
-                    self::MATCH_INDEX,
-                    sprintf('Source file can not be found in the following diff line: "%s"', $line),
-                );
-
-                $filePath = $matches[self::MATCH_INDEX];
-            } elseif (str_starts_with((string) $line, '@@ ')) {
-                Assert::string(
-                    $filePath,
-                    sprintf(
-                        'Real path for file from diff can not be calculated. Diff: %s',
-                        $linesWithoutIndex,
-                    ),
-                );
-
-                preg_match('/\s\+(.*)\s@/', $line, $matches);
-
-                Assert::keyExists(
-                    $matches,
-                    self::MATCH_INDEX,
-                    sprintf(
-                        'Added/modified lines can not be found in the following diff line: "%s"',
-                        $line,
-                    ),
-                );
-
-                // can be "523,12", meaning from 523 lines new 12 are added; or just "532"
-                $linesText = $matches[self::MATCH_INDEX];
-
-                $lineParts = array_map(intval(...), explode(',', $linesText));
-
-                Assert::minCount($lineParts, 1);
-
-                $startLine = $lineParts[0];
-                $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
-
-                $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
-            }
-        }
-
-        return $resultMap;
+        return preg_split('/\n|\r\n?/', $result);
     }
 
     public function getBaseReference(string $base): string
@@ -194,10 +145,110 @@ final class CommandLineGit implements Git
             // TODO: could do some logging here...
         }
 
-        /**
-         * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-         * Fall back to direct diff
-         */
+        // There is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+        // Fall back to direct diff.
         return $base;
+    }
+
+    /**
+     * @param string[] $lines
+     *
+     * @return array<string, list<ChangedLinesRange>>
+     */
+    private static function parsedChangedLines(array $lines): array
+    {
+        $filePath = '';
+        $result = [];
+
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'diff ')) {
+                $filePath = self::parseFilePathFromLine($line);
+            } elseif (str_starts_with($line, '@@ ')) {
+                $result[$filePath][] = self::parseChangedLinesRangeFromLine($line);
+            }
+        }
+
+        // Do not use asser to avoid doing the implode unless necessary.
+        if ($filePath === '') {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Real path for file from diff can not be calculated. Diff: %s',
+                    implode(PHP_EOL, $lines),
+                ),
+            );
+        }
+
+        return $result;
+    }
+
+    private static function parseFilePathFromLine(string $line): string
+    {
+        preg_match(self::DIFF_LINE_REGEX, $line, $matches);
+
+        Assert::keyExists(
+            $matches,
+            self::DIFF_LINE_PATH_KEY,
+            sprintf(
+                'Source file can not be found in the following diff line: "%s"',
+                $line,
+            ),
+        );
+
+        return $matches[self::DIFF_LINE_PATH_KEY];
+    }
+
+    /**
+     * Examples of possible forms for the input line:
+     *
+     * - '@@ -10,5 +12,7 @@ ...': lines added and removed, here 5 lines removed at L10 in the old file and 7 lines added from L12 in the new file
+     * - '@@ -10,0 +11,5 @@ ...': only lines added, 0 lines from the old file at L10, 5 lines added starting at L11 in new file
+     *
+     * Check the test for more examples.
+     */
+    private static function parseChangedLinesRangeFromLine(string $line): ChangedLinesRange
+    {
+        preg_match(self::DIFF_LINE_RANGE_REGEX, $line, $matches);
+
+        Assert::keyExists(
+            $matches,
+            self::DIFF_LINE_RANGE_KEY,
+            sprintf(
+                'Added/modified lines can not be found in the following diff line: "%s"',
+                $line,
+            ),
+        );
+
+        $range = $matches[self::DIFF_LINE_RANGE_KEY];
+
+        $lineParts = array_map(
+            intval(...),
+            explode(',', $range),
+        );
+
+        Assert::minCount($lineParts, 1);
+
+        $startLine = $lineParts[0];
+        $endLine = count($lineParts) > 1
+            ? $lineParts[0] + $lineParts[1] - 1
+            : $startLine;
+
+        return new ChangedLinesRange($startLine, $endLine);
+    }
+
+    private function readSymbolicReference(string $name): ?string
+    {
+        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
+        try {
+            return $this->shellCommandLineExecutor->execute([
+                'git',
+                'symbolic-ref',
+                $name,
+            ]);
+        } catch (ProcessException) {
+            // e.g. no symbolic ref might be configured for a remote named "origin"
+            // TODO: we could log the failure to figure it out somewhere...
+        }
+
+        return null;
     }
 }

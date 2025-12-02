@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 /**
+ * Inclusive segment of the changed lines.
+ *
  * @internal
  */
 final readonly class ChangedLinesRange
