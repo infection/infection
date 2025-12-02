@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Git;
 
 use Exception;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
@@ -47,6 +48,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function Safe\realpath;
 
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
@@ -122,52 +124,76 @@ final class CommandLineGitTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_get_the_changed_lines_as_a_string(): void
-    {
+    #[DataProvider('diffLinesProvider')]
+    public function test_it_get_the_changed_lines(
+        string $diff,
+        array $expected,
+    ): void {
         $expectedDiffCommandLine = ['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'];
-        $diffCommandLineOutput = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                index 2a9e281..01cbf04 100644
-                --- a/tests/FooTest.php
-                +++ b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-                -            return false === \strpos($sql, 'doctrine_migrations');
-                +            return ! \str_contains($sql, 'doctrine_migrations');
-                diff --git a/Bar.php b/Bar.php
-                index f97971a..1ef35a5 100644
-                --- a/Bar.php
-                +++ b/Bar.php
-                @@ -10,0 +11,3 @@ final class Bar
-                +    /**
-                +     * @var null|non-empty-string
-                +     */
-                @@ -21 +31,4 @@ final class Bar
-                -        return $this->foo = \strrev($encryptedMessage);
-                +        $strrev = \strrev($encryptedMessage);
-
-                EOF,
-        );
 
         $this->commandLineMock
             ->method('execute')
             ->with($expectedDiffCommandLine)
-            ->willReturn($diffCommandLineOutput);
-
-        $expected = Str::toSystemLineEndings(
-            <<<'EOF'
-                diff --git a/tests/FooTest.php b/tests/FooTest.php
-                @@ -73 +73 @@ final class FooTest
-                diff --git a/Bar.php b/Bar.php
-                @@ -10,0 +11,3 @@ final class Bar
-                @@ -21 +31,4 @@ final class Bar
-
-                EOF,
-        );
+            ->willReturn($diff);
 
         $actual = $this->git->provideWithLines('main');
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function diffLinesProvider(): iterable
+    {
+        yield [
+            <<<'EOF'
+                diff --git a/src/Container.php b/src/Container.php
+                index f97971a..1ef35a5 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+
+                EOF,
+            [
+                realpath(__DIR__ . '/../../../src/Container.php') => [
+                    new ChangedLinesRange(38, 38),
+                    new ChangedLinesRange(534, 535),
+                    new ChangedLinesRange(538, 540),
+                    new ChangedLinesRange(1213, 1217),
+                ],
+            ],
+        ];
+
+        yield 'two files, second one is new created' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index f97971a..1ef35a5 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -37,0 +38 @@ namespace Infection;
+                @@ -533 +534,2 @@ final class Container
+                @@ -535,0 +538,3 @@ final class Container
+                @@ -1207,0 +1213,5 @@ final class Container
+                diff --git a/src/Git/CommandLineGit.php b/src/Git/CommandLineGit.php
+                index f97971a..1ef35a5 100644
+                --- a/src/Git/CommandLineGit.php
+                +++ b/src/Git/CommandLineGit.php
+                new file mode 100644
+                @@ -0,0 +1,18 @@
+                DIFF,
+            [
+                realpath(__DIR__ . '/../../../src/Container.php') => [
+                    new ChangedLinesRange(38, 38),
+                    new ChangedLinesRange(534, 535),
+                    new ChangedLinesRange(538, 540),
+                    new ChangedLinesRange(1213, 1217),
+                ],
+                realpath(__DIR__ . '/../../../src/Git/CommandLineGit.php') => [
+                    new ChangedLinesRange(1, 18),
+                ],
+            ],
+        ];
     }
 
     #[DataProvider('defaultGitBaseProvider')]

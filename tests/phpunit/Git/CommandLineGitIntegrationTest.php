@@ -42,10 +42,10 @@ use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Tests\TestingUtility\TestCIDetector;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function Safe\realpath;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
@@ -143,14 +143,13 @@ final class CommandLineGitIntegrationTest extends TestCase
         );
     }
 
-    public function test_it_get_the_changed_lines_as_a_string(): void
+    public function test_it_get_the_changed_lines(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
         $actual = $this->git->provideWithLines(self::COMMIT_REFERENCE);
 
-        $this->assertStringContainsString(PHP_EOL . 'diff --git a/src/Git/Git.php b/src/Git/Git.php' . PHP_EOL, $actual);
-        $this->assertMatchesRegularExpression('/\n@@ [\-\+,\.\s\d]+ @@ interface Git\n/', $actual);
+        $this->assertArrayHasKey(realpath(__DIR__ . '/../../../src/Git/Git.php'), $actual);
     }
 
     public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void

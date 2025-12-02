@@ -39,6 +39,7 @@ use function array_filter;
 use function array_merge;
 use function explode;
 use function implode;
+use Infection\Differ\DiffChangedLinesParser;
 use Infection\Process\ShellCommandLineExecutor;
 use const PHP_EOL;
 use function Safe\preg_match;
@@ -105,7 +106,7 @@ final class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function provideWithLines(string $base): string
+    public function provideWithLines(string $base): array
     {
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
@@ -117,7 +118,9 @@ final class CommandLineGit implements Git
         $lines = explode(PHP_EOL, $filter);
         $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
 
-        return implode(PHP_EOL, $lines);
+        $value = implode(PHP_EOL, $lines);
+
+        return (new DiffChangedLinesParser())->parse($value);
     }
 
     public function getBaseReference(string $base): string
