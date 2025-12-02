@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Git;
 
 use Infection\Differ\ChangedLinesRange;
+use Infection\Source\Exception\NoSourceFound;
 
 /**
  * @internal
@@ -82,7 +83,7 @@ interface Git
      * @param string $base E.g. 'origin.main'.
      * @param string[] $sourceDirectories
      *
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      */
     public function getChangedFileRelativePaths(
         string $diffFilter,
@@ -102,6 +103,8 @@ interface Git
      *     src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
      * ]
      * ```
+     *
+     * @throws NoSourceFound
      *
      * @return array<string, list<ChangedLinesRange>>
      */

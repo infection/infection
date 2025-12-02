@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function dirname;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
@@ -57,7 +58,7 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
 
     /**
      * @throws InvalidCoverage
-     * @throws NoLineExecuted
+     * @throws NoSourceFound
      *
      * @return iterable<Trace>
      */

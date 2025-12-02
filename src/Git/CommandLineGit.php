@@ -43,6 +43,7 @@ use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Exception\NoSourceFound;
 use const PHP_EOL;
 use function Safe\preg_match;
 use function Safe\preg_split;
@@ -108,7 +109,7 @@ final class CommandLineGit implements Git
         ));
 
         if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
+            throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
         return implode(',', explode(PHP_EOL, $filter));
@@ -116,15 +117,17 @@ final class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $base): array
     {
-        $filter = $this->shellCommandLineExecutor->execute([
+        $filter = 'AM';
+
+        $diff = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
             '--unified=0',
-            '--diff-filter=AM',
+            '--diff-filter=' . $filter,
         ]);
 
-        $lines = explode(PHP_EOL, $filter);
+        $lines = explode(PHP_EOL, $diff);
         $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
         $linesWithoutIndex = implode(PHP_EOL, $lines);
 
@@ -176,6 +179,10 @@ final class CommandLineGit implements Git
 
                 $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
             }
+        }
+
+        if (count($resultMap) === 0) {
+            throw NoSourceFound::noChangedLinesForGitDiff($filter, $base, $diff);
         }
 
         return $resultMap;

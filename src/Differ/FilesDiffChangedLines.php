@@ -37,6 +37,7 @@ namespace Infection\Differ;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
+use Infection\Source\Exception\NoSourceFound;
 
 /**
  * @internal
@@ -53,6 +54,9 @@ class FilesDiffChangedLines
     ) {
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath, $gitDiffBase) as $changedLinesRange) {
@@ -65,6 +69,8 @@ class FilesDiffChangedLines
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return list<ChangedLinesRange>
      */
     private function getChangedLinesRanges(string $fileRealPath, string $gitBase): array
@@ -75,6 +81,8 @@ class FilesDiffChangedLines
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return array<string, list<ChangedLinesRange>>
      */
     private function getFilesChangedLinesRanges(string $gitBase): array

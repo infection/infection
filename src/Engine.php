@@ -45,6 +45,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
+use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
@@ -52,6 +53,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\IgnoresAdditionalNodes;
@@ -86,6 +88,8 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
+     * @throws NoSourceFound
+     * @throws UnparsableFile
      */
     public function execute(): void
     {
@@ -186,6 +190,10 @@ final readonly class Engine
         return explode(' ', (string) $this->config->initialTestsPhpOptions);
     }
 
+    /**
+     * @throws NoSourceFound
+     * @throws UnparsableFile
+     */
     private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(

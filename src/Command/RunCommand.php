@@ -50,12 +50,11 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -448,10 +447,14 @@ final class RunCommand extends BaseCommand
             $engine->execute();
 
             return true;
-        } catch (NoFilesInDiffToMutate|NoLineExecutedInDiffLinesMode $e) {
-            $io->success($e->getMessage());
+        } catch (NoSourceFound $noSourceFoundException) {
+            if ($noSourceFoundException->isSourceFiltered) {
+                $io->success($noSourceFoundException->getMessage());
 
-            return true;
+                return true;
+            }
+
+            throw $noSourceFoundException;
         } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead

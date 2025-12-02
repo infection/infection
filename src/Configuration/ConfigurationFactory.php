@@ -58,6 +58,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function max;
@@ -93,6 +94,9 @@ class ConfigurationFactory
     ) {
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -370,6 +374,8 @@ class ConfigurationFactory
 
     /**
      * @param string[] $sourceDirectories
+     *
+     * @throws NoSourceFound
      */
     private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitBase, array $sourceDirectories): string
     {

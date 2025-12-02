@@ -41,6 +41,7 @@ use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
@@ -92,6 +93,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return iterable<Mutation>
      */
     public function generate(Node $node): iterable

@@ -43,6 +43,7 @@ use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use PhpParser\Node;
@@ -75,6 +76,7 @@ class MutationGenerator
      * @param bool $onlyCovered Mutates only covered by tests lines of code
      * @param NodeIgnorer[] $nodeIgnorers
      *
+     * @throws NoSourceFound
      * @throws UnparsableFile
      *
      * @return iterable<Mutation>
