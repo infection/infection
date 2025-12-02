@@ -89,7 +89,6 @@ final class FileMutationGeneratorTest extends TestCase
             new LineRangeCalculator(),
             $this->filesDiffChangedLines,
             false,
-            'master',
         );
     }
 
@@ -289,7 +288,6 @@ final class FileMutationGeneratorTest extends TestCase
             new LineRangeCalculator(),
             $this->filesDiffChangedLines,
             false,
-            'master',
         );
 
         $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);

@@ -179,8 +179,6 @@ final class Container extends DIContainer
 
     public const DEFAULT_GIT_DIFF_FILTER = null;
 
-    public const DEFAULT_GIT_DIFF_LINES = false;
-
     public const DEFAULT_GIT_DIFF_BASE = null;
 
     public const DEFAULT_USE_GITHUB_LOGGER = null;
@@ -449,7 +447,6 @@ final class Container extends DIContainer
                     $container->getLineRangeCalculator(),
                     $container->getFilesDiffChangedLines(),
                     $configuration->isForGitDiffLines,
-                    $configuration->gitDiffBase,
                 );
             },
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
@@ -561,6 +558,23 @@ final class Container extends DIContainer
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
             Git::class => static fn (): Git => new CommandLineGit(new ShellCommandLineExecutor()),
+            FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
+                $configuration = $container->getConfiguration();
+
+                // This service should not be used if there is no git base/filter configured.
+                $gitDiffBase = $configuration->gitDiffBase;
+                Assert::notNull($gitDiffBase);
+
+                $gitDiffFilter = $configuration->gitDiffFilter;
+                Assert::notNull($gitDiffFilter);
+
+                return new FilesDiffChangedLines(
+                    $container->getGit(),
+                    $container->getFileSystem(),
+                    $gitDiffBase,
+                    $gitDiffFilter,
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -595,7 +609,6 @@ final class Container extends DIContainer
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
-        bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
         ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
@@ -670,7 +683,6 @@ final class Container extends DIContainer
                 threadCount: $threadCount,
                 dryRun: $dryRun,
                 gitDiffFilter: $gitDiffFilter,
-                isForGitDiffLines: $isForGitDiffLines,
                 gitDiffBase: $gitDiffBase,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,
