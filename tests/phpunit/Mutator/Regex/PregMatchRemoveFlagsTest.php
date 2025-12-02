@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Generator;
 use Infection\Mutator\Regex\PregMatchRemoveFlags;
 use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -56,7 +55,7 @@ final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
         $this->assertMutatesInput($input, $expected);
     }
 
-    public static function provideMutationCases(): Generator
+    public static function provideMutationCases(): iterable
     {
         yield 'It removes flags one by one' => [
             <<<'PHP'

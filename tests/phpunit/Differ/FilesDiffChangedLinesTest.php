@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
-use Generator;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\FileSystem\FileSystem;
@@ -104,7 +103,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         );
     }
 
-    public static function provideLines(): Generator
+    public static function provideLines(): iterable
     {
         yield 'not found line in one-line range before' => [
             [
