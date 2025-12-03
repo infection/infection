@@ -37,6 +37,7 @@ namespace Infection\Differ;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
+use Infection\Git\NoFilesInDiffToMutate;
 
 /**
  * @internal
@@ -55,6 +56,9 @@ class FilesDiffChangedLines
     ) {
     }
 
+    /**
+     * @throws NoFilesInDiffToMutate
+     */
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
@@ -67,6 +71,8 @@ class FilesDiffChangedLines
     }
 
     /**
+     * @throws NoFilesInDiffToMutate
+     *
      * @return list<ChangedLinesRange>
      */
     private function getChangedLinesRanges(string $fileRealPath): array
@@ -77,6 +83,8 @@ class FilesDiffChangedLines
     }
 
     /**
+     * @throws NoFilesInDiffToMutate
+     *
      * @return array<string, list<ChangedLinesRange>>
      */
     private function getFilesChangedLinesRanges(): array

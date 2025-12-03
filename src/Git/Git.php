@@ -107,7 +107,9 @@ interface Git
      *
      * @param string $diffFilter E.g. 'AM'.
      *
-     * @return array<string, list<ChangedLinesRange>>
+     * @throws NoFilesInDiffToMutate
+     *
+     * @return non-empty-array<string, list<ChangedLinesRange>>
      */
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array;
 

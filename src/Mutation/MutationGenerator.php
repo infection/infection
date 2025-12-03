@@ -39,12 +39,20 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
@@ -76,6 +84,14 @@ class MutationGenerator
      * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoLineExecuted
+     * @throws NoLineExecutedInDiffLinesMode
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
+     * @throws NoFilesInDiffToMutate
      *
      * @return iterable<Mutation>
      */

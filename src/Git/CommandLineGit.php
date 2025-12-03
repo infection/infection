@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
@@ -42,7 +43,6 @@ use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
-use InvalidArgumentException;
 use const PHP_EOL;
 use function Safe\preg_match;
 use function Safe\preg_split;
@@ -61,13 +61,7 @@ final readonly class CommandLineGit implements Git
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
-    private const DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
-
-    private const DIFF_LINE_PATH_KEY = 'filePath';
-
-    private const DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
-
-    private const DIFF_LINE_RANGE_KEY = 'range';
+    private const MATCH_INDEX = 1;
 
     public function __construct(
         private ShellCommandLineExecutor $shellCommandLineExecutor,
@@ -86,8 +80,7 @@ final readonly class CommandLineGit implements Git
                 'git',
                 'diff',
                 $base,
-                '--diff-filter',
-                $diffFilter,
+                '--diff-filter=' . $diffFilter,
                 '--name-only',
                 '--',
             ],
@@ -103,9 +96,79 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
-        return self::parsedChangedLines(
-            $this->diffLines($diffFilter, $base),
-        );
+        $lines = $this->diffLines($diffFilter, $base);
+
+        $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
+        $linesWithoutIndex = implode(PHP_EOL, $lines);
+
+        $splitLines = preg_split('/\n|\r\n?/', $linesWithoutIndex);
+
+        $filePath = null;
+        $resultMap = [];
+
+        foreach ($splitLines as $line) {
+            if (str_starts_with((string) $line, 'diff ')) {
+                preg_match('/diff.*a\/.*\sb\/(.*)/', $line, $matches);
+
+                Assert::keyExists(
+                    $matches,
+                    self::MATCH_INDEX,
+                    sprintf('Source file can not be found in the following diff line: "%s"', $line),
+                );
+
+                $filePath = $matches[self::MATCH_INDEX];
+            } elseif (str_starts_with((string) $line, '@@ ')) {
+                Assert::string(
+                    $filePath,
+                    sprintf(
+                        'Real path for file from diff can not be calculated. Diff: %s',
+                        $linesWithoutIndex,
+                    ),
+                );
+
+                preg_match('/\s\+(.*)\s@/', $line, $matches);
+
+                Assert::keyExists(
+                    $matches,
+                    self::MATCH_INDEX,
+                    sprintf(
+                        'Added/modified lines can not be found in the following diff line: "%s"',
+                        $line,
+                    ),
+                );
+
+                // can be "523,12", meaning from 523 lines new 12 are added; or just "532"
+                $linesText = $matches[self::MATCH_INDEX];
+
+                $lineParts = array_map(intval(...), explode(',', $linesText));
+
+                Assert::countBetween($lineParts, 1, 2);
+
+                if (count($lineParts) === 1) {
+                    [$line] = $lineParts;
+
+                    $changedLinesRange = new ChangedLinesRange($line, $line);
+                } else {
+                    [$startLine, $newCount] = $lineParts;
+
+                    if ($newCount === 0) {
+                        continue;
+                    }
+
+                    $endLine = $startLine + $newCount - 1;
+
+                    $changedLinesRange = new ChangedLinesRange($startLine, $endLine);
+                }
+
+                $resultMap[$filePath][] = $changedLinesRange;
+            }
+        }
+
+        if (count($resultMap) === 0) {
+            throw NoFilesInDiffToMutate::create();
+        }
+
+        return $resultMap;
     }
 
     public function getBaseReference(string $base): string
@@ -121,8 +184,10 @@ final readonly class CommandLineGit implements Git
             // TODO: could do some logging here...
         }
 
-        // There is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-        // Fall back to direct diff.
+        /**
+         * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+         * Fall back to direct diff
+         */
         return $base;
     }
 
@@ -136,112 +201,10 @@ final readonly class CommandLineGit implements Git
             'diff',
             $base,
             '--unified=0',
-            '--diff-filter',
-            $diffFilter,
+            '--diff-filter=' . $diffFilter,
         ]);
 
         return preg_split('/\n|\r\n?/', $result);
-    }
-
-    /**
-     * @param string[] $lines
-     *
-     * @return array<string, list<ChangedLinesRange>>
-     */
-    private static function parsedChangedLines(array $lines): array
-    {
-        $filePath = '';
-        $result = [];
-
-        foreach ($lines as $line) {
-            if (str_starts_with($line, 'diff ')) {
-                $filePath = self::parseFilePathFromLine($line);
-            } elseif (str_starts_with($line, '@@ ')) {
-                $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
-
-                if ($changedLinesRange !== null) {
-                    $result[$filePath][] = $changedLinesRange;
-                }
-            }
-        }
-
-        // Do not use asser to avoid doing the imploding unless necessary.
-        if ($filePath === '') {
-            // TODO: throw an exception here.
-            //   wait on https://github.com/infection/infection/pull/2648
-            return [];
-
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Real path for file from diff can not be calculated. Diff: %s',
-                    implode(PHP_EOL, $lines),
-                ),
-            );
-        }
-
-        return $result;
-    }
-
-    private static function parseFilePathFromLine(string $line): string
-    {
-        preg_match(self::DIFF_LINE_REGEX, $line, $matches);
-
-        Assert::keyExists(
-            $matches,
-            self::DIFF_LINE_PATH_KEY,
-            sprintf(
-                'Source file can not be found in the following diff line: "%s"',
-                $line,
-            ),
-        );
-
-        return $matches[self::DIFF_LINE_PATH_KEY];
-    }
-
-    /**
-     * Examples of possible forms for the input line:
-     *
-     * - '@@ -10,5 +12,7 @@ ...': lines added and removed, here 5 lines removed at L10 in the old file and 7 lines added from L12 in the new file
-     * - '@@ -10,0 +11,5 @@ ...': only lines added, 0 lines from the old file at L10, 5 lines added starting at L11 in new file
-     *
-     * Check the test for more examples.
-     */
-    private static function parseChangedLinesRangeFromLine(string $line): ?ChangedLinesRange
-    {
-        preg_match(self::DIFF_LINE_RANGE_REGEX, $line, $matches);
-
-        Assert::keyExists(
-            $matches,
-            self::DIFF_LINE_RANGE_KEY,
-            sprintf(
-                'Added/modified lines can not be found in the following diff line: "%s"',
-                $line,
-            ),
-        );
-
-        $range = $matches[self::DIFF_LINE_RANGE_KEY];
-
-        $lineParts = array_map(
-            intval(...),
-            explode(',', $range),
-        );
-
-        Assert::countBetween($lineParts, 1, 2);
-
-        if (count($lineParts) === 1) {
-            [$line] = $lineParts;
-
-            return new ChangedLinesRange($line, $line);
-        }
-        [$startLine, $newCount] = $lineParts;
-
-        if ($newCount === 0) {
-            return null;
-        }
-
-        $endLine = $startLine + $newCount - 1;
-
-        return new ChangedLinesRange($startLine, $endLine);
     }
 
     private function readSymbolicReference(string $name): ?string

@@ -50,9 +50,6 @@ final readonly class UnionTraceProvider implements TraceProvider
     ) {
     }
 
-    /**
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
         yield from $this->coveredTraceProvider->provideTraces();

@@ -19,6 +19,7 @@
 /phpunit.xml
 /tests/benchmark/*/coverage/
 /tests/benchmark/*/sources/
+/tests/benchmark/GitParseDiff/diff
 /tests/e2e/*/coverage/
 /tests/e2e/*/infection/
 /tests/e2e/Configure/infection.json.dist

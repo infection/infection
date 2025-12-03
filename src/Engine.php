@@ -41,10 +41,12 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
+use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
@@ -54,6 +56,13 @@ use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
+use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -86,6 +95,14 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
+     * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoLineExecuted
+     * @throws NoLineExecutedInDiffLinesMode
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
      */
     public function execute(): void
     {
@@ -186,6 +203,17 @@ final readonly class Engine
         return explode(' ', (string) $this->config->initialTestsPhpOptions);
     }
 
+    /**
+     * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoLineExecuted
+     * @throws NoLineExecutedInDiffLinesMode
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
+     * @throws NoFilesInDiffToMutate
+     */
     private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(

@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Differ\FilesDiffChangedLines;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -67,6 +68,7 @@ class FileMutationGenerator
      * @param Mutator<Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
+     * @throws NoFilesInDiffToMutate
      * @throws UnparsableFile
      *
      * @return iterable<Mutation>
