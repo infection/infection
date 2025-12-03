@@ -43,7 +43,6 @@ use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
-use InvalidArgumentException;
 use const PHP_EOL;
 use function Safe\preg_match;
 use function Safe\preg_split;
@@ -103,12 +102,18 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
-        return self::parsedChangedLines(
-            $this->diffLines($diffFilter, $base),
-        );
-        return self::parsedChangedLines(
-            $this->diffLines($diffFilter, $base),
-        );
+        $lines = $this->diffLines($diffFilter, $base);
+        $changedLines = self::parsedChangedLines($lines);
+
+        if (count($changedLines) === 0) {
+            throw NoSourceFound::noChangedLinesForGitDiff(
+                $diffFilter,
+                $base,
+                implode(PHP_EOL, $lines),
+            );
+        }
+
+        return $changedLines;
     }
 
     public function getBaseReference(string $base): string
@@ -124,21 +129,12 @@ final readonly class CommandLineGit implements Git
             // TODO: could do some logging here...
         }
 
-        // There is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-        // Fall back to direct diff.
+        // there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+        // Fall back to direct diff
         return $base;
     }
 
     /**
-     * @return string[]
-     */
-    private function diffLines(string $diffFilter, string $base): array
-    {
-        $result = $this->shellCommandLineExecutor->execute([
-        return preg_split('/\n|\r\n?/', $result);
-    }
-
-    /**
      * @param string[] $lines
      *
      * @return array<string, list<ChangedLinesRange>>
@@ -157,52 +153,6 @@ final readonly class CommandLineGit implements Git
                 if ($changedLinesRange !== null) {
                     $result[$filePath][] = $changedLinesRange;
                 }
-            }
-        }
-
-        // Do not use asser to avoid doing the imploding unless necessary.
-        if ($filePath === '') {
-            // TODO: throw an exception here.
-            //   wait on https://github.com/infection/infection/pull/2648
-            return [];
-
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Real path for file from diff can not be calculated. Diff: %s',
-                    implode(PHP_EOL, $lines),
-                ),
-            );
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string[] $lines
-     *
-     * @return array<string, list<ChangedLinesRange>>
-     */
-    private static function parsedChangedLines(array $lines): array
-    {
-        $filePath = '';
-        $result = [];
-
-        foreach ($lines as $line) {
-            if (str_starts_with($line, 'diff ')) {
-                $filePath = self::parseFilePathFromLine($line);
-            } elseif (str_starts_with($line, '@@ ')) {
-                $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
-
-                if ($changedLinesRange !== null) {
-                    $result[$filePath][] = $changedLinesRange;
-                }
-            }
-        }
-
-        // Do not use asser to avoid doing the imploding unless necessary.
-        if ($filePath === '') {
-            if (count($resultMap) === 0) {
-                throw NoSourceFound::noChangedLinesForGitDiff($diffFilter, $base, $diff);
             }
         }
 
@@ -269,23 +219,6 @@ final readonly class CommandLineGit implements Git
         $endLine = $startLine + $newCount - 1;
 
         return new ChangedLinesRange($startLine, $endLine);
-    }
-
-    private function readSymbolicReference(string $name): ?string
-    {
-        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
-        try {
-            return $this->shellCommandLineExecutor->execute([
-                'git',
-                'symbolic-ref',
-                $name,
-            ]);
-        } catch (ProcessException) {
-            // e.g. no symbolic ref might be configured for a remote named "origin"
-            // TODO: we could log the failure to figure it out somewhere...
-        }
-
-        return null;
     }
 
     /**
