@@ -69,7 +69,7 @@ final class GitParseDiffBench
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
     #[Revs(5)]
-    public function benchMutationGeneration(): void
+    public function bench(): void
     {
         $this->count = ($this->main)();
     }
