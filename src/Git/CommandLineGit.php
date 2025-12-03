@@ -43,6 +43,7 @@ use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Exception\NoSourceFound;
 use const PHP_EOL;
 use function Safe\preg_match;
 use function Safe\preg_split;
@@ -88,7 +89,7 @@ final readonly class CommandLineGit implements Git
         ));
 
         if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
+            throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
         return implode(',', explode(PHP_EOL, $filter));
@@ -165,7 +166,7 @@ final readonly class CommandLineGit implements Git
         }
 
         if (count($resultMap) === 0) {
-            throw NoFilesInDiffToMutate::create();
+            throw NoSourceFound::noChangedLinesForGitDiff($diffFilter, $base, $diff);
         }
 
         return $resultMap;
@@ -196,7 +197,7 @@ final readonly class CommandLineGit implements Git
      */
     private function diffLines(string $diffFilter, string $base): array
     {
-        $result = $this->shellCommandLineExecutor->execute([
+        $diff = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
@@ -204,7 +205,7 @@ final readonly class CommandLineGit implements Git
             '--diff-filter=' . $diffFilter,
         ]);
 
-        return preg_split('/\n|\r\n?/', $result);
+        return preg_split('/\n|\r\n?/', $diff);
     }
 
     private function readSymbolicReference(string $name): ?string

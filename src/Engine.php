@@ -41,7 +41,6 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -54,6 +53,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
@@ -61,8 +61,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -97,8 +95,7 @@ final readonly class Engine
      * @throws MinMsiCheckFailed
      * @throws UnparsableFile
      * @throws InvalidCoverage
-     * @throws NoLineExecuted
-     * @throws NoLineExecutedInDiffLinesMode
+     * @throws NoSourceFound
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
@@ -206,13 +203,11 @@ final readonly class Engine
     /**
      * @throws UnparsableFile
      * @throws InvalidCoverage
-     * @throws NoLineExecuted
-     * @throws NoLineExecutedInDiffLinesMode
+     * @throws NoSourceFound
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
      * @throws TestFileNameNotFoundException
-     * @throws NoFilesInDiffToMutate
      */
     private function runMutationAnalysis(): void
     {
