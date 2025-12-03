@@ -50,12 +50,14 @@ class FilesDiffChangedLines
     public function __construct(
         private readonly Git $git,
         private readonly FileSystem $filesystem,
+        private readonly string $gitDiffBase,
+        private readonly string $gitDiffFilter,
     ) {
     }
 
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
+    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
     {
-        foreach ($this->getChangedLinesRanges($fileRealPath, $gitDiffBase) as $changedLinesRange) {
+        foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
             if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
                 return true;
             }
@@ -67,9 +69,9 @@ class FilesDiffChangedLines
     /**
      * @return list<ChangedLinesRange>
      */
-    private function getChangedLinesRanges(string $fileRealPath, string $gitBase): array
+    private function getChangedLinesRanges(string $fileRealPath): array
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->getFilesChangedLinesRanges($gitBase);
+        $this->memoizedFilesChangedLinesMap ??= $this->getFilesChangedLinesRanges();
 
         return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
     }
@@ -77,9 +79,12 @@ class FilesDiffChangedLines
     /**
      * @return array<string, list<ChangedLinesRange>>
      */
-    private function getFilesChangedLinesRanges(string $gitBase): array
+    private function getFilesChangedLinesRanges(): array
     {
-        $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths($gitBase);
+        $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths(
+            $this->gitDiffFilter,
+            $this->gitDiffBase,
+        );
 
         $changedLinesByAbsolutePaths = [];
 

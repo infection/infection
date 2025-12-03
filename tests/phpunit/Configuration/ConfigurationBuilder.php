@@ -95,6 +95,7 @@ final class ConfigurationBuilder
         private bool $executeOnlyCoveringTestCases,
         private bool $isForGitDiffLines,
         private ?string $gitDiffBase,
+        private ?string $gitDiffFilter,
         private ?string $mapSourceClassToTestStrategy,
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
@@ -140,6 +141,7 @@ final class ConfigurationBuilder
             $configuration->executeOnlyCoveringTestCases,
             $configuration->isForGitDiffLines,
             $configuration->gitDiffBase,
+            $configuration->gitDiffFilter,
             $configuration->mapSourceClassToTestStrategy,
             $configuration->loggerProjectRootDirectory,
             $configuration->staticAnalysisTool,
@@ -183,6 +185,7 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: false,
             isForGitDiffLines: false,
             gitDiffBase: null,
+            gitDiffFilter: null,
             mapSourceClassToTestStrategy: null,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -247,6 +250,7 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: true,
             isForGitDiffLines: true,
             gitDiffBase: 'origin/master',
+            gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
@@ -527,6 +531,14 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    public function withGitDiffFilter(?string $gitDiffFilter): self
+    {
+        $clone = clone $this;
+        $clone->gitDiffFilter = $gitDiffFilter;
+
+        return $clone;
+    }
+
     public function withMapSourceClassToTestStrategy(?string $mapSourceClassToTestStrategy): self
     {
         $clone = clone $this;
@@ -595,6 +607,7 @@ final class ConfigurationBuilder
             $this->executeOnlyCoveringTestCases,
             $this->isForGitDiffLines,
             $this->gitDiffBase,
+            $this->gitDiffFilter,
             $this->mapSourceClassToTestStrategy,
             $this->loggerProjectRootDirectory,
             $this->staticAnalysisTool,

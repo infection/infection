@@ -129,13 +129,6 @@ parameters:
             count: 1
             path: ../tests/phpunit/TestingUtility/FS.php
 
-        # This is a false-positive. It should be fixed by having a clearer API.
-        -
-            message: "#\\$gitDiffBase.+FilesDiffChangedLines::contains\\(\\)#"
-            identifier: argument.type
-            count: 1
-            path: ../src/Mutator/NodeMutationGenerator.php
-
         # We are explicitly testing the guards here
         -
             identifier: argument.type
