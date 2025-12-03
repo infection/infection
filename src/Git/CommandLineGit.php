@@ -81,17 +81,19 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
     {
-        $filter = $this->shellCommandLineExecutor->execute(array_merge(
-            [
-                'git',
-                'diff',
-                $base,
-                '--diff-filter=' . $diffFilter,
-                '--name-only',
-                '--',
-            ],
-            $sourceDirectories,
-        ));
+        $filter = $this->shellCommandLineExecutor->execute(
+            array_merge(
+                [
+                    'git',
+                    'diff',
+                    $base,
+                    '--diff-filter=' . $diffFilter,
+                    '--name-only',
+                    '--',
+                ],
+                $sourceDirectories,
+            ),
+        );
 
         if ($filter === '') {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
@@ -100,9 +102,12 @@ final readonly class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
-    {
-        $lines = $this->diffLines($diffFilter, $base);
+    public function getChangedLinesRangesByFileRelativePaths(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+    ): array {
+        $lines = $this->diffLines($diffFilter, $base, $sourceDirectories);
         $changedLines = self::parsedChangedLines($lines);
 
         if (count($changedLines) === 0) {
@@ -223,17 +228,28 @@ final readonly class CommandLineGit implements Git
     }
 
     /**
+     * @param string[] $sourceDirectories
+     *
      * @return string[]
      */
-    private function diffLines(string $diffFilter, string $base): array
-    {
-        $diff = $this->shellCommandLineExecutor->execute([
-            'git',
-            'diff',
-            $base,
-            '--unified=0',
-            '--diff-filter=' . $diffFilter,
-        ]);
+    private function diffLines(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+    ): array {
+        $diff = $this->shellCommandLineExecutor->execute(
+            array_merge(
+                [
+                    'git',
+                    'diff',
+                    $base,
+                    '--unified=0',
+                    '--diff-filter=' . $diffFilter,
+                    '--',
+                ],
+                $sourceDirectories,
+            ),
+        );
 
         return preg_split('/\n|\r\n?/', $diff);
     }

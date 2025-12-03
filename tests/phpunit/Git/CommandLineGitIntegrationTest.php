@@ -142,13 +142,32 @@ final class CommandLineGitIntegrationTest extends TestCase
         );
     }
 
-    public function test_it_get_the_changed_lines_as_a_string(): void
+    public function test_it_get_the_changed_lines(): void
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', self::COMMIT_REFERENCE);
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
+            'AM',
+            self::COMMIT_REFERENCE,
+            ['src', 'tests'],
+        );
 
         $this->assertArrayHasKey('src/Git/Git.php', $actual);
+        $this->assertArrayHasKey('tests/phpunit/Git/CommandLineGitTest.php', $actual);
+    }
+
+    public function test_it_get_the_changed_lines_excluding_the_files_that_are_not_part_of_the_source_directories(): void
+    {
+        $this->skipIfCommitReferenceIsNotAvailable();
+
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
+            'AM',
+            self::COMMIT_REFERENCE,
+            ['src'],
+        );
+
+        $this->assertArrayHasKey('src/Git/Git.php', $actual);
+        $this->assertArrayNotHasKey('tests/phpunit/Git/CommandLineGitTest.php', $actual);
     }
 
     public function test_it_fails_at_getting_the_modified_lines_if_getting_the_merge_base_failed_unexpectedly(): void
@@ -167,12 +186,16 @@ final class CommandLineGitIntegrationTest extends TestCase
 
                     Error Output:
                     ================
-                    fatal: ambiguous argument '{$badCommitReference}': unknown revision or path not in the working tree.
+                    fatal: bad revision '{$badCommitReference}'
                     EOF,
             ),
         );
 
-        $this->git->getChangedLinesRangesByFileRelativePaths('AM', $badCommitReference);
+        $this->git->getChangedLinesRangesByFileRelativePaths(
+            'AM',
+            $badCommitReference,
+            ['src'],
+        );
     }
 
     public function test_it_can_get_this_project_default_git_base(): void

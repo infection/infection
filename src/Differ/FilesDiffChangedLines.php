@@ -48,11 +48,15 @@ class FilesDiffChangedLines
     /** @var array<string, list<ChangedLinesRange>> */
     private ?array $memoizedFilesChangedLinesMap = null;
 
+    /**
+     * @param string[] $sourceDirectories
+     */
     public function __construct(
         private readonly Git $git,
         private readonly FileSystem $filesystem,
         private readonly string $gitDiffBase,
         private readonly string $gitDiffFilter,
+        private readonly array $sourceDirectories,
     ) {
     }
 
@@ -92,6 +96,7 @@ class FilesDiffChangedLines
         $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths(
             $this->gitDiffFilter,
             $this->gitDiffBase,
+            $this->sourceDirectories,
         );
 
         $changedLinesByAbsolutePaths = [];
