@@ -186,7 +186,7 @@ parameters:
 
         # PHPStan cannot really properly infer that we throw those here
         -
-            message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoFilesInDiffToMutate) in PHPDoc \@throws tag but it.+s not thrown\.$#'
+            message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoSourceFound) in PHPDoc \@throws tag but it.+s not thrown\.$#'
             identifier: throws.unusedType
             path: ../src/Container.php
 

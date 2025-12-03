@@ -189,10 +189,6 @@ final readonly class CommandLineGit implements Git
         }
 
         if (count($resultMap) === 0) {
-            throw NoFilesInDiffToMutate::create();
-        }
-
-        if (count($resultMap) === 0) {
             throw NoSourceFound::noChangedLinesForGitDiff($filter, $base, $diff);
         }
 

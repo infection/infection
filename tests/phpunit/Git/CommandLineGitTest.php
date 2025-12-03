@@ -188,7 +188,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -10,5 +10,0 @@ line change example
                 DIFF,
-            NoFilesInDiffToMutate::class,
+            NoSourceFound::class,
         ];
 
         yield 'single line in old file, 2 lines in new file (count of 1 omitted in old)' => [
@@ -290,7 +290,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -1,18 +0,0 @@ line change example
                 DIFF,
-            NoFilesInDiffToMutate::class,
+            NoSourceFound::class,
         ];
 
         yield 'single line added at beginning of file (count of 1 omitted)' => [
@@ -314,7 +314,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -1 +1,0 @@ line change example
                 DIFF,
-            NoFilesInDiffToMutate::class,
+            NoSourceFound::class,
         ];
 
         yield 'one file with added lines in different places' => [

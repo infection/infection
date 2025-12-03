@@ -59,7 +59,7 @@ class FilesDiffChangedLines
     /**
      * @throws NoSourceFound
      */
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine, string $gitDiffBase): bool
+    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
             if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {

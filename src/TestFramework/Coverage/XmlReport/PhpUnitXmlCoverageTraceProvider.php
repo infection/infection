@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function dirname;
-use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\TraceProvider;
 
@@ -55,12 +54,6 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
     ) {
     }
 
-    /**
-     * @throws InvalidCoverage
-     * @throws NoSourceFound
-     *
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
         // The existence of the file should have already been checked. Hence in theory we should not
