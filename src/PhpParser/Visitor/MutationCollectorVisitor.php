@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\Source\Exception\NoSourceFound;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -66,7 +66,7 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
     /**
      * {@inheritdoc}
      *
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      */
     public function leaveNode(Node $node): ?Node
     {

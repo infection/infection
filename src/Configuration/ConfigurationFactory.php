@@ -51,7 +51,6 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\FileLogger;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -59,6 +58,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function max;
@@ -96,7 +96,7 @@ class ConfigurationFactory
 
     /**
      * @throws FileOrDirectoryNotFound
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      */
     public function create(
         SchemaConfiguration $schema,
@@ -378,7 +378,8 @@ class ConfigurationFactory
 
     /**
      * @param string[] $sourceDirectories
-     * @throws NoFilesInDiffToMutate
+     *
+     * @throws NoSourceFound
      */
     private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitBase, array $sourceDirectories): string
     {

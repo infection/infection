@@ -37,7 +37,7 @@ namespace Infection\Differ;
 
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
-use Infection\Git\NoFilesInDiffToMutate;
+use Infection\Source\Exception\NoSourceFound;
 
 /**
  * @internal
@@ -57,7 +57,7 @@ class FilesDiffChangedLines
     }
 
     /**
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      */
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
     {
@@ -71,7 +71,7 @@ class FilesDiffChangedLines
     }
 
     /**
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      *
      * @return list<ChangedLinesRange>
      */
@@ -83,7 +83,7 @@ class FilesDiffChangedLines
     }
 
     /**
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      *
      * @return array<string, list<ChangedLinesRange>>
      */

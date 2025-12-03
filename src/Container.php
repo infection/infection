@@ -85,7 +85,6 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
@@ -121,6 +120,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -668,7 +668,7 @@ final class Container extends DIContainer
             Configuration::class,
             /**
              * @throws FileOrDirectoryNotFound
-             * @throws NoFilesInDiffToMutate
+             * @throws NoSourceFound
              */
             static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
                 schema: $container->getSchemaConfiguration(),
@@ -917,7 +917,7 @@ final class Container extends DIContainer
     // Should throw all the exceptions ConfigurationFactory::create() can throw.
     /**
      * @throws FileOrDirectoryNotFound
-     * @throws NoFilesInDiffToMutate
+     * @throws NoSourceFound
      */
     public function getConfiguration(): Configuration
     {
