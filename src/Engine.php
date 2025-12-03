@@ -41,6 +41,7 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -211,6 +212,7 @@ final readonly class Engine
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
      * @throws TestFileNameNotFoundException
+     * @throws NoFilesInDiffToMutate
      */
     private function runMutationAnalysis(): void
     {

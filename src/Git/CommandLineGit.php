@@ -185,6 +185,10 @@ final readonly class CommandLineGit implements Git
             }
         }
 
+        if (count($resultMap) === 0) {
+            throw NoFilesInDiffToMutate::create();
+        }
+
         return $resultMap;
     }
 

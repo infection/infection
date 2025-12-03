@@ -39,6 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
@@ -90,6 +91,7 @@ class MutationGenerator
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
      * @throws TestFileNameNotFoundException
+     * @throws NoFilesInDiffToMutate
      *
      * @return iterable<Mutation>
      */
