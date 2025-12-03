@@ -133,7 +133,7 @@ final class CommandLineGitTest extends TestCase
     ): void {
         $this->commandLineMock
             ->method('execute')
-            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter', 'AM'])
+            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'])
             ->willReturn($diff);
 
         $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', 'main');
