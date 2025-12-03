@@ -668,7 +668,7 @@ final class Container extends DIContainer
             Configuration::class,
             /**
              * @throws FileOrDirectoryNotFound
-             * @throws NoFilesInDiffToMutate
+             * @throws NoSourceFound
              */
             static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
                 schema: $container->getSchemaConfiguration(),
