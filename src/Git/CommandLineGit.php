@@ -109,14 +109,15 @@ final readonly class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function getChangedLinesRangesByFileRelativePaths(string $base): array
+    public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
             '--unified=0',
-            '--diff-filter=AM',
+            '--diff-filter',
+            $diffFilter,
         ]);
 
         $lines = explode(PHP_EOL, $filter);
