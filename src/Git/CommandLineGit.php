@@ -111,8 +111,6 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
-        $filter = 'AM';
-
         $diff = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
@@ -189,7 +187,7 @@ final readonly class CommandLineGit implements Git
         }
 
         if (count($resultMap) === 0) {
-            throw NoSourceFound::noChangedLinesForGitDiff($filter, $base, $diff);
+            throw NoSourceFound::noChangedLinesForGitDiff($diffFilter, $base, $diff);
         }
 
         return $resultMap;

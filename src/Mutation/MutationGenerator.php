@@ -81,7 +81,6 @@ class MutationGenerator
      * @param bool $onlyCovered Mutates only covered by tests lines of code
      * @param NodeIgnorer[] $nodeIgnorers
      *
-     * @throws NoSourceFound
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
