@@ -85,7 +85,6 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
