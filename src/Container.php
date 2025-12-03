@@ -150,6 +150,7 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
@@ -561,12 +562,14 @@ final class Container extends DIContainer
             FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
                 $configuration = $container->getConfiguration();
 
-                // This service should not be used if there is no git base/filter configured.
                 $gitDiffBase = $configuration->gitDiffBase;
-                Assert::notNull($gitDiffBase);
-
                 $gitDiffFilter = $configuration->gitDiffFilter;
-                Assert::notNull($gitDiffFilter);
+
+                if ($gitDiffBase === null || $gitDiffFilter === null) {
+                    // This service should not be used if there is no git base/filter configured.
+                    // TODO: this is quite ugly, but to get rid of this more work is needed.
+                    return (new ReflectionClass(FilesDiffChangedLines::class))->newInstanceWithoutConstructor();
+                }
 
                 return new FilesDiffChangedLines(
                     $container->getGit(),
