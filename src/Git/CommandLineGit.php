@@ -42,6 +42,7 @@ use function explode;
 use function implode;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Exception\NoSourceFound;
 use InvalidArgumentException;
 use const PHP_EOL;
 use function Safe\preg_match;
@@ -86,8 +87,7 @@ final readonly class CommandLineGit implements Git
                 'git',
                 'diff',
                 $base,
-                '--diff-filter',
-                $diffFilter,
+                '--diff-filter=' . $diffFilter,
                 '--name-only',
                 '--',
             ],
@@ -95,7 +95,7 @@ final readonly class CommandLineGit implements Git
         ));
 
         if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
+            throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
         return implode(',', explode(PHP_EOL, $filter));
@@ -103,6 +103,9 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
+        return self::parsedChangedLines(
+            $this->diffLines($diffFilter, $base),
+        );
         return self::parsedChangedLines(
             $this->diffLines($diffFilter, $base),
         );
@@ -132,14 +135,6 @@ final readonly class CommandLineGit implements Git
     private function diffLines(string $diffFilter, string $base): array
     {
         $result = $this->shellCommandLineExecutor->execute([
-            'git',
-            'diff',
-            $base,
-            '--unified=0',
-            '--diff-filter',
-            $diffFilter,
-        ]);
-
         return preg_split('/\n|\r\n?/', $result);
     }
 
@@ -177,6 +172,38 @@ final readonly class CommandLineGit implements Git
                     implode(PHP_EOL, $lines),
                 ),
             );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string[] $lines
+     *
+     * @return array<string, list<ChangedLinesRange>>
+     */
+    private static function parsedChangedLines(array $lines): array
+    {
+        $filePath = '';
+        $result = [];
+
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'diff ')) {
+                $filePath = self::parseFilePathFromLine($line);
+            } elseif (str_starts_with($line, '@@ ')) {
+                $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
+
+                if ($changedLinesRange !== null) {
+                    $result[$filePath][] = $changedLinesRange;
+                }
+            }
+        }
+
+        // Do not use asser to avoid doing the imploding unless necessary.
+        if ($filePath === '') {
+            if (count($resultMap) === 0) {
+                throw NoSourceFound::noChangedLinesForGitDiff($diffFilter, $base, $diff);
+            }
         }
 
         return $result;

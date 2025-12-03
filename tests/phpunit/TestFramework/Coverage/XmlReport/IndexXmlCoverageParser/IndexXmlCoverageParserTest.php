@@ -36,10 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 use function array_diff;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecuted;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
@@ -129,7 +128,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         $filename = __DIR__ . '/generated_index.xml';
         $this->filesystem->dumpFile($filename, $xml);
 
-        $this->expectException(NoLineExecuted::class);
+        $this->expectException(NoSourceFound::class);
 
         $this->parser->parse(
             $filename,
@@ -143,7 +142,7 @@ final class IndexXmlCoverageParserTest extends TestCase
         $filename = __DIR__ . '/generated_index.xml';
         $this->filesystem->dumpFile($filename, $xml);
 
-        $this->expectException(NoLineExecutedInDiffLinesMode::class);
+        $this->expectException(NoSourceFound::class);
 
         (new IndexXmlCoverageParser(true))->parse(
             $filename,

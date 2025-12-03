@@ -40,8 +40,8 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Framework\Str;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
-use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Process\ShellCommandLineExecutor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\Process\Exception\GenericProcessException;
 use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -69,7 +69,7 @@ final class CommandLineGitTest extends TestCase
             ->method('execute')
             ->willReturn('');
 
-        $this->expectException(NoFilesInDiffToMutate::class);
+        $this->expectException(NoSourceFound::class);
 
         $this->git->getChangedFileRelativePaths('AM', 'master', ['src/']);
     }
@@ -105,7 +105,7 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('execute')
             ->with(
-                ['git', 'diff', 'main', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'],
+                ['git', 'diff', 'main', '--diff-filter=AM', '--name-only', '--', 'app/', 'my lib/'],
             )
             ->willReturn(
                 Str::toSystemLineEndings(
@@ -124,28 +124,34 @@ final class CommandLineGitTest extends TestCase
     }
 
     /**
-     * @param array<string, array<int, ChangedLinesRange>> $expected
+     * @param array<string, array<int, ChangedLinesRange>>|class-string<Exception> $expected
      */
     #[DataProvider('gitChangedLinesRangesProvider')]
     public function test_it_get_the_changed_lines_ranges_by_files_relative_paths(
         string $diff,
-        array $expected,
+        array|string $expected,
     ): void {
+        if (is_string($expected)) {
+            $this->expectException($expected);
+        }
+
         $this->commandLineMock
             ->method('execute')
-            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter', 'AM'])
+            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'])
             ->willReturn($diff);
 
         $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', 'main');
 
-        $this->assertEquals($expected, $actual);
+        if (!is_string($expected)) {
+            $this->assertEquals($expected, $actual);
+        }
     }
 
     public static function gitChangedLinesRangesProvider(): iterable
     {
         yield 'empty diff' => [
             '',
-            [],
+            NoSourceFound::class,
         ];
 
         yield '5 lines removed at L10 in old file, 7 lines added starting at L12 in new file' => [
@@ -182,7 +188,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -10,5 +10,0 @@ line change example
                 DIFF,
-            [],
+            NoSourceFound::class,
         ];
 
         yield 'single line in old file, 2 lines in new file (count of 1 omitted in old)' => [
@@ -284,7 +290,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -1,18 +0,0 @@ line change example
                 DIFF,
-            [],
+            NoSourceFound::class,
         ];
 
         yield 'single line added at beginning of file (count of 1 omitted)' => [
@@ -308,7 +314,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -1 +1,0 @@ line change example
                 DIFF,
-            [],
+            NoSourceFound::class,
         ];
 
         yield 'one file with added lines in different places' => [

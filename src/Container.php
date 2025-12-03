@@ -77,6 +77,7 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
@@ -119,6 +120,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -664,6 +666,10 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             Configuration::class,
+            /**
+             * @throws FileOrDirectoryNotFound
+             * @throws NoSourceFound
+             */
             static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
                 schema: $container->getSchemaConfiguration(),
                 existingCoveragePath: $existingCoveragePath,
@@ -908,6 +914,11 @@ final class Container extends DIContainer
         return $this->get(SchemaConfiguration::class);
     }
 
+    // Should throw all the exceptions ConfigurationFactory::create() can throw.
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);

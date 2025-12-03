@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\SafeDOMXPath;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -57,7 +58,7 @@ class IndexXmlCoverageParser
      * need to be enriched to contain all the desired data.
      *
      * @throws InvalidCoverage
-     * @throws NoLineExecuted
+     * @throws NoSourceFound
      *
      * @return iterable<SourceFileInfoProvider>
      */
@@ -99,7 +100,7 @@ class IndexXmlCoverageParser
     }
 
     /**
-     * @throws NoLineExecuted
+     * @throws NoSourceFound
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {
@@ -111,8 +112,8 @@ class IndexXmlCoverageParser
             || $coverageCount === ''
         ) {
             throw $isForGitDiffLines
-                ? NoLineExecutedInDiffLinesMode::create()
-                : NoLineExecuted::create();
+                ? NoSourceFound::noExecutableSourceCodeForDiff()
+                : NoSourceFound::noExecutableSourceCode();
         }
     }
 

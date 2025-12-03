@@ -169,6 +169,7 @@ parameters:
         -
             message: '#Do not use magic number as a function argument.#'
             path: ../src/Framework/ClassName.php
+
         # Those cannot be avoided as ClassName does some class-string manipulation.
         -
             message: '#should return .*class-string.* but returns .*string#'
@@ -182,6 +183,12 @@ parameters:
             message: "#Do not use magic number as a function argument. Move to constant with a suitable name.#"
             count: 1
             path: ../src/Git/CommandLineGit.php
+
+        # PHPStan cannot really properly infer that we throw those here
+        -
+            message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoSourceFound) in PHPDoc \@throws tag but it.+s not thrown\.$#'
+            identifier: throws.unusedType
+            path: ../src/Container.php
 
     level: 8
     paths:
