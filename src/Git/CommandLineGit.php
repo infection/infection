@@ -71,21 +71,7 @@ final readonly class CommandLineGit implements Git
 
     public function getDefaultBase(): string
     {
-        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
-        try {
-            return $this->shellCommandLineExecutor->execute([
-                'git',
-                'symbolic-ref',
-                self::DEFAULT_SYMBOLIC_REFERENCE,
-            ]);
-        } catch (ProcessException) {
-            // e.g. no symbolic ref might be configured for a remote named "origin"
-
-            // TODO: we could log the failure to figure it out somewhere...
-
-            // unable to figure it out, return the default
-            return Git::FALLBACK_BASE;
-        }
+        return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
@@ -111,15 +97,8 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
-        $diff = $this->shellCommandLineExecutor->execute([
-            'git',
-            'diff',
-            $base,
-            '--unified=0',
-            '--diff-filter=' . $diffFilter,
-        ]);
+        $lines = $this->diffLines($diffFilter, $base);
 
-        $lines = explode(PHP_EOL, $diff);
         $lines = array_filter($lines, static fn (string $line): bool => preg_match('/^(\\+|-|index)/', $line) === 0);
         $linesWithoutIndex = implode(PHP_EOL, $lines);
 
@@ -187,7 +166,11 @@ final readonly class CommandLineGit implements Git
         }
 
         if (count($resultMap) === 0) {
-            throw NoSourceFound::noChangedLinesForGitDiff($diffFilter, $base, $diff);
+            throw NoSourceFound::noChangedLinesForGitDiff(
+                $diffFilter,
+                $base,
+                implode(PHP_EOL, $lines),
+            );
         }
 
         return $resultMap;
@@ -211,5 +194,38 @@ final readonly class CommandLineGit implements Git
          * Fall back to direct diff
          */
         return $base;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function diffLines(string $diffFilter, string $base): array
+    {
+        $diff = $this->shellCommandLineExecutor->execute([
+            'git',
+            'diff',
+            $base,
+            '--unified=0',
+            '--diff-filter=' . $diffFilter,
+        ]);
+
+        return preg_split('/\n|\r\n?/', $diff);
+    }
+
+    private function readSymbolicReference(string $name): ?string
+    {
+        // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
+        try {
+            return $this->shellCommandLineExecutor->execute([
+                'git',
+                'symbolic-ref',
+                $name,
+            ]);
+        } catch (ProcessException) {
+            // e.g. no symbolic ref might be configured for a remote named "origin"
+            // TODO: we could log the failure to figure it out somewhere...
+        }
+
+        return null;
     }
 }
