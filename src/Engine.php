@@ -56,6 +56,11 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -88,8 +93,13 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
-     * @throws NoSourceFound
      * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoSourceFound
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
      */
     public function execute(): void
     {
@@ -191,8 +201,13 @@ final readonly class Engine
     }
 
     /**
-     * @throws NoSourceFound
      * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoSourceFound
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
      */
     private function runMutationAnalysis(): void
     {

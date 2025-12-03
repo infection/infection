@@ -38,7 +38,6 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 use function dirname;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 
 /**

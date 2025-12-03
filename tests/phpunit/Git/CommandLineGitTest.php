@@ -105,7 +105,7 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('execute')
             ->with(
-                ['git', 'diff', 'main', '--diff-filter', 'AM', '--name-only', '--', 'app/', 'my lib/'],
+                ['git', 'diff', 'main', '--diff-filter=AM', '--name-only', '--', 'app/', 'my lib/'],
             )
             ->willReturn(
                 Str::toSystemLineEndings(
@@ -140,7 +140,7 @@ final class CommandLineGitTest extends TestCase
             ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'])
             ->willReturn($diff);
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('main');
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', 'main');
 
         if (!is_string($expected)) {
             $this->assertEquals($expected, $actual);
@@ -188,10 +188,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -10,5 +10,0 @@ line change example
                 DIFF,
-            [
-                // TODO: this is a bug: no line changed!
-                'src/Container.php' => [new ChangedLinesRange(10, 9)],
-            ],
+            NoFilesInDiffToMutate::class,
         ];
 
         yield 'single line in old file, 2 lines in new file (count of 1 omitted in old)' => [
@@ -293,10 +290,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -1,18 +0,0 @@ line change example
                 DIFF,
-            [
-                // TODO: this is a bug: no line changed!
-                'src/Container.php' => [new ChangedLinesRange(0, -1)],
-            ],
+            NoFilesInDiffToMutate::class,
         ];
 
         yield 'single line added at beginning of file (count of 1 omitted)' => [
@@ -320,10 +314,7 @@ final class CommandLineGitTest extends TestCase
                 +++ b/src/Container.php
                 @@ -1 +1,0 @@ line change example
                 DIFF,
-            [
-                // TODO: this is a bug: no line changed!
-                'src/Container.php' => [new ChangedLinesRange(1, 0)],
-            ],
+            NoFilesInDiffToMutate::class,
         ];
 
         yield 'one file with added lines in different places' => [
@@ -425,6 +416,20 @@ final class CommandLineGitTest extends TestCase
             ],
         ];
 
+        yield 'one file with all kind of transformations' => [
+            <<<'DIFF'
+                diff --git a/src/Source.php b/src/Source.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Source.php
+                +++ b/src/Source.php
+                @@ -1,18 +0,0 @@ old lines deleted
+                @@ -10,0 +11,5 @@ new lines added
+                DIFF,
+            [
+                'src/Source.php' => [new ChangedLinesRange(11, 15)],
+            ],
+        ];
+
         yield 'three files' => [
             <<<'DIFF'
                 diff --git a/src/Git/Git.php b/src/Git/Git.php
@@ -516,6 +521,24 @@ final class CommandLineGitTest extends TestCase
                     new ChangedLinesRange(66, 66),
                     new ChangedLinesRange(82, 91),
                 ],
+            ],
+        ];
+
+        yield 'only some files have changed lines in their new files' => [
+            <<<'DIFF'
+                diff --git a/src/OldLinesDeleted.php b/src/OldLinesDeleted.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/OldLinesDeleted.php
+                +++ b/src/OldLinesDeleted.php
+                @@ -1,18 +0,0 @@ line change example
+                diff --git a/src/NewLinesAdded.php b/src/NewLinesAdded.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/NewLinesAdded.php
+                +++ b/src/NewLinesAdded.php
+                @@ -10,18 +10,2 @@ line change example
+                DIFF,
+            [
+                'src/NewLinesAdded.php' => [new ChangedLinesRange(10, 11)],
             ],
         ];
     }

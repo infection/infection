@@ -64,6 +64,8 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws NoSourceFound
      */
     public function leaveNode(Node $node): ?Node

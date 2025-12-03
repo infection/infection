@@ -54,6 +54,8 @@ interface Git
     // commit reference.
     public const FALLBACK_BASE = 'origin/master';
 
+    public const DEFAULT_GIT_DIFF_FILTER = 'AM';
+
     /**
      * Retrieves the default base branch name for the repository.
      *
@@ -104,11 +106,13 @@ interface Git
      * ]
      * ```
      *
+     * @param string $diffFilter E.g. 'AM'.
+     *
      * @throws NoSourceFound
      *
-     * @return array<string, list<ChangedLinesRange>>
+     * @return non-empty-array<string, list<ChangedLinesRange>>
      */
-    public function getChangedLinesRangesByFileRelativePaths(string $base): array;
+    public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array;
 
     /**
      * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.

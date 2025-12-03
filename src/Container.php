@@ -77,6 +77,7 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
@@ -84,6 +85,7 @@ use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
@@ -151,6 +153,7 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
@@ -179,8 +182,6 @@ final class Container extends DIContainer
     public const DEFAULT_MUTANT_ID = null;
 
     public const DEFAULT_GIT_DIFF_FILTER = null;
-
-    public const DEFAULT_GIT_DIFF_LINES = false;
 
     public const DEFAULT_GIT_DIFF_BASE = null;
 
@@ -450,7 +451,6 @@ final class Container extends DIContainer
                     $container->getLineRangeCalculator(),
                     $container->getFilesDiffChangedLines(),
                     $configuration->isForGitDiffLines,
-                    $configuration->gitDiffBase,
                 );
             },
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
@@ -562,6 +562,25 @@ final class Container extends DIContainer
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
             Git::class => static fn (): Git => new CommandLineGit(new ShellCommandLineExecutor()),
+            FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
+                $configuration = $container->getConfiguration();
+
+                $gitDiffBase = $configuration->gitDiffBase;
+                $gitDiffFilter = $configuration->gitDiffFilter;
+
+                if ($gitDiffBase === null || $gitDiffFilter === null) {
+                    // This service should not be used if there is no git base/filter configured.
+                    // TODO: this is quite ugly, but to get rid of this more work is needed.
+                    return (new ReflectionClass(FilesDiffChangedLines::class))->newInstanceWithoutConstructor();
+                }
+
+                return new FilesDiffChangedLines(
+                    $container->getGit(),
+                    $container->getFileSystem(),
+                    $gitDiffBase,
+                    $gitDiffFilter,
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -596,7 +615,6 @@ final class Container extends DIContainer
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
-        bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
         ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
@@ -649,6 +667,10 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             Configuration::class,
+            /**
+             * @throws FileOrDirectoryNotFound
+             * @throws NoFilesInDiffToMutate
+             */
             static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
                 schema: $container->getSchemaConfiguration(),
                 existingCoveragePath: $existingCoveragePath,
@@ -671,7 +693,6 @@ final class Container extends DIContainer
                 threadCount: $threadCount,
                 dryRun: $dryRun,
                 gitDiffFilter: $gitDiffFilter,
-                isForGitDiffLines: $isForGitDiffLines,
                 gitDiffBase: $gitDiffBase,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,
@@ -896,6 +917,7 @@ final class Container extends DIContainer
 
     // Should throw all the exceptions ConfigurationFactory::create() can throw.
     /**
+     * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
      */
     public function getConfiguration(): Configuration

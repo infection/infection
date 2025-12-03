@@ -129,13 +129,6 @@ parameters:
             count: 1
             path: ../tests/phpunit/TestingUtility/FS.php
 
-        # This is a false-positive. It should be fixed by having a clearer API.
-        -
-            message: "#\\$gitDiffBase.+FilesDiffChangedLines::contains\\(\\)#"
-            identifier: argument.type
-            count: 1
-            path: ../src/Mutator/NodeMutationGenerator.php
-
         # We are explicitly testing the guards here
         -
             identifier: argument.type
@@ -185,9 +178,15 @@ parameters:
             message: '#expects class-string, string given#'
             path: ../src/Framework/ClassName.php
 
+        # This is a valid case of magic number
+        -
+            message: "#Do not use magic number as a function argument. Move to constant with a suitable name.#"
+            count: 1
+            path: ../src/Git/CommandLineGit.php
+
         # PHPStan cannot really properly infer that we throw those here
         -
-            message: '#^Method .+\\Container::getConfiguration\(\) has .+\\NoSourceFound in PHPDoc \@throws tag but it.+s not thrown\.$#'
+            message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoFilesInDiffToMutate) in PHPDoc \@throws tag but it.+s not thrown\.$#'
             identifier: throws.unusedType
             path: ../src/Container.php
 

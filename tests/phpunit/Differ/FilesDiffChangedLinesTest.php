@@ -65,12 +65,14 @@ final class FilesDiffChangedLinesTest extends TestCase
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $this->createGitStub([]),
             $this->fileSystemStub,
+            'main',
+            'AM',
         );
 
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'main');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'main');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
     }
 
     /**
@@ -87,13 +89,14 @@ final class FilesDiffChangedLinesTest extends TestCase
         $filesDiffChangedLines = new FilesDiffChangedLines(
             $this->createGitStub($changedLinesRangesByFilePathname),
             $this->fileSystemStub,
+            'main',
+            'AM',
         );
 
         $actual = $filesDiffChangedLines->contains(
             $fileRealPath,
             $mutationStartLine,
             $mutationEndLine,
-            'main',
         );
 
         $this->assertSame(
@@ -246,7 +249,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('main')
+            ->with('AM', 'main')
             ->willReturn($changedLinesRangesByFilePathname);
 
         return $git;

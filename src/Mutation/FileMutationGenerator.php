@@ -61,7 +61,6 @@ class FileMutationGenerator
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly FilesDiffChangedLines $filesDiffChangedLines,
         private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
     ) {
     }
 
@@ -102,7 +101,6 @@ class FileMutationGenerator
                 trace: $trace,
                 onlyCovered: $onlyCovered,
                 isForGitDiffLines: $this->isForGitDiffLines,
-                gitDiffBase: $this->gitDiffBase,
                 lineRangeCalculator: $this->lineRangeCalculator,
                 filesDiffChangedLines: $this->filesDiffChangedLines,
                 originalFileTokens: $originalFileTokens,

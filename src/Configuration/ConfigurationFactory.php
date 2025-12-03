@@ -95,6 +95,7 @@ class ConfigurationFactory
     }
 
     /**
+     * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
      */
     public function create(
@@ -119,7 +120,6 @@ class ConfigurationFactory
         ?int $threadCount,
         bool $dryRun,
         ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
         ?string $gitDiffBase,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
@@ -154,8 +154,8 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $useGitDiff = $isForGitDiffLines || $gitDiffFilter !== null;
-        $refinedGitBase = self::refineGitBase($gitDiffBase, $useGitDiff);
+        $useGitDiff = $gitDiffFilter !== null;
+        $refinedGitBase = self::refineGitBaseIfNecessary($gitDiffBase, $useGitDiff);
 
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
@@ -164,7 +164,7 @@ class ConfigurationFactory
             sourceFilesFilter: $this->retrieveFilter(
                 $filter,
                 $gitDiffFilter,
-                $isForGitDiffLines,
+                $useGitDiff,
                 $refinedGitBase,
                 $schema->source->directories,
             ),
@@ -197,6 +197,7 @@ class ConfigurationFactory
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
             isForGitDiffLines: $useGitDiff,
             gitDiffBase: $refinedGitBase,
+            gitDiffFilter: $gitDiffFilter,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
@@ -204,6 +205,9 @@ class ConfigurationFactory
         );
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     */
     private function includeUserBootstrap(?string $bootstrap): void
     {
         if ($bootstrap === null) {
@@ -483,7 +487,7 @@ class ConfigurationFactory
     /**
      * @return ($useGitDiff is false ? string|null : string)
      */
-    private function refineGitBase(?string $base, bool $useGitDiff): ?string
+    private function refineGitBaseIfNecessary(?string $base, bool $useGitDiff): ?string
     {
         // When the user gives a base, we need to try to refine it.
         // For example, if the user created their feature branch:

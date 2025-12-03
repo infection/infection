@@ -59,6 +59,8 @@ class JUnitTestExecutionInfoAdder
     /**
      * @param iterable<Trace> $traces
      *
+     * @throws TestFileNameNotFoundException
+     *
      * @return iterable<Trace>
      */
     public function addTestExecutionInfo(iterable $traces): iterable
@@ -72,6 +74,8 @@ class JUnitTestExecutionInfoAdder
 
     /**
      * @param iterable<Trace> $traces
+     *
+     * @throws TestFileNameNotFoundException
      *
      * @return iterable<Trace>
      */
@@ -96,6 +100,9 @@ class JUnitTestExecutionInfoAdder
         }
     }
 
+    /**
+     * @throws TestFileNameNotFoundException
+     */
     private function createCompleteTestLocation(TestLocation $test): TestLocation
     {
         $class = explode(':', $test->getMethod(), self::MAX_EXPLODE_PARTS)[0];
