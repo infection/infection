@@ -210,6 +210,7 @@ final readonly class CommandLineGit implements Git
 
             return new ChangedLinesRange($line, $line);
         }
+
         [$startLine, $newCount] = $lineParts;
 
         if ($newCount === 0) {
