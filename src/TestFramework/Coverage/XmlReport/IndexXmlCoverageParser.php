@@ -58,6 +58,7 @@ class IndexXmlCoverageParser
      *
      * @throws InvalidCoverage
      * @throws NoLineExecuted
+     * @throws NoLineExecutedInDiffLinesMode
      *
      * @return iterable<SourceFileInfoProvider>
      */
@@ -100,6 +101,7 @@ class IndexXmlCoverageParser
 
     /**
      * @throws NoLineExecuted
+     * @throws NoLineExecutedInDiffLinesMode
      */
     private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
     {

@@ -52,9 +52,6 @@ final readonly class CoveredTraceProvider implements TraceProvider
     ) {
     }
 
-    /**
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
         /** @var iterable<Trace> $filteredTraces */

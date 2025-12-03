@@ -51,6 +51,7 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Logger\FileLogger;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
@@ -93,6 +94,10 @@ class ConfigurationFactory
     ) {
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoFilesInDiffToMutate
+     */
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -200,6 +205,9 @@ class ConfigurationFactory
         );
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     */
     private function includeUserBootstrap(?string $bootstrap): void
     {
         if ($bootstrap === null) {
@@ -370,6 +378,7 @@ class ConfigurationFactory
 
     /**
      * @param string[] $sourceDirectories
+     * @throws NoFilesInDiffToMutate
      */
     private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitBase, array $sourceDirectories): string
     {
