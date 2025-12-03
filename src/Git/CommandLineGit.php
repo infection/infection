@@ -76,7 +76,7 @@ final readonly class CommandLineGit implements Git
 
     public function getDefaultBase(): string
     {
-        $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
+        return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
@@ -104,25 +104,8 @@ final readonly class CommandLineGit implements Git
     public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
         return self::parsedChangedLines(
-            $this->diffLines($base),
+            $this->diffLines($diffFilter, $base),
         );
-    }
-
-    /**
-     * @return string[]
-     */
-    private function diffLines(string $diffFilter, string $base): array
-    {
-        $result = $this->shellCommandLineExecutor->execute([
-            'git',
-            'diff',
-            $base,
-            '--unified=0',
-            '--diff-filter',
-            $diffFilter,
-        ]);
-
-        return preg_split('/\n|\r\n?/', $result);
     }
 
     public function getBaseReference(string $base): string
@@ -144,6 +127,23 @@ final readonly class CommandLineGit implements Git
     }
 
     /**
+     * @return string[]
+     */
+    private function diffLines(string $diffFilter, string $base): array
+    {
+        $result = $this->shellCommandLineExecutor->execute([
+            'git',
+            'diff',
+            $base,
+            '--unified=0',
+            '--diff-filter',
+            $diffFilter,
+        ]);
+
+        return preg_split('/\n|\r\n?/', $result);
+    }
+
+    /**
      * @param string[] $lines
      *
      * @return array<string, list<ChangedLinesRange>>
@@ -159,14 +159,18 @@ final readonly class CommandLineGit implements Git
             } elseif (str_starts_with($line, '@@ ')) {
                 $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
 
-                if (null !== $changedLinesRange) {
+                if ($changedLinesRange !== null) {
                     $result[$filePath][] = $changedLinesRange;
                 }
             }
         }
 
-        // Do not use asser to avoid doing the implode unless necessary.
+        // Do not use asser to avoid doing the imploding unless necessary.
         if ($filePath === '') {
+            // TODO: throw an exception here.
+            //   wait on https://github.com/infection/infection/pull/2648
+            return [];
+
             throw new InvalidArgumentException(
                 sprintf(
                     'Real path for file from diff can not be calculated. Diff: %s',
@@ -228,17 +232,16 @@ final readonly class CommandLineGit implements Git
             [$line] = $lineParts;
 
             return new ChangedLinesRange($line, $line);
-        } else {
-            [$startLine, $newCount] = $lineParts;
-
-            if ($newCount === 0) {
-                return null;
-            }
-
-            $endLine = $startLine + $newCount - 1;
-
-            return new ChangedLinesRange($startLine, $endLine);
         }
+        [$startLine, $newCount] = $lineParts;
+
+        if ($newCount === 0) {
+            return null;
+        }
+
+        $endLine = $startLine + $newCount - 1;
+
+        return new ChangedLinesRange($startLine, $endLine);
     }
 
     private function readSymbolicReference(string $name): ?string
