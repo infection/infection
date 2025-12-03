@@ -85,6 +85,7 @@ final readonly class CommandLineGit implements Git
             array_merge(
                 [
                     'git',
+                    '--no-pager',
                     'diff',
                     $base,
                     '--no-color',
@@ -242,6 +243,7 @@ final readonly class CommandLineGit implements Git
             array_merge(
                 [
                     'git',
+                    '--no-pager',
                     'diff',
                     $base,
                     '--no-color',
