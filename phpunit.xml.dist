@@ -8,6 +8,7 @@
          failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
+         displayDetailsOnIncompleteTests="true"
          displayDetailsOnPhpunitDeprecations="true"
          displayDetailsOnSkippedTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
