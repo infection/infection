@@ -94,8 +94,7 @@ final readonly class CommandLineGit implements Git
                 'git',
                 'diff',
                 $base,
-                '--diff-filter',
-                $diffFilter,
+                '--diff-filter=' . $diffFilter,
                 '--name-only',
                 '--',
             ],
@@ -116,8 +115,7 @@ final readonly class CommandLineGit implements Git
             'diff',
             $base,
             '--unified=0',
-            '--diff-filter',
-            $diffFilter,
+            '--diff-filter=' . $diffFilter,
         ]);
 
         $lines = explode(PHP_EOL, $filter);
