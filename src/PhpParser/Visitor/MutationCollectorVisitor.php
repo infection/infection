@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
 use PhpParser\Node;
@@ -62,6 +63,11 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws NoFilesInDiffToMutate
+     */
     public function leaveNode(Node $node): ?Node
     {
         $this->mutationChunks[] = $this->mutationGenerator->generate($node);

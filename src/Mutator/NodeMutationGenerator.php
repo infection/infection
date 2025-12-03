@@ -38,6 +38,7 @@ namespace Infection\Mutator;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Differ\FilesDiffChangedLines;
+use Infection\Git\NoFilesInDiffToMutate;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -91,6 +92,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @throws NoFilesInDiffToMutate
+     *
      * @return iterable<Mutation>
      */
     public function generate(Node $node): iterable
