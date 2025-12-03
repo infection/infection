@@ -228,6 +228,8 @@ final readonly class CommandLineGit implements Git
     }
 
     /**
+     * @param string[] $sourceDirectories
+     *
      * @return string[]
      */
     private function diffLines(
