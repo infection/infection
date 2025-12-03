@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
@@ -81,28 +82,18 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
     {
-        $filter = $this->shellCommandLineExecutor->execute(
-            array_merge(
-                [
-                    'git',
-                    '--no-pager',
-                    'diff',
-                    $base,
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--diff-filter=' . $diffFilter,
-                    '--name-only',
-                    '--',
-                ],
-                $sourceDirectories,
-            ),
+        $lines = $this->diff(
+            $diffFilter,
+            $base,
+            $sourceDirectories,
+            nameOnly: true,
         );
 
-        if ($filter === '') {
+        if (count($lines) === 0) {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
-        return implode(',', explode(PHP_EOL, $filter));
+        return implode(',', $lines);
     }
 
     public function getChangedLinesRangesByFileRelativePaths(
@@ -110,7 +101,12 @@ final readonly class CommandLineGit implements Git
         string $base,
         array $sourceDirectories,
     ): array {
-        $lines = $this->diffLines($diffFilter, $base, $sourceDirectories);
+        $lines = $this->diff(
+            $diffFilter,
+            $base,
+            $sourceDirectories,
+            noContext: true,
+        );
         $changedLines = self::parsedChangedLines($lines);
 
         if (count($changedLines) === 0) {
@@ -235,27 +231,36 @@ final readonly class CommandLineGit implements Git
      *
      * @return string[]
      */
-    private function diffLines(
+    private function diff(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        bool $nameOnly = false,
+        bool $noContext = false,
     ): array {
+        $command = [
+            'git',
+            '--no-pager',
+            'diff',
+            $base,
+            '--no-ext-diff',
+            '--no-color',
+            $nameOnly ? '--name-only' : null,
+            $noContext ? '--unified=0' : null,
+            '--diff-filter=' . $diffFilter,
+            '--',
+        ];
+
         $diff = $this->shellCommandLineExecutor->execute(
             array_merge(
-                [
-                    'git',
-                    '--no-pager',
-                    'diff',
-                    $base,
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--unified=0',
-                    '--diff-filter=' . $diffFilter,
-                    '--',
-                ],
+                array_filter($command),
                 $sourceDirectories,
             ),
         );
+
+        if ($diff === '') {
+            return [];
+        }
 
         return preg_split('/\n|\r\n?/', $diff);
     }
