@@ -105,7 +105,7 @@ final class CommandLineGitTest extends TestCase
         $this->commandLineMock
             ->method('execute')
             ->with(
-                ['git', 'diff', 'main', '--diff-filter=AM', '--name-only', '--', 'app/', 'my lib/'],
+                ['git', 'diff', 'main', '--no-color', '--diff-filter=AM', '--name-only', '--', 'app/', 'my lib/'],
             )
             ->willReturn(
                 Str::toSystemLineEndings(
@@ -137,7 +137,7 @@ final class CommandLineGitTest extends TestCase
 
         $this->commandLineMock
             ->method('execute')
-            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM', '--', 'src', 'lib'])
+            ->with(['git', 'diff', 'main', '--no-color', '--unified=0', '--diff-filter=AM', '--', 'src', 'lib'])
             ->willReturn($diff);
 
         $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
