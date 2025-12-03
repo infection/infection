@@ -166,7 +166,11 @@ final readonly class CommandLineGit implements Git
         }
 
         if (count($resultMap) === 0) {
-            throw NoSourceFound::noChangedLinesForGitDiff($diffFilter, $base, $diff);
+            throw NoSourceFound::noChangedLinesForGitDiff(
+                $diffFilter,
+                $base,
+                implode(PHP_EOL, $lines),
+            );
         }
 
         return $resultMap;
