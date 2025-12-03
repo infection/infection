@@ -250,6 +250,7 @@ final readonly class CommandLineGit implements Git
                     '--no-ext-diff',
                     '--no-color',
                     '--unified=0',
+                    '--no-renames',
                     '--diff-filter=' . $diffFilter,
                     '--',
                 ],
