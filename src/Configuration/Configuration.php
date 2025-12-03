@@ -101,6 +101,7 @@ readonly class Configuration
         public bool $executeOnlyCoveringTestCases,
         public bool $isForGitDiffLines,
         public ?string $gitDiffBase,
+        public ?string $gitDiffFilter,
         public ?string $mapSourceClassToTestStrategy,
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,

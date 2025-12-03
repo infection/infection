@@ -56,26 +56,20 @@ use Webmozart\Assert\Assert;
  *
  * Implementation of the Git contract leveraging the git binary via processes.
  */
-final class CommandLineGit implements Git
+final readonly class CommandLineGit implements Git
 {
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
     private const MATCH_INDEX = 1;
 
-    private ?string $defaultBase = null;
-
     public function __construct(
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
     public function getDefaultBase(): string
     {
-        if ($this->defaultBase !== null) {
-            return $this->defaultBase;
-        }
-
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
             return $this->shellCommandLineExecutor->execute([
@@ -85,11 +79,12 @@ final class CommandLineGit implements Git
             ]);
         } catch (ProcessException) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
-            // TODO: we could log the failure to figure it out somewhere...
-        }
 
-        // unable to figure it out, return the default
-        return $this->defaultBase = Git::FALLBACK_BASE;
+            // TODO: we could log the failure to figure it out somewhere...
+
+            // unable to figure it out, return the default
+            return Git::FALLBACK_BASE;
+        }
     }
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
@@ -113,14 +108,15 @@ final class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function getChangedLinesRangesByFileRelativePaths(string $base): array
+    public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
         $filter = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
             '--unified=0',
-            '--diff-filter=AM',
+            '--diff-filter',
+            $diffFilter,
         ]);
 
         $lines = explode(PHP_EOL, $filter);
@@ -168,12 +164,25 @@ final class CommandLineGit implements Git
 
                 $lineParts = array_map(intval(...), explode(',', $linesText));
 
-                Assert::minCount($lineParts, 1);
+                Assert::countBetween($lineParts, 1, 2);
 
-                $startLine = $lineParts[0];
-                $endLine = count($lineParts) > 1 ? $lineParts[0] + $lineParts[1] - 1 : $startLine;
+                if (count($lineParts) === 1) {
+                    [$line] = $lineParts;
 
-                $resultMap[$filePath][] = new ChangedLinesRange($startLine, $endLine);
+                    $changedLinesRange = new ChangedLinesRange($line, $line);
+                } else {
+                    [$startLine, $newCount] = $lineParts;
+
+                    if ($newCount === 0) {
+                        continue;
+                    }
+
+                    $endLine = $startLine + $newCount - 1;
+
+                    $changedLinesRange = new ChangedLinesRange($startLine, $endLine);
+                }
+
+                $resultMap[$filePath][] = $changedLinesRange;
             }
         }
 

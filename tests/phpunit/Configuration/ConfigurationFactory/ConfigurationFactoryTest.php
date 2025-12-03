@@ -168,7 +168,6 @@ final class ConfigurationFactoryTest extends TestCase
                 threadCount: 0,
                 dryRun: false,
                 gitDiffFilter: null,
-                isForGitDiffLines: false,
                 gitDiffBase: 'master',
                 useGitHubLogger: false,
                 gitlabLogFilePath: null,
@@ -233,7 +232,6 @@ final class ConfigurationFactoryTest extends TestCase
             threadCount: 1,
             dryRun: false,
             gitDiffFilter: 'AM',
-            isForGitDiffLines: false,
             gitDiffBase: 'master',
             useGitHubLogger: true,
             gitlabLogFilePath: null,
@@ -281,6 +279,7 @@ final class ConfigurationFactoryTest extends TestCase
             executeOnlyCoveringTestCases: true,
             isForGitDiffLines: true,
             gitDiffBase: 'reference(master)',
+            gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -1048,7 +1047,6 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultInputBuilder
                         ->withFilter('src/Foo.php, src/Bar.php')
                         ->withGitDiffFilter(null)
-                        ->withIsForGitDiffLines(false)
                         ->withGitDiffBase(null)
                         ->withUseGitHubLogger(false),
                 )
@@ -1063,6 +1061,7 @@ final class ConfigurationFactoryTest extends TestCase
                         ->withSourceFilesExcludes('vendor/')
                         ->withIsForGitDiffLines(false)
                         ->withGitDiffBase(null)
+                        ->withGitDiffFilter(null)
                         ->withLogs(Logs::createEmpty())
                         ->build(),
                 ),
@@ -1073,11 +1072,11 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forFilter(
                     filter: '',
                     gitDiffFilter: null,
-                    isForGitDiffLines: false,
                     gitDiffBase: null,
                     expectedSourceFilesFilter: '',
                     expectedIsForGitDiffLines: false,
                     expectedDiffBase: null,
+                    expectedDiffFilter: null,
                 ),
         ];
 
@@ -1086,11 +1085,11 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forFilter(
                     filter: 'src/Foo.php, src/Bar.php',
                     gitDiffFilter: null,
-                    isForGitDiffLines: false,
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'src/Foo.php, src/Bar.php',
                     expectedIsForGitDiffLines: false,
                     expectedDiffBase: null,
+                    expectedDiffFilter: null,
                 ),
         ];
 
@@ -1099,11 +1098,11 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forFilter(
                     filter: '',
                     gitDiffFilter: 'AD',
-                    isForGitDiffLines: false,
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'f(AD, reference(test/default), []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(test/default)',
+                    expectedDiffFilter: 'AD',
                 ),
         ];
 
@@ -1112,37 +1111,11 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forFilter(
                     filter: '',
                     gitDiffFilter: 'AD',
-                    isForGitDiffLines: false,
                     gitDiffBase: 'upstream/main',
                     expectedSourceFilesFilter: 'f(AD, reference(upstream/main), []) = src/a.php,src/b.php',
                     expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(upstream/main)',
-                ),
-        ];
-
-        yield 'with is for git diff lines' => [
-            $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: null,
-                    isForGitDiffLines: true,
-                    gitDiffBase: null,
-                    expectedSourceFilesFilter: 'f(AM, reference(test/default), []) = src/a.php,src/b.php',
-                    expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'reference(test/default)',
-                ),
-        ];
-
-        yield 'with is for git diff lines and base branch' => [
-            $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: null,
-                    isForGitDiffLines: true,
-                    gitDiffBase: 'upstream/main',
-                    expectedSourceFilesFilter: 'f(AM, reference(upstream/main), []) = src/a.php,src/b.php',
-                    expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'reference(upstream/main)',
+                    expectedDiffFilter: 'AD',
                 ),
         ];
 
@@ -1158,7 +1131,6 @@ final class ConfigurationFactoryTest extends TestCase
                     $defaultInputBuilder
                         ->withFilter('src/Foo.php, src/Bar.php')
                         ->withGitDiffFilter(null)
-                        ->withIsForGitDiffLines(false)
                         ->withUseGitHubLogger(false),
                 )
                 ->withExpected(
@@ -1172,6 +1144,7 @@ final class ConfigurationFactoryTest extends TestCase
                         ->withSourceFilesExcludes('vendor/')
                         ->withIsForGitDiffLines(false)
                         ->withGitDiffBase(null)
+                        ->withGitDiffFilter(null)
                         ->withLogs(Logs::createEmpty())
                         ->build(),
                 ),
@@ -1230,7 +1203,6 @@ final class ConfigurationFactoryTest extends TestCase
                     threadCount: 4,
                     dryRun: true,
                     gitDiffFilter: null,
-                    isForGitDiffLines: false,
                     gitDiffBase: 'master',
                     useGitHubLogger: false,
                     gitlabLogFilePath: null,
