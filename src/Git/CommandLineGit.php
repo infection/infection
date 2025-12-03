@@ -56,12 +56,10 @@ use Webmozart\Assert\Assert;
  *
  * Implementation of the Git contract leveraging the git binary via processes.
  */
-final class CommandLineGit implements Git
+final readonly class CommandLineGit implements Git
 {
     // https://github.com/infection/infection/issues/2611
     private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
-
-    private const MATCH_INDEX = 1;
 
     private const DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
 
@@ -71,20 +69,14 @@ final class CommandLineGit implements Git
 
     private const DIFF_LINE_RANGE_KEY = 'range';
 
-    private ?string $defaultBase = null;
-
     public function __construct(
-        private readonly ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
     public function getDefaultBase(): string
     {
-        if ($this->defaultBase === null) {
-            $this->defaultBase = $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
-        }
-
-        return $this->defaultBase;
+        $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
     }
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
@@ -109,7 +101,7 @@ final class CommandLineGit implements Git
         return implode(',', explode(PHP_EOL, $filter));
     }
 
-    public function getChangedLinesRangesByFileRelativePaths(string $base): array
+    public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array
     {
         return self::parsedChangedLines(
             $this->diffLines($base),
@@ -119,14 +111,15 @@ final class CommandLineGit implements Git
     /**
      * @return string[]
      */
-    public function diffLines(string $base): array
+    private function diffLines(string $diffFilter, string $base): array
     {
         $result = $this->shellCommandLineExecutor->execute([
             'git',
             'diff',
             $base,
             '--unified=0',
-            '--diff-filter=AM',
+            '--diff-filter',
+            $diffFilter,
         ]);
 
         return preg_split('/\n|\r\n?/', $result);
@@ -164,7 +157,11 @@ final class CommandLineGit implements Git
             if (str_starts_with($line, 'diff ')) {
                 $filePath = self::parseFilePathFromLine($line);
             } elseif (str_starts_with($line, '@@ ')) {
-                $result[$filePath][] = self::parseChangedLinesRangeFromLine($line);
+                $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
+
+                if (null !== $changedLinesRange) {
+                    $result[$filePath][] = $changedLinesRange;
+                }
             }
         }
 
@@ -205,7 +202,7 @@ final class CommandLineGit implements Git
      *
      * Check the test for more examples.
      */
-    private static function parseChangedLinesRangeFromLine(string $line): ChangedLinesRange
+    private static function parseChangedLinesRangeFromLine(string $line): ?ChangedLinesRange
     {
         preg_match(self::DIFF_LINE_RANGE_REGEX, $line, $matches);
 
@@ -225,14 +222,23 @@ final class CommandLineGit implements Git
             explode(',', $range),
         );
 
-        Assert::minCount($lineParts, 1);
+        Assert::countBetween($lineParts, 1, 2);
 
-        $startLine = $lineParts[0];
-        $endLine = count($lineParts) > 1
-            ? $lineParts[0] + $lineParts[1] - 1
-            : $startLine;
+        if (count($lineParts) === 1) {
+            [$line] = $lineParts;
 
-        return new ChangedLinesRange($startLine, $endLine);
+            return new ChangedLinesRange($line, $line);
+        } else {
+            [$startLine, $newCount] = $lineParts;
+
+            if ($newCount === 0) {
+                return null;
+            }
+
+            $endLine = $startLine + $newCount - 1;
+
+            return new ChangedLinesRange($startLine, $endLine);
+        }
     }
 
     private function readSymbolicReference(string $name): ?string

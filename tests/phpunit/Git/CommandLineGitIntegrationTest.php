@@ -146,7 +146,7 @@ final class CommandLineGitIntegrationTest extends TestCase
     {
         $this->skipIfCommitReferenceIsNotAvailable();
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(self::COMMIT_REFERENCE);
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', self::COMMIT_REFERENCE);
 
         $this->assertArrayHasKey('src/Git/Git.php', $actual);
     }
@@ -172,7 +172,7 @@ final class CommandLineGitIntegrationTest extends TestCase
             ),
         );
 
-        $this->git->getChangedLinesRangesByFileRelativePaths($badCommitReference);
+        $this->git->getChangedLinesRangesByFileRelativePaths('AM', $badCommitReference);
     }
 
     public function test_it_can_get_this_project_default_git_base(): void

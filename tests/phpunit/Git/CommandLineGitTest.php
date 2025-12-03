@@ -138,10 +138,10 @@ final class CommandLineGitTest extends TestCase
 
         $this->commandLineMock
             ->method('execute')
-            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'])
+            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter', 'AM'])
             ->willReturn($diff);
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('main');
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', 'main');
 
         if (!($expected instanceof Exception)) {
             $this->assertEquals($expected, $actual);
@@ -325,6 +325,169 @@ final class CommandLineGitTest extends TestCase
             ],
         ];
 
+        yield '5 lines removed at L10 in old file, 7 lines added starting at L12 in new file' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,5 +12,7 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(12, 18)],
+            ],
+        ];
+
+        yield '5 lines added starting at L11 in new file (0 lines in old file)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,0 +11,5 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(11, 15)],
+            ],
+        ];
+
+        yield '5 lines deleted starting at L10 in old file (0 lines in new file)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,5 +10,0 @@ line change example
+                DIFF,
+            [],
+        ];
+
+        yield 'single line in old file, 2 lines in new file (count of 1 omitted in old)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10 +10,2 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(10, 11)],
+            ],
+        ];
+
+        yield 'single line in old file, 2 lines in new file (count of 1 explicit in old)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,1 +10,2 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(10, 11)],
+            ],
+        ];
+
+        yield '2 lines in old file, single line in new file (count of 1 omitted in new)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,2 +10 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+            ],
+        ];
+
+        yield '2 lines in old file, single line in new file (count of 1 explicit in new)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,2 +10,1 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+            ],
+        ];
+
+        yield 'single line changed (count of 1 omitted in both)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10 +10 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+            ],
+        ];
+
+        yield 'single line changed (count of 1 explicit in both)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -10,1 +10,1 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+            ],
+        ];
+
+        yield 'new file with 18 lines added' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -0,0 +1,18 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(1, 18)],
+            ],
+        ];
+
+        yield 'deleted file with 18 lines removed' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -1,18 +0,0 @@ line change example
+                DIFF,
+            [],
+        ];
+
+        yield 'single line added at beginning of file (count of 1 omitted)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -1,0 +1 @@ line change example
+                DIFF,
+            [
+                'src/Container.php' => [new ChangedLinesRange(1, 1)],
+            ],
+        ];
+
+        yield 'single line deleted at beginning of file (count of 1 omitted)' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/Container.php
+                @@ -1 +1,0 @@ line change example
+                DIFF,
+            [],
+        ];
+
         yield 'one file with added lines in different places' => [
             <<<'DIFF'
                 diff --git a/src/Container.php b/src/Container.php
@@ -424,6 +587,20 @@ final class CommandLineGitTest extends TestCase
             ],
         ];
 
+        yield 'one file with all kind of transformations' => [
+            <<<'DIFF'
+                diff --git a/src/Source.php b/src/Source.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Source.php
+                +++ b/src/Source.php
+                @@ -1,18 +0,0 @@ old lines deleted
+                @@ -10,0 +11,5 @@ new lines added
+                DIFF,
+            [
+                'src/Source.php' => [new ChangedLinesRange(11, 15)],
+            ],
+        ];
+
         yield 'three files' => [
             <<<'DIFF'
                 diff --git a/src/Git/Git.php b/src/Git/Git.php
@@ -515,6 +692,24 @@ final class CommandLineGitTest extends TestCase
                     new ChangedLinesRange(66, 66),
                     new ChangedLinesRange(82, 91),
                 ],
+            ],
+        ];
+
+        yield 'only some files have changed lines in their new files' => [
+            <<<'DIFF'
+                diff --git a/src/OldLinesDeleted.php b/src/OldLinesDeleted.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/OldLinesDeleted.php
+                +++ b/src/OldLinesDeleted.php
+                @@ -1,18 +0,0 @@ line change example
+                diff --git a/src/NewLinesAdded.php b/src/NewLinesAdded.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/NewLinesAdded.php
+                +++ b/src/NewLinesAdded.php
+                @@ -10,18 +10,2 @@ line change example
+                DIFF,
+            [
+                'src/NewLinesAdded.php' => [new ChangedLinesRange(10, 11)],
             ],
         ];
     }
