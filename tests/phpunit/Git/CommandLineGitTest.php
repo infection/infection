@@ -410,6 +410,20 @@ final class CommandLineGitTest extends TestCase
             ],
         ];
 
+        yield 'one file with all kind of transformations' => [
+            <<<'DIFF'
+                diff --git a/src/Source.php b/src/Source.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Source.php
+                +++ b/src/Source.php
+                @@ -1,18 +0,0 @@ old lines deleted
+                @@ -10,0 +11,5 @@ new lines added
+                DIFF,
+            [
+                'src/Source.php' => [new ChangedLinesRange(11, 15)],
+            ],
+        ];
+
         yield 'three files' => [
             <<<'DIFF'
                 diff --git a/src/Git/Git.php b/src/Git/Git.php
