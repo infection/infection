@@ -82,7 +82,7 @@ interface Git
      * Returns a comma-separated list of the relative paths.
      *
      * @param string $diffFilter E.g. 'AM'.
-     * @param string $base E.g. 'origin.main'.
+     * @param string $base E.g. 'origin/main' or a commit hash.
      * @param string[] $sourceDirectories
      *
      * @throws NoSourceFound
@@ -107,12 +107,18 @@ interface Git
      * ```
      *
      * @param string $diffFilter E.g. 'AM'.
+     * @param string $base E.g. 'origin/main' or a commit hash.
+     * @param string[] $sourceDirectories
      *
      * @throws NoSourceFound
      *
      * @return non-empty-array<string, list<ChangedLinesRange>>
      */
-    public function getChangedLinesRangesByFileRelativePaths(string $diffFilter, string $base): array;
+    public function getChangedLinesRangesByFileRelativePaths(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+    ): array;
 
     /**
      * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.

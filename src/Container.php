@@ -578,6 +578,7 @@ final class Container extends DIContainer
                     $container->getFileSystem(),
                     $gitDiffBase,
                     $gitDiffFilter,
+                    $configuration->sourceDirectories,
                 );
             },
         ]);

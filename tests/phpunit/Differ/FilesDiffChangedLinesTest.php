@@ -67,6 +67,7 @@ final class FilesDiffChangedLinesTest extends TestCase
             $this->fileSystemStub,
             'main',
             'AM',
+            ['src', 'lib'],
         );
 
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
@@ -91,6 +92,7 @@ final class FilesDiffChangedLinesTest extends TestCase
             $this->fileSystemStub,
             'main',
             'AM',
+            ['src', 'lib'],
         );
 
         $actual = $filesDiffChangedLines->contains(
@@ -249,7 +251,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         $git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'main')
+            ->with('AM', 'main', ['src', 'lib'])
             ->willReturn($changedLinesRangesByFilePathname);
 
         return $git;

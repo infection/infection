@@ -137,10 +137,14 @@ final class CommandLineGitTest extends TestCase
 
         $this->commandLineMock
             ->method('execute')
-            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM'])
+            ->with(['git', 'diff', 'main', '--unified=0', '--diff-filter=AM', '--', 'src', 'lib'])
             ->willReturn($diff);
 
-        $actual = $this->git->getChangedLinesRangesByFileRelativePaths('AM', 'main');
+        $actual = $this->git->getChangedLinesRangesByFileRelativePaths(
+            'AM',
+            'main',
+            ['src', 'lib'],
+        );
 
         if (!is_string($expected)) {
             $this->assertEquals($expected, $actual);
