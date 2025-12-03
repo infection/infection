@@ -39,6 +39,10 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 
 final class ConfigurationFactoryInputBuilder
 {
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function __construct(
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
@@ -226,6 +230,9 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     */
     public function withGitDiffFilter(?string $gitDiffFilter): self
     {
         $clone = clone $this;
@@ -234,6 +241,9 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function withGitDiffBase(?string $gitDiffBase): self
     {
         $clone = clone $this;
@@ -344,8 +354,8 @@ final class ConfigurationFactoryInputBuilder
      *     17: string,
      *     18: int|null,
      *     19: bool,
-     *     20: string|null,
-     *     21: string|null,
+     *     20: non-empty-string|null,
+     *     21: non-empty-string|null,
      *     22: bool|null,
      *     23: string|null,
      *     24: string|null,

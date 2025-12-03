@@ -49,7 +49,9 @@ class FilesDiffChangedLines
     private ?array $memoizedFilesChangedLinesMap = null;
 
     /**
-     * @param string[] $sourceDirectories
+     * @param non-empty-string $gitDiffBase
+     * @param non-empty-string $gitDiffFilter
+     * @param non-empty-string[] $sourceDirectories
      */
     public function __construct(
         private readonly Git $git,

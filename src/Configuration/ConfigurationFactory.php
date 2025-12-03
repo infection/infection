@@ -95,6 +95,9 @@ class ConfigurationFactory
     }
 
     /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     *
      * @throws FileOrDirectoryNotFound
      * @throws NoSourceFound
      */
@@ -377,12 +380,19 @@ class ConfigurationFactory
     }
 
     /**
-     * @param string[] $sourceDirectories
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string|null $gitBase
      *
      * @throws NoSourceFound
      */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitBase, array $sourceDirectories): string
-    {
+    private function retrieveFilter(
+        string $filter,
+        ?string $gitDiffFilter,
+        bool $isForGitDiffLines,
+        ?string $gitBase,
+        array $sourceDirectories,
+    ): string {
         if ($gitDiffFilter === null && !$isForGitDiffLines) {
             return $filter;
         }
@@ -485,7 +495,9 @@ class ConfigurationFactory
     }
 
     /**
-     * @return ($useGitDiff is false ? string|null : string)
+     * @param non-empty-string $base
+     *
+     * @return ($useGitDiff is false ? non-empty-string|null : non-empty-string)
      */
     private function refineGitBaseIfNecessary(?string $base, bool $useGitDiff): ?string
     {

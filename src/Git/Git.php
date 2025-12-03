@@ -72,6 +72,8 @@ interface Git
      * https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
      *
      * Preferably, this method returns the full path which is less ambiguous. However, this is not always possible.
+     *
+     * @return non-empty-string
      */
     public function getDefaultBase(): string;
 
@@ -81,11 +83,13 @@ interface Git
      *
      * Returns a comma-separated list of the relative paths.
      *
-     * @param string $diffFilter E.g. 'AM'.
-     * @param string $base E.g. 'origin/main' or a commit hash.
-     * @param string[] $sourceDirectories
+     * @param non-empty-string $diffFilter E.g. 'AM'.
+     * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
+     * @param non-empty-string[] $sourceDirectories
      *
      * @throws NoSourceFound
+     *
+     * @return non-empty-string
      */
     public function getChangedFileRelativePaths(
         string $diffFilter,
@@ -106,9 +110,9 @@ interface Git
      * ]
      * ```
      *
-     * @param string $diffFilter E.g. 'AM'.
-     * @param string $base E.g. 'origin/main' or a commit hash.
-     * @param string[] $sourceDirectories
+     * @param non-empty-string $diffFilter E.g. 'AM'.
+     * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
+     * @param non-empty-string[] $sourceDirectories
      *
      * @throws NoSourceFound
      *
@@ -124,6 +128,10 @@ interface Git
      * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.
      *
      * Returns either the commit hash, e.g. '8af25a159143aadacf4d875a3114014e99053430' or the fallback value.
+     *
+     * @param non-empty-string $base
+     *
+     * @return non-empty-string
      */
     public function getBaseReference(string $base): string;
 }

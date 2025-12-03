@@ -43,6 +43,9 @@ use function sprintf;
 
 final readonly class ConfigurationFactoryGit implements Git
 {
+    /**
+     * @param non-empty-string $defaultBaseBranch
+     */
     public function __construct(
         private string $defaultBaseBranch,
         private string $changedFileRelativePaths,

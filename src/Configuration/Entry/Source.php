@@ -35,22 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Entry;
 
-use Webmozart\Assert\Assert;
-
 /**
  * @internal
  */
 final readonly class Source
 {
     /**
-     * @param string[] $directories
-     * @param string[] $excludes
+     * @param list<non-empty-string> $directories
+     * @param list<non-empty-string> $excludes
      */
     public function __construct(
         public array $directories,
         public array $excludes,
     ) {
-        Assert::allString($directories);
-        Assert::allString($excludes);
     }
 }

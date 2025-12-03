@@ -55,11 +55,13 @@ use Symfony\Component\Finder\SplFileInfo;
 final class ConfigurationBuilder
 {
     /**
-     * @param string[] $sourceDirectories
+     * @param non-empty-string[] $sourceDirectories
      * @param iterable<SplFileInfo> $sourceFiles
-     * @param string[] $sourceFilesExcludes
+     * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string $gitDiffBase
+     * @param non-empty-string $gitDiffFilter
      */
     private function __construct(
         private float $timeout,
@@ -266,6 +268,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string ...$sourceDirectories
+     */
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
         $clone = clone $this;
@@ -293,6 +298,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string ...$sourceFilesExcludes
+     */
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
         $clone = clone $this;
@@ -523,6 +531,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function withGitDiffBase(?string $gitDiffBase): self
     {
         $clone = clone $this;
@@ -531,6 +542,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     */
     public function withGitDiffFilter(?string $gitDiffFilter): self
     {
         $clone = clone $this;

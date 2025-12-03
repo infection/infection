@@ -61,11 +61,13 @@ readonly class Configuration
     ];
 
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $sourceFilesExcludes
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $sourceFilesExcludes
      * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string|null $gitDiffBase
+     * @param non-empty-string|null $gitDiffFilter
      */
     public function __construct(
         public float $processTimeout,
