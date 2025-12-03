@@ -545,6 +545,25 @@ final class CommandLineGitTest extends TestCase
                 'src/NewLinesAdded.php' => [new ChangedLinesRange(10, 11)],
             ],
         ];
+
+        yield 'file was renamed' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/LegacyContainer.php
+                index 2a9e281..01cbf04 100644
+                --- a/src/Container.php
+                +++ b/src/LegacyContainer.php
+                DIFF,
+            NoSourceFound::class,
+        ];
+
+        yield 'empty file was added' => [
+            <<<'DIFF'
+                diff --git a/src/Container.php b/src/Container.php
+                new file mode 100644
+                index 2a9e281..01cbf04 100644
+                DIFF,
+            NoSourceFound::class,
+        ];
     }
 
     #[DataProvider('defaultGitBaseProvider')]
