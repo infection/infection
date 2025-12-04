@@ -577,6 +577,12 @@ final class CommandLineGitTest extends TestCase
                 --- a/src/Container.php
                 +++ b/src/LegacyContainer.php
                 DIFF,
+            // There is no new or updated code, hence nothing to mutate.
+            // While discussing this, we thought _maybe_ there was a very narrow edge case
+            // where this _may_ not be true, but it is not compelling enough to change
+            // our stance on it.
+            // Also note that if other files used the moved file path or symbols, we can
+            // expect their usage to change hence to be picked up in the diff.
             NoSourceFound::class,
         ];
 
