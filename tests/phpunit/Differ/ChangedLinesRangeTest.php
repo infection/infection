@@ -106,6 +106,27 @@ final class ChangedLinesRangeTest extends TestCase
             true,
         ];
 
+        yield 'the first line of the mutation touches the changed lines' => [
+            ChangedLinesRange::forLine(11),
+            11,
+            19,
+            true,
+        ];
+
+        yield 'the last line of the mutation touches the changed lines' => [
+            ChangedLinesRange::forLine(19),
+            11,
+            19,
+            true,
+        ];
+
+        yield 'the mutation touches the changed lines' => [
+            ChangedLinesRange::forLine(15),
+            11,
+            19,
+            true,
+        ];
+
         yield 'the mutation touches some of the changed lines (before)' => [
             ChangedLinesRange::create(10, 20),
             9,
