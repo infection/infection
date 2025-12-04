@@ -48,7 +48,7 @@ final readonly class ChangedLinesRange
      * @param positive-int|0 $startLine
      * @param positive-int|0 $endLine
      */
-    public function __construct(
+    private function __construct(
         public int $startLine,
         public int $endLine,
     ) {
