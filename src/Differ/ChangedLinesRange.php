@@ -95,9 +95,9 @@ final readonly class ChangedLinesRange
      * @param positive-int|0 $startLine
      * @param positive-int|0 $endLine
      */
-    public function contains(int $startLine, int $endLine): bool
+    public function touches(int $startLine, int $endLine): bool
     {
-        return $this->startLine <= $startLine
-            && $endLine <= $this->endLine;
+        return $endLine >= $this->startLine
+            && $startLine <= $this->endLine;
     }
 }

@@ -78,38 +78,59 @@ final class ChangedLinesRangeTest extends TestCase
         int $endLine,
         bool $expected,
     ): void {
-        $actual = $range->contains($startLine, $endLine);
+        $actual = $range->touches($startLine, $endLine);
 
         $this->assertSame($expected, $actual);
     }
 
     public static function rangeProvider(): iterable
     {
-        yield 'within range' => [
+        yield 'the mutation touches some of the changed lines' => [
             ChangedLinesRange::create(10, 20),
-            12,
-            18,
+            11,
+            19,
             true,
         ];
 
-        yield 'within range (limit)' => [
+        yield 'the mutation touches all the changed lines' => [
             ChangedLinesRange::create(10, 20),
             10,
             20,
             true,
         ];
 
-        yield 'starts one line before' => [
+        yield 'the mutation touches all changed lines and more' => [
+            ChangedLinesRange::create(10, 20),
+            11,
+            21,
+            true,
+        ];
+
+        yield 'the mutation touches some of the changed lines (before)' => [
             ChangedLinesRange::create(10, 20),
             9,
             18,
-            false,
+            true,
         ];
 
-        yield 'ends one line after' => [
+        yield 'the mutation touches some of the changed lines (after)' => [
             ChangedLinesRange::create(10, 20),
             12,
             21,
+            true,
+        ];
+
+        yield 'the mutation does not affect any changed lines (before)' => [
+            ChangedLinesRange::create(10, 20),
+            7,
+            9,
+            false,
+        ];
+
+        yield 'the mutation does not affect any changed lines (after)' => [
+            ChangedLinesRange::create(10, 20),
+            21,
+            23,
             false,
         ];
 
