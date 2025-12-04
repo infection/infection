@@ -589,6 +589,10 @@ final class Container extends DIContainer
         );
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,

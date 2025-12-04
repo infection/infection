@@ -589,6 +589,12 @@ final class ConfigurationFactoryScenario
             );
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     * @param non-empty-string|null $expectedDiffBase
+     * @param non-empty-string|null $expectedDiffFilter
+     */
     public function forFilter(
         string $filter,
         ?string $gitDiffFilter,

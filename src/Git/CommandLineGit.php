@@ -123,12 +123,16 @@ final readonly class CommandLineGit implements Git
     public function getBaseReference(string $base): string
     {
         try {
-            return $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandLineExecutor->execute([
                 'git',
                 'merge-base',
                 $base,
                 'HEAD',
             ]);
+
+            Assert::stringNotEmpty($reference);
+
+            return $reference;
         } catch (ProcessException) {
             // TODO: could do some logging here...
         }
@@ -265,15 +269,22 @@ final readonly class CommandLineGit implements Git
         return preg_split('/\n|\r\n?/', $diff);
     }
 
+    /**
+     * @return non-empty-string|null
+     */
     private function readSymbolicReference(string $name): ?string
     {
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
-            return $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandLineExecutor->execute([
                 'git',
                 'symbolic-ref',
                 $name,
             ]);
+
+            Assert::stringNotEmpty($reference);
+
+            return $reference;
         } catch (ProcessException) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
             // TODO: we could log the failure to figure it out somewhere...
