@@ -43,7 +43,9 @@ use PHPUnit\Framework\TestCase;
 final class ConfigurationFactoryGitTest extends TestCase
 {
     /**
-     * @param string[] $sourceDirectories
+     * @param non-empty-string $diffFilter
+     * @param non-empty-string $baseBranch
+     * @param non-empty-string[] $sourceDirectories
      */
     #[DataProvider('changedFileRelativePathsProvider')]
     public function test_it_can_show_the_changed_file_relative_paths(

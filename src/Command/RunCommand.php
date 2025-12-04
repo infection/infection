@@ -65,6 +65,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -86,7 +87,8 @@ final class RunCommand extends BaseCommand
     public const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
 
     /**
-     * Sentinel value for VALUE_OPTIONAL options to distinguish "not provided" from "provided without value"
+     * Sentinel value for VALUE_OPTIONAL options to distinguish "not provided" from "provided
+     * without value"
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
@@ -681,7 +683,7 @@ final class RunCommand extends BaseCommand
     }
 
     /**
-     * @return array{string, string|null, string|null}
+     * @return array{string, non-empty-string|null, non-empty-string|null}
      */
     private static function getSourceFilters(InputInterface $input): array
     {
@@ -699,13 +701,14 @@ final class RunCommand extends BaseCommand
     }
 
     /**
-     * @return array{string|null, string|null}
+     * @return array{non-empty-string|null, non-empty-string|null}
      */
     private static function getGitOptions(InputInterface $input): array
     {
-        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+        $gitDiffFilter = self::getGitDiffFilter($input);
+
         $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
-        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+        $gitDiffBase = self::getGitDiffBase($input);
 
         self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
 
@@ -716,6 +719,54 @@ final class RunCommand extends BaseCommand
         self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
 
         return [$gitDiffFilter, $gitDiffBase];
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    private static function getGitDiffFilter(InputInterface $input): ?string
+    {
+        $value = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmedValue = trim((string) $value);
+
+        Assert::stringNotEmpty(
+            $trimmedValue,
+            sprintf(
+                'Expected a non-blank value for the option "--%s".',
+                self::OPTION_GIT_DIFF_FILTER,
+            ),
+        );
+
+        return $trimmedValue;
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    private static function getGitDiffBase(InputInterface $input): ?string
+    {
+        $value = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmedValue = trim((string) $value);
+
+        Assert::stringNotEmpty(
+            $trimmedValue,
+            sprintf(
+                'Expected a non-blank value for the option "--%s".',
+                self::OPTION_GIT_DIFF_BASE,
+            ),
+        );
+
+        return $trimmedValue;
     }
 
     private static function assertOnlyOneTypeOfGitFiltering(

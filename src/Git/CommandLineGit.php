@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
@@ -81,28 +82,18 @@ final readonly class CommandLineGit implements Git
 
     public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
     {
-        $filter = $this->shellCommandLineExecutor->execute(
-            array_merge(
-                [
-                    'git',
-                    '--no-pager',
-                    'diff',
-                    $base,
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--diff-filter=' . $diffFilter,
-                    '--name-only',
-                    '--',
-                ],
-                $sourceDirectories,
-            ),
+        $lines = $this->diff(
+            $diffFilter,
+            $base,
+            $sourceDirectories,
+            nameOnly: true,
         );
 
-        if ($filter === '') {
+        if (count($lines) === 0) {
             throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
         }
 
-        return implode(',', explode(PHP_EOL, $filter));
+        return implode(',', $lines);
     }
 
     public function getChangedLinesRangesByFileRelativePaths(
@@ -110,7 +101,12 @@ final readonly class CommandLineGit implements Git
         string $base,
         array $sourceDirectories,
     ): array {
-        $lines = $this->diffLines($diffFilter, $base, $sourceDirectories);
+        $lines = $this->diff(
+            $diffFilter,
+            $base,
+            $sourceDirectories,
+            noContext: true,
+        );
         $changedLines = self::parsedChangedLines($lines);
 
         if (count($changedLines) === 0) {
@@ -127,12 +123,16 @@ final readonly class CommandLineGit implements Git
     public function getBaseReference(string $base): string
     {
         try {
-            return $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandLineExecutor->execute([
                 'git',
                 'merge-base',
                 $base,
                 'HEAD',
             ]);
+
+            Assert::stringNotEmpty($reference);
+
+            return $reference;
         } catch (ProcessException) {
             // TODO: could do some logging here...
         }
@@ -235,41 +235,56 @@ final readonly class CommandLineGit implements Git
      *
      * @return string[]
      */
-    private function diffLines(
+    private function diff(
         string $diffFilter,
         string $base,
         array $sourceDirectories,
+        bool $nameOnly = false,
+        bool $noContext = false,
     ): array {
+        $command = [
+            'git',
+            '--no-pager',
+            'diff',
+            $base,
+            '--no-ext-diff',
+            '--no-color',
+            $nameOnly ? '--name-only' : null,
+            $noContext ? '--unified=0' : null,
+            '--diff-filter=' . $diffFilter,
+            '--',
+        ];
+
         $diff = $this->shellCommandLineExecutor->execute(
             array_merge(
-                [
-                    'git',
-                    '--no-pager',
-                    'diff',
-                    $base,
-                    '--no-ext-diff',
-                    '--no-color',
-                    '--unified=0',
-                    '--no-renames',
-                    '--diff-filter=' . $diffFilter,
-                    '--',
-                ],
+                array_filter($command),
                 $sourceDirectories,
             ),
         );
 
+        if ($diff === '') {
+            return [];
+        }
+
         return preg_split('/\n|\r\n?/', $diff);
     }
 
+    /**
+     * @return non-empty-string|null
+     */
     private function readSymbolicReference(string $name): ?string
     {
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
-            return $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandLineExecutor->execute([
                 'git',
                 'symbolic-ref',
                 $name,
             ]);
+
+            Assert::stringNotEmpty($reference);
+
+            return $reference;
         } catch (ProcessException) {
             // e.g. no symbolic ref might be configured for a remote named "origin"
             // TODO: we could log the failure to figure it out somewhere...
