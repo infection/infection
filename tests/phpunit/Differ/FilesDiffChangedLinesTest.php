@@ -70,10 +70,10 @@ final class FilesDiffChangedLinesTest extends TestCase
             ['src', 'lib'],
         );
 
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
+        $filesDiffChangedLines->touches('/path/to/File.php', 1, 1);
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
+        $filesDiffChangedLines->touches('/path/to/File.php', 1, 1);
     }
 
     /**
@@ -82,7 +82,7 @@ final class FilesDiffChangedLinesTest extends TestCase
      * @param positive-int $mutationEndLine
      */
     #[DataProvider('provideLines')]
-    public function test_it_finds_line_in_changed_lines_from_diff(
+    public function test_it_tells_if_the_mutation_touches_any_of_the_changed_lines(
         array $changedLinesRangesByFilePathname,
         string $fileRealPath,
         int $mutationStartLine,
@@ -97,7 +97,7 @@ final class FilesDiffChangedLinesTest extends TestCase
             ['src', 'lib'],
         );
 
-        $actual = $filesDiffChangedLines->contains(
+        $actual = $filesDiffChangedLines->touches(
             $fileRealPath,
             $mutationStartLine,
             $mutationEndLine,
@@ -112,7 +112,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     public static function provideLines(): iterable
     {
-        yield 'not found line in one-line range before' => [
+        yield 'the mutation touches no changed line' => [
             [
                 'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
@@ -122,113 +122,46 @@ final class FilesDiffChangedLinesTest extends TestCase
             false,
         ];
 
-        yield 'not found line in one-line range after' => [
+        yield 'the mutation touches a changed line' => [
             [
                 'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
-            5,
-            5,
-            false,
-        ];
-
-        yield 'line in one-line range' => [
-            [
-                'src/File.php' => [ChangedLinesRange::forLine(3)],
-            ],
-            '/path/to/src/File.php',
-            3,
-            3,
-            true,
-        ];
-
-        yield 'line in multi-line range in the beginning' => [
-            [
-                'src/File.php' => [ChangedLinesRange::create(3, 5)],
-            ],
-            '/path/to/src/File.php',
-            3,
-            3,
-            true,
-        ];
-
-        yield 'line in multi-line range in the middle' => [
-            [
-                'src/File.php' => [ChangedLinesRange::create(1, 5)],
-            ],
-            '/path/to/src/File.php',
-            3,
-            3,
-            true,
-        ];
-
-        yield 'line in multi-line range in the end' => [
-            [
-                'src/File.php' => [ChangedLinesRange::create(1, 3)],
-            ],
-            '/path/to/src/File.php',
-            3,
-            3,
-            true,
-        ];
-
-        yield 'line in the second range' => [
-            [
-                'src/File.php' => [
-                    ChangedLinesRange::create(1, 1),
-                    ChangedLinesRange::create(3, 5),
-                ],
-            ],
-            '/path/to/src/File.php',
-            4,
-            4,
-            true,
-        ];
-
-        yield 'mutation range in one-line range, around' => [
-            [
-                'src/File.php' => [ChangedLinesRange::forLine(3)],
-            ],
-            '/path/to/src/File.php',
-            1,
-            4,
-            true,
-        ];
-
-        yield 'mutation range in one-line range, before' => [
-            [
-                'src/File.php' => [ChangedLinesRange::forLine(3)],
-            ],
-            '/path/to/src/File.php',
-            1,
-            3,
-            true,
-        ];
-
-        yield 'mutation range in one-line range, after' => [
-            [
-                'src/File.php' => [ChangedLinesRange::forLine(3)],
-            ],
-            '/path/to/src/File.php',
-            3,
+            2,
             5,
             true,
         ];
 
-        yield 'mutation range in one-line range, inside' => [
-            [
-                'src/File.php' => [ChangedLinesRange::create(1, 30)],
-            ],
-            '/path/to/src/File.php',
-            3,
-            5,
-            true,
-        ];
-
-        yield 'mutation in range with diff with multiple files' => [
+        yield 'the mutation touches none of the changed lines' => [
             [
                 'src/File1.php' => [
-                    ChangedLinesRange::create(10, 10),
+                    ChangedLinesRange::forLine(10),
+                    ChangedLinesRange::create(30, 50),
+                ],
+            ],
+            '/path/to/src/File2.php',
+            12,
+            15,
+            false,
+        ];
+
+        yield 'the mutation touches one of the changed lines' => [
+            [
+                'src/File1.php' => [
+                    ChangedLinesRange::forLine(10),
+                    ChangedLinesRange::create(30, 50),
+                ],
+            ],
+            '/path/to/src/File1.php',
+            4,
+            12,
+            true,
+        ];
+
+        yield 'the mutation touches one of the changed lines of a different file' => [
+            [
+                'src/File1.php' => [
+                    ChangedLinesRange::forLine(10),
                     ChangedLinesRange::create(30, 50),
                 ],
                 'src/File2.php' => [
@@ -236,10 +169,10 @@ final class FilesDiffChangedLinesTest extends TestCase
                     ChangedLinesRange::create(3, 5),
                 ],
             ],
-            '/path/to/src/File2.php',
+            '/path/to/src/File1.php',
+            1,
             4,
-            4,
-            true,
+            false,
         ];
     }
 

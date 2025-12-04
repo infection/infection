@@ -68,7 +68,7 @@ class FilesDiffChangedLines
      *
      * @throws NoSourceFound
      */
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
+    public function touches(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
             if ($changedLinesRange->touches($mutationStartLine, $mutationEndLine)) {

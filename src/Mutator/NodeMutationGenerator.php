@@ -110,7 +110,7 @@ class NodeMutationGenerator
         }
 
         /** @psalm-suppress InvalidArgument */
-        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine())) {
+        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return;
         }
 
