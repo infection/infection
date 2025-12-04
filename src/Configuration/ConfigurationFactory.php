@@ -389,15 +389,15 @@ class ConfigurationFactory
     private function retrieveFilter(
         string $filter,
         ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
+        bool $useGitDiff,
         ?string $gitBase,
         array $sourceDirectories,
     ): string {
-        if ($gitDiffFilter === null && !$isForGitDiffLines) {
+        if ($gitDiffFilter === null && !$useGitDiff) {
             return $filter;
         }
 
-        $gitDiffFilter ??= 'AM';
+        Assert::notNull($gitDiffFilter);
         Assert::notNull($gitBase);
 
         return $this->git->getChangedFileRelativePaths($gitDiffFilter, $gitBase, $sourceDirectories);
