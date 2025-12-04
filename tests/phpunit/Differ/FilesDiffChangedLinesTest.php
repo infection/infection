@@ -78,6 +78,8 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     /**
      * @param array<string, list<ChangedLinesRange>> $changedLinesRangesByFilePathname
+     * @param positive-int $mutationStartLine
+     * @param positive-int $mutationEndLine
      */
     #[DataProvider('provideLines')]
     public function test_it_finds_line_in_changed_lines_from_diff(
@@ -112,7 +114,7 @@ final class FilesDiffChangedLinesTest extends TestCase
     {
         yield 'not found line in one-line range before' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             1,
@@ -122,7 +124,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'not found line in one-line range after' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             5,
@@ -132,7 +134,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'line in one-line range' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             3,
@@ -142,7 +144,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'line in multi-line range in the beginning' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 5)],
+                'src/File.php' => [ChangedLinesRange::create(3, 5)],
             ],
             '/path/to/src/File.php',
             3,
@@ -152,7 +154,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'line in multi-line range in the middle' => [
             [
-                'src/File.php' => [new ChangedLinesRange(1, 5)],
+                'src/File.php' => [ChangedLinesRange::create(1, 5)],
             ],
             '/path/to/src/File.php',
             3,
@@ -162,7 +164,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'line in multi-line range in the end' => [
             [
-                'src/File.php' => [new ChangedLinesRange(1, 3)],
+                'src/File.php' => [ChangedLinesRange::create(1, 3)],
             ],
             '/path/to/src/File.php',
             3,
@@ -173,8 +175,8 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'line in the second range' => [
             [
                 'src/File.php' => [
-                    new ChangedLinesRange(1, 1),
-                    new ChangedLinesRange(3, 5),
+                    ChangedLinesRange::create(1, 1),
+                    ChangedLinesRange::create(3, 5),
                 ],
             ],
             '/path/to/src/File.php',
@@ -185,7 +187,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'mutation range in one-line range, around' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             1,
@@ -195,7 +197,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'mutation range in one-line range, before' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             1,
@@ -205,7 +207,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'mutation range in one-line range, after' => [
             [
-                'src/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [ChangedLinesRange::forLine(3)],
             ],
             '/path/to/src/File.php',
             3,
@@ -215,7 +217,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
         yield 'mutation range in one-line range, inside' => [
             [
-                'src/File.php' => [new ChangedLinesRange(1, 30)],
+                'src/File.php' => [ChangedLinesRange::create(1, 30)],
             ],
             '/path/to/src/File.php',
             3,
@@ -226,12 +228,12 @@ final class FilesDiffChangedLinesTest extends TestCase
         yield 'mutation in range with diff with multiple files' => [
             [
                 'src/File1.php' => [
-                    new ChangedLinesRange(10, 10),
-                    new ChangedLinesRange(30, 50),
+                    ChangedLinesRange::create(10, 10),
+                    ChangedLinesRange::create(30, 50),
                 ],
                 'src/File2.php' => [
-                    new ChangedLinesRange(1, 1),
-                    new ChangedLinesRange(3, 5),
+                    ChangedLinesRange::create(1, 1),
+                    ChangedLinesRange::create(3, 5),
                 ],
             ],
             '/path/to/src/File2.php',

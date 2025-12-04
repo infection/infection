@@ -63,12 +63,15 @@ class FilesDiffChangedLines
     }
 
     /**
+     * @param positive-int $mutationStartLine
+     * @param positive-int $mutationEndLine
+     *
      * @throws NoSourceFound
      */
     public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
-            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
+            if ($changedLinesRange->contains($mutationStartLine, $mutationEndLine)) {
                 return true;
             }
         }

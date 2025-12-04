@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Differ;
 
+use Webmozart\Assert\Assert;
+
 /**
  * Inclusive segment of the changed lines.
  *
@@ -42,19 +44,60 @@ namespace Infection\Differ;
  */
 final readonly class ChangedLinesRange
 {
+    /**
+     * @param positive-int|0 $startLine
+     * @param positive-int|0 $endLine
+     */
     public function __construct(
-        private int $startLine,
-        private int $endLine,
+        public int $startLine,
+        public int $endLine,
     ) {
     }
 
-    public function getStartLine(): int
-    {
-        return $this->startLine;
+    /**
+     * @param positive-int|0 $startLine
+     * @param positive-int|0 $endLine
+     */
+    public static function create(
+        int $startLine,
+        int $endLine,
+    ): self {
+        Assert::lessThanEq(value: $startLine, limit: $endLine);
+
+        return new self($startLine, $endLine);
     }
 
-    public function getEndLine(): int
+    /**
+     * @param positive-int|0 $line
+     */
+    public static function forLine(int $line): self
     {
-        return $this->endLine;
+        return new self($line, $line);
+    }
+
+    /**
+     * For example, in a GNU diff, "12,7" means the lines [12,18] (7 lines)
+     * changed.
+     *
+     * @param positive-int|0 $startLine
+     * @param positive-int $newCount Span of the change, starting at the start line.
+     */
+    public static function forRange(int $startLine, int $newCount): self
+    {
+        $endLine = $startLine + $newCount - 1;
+
+        Assert::lessThanEq(value: $startLine, limit: $endLine);
+
+        return new self($startLine, $endLine);
+    }
+
+    /**
+     * @param positive-int|0 $startLine
+     * @param positive-int|0 $endLine
+     */
+    public function contains(int $startLine, int $endLine): bool
+    {
+        return $this->startLine <= $startLine
+            && $endLine <= $this->endLine;
     }
 }
