@@ -187,7 +187,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
     }
 
     /**
-     * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element which from the XML report which contained the list of tokens of the source code file.
+     * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element from the XML report which contained the list of tokens of the source code file.
      */
     public static function supportsExcludingSourceFromCoverage(string $version): bool
     {

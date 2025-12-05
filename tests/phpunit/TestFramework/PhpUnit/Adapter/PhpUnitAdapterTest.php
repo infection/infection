@@ -378,20 +378,20 @@ final class PhpUnitAdapterTest extends TestCase
     }
 
     #[DataProvider('coverageWithoutSourceProvider')]
-    public function test_supports_coverage_without_source(bool $expected, string $version): void
+    public function test_supports_coverage_without_source(string $version, bool $expected): void
     {
         $this->assertSame($expected, PhpUnitAdapter::supportsExcludingSourceFromCoverage($version));
     }
 
     public static function coverageWithoutSourceProvider(): iterable
     {
-        yield [false, '11.5.599'];
+        yield ['11.5.599', false];
 
-        yield [false, '12.0'];
+        yield ['12.0', false];
 
-        yield [true, '12.5'];
+        yield ['12.5', true];
 
-        yield [true, '13.0'];
+        yield ['13.0', true];
     }
 
     private function getPHPUnitAdapter(string $version = '9.0'): PhpUnitAdapter
