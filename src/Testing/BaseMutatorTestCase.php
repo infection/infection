@@ -134,7 +134,21 @@ abstract class BaseMutatorTestCase extends TestCase
 
     protected function getTestedMutatorClassName(): string
     {
-        return ClassName::getCanonicalSourceClassName(static::class);
+        $mutatorClassName = ClassName::getCanonicalSourceClassName(static::class);
+
+        Assert::notNull(
+            $mutatorClassName,
+            sprintf(
+                'Could not find the tested mutator class name for "%s". Ensure the test case follow the Infection naming convention. The expected class name(s) was/were: "%s"',
+                static::class,
+                implode(
+                    ', ',
+                    ClassName::getCanonicalSourceClassNames(static::class),
+                ),
+            ),
+        );
+
+        return $mutatorClassName;
     }
 
     /**

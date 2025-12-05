@@ -43,15 +43,14 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\SourceMethodLineRange;
 use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
@@ -86,15 +85,15 @@ final class PHPUnitCoverageTracerTest extends TestCase
 
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
-                IndexXmlCoverageLocator::create($coveragePath),
-                new IndexXmlCoverageParser(areSourcesFiltered: false),
-                new XmlCoverageParser(),
+                indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
+                indexParser: new IndexXmlCoverageParser(isForGitDiffLines: false),
+                parser: new XmlCoverageParser(),
             ),
             new JUnitTestExecutionInfoAdder(
                 $testFrameworkAdapterStub,
                 new MemoizedTestFileDataProvider(
                     new JUnitTestFileDataProvider(
-                        JUnitReportLocator::create($coveragePath),
+                        new FixedLocator($coveragePath . '/junit.xml'),
                     ),
                 ),
             ),

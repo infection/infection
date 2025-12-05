@@ -36,10 +36,20 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\Locator\Throwable;
 
 use RuntimeException;
+use function sprintf;
 
 /**
  * @internal
  */
 final class InvalidReportSource extends RuntimeException implements ReportLocationThrowable
 {
+    public static function create(string $pathname): self
+    {
+        return new self(
+            sprintf(
+                'The pathname "%s" is not a valid or readable directory.',
+                $pathname,
+            ),
+        );
+    }
 }

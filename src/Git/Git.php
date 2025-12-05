@@ -35,21 +35,103 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use Infection\Differ\ChangedLinesRange;
+use Infection\Source\Exception\NoSourceFound;
+
+/**
+ * @internal
+ *
+ * Defines the contract for interacting with Git.
+ *
+ * This interface abstracts away the underlying Git implementation, whether it is spawning
+ * git processes, using a native library or mocking.
+ *
+ * This aims at highlighting what API we use from git and allow the code to be more expressive and usable.
+ */
 interface Git
 {
-    public function getDefaultBaseBranch(): string;
+    // The default git base used. It can be a short branch name, full name or a
+    // commit reference.
+    public const FALLBACK_BASE = 'origin/master';
 
-    public function getDefaultBaseFilter(): string;
-
-    /**
-     * git merge-base finds the best common ancestor(s) between two commits to use in a three-way merge. One common ancestor is better than
-     * another common ancestor if the latter is an ancestor of the former. A common ancestor that does not have any better common ancestor is
-     * a best common ancestor, i.e. a merge base. Note that there can be more than one merge base for a pair of commits.
-     */
-    public function findReferenceCommit(string $reference): string;
+    public const DEFAULT_GIT_DIFF_FILTER = 'AM';
 
     /**
-     * @param string[] $paths
+     * Retrieves the default base branch name for the repository.
+     *
+     * Examples of output:
+     * - 'refs/remotes/origin/main'
+     * - 'origin/main'
+     * - 'origin/master'
+     *
+     * A branch may have two forms:
+     * - full path: refs/remotes/origin/HEAD
+     * - shorthand: origin/HEAD
+     *
+     * The order that git uses to resolve a shorthand notation is defined here:
+     * https://git-scm.com/docs/gitrevisions#Documentation/gitrevisions.txt-refnameegmasterheadsmasterrefsheadsmaster
+     *
+     * Preferably, this method returns the full path which is less ambiguous. However, this is not always possible.
+     *
+     * @return non-empty-string
      */
-    public function diff(string $commit, string $filter, array $paths): string;
+    public function getDefaultBase(): string;
+
+    /**
+     * Finds the list of relative paths (relative to the current working directory) of the changed files that changed
+     * compared to the base branch used and matching the given filter.
+     *
+     * Returns a comma-separated list of the relative paths.
+     *
+     * @param non-empty-string $diffFilter E.g. 'AM'.
+     * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
+     * @param non-empty-string[] $sourceDirectories
+     *
+     * @throws NoSourceFound
+     *
+     * @return non-empty-string
+     */
+    public function getChangedFileRelativePaths(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+    ): string;
+
+    /**
+     * Gets the modifications with their line numbers of the files that changed compared to the base branch used and
+     * matching the given filter.
+     *
+     * Returned result example:
+     *
+     * ```php
+     * [
+     *     src/File1.php => [ChangedLinesRange(1, 2)],
+     *     src/File2.php => [ChangedLinesRange(1, 20), ChangedLinesRange(33, 33)],
+     * ]
+     * ```
+     *
+     * @param non-empty-string $diffFilter E.g. 'AM'.
+     * @param non-empty-string $base E.g. 'origin/main' or a commit hash.
+     * @param non-empty-string[] $sourceDirectories
+     *
+     * @throws NoSourceFound
+     *
+     * @return non-empty-array<string, list<ChangedLinesRange>>
+     */
+    public function getChangedLinesRangesByFileRelativePaths(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+    ): array;
+
+    /**
+     * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.
+     *
+     * Returns either the commit hash, e.g. '8af25a159143aadacf4d875a3114014e99053430' or the fallback value.
+     *
+     * @param non-empty-string $base
+     *
+     * @return non-empty-string
+     */
+    public function getBaseReference(string $base): string;
 }

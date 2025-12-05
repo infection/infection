@@ -33,6 +33,13 @@
             </errorLevel>
         </ImpureFunctionCall>
 
+        <ParamNameMismatch>
+            <errorLevel type="suppress">
+                <file name="src/TestFramework/Coverage/JUnit/JUnitReportLocator.php" />
+                <file name="src/TestFramework/Coverage/XmlReport/IndexXmlCoverageLocator.php" />
+            </errorLevel>
+        </ParamNameMismatch>
+
         <UnusedConstructor>
             <errorLevel type="suppress">
                 <file name="src/CannotBeInstantiated.php" />

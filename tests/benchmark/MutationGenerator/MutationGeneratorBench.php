@@ -68,7 +68,7 @@ final class MutationGeneratorBench
     #[BeforeMethods('setUp')]
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
-    public function benchMutationGeneration(): void
+    public function bench(): void
     {
         $this->count = ($this->main)();
     }

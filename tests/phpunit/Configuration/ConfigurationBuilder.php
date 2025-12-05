@@ -55,11 +55,13 @@ use Symfony\Component\Finder\SplFileInfo;
 final class ConfigurationBuilder
 {
     /**
-     * @param string[] $sourceDirectories
+     * @param non-empty-string[] $sourceDirectories
      * @param iterable<SplFileInfo> $sourceFiles
-     * @param string[] $sourceFilesExcludes
+     * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string $gitDiffBase
+     * @param non-empty-string $gitDiffFilter
      */
     private function __construct(
         private float $timeout,
@@ -95,6 +97,7 @@ final class ConfigurationBuilder
         private bool $executeOnlyCoveringTestCases,
         private bool $isForGitDiffLines,
         private ?string $gitDiffBase,
+        private ?string $gitDiffFilter,
         private ?string $mapSourceClassToTestStrategy,
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
@@ -140,6 +143,7 @@ final class ConfigurationBuilder
             $configuration->executeOnlyCoveringTestCases,
             $configuration->isForFilteredSources,
             $configuration->gitDiffBase,
+            $configuration->gitDiffFilter,
             $configuration->mapSourceClassToTestStrategy,
             $configuration->loggerProjectRootDirectory,
             $configuration->staticAnalysisTool,
@@ -183,6 +187,7 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: false,
             isForGitDiffLines: false,
             gitDiffBase: null,
+            gitDiffFilter: null,
             mapSourceClassToTestStrategy: null,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -247,6 +252,7 @@ final class ConfigurationBuilder
             executeOnlyCoveringTestCases: true,
             isForGitDiffLines: true,
             gitDiffBase: 'origin/master',
+            gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
@@ -262,6 +268,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string ...$sourceDirectories
+     */
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
         $clone = clone $this;
@@ -289,6 +298,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string ...$sourceFilesExcludes
+     */
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
         $clone = clone $this;
@@ -519,10 +531,24 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function withGitDiffBase(?string $gitDiffBase): self
     {
         $clone = clone $this;
         $clone->gitDiffBase = $gitDiffBase;
+
+        return $clone;
+    }
+
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     */
+    public function withGitDiffFilter(?string $gitDiffFilter): self
+    {
+        $clone = clone $this;
+        $clone->gitDiffFilter = $gitDiffFilter;
 
         return $clone;
     }
@@ -595,6 +621,7 @@ final class ConfigurationBuilder
             $this->executeOnlyCoveringTestCases,
             $this->isForGitDiffLines,
             $this->gitDiffBase,
+            $this->gitDiffFilter,
             $this->mapSourceClassToTestStrategy,
             $this->loggerProjectRootDirectory,
             $this->staticAnalysisTool,

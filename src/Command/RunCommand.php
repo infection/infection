@@ -52,12 +52,12 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
+use Infection\Git\Git;
 use Infection\Logger\ConsoleLogger;
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\Coverage\XmlReport\NoLineExecutedInDiffLinesMode;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
 use const PHP_SAPI;
@@ -67,6 +67,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -88,7 +89,8 @@ final class RunCommand extends BaseCommand
     public const OPTION_IGNORE_MSI_WITH_NO_MUTATIONS = 'ignore-msi-with-no-mutations';
 
     /**
-     * Sentinel value for VALUE_OPTIONAL options to distinguish "not provided" from "provided without value"
+     * Sentinel value for VALUE_OPTIONAL options to distinguish "not provided" from "provided
+     * without value"
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
@@ -293,14 +295,17 @@ final class RunCommand extends BaseCommand
                 self::OPTION_GIT_DIFF_LINES,
                 null,
                 InputOption::VALUE_NONE,
-                'Mutates only added and modified <comment>lines</comment> in files.',
+                sprintf(
+                    'Mutates only added and modified <comment>lines</comment> in files (applies the git diff filter "%s").',
+                    Git::DEFAULT_GIT_DIFF_FILTER,
+                ),
                 Container::DEFAULT_GIT_DIFF_FILTER,
             )
             ->addOption(
                 self::OPTION_GIT_DIFF_BASE,
                 null,
                 InputOption::VALUE_REQUIRED,
-                sprintf('Base branch for <comment>"--%1$s"</comment> option. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
+                sprintf('Base for <comment>"--%1$s"</comment> option. Can be the git branch short name, full name or a commit hash. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
                 Container::DEFAULT_GIT_DIFF_BASE,
             )
             ->addOption(
@@ -451,10 +456,14 @@ final class RunCommand extends BaseCommand
             $engine->execute();
 
             return true;
-        } catch (NoFilesInDiffToMutate|NoLineExecutedInDiffLinesMode $e) {
-            $io->success($e->getMessage());
+        } catch (NoSourceFound $noSourceFoundException) {
+            if ($noSourceFoundException->isSourceFiltered) {
+                $io->success($noSourceFoundException->getMessage());
 
-            return true;
+                return true;
+            }
+
+            throw $noSourceFoundException;
         } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
@@ -504,6 +513,12 @@ final class RunCommand extends BaseCommand
             );
         }
 
+        [
+            $filter,
+            $gitDiffFilter,
+            $gitDiffBase,
+        ] = self::getSourceFilters($input);
+
         $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
@@ -543,10 +558,12 @@ final class RunCommand extends BaseCommand
             staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            sourceFilter: self::getSourceFilters($input),
+            filter: $filter,
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
+            gitDiffFilter: $gitDiffFilter,
+            gitDiffBase: $gitDiffBase,
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),
             gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
@@ -690,12 +707,56 @@ final class RunCommand extends BaseCommand
 
     private static function getGitOptions(InputInterface $input): ?GitOptions
     {
-        $gitDiffFilter = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+        $gitDiffFilter = self::getGitDiffFilter($input);
+
         $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
-        $gitDiffBase = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+        $gitDiffBase = self::getGitDiffBase($input);
 
         self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
-        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $isForGitDiffLines, $gitDiffBase);
+
+        if ($isForGitDiffLines) {
+            $gitDiffFilter = Git::DEFAULT_GIT_DIFF_FILTER;
+        }
+
+        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
+
+        return [$gitDiffFilter, $gitDiffBase];
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    private static function getGitDiffFilter(InputInterface $input): ?string
+    {
+        $value = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
+
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmedValue = trim((string) $value);
+
+        Assert::stringNotEmpty(
+            $trimmedValue,
+            sprintf(
+                'Expected a non-blank value for the option "--%s".',
+                self::OPTION_GIT_DIFF_FILTER,
+            ),
+        );
+
+        return $trimmedValue;
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    private static function getGitDiffBase(InputInterface $input): ?string
+    {
+        $value = $input->getOption(self::OPTION_GIT_DIFF_BASE);
+
+        if ($value === null) {
+            return null;
+        }
 
         return GitOptions::tryCreate(
             $gitDiffFilter,
@@ -723,12 +784,10 @@ final class RunCommand extends BaseCommand
 
     private static function assertGitBaseHasRequiredFilter(
         ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
         ?string $gitDiffBase,
     ): void {
-        if ($gitDiffBase !== null
-            && $gitDiffFilter === null
-            && $isForGitDiffLines === false
+        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
+            && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER
         ) {
             throw new InvalidArgumentException(
                 sprintf(

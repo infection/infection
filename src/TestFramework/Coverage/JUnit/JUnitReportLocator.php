@@ -35,46 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use function array_map;
-use function count;
-use function current;
 use const DIRECTORY_SEPARATOR;
-use function file_exists;
 use function implode;
+use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use function is_dir;
-use function is_readable;
-use function iterator_to_array;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
- * @final
  */
-class JUnitReportLocator
+final class JUnitReportLocator extends BaseReportLocator implements ReportLocator
 {
     public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
     private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
-    private ?string $jUnitPath = null;
-
-    public function __construct(
-        private readonly string $coveragePath,
-        private readonly string $defaultJUnitPath,
-    ) {
-    }
-
     public static function create(
+        FileSystem $filesystem,
         string $coverageDirectory,
         ?string $defaultJUnitPathname = null,
     ): self {
+        // TODO: ensure the default path is in the coverage dir or make the path absolute?
         return new self(
+            $filesystem,
             $coverageDirectory,
             $defaultJUnitPathname === null
                 ? self::createPHPUnitDefaultJUnitPathname($coverageDirectory)
@@ -82,82 +71,56 @@ class JUnitReportLocator
         );
     }
 
-    public function getDefaultLocation(): string
+    protected function createInvalidReportSource(string $coverageDirectory): InvalidReportSource
     {
-        return $this->defaultJUnitPath;
+        return new InvalidReportSource(
+            sprintf(
+                'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                $coverageDirectory,
+            ),
+        );
     }
 
-    /**
-     * @throws InvalidReportSource
-     * @throws TooManyReportsFound
-     * @throws NoReportFound
-     */
-    public function locate(): string
-    {
-        if ($this->jUnitPath !== null) {
-            return $this->jUnitPath;
-        }
-
-        // This is the JUnit path enforced before. It is also the one recommended by the
-        // CoverageChecker hence it makes sense to try this one first before attempting any more
-        // expensive lookup
-        if (file_exists($this->defaultJUnitPath)) {
-            return $this->jUnitPath = $this->defaultJUnitPath;
-        }
-
-        if (!file_exists($this->coveragePath)
-            || !is_readable($this->coveragePath)
-            || !is_dir($this->coveragePath)
-        ) {
-            throw new InvalidReportSource(
-                sprintf(
-                    'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
-                    $this->coveragePath,
+    protected function createTooManyReportsFound(
+        string $coverageDirectory,
+        array $reportPathnames,
+    ): TooManyReportsFound {
+        return new TooManyReportsFound(
+            sprintf(
+                'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                $coverageDirectory,
+                self::JUNIT_FILENAME_REGEX,
+                implode(
+                    '", "',
+                    $reportPathnames,
                 ),
-            );
-        }
-
-        $files = iterator_to_array(
-            Finder::create()
-                ->files()
-                ->in($this->coveragePath)
-                ->name(self::JUNIT_FILENAME_REGEX)
-                ->sortByName(),
-            false,
+            ),
+            reportPathnames: $reportPathnames,
         );
+    }
 
-        if (count($files) > 1) {
-            $pathnames = array_map(
-                static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
-                $files,
-            );
-
-            throw new TooManyReportsFound(
-                sprintf(
-                    'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
-                    $this->coveragePath,
-                    self::JUNIT_FILENAME_REGEX,
-                    implode(
-                        '", "',
-                        $pathnames,
-                    ),
-                ),
-            );
-        }
-
-        $junitFileInfo = current($files);
-
-        if ($junitFileInfo !== false) {
-            return $this->jUnitPath = Path::canonicalize($junitFileInfo->getPathname());
-        }
-
-        throw new NoReportFound(
+    protected function createNoReportFound(string $coverageDirectory): NoReportFound
+    {
+        return new NoReportFound(
             sprintf(
                 'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
-                $this->coveragePath,
+                $coverageDirectory,
                 self::JUNIT_FILENAME_REGEX,
             ),
         );
+    }
+
+    protected function configureFinder(Finder $finder): void
+    {
+        // TODO: should the file depth be limited too?
+        $finder
+            ->name(self::JUNIT_FILENAME_REGEX)
+            // We sort by name for deterministic results. It has no impact on
+            // the happy path as we expect to find only one file.
+            // In the other scenario, this gives a more consistent result to the
+            // user for a failing scenario.
+            // This also makes testing easier.
+            ->sortByName();
     }
 
     private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string

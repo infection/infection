@@ -35,92 +35,261 @@ declare(strict_types=1);
 
 namespace Infection\Git;
 
+use function array_filter;
+use function array_map;
 use function array_merge;
-use function array_slice;
 use function count;
 use function explode;
 use function implode;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
-use RuntimeException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Infection\Source\Exception\NoSourceFound;
+use const PHP_EOL;
+use function Safe\preg_match;
+use function Safe\preg_split;
+use function sprintf;
+use function str_starts_with;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
+use Webmozart\Assert\Assert;
 
+/**
+ * @internal
+ *
+ * Implementation of the Git contract leveraging the git binary via processes.
+ */
 final readonly class CommandLineGit implements Git
 {
-    private const NUM_ORIGIN_AND_BRANCH_PARTS = 2;
+    // https://github.com/infection/infection/issues/2611
+    private const DEFAULT_SYMBOLIC_REFERENCE = 'refs/remotes/origin/HEAD';
 
-    // TODO: maybe the default base could be configured in the config file?
-    private const DEFAULT_BASE = 'origin/master';
+    private const DIFF_LINE_REGEX = '/diff.*a\/.*\sb\/(?<filePath>.*)/';
+
+    private const DIFF_LINE_PATH_KEY = 'filePath';
+
+    private const DIFF_LINE_RANGE_REGEX = '/\s\+(?<range>.*)\s@/';
+
+    private const DIFF_LINE_RANGE_KEY = 'range';
 
     public function __construct(
         private ShellCommandLineExecutor $shellCommandLineExecutor,
     ) {
     }
 
-    public function getDefaultBaseBranch(): string
+    public function getDefaultBase(): string
+    {
+        return $this->readSymbolicReference(self::DEFAULT_SYMBOLIC_REFERENCE) ?? Git::FALLBACK_BASE;
+    }
+
+    public function getChangedFileRelativePaths(string $diffFilter, string $base, array $sourceDirectories): string
+    {
+        $lines = $this->diff(
+            $diffFilter,
+            $base,
+            $sourceDirectories,
+            nameOnly: true,
+        );
+
+        if (count($lines) === 0) {
+            throw NoSourceFound::noFilesForGitDiff($diffFilter, $base);
+        }
+
+        return implode(',', $lines);
+    }
+
+    public function getChangedLinesRangesByFileRelativePaths(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+    ): array {
+        $lines = $this->diff(
+            $diffFilter,
+            $base,
+            $sourceDirectories,
+            noContext: true,
+        );
+        $changedLines = self::parsedChangedLines($lines);
+
+        if (count($changedLines) === 0) {
+            throw NoSourceFound::noChangedLinesForGitDiff(
+                $diffFilter,
+                $base,
+                implode(PHP_EOL, $lines),
+            );
+        }
+
+        return $changedLines;
+    }
+
+    public function getBaseReference(string $base): string
+    {
+        try {
+            $reference = $this->shellCommandLineExecutor->execute([
+                'git',
+                'merge-base',
+                $base,
+                'HEAD',
+            ]);
+
+            Assert::stringNotEmpty($reference);
+
+            return $reference;
+        } catch (ProcessException) {
+            // TODO: could do some logging here...
+        }
+
+        // there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
+        // Fall back to direct diff
+        return $base;
+    }
+
+    /**
+     * @param string[] $lines
+     *
+     * @return array<string, list<ChangedLinesRange>>
+     */
+    private static function parsedChangedLines(array $lines): array
+    {
+        $filePath = '';
+        $result = [];
+
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'diff ')) {
+                $filePath = self::parseFilePathFromLine($line);
+            } elseif (str_starts_with($line, '@@ ')) {
+                $changedLinesRange = self::parseChangedLinesRangeFromLine($line);
+
+                if ($changedLinesRange !== null) {
+                    $result[$filePath][] = $changedLinesRange;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private static function parseFilePathFromLine(string $line): string
+    {
+        preg_match(self::DIFF_LINE_REGEX, $line, $matches);
+
+        Assert::keyExists(
+            $matches,
+            self::DIFF_LINE_PATH_KEY,
+            sprintf(
+                'Source file can not be found in the following diff line: "%s"',
+                $line,
+            ),
+        );
+
+        return $matches[self::DIFF_LINE_PATH_KEY];
+    }
+
+    /**
+     * Examples of possible forms for the input line:
+     *
+     * - '@@ -10,5 +12,7 @@ ...': lines added and removed, here 5 lines removed at L10 in the old file and 7 lines added from L12 in the new file
+     * - '@@ -10,0 +11,5 @@ ...': only lines added, 0 lines from the old file at L10, 5 lines added starting at L11 in new file
+     *
+     * Check the test for more examples.
+     */
+    private static function parseChangedLinesRangeFromLine(string $line): ?ChangedLinesRange
+    {
+        preg_match(self::DIFF_LINE_RANGE_REGEX, $line, $matches);
+
+        Assert::keyExists(
+            $matches,
+            self::DIFF_LINE_RANGE_KEY,
+            sprintf(
+                'Added/modified lines can not be found in the following diff line: "%s"',
+                $line,
+            ),
+        );
+
+        $range = $matches[self::DIFF_LINE_RANGE_KEY];
+
+        $lineParts = array_map(
+            intval(...),
+            explode(',', $range),
+        );
+
+        Assert::countBetween($lineParts, 1, 2);
+
+        if (count($lineParts) === 1) {
+            [$line] = $lineParts;
+
+            return new ChangedLinesRange($line, $line);
+        }
+
+        [$startLine, $newCount] = $lineParts;
+
+        if ($newCount === 0) {
+            return null;
+        }
+
+        $endLine = $startLine + $newCount - 1;
+
+        return new ChangedLinesRange($startLine, $endLine);
+    }
+
+    /**
+     * @param string[] $sourceDirectories
+     *
+     * @return string[]
+     */
+    private function diff(
+        string $diffFilter,
+        string $base,
+        array $sourceDirectories,
+        bool $nameOnly = false,
+        bool $noContext = false,
+    ): array {
+        $command = [
+            'git',
+            '--no-pager',
+            'diff',
+            $base,
+            '--no-ext-diff',
+            '--no-color',
+            $nameOnly ? '--name-only' : null,
+            $noContext ? '--unified=0' : null,
+            '--diff-filter=' . $diffFilter,
+            '--',
+        ];
+
+        $diff = $this->shellCommandLineExecutor->execute(
+            array_merge(
+                array_filter($command),
+                $sourceDirectories,
+            ),
+        );
+
+        if ($diff === '') {
+            return [];
+        }
+
+        return preg_split('/\n|\r\n?/', $diff);
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    private function readSymbolicReference(string $name): ?string
     {
         // see https://www.reddit.com/r/git/comments/jbdb7j/comment/lpdk30e/
         try {
-            $gitRefs = $this->shellCommandLineExecutor->execute([
+            $reference = $this->shellCommandLineExecutor->execute([
                 'git',
                 'symbolic-ref',
-                'refs/remotes/origin/HEAD',
+                $name,
             ]);
 
-            $parts = explode('/', $gitRefs);
+            Assert::stringNotEmpty($reference);
 
-            if (count($parts) > self::NUM_ORIGIN_AND_BRANCH_PARTS) {
-                // extract origin/branch from a string like 'refs/remotes/origin/master'
-                return implode(
-                    '/',
-                    array_slice($parts, -self::NUM_ORIGIN_AND_BRANCH_PARTS),
-                );
-            }
-        } catch (RuntimeException) {
-            // e.g. no symbolic ref might be configured for a remote named "origin"
-        }
-
-        // unable to figure it out, return the default
-        return self::DEFAULT_BASE;
-    }
-
-    public function getDefaultBaseFilter(): string
-    {
-        return 'AM';
-    }
-
-    public function findReferenceCommit(string $reference): string
-    {
-        try {
-            return $this->shellCommandLineExecutor->execute([
-                'git',
-                'merge-base',
-                $reference,
-                'HEAD',
-            ]);
-        } catch (ProcessFailedException) {
-            /**
-             * there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-             * Fall back to direct diff
-             */
             return $reference;
+        } catch (ProcessException) {
+            // e.g. no symbolic ref might be configured for a remote named "origin"
+            // TODO: we could log the failure to figure it out somewhere...
         }
-    }
 
-    public function diff(string $commit, string $filter, array $paths): string
-    {
-        return $this->shellCommandLineExecutor->execute(
-            array_merge(
-                [
-                    'git',
-                    'diff',
-                    $commit,
-                    '--diff-filter',
-                    $filter,
-                    '--name-only',
-                    '--',
-                ],
-                $paths,
-            ),
-        );
+        return null;
     }
 }

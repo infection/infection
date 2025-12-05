@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
-use Generator;
 use Infection\Differ\ChangedLinesRange;
-use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\FilesDiffChangedLines;
-use Infection\Logger\GitHub\GitDiffFileProvider;
+use Infection\FileSystem\FileSystem;
+use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -49,166 +48,212 @@ use function sprintf;
 #[CoversClass(FilesDiffChangedLines::class)]
 final class FilesDiffChangedLinesTest extends TestCase
 {
+    private FileSystem&MockObject $fileSystemStub;
+
+    protected function setUp(): void
+    {
+        $this->fileSystemStub = $this->createMock(FileSystem::class);
+        $this->fileSystemStub
+            ->method('realPath')
+            ->willReturnCallback(
+                static fn (string $path): string => '/path/to/' . $path,
+            );
+    }
+
     public function test_it_memoizes_parsed_results(): void
     {
-        [$parser, $diffProvider] = $this->prepareServices([]);
-
         $filesDiffChangedLines = new FilesDiffChangedLines(
-            $parser,
-            $diffProvider,
+            $this->createGitStub([]),
+            $this->fileSystemStub,
+            'main',
+            'AM',
+            ['src', 'lib'],
         );
 
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1, 'master');
+        $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
     }
 
     /**
-     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
+     * @param array<string, list<ChangedLinesRange>> $changedLinesRangesByFilePathname
      */
     #[DataProvider('provideLines')]
     public function test_it_finds_line_in_changed_lines_from_diff(
-        bool $expectedIsFound,
-        array $returnedFilesDiffChangedLinesMap,
+        array $changedLinesRangesByFilePathname,
+        string $fileRealPath,
         int $mutationStartLine,
         int $mutationEndLine,
+        bool $expected,
     ): void {
-        [$parser, $diffProvider] = $this->prepareServices($returnedFilesDiffChangedLinesMap);
-
         $filesDiffChangedLines = new FilesDiffChangedLines(
-            $parser,
-            $diffProvider,
+            $this->createGitStub($changedLinesRangesByFilePathname),
+            $this->fileSystemStub,
+            'main',
+            'AM',
+            ['src', 'lib'],
         );
 
-        $isLineFoundInDiff = $filesDiffChangedLines->contains('/path/to/File.php', $mutationStartLine, $mutationEndLine, 'master');
+        $actual = $filesDiffChangedLines->contains(
+            $fileRealPath,
+            $mutationStartLine,
+            $mutationEndLine,
+        );
 
-        $this->assertSame($expectedIsFound, $isLineFoundInDiff, sprintf('Line %d was not found in diff', $mutationStartLine));
+        $this->assertSame(
+            $expected,
+            $actual,
+            sprintf('Line %d was not found in diff', $mutationStartLine),
+        );
     }
 
-    public static function provideLines(): Generator
+    public static function provideLines(): iterable
     {
         yield 'not found line in one-line range before' => [
-            false,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             1,
             1,
+            false,
         ];
 
         yield 'not found line in one-line range after' => [
-            false,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             5,
             5,
+            false,
         ];
 
         yield 'line in one-line range' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in multi-line range in the beginning' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 5)],
+                'src/File.php' => [new ChangedLinesRange(3, 5)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in multi-line range in the middle' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 5)],
+                'src/File.php' => [new ChangedLinesRange(1, 5)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in multi-line range in the end' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 3)],
+                'src/File.php' => [new ChangedLinesRange(1, 3)],
             ],
+            '/path/to/src/File.php',
             3,
             3,
+            true,
         ];
 
         yield 'line in the second range' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 1), new ChangedLinesRange(3, 5)],
+                'src/File.php' => [
+                    new ChangedLinesRange(1, 1),
+                    new ChangedLinesRange(3, 5),
+                ],
             ],
+            '/path/to/src/File.php',
             4,
             4,
+            true,
         ];
 
         yield 'mutation range in one-line range, around' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             1,
             4,
+            true,
         ];
 
         yield 'mutation range in one-line range, before' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             1,
             3,
+            true,
         ];
 
         yield 'mutation range in one-line range, after' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(3, 3)],
+                'src/File.php' => [new ChangedLinesRange(3, 3)],
             ],
+            '/path/to/src/File.php',
             3,
             5,
+            true,
         ];
 
         yield 'mutation range in one-line range, inside' => [
-            true,
             [
-                '/path/to/File.php' => [new ChangedLinesRange(1, 30)],
+                'src/File.php' => [new ChangedLinesRange(1, 30)],
             ],
+            '/path/to/src/File.php',
             3,
             5,
+            true,
+        ];
+
+        yield 'mutation in range with diff with multiple files' => [
+            [
+                'src/File1.php' => [
+                    new ChangedLinesRange(10, 10),
+                    new ChangedLinesRange(30, 50),
+                ],
+                'src/File2.php' => [
+                    new ChangedLinesRange(1, 1),
+                    new ChangedLinesRange(3, 5),
+                ],
+            ],
+            '/path/to/src/File2.php',
+            4,
+            4,
+            true,
         ];
     }
 
     /**
-     * @param array<string, ChangedLinesRange[]> $returnedFilesDiffChangedLinesMap
-     * @return array{0: DiffChangedLinesParser, 1: GitDiffFileProvider}
+     * @param array<string, list<ChangedLinesRange>> $changedLinesRangesByFilePathname
      */
-    private function prepareServices(array $returnedFilesDiffChangedLinesMap): array
+    private function createGitStub(array $changedLinesRangesByFilePathname): Git&MockObject
     {
-        /** @var DiffChangedLinesParser&MockObject $parser */
-        $parser = $this->createMock(DiffChangedLinesParser::class);
-        $parser
+        /** @var Git&MockObject $git */
+        $git = $this->createMock(Git::class);
+        $git
             ->expects($this->once())
-            ->method('parse')
-            ->willReturn($returnedFilesDiffChangedLinesMap);
+            ->method('getChangedLinesRangesByFileRelativePaths')
+            ->with('AM', 'main', ['src', 'lib'])
+            ->willReturn($changedLinesRangesByFilePathname);
 
-        /** @var GitDiffFileProvider&MockObject $diffProvider */
-        $diffProvider = $this->createMock(GitDiffFileProvider::class);
-        $diffProvider
-            ->expects($this->once())
-            ->method('provideWithLines')
-            ->with('master')
-            ->willReturn('');
-
-        return [$parser, $diffProvider];
+        return $git;
     }
 }

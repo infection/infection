@@ -38,6 +38,7 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use function basename;
 use const DIRECTORY_SEPARATOR;
 use function dirname;
+use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
@@ -50,7 +51,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
 use function strtoupper;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -59,7 +59,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 {
     private const TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/test-index.xml';
 
-    private Filesystem $filesystem;
+    private FileSystem $fileSystem;
 
     private IndexXmlCoverageLocator $locator;
 
@@ -67,9 +67,10 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     {
         parent::setUp();
 
-        $this->filesystem = new Filesystem();
+        $this->fileSystem = new FileSystem();
 
         $this->locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
             $this->tmp,
             $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME,
         );
@@ -79,9 +80,12 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     #[CoversNothing]
     public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
     {
-        $this->filesystem->dumpFile(self::TEST_DEFAULT_RELATIVE_PATHNAME, '');
+        $this->fileSystem->dumpFile(self::TEST_DEFAULT_RELATIVE_PATHNAME, '');
 
-        $locator = IndexXmlCoverageLocator::create($this->tmp);
+        $locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
+            $this->tmp,
+        );
 
         $this->expectException(NoReportFound::class);
 
@@ -96,6 +100,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         $coverageDirectory = '/path/to/random-coverage';
 
         $locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
             $coverageDirectory,
             defaultPHPUnitXmlCoverageIndexPathname: $defaultLocation,
         );
@@ -123,7 +128,10 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         string $coverageDirectory,
         string $expected,
     ): void {
-        $locator = IndexXmlCoverageLocator::create($coverageDirectory);
+        $locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
+            $coverageDirectory,
+        );
 
         $actual = $locator->getDefaultLocation();
 
@@ -143,40 +151,6 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
         ];
     }
 
-    public function test_it_returns_the_default_path_if_it_exists(): void
-    {
-        $default = $this->filesystem->tempnam($this->tmp, 'default-');
-
-        $locator = new IndexXmlCoverageLocator(
-            '/path/to/unknown-dir',
-            $default,
-        );
-
-        // Note that here we can't really check that we do not use the FS
-        // since we use `file_exists()` directly.
-        $actual = $locator->locate();
-
-        $this->assertSame($default, $actual);
-    }
-
-    public function test_it_caches_the_result_found(): void
-    {
-        $default = $this->filesystem->tempnam($this->tmp, 'default-');
-
-        $this->locator = new IndexXmlCoverageLocator(
-            '/path/to/unknown-dir',
-            $default,
-        );
-
-        // Note that here we can't really check that we do not use a Filesystem
-        // object which we could mock.
-        $actual1 = $this->locator->locate();
-        $actual2 = $this->locator->locate();
-
-        $this->assertSame($default, $actual1);
-        $this->assertSame($default, $actual2);
-    }
-
     #[DataProvider('reportPathnameProvider')]
     public function test_it_can_find_a_report_pathname(
         string $relativePathname,
@@ -184,7 +158,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     ): void {
         $expectedRelativePathname ??= $relativePathname;
 
-        $this->filesystem->dumpFile($relativePathname, '');
+        $this->fileSystem->dumpFile($relativePathname, '');
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . $expectedRelativePathname);
 
         $actual = $this->locator->locate();
@@ -209,7 +183,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
         $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
 
-        $this->filesystem->dumpFile($relativePathname, '');
+        $this->fileSystem->dumpFile($relativePathname, '');
 
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME);
 
@@ -226,7 +200,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
         $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
 
-        $this->filesystem->dumpFile($relativePathname, '');
+        $this->fileSystem->dumpFile($relativePathname, '');
 
         $this->expectException(NoReportFound::class);
 
@@ -236,9 +210,10 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     public function test_it_can_locate_the_report_with_the_wrong_case(): void
     {
         $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'INDEX.xml');
-        $this->filesystem->dumpFile($expected, '');
+        $this->fileSystem->dumpFile($expected, '');
 
         $locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
             $this->tmp,
             $this->tmp . '/unknown-file.xml',
         );
@@ -254,8 +229,8 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
             $this->markTestSkipped('Requires a case-sensitive system.');
         }
 
-        $this->filesystem->touch('index.xml');
-        $this->filesystem->dumpFile('sub-dir/index.xml', '');
+        $this->fileSystem->touch('index.xml');
+        $this->fileSystem->dumpFile('sub-dir/index.xml', '');
 
         $expectedReportsPathnames = [
             Path::normalize($this->tmp . '/index.xml'),
@@ -294,7 +269,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_find_the_report_no_suitable_file_was_found(): void
     {
-        $this->filesystem->touch('not-a-matching-file.txt');
+        $this->fileSystem->touch('not-a-matching-file.txt');
 
         $this->expectExceptionObject(
             new NoReportFound(
@@ -313,7 +288,10 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
     {
         $unknownDir = $this->tmp . '/unknown-dir';
 
-        $this->locator = IndexXmlCoverageLocator::create($unknownDir);
+        $this->locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
+            $unknownDir,
+        );
 
         $this->expectExceptionObject(
             new InvalidReportSource(
@@ -329,10 +307,13 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_locate_the_report_if_the_source_directory_is_not_a_directory(): void
     {
-        $file = $this->filesystem->tempnam($this->tmp, 'default-');
-        $this->filesystem->touch($file);
+        $file = $this->fileSystem->tempnam($this->tmp, 'default-');
+        $this->fileSystem->touch($file);
 
-        $locator = IndexXmlCoverageLocator::create($file);
+        $locator = IndexXmlCoverageLocator::create(
+            $this->fileSystem,
+            $file,
+        );
 
         $this->expectExceptionObject(
             new InvalidReportSource(

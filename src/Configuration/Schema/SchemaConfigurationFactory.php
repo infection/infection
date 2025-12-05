@@ -183,11 +183,11 @@ class SchemaConfigurationFactory
     /**
      * @param string[] $values
      *
-     * @return string[]
+     * @return list<non-empty-string>
      */
     private static function normalizeStringArray(array $values): array
     {
-        $normalizedValue = array_filter(array_map('trim', $values));
+        $normalizedValue = array_filter(array_map(trim(...), $values));
 
         return array_values($normalizedValue);
     }

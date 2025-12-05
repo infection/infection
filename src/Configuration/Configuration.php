@@ -63,6 +63,8 @@ readonly class Configuration
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string|null $gitDiffBase
+     * @param non-empty-string|null $gitDiffFilter
      */
     public function __construct(
         public float $processTimeout,
@@ -94,6 +96,9 @@ readonly class Configuration
         public bool $isDryRun,
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
+        public bool $isForGitDiffLines,
+        public ?string $gitDiffBase,
+        public ?string $gitDiffFilter,
         public ?string $mapSourceClassToTestStrategy,
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,

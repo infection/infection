@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\SourceLineFilter;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
@@ -79,6 +80,7 @@ class NodeMutationGenerator
         private readonly array $fileNodes,
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
+        private readonly bool $isForGitDiffLines,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineFilter $lineFilter,
         private readonly array $originalFileTokens,
@@ -90,6 +92,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return iterable<Mutation>
      */
     public function generate(Node $node): iterable
