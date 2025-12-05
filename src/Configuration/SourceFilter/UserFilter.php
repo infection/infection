@@ -41,9 +41,9 @@ final readonly class UserFilter implements SourceFilter
     /**
      * TODO: give examples
      *
-     * @param non-empty-string $filter
+     * @param non-empty-string $value
      */
-    public function __construct(public string $filter)
+    public function __construct(public string $value)
     {
     }
 }

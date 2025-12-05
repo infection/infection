@@ -33,41 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Git;
+namespace Infection\Source;
 
-// TODO: maybe we don't want memoized results for everything...
-final class MemoizedGit implements Git
+final class NullSourceLineFilter implements SourceLineFilter
 {
-    private string $defaultBase;
-
-    private string $defaultBaseFilter;
-
-    public function __construct(
-        private readonly Git $decoratedGit,
-    ) {
-    }
-
-    public function reset(): void
+    public function touches(string $sourceFilePathname, int $startLine, int $endLine): bool
     {
-        unset($this->defaultBase);
-        unset($this->defaultBaseFilter);
-    }
-
-    public function getDefaultBaseBranch(): string
-    {
-        if (!isset($this->defaultBase)) {
-            $this->defaultBase = $this->decoratedGit->getDefaultBaseBranch();
-        }
-
-        return $this->defaultBase;
-    }
-
-    public function getDefaultBaseFilter(): string
-    {
-        if (!isset($this->defaultBaseFilter)) {
-            $this->defaultBaseFilter = $this->decoratedGit->getDefaultBaseFilter();
-        }
-
-        return $this->defaultBaseFilter;
+        return true;
     }
 }

@@ -35,37 +35,40 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Source;
-use Infection\Git\Git;
-use Infection\Process\ShellCommandLineExecutor;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Differ\FilesDiffChangedLines;
+use Infection\FileSystem\FileSystem;
+use Infection\Git\ConfiguredGit;
 use const true;
 
 final readonly class SourceCollectorFactory
 {
     public function __construct(
-        private Git $git,
-        private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private ConfiguredGit $git,
+        private FileSystem $fileSystem,
     ) {
     }
 
-    /**
-     * @param non-empty-string|GitOptions|null $sourceFilter E.g. "src/Service/Mailer.php", "Mailer.php", "src/Service/", "Mailer.php,Sender.php", etc.
-     */
     public function create(
         Source $source,
-        string|GitOptions|null $sourceFilter,
+        ?SourceFilter $sourceFilter,
     ): SourceCollector {
         return match (true) {
-            $sourceFilter instanceof GitOptions => new GitDiffSourceCollector(
-                $this->shellCommandLineExecutor,
-                $sourceFilter->baseBranch,
+            $sourceFilter instanceof GitDiffFilter => new GitDiffSourceCollector(
+                $this->git,
+                new FilesDiffChangedLines(
+                    $this->git,
+                    $this->fileSystem,
+                ),
                 $source->directories,
                 $source->excludes,
             ),
-            default => new SchemaSourceCollector(
-                $sourceDirectories,
-                $excludedDirectoriesOrFiles,
+            default => SchemaSourceCollector::create(
+                $sourceFilter,
+                $source->directories,
+                $source->excludes,
             ),
         };
     }

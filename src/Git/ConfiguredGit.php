@@ -33,68 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
+namespace Infection\Git;
 
-use Infection\FileSystem\FileSystem;
-use Infection\Git\ConfiguredGit;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Differ\ChangedLinesRange;
 use Infection\Source\Exception\NoSourceFound;
 
 /**
  * @internal
- * @final
  */
-class FilesDiffChangedLines
+final readonly class ConfiguredGit
 {
-    /** @var array<string, list<ChangedLinesRange>> */
-    private ?array $memoizedFilesChangedLinesMap = null;
-
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     */
     public function __construct(
-        private readonly ConfiguredGit $git,
-        private readonly FileSystem $filesystem,
+        private Git $git,
+        private GitDiffFilter $config,
+        private array $sourceDirectories,
     ) {
     }
 
     /**
      * @throws NoSourceFound
+     *
+     * @return non-empty-string
      */
-    public function contains(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
+    public function getChangedFileRelativePaths(): string
     {
-        foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
-            if ($mutationEndLine >= $changedLinesRange->getStartLine() && $mutationStartLine <= $changedLinesRange->getEndLine()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->git->getChangedFileRelativePaths(
+            $this->config->filter,
+            $this->config->base,
+            $this->sourceDirectories,
+        );
     }
 
     /**
      * @throws NoSourceFound
      *
-     * @return list<ChangedLinesRange>
+     * @return non-empty-array<string, list<ChangedLinesRange>>
      */
-    private function getChangedLinesRanges(string $fileRealPath): array
+    public function getChangedLinesRangesByFileRelativePaths(): array
     {
-        $this->memoizedFilesChangedLinesMap ??= $this->getFilesChangedLinesRanges();
-
-        return $this->memoizedFilesChangedLinesMap[$fileRealPath] ?? [];
-    }
-
-    /**
-     * @throws NoSourceFound
-     *
-     * @return array<string, list<ChangedLinesRange>>
-     */
-    private function getFilesChangedLinesRanges(): array
-    {
-        $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths();
-
-        $changedLinesByAbsolutePaths = [];
-
-        foreach ($changedLinesByRelativePaths as $relativeFilePath => $changedLines) {
-            $changedLinesByAbsolutePaths[$this->filesystem->realPath($relativeFilePath)] = $changedLines;
-        }
-
-        return $changedLinesByAbsolutePaths;
+        return $this->git->getChangedLinesRangesByFileRelativePaths(
+            $this->config->filter,
+            $this->config->base,
+            $this->sourceDirectories,
+        );
     }
 }

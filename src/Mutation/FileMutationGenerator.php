@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -44,6 +43,7 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\SourceLineFilter;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use PhpParser\Node;
@@ -59,8 +59,7 @@ class FileMutationGenerator
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly bool $isForGitDiffLines,
+        private readonly SourceLineFilter $sourceLineFilter,
     ) {
     }
 
@@ -100,9 +99,8 @@ class FileMutationGenerator
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
-                isForGitDiffLines: $this->isForGitDiffLines,
                 lineRangeCalculator: $this->lineRangeCalculator,
-                filesDiffChangedLines: $this->filesDiffChangedLines,
+                sourceLineFilter: $this->sourceLineFilter,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $sourceFile->getContents(),
             ),

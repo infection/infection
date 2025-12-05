@@ -33,13 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source;
+namespace Infection\Configuration\SourceFilter;
 
-interface SourceLineFilter
+final readonly class GitDiffFilter implements SourceFilter
 {
-    public function touches(
-        string $sourceFilePathname,
-        int $startLine,
-        int $endLine,
-    ): bool;
+    /**
+     * @param non-empty-string $filter
+     * @param non-empty-string $base
+     */
+    public function __construct(
+        public string $filter,
+        public string $base,
+    ) {
+    }
 }

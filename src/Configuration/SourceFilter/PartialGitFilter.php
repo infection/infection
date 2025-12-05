@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
-final readonly class GitFilter implements SourceFilter
+final readonly class PartialGitFilter
 {
+    /**
+     * @param non-empty-string $filter
+     * @param non-empty-string|null $base
+     */
     public function __construct(
         public string $filter,
-        public string $baseBranch,
+        public ?string $base,
     ) {
     }
 }

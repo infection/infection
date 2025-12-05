@@ -80,9 +80,8 @@ class NodeMutationGenerator
         private readonly array $fileNodes,
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
-        private readonly bool $isForGitDiffLines,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineFilter $lineFilter,
+        private readonly SourceLineFilter $sourceLineFilter,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
@@ -109,7 +108,7 @@ class NodeMutationGenerator
             return;
         }
 
-        $isNodeAModifiedLine = $this->lineFilter->contains(
+        $isNodeAModifiedLine = $this->sourceLineFilter->touches(
             $this->filePath,
             $node->getStartLine(),
             $node->getEndLine(),

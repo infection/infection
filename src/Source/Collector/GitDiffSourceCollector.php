@@ -35,28 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use function explode;
-use function implode;
-use Infection\Git\Git;
-use Infection\Logger\GitHub\NoFilesInDiffToMutate;
-use const PHP_EOL;
+use Infection\Configuration\SourceFilter\UserFilter;
+use Infection\Differ\FilesDiffChangedLines;
+use Infection\Git\ConfiguredGit;
+use Infection\Source\SourceLineFilter;
 
 /**
  * @internal
  */
-final class GitDiffSourceCollector implements SourceCollector
+final class GitDiffSourceCollector implements SourceCollector, SourceLineFilter
 {
     private ?SourceCollector $innerCollector = null;
 
     /**
-     * @param non-empty-string $filter
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedDirectoriesOrFiles
      */
     public function __construct(
-        private readonly Git $git,
-        private readonly string $filter,
-        private readonly string $baseBranch,
+        private readonly ConfiguredGit $git,
+        private readonly FilesDiffChangedLines $filesDiffChangedLines,
         private readonly array $sourceDirectories,
         private readonly array $excludedDirectoriesOrFiles,
     ) {
@@ -77,43 +74,27 @@ final class GitDiffSourceCollector implements SourceCollector
         return true;
     }
 
+    public function touches(string $sourceFilePathname, int $startLine, int $endLine): bool
+    {
+        return $this->filesDiffChangedLines->contains(
+            $sourceFilePathname,
+            $startLine,
+            $endLine,
+        );
+    }
+
     private function getInnerCollector(): SourceCollector
     {
         if ($this->innerCollector === null) {
-            $filter = $this->getFilter();
+            $filter = $this->git->getChangedFileRelativePaths();
 
             $this->innerCollector = SchemaSourceCollector::create(
-                $filter,
+                new UserFilter($filter),
                 $this->sourceDirectories,
                 $this->excludedDirectoriesOrFiles,
             );
         }
 
         return $this->innerCollector;
-    }
-
-    /**
-     * @throws NoFilesInDiffToMutate
-     *
-     * @return non-empty-string
-     */
-    private function getFilter(): string
-    {
-        $referenceCommit = $this->git->findReferenceCommit($this->baseBranch);
-
-        $filter = $this->git->diff(
-            $referenceCommit,
-            $this->filter,
-            $this->sourceDirectories,
-        );
-
-        if ($filter === '') {
-            throw NoFilesInDiffToMutate::create();
-        }
-
-        return implode(
-            ',',
-            explode(PHP_EOL, $filter),
-        );
     }
 }
