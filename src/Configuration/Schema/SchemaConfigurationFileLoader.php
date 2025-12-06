@@ -46,6 +46,9 @@ class SchemaConfigurationFileLoader
     ) {
     }
 
+    /**
+     * @param non-empty-string $file
+     */
     public function loadFile(string $file): SchemaConfiguration
     {
         $rawConfig = new SchemaConfigurationFile($file);
@@ -53,7 +56,7 @@ class SchemaConfigurationFileLoader
         $this->schemaValidator->validate($rawConfig);
 
         return $this->factory->create(
-            $rawConfig->getPath(),
+            $rawConfig->getPathname(),
             $rawConfig->getDecodedContents(),
         );
     }

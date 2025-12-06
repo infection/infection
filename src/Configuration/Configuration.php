@@ -45,7 +45,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -63,16 +62,15 @@ readonly class Configuration
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $sourceFilesExcludes
-     * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string|null $gitDiffBase
      * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string $configurationPathname
      */
     public function __construct(
         public float $processTimeout,
         public array $sourceDirectories,
-        public iterable $sourceFiles,
         public string $sourceFilesFilter,
         public array $sourceFilesExcludes,
         public Logs $logs,
@@ -108,6 +106,7 @@ readonly class Configuration
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
+        public string $configurationPathname,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allString($sourceDirectories);

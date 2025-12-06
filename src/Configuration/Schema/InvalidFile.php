@@ -48,7 +48,7 @@ final class InvalidFile extends UnexpectedValueException
     {
         return new self(sprintf(
             'The file "%s" could not be found or is not a file.',
-            $config->getPath(),
+            $config->getPathname(),
         ));
     }
 
@@ -56,7 +56,7 @@ final class InvalidFile extends UnexpectedValueException
     {
         return new self(sprintf(
             'The file "%s" is not readable.',
-            $config->getPath(),
+            $config->getPathname(),
         ));
     }
 
@@ -64,7 +64,7 @@ final class InvalidFile extends UnexpectedValueException
     {
         return new self(sprintf(
             'Could not retrieve the contents of the file "%s".',
-            $config->getPath(),
+            $config->getPathname(),
         ));
     }
 
@@ -76,7 +76,7 @@ final class InvalidFile extends UnexpectedValueException
         return new self(
             sprintf(
                 'Could not parse the JSON file "%s": %s',
-                $config->getPath(),
+                $config->getPathname(),
                 $error,
             ),
             0,

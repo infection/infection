@@ -58,7 +58,7 @@ final class SchemaConfigurationFileTest extends TestCase
 
         $config = new SchemaConfigurationFile($path);
 
-        $this->assertSame($path, $config->getPath());
+        $this->assertSame($path, $config->getPathname());
     }
 
     public function test_its_contents_is_retrieved_lazily(): void

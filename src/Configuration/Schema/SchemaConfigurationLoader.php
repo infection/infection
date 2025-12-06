@@ -42,6 +42,9 @@ use Infection\FileSystem\Locator\Locator;
  */
 final readonly class SchemaConfigurationLoader
 {
+    /**
+     * @var non-empty-string[]
+     */
     public const POSSIBLE_DEFAULT_CONFIG_FILES = [
         self::DEFAULT_JSON5_CONFIG_FILE,
         self::DEFAULT_JSON_CONFIG_FILE,
@@ -64,7 +67,7 @@ final readonly class SchemaConfigurationLoader
     }
 
     /**
-     * @param string[] $potentialPaths
+     * @param non-empty-string[] $potentialPaths
      */
     public function loadConfiguration(array $potentialPaths): SchemaConfiguration
     {

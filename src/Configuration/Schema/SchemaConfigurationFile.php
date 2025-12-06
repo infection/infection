@@ -49,12 +49,18 @@ final class SchemaConfigurationFile
 {
     private ?stdClass $decodedContents = null;
 
+    /**
+     * @param non-empty-string $path
+     */
     public function __construct(
         private readonly string $path,
     ) {
     }
 
-    public function getPath(): string
+    /**
+     * @return non-empty-string
+     */
+    public function getPathname(): string
     {
         return $this->path;
     }
