@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+
 /**
  * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
  *
@@ -43,7 +45,7 @@ namespace Infection\TestFramework\Coverage;
 final readonly class UncoveredTraceProvider implements TraceProvider
 {
     public function __construct(
-        private BufferedSourceFileFilter $bufferedFilter,
+        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
     ) {
     }
 

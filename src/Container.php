@@ -42,14 +42,13 @@ use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
-use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PartialGitFilter;
-use Infection\Configuration\SourceFilter\UserFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
@@ -124,7 +123,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
-use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
 use Infection\Source\NullSourceLineFilter;
 use Infection\Source\SourceLineFilter;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
@@ -133,7 +132,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -253,10 +251,6 @@ final class Container extends DIContainer
                 $container->getCoveredTraceProvider(),
                 $container->getUncoveredTraceProvider(),
                 $container->getConfiguration()->shouldMutateOnlyCoveredCode(),
-            ),
-            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
-                $container->getSourceFileFilter(),
-                $container->getConfiguration()->sourceFiles,
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
@@ -559,9 +553,10 @@ final class Container extends DIContainer
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
             Git::class => static fn (): Git => new CommandLineGit(new ShellCommandLineExecutor()),
             // TODO: this is ugly... to fix this.
-            ConfiguredGit::class => (new ReflectionClass(ConfiguredGit::class))->newInstanceWithoutConstructor(),
+            ConfiguredGit::class => static fn () => (new ReflectionClass(ConfiguredGit::class))->newInstanceWithoutConstructor(),
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->get(ConfiguredGit::class),
+                $container->getFileSystem(),
             ),
             SourceCollector::class => static function (self $container): SourceCollector {
                 $factory = $container->get(SourceCollectorFactory::class);
@@ -580,9 +575,6 @@ final class Container extends DIContainer
         );
     }
 
-    /**
-     * @param non-empty-string|GitOptions|null $sourceFilter
-     */
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,
@@ -605,7 +597,7 @@ final class Container extends DIContainer
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        UserFilter|PartialGitFilter|null $sourceFilter = null,
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
@@ -661,7 +653,6 @@ final class Container extends DIContainer
             Configuration::class,
             /**
              * @throws FileOrDirectoryNotFound
-             * @throws NoSourceFound
              */
             static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
                 schema: $container->getSchemaConfiguration(),
@@ -928,7 +919,6 @@ final class Container extends DIContainer
     // Should throw all the exceptions ConfigurationFactory::create() can throw.
     /**
      * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
      */
     public function getConfiguration(): Configuration
     {
@@ -1130,9 +1120,9 @@ final class Container extends DIContainer
         return $this->get(StaticAnalysisToolFactory::class);
     }
 
-    private function getBufferedSourceFileFilter(): BufferedSourceFileFilter
+    private function getBufferedSourceFileFilter(): UnseenInCoverageSourceFileSourceCollector
     {
-        return $this->get(BufferedSourceFileFilter::class);
+        return $this->get(UnseenInCoverageSourceFileSourceCollector::class);
     }
 
     private function getUncoveredTraceProvider(): UncoveredTraceProvider

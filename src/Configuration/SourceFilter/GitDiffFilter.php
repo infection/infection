@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
+/**
+ * Represents the information supplied for applying a git diff filter.
+ */
 final readonly class GitDiffFilter implements SourceFilter
 {
     /**

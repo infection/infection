@@ -33,42 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Configuration\SourceFilter;
 
-use Webmozart\Assert\Assert;
-
-final readonly class GitOptions
+// TODO: supports globs? To double check... name may change
+final readonly class PlainFilter implements SourceFilter
 {
-    private const GIT_DIFF_LINE_FILTER = 'AM';
-
     /**
-     * @param non-empty-string $filter
-     * @param non-empty-string|null $baseBranch
+     * @param non-empty-string $value A comma separated list of paths to exclude.
      */
-    public function __construct(
-        public string $filter,
-        public ?string $baseBranch,
-    ) {
-    }
-
-    public static function tryCreate(
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
-    ) {
-        if ($gitDiffBase === null && $isForGitDiffLines === false) {
-            return null;
-        }
-
-        if ($gitDiffFilter === null) {
-            Assert::true($isForGitDiffLines);
-        } else {
-            Assert::false($isForGitDiffLines);
-        }
-
-        return new self(
-            $gitDiffFilter ?? self::GIT_DIFF_LINE_FILTER,
-            $gitDiffBase,
-        );
+    public function __construct(public string $value)
+    {
     }
 }

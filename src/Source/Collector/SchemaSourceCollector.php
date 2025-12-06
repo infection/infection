@@ -39,7 +39,7 @@ use function array_filter;
 use function array_map;
 use function count;
 use function explode;
-use Infection\Configuration\SourceFilter\UserFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Infection\TestFramework\Coverage\Trace;
 use Iterator;
@@ -69,7 +69,7 @@ final readonly class SchemaSourceCollector implements SourceCollector
      * @param non-empty-string[] $excludedDirectoriesOrFiles
      */
     public static function create(
-        ?UserFilter $filter,
+        ?PlainFilter $filter,
         array $sourceDirectories,
         array $excludedDirectoriesOrFiles,
     ): self {
@@ -133,7 +133,7 @@ final readonly class SchemaSourceCollector implements SourceCollector
     /**
      * @return non-empty-string[]
      */
-    private static function createFilters(?UserFilter $filter): array
+    private static function createFilters(?PlainFilter $filter): array
     {
         return array_filter(
             array_map(

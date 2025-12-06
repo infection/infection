@@ -42,15 +42,14 @@ use function array_values;
 use function dirname;
 use function file_exists;
 use function in_array;
-use Infection\Configuration\Entry\GitOptions;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PartialGitFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
-use Infection\Configuration\SourceFilter\UserFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
@@ -61,7 +60,6 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function max;
@@ -95,13 +93,11 @@ final readonly class ConfigurationFactory
     }
 
     /**
-     * @param non-empty-string|GitOptions|null $sourceFilter
-     *
      * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
      */
     public function create(
         SchemaConfiguration $schema,
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
@@ -118,7 +114,6 @@ final readonly class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         ?string $staticAnalysisToolOptions,
-        UserFilter|PartialGitFilter|null $sourceFilter,
         ?int $threadCount,
         bool $dryRun,
         ?bool $useGitHubLogger,
@@ -157,7 +152,7 @@ final readonly class ConfigurationFactory
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
-            sourceFilter: $this->resolveFilter($sourceFilter),
+            sourceFilter: $this->refineFilterIfNecessary($sourceFilter),
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
@@ -334,14 +329,11 @@ final readonly class ConfigurationFactory
         return $map;
     }
 
-    /**
-     * @throws NoSourceFound
-     */
-    private function resolveFilter(UserFilter|PartialGitFilter|null $filter): SourceFilter
+    private function refineFilterIfNecessary(PlainFilter|IncompleteGitDiffFilter|null $filter): ?SourceFilter
     {
-        if ($filter instanceof PartialGitFilter) {
+        if ($filter instanceof IncompleteGitDiffFilter) {
             return new GitDiffFilter(
-                $filter->filter,
+                $filter->value,
                 self::refineGitBase($filter->base),
             );
         }
@@ -445,7 +437,7 @@ final readonly class ConfigurationFactory
      *
      * @return non-empty-string
      */
-    private function refineGitBase(?string $base): ?string
+    private function refineGitBase(?string $base): string
     {
         // When the user gives a base, we need to try to refine it.
         // For example, if the user created their feature branch:

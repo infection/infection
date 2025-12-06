@@ -55,6 +55,15 @@ final readonly class SourceCollectorFactory
         Source $source,
         ?SourceFilter $sourceFilter,
     ): SourceCollector {
+        return new UnseenInCoverageSourceFileSourceCollector(
+            $this->doCreate($source, $sourceFilter),
+        );
+    }
+
+    private function doCreate(
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
         return match (true) {
             $sourceFilter instanceof GitDiffFilter => new GitDiffSourceCollector(
                 $this->git,

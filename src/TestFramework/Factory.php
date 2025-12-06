@@ -71,13 +71,15 @@ final readonly class Factory
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        // TODO: to dig deeper how this is used.
-        //  this looks a bit fishy as we may have a different config here than what the user
-        //  configured in their phpunit.xml for example.
-        //  likewise depending of the state, what files are considered for mutations changes.
-        $filteredSourceFilesToMutate = take($this->sourceCollector->collect())->toList();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
+            // TODO: extract in a separate method
+
+            // TODO: to dig deeper how this is used.
+            //  this looks a bit fishy as we may have a different config here than what the user
+            //  configured in their phpunit.xml for example.
+            //  likewise depending of the state, what files are considered for mutations changes.
+            $filteredSourceFilesToMutate = take($this->sourceCollector->collect())->toList();
+
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(

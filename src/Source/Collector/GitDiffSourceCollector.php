@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Configuration\SourceFilter\UserFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\Git\ConfiguredGit;
 use Infection\Source\SourceLineFilter;
@@ -89,7 +89,7 @@ final class GitDiffSourceCollector implements SourceCollector, SourceLineFilter
             $filter = $this->git->getChangedFileRelativePaths();
 
             $this->innerCollector = SchemaSourceCollector::create(
-                new UserFilter($filter),
+                new PlainFilter($filter),
                 $this->sourceDirectories,
                 $this->excludedDirectoriesOrFiles,
             );

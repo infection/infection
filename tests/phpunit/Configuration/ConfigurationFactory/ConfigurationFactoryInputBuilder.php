@@ -36,13 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 
 final class ConfigurationFactoryInputBuilder
 {
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string|null $gitDiffBase
-     */
     public function __construct(
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
@@ -60,11 +58,9 @@ final class ConfigurationFactoryInputBuilder
         private ?string $testFramework,
         private ?string $testFrameworkExtraOptions,
         private ?string $staticAnalysisToolOptions,
-        private string $filter,
+        private PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         private ?int $threadCount,
         private bool $dryRun,
-        private ?string $gitDiffFilter,
-        private ?string $gitDiffBase,
         private ?bool $useGitHubLogger,
         private ?string $gitlabLogFilePath,
         private ?string $htmlLogFilePath,
@@ -206,10 +202,10 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withFilter(string $filter): self
+    public function withSourceFilter(PlainFilter|IncompleteGitDiffFilter|null $sourceFilter): self
     {
         $clone = clone $this;
-        $clone->filter = $filter;
+        $clone->sourceFilter = $sourceFilter;
 
         return $clone;
     }
@@ -226,28 +222,6 @@ final class ConfigurationFactoryInputBuilder
     {
         $clone = clone $this;
         $clone->dryRun = $dryRun;
-
-        return $clone;
-    }
-
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     */
-    public function withGitDiffFilter(?string $gitDiffFilter): self
-    {
-        $clone = clone $this;
-        $clone->gitDiffFilter = $gitDiffFilter;
-
-        return $clone;
-    }
-
-    /**
-     * @param non-empty-string|null $gitDiffBase
-     */
-    public function withGitDiffBase(?string $gitDiffBase): self
-    {
-        $clone = clone $this;
-        $clone->gitDiffBase = $gitDiffBase;
 
         return $clone;
     }
@@ -335,43 +309,42 @@ final class ConfigurationFactoryInputBuilder
     /**
      * @return array{
      *     0: SchemaConfiguration,
-     *     1: string|null,
+     *     1: PlainFilter|IncompleteGitDiffFilter|null,
      *     2: string|null,
-     *     3: bool,
-     *     4: string,
-     *     5: bool,
+     *     3: string|null,
+     *     4: bool,
+     *     5: string,
      *     6: bool,
      *     7: bool,
-     *     8: bool|null,
-     *     9: float|null,
-     *     10: int|null,
-     *     11: float|null,
-     *     12: int,
-     *     13: string,
-     *     14: string|null,
+     *     8: bool,
+     *     9: bool|null,
+     *     10: float|null,
+     *     11: int|null,
+     *     12: float|null,
+     *     13: int,
+     *     14: string,
      *     15: string|null,
      *     16: string|null,
-     *     17: string,
+     *     17: string|null,
      *     18: int|null,
      *     19: bool,
-     *     20: non-empty-string|null,
-     *     21: non-empty-string|null,
-     *     22: bool|null,
+     *     20: bool|null,
+     *     21: string|null,
+     *     22: string|null,
      *     23: string|null,
-     *     24: string|null,
-     *     25: string|null,
-     *     26: bool,
-     *     27: bool,
+     *     24: bool,
+     *     25: bool,
+     *     26: string|null,
+     *     27: string|null,
      *     28: string|null,
-     *     29: string|null,
-     *     30: string|null,
-     *     31: string|null
+     *     29: string|null
      * }
      */
     public function build(SchemaConfiguration $schema): array
     {
         return [
             $schema,
+            $this->sourceFilter,
             $this->existingCoveragePath,
             $this->initialTestsPhpOptions,
             $this->skipInitialTests,
@@ -388,11 +361,8 @@ final class ConfigurationFactoryInputBuilder
             $this->testFramework,
             $this->testFrameworkExtraOptions,
             $this->staticAnalysisToolOptions,
-            $this->filter,
             $this->threadCount,
             $this->dryRun,
-            $this->gitDiffFilter,
-            $this->gitDiffBase,
             $this->useGitHubLogger,
             $this->gitlabLogFilePath,
             $this->htmlLogFilePath,

@@ -35,15 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
-// TODO: supports globs? To double check... name may change
-final readonly class UserFilter implements SourceFilter
+/**
+ * Represents the information supplied for applying a git diff filter. However, it may
+ * be incomplete or require to refine, e.g. find a better merge base for the base provided.
+ */
+final readonly class IncompleteGitDiffFilter
 {
     /**
-     * TODO: give examples
-     *
      * @param non-empty-string $value
+     * @param non-empty-string|null $base
      */
-    public function __construct(public string $value)
-    {
+    public function __construct(
+        public string $value,
+        public ?string $base,
+    ) {
     }
 }

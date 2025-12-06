@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Differ;
 
+use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Differ\FilesDiffChangedLines;
 use Infection\FileSystem\FileSystem;
+use Infection\Git\ConfiguredGit;
 use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -63,11 +65,12 @@ final class FilesDiffChangedLinesTest extends TestCase
     public function test_it_memoizes_parsed_results(): void
     {
         $filesDiffChangedLines = new FilesDiffChangedLines(
-            $this->createGitStub([]),
+            new ConfiguredGit(
+                $this->createGitStub([]),
+                new GitDiffFilter('AM', 'main'),
+                ['src', 'lib'],
+            ),
             $this->fileSystemStub,
-            'main',
-            'AM',
-            ['src', 'lib'],
         );
 
         $filesDiffChangedLines->contains('/path/to/File.php', 1, 1);
@@ -88,11 +91,12 @@ final class FilesDiffChangedLinesTest extends TestCase
         bool $expected,
     ): void {
         $filesDiffChangedLines = new FilesDiffChangedLines(
-            $this->createGitStub($changedLinesRangesByFilePathname),
+            new ConfiguredGit(
+                $this->createGitStub($changedLinesRangesByFilePathname),
+                new GitDiffFilter('AM', 'main'),
+                ['src', 'lib'],
+            ),
             $this->fileSystemStub,
-            'main',
-            'AM',
-            ['src', 'lib'],
         );
 
         $actual = $filesDiffChangedLines->contains(

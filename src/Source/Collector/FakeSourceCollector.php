@@ -33,17 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Source\Collector;
 
-final readonly class PartialGitFilter
+use DomainException;
+
+final class FakeSourceCollector implements SourceCollector
 {
-    /**
-     * @param non-empty-string $filter
-     * @param non-empty-string|null $base
-     */
-    public function __construct(
-        public string $filter,
-        public ?string $base,
-    ) {
+    public function collect(): iterable
+    {
+        throw new DomainException('Unexpected call.');
+    }
+
+    public function filter(iterable $input): iterable
+    {
+        throw new DomainException('Unexpected call.');
+    }
+
+    public function isFiltered(): bool
+    {
+        throw new DomainException('Unexpected call.');
     }
 }

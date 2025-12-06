@@ -45,8 +45,8 @@ final readonly class Source
      * @param list<non-empty-string> $excludes
      */
     public function __construct(
-        public array $directories,
-        public array $excludes,
+        public array $directories = [],
+        public array $excludes = [],
     ) {
     }
 }

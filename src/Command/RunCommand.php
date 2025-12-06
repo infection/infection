@@ -39,8 +39,8 @@ use function extension_loaded;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Configuration\SourceFilter\PartialGitFilter;
-use Infection\Configuration\SourceFilter\UserFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
@@ -271,7 +271,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Filter which files to mutate',
+                'Filter which files to mutate, e.g. "src/Service/FirstService.php,src/Entity/Event.php"',
                 Container::DEFAULT_SOURCE_FILTER,
             )
             ->addOption(
@@ -679,26 +679,26 @@ final class RunCommand extends BaseCommand
         return FormatterName::from($value);
     }
 
-    private static function getSourceFilter(InputInterface $input): UserFilter|PartialGitFilter|null
+    private static function getSourceFilter(InputInterface $input): PlainFilter|IncompleteGitDiffFilter|null
     {
-        $filter = self::getFilter($input);
-        $gitFilter = self::getGitOptions($input);
+        $filter = self::getPlainFilter($input);
+        $gitFilter = self::getGitFilter($input);
 
         self::assertOnlyOneTypeOfFiltering($filter, $gitFilter);
 
         return $filter ?? $gitFilter;
     }
 
-    private static function getFilter(InputInterface $input): ?UserFilter
+    private static function getPlainFilter(InputInterface $input): ?PlainFilter
     {
-        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
+        $value = trim((string) $input->getOption(self::OPTION_FILTER));
 
-        return $filter === ''
+        return $value === ''
             ? null
-            : new UserFilter($filter);
+            : new PlainFilter($value);
     }
 
-    private static function getGitOptions(InputInterface $input): ?PartialGitFilter
+    private static function getGitFilter(InputInterface $input): ?IncompleteGitDiffFilter
     {
         $gitDiffFilter = self::getGitDiffFilter($input);
 
@@ -713,8 +713,8 @@ final class RunCommand extends BaseCommand
 
         self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
 
-        return $gitDiffFilter !== null || $gitDiffBase !== null
-            ? new PartialGitFilter($gitDiffFilter, $gitDiffBase)
+        return $gitDiffFilter !== null
+            ? new IncompleteGitDiffFilter($gitDiffFilter, $gitDiffBase)
             : null;
     }
 
@@ -802,8 +802,8 @@ final class RunCommand extends BaseCommand
     }
 
     private static function assertOnlyOneTypeOfFiltering(
-        ?UserFilter $filter,
-        ?PartialGitFilter $gitFilter,
+        ?PlainFilter $filter,
+        ?IncompleteGitDiffFilter $gitFilter,
     ): void {
         if ($filter !== null && $gitFilter !== null) {
             throw new InvalidArgumentException(
