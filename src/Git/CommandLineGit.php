@@ -45,6 +45,8 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Process\ShellCommandLineExecutor;
 use Infection\Source\Exception\NoSourceFound;
 use const PHP_EOL;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use function Safe\preg_match;
 use function Safe\preg_split;
 use function sprintf;
@@ -72,6 +74,7 @@ final readonly class CommandLineGit implements Git
 
     public function __construct(
         private ShellCommandLineExecutor $shellCommandLineExecutor,
+        private LoggerInterface $logger = new NullLogger(),
     ) {
     }
 
@@ -133,12 +136,16 @@ final readonly class CommandLineGit implements Git
             Assert::stringNotEmpty($reference);
 
             return $reference;
-        } catch (ProcessException) {
-            // TODO: could do some logging here...
+        } catch (ProcessException $exception) {
+            $this->logger->info(
+                sprintf(
+                    'Could not find a common ancestor commit between "%1$s" and "HEAD" and fell back to the base "%1$s". This can if there is no common ancestor commit or if we are in a shallow commit.',
+                    $base,
+                ),
+                ['exception' => $exception],
+            );
         }
 
-        // there is no common ancestor commit, or we are in a shallow checkout and do have a copy of it.
-        // Fall back to direct diff
         return $base;
     }
 
@@ -285,9 +292,14 @@ final readonly class CommandLineGit implements Git
             Assert::stringNotEmpty($reference);
 
             return $reference;
-        } catch (ProcessException) {
-            // e.g. no symbolic ref might be configured for a remote named "origin"
-            // TODO: we could log the failure to figure it out somewhere...
+        } catch (ProcessException $exception) {
+            $this->logger->info(
+                sprintf(
+                    'Could not find a symbolic reference for "%s".',
+                    $name,
+                ),
+                ['exception' => $exception],
+            );
         }
 
         return null;
