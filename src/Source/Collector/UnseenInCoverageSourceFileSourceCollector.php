@@ -33,15 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Source\Collector;
 
 use function array_key_exists;
 use Infection\FileSystem\FileFilter;
+use Infection\TestFramework\Coverage\Trace;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
+ * TODO: figure out how to get rid of this.
  * We need to remove traces that are not in the list of source files,
  * which could have files that were been directly specified. All the
  * while later we may need a list of files that in the list but were
@@ -51,9 +53,8 @@ use Webmozart\Assert\Assert;
  * we're checking them against pre-filtered list of files.
  *
  * @internal
- * @final
  */
-class BufferedSourceFileFilter implements FileFilter
+final class UnseenInCoverageSourceFileSourceCollector implements FileFilter
 {
     /**
      * An associative array mapping real paths to SplFileInfo objects.
@@ -62,12 +63,8 @@ class BufferedSourceFileFilter implements FileFilter
      */
     private array $sourceFiles = [];
 
-    /**
-     * @param iterable<SplFileInfo> $sourceFiles
-     */
     public function __construct(
-        private readonly FileFilter $filter,
-        iterable $sourceFiles,
+        private readonly SourceCollector $decoratedCollector,
     ) {
         // Make a map of source files so we can check covered files against it.
         // We don't filter here on the assumption that hash table lookups are faster.
@@ -82,7 +79,7 @@ class BufferedSourceFileFilter implements FileFilter
      */
     public function filter(iterable $input): iterable
     {
-        return take($this->filter->filter($input))
+        return take($this->decoratedCollector->filter($input))
             ->filter(function ($trace): bool {
                 Assert::isInstanceOf($trace, Trace::class);
 
@@ -108,7 +105,7 @@ class BufferedSourceFileFilter implements FileFilter
     public function getUnseenInCoverageReportFiles(): iterable
     {
         /** @var iterable<SplFileInfo> $result */
-        $result = $this->filter->filter($this->sourceFiles);
+        $result = $this->decoratedCollector->filter($this->sourceFiles);
 
         return $result;
     }

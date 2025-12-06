@@ -33,26 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Source\Collector;
 
-use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+use Infection\FileSystem\FileFilter;
+use SplFileInfo;
 
-/**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
- * @internal
- */
-final readonly class UncoveredTraceProvider implements TraceProvider
+// TODO: I do not think FileFilter should be necessary here. To check how to phase it out.
+interface SourceCollector extends FileFilter
 {
-    public function __construct(
-        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
-    ) {
-    }
+    /**
+     * TODO: find a better method name
+     *
+     * Whether the collector collects all the project source files or if they are filtered, e.g.
+     * to match a user input filter or to git added/modified files.
+     */
+    public function isFiltered(): bool;
 
-    public function provideTraces(): iterable
-    {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
-        }
-    }
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    public function collect(): iterable;
 }

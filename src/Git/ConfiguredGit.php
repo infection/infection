@@ -33,26 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Git;
 
-use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Differ\ChangedLinesRange;
+use Infection\Source\Exception\NoSourceFound;
 
 /**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
  * @internal
  */
-final readonly class UncoveredTraceProvider implements TraceProvider
+final readonly class ConfiguredGit
 {
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     */
     public function __construct(
-        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
+        private Git $git,
+        private GitDiffFilter $config,
+        private array $sourceDirectories,
     ) {
     }
 
-    public function provideTraces(): iterable
+    /**
+     * @throws NoSourceFound
+     *
+     * @return non-empty-string
+     */
+    public function getChangedFileRelativePaths(): string
     {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
-        }
+        return $this->git->getChangedFileRelativePaths(
+            $this->config->filter,
+            $this->config->base,
+            $this->sourceDirectories,
+        );
+    }
+
+    /**
+     * @throws NoSourceFound
+     *
+     * @return non-empty-array<string, list<ChangedLinesRange>>
+     */
+    public function getChangedLinesRangesByFileRelativePaths(): array
+    {
+        return $this->git->getChangedLinesRangesByFileRelativePaths(
+            $this->config->filter,
+            $this->config->base,
+            $this->sourceDirectories,
+        );
     }
 }

@@ -33,38 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem;
-
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+namespace Infection\Configuration;
 
 /**
- * @final
- *
  * @internal
  */
-class SourceFileCollector
+final readonly class Source
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedFilesOrDirectories
-     *
-     * @return iterable<string, SplFileInfo>
+     * @param list<non-empty-string> $directories
+     * @param list<non-empty-string> $excludes
      */
-    public function collectFiles(
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-    ): iterable {
-        if ($sourceDirectories === []) {
-            return [];
-        }
-
-        return Finder::create()
-            ->in($sourceDirectories)
-            ->exclude($excludedFilesOrDirectories)
-            ->notPath($excludedFilesOrDirectories)
-            ->files()
-            ->name('*.php')
-        ;
+    public function __construct(
+        public array $directories = [],
+        public array $excludes = [],
+    ) {
     }
 }

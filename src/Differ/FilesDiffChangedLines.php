@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Differ;
 
 use Infection\FileSystem\FileSystem;
-use Infection\Git\Git;
+use Infection\Git\ConfiguredGit;
 use Infection\Source\Exception\NoSourceFound;
 
 /**
@@ -48,17 +48,9 @@ class FilesDiffChangedLines
     /** @var array<string, list<ChangedLinesRange>> */
     private ?array $memoizedFilesChangedLinesMap = null;
 
-    /**
-     * @param non-empty-string $gitDiffBase
-     * @param non-empty-string $gitDiffFilter
-     * @param non-empty-string[] $sourceDirectories
-     */
     public function __construct(
-        private readonly Git $git,
+        private readonly ConfiguredGit $git,
         private readonly FileSystem $filesystem,
-        private readonly string $gitDiffBase,
-        private readonly string $gitDiffFilter,
-        private readonly array $sourceDirectories,
     ) {
     }
 
@@ -95,11 +87,7 @@ class FilesDiffChangedLines
      */
     private function getFilesChangedLinesRanges(): array
     {
-        $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths(
-            $this->gitDiffFilter,
-            $this->gitDiffBase,
-            $this->sourceDirectories,
-        );
+        $changedLinesByRelativePaths = $this->git->getChangedLinesRangesByFileRelativePaths();
 
         $changedLinesByAbsolutePaths = [];
 

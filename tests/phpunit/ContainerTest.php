@@ -58,11 +58,11 @@ final class ContainerTest extends TestCase
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown service "Infection\FileSystem\SourceFileFilter"');
+        $this->expectExceptionMessage('Unknown service "Infection\Configuration\Source"');
 
         $container = new Container([]);
 
-        $container->getSourceFileFilter();
+        $container->getConfiguration();
     }
 
     public function test_it_can_build_simple_services_without_configuration(): void

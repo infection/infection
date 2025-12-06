@@ -33,26 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Configuration\SourceFilter;
 
-use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
-
-/**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
- * @internal
- */
-final readonly class UncoveredTraceProvider implements TraceProvider
+// TODO: supports globs? To double check... name may change
+final readonly class PlainFilter implements SourceFilter
 {
-    public function __construct(
-        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
-    ) {
-    }
-
-    public function provideTraces(): iterable
+    /**
+     * @param non-empty-string $value A comma separated list of paths to exclude.
+     */
+    public function __construct(public string $value)
     {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
-        }
     }
 }

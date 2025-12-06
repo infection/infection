@@ -38,7 +38,7 @@ namespace Infection\Configuration\Schema;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Source;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use Webmozart\Assert\Assert;

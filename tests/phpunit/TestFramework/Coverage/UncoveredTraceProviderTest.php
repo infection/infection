@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage;
 
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
+use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
 use Infection\TestFramework\Coverage\ProxyTrace;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
@@ -49,7 +49,7 @@ final class UncoveredTraceProviderTest extends TestCase
 {
     public function test_it_provides_traces(): void
     {
-        $filter = $this->createMock(BufferedSourceFileFilter::class);
+        $filter = $this->createMock(UnseenInCoverageSourceFileSourceCollector::class);
         $fileInfo = new MockSplFileInfo([
             'file' => 'test.txt',
         ]);

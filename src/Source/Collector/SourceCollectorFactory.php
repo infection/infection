@@ -33,20 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Entry;
+namespace Infection\Source\Collector;
 
-/**
- * @internal
- */
-final readonly class Source
+use Infection\Configuration\Source;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Differ\FilesDiffChangedLines;
+use Infection\FileSystem\FileSystem;
+use Infection\Git\ConfiguredGit;
+use const true;
+
+final readonly class SourceCollectorFactory
 {
-    /**
-     * @param list<non-empty-string> $directories
-     * @param list<non-empty-string> $excludes
-     */
     public function __construct(
-        public array $directories,
-        public array $excludes,
+        private ConfiguredGit $git,
+        private FileSystem $fileSystem,
     ) {
+    }
+
+    public function create(
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
+        return new UnseenInCoverageSourceFileSourceCollector(
+            $this->doCreate($source, $sourceFilter),
+        );
+    }
+
+    private function doCreate(
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
+        return match (true) {
+            $sourceFilter instanceof GitDiffFilter => new GitDiffSourceCollector(
+                $this->git,
+                new FilesDiffChangedLines(
+                    $this->git,
+                    $this->fileSystem,
+                ),
+                $source->directories,
+                $source->excludes,
+            ),
+            default => SchemaSourceCollector::create(
+                $sourceFilter,
+                $source->directories,
+                $source->excludes,
+            ),
+        };
     }
 }

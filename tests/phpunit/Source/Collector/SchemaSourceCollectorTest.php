@@ -33,9 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem\SourceFileCollector;
+namespace Infection\Tests\Source\Collector;
 
-use Infection\FileSystem\SourceFileCollector;
+use Infection\Source\Collector\SchemaSourceCollector;
+use Infection\TestFramework\Coverage\Trace;
+use Infection\Tests\Fixtures\MockSplFileInfo;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -43,11 +45,52 @@ use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
+use Traversable;
 
-#[CoversClass(SourceFileCollector::class)]
-final class SourceFileCollectorTest extends TestCase
+#[CoversClass(SchemaSourceCollector::class)]
+final class SchemaSourceCollectorTest extends TestCase
 {
     private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
+
+    /**
+     * @param string[] $expectedFilters
+     */
+    #[DataProvider('filterProvider')]
+    public function test_it_can_parse_and_normalize_string_filter(
+        string $filter,
+        array $expectedFilters,
+    ): void {
+        $fileFilter = SchemaSourceCollector::create(
+            filter: $filter,
+            sourceDirectories: [],
+            excludedDirectoriesOrFiles: [],
+        );
+
+        $actual = $fileFilter->filters;
+
+        $this->assertEqualsCanonicalizing($expectedFilters, $actual);
+    }
+
+    public static function filterProvider(): iterable
+    {
+        yield 'empty' => ['', []];
+
+        yield 'nominal' => [
+            'src/Foo.php, src/Bar.php',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+        ];
+
+        yield 'spaces & untrimmed string' => [
+            '  src/Foo.php,, , src/Bar.php  ',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+        ];
+    }
 
     /**
      * @param string[] $sourceDirectories
@@ -56,14 +99,18 @@ final class SourceFileCollectorTest extends TestCase
      */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(
+        ?string $filter,
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
         array $expectedList,
     ): void {
-        $files = (new SourceFileCollector())->collectFiles(
+        $collector = SchemaSourceCollector::create(
+            $filter,
             $sourceDirectories,
             $excludedFilesOrDirectories,
         );
+
+        $files = $collector->collect();
 
         self::assertIsEqualCanonicalizing(
             $expectedList,
@@ -77,12 +124,14 @@ final class SourceFileCollectorTest extends TestCase
     public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
+            null,
             [],
             [],
             [],
         ];
 
         yield 'one directory' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             [],
             [
@@ -93,6 +142,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'multiple directories' => [
+            null,
             [
                 self::FIXTURES_ROOT . '/case0',
                 self::FIXTURES_ROOT . '/case1',
@@ -108,6 +158,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory with a child directory excluded via its base name' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             ['sub-dir'],
             [
@@ -117,26 +168,29 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory with a child directory excluded via its full path' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             [self::FIXTURES_ROOT . '/case0/sub-dir'],
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',  // Does not work
+                'case0/sub-dir/b.php',  // Does not work; https://github.com/infection/infection/issues/2594
             ],
         ];
 
         yield 'one directory with a child directory excluded via its path relative to the source root' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             ['case0/sub-dir'],
             [
                 'case0/a.php',
                 'case0/outside-symlink.php',
-                'case0/sub-dir/b.php',  // Does not work
+                'case0/sub-dir/b.php',  // Does not work; https://github.com/infection/infection/issues/2594
             ],
         ];
 
         yield 'one directory with a directory excluded via its full path with the same name as an included child directory' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             [self::FIXTURES_ROOT . '/sub-dir'],
             [
@@ -147,6 +201,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory with a directory excluded via its full path with the same name as an included directory' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             [self::FIXTURES_ROOT . '/case0'],
             [
@@ -158,10 +213,12 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory with a directory excluded via its base name with the same name as an included directory' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             ['case0'],
             [
                 // Does not work
+                // https://github.com/infection/infection/issues/2594
                 'case0/a.php',
                 'case0/outside-symlink.php',
                 'case0/sub-dir/b.php',
@@ -169,6 +226,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'multiple directories with a common child directory excluded via its base name' => [
+            null,
             [
                 self::FIXTURES_ROOT . '/case0',
                 self::FIXTURES_ROOT . '/case1',
@@ -182,6 +240,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory with a child file excluded via its base name' => [
+            null,
             [self::FIXTURES_ROOT . '/case1'],
             ['a.php'],
             [
@@ -190,6 +249,7 @@ final class SourceFileCollectorTest extends TestCase
         ];
 
         yield 'one directory with a child file and directory excluded via its base name' => [
+            null,
             [self::FIXTURES_ROOT . '/case0'],
             [
                 'sub-dir',
@@ -199,6 +259,145 @@ final class SourceFileCollectorTest extends TestCase
                 'case0/outside-symlink.php',
             ],
         ];
+    }
+
+    /**
+     * @param non-empty-string|null $filter
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    #[DataProvider('fileListProvider')]
+    public function test_it_filters_spl_file_info_files_traversable(
+        ?string $filter,
+        array $filePaths,
+        array $expectedFilePaths,
+    ): void {
+        $collector = SchemaSourceCollector::create(
+            filter: $filter,
+            sourceDirectories: [],
+            excludedDirectoriesOrFiles: [],
+        );
+
+        $files = self::createSplFileInfosTraversable($filePaths);
+
+        $actual = take($collector->filter($files))
+            ->map(self::mapFileInfoOrTraceToRealPath(...))
+            ->toList();
+
+        $this->assertSame($expectedFilePaths, $actual);
+    }
+
+    /**
+     * @param string[] $filePaths
+     * @param string[] $expectedFilePaths
+     */
+    #[DataProvider('fileListProvider')]
+    public function test_it_filters_traces_traversable(
+        string $filter,
+        array $filePaths,
+        array $expectedFilePaths,
+    ): void {
+        $collector = SchemaSourceCollector::create(
+            filter: $filter,
+            sourceDirectories: [],
+            excludedDirectoriesOrFiles: [],
+        );
+
+        $traces = $this->createTracesTraversable($filePaths);
+
+        $actual = take($collector->filter($traces))
+            ->map(self::mapFileInfoOrTraceToRealPath(...))
+            ->toList();
+
+        $this->assertSame($expectedFilePaths, $actual);
+    }
+
+    public static function fileListProvider(): iterable
+    {
+        yield [
+            'src/Example',
+            [
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Example/Test.php',
+            ],
+        ];
+
+        yield [
+            'src/Foo',
+            [
+                'src/Example/Test.php',
+            ],
+            [],
+        ];
+
+        yield [
+            '',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+        ];
+
+        yield [
+            'src/Foo,src/Bar',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+            ],
+        ];
+    }
+
+    private static function mapFileInfoOrTraceToRealPath(SplFileInfo|Trace $fileInfoOrTrace): string
+    {
+        return $fileInfoOrTrace->getRealPath();
+    }
+
+    /**
+     * @param string[] $filePaths
+     *
+     * @return Traversable<MockSplFileInfo>
+     */
+    private static function createSplFileInfosTraversable(array $filePaths): Traversable
+    {
+        return take($filePaths)
+            ->map(static fn (string $realPath): MockSplFileInfo => new MockSplFileInfo([
+                'realPath' => $realPath,
+                'type' => 'file',
+                'mode' => 'r+',
+            ]));
+    }
+
+    /**
+     * @param string[] $filePaths
+     *
+     * @return Traversable<Trace>
+     */
+    private function createTracesTraversable(array $filePaths): Traversable
+    {
+        return take($filePaths)
+            ->map(function (string $filename): Trace {
+                $traceMock = $this->createMock(Trace::class);
+                $traceMock
+                    ->method('getRealPath')
+                    ->willReturn($filename)
+                ;
+
+                return $traceMock;
+            })
+        ;
     }
 
     /**

@@ -33,26 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
-
-use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+namespace Infection\Configuration\SourceFilter;
 
 /**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
- * @internal
+ * Represents the information supplied for applying a git diff filter. However, it may
+ * be incomplete or require to refine, e.g. find a better merge base for the base provided.
  */
-final readonly class UncoveredTraceProvider implements TraceProvider
+final readonly class IncompleteGitDiffFilter
 {
+    /**
+     * @param non-empty-string $value
+     * @param non-empty-string|null $base
+     */
     public function __construct(
-        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
+        public string $value,
+        public ?string $base,
     ) {
-    }
-
-    public function provideTraces(): iterable
-    {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
-        }
     }
 }

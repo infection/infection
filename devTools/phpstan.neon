@@ -12,6 +12,7 @@ parameters:
     sidzIgnoreNumericStrings: true
     parallel:
         processTimeout: 120.0
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#generic class ReflectionClass (but )?does not specify its types#'
         - '#^Parameter \#\d+ \$.+ \(.+\) of method .+ should be contravariant with parameter \$.+ \(.+\) of method .+$#'
@@ -211,3 +212,4 @@ parameters:
     stubFiles:
         - phpstan.stub
     treatPhpDocTypesAsCertain: false
+

@@ -33,26 +33,68 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Source\Collector;
 
-use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Differ\FilesDiffChangedLines;
+use Infection\Git\ConfiguredGit;
+use Infection\Source\SourceLineFilter;
 
 /**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
  * @internal
  */
-final readonly class UncoveredTraceProvider implements TraceProvider
+final class GitDiffSourceCollector implements SourceCollector, SourceLineFilter
 {
+    private ?SourceCollector $innerCollector = null;
+
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedDirectoriesOrFiles
+     */
     public function __construct(
-        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
+        private readonly ConfiguredGit $git,
+        private readonly FilesDiffChangedLines $filesDiffChangedLines,
+        private readonly array $sourceDirectories,
+        private readonly array $excludedDirectoriesOrFiles,
     ) {
     }
 
-    public function provideTraces(): iterable
+    public function collect(): iterable
     {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
+        return $this->getInnerCollector()->collect();
+    }
+
+    public function filter(iterable $input): iterable
+    {
+        return $this->getInnerCollector()->filter($input);
+    }
+
+    public function isFiltered(): bool
+    {
+        return true;
+    }
+
+    public function touches(string $sourceFilePathname, int $startLine, int $endLine): bool
+    {
+        return $this->filesDiffChangedLines->contains(
+            $sourceFilePathname,
+            $startLine,
+            $endLine,
+        );
+    }
+
+    private function getInnerCollector(): SourceCollector
+    {
+        if ($this->innerCollector === null) {
+            $filter = $this->git->getChangedFileRelativePaths();
+
+            $this->innerCollector = SchemaSourceCollector::create(
+                new PlainFilter($filter),
+                $this->sourceDirectories,
+                $this->excludedDirectoriesOrFiles,
+            );
         }
+
+        return $this->innerCollector;
     }
 }

@@ -212,7 +212,7 @@ final readonly class Engine
     private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(
-            $this->config->mutateOnlyCoveredCode(),
+            $this->config->shouldMutateOnlyCoveredCode(),
             $this->getNodeIgnorers(),
         );
 

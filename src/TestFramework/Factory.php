@@ -40,13 +40,12 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
-use function iterator_to_array;
-use SplFileInfo;
+use function Pipeline\take;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -65,16 +64,22 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
-        private SourceFileFilter $sourceFileFilter,
         private array $installedExtensions,
+        private SourceCollector $sourceCollector,
     ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
+            // TODO: extract in a separate method
+
+            // TODO: to dig deeper how this is used.
+            //  this looks a bit fishy as we may have a different config here than what the user
+            //  configured in their phpunit.xml for example.
+            //  likewise depending of the state, what files are considered for mutations changes.
+            $filteredSourceFilesToMutate = take($this->sourceCollector->collect())->toList();
+
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
@@ -87,7 +92,7 @@ final readonly class Factory
                 (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->sourceDirectories,
+                $this->infectionConfig->source->directories,
                 $skipCoverage,
                 $this->infectionConfig->executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
@@ -118,7 +123,7 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $configuration->sourceDirectories,
+                    $configuration->source->directories,
                     $skipCoverage,
                 );
             }
@@ -129,25 +134,5 @@ final readonly class Factory
             $adapterName,
             implode(', ', $availableTestFrameworks),
         ));
-    }
-
-    /**
-     * Get only those source files that will be mutated to use them in coverage whitelist
-     *
-     * @return list<SplFileInfo>
-     */
-    private function getFilteredSourceFilesToMutate(): array
-    {
-        if ($this->sourceFileFilter->getFilters() === []) {
-            return [];
-        }
-
-        /**
-         * @var list<SplFileInfo> $files
-         * @psalm-suppress InvalidArgument
-         */
-        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->sourceFiles));
-
-        return $files;
     }
 }

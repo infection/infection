@@ -33,26 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Source\Collector;
 
-use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+use DomainException;
 
-/**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
- * @internal
- */
-final readonly class UncoveredTraceProvider implements TraceProvider
+final class FakeSourceCollector implements SourceCollector
 {
-    public function __construct(
-        private UnseenInCoverageSourceFileSourceCollector $bufferedFilter,
-    ) {
+    public function collect(): iterable
+    {
+        throw new DomainException('Unexpected call.');
     }
 
-    public function provideTraces(): iterable
+    public function filter(iterable $input): iterable
     {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
-        }
+        throw new DomainException('Unexpected call.');
+    }
+
+    public function isFiltered(): bool
+    {
+        throw new DomainException('Unexpected call.');
     }
 }

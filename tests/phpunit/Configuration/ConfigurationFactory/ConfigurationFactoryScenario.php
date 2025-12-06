@@ -39,6 +39,9 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
@@ -589,34 +592,18 @@ final class ConfigurationFactoryScenario
             );
     }
 
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string|null $gitDiffBase
-     * @param non-empty-string|null $expectedDiffBase
-     * @param non-empty-string|null $expectedDiffFilter
-     */
-    public function forFilter(
-        string $filter,
-        ?string $gitDiffFilter,
-        ?string $gitDiffBase,
-        string $expectedSourceFilesFilter,
-        bool $expectedIsForGitDiffLines,
-        ?string $expectedDiffBase,
-        ?string $expectedDiffFilter,
+    public function forSourceFilter(
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        ?SourceFilter $expectedSourceFilter,
     ): self {
         return $this
             ->withInput(
                 $this->inputBuilder
-                ->withFilter($filter)
-                ->withGitDiffFilter($gitDiffFilter)
-                ->withGitDiffBase($gitDiffBase),
+                ->withSourceFilter($sourceFilter),
             )
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
-                    ->withSourceFilesFilter($expectedSourceFilesFilter)
-                    ->withIsForGitDiffLines($expectedIsForGitDiffLines)
-                    ->withGitDiffBase($expectedDiffBase)
-                    ->withGitDiffFilter($expectedDiffFilter)
+                    ->withSourceFilter($expectedSourceFilter)
                     ->build(),
             );
     }

@@ -33,55 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Tracing;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Infection\TestFramework\Coverage\Trace;
+use SplFileInfo;
 
-#[CoversClass(ConfigurationFactoryGit::class)]
-final class ConfigurationFactoryGitTest extends TestCase
+interface Tracer
 {
-    /**
-     * @param non-empty-string $diffFilter
-     * @param non-empty-string $baseBranch
-     * @param non-empty-string[] $sourceDirectories
-     */
-    #[DataProvider('changedFileRelativePathsProvider')]
-    public function test_it_can_show_the_changed_file_relative_paths(
-        string $changedFileRelativePaths,
-        string $diffFilter,
-        string $baseBranch,
-        array $sourceDirectories,
-        string $expected,
-    ): void {
-        $git = new ConfigurationFactoryGit('unknown', $changedFileRelativePaths);
+    public function hasTrace(SplFileInfo $fileInfo): Trace;
 
-        $actual = $git->getChangedFileRelativePaths(
-            $diffFilter,
-            $baseBranch,
-            $sourceDirectories,
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public static function changedFileRelativePathsProvider(): iterable
-    {
-        yield 'no source directories' => [
-            'src/a.php,src/b.php',
-            'AM',
-            'main',
-            [],
-            'f(AM, main, []) = src/a.php,src/b.php',
-        ];
-
-        yield 'with source directories' => [
-            'src/a.php,src/b.php',
-            'AM',
-            'main',
-            ['src', 'config'],
-            'f(AM, main, [src, config]) = src/a.php,src/b.php',
-        ];
-    }
+    public function trace(SplFileInfo $fileInfo): Trace;
 }

@@ -37,14 +37,14 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use function array_values;
 use Infection\FileSystem\FileFilter;
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
+use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(BufferedSourceFileFilter::class)]
+#[CoversClass(UnseenInCoverageSourceFileSourceCollector::class)]
 final class BufferedSourceFileFilterTest extends TestCase
 {
     public function test_it_filters_and_collects_unseen(): void
@@ -74,7 +74,7 @@ final class BufferedSourceFileFilterTest extends TestCase
                 default => 'noop',
             });
 
-        $bufferedFilter = new BufferedSourceFileFilter($filter, $sourceFiles);
+        $bufferedFilter = new UnseenInCoverageSourceFileSourceCollector($filter, $sourceFiles);
 
         $this->assertSame($traces, iterator_to_array($bufferedFilter->filter($traces), false));
 

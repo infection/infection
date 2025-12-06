@@ -37,7 +37,6 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
-use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
@@ -47,8 +46,11 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
 use Infection\Logger\FileLogger;
@@ -58,7 +60,6 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function max;
@@ -68,15 +69,13 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class ConfigurationFactory
+final readonly class ConfigurationFactory
 {
     /**
      * Default allowed timeout (on a test basis) in seconds
@@ -84,25 +83,21 @@ class ConfigurationFactory
     private const DEFAULT_TIMEOUT = 10;
 
     public function __construct(
-        private readonly TmpDirProvider $tmpDirProvider,
-        private readonly MutatorResolver $mutatorResolver,
-        private readonly MutatorFactory $mutatorFactory,
-        private readonly MutatorParser $mutatorParser,
-        private readonly SourceFileCollector $sourceFileCollector,
-        private readonly CiDetectorInterface $ciDetector,
-        private readonly Git $git,
+        private TmpDirProvider $tmpDirProvider,
+        private MutatorResolver $mutatorResolver,
+        private MutatorFactory $mutatorFactory,
+        private MutatorParser $mutatorParser,
+        private CiDetectorInterface $ciDetector,
+        private Git $git,
     ) {
     }
 
     /**
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string|null $gitDiffBase
-     *
      * @throws FileOrDirectoryNotFound
-     * @throws NoSourceFound
      */
     public function create(
         SchemaConfiguration $schema,
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?string $existingCoveragePath,
         ?string $initialTestsPhpOptions,
         bool $skipInitialTests,
@@ -119,11 +114,8 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         ?string $staticAnalysisToolOptions,
-        string $filter,
         ?int $threadCount,
         bool $dryRun,
-        ?string $gitDiffFilter,
-        ?string $gitDiffBase,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
@@ -157,21 +149,10 @@ class ConfigurationFactory
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
-        $useGitDiff = $gitDiffFilter !== null;
-        $refinedGitBase = self::refineGitBaseIfNecessary($gitDiffBase, $useGitDiff);
-
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
-            sourceDirectories: $schema->source->directories,
-            sourceFiles: $this->collectFiles($schema),
-            sourceFilesFilter: $this->retrieveFilter(
-                $filter,
-                $gitDiffFilter,
-                $useGitDiff,
-                $refinedGitBase,
-                $schema->source->directories,
-            ),
-            sourceFilesExcludes: $schema->source->excludes,
+            source: $schema->source,
+            sourceFilter: $this->refineFilterIfNecessary($sourceFilter),
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
@@ -198,9 +179,6 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForGitDiffLines: $useGitDiff,
-            gitDiffBase: $refinedGitBase,
-            gitDiffFilter: $gitDiffFilter,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
@@ -351,56 +329,16 @@ class ConfigurationFactory
         return $map;
     }
 
-    /**
-     * @return iterable<string, SplFileInfo>
-     */
-    private function collectFiles(SchemaConfiguration $schema): iterable
+    private function refineFilterIfNecessary(PlainFilter|IncompleteGitDiffFilter|null $filter): ?SourceFilter
     {
-        $source = $schema->source;
-        $schemaDirname = dirname($schema->file);
-
-        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
-            ? $path
-            : Path::join(
-                $schemaDirname,
-                $path,
+        if ($filter instanceof IncompleteGitDiffFilter) {
+            return new GitDiffFilter(
+                $filter->value,
+                self::refineGitBase($filter->base),
             );
-
-        return $this->sourceFileCollector->collectFiles(
-            // We need to make the source file paths absolute, otherwise the
-            // collector will collect the files relative to the current working
-            // directory instead of relative to the location of the configuration
-            // file.
-            array_map(
-                $mapToAbsolutePath(...),
-                $source->directories,
-            ),
-            $source->excludes,
-        );
-    }
-
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string|null $gitBase
-     *
-     * @throws NoSourceFound
-     */
-    private function retrieveFilter(
-        string $filter,
-        ?string $gitDiffFilter,
-        bool $useGitDiff,
-        ?string $gitBase,
-        array $sourceDirectories,
-    ): string {
-        if ($gitDiffFilter === null && !$useGitDiff) {
-            return $filter;
         }
 
-        Assert::notNull($gitDiffFilter);
-        Assert::notNull($gitBase);
-
-        return $this->git->getChangedFileRelativePaths($gitDiffFilter, $gitBase, $sourceDirectories);
+        return $filter;
     }
 
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
@@ -495,11 +433,11 @@ class ConfigurationFactory
     }
 
     /**
-     * @param non-empty-string $base
+     * @param non-empty-string|null $base
      *
-     * @return ($useGitDiff is false ? non-empty-string|null : non-empty-string)
+     * @return non-empty-string
      */
-    private function refineGitBaseIfNecessary(?string $base, bool $useGitDiff): ?string
+    private function refineGitBase(?string $base): string
     {
         // When the user gives a base, we need to try to refine it.
         // For example, if the user created their feature branch:
@@ -519,8 +457,6 @@ class ConfigurationFactory
         //
         // To prevent this, we try to find the best common ancestor, here C.
         // As a result, we would do `git diff C HEAD` which would give (D,E).
-        return $useGitDiff
-            ? $this->git->getBaseReference($base ?? $this->git->getDefaultBase())
-            : null;
+        return $this->git->getBaseReference($base ?? $this->git->getDefaultBase());
     }
 }

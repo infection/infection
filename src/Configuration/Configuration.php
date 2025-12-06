@@ -40,12 +40,12 @@ use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -61,20 +61,13 @@ readonly class Configuration
     ];
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $sourceFilesExcludes
-     * @param iterable<SplFileInfo> $sourceFiles
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
-     * @param non-empty-string|null $gitDiffBase
-     * @param non-empty-string|null $gitDiffFilter
      */
     public function __construct(
         public float $processTimeout,
-        public array $sourceDirectories,
-        public iterable $sourceFiles,
-        public string $sourceFilesFilter,
-        public array $sourceFilesExcludes,
+        public Source $source,
+        public ?SourceFilter $sourceFilter,
         public Logs $logs,
         public string $logVerbosity,
         public string $tmpDir,
@@ -101,16 +94,12 @@ readonly class Configuration
         public bool $isDryRun,
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
-        public bool $isForGitDiffLines,
-        public ?string $gitDiffBase,
-        public ?string $gitDiffFilter,
         public ?string $mapSourceClassToTestStrategy,
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
-        Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());
@@ -136,7 +125,7 @@ readonly class Configuration
         return $this->parseStaticAnalysisToolOptions($this->staticAnalysisToolOptions);
     }
 
-    public function mutateOnlyCoveredCode(): bool
+    public function shouldMutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
     }
