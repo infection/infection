@@ -76,7 +76,7 @@ final class SchemaConfigurationBuilder
     public static function from(SchemaConfiguration $schema): self
     {
         return new self(
-            $schema->file,
+            $schema->pathname,
             $schema->timeout,
             $schema->source,
             $schema->logs,
