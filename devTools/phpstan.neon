@@ -190,6 +190,16 @@ parameters:
             identifier: throws.unusedType
             path: ../src/Container.php
 
+        # PHPStan cannot really properly infer the types here
+        -
+            message: '#SourceFileCollector::makePathsAbsolute\(\)#'
+            identifier: argument.type
+            path: ../src/FileSystem/SourceFileCollector.php
+        -
+            message: '#SourceFileCollector::makePathsAbsolute\(\)#'
+            identifier: return.type
+            path: ../src/FileSystem/SourceFileCollector.php
+
         # False-positive: the value cannot be -1 with our configuration.
         -
             message: '#^.*mutation(Start|End)Line.*FilesDiffChangedLines::contains\(\) expects int\<1\, max\>\, -1\|int\<1\, max\> given\.$#'

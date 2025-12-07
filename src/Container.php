@@ -250,7 +250,7 @@ final class Container extends DIContainer
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
                 $container->getSourceFileFilter(),
-                $container->getConfiguration()->sourceFiles,
+                $container->getSourceFileCollector()->collect(),
             ),
             SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
                 $container->getConfiguration()->sourceFilesFilter,
@@ -280,6 +280,7 @@ final class Container extends DIContainer
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
                     $container->getSourceFileFilter(),
+                    $container->getSourceFileCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -581,6 +582,15 @@ final class Container extends DIContainer
                     $configuration->sourceDirectories,
                 );
             },
+            SourceFileCollector::class => static function (self $container): SourceFileCollector {
+                $configuration = $container->getConfiguration();
+
+                return SourceFileCollector::create(
+                    $configuration->configurationPathname,
+                    $configuration->sourceDirectories,
+                    $configuration->sourceFilesExcludes,
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -590,6 +600,7 @@ final class Container extends DIContainer
     }
 
     /**
+     * @param non-empty-string|null $configFile
      * @param non-empty-string|null $gitDiffFilter
      * @param non-empty-string|null $gitDiffBase
      */
@@ -653,7 +664,7 @@ final class Container extends DIContainer
                 array_filter(
                     [
                         $configFile,
-                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILE_NAMES,
                     ],
                 ),
             ),

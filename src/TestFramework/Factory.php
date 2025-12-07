@@ -40,6 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
@@ -66,6 +67,7 @@ final readonly class Factory
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
         private SourceFileFilter $sourceFileFilter,
+        private SourceFileCollector $sourceFileCollector,
         private array $installedExtensions,
     ) {
     }
@@ -146,7 +148,11 @@ final readonly class Factory
          * @var list<SplFileInfo> $files
          * @psalm-suppress InvalidArgument
          */
-        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->sourceFiles));
+        $files = iterator_to_array(
+            $this->sourceFileFilter->filter(
+                $this->sourceFileCollector->collect(),
+            ),
+        );
 
         return $files;
     }
