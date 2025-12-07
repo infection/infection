@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
-use Infection\Source\Collector\SourceFileCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\Tests\Configuration\ConfigurationBuilder;

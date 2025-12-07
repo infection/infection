@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\SourceFileCollector;
+namespace Infection\Tests\FileSystem\SourceFileCollector;
 
-use Infection\Source\Collector\SourceFileCollector;
+use Infection\FileSystem\SourceFileCollector;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

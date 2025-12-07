@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Collector;
+namespace Infection\FileSystem;
 
 use function array_map;
 use function dirname;
