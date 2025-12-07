@@ -30,10 +30,6 @@ parameters:
         -
             path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
             message: '#return type with generic class ArrayObject does not specify its types\: TKey, TValue#'
-        -
-            message: "#^ArrayObject\\<\\*NEVER\\*, \\*NEVER\\*\\> does not accept array\\<string, array\\|string\\>\\.$#"
-            count: 1
-            path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
 
         -
             message: "#^Generator expects value type list\\<PhpParser\\\\Node\\\\Stmt\\>, array\\<PhpParser\\\\Node\\\\Stmt\\> given\\.$#"
