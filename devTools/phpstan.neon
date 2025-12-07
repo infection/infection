@@ -194,11 +194,11 @@ parameters:
         -
             message: '#SourceFileCollector::makePathsAbsolute\(\)#'
             identifier: argument.type
-            path: ../src/Source/Collector/SourceFileCollector.php
+            path: ../src/FileSystem/SourceFileCollector.php
         -
             message: '#SourceFileCollector::makePathsAbsolute\(\)#'
             identifier: return.type
-            path: ../src/Source/Collector/SourceFileCollector.php
+            path: ../src/FileSystem/SourceFileCollector.php
 
     level: 8
     paths:

@@ -39,11 +39,13 @@ use Infection\FileSystem\SourceFileCollector;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 
+#[Group('integration')]
 #[CoversClass(SourceFileCollector::class)]
 final class SourceFileCollectorTest extends TestCase
 {
