@@ -154,10 +154,6 @@ parameters:
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
-        # PHPBench benchmarks are not meant to be exposed.
-        -
-            identifier: shipmonk.deadMethod
-            path: ../tests/benchmark/*/*Bench.php
 
         # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
