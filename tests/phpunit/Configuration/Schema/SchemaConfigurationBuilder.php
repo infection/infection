@@ -47,12 +47,13 @@ use Infection\TestFramework\TestFrameworkTypes;
 final class SchemaConfigurationBuilder
 {
     /**
+     * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     private function __construct(
-        private string $file,
+        private string $pathname,
         private ?float $timeout,
         private Source $source,
         private Logs $logs,
@@ -76,7 +77,7 @@ final class SchemaConfigurationBuilder
     public static function from(SchemaConfiguration $schema): self
     {
         return new self(
-            file: $schema->file,
+            pathname: $schema->pathname,
             timeout: $schema->timeout,
             source: $schema->source,
             logs: $schema->logs,
@@ -100,7 +101,7 @@ final class SchemaConfigurationBuilder
     public static function withMinimalTestData(): self
     {
         return new self(
-            file: '/path/to/infection.json',
+            pathname: '/path/to/infection.json',
             timeout: null,
             source: new Source([], []),
             logs: Logs::createEmpty(),
@@ -124,7 +125,7 @@ final class SchemaConfigurationBuilder
     public static function withCompleteTestData(): self
     {
         return new self(
-            file: '/complete/path/infection.json',
+            pathname: '/complete/path/infection.json',
             timeout: 10.0,
             source: new Source(['src', 'lib'], ['vendor', 'tests']),
             logs: new Logs(
@@ -156,10 +157,13 @@ final class SchemaConfigurationBuilder
         );
     }
 
-    public function withFile(string $file): self
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function withPathname(string $pathname): self
     {
         $clone = clone $this;
-        $clone->file = $file;
+        $clone->pathname = $pathname;
 
         return $clone;
     }
@@ -312,7 +316,7 @@ final class SchemaConfigurationBuilder
     public function build(): SchemaConfiguration
     {
         return new SchemaConfiguration(
-            file: $this->file,
+            pathname: $this->pathname,
             timeout: $this->timeout,
             source: $this->source,
             logs: $this->logs,
