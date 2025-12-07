@@ -50,23 +50,21 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class ConfigurationBuilder
 {
     /**
      * @param non-empty-string[] $sourceDirectories
-     * @param iterable<SplFileInfo> $sourceFiles
      * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string $gitDiffBase
      * @param non-empty-string $gitDiffFilter
+     * @param non-empty-string $configPathname
      */
     private function __construct(
         private float $timeout,
         private array $sourceDirectories,
-        private iterable $sourceFiles,
         private string $sourceFilesFilter,
         private array $sourceFilesExcludes,
         private Logs $logs,
@@ -102,6 +100,7 @@ final class ConfigurationBuilder
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
+        private string $configPathname,
     ) {
     }
 
@@ -110,7 +109,6 @@ final class ConfigurationBuilder
         return new self(
             timeout: $configuration->processTimeout,
             sourceDirectories: $configuration->sourceDirectories,
-            sourceFiles: $configuration->sourceFiles,
             sourceFilesFilter: $configuration->sourceFilesFilter,
             sourceFilesExcludes: $configuration->sourceFilesExcludes,
             logs: $configuration->logs,
@@ -148,6 +146,7 @@ final class ConfigurationBuilder
             loggerProjectRootDirectory: $configuration->loggerProjectRootDirectory,
             staticAnalysisTool: $configuration->staticAnalysisTool,
             mutantId: $configuration->mutantId,
+            configPathname: $configuration->configurationPathname,
         );
     }
 
@@ -156,7 +155,6 @@ final class ConfigurationBuilder
         return new self(
             timeout: 10.0,
             sourceDirectories: [],
-            sourceFiles: [],
             sourceFilesFilter: '',
             sourceFilesExcludes: [],
             logs: Logs::createEmpty(),
@@ -192,6 +190,7 @@ final class ConfigurationBuilder
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
+            configPathname: '/path/to/project/infection.json5',
         );
     }
 
@@ -200,10 +199,6 @@ final class ConfigurationBuilder
         return new self(
             timeout: 5.0,
             sourceDirectories: ['src', 'lib'],
-            sourceFiles: [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ],
             sourceFilesFilter: 'src/Foo.php,src/Bar.php',
             sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
@@ -257,6 +252,7 @@ final class ConfigurationBuilder
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
+            configPathname: '/path/to/project/infection.json5',
         );
     }
 
@@ -275,17 +271,6 @@ final class ConfigurationBuilder
     {
         $clone = clone $this;
         $clone->sourceDirectories = $sourceDirectories;
-
-        return $clone;
-    }
-
-    /**
-     * @param iterable<SplFileInfo> $sourceFiles
-     */
-    public function withSourceFiles(iterable $sourceFiles): self
-    {
-        $clone = clone $this;
-        $clone->sourceFiles = $sourceFiles;
 
         return $clone;
     }
@@ -585,12 +570,22 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function withConfigPathname(string $pathname): self
+    {
+        $clone = clone $this;
+        $clone->configPathname = $pathname;
+
+        return $clone;
+    }
+
     public function build(): Configuration
     {
         return new Configuration(
             processTimeout: $this->timeout,
             sourceDirectories: $this->sourceDirectories,
-            sourceFiles: $this->sourceFiles,
             sourceFilesFilter: $this->sourceFilesFilter,
             sourceFilesExcludes: $this->sourceFilesExcludes,
             logs: $this->logs,
@@ -626,6 +621,7 @@ final class ConfigurationBuilder
             loggerProjectRootDirectory: $this->loggerProjectRootDirectory,
             staticAnalysisTool: $this->staticAnalysisTool,
             mutantId: $this->mutantId,
+            configurationPathname: $this->configPathname,
         );
     }
 }

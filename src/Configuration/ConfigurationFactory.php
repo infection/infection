@@ -37,7 +37,6 @@ namespace Infection\Configuration;
 
 use function array_fill_keys;
 use function array_key_exists;
-use function array_map;
 use function array_unique;
 use function array_values;
 use function dirname;
@@ -48,7 +47,6 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\Git;
 use Infection\Logger\FileLogger;
@@ -68,7 +66,6 @@ use OndraM\CiDetector\Exception\CiNotDetectedException;
 use PhpParser\Node;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
 use Webmozart\Assert\Assert;
 
@@ -88,7 +85,6 @@ class ConfigurationFactory
         private readonly MutatorResolver $mutatorResolver,
         private readonly MutatorFactory $mutatorFactory,
         private readonly MutatorParser $mutatorParser,
-        private readonly SourceFileCollector $sourceFileCollector,
         private readonly CiDetectorInterface $ciDetector,
         private readonly Git $git,
     ) {
@@ -163,7 +159,6 @@ class ConfigurationFactory
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             sourceDirectories: $schema->source->directories,
-            sourceFiles: $this->collectFiles($schema),
             sourceFilesFilter: $this->retrieveFilter(
                 $filter,
                 $gitDiffFilter,
@@ -205,6 +200,7 @@ class ConfigurationFactory
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
+            configurationPathname: $schema->pathname,
         );
     }
 
@@ -349,34 +345,6 @@ class ConfigurationFactory
         }
 
         return $map;
-    }
-
-    /**
-     * @return iterable<string, SplFileInfo>
-     */
-    private function collectFiles(SchemaConfiguration $schema): iterable
-    {
-        $source = $schema->source;
-        $schemaDirname = dirname($schema->pathname);
-
-        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
-            ? $path
-            : Path::join(
-                $schemaDirname,
-                $path,
-            );
-
-        return $this->sourceFileCollector->collectFiles(
-            // We need to make the source file paths absolute, otherwise the
-            // collector will collect the files relative to the current working
-            // directory instead of relative to the location of the configuration
-            // file.
-            array_map(
-                $mapToAbsolutePath(...),
-                $source->directories,
-            ),
-            $source->excludes,
-        );
     }
 
     /**

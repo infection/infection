@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
@@ -61,6 +62,7 @@ final class FactoryTest extends TestCase
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createMock(SourceFileFilter::class),
+            $this->createMock(SourceFileCollector::class),
             [],
         );
 
@@ -78,6 +80,7 @@ final class FactoryTest extends TestCase
             '',
             ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createMock(SourceFileFilter::class),
+            $this->createMock(SourceFileCollector::class),
             [
                 'infection/codeception-adapter' => [
                     'install_path' => '/path/to/dummy/adapter/factory.php',

@@ -190,6 +190,16 @@ parameters:
             identifier: throws.unusedType
             path: ../src/Container.php
 
+        # PHPStan cannot really properly infer the types here
+        -
+            message: '#SourceFileCollector::makePathsAbsolute\(\)#'
+            identifier: argument.type
+            path: ../src/FileSystem/SourceFileCollector.php
+        -
+            message: '#SourceFileCollector::makePathsAbsolute\(\)#'
+            identifier: return.type
+            path: ../src/FileSystem/SourceFileCollector.php
+
     level: 8
     paths:
         - ../src
