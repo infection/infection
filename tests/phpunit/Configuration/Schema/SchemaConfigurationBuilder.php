@@ -47,12 +47,13 @@ use Infection\TestFramework\TestFrameworkTypes;
 final class SchemaConfigurationBuilder
 {
     /**
+     * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     private function __construct(
-        private string $file,
+        private string $pathname,
         private ?float $timeout,
         private Source $source,
         private Logs $logs,
@@ -76,31 +77,31 @@ final class SchemaConfigurationBuilder
     public static function from(SchemaConfiguration $schema): self
     {
         return new self(
-            $schema->pathname,
-            $schema->timeout,
-            $schema->source,
-            $schema->logs,
-            $schema->tmpDir,
-            $schema->phpUnit,
-            $schema->phpStan,
-            $schema->ignoreMsiWithNoMutations,
-            $schema->minMsi,
-            $schema->minCoveredMsi,
-            $schema->mutators,
-            $schema->testFramework,
-            $schema->bootstrap,
-            $schema->initialTestsPhpOptions,
-            $schema->testFrameworkExtraOptions,
-            $schema->staticAnalysisToolOptions,
-            $schema->threads,
-            $schema->staticAnalysisTool,
+            pathname: $schema->pathname,
+            timeout: $schema->timeout,
+            source: $schema->source,
+            logs: $schema->logs,
+            tmpDir: $schema->tmpDir,
+            phpUnit: $schema->phpUnit,
+            phpStan: $schema->phpStan,
+            ignoreMsiWithNoMutations: $schema->ignoreMsiWithNoMutations,
+            minMsi: $schema->minMsi,
+            minCoveredMsi: $schema->minCoveredMsi,
+            mutators: $schema->mutators,
+            testFramework: $schema->testFramework,
+            bootstrap: $schema->bootstrap,
+            initialTestsPhpOptions: $schema->initialTestsPhpOptions,
+            testFrameworkExtraOptions: $schema->testFrameworkExtraOptions,
+            staticAnalysisToolOptions: $schema->staticAnalysisToolOptions,
+            threads: $schema->threads,
+            staticAnalysisTool: $schema->staticAnalysisTool,
         );
     }
 
     public static function withMinimalTestData(): self
     {
         return new self(
-            file: '/path/to/infection.json',
+            pathname: '/path/to/infection.json',
             timeout: null,
             source: new Source([], []),
             logs: Logs::createEmpty(),
@@ -124,7 +125,7 @@ final class SchemaConfigurationBuilder
     public static function withCompleteTestData(): self
     {
         return new self(
-            file: '/complete/path/infection.json',
+            pathname: '/complete/path/infection.json',
             timeout: 10.0,
             source: new Source(['src', 'lib'], ['vendor', 'tests']),
             logs: new Logs(
@@ -156,10 +157,13 @@ final class SchemaConfigurationBuilder
         );
     }
 
-    public function withFile(string $file): self
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function withPathname(string $pathname): self
     {
         $clone = clone $this;
-        $clone->file = $file;
+        $clone->pathname = $pathname;
 
         return $clone;
     }
@@ -312,24 +316,24 @@ final class SchemaConfigurationBuilder
     public function build(): SchemaConfiguration
     {
         return new SchemaConfiguration(
-            $this->file,
-            $this->timeout,
-            $this->source,
-            $this->logs,
-            $this->tmpDir,
-            $this->phpUnit,
-            $this->phpStan,
-            $this->ignoreMsiWithNoMutations,
-            $this->minMsi,
-            $this->minCoveredMsi,
-            $this->mutators,
-            $this->testFramework,
-            $this->bootstrap,
-            $this->initialTestsPhpOptions,
-            $this->testFrameworkExtraOptions,
-            $this->staticAnalysisToolOptions,
-            $this->threads,
-            $this->staticAnalysisTool,
+            pathname: $this->pathname,
+            timeout: $this->timeout,
+            source: $this->source,
+            logs: $this->logs,
+            tmpDir: $this->tmpDir,
+            phpUnit: $this->phpUnit,
+            phpStan: $this->phpStan,
+            ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
+            minMsi: $this->minMsi,
+            minCoveredMsi: $this->minCoveredMsi,
+            mutators: $this->mutators,
+            testFramework: $this->testFramework,
+            bootstrap: $this->bootstrap,
+            initialTestsPhpOptions: $this->initialTestsPhpOptions,
+            testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
+            staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
+            threads: $this->threads,
+            staticAnalysisTool: $this->staticAnalysisTool,
         );
     }
 }

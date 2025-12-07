@@ -481,12 +481,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_it_can_locate_files\(\) has parameter \$roots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
 			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
 			identifier: argument.type
 			count: 1

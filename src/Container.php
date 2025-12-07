@@ -663,7 +663,7 @@ final class Container extends DIContainer
                 array_filter(
                     [
                         $configFile,
-                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILE_NAMES,
                     ],
                 ),
             ),

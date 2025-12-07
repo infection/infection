@@ -47,11 +47,11 @@ class SchemaConfigurationFileLoader
     }
 
     /**
-     * @param non-empty-string $file
+     * @param non-empty-string $pathname
      */
-    public function loadFile(string $file): SchemaConfiguration
+    public function loadFile(string $pathname): SchemaConfiguration
     {
-        $rawConfig = new SchemaConfigurationFile($file);
+        $rawConfig = new SchemaConfigurationFile($pathname);
 
         $this->schemaValidator->validate($rawConfig);
 

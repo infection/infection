@@ -43,7 +43,11 @@ interface Locator
     /**
      * Determine the realpath of the given file or directory located.
      *
+     * @param non-empty-string $fileName
+     *
      * @throws FileNotFound|FileOrDirectoryNotFound
+     *
+     * @return non-empty-string
      */
     public function locate(string $fileName): string;
 
