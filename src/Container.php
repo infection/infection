@@ -81,7 +81,6 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\SourceFileFilter;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
@@ -120,6 +119,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Source\Collector\SourceFileCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -250,7 +250,7 @@ final class Container extends DIContainer
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
                 $container->getSourceFileFilter(),
-                $container->get(Source\Collector\SourceFileCollector::class)->collect(),
+                $container->getSourceFileCollector()->collect(),
             ),
             SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
                 $container->getConfiguration()->sourceFilesFilter,
@@ -280,6 +280,7 @@ final class Container extends DIContainer
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
                     $container->getSourceFileFilter(),
+                    $container->getSourceFileCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -581,7 +582,7 @@ final class Container extends DIContainer
                     $configuration->sourceDirectories,
                 );
             },
-            Source\Collector\SourceFileCollector::class => static function (self $container): SourceFileCollector {
+            SourceFileCollector::class => static function (self $container): SourceFileCollector {
                 $configuration = $container->getConfiguration();
 
                 return SourceFileCollector::create(

@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem\SourceFileCollector;
+namespace Infection\Tests\Source\Collector\SourceFileCollector;
 
-use Infection\FileSystem\SourceFileCollector;
+use Infection\Source\Collector\SourceFileCollector;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,9 +50,9 @@ final class SourceFileCollectorTest extends TestCase
     private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedFilesOrDirectories
-     * @param list<string> $expectedList
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param list<non-empty-string> $expectedList
      */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(
@@ -60,15 +60,37 @@ final class SourceFileCollectorTest extends TestCase
         array $excludedFilesOrDirectories,
         array $expectedList,
     ): void {
-        $files = (new SourceFileCollector())->collectFiles(
+        $collector = new SourceFileCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
         );
 
-        self::assertIsEqualCanonicalizing(
+        $files = $collector->collect();
+
+        self::assertIsEqualUnorderedLists(
             $expectedList,
             take($files)->toAssoc(),
         );
+    }
+
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     */
+    #[DataProvider('sourceFilesProvider')]
+    public function test_it_memoizes_the_result(
+        array $sourceDirectories,
+        array $excludedFilesOrDirectories,
+    ): void {
+        $collector = new SourceFileCollector(
+            $sourceDirectories,
+            $excludedFilesOrDirectories,
+        );
+
+        $first = $collector->collect();
+        $second = $collector->collect();
+
+        $this->assertSame($first, $second);
     }
 
     /**
@@ -203,9 +225,9 @@ final class SourceFileCollectorTest extends TestCase
 
     /**
      * @param list<string> $expectedList
-     * @param array<string, SplFileInfo> $actual
+     * @param SplFileInfo[] $actual
      */
-    private static function assertIsEqualCanonicalizing(
+    private static function assertIsEqualUnorderedLists(
         array $expectedList,
         array $actual,
     ): void {
