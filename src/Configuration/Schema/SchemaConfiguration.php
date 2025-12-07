@@ -49,12 +49,13 @@ use Webmozart\Assert\Assert;
 final readonly class SchemaConfiguration
 {
     /**
+     * @param non-empty-string $pathname
      * @param array<string, mixed> $mutators
      * @param TestFrameworkTypes::*|null $testFramework
      * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
      */
     public function __construct(
-        public string $file,
+        public string $pathname,
         public ?float $timeout,
         public Source $source,
         public Logs $logs,

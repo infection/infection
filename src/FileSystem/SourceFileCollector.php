@@ -35,36 +35,104 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function array_map;
+use function dirname;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @final
- *
  * @internal
+ * @final
  */
 class SourceFileCollector
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedFilesOrDirectories
-     *
-     * @return iterable<string, SplFileInfo>
+     * @var iterable<SplFileInfo>
      */
-    public function collectFiles(
+    private ?iterable $sourceFiles = null;
+
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     */
+    public function __construct(
+        private readonly array $sourceDirectories,
+        private readonly array $excludedFilesOrDirectories,
+    ) {
+    }
+
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    public function collect(): iterable
+    {
+        if ($this->sourceFiles === null) {
+            $this->sourceFiles = $this->doCollect();
+        }
+
+        return $this->sourceFiles;
+    }
+
+    /**
+     * @param non-empty-string $configurationPathname
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     */
+    public static function create(
+        string $configurationPathname,
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
-    ): iterable {
-        if ($sourceDirectories === []) {
+    ): self {
+        $configurationDirname = dirname($configurationPathname);
+
+        return new self(
+            // We need to make the source file paths absolute, otherwise the
+            // collector will collect the files relative to the current working
+            // directory instead of relative to the location of the configuration
+            // file.
+            self::makePathsAbsolute($configurationDirname, $sourceDirectories),
+            $excludedFilesOrDirectories,
+        );
+    }
+
+    /**
+     * @param non-empty-string $configurationDirname
+     * @param non-empty-string[] $sourceDirectories
+     *
+     * @return non-empty-string[]
+     */
+    private static function makePathsAbsolute(
+        string $configurationDirname,
+        array $sourceDirectories,
+    ): array {
+        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+            ? $path
+            : Path::join(
+                $configurationDirname,
+                $path,
+            );
+
+        return array_map(
+            $mapToAbsolutePath(...),
+            $sourceDirectories,
+        );
+    }
+
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    private function doCollect(): iterable
+    {
+        if ($this->sourceDirectories === []) {
             return [];
         }
 
         return Finder::create()
-            ->in($sourceDirectories)
-            ->exclude($excludedFilesOrDirectories)
-            ->notPath($excludedFilesOrDirectories)
+            ->in($this->sourceDirectories)
+            ->exclude($this->excludedFilesOrDirectories)
+            ->notPath($this->excludedFilesOrDirectories)
             ->files()
-            ->name('*.php')
-        ;
+            ->name('*.php');
     }
 }
