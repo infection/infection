@@ -54,10 +54,13 @@ use Webmozart\Assert\Assert;
  */
 class SchemaConfigurationFactory
 {
-    public function create(string $path, stdClass $rawConfig): SchemaConfiguration
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function create(string $pathname, stdClass $rawConfig): SchemaConfiguration
     {
         return new SchemaConfiguration(
-            file: $path,
+            pathname: $pathname,
             timeout: self::getTimeout($rawConfig),
             source: self::createSource($rawConfig->source),
             logs: self::createLogs($rawConfig->logs ?? new stdClass()),

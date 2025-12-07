@@ -135,7 +135,7 @@ class ConfigurationFactory
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
-        $configDir = dirname($schema->file);
+        $configDir = dirname($schema->pathname);
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
@@ -357,7 +357,7 @@ class ConfigurationFactory
     private function collectFiles(SchemaConfiguration $schema): iterable
     {
         $source = $schema->source;
-        $schemaDirname = dirname($schema->file);
+        $schemaDirname = dirname($schema->pathname);
 
         $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
             ? $path
