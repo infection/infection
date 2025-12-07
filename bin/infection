@@ -84,11 +84,4 @@ if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
     throw new RuntimeException('Unable to find the Composer autoloader.');
 })();
 
-// Project (third-party) autoloading
-(static function (): void {
-    if (\file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
-        include_once $autoload;
-    }
-})();
-
 (new Application(Container::create()))->run();
