@@ -37,7 +37,10 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function implode;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
@@ -510,11 +513,7 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        [
-            $filter,
-            $gitDiffFilter,
-            $gitDiffBase,
-        ] = self::getSourceFilters($input);
+        $sourceFilter = self::getSourceFilter($input);
 
         $commandHelper = new RunCommandHelper($input);
 
@@ -555,12 +554,10 @@ final class RunCommand extends BaseCommand
             staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            filter: $filter,
+            sourceFilter: $sourceFilter,
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
-            gitDiffFilter: $gitDiffFilter,
-            gitDiffBase: $gitDiffBase,
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),
             gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
@@ -682,28 +679,26 @@ final class RunCommand extends BaseCommand
         return FormatterName::from($value);
     }
 
-    /**
-     * @return array{string, non-empty-string|null, non-empty-string|null}
-     */
-    private static function getSourceFilters(InputInterface $input): array
+    private static function getSourceFilter(InputInterface $input): PlainFilter|IncompleteGitDiffFilter|null
     {
-        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
+        $filter = self::getPlainFilter($input);
+        $gitFilter = self::getGitFilter($input);
 
-        [$gitDiffFilter, $gitDiffBase] = self::getGitOptions($input);
+        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter);
 
-        self::assertOnlyOneTypeOfFiltering($filter, $gitDiffFilter);
-
-        return [
-            $filter,
-            $gitDiffFilter,
-            $gitDiffBase,
-        ];
+        return $filter ?? $gitFilter;
     }
 
-    /**
-     * @return array{non-empty-string|null, non-empty-string|null}
-     */
-    private static function getGitOptions(InputInterface $input): array
+    private static function getPlainFilter(InputInterface $input): ?PlainFilter
+    {
+        $value = trim((string) $input->getOption(self::OPTION_FILTER));
+
+        return $value === ''
+            ? null
+            : new PlainFilter($value);
+    }
+
+    private static function getGitFilter(InputInterface $input): ?IncompleteGitDiffFilter
     {
         $gitDiffFilter = self::getGitDiffFilter($input);
 
@@ -718,7 +713,9 @@ final class RunCommand extends BaseCommand
 
         self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
 
-        return [$gitDiffFilter, $gitDiffBase];
+        return $gitDiffFilter !== null
+            ? new IncompleteGitDiffFilter($gitDiffFilter, $gitDiffBase)
+            : null;
     }
 
     /**
@@ -790,8 +787,8 @@ final class RunCommand extends BaseCommand
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
     ): void {
-        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
-            && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER
+        if ($gitDiffBase !== null
+            && $gitDiffFilter === null
         ) {
             throw new InvalidArgumentException(
                 sprintf(
@@ -805,10 +802,10 @@ final class RunCommand extends BaseCommand
     }
 
     private static function assertOnlyOneTypeOfFiltering(
-        string $filter,
-        ?string $gitDiffFilter,
+        ?PlainFilter $filter,
+        ?IncompleteGitDiffFilter $gitFilter,
     ): void {
-        if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
+        if ($filter !== null && $gitFilter !== null) {
             throw new InvalidArgumentException(
                 sprintf(
                     'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
