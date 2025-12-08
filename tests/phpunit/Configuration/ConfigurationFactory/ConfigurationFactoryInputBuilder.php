@@ -40,6 +40,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 final class ConfigurationFactoryInputBuilder
 {
     /**
+     * @param non-empty-string|null $filter
      * @param non-empty-string|null $gitDiffFilter
      * @param non-empty-string|null $gitDiffBase
      */
@@ -60,7 +61,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $testFramework,
         private ?string $testFrameworkExtraOptions,
         private ?string $staticAnalysisToolOptions,
-        private string $filter,
+        private ?string $filter,
         private ?int $threadCount,
         private bool $dryRun,
         private ?string $gitDiffFilter,
@@ -206,7 +207,10 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withFilter(string $filter): self
+    /**
+     * @param non-empty-string|null $filter
+     */
+    public function withFilter(?string $filter): self
     {
         $clone = clone $this;
         $clone->filter = $filter;
@@ -351,7 +355,7 @@ final class ConfigurationFactoryInputBuilder
      *     14: string|null,
      *     15: string|null,
      *     16: string|null,
-     *     17: string,
+     *     17: non-empty-string|null,
      *     18: int|null,
      *     19: bool,
      *     20: non-empty-string|null,

@@ -55,6 +55,7 @@ final class ConfigurationBuilder
 {
     /**
      * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string|null $sourceFilesFilter
      * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
@@ -65,7 +66,7 @@ final class ConfigurationBuilder
     private function __construct(
         private float $timeout,
         private array $sourceDirectories,
-        private string $sourceFilesFilter,
+        private ?string $sourceFilesFilter,
         private array $sourceFilesExcludes,
         private Logs $logs,
         private string $logVerbosity,
@@ -155,7 +156,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: 10.0,
             sourceDirectories: [],
-            sourceFilesFilter: '',
+            sourceFilesFilter: null,
             sourceFilesExcludes: [],
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
@@ -275,7 +276,10 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withSourceFilesFilter(string $sourceFilesFilter): self
+    /**
+     * @param non-empty-string|null $sourceFilesFilter
+     */
+    public function withSourceFilesFilter(?string $sourceFilesFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilesFilter = $sourceFilesFilter;
