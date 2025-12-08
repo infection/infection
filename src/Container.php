@@ -561,7 +561,10 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
-            Git::class => static fn (): Git => new CommandLineGit(new ShellCommandLineExecutor()),
+            Git::class => static fn (self $container): Git => new CommandLineGit(
+                new ShellCommandLineExecutor(),
+                $container->getLogger(),
+            ),
             FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
                 $configuration = $container->getConfiguration();
 
