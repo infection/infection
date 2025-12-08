@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
-use Infection\FileSystem\FileFilter;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -53,7 +52,7 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  */
-class BufferedSourceFileFilter implements FileFilter
+class BufferedSourceFileFilter
 {
     /**
      * @param array<string, SplFileInfo> $sourceFiles
@@ -75,15 +74,14 @@ class BufferedSourceFileFilter implements FileFilter
     }
 
     /**
-     * We duck-typed the input to be iterable<SplFileInfo|Trace> in the interface,
-     * but we actually only use iterable<Trace> here.
+     * @param iterable<Trace> $input
+     *
+     * @return iterable<Trace>
      */
     public function filter(iterable $input): iterable
     {
         return take($input)
-            ->filter(function ($trace): bool {
-                Assert::isInstanceOf($trace, Trace::class);
-
+            ->filter(function (Trace $trace): bool {
                 $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
                 Assert::string($traceRealPath);
