@@ -1023,3 +1023,15 @@ parameters:
 			message: '#\$executableFinder of class.*TestFrameworkFinder constructor expects.*MockObject given\.$#'
 			identifier: argument.type
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			message: '#non-empty-string#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
+
+		-
+			message: '#Unable to resolve the template type TMapKey in call to method#'
+			identifier: argument.templateType
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php

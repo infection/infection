@@ -94,47 +94,49 @@ final class ConfigurationBuilder
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
+        private string $configPathname,
     ) {
     }
 
     public static function from(Configuration $configuration): self
     {
         return new self(
-            $configuration->processTimeout,
-            $configuration->source,
-            $configuration->sourceFilter,
-            $configuration->logs,
-            $configuration->logVerbosity,
-            $configuration->tmpDir,
-            $configuration->phpUnit,
-            $configuration->phpStan,
-            $configuration->mutators,
-            $configuration->testFramework,
-            $configuration->bootstrap,
-            $configuration->initialTestsPhpOptions,
-            $configuration->testFrameworkExtraOptions,
-            $configuration->getStaticAnalysisToolOptions() === []
+            timeout: $configuration->processTimeout,
+            source: $configuration->source,
+            sourceFilter: $configuration->sourceFilter,
+            logs: $configuration->logs,
+            logVerbosity: $configuration->logVerbosity,
+            tmpDir: $configuration->tmpDir,
+            phpUnit: $configuration->phpUnit,
+            phpStan: $configuration->phpStan,
+            mutators: $configuration->mutators,
+            testFramework: $configuration->testFramework,
+            bootstrap: $configuration->bootstrap,
+            initialTestsPhpOptions: $configuration->initialTestsPhpOptions,
+            testFrameworkExtraOptions: $configuration->testFrameworkExtraOptions,
+            staticAnalysisToolOptions: $configuration->getStaticAnalysisToolOptions() === []
                 ? null
                 : implode(' ', $configuration->getStaticAnalysisToolOptions()),
-            $configuration->coveragePath,
-            $configuration->skipCoverage,
-            $configuration->skipInitialTests,
-            $configuration->isDebugEnabled,
-            !$configuration->shouldMutateOnlyCoveredCode(),
-            $configuration->noProgress,
-            $configuration->ignoreMsiWithNoMutations,
-            $configuration->minMsi,
-            $configuration->numberOfShownMutations,
-            $configuration->minCoveredMsi,
-            $configuration->msiPrecision,
-            $configuration->threadCount,
-            $configuration->isDryRun,
-            $configuration->ignoreSourceCodeMutatorsMap,
-            $configuration->executeOnlyCoveringTestCases,
-            $configuration->mapSourceClassToTestStrategy,
-            $configuration->loggerProjectRootDirectory,
-            $configuration->staticAnalysisTool,
-            $configuration->mutantId,
+            coveragePath: $configuration->coveragePath,
+            skipCoverage: $configuration->skipCoverage,
+            skipInitialTests: $configuration->skipInitialTests,
+            debug: $configuration->isDebugEnabled,
+            uncovered: !$configuration->shouldMutateOnlyCoveredCode(),
+            noProgress: $configuration->noProgress,
+            ignoreMsiWithNoMutations: $configuration->ignoreMsiWithNoMutations,
+            minMsi: $configuration->minMsi,
+            numberOfShownMutations: $configuration->numberOfShownMutations,
+            minCoveredMsi: $configuration->minCoveredMsi,
+            msiPrecision: $configuration->msiPrecision,
+            threadCount: $configuration->threadCount,
+            dryRun: $configuration->isDryRun,
+            ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
+            executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
+            mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
+            loggerProjectRootDirectory: $configuration->loggerProjectRootDirectory,
+            staticAnalysisTool: $configuration->staticAnalysisTool,
+            mutantId: $configuration->mutantId,
+            configPathname: $configuration->configurationPathname,
         );
     }
 
@@ -174,6 +176,7 @@ final class ConfigurationBuilder
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
+            configPathname: '/path/to/project/infection.json5',
         );
     }
 
@@ -234,6 +237,7 @@ final class ConfigurationBuilder
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
+            configPathname: '/path/to/project/infection.json5',
         );
     }
 
@@ -535,42 +539,54 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function withConfigPathname(string $pathname): self
+    {
+        $clone = clone $this;
+        $clone->configPathname = $pathname;
+
+        return $clone;
+    }
+
     public function build(): Configuration
     {
         return new Configuration(
-            $this->timeout,
-            $this->source,
-            $this->sourceFilter,
-            $this->logs,
-            $this->logVerbosity,
-            $this->tmpDir,
-            $this->phpUnit,
-            $this->phpStan,
-            $this->mutators,
-            $this->testFramework,
-            $this->bootstrap,
-            $this->initialTestsPhpOptions,
-            $this->testFrameworkExtraOptions,
-            $this->staticAnalysisToolOptions,
-            $this->coveragePath,
-            $this->skipCoverage,
-            $this->skipInitialTests,
-            $this->debug,
-            $this->uncovered,
-            $this->noProgress,
-            $this->ignoreMsiWithNoMutations,
-            $this->minMsi,
-            $this->numberOfShownMutations,
-            $this->minCoveredMsi,
-            $this->msiPrecision,
-            $this->threadCount,
-            $this->dryRun,
-            $this->ignoreSourceCodeMutatorsMap,
-            $this->executeOnlyCoveringTestCases,
-            $this->mapSourceClassToTestStrategy,
-            $this->loggerProjectRootDirectory,
-            $this->staticAnalysisTool,
-            $this->mutantId,
+            processTimeout: $this->timeout,
+            source: $this->source,
+            sourceFilter: $this->sourceFilter,
+            logs: $this->logs,
+            logVerbosity: $this->logVerbosity,
+            tmpDir: $this->tmpDir,
+            phpUnit: $this->phpUnit,
+            phpStan: $this->phpStan,
+            mutators: $this->mutators,
+            testFramework: $this->testFramework,
+            bootstrap: $this->bootstrap,
+            initialTestsPhpOptions: $this->initialTestsPhpOptions,
+            testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
+            staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
+            coveragePath: $this->coveragePath,
+            skipCoverage: $this->skipCoverage,
+            skipInitialTests: $this->skipInitialTests,
+            isDebugEnabled: $this->debug,
+            withUncovered: $this->uncovered,
+            noProgress: $this->noProgress,
+            ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
+            minMsi: $this->minMsi,
+            numberOfShownMutations: $this->numberOfShownMutations,
+            minCoveredMsi: $this->minCoveredMsi,
+            msiPrecision: $this->msiPrecision,
+            threadCount: $this->threadCount,
+            isDryRun: $this->dryRun,
+            ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
+            executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
+            mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
+            loggerProjectRootDirectory: $this->loggerProjectRootDirectory,
+            staticAnalysisTool: $this->staticAnalysisTool,
+            mutantId: $this->mutantId,
+            configurationPathname: $this->configPathname,
         );
     }
 }

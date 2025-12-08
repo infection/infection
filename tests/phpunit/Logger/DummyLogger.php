@@ -37,6 +37,7 @@ namespace Infection\Tests\Logger;
 
 use Infection\Framework\Str;
 use Psr\Log\AbstractLogger;
+use Stringable;
 use Webmozart\Assert\Assert;
 
 final class DummyLogger extends AbstractLogger
@@ -46,7 +47,7 @@ final class DummyLogger extends AbstractLogger
      */
     private array $logs = [];
 
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         Assert::string($level);
         Assert::string($message);

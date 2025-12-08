@@ -77,11 +77,11 @@ final class SchemaValidatorTest extends TestCase
 
     public static function configProvider(): iterable
     {
-        $path = '/path/to/config';
+        $pathname = '/path/to/config';
 
         yield 'empty JSON' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 '{}',
             ),
             <<<'ERROR'
@@ -92,7 +92,7 @@ final class SchemaValidatorTest extends TestCase
 
         yield 'invalid timeout' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 '{"timeout": "10"}',
             ),
             <<<'ERROR'
@@ -104,7 +104,7 @@ final class SchemaValidatorTest extends TestCase
 
         yield 'invalid custom mutator' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 <<<'JSON'
                     {
                         "source": {
@@ -124,7 +124,7 @@ final class SchemaValidatorTest extends TestCase
 
         yield 'valid custom mutator' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 <<<'JSON'
                     {
                         "source": {
@@ -141,7 +141,7 @@ final class SchemaValidatorTest extends TestCase
 
         yield 'valid schema' => [
             self::createConfigWithContents(
-                $path,
+                $pathname,
                 <<<'JSON'
                     {
                         "source": {
@@ -154,11 +154,14 @@ final class SchemaValidatorTest extends TestCase
         ];
     }
 
+    /**
+     * @param non-empty-string $pathname
+     */
     private static function createConfigWithContents(
-        string $path,
+        string $pathname,
         string $contents,
     ): SchemaConfigurationFile {
-        $config = new SchemaConfigurationFile($path);
+        $config = new SchemaConfigurationFile($pathname);
 
         $decodedContents = json_decode($contents);
 

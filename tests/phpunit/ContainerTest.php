@@ -62,7 +62,7 @@ final class ContainerTest extends TestCase
 
         $container = new Container([]);
 
-        $container->getConfiguration();
+        $container->get('Infection\Configuration\Source');
     }
 
     public function test_it_can_build_simple_services_without_configuration(): void

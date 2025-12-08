@@ -112,7 +112,7 @@ final class ConfigurationFactoryTest extends TestCase
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
     {
         $schema = new SchemaConfiguration(
-            file: '/path/to/infection.json',
+            pathname: '/path/to/infection.json',
             timeout: null,
             source: new Source([], []),
             logs: Logs::createEmpty(),
@@ -181,7 +181,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultLogs = $defaultLogsBuilder->build();
 
         $defaultSchema = new SchemaConfiguration(
-            file: '/path/to/infection.json',
+            pathname: '/path/to/infection.json',
             timeout: null,
             source: new Source([], []),
             logs: Logs::createEmpty(),
@@ -272,6 +272,7 @@ final class ConfigurationFactoryTest extends TestCase
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
+            configurationPathname: '/path/to/infection.json',
         );
         $defaultConfigurationBuilder = ConfigurationBuilder::from($defaultConfiguration);
 
@@ -1173,6 +1174,7 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withLoggerProjectRootDirectory(null)
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
+                    ->withConfigPathname('/path/to/infection.json')
                     ->build(),
             ),
         ];

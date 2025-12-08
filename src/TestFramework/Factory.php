@@ -45,6 +45,7 @@ use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
 use function is_a;
+use function iterator_to_array;
 use function Pipeline\take;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -64,8 +65,8 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
-        private array $installedExtensions,
         private SourceCollector $sourceCollector,
+        private array $installedExtensions,
     ) {
     }
 
@@ -134,5 +135,30 @@ final readonly class Factory
             $adapterName,
             implode(', ', $availableTestFrameworks),
         ));
+    }
+
+    /**
+     * Get only those source files that will be mutated to use them in coverage whitelist
+     *
+     * @return list<SplFileInfo>
+     */
+    private function getFilteredSourceFilesToMutate(): array
+    {
+        // TODO: this looks incorrect to me... But it is what it is right now.
+        if (!$this->sourceFileCollector->isFiltered()) {
+            return [];
+        }
+
+        /**
+         * TODO: fix this warning, it is legit...
+         * @var list<SplFileInfo> $files
+         * @psalm-suppress InvalidArgument
+         * @phpstan-ignore varTag.type
+         */
+        $files = iterator_to_array(
+            $this->sourceFileCollector->collect(),
+        );
+
+        return $files;
     }
 }

@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework;
 
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\Source\Collector\FakeSourceCollector;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\Factory;
 use Infection\Tests\Configuration\ConfigurationBuilder;
@@ -54,14 +54,14 @@ final class FactoryTest extends TestCase
     public function test_it_throws_an_exception_if_it_cant_find_the_testframework(): void
     {
         $factory = new Factory(
-            tmpDir: '',
-            projectDir: '',
-            configLocator: $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            testFrameworkFinder: $this->createMock(TestFrameworkFinder::class),
-            jUnitFilePath: '',
-            infectionConfig: ConfigurationBuilder::withMinimalTestData()->build(),
-            installedExtensions: [],
-            sourceCollector: new FakeSourceCollector(),
+            '',
+            '',
+            $this->createMock(TestFrameworkConfigLocatorInterface::class),
+            $this->createMock(TestFrameworkFinder::class),
+            '',
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            $this->createMock(SourceFileCollector::class),
+            [],
         );
 
         $this->expectException(InvalidArgumentException::class);
@@ -71,20 +71,20 @@ final class FactoryTest extends TestCase
     public function test_it_uses_installed_test_framework_adapters(): void
     {
         $factory = new Factory(
-            tmpDir: '',
-            projectDir: '',
-            configLocator: $this->createMock(TestFrameworkConfigLocatorInterface::class),
-            testFrameworkFinder: $this->createMock(TestFrameworkFinder::class),
-            jUnitFilePath: '',
-            infectionConfig: ConfigurationBuilder::withMinimalTestData()->build(),
-            installedExtensions: [
+            '',
+            '',
+            $this->createMock(TestFrameworkConfigLocatorInterface::class),
+            $this->createMock(TestFrameworkFinder::class),
+            '',
+            ConfigurationBuilder::withMinimalTestData()->build(),
+            $this->createMock(SourceFileCollector::class),
+            [
                 'infection/codeception-adapter' => [
                     'install_path' => '/path/to/dummy/adapter/factory.php',
                     'extra' => ['class' => DummyTestFrameworkFactory::class],
                     'version' => '1.0.0',
                 ],
             ],
-            sourceCollector: new FakeSourceCollector(),
         );
 
         $adapter = $factory->create('dummy', false);

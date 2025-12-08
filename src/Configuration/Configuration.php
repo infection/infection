@@ -63,6 +63,7 @@ readonly class Configuration
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string $configurationPathname
      */
     public function __construct(
         public float $processTimeout,
@@ -98,6 +99,7 @@ readonly class Configuration
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
+        public string $configurationPathname,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allIsInstanceOf($mutators, Mutator::class);

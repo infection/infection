@@ -127,7 +127,7 @@ final readonly class ConfigurationFactory
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
-        $configDir = dirname($schema->file);
+        $configDir = dirname($schema->pathname);
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
@@ -183,6 +183,7 @@ final readonly class ConfigurationFactory
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
             mutantId: $mutantId,
+            configurationPathname: $schema->pathname,
         );
     }
 

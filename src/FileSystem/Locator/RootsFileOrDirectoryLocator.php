@@ -91,7 +91,9 @@ final readonly class RootsFileOrDirectoryLocator implements Locator
     }
 
     /**
-     * @param string[] $fileNames
+     * @param non-empty-string[] $fileNames
+     *
+     * @return non-empty-string|null
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {

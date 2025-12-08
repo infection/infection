@@ -40,7 +40,8 @@ use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Source\Collector\SchemaSourceCollector;
+use Infection\FileSystem\SourceFileCollector;
+use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -95,10 +96,14 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     ),
                 ),
             ),
-            new SchemaSourceCollector(
-                filters: [],
-                sourceDirectories: [self::FIXTURE_DIR . '/src'],
-                excludedDirectoriesOrFiles: [],
+            BufferedSourceFileFilter::create(
+                SourceFileCollector::create(
+                    configurationPathname: self::FIXTURE_DIR,
+                    sourceDirectories: [self::FIXTURE_DIR . '/src'],
+                    excludedFilesOrDirectories: [],
+                    filter: '',
+                )
+                ->collect(),
             ),
         );
 

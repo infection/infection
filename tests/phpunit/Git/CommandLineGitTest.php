@@ -48,19 +48,27 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
 {
     private ShellCommandLineExecutor&MockObject $commandLineMock;
 
+    private TestLogger $logger;
+
     private Git $git;
 
     protected function setUp(): void
     {
         $this->commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $this->logger = new TestLogger();
 
-        $this->git = new CommandLineGit($this->commandLineMock);
+        $this->git = new CommandLineGit(
+            $this->commandLineMock,
+            $this->logger,
+        );
     }
 
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
@@ -90,14 +98,25 @@ final class CommandLineGitTest extends TestCase
 
     public function test_it_falls_back_to_the_given_branch_when_no_merge_base_could_be_found(): void
     {
+        $exception = new GenericProcessException('fatal!');
+
+        $expectedRecords = [
+            [
+                'level' => LogLevel::INFO,
+                'message' => 'Could not find a common ancestor commit between "main" and "HEAD" and fell back to the base "main". This can if there is no common ancestor commit or if we are in a shallow commit.',
+                'context' => ['exception' => $exception],
+            ],
+        ];
+
         $this->commandLineMock
             ->method('execute')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
-            ->willThrowException(new GenericProcessException('fatal!'));
+            ->willThrowException($exception);
 
         $actual = $this->git->getBaseReference('main');
 
         $this->assertSame('main', $actual);
+        $this->assertEquals($expectedRecords, $this->logger->records);
     }
 
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
@@ -191,7 +210,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,5 +12,7 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(12, 18)],
+                'src/Container.php' => [ChangedLinesRange::create(12, 18)],
             ],
         ];
 
@@ -204,7 +223,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,0 +11,5 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(11, 15)],
+                'src/Container.php' => [ChangedLinesRange::create(11, 15)],
             ],
         ];
 
@@ -228,7 +247,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10 +10,2 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(10, 11)],
+                'src/Container.php' => [ChangedLinesRange::create(10, 11)],
             ],
         ];
 
@@ -241,7 +260,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,1 +10,2 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(10, 11)],
+                'src/Container.php' => [ChangedLinesRange::create(10, 11)],
             ],
         ];
 
@@ -254,7 +273,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,2 +10 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+                'src/Container.php' => [ChangedLinesRange::create(10, 10)],
             ],
         ];
 
@@ -267,7 +286,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,2 +10,1 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+                'src/Container.php' => [ChangedLinesRange::create(10, 10)],
             ],
         ];
 
@@ -280,7 +299,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10 +10 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+                'src/Container.php' => [ChangedLinesRange::create(10, 10)],
             ],
         ];
 
@@ -293,7 +312,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,1 +10,1 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(10, 10)],
+                'src/Container.php' => [ChangedLinesRange::create(10, 10)],
             ],
         ];
 
@@ -306,7 +325,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -0,0 +1,18 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(1, 18)],
+                'src/Container.php' => [ChangedLinesRange::create(1, 18)],
             ],
         ];
 
@@ -330,7 +349,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -1,0 +1 @@ line change example
                 DIFF,
             [
-                'src/Container.php' => [new ChangedLinesRange(1, 1)],
+                'src/Container.php' => [ChangedLinesRange::create(1, 1)],
             ],
         ];
 
@@ -358,10 +377,10 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Container.php' => [
-                    new ChangedLinesRange(38, 38),
-                    new ChangedLinesRange(534, 535),
-                    new ChangedLinesRange(538, 540),
-                    new ChangedLinesRange(1213, 1217),
+                    ChangedLinesRange::create(38, 38),
+                    ChangedLinesRange::create(534, 535),
+                    ChangedLinesRange::create(538, 540),
+                    ChangedLinesRange::create(1213, 1217),
                 ],
             ],
         ];
@@ -385,13 +404,13 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Container.php' => [
-                    new ChangedLinesRange(38, 38),
-                    new ChangedLinesRange(534, 535),
-                    new ChangedLinesRange(538, 540),
-                    new ChangedLinesRange(1213, 1217),
+                    ChangedLinesRange::create(38, 38),
+                    ChangedLinesRange::create(534, 535),
+                    ChangedLinesRange::create(538, 540),
+                    ChangedLinesRange::create(1213, 1217),
                 ],
                 'src/Differ/FilesDiffChangedLines.php' => [
-                    new ChangedLinesRange(1, 18),
+                    ChangedLinesRange::create(1, 18),
                 ],
             ],
         ];
@@ -406,7 +425,7 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Git/Git.php' => [
-                    new ChangedLinesRange(51, 51),
+                    ChangedLinesRange::create(51, 51),
                 ],
             ],
         ];
@@ -422,7 +441,7 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Git/CommandLineGit.php' => [
-                    new ChangedLinesRange(1, 5),
+                    ChangedLinesRange::create(1, 5),
                 ],
             ],
         ];
@@ -438,8 +457,8 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'tests/phpunit/Git/CommandLineGitTest.php' => [
-                    new ChangedLinesRange(10001, 10003),
-                    new ChangedLinesRange(15238, 15247),
+                    ChangedLinesRange::create(10001, 10003),
+                    ChangedLinesRange::create(15238, 15247),
                 ],
             ],
         ];
@@ -454,7 +473,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,0 +11,5 @@ new lines added
                 DIFF,
             [
-                'src/Source.php' => [new ChangedLinesRange(11, 15)],
+                'src/Source.php' => [ChangedLinesRange::create(11, 15)],
             ],
         ];
 
@@ -479,14 +498,14 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Git/Git.php' => [
-                    new ChangedLinesRange(11, 12),
+                    ChangedLinesRange::create(11, 12),
                 ],
                 'src/Git/CommandLineGit.php' => [
-                    new ChangedLinesRange(21, 25),
+                    ChangedLinesRange::create(21, 25),
                 ],
                 'tests/phpunit/Git/CommandLineGitTest.php' => [
-                    new ChangedLinesRange(101, 101),
-                    new ChangedLinesRange(202, 204),
+                    ChangedLinesRange::create(101, 101),
+                    ChangedLinesRange::create(202, 204),
                 ],
             ],
         ];
@@ -504,10 +523,10 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Git/CommandLineGit.php' => [
-                    new ChangedLinesRange(6, 6),
-                    new ChangedLinesRange(14, 14),
-                    new ChangedLinesRange(28, 28),
-                    new ChangedLinesRange(54, 54),
+                    ChangedLinesRange::create(6, 6),
+                    ChangedLinesRange::create(14, 14),
+                    ChangedLinesRange::create(28, 28),
+                    ChangedLinesRange::create(54, 54),
                 ],
             ],
         ];
@@ -522,7 +541,7 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'src/Git/Git.php' => [
-                    new ChangedLinesRange(43, 50),
+                    ChangedLinesRange::create(43, 50),
                 ],
             ],
         ];
@@ -542,12 +561,12 @@ final class CommandLineGitTest extends TestCase
                 DIFF,
             [
                 'tests/phpunit/Git/CommandLineGitTest.php' => [
-                    new ChangedLinesRange(11, 11),
-                    new ChangedLinesRange(22, 24),
-                    new ChangedLinesRange(34, 38),
-                    new ChangedLinesRange(51, 51),
-                    new ChangedLinesRange(66, 66),
-                    new ChangedLinesRange(82, 91),
+                    ChangedLinesRange::create(11, 11),
+                    ChangedLinesRange::create(22, 24),
+                    ChangedLinesRange::create(34, 38),
+                    ChangedLinesRange::create(51, 51),
+                    ChangedLinesRange::create(66, 66),
+                    ChangedLinesRange::create(82, 91),
                 ],
             ],
         ];
@@ -566,7 +585,7 @@ final class CommandLineGitTest extends TestCase
                 @@ -10,18 +10,2 @@ line change example
                 DIFF,
             [
-                'src/NewLinesAdded.php' => [new ChangedLinesRange(10, 11)],
+                'src/NewLinesAdded.php' => [ChangedLinesRange::create(10, 11)],
             ],
         ];
 
@@ -601,11 +620,19 @@ final class CommandLineGitTest extends TestCase
         string|Exception $shellOutputOrException,
         string $expected,
     ): void {
+        $expectedRecords = [];
+
         if (is_string($shellOutputOrException)) {
             $this->commandLineMock
                 ->method('execute')
                 ->willReturn($shellOutputOrException);
         } else {
+            $expectedRecords[] = [
+                'level' => LogLevel::INFO,
+                'message' => 'Could not find a symbolic reference for "refs/remotes/origin/HEAD".',
+                'context' => ['exception' => $shellOutputOrException],
+            ];
+
             $this->commandLineMock
                 ->method('execute')
                 ->willThrowException($shellOutputOrException);
@@ -614,6 +641,7 @@ final class CommandLineGitTest extends TestCase
         $actual = $this->git->getDefaultBase();
 
         $this->assertSame($expected, $actual);
+        $this->assertEquals($expectedRecords, $this->logger->records);
     }
 
     public static function defaultGitBaseProvider(): iterable

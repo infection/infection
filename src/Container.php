@@ -551,7 +551,10 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
-            Git::class => static fn (): Git => new CommandLineGit(new ShellCommandLineExecutor()),
+            Git::class => static fn (self $container): Git => new CommandLineGit(
+                new ShellCommandLineExecutor(),
+                $container->getLogger(),
+            ),
             // TODO: this is ugly... to fix this.
             ConfiguredGit::class => static fn () => (new ReflectionClass(ConfiguredGit::class))->newInstanceWithoutConstructor(),
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
@@ -567,6 +570,16 @@ final class Container extends DIContainer
                     $configuration->sourceFilter,
                 );
             },
+            SourceFileCollector::class => static function (self $container): SourceFileCollector {
+                $configuration = $container->getConfiguration();
+
+                return SourceFileCollector::create(
+                    $configuration->configurationPathname,
+                    $configuration->sourceDirectories,
+                    $configuration->sourceFilesExcludes,
+                    $configuration->sourceFilesFilter,
+                );
+            },
         ]);
 
         return $container->withValues(
@@ -575,6 +588,9 @@ final class Container extends DIContainer
         );
     }
 
+    /**
+     * @param non-empty-string|null $configFile
+     */
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,
@@ -633,7 +649,7 @@ final class Container extends DIContainer
                 array_filter(
                     [
                         $configFile,
-                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILE_NAMES,
                     ],
                 ),
             ),
