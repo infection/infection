@@ -37,7 +37,6 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use Infection\FileSystem\FileFilter;
-use Infection\FileSystem\SourceFileCollector;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -57,16 +56,22 @@ use Webmozart\Assert\Assert;
 class BufferedSourceFileFilter implements FileFilter
 {
     /**
-     * An associative array mapping real paths to SplFileInfo objects.
-     *
-     * @var array<string, SplFileInfo>
+     * @param array<string, SplFileInfo> $sourceFiles
      */
-    private array $sourceFiles;
-
-    public function __construct(
-        SourceFileCollector $collector,
+    private function __construct(
+        private array $sourceFiles,
     ) {
-        $this->sourceFiles = self::createSourceFiles($collector);
+    }
+
+    /**
+     * @param iterable<SplFileInfo> $sourceFiles
+     */
+    public static function create(
+        iterable $sourceFiles,
+    ): self {
+        return new self(
+            self::indexByRealPath($sourceFiles),
+        );
     }
 
     /**
@@ -106,18 +111,20 @@ class BufferedSourceFileFilter implements FileFilter
     }
 
     /**
+     * @param iterable<SplFileInfo> $sourceFiles
+     *
      * @return array<string, SplFileInfo>
      */
-    private static function createSourceFiles(SourceFileCollector $collector): array
+    private static function indexByRealPath(iterable $sourceFiles): array
     {
-        $sourceFiles = [];
+        $indexedSourceFiles = [];
 
         // Make a map of source files so we can check covered files against it.
         // We don't filter here on the assumption that hash table lookups are faster.
-        foreach ($collector->collect() as $fileInfo) {
-            $sourceFiles[(string) $fileInfo->getRealPath()] = $fileInfo;
+        foreach ($sourceFiles as $fileInfo) {
+            $indexedSourceFiles[(string) $fileInfo->getRealPath()] = $fileInfo;
         }
 
-        return $sourceFiles;
+        return $indexedSourceFiles;
     }
 }

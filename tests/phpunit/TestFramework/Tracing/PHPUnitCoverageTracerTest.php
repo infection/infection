@@ -96,13 +96,14 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     ),
                 ),
             ),
-            new BufferedSourceFileFilter(
+            BufferedSourceFileFilter::create(
                 SourceFileCollector::create(
                     configurationPathname: self::FIXTURE_DIR,
                     sourceDirectories: [self::FIXTURE_DIR . '/src'],
                     excludedFilesOrDirectories: [],
                     filter: '',
-                ),
+                )
+                ->collect(),
             ),
         );
 
