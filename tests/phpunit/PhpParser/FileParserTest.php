@@ -84,9 +84,7 @@ final class FileParserTest extends TestCase
     {
         [$statements] = SingletonContainer::getContainer()->getFileParser()->parse($fileInfo);
 
-        foreach ($statements as $statement) {
-            $this->assertInstanceOf(Node::class, $statement);
-        }
+        $this->assertContainsOnlyInstancesOf(Node::class, $statements);
 
         $actualPrintedParsedContents = SingletonContainer::getNodeDumper()->dump($statements);
 

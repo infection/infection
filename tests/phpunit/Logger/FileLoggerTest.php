@@ -52,15 +52,9 @@ final class FileLoggerTest extends FileSystemTestCase
 {
     private const LOG_FILE_PATH = '/path/to/text.log';
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
-    /**
-     * @var DummyLogger
-     */
-    private $logger;
+    private DummyLogger $logger;
 
     protected function setUp(): void
     {

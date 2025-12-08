@@ -41,6 +41,7 @@ use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
@@ -80,7 +81,6 @@ class NodeMutationGenerator
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
         private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly FilesDiffChangedLines $filesDiffChangedLines,
         private readonly array $originalFileTokens,
@@ -92,6 +92,8 @@ class NodeMutationGenerator
     }
 
     /**
+     * @throws NoSourceFound
+     *
      * @return iterable<Mutation>
      */
     public function generate(Node $node): iterable
@@ -107,7 +109,8 @@ class NodeMutationGenerator
             return;
         }
 
-        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine(), $this->gitDiffBase)) {
+        /** @psalm-suppress InvalidArgument */
+        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return;
         }
 

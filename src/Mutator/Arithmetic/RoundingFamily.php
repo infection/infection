@@ -106,12 +106,7 @@ final class RoundingFamily implements Mutator
             return false;
         }
 
-        if (!$node->name instanceof Node\Name
-            || !in_array($node->name->toLowerString(), self::MUTATORS_MAP, true)
-        ) {
-            return false;
-        }
-
-        return true;
+        return $node->name instanceof Node\Name
+            && in_array($node->name->toLowerString(), self::MUTATORS_MAP, true);
     }
 }

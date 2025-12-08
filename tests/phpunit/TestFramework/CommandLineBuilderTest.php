@@ -48,10 +48,7 @@ final class CommandLineBuilderTest extends TestCase
 
     private const TEST_FRAMEWORK_ARGS = ['--filter XYZ', '--exclude-group=integration'];
 
-    /**
-     * @var CommandLineBuilder
-     */
-    private $commandLineBuilder;
+    private CommandLineBuilder $commandLineBuilder;
 
     protected function setUp(): void
     {

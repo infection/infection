@@ -36,23 +36,36 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
 use Infection\FileSystem\SourceFileCollector;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 use function Pipeline\take;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 
+#[Group('integration')]
 #[CoversClass(SourceFileCollector::class)]
-final class SourceFileCollectorTest extends TestCase
+final class SourceFileCollectorTest extends FileSystemTestCase
 {
     private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
+    private Filesystem $filesystem;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->filesystem = new Filesystem();
+    }
+
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedFilesOrDirectories
-     * @param list<string> $expectedList
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param list<non-empty-string> $expectedList
      */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(
@@ -60,15 +73,39 @@ final class SourceFileCollectorTest extends TestCase
         array $excludedFilesOrDirectories,
         array $expectedList,
     ): void {
-        $files = (new SourceFileCollector())->collectFiles(
+        $collector = new SourceFileCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
+            [],
         );
 
-        self::assertIsEqualCanonicalizing(
+        $files = $collector->collect();
+
+        self::assertIsEqualUnorderedLists(
             $expectedList,
             take($files)->toAssoc(),
         );
+    }
+
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     */
+    #[DataProvider('sourceFilesProvider')]
+    public function test_it_memoizes_the_result(
+        array $sourceDirectories,
+        array $excludedFilesOrDirectories,
+    ): void {
+        $collector = new SourceFileCollector(
+            $sourceDirectories,
+            $excludedFilesOrDirectories,
+            [],
+        );
+
+        $first = $collector->collect();
+        $second = $collector->collect();
+
+        $this->assertSame($first, $second);
     }
 
     /**
@@ -82,7 +119,7 @@ final class SourceFileCollectorTest extends TestCase
             [],
         ];
 
-        yield 'one directory, no filter, no excludes' => [
+        yield 'one directory' => [
             [self::FIXTURES_ROOT . '/case0'],
             [],
             [
@@ -92,8 +129,11 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'multiple directories, no filter, no excludes' => [
-            [self::FIXTURES_ROOT . '/case0', self::FIXTURES_ROOT . '/case1'],
+        yield 'multiple directories' => [
+            [
+                self::FIXTURES_ROOT . '/case0',
+                self::FIXTURES_ROOT . '/case1',
+            ],
             [],
             [
                 'case0/a.php',
@@ -104,7 +144,7 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'one directory, no filter, one excludes' => [
+        yield 'one directory with a child directory excluded via its base name' => [
             [self::FIXTURES_ROOT . '/case0'],
             ['sub-dir'],
             [
@@ -113,7 +153,27 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'one directory, no filter, absolute path excludes' => [
+        yield 'one directory with a child directory excluded via its full path' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            [self::FIXTURES_ROOT . '/case0/sub-dir'],
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',  // Does not work
+            ],
+        ];
+
+        yield 'one directory with a child directory excluded via its path relative to the source root' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            ['case0/sub-dir'],
+            [
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',  // Does not work
+            ],
+        ];
+
+        yield 'one directory with a directory excluded via its full path with the same name as an included child directory' => [
             [self::FIXTURES_ROOT . '/case0'],
             [self::FIXTURES_ROOT . '/sub-dir'],
             [
@@ -123,18 +183,33 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'one directory, no filter, relative path excludes relative to source root' => [
+        yield 'one directory with a directory excluded via its full path with the same name as an included directory' => [
             [self::FIXTURES_ROOT . '/case0'],
-            ['case0/sub-dir'],
+            [self::FIXTURES_ROOT . '/case0'],
             [
+                // Does not work
                 'case0/a.php',
                 'case0/outside-symlink.php',
                 'case0/sub-dir/b.php',
             ],
         ];
 
-        yield 'multiple directories, no filter, one common excludes' => [
-            [self::FIXTURES_ROOT . '/case0', self::FIXTURES_ROOT . '/case1'],
+        yield 'one directory with a directory excluded via its base name with the same name as an included directory' => [
+            [self::FIXTURES_ROOT . '/case0'],
+            ['case0'],
+            [
+                // Does not work
+                'case0/a.php',
+                'case0/outside-symlink.php',
+                'case0/sub-dir/b.php',
+            ],
+        ];
+
+        yield 'multiple directories with a common child directory excluded via its base name' => [
+            [
+                self::FIXTURES_ROOT . '/case0',
+                self::FIXTURES_ROOT . '/case1',
+            ],
             ['sub-dir'],
             [
                 'case0/a.php',
@@ -143,7 +218,7 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'exclude file by its name' => [
+        yield 'one directory with a child file excluded via its base name' => [
             [self::FIXTURES_ROOT . '/case1'],
             ['a.php'],
             [
@@ -151,7 +226,7 @@ final class SourceFileCollectorTest extends TestCase
             ],
         ];
 
-        yield 'one directory, no filter, one common excludes and one file exclude' => [
+        yield 'one directory with a child file and directory excluded via its base name' => [
             [self::FIXTURES_ROOT . '/case0'],
             [
                 'sub-dir',
@@ -164,10 +239,135 @@ final class SourceFileCollectorTest extends TestCase
     }
 
     /**
-     * @param list<string> $expectedList
-     * @param array<string, SplFileInfo> $actual
+     * @param non-empty-string[] $expectedFilters
      */
-    private static function assertIsEqualCanonicalizing(
+    #[DataProvider('filterProvider')]
+    public function test_it_can_parse_and_normalize_string_filter(
+        string $filter,
+        array $expectedFilters,
+        bool $expectedIsFiltered,
+    ): void {
+        $collector = SourceFileCollector::create(
+            configurationPathname: '/path/to/project',
+            sourceDirectories: [],
+            excludedFilesOrDirectories: [],
+            filter: $filter,
+        );
+
+        $actual = $collector->getFilters();
+
+        $this->assertEqualsCanonicalizing($expectedFilters, $actual);
+        $this->assertSame($expectedIsFiltered, $collector->isFiltered());
+    }
+
+    public static function filterProvider(): iterable
+    {
+        yield 'empty' => [
+            '',
+            [],
+            false,
+        ];
+
+        yield 'nominal' => [
+            'src/Foo.php, src/Bar.php',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+            true,
+        ];
+
+        yield 'spaces & untrimmed string' => [
+            '  src/Foo.php,, , src/Bar.php  ',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+            true,
+        ];
+    }
+
+    /**
+     * @param string[] $filePaths
+     * @param string[] $expected
+     */
+    #[DataProvider('filteredFilesProvider')]
+    public function test_it_filters_the_collected_files(
+        string $filter,
+        array $filePaths,
+        array $expected,
+    ): void {
+        foreach ($filePaths as $filePath) {
+            $this->filesystem->dumpFile($filePath, '');
+        }
+
+        $collector = SourceFileCollector::create(
+            configurationPathname: '/path/to/project',
+            sourceDirectories: [$this->tmp],
+            excludedFilesOrDirectories: [],
+            filter: $filter,
+        );
+
+        $actual = take($collector->collect())
+            ->map(static fn (FinderSplFileInfo $fileInfo) => $fileInfo->getRelativePathname())
+            ->toList();
+
+        $this->assertEqualsCanonicalizing($expected, $actual);
+    }
+
+    public static function filteredFilesProvider(): iterable
+    {
+        yield [
+            'src/Example',
+            [
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Example/Test.php',
+            ],
+        ];
+
+        yield [
+            'src/Foo',
+            [
+                'src/Example/Test.php',
+            ],
+            [],
+        ];
+
+        yield [
+            '',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+        ];
+
+        yield [
+            'src/Foo,src/Bar',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+            ],
+        ];
+    }
+
+    /**
+     * @param list<string> $expectedList
+     * @param SplFileInfo[] $actual
+     */
+    private static function assertIsEqualUnorderedLists(
         array $expectedList,
         array $actual,
     ): void {

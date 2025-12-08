@@ -36,7 +36,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Infection\Configuration\Entry\GitSource;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
@@ -51,34 +50,32 @@ use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 
 final class ConfigurationBuilder
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param iterable<SplFileInfo> $sourceFiles
-     * @param non-empty-string|null $sourceFilter
-     * @param string[] $sourceFilesExcludes
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string $gitDiffBase
+     * @param non-empty-string $gitDiffFilter
+     * @param non-empty-string $configPathname
      */
     private function __construct(
-        private float    $timeout,
-        private array    $sourceDirectories,
-        private iterable $sourceFiles,
-        private ?string   $sourceFilter,
-        private ?GitSource $gitSource,
-        private array    $sourceFilesExcludes,
-        private Logs     $logs,
-        private string   $logVerbosity,
-        private string   $tmpDir,
-        private PhpUnit  $phpUnit,
-        private PhpStan  $phpStan,
-        private array    $mutators,
-        private string   $testFramework,
-        private ?string  $bootstrap,
-        private ?string  $initialTestsPhpOptions,
+        private float $timeout,
+        private array $sourceDirectories,
+        private string $sourceFilesFilter,
+        private array $sourceFilesExcludes,
+        private Logs $logs,
+        private string $logVerbosity,
+        private string $tmpDir,
+        private PhpUnit $phpUnit,
+        private PhpStan $phpStan,
+        private array $mutators,
+        private string $testFramework,
+        private ?string $bootstrap,
+        private ?string $initialTestsPhpOptions,
         private string $testFrameworkExtraOptions,
         private ?string $staticAnalysisToolOptions,
         private string $coveragePath,
@@ -96,54 +93,60 @@ final class ConfigurationBuilder
         private bool $dryRun,
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
+        private bool $isForGitDiffLines,
+        private ?string $gitDiffBase,
+        private ?string $gitDiffFilter,
         private ?string $mapSourceClassToTestStrategy,
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
         private ?string $mutantId,
+        private string $configPathname,
     ) {
     }
 
     public static function from(Configuration $configuration): self
     {
         return new self(
-            $configuration->processTimeout,
-            $configuration->sourceDirectories,
-            $configuration->sourceFiles,
-            $configuration->sourceFilter,
-            $configuration->gitSource,
-            $configuration->sourceFilesExcludes,
-            $configuration->logs,
-            $configuration->logVerbosity,
-            $configuration->tmpDir,
-            $configuration->phpUnit,
-            $configuration->phpStan,
-            $configuration->mutators,
-            $configuration->testFramework,
-            $configuration->bootstrap,
-            $configuration->initialTestsPhpOptions,
-            $configuration->testFrameworkExtraOptions,
-            $configuration->getStaticAnalysisToolOptions() === []
+            timeout: $configuration->processTimeout,
+            sourceDirectories: $configuration->sourceDirectories,
+            sourceFilesFilter: $configuration->sourceFilesFilter,
+            sourceFilesExcludes: $configuration->sourceFilesExcludes,
+            logs: $configuration->logs,
+            logVerbosity: $configuration->logVerbosity,
+            tmpDir: $configuration->tmpDir,
+            phpUnit: $configuration->phpUnit,
+            phpStan: $configuration->phpStan,
+            mutators: $configuration->mutators,
+            testFramework: $configuration->testFramework,
+            bootstrap: $configuration->bootstrap,
+            initialTestsPhpOptions: $configuration->initialTestsPhpOptions,
+            testFrameworkExtraOptions: $configuration->testFrameworkExtraOptions,
+            staticAnalysisToolOptions: $configuration->getStaticAnalysisToolOptions() === []
                 ? null
                 : implode(' ', $configuration->getStaticAnalysisToolOptions()),
-            $configuration->coveragePath,
-            $configuration->skipCoverage,
-            $configuration->skipInitialTests,
-            $configuration->isDebugEnabled,
-            !$configuration->mutateOnlyCoveredCode(),
-            $configuration->noProgress,
-            $configuration->ignoreMsiWithNoMutations,
-            $configuration->minMsi,
-            $configuration->numberOfShownMutations,
-            $configuration->minCoveredMsi,
-            $configuration->msiPrecision,
-            $configuration->threadCount,
-            $configuration->isDryRun,
-            $configuration->ignoreSourceCodeMutatorsMap,
-            $configuration->executeOnlyCoveringTestCases,
-            $configuration->mapSourceClassToTestStrategy,
-            $configuration->loggerProjectRootDirectory,
-            $configuration->staticAnalysisTool,
-            $configuration->mutantId,
+            coveragePath: $configuration->coveragePath,
+            skipCoverage: $configuration->skipCoverage,
+            skipInitialTests: $configuration->skipInitialTests,
+            debug: $configuration->isDebugEnabled,
+            uncovered: !$configuration->mutateOnlyCoveredCode(),
+            noProgress: $configuration->noProgress,
+            ignoreMsiWithNoMutations: $configuration->ignoreMsiWithNoMutations,
+            minMsi: $configuration->minMsi,
+            numberOfShownMutations: $configuration->numberOfShownMutations,
+            minCoveredMsi: $configuration->minCoveredMsi,
+            msiPrecision: $configuration->msiPrecision,
+            threadCount: $configuration->threadCount,
+            dryRun: $configuration->isDryRun,
+            ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
+            executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
+            isForGitDiffLines: $configuration->isForGitDiffLines,
+            gitDiffBase: $configuration->gitDiffBase,
+            gitDiffFilter: $configuration->gitDiffFilter,
+            mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
+            loggerProjectRootDirectory: $configuration->loggerProjectRootDirectory,
+            staticAnalysisTool: $configuration->staticAnalysisTool,
+            mutantId: $configuration->mutantId,
+            configPathname: $configuration->configurationPathname,
         );
     }
 
@@ -152,9 +155,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: 10.0,
             sourceDirectories: [],
-            sourceFiles: [],
-            sourceFilter: null,
-            gitSource: null,
+            sourceFilesFilter: '',
             sourceFilesExcludes: [],
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
@@ -182,10 +183,14 @@ final class ConfigurationBuilder
             dryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
+            isForGitDiffLines: false,
+            gitDiffBase: null,
+            gitDiffFilter: null,
             mapSourceClassToTestStrategy: null,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
+            configPathname: '/path/to/project/infection.json5',
         );
     }
 
@@ -194,15 +199,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: 5.0,
             sourceDirectories: ['src', 'lib'],
-            sourceFiles: [
-                new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-            ],
-            sourceFilter: 'src/Foo.php,src/Bar.php',
-            gitSource: new GitSource(
-                baseBranch: 'origin/main',
-                isForDiffLines: true,
-            ),
+            sourceFilesFilter: 'src/Foo.php,src/Bar.php',
             sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
                 textLogFilePath: 'text.log',
@@ -248,10 +245,14 @@ final class ConfigurationBuilder
                 'Foo\\Bar' => ['.*test.*'],
             ],
             executeOnlyCoveringTestCases: true,
+            isForGitDiffLines: true,
+            gitDiffBase: 'origin/master',
+            gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
             mutantId: 'abc123def456',
+            configPathname: '/path/to/project/infection.json5',
         );
     }
 
@@ -263,6 +264,9 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string ...$sourceDirectories
+     */
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
         $clone = clone $this;
@@ -271,36 +275,17 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    /**
-     * @param iterable<SplFileInfo> $sourceFiles
-     */
-    public function withSourceFiles(iterable $sourceFiles): self
+    public function withSourceFilesFilter(string $sourceFilesFilter): self
     {
         $clone = clone $this;
-        $clone->sourceFiles = $sourceFiles;
+        $clone->sourceFilesFilter = $sourceFilesFilter;
 
         return $clone;
     }
 
     /**
-     * @param non-empty-string|null $sourceFilter
+     * @param non-empty-string ...$sourceFilesExcludes
      */
-    public function withSourceFilter(?string $sourceFilter): self
-    {
-        $clone = clone $this;
-        $clone->sourceFilter = $sourceFilter;
-
-        return $clone;
-    }
-
-    public function withGitSource(?GitSource $source): self
-    {
-        $clone = clone $this;
-        $clone->gitSource = $source;
-
-        return $clone;
-    }
-
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
         $clone = clone $this;
@@ -523,6 +508,36 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    public function withIsForGitDiffLines(bool $isForGitDiffLines): self
+    {
+        $clone = clone $this;
+        $clone->isForGitDiffLines = $isForGitDiffLines;
+
+        return $clone;
+    }
+
+    /**
+     * @param non-empty-string|null $gitDiffBase
+     */
+    public function withGitDiffBase(?string $gitDiffBase): self
+    {
+        $clone = clone $this;
+        $clone->gitDiffBase = $gitDiffBase;
+
+        return $clone;
+    }
+
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     */
+    public function withGitDiffFilter(?string $gitDiffFilter): self
+    {
+        $clone = clone $this;
+        $clone->gitDiffFilter = $gitDiffFilter;
+
+        return $clone;
+    }
+
     public function withMapSourceClassToTestStrategy(?string $mapSourceClassToTestStrategy): self
     {
         $clone = clone $this;
@@ -555,45 +570,58 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function withConfigPathname(string $pathname): self
+    {
+        $clone = clone $this;
+        $clone->configPathname = $pathname;
+
+        return $clone;
+    }
+
     public function build(): Configuration
     {
         return new Configuration(
-            $this->timeout,
-            $this->sourceDirectories,
-            $this->sourceFiles,
-            $this->sourceFilter,
-            $this->gitSource,
-            $this->sourceFilesExcludes,
-            $this->logs,
-            $this->logVerbosity,
-            $this->tmpDir,
-            $this->phpUnit,
-            $this->phpStan,
-            $this->mutators,
-            $this->testFramework,
-            $this->bootstrap,
-            $this->initialTestsPhpOptions,
-            $this->testFrameworkExtraOptions,
-            $this->staticAnalysisToolOptions,
-            $this->coveragePath,
-            $this->skipCoverage,
-            $this->skipInitialTests,
-            $this->debug,
-            $this->uncovered,
-            $this->noProgress,
-            $this->ignoreMsiWithNoMutations,
-            $this->minMsi,
-            $this->numberOfShownMutations,
-            $this->minCoveredMsi,
-            $this->msiPrecision,
-            $this->threadCount,
-            $this->dryRun,
-            $this->ignoreSourceCodeMutatorsMap,
-            $this->executeOnlyCoveringTestCases,
-            $this->mapSourceClassToTestStrategy,
-            $this->loggerProjectRootDirectory,
-            $this->staticAnalysisTool,
-            $this->mutantId,
+            processTimeout: $this->timeout,
+            sourceDirectories: $this->sourceDirectories,
+            sourceFilesFilter: $this->sourceFilesFilter,
+            sourceFilesExcludes: $this->sourceFilesExcludes,
+            logs: $this->logs,
+            logVerbosity: $this->logVerbosity,
+            tmpDir: $this->tmpDir,
+            phpUnit: $this->phpUnit,
+            phpStan: $this->phpStan,
+            mutators: $this->mutators,
+            testFramework: $this->testFramework,
+            bootstrap: $this->bootstrap,
+            initialTestsPhpOptions: $this->initialTestsPhpOptions,
+            testFrameworkExtraOptions: $this->testFrameworkExtraOptions,
+            staticAnalysisToolOptions: $this->staticAnalysisToolOptions,
+            coveragePath: $this->coveragePath,
+            skipCoverage: $this->skipCoverage,
+            skipInitialTests: $this->skipInitialTests,
+            isDebugEnabled: $this->debug,
+            withUncovered: $this->uncovered,
+            noProgress: $this->noProgress,
+            ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
+            minMsi: $this->minMsi,
+            numberOfShownMutations: $this->numberOfShownMutations,
+            minCoveredMsi: $this->minCoveredMsi,
+            msiPrecision: $this->msiPrecision,
+            threadCount: $this->threadCount,
+            isDryRun: $this->dryRun,
+            ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
+            executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
+            isForGitDiffLines: $this->isForGitDiffLines,
+            gitDiffBase: $this->gitDiffBase,
+            gitDiffFilter: $this->gitDiffFilter,
+            mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
+            loggerProjectRootDirectory: $this->loggerProjectRootDirectory,
+            staticAnalysisTool: $this->staticAnalysisTool,
+            mutantId: $this->mutantId,
+            configurationPathname: $this->configPathname,
         );
     }
 }

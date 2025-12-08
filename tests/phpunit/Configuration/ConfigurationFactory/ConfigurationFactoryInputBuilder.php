@@ -39,6 +39,10 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 
 final class ConfigurationFactoryInputBuilder
 {
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function __construct(
         private ?string $existingCoveragePath,
         private ?string $initialTestsPhpOptions,
@@ -60,7 +64,6 @@ final class ConfigurationFactoryInputBuilder
         private ?int $threadCount,
         private bool $dryRun,
         private ?string $gitDiffFilter,
-        private bool $isForGitDiffLines,
         private ?string $gitDiffBase,
         private ?bool $useGitHubLogger,
         private ?string $gitlabLogFilePath,
@@ -227,6 +230,9 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     */
     public function withGitDiffFilter(?string $gitDiffFilter): self
     {
         $clone = clone $this;
@@ -235,14 +241,9 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
-    public function withIsForGitDiffLines(bool $isForGitDiffLines): self
-    {
-        $clone = clone $this;
-        $clone->isForGitDiffLines = $isForGitDiffLines;
-
-        return $clone;
-    }
-
+    /**
+     * @param non-empty-string|null $gitDiffBase
+     */
     public function withGitDiffBase(?string $gitDiffBase): self
     {
         $clone = clone $this;
@@ -353,19 +354,18 @@ final class ConfigurationFactoryInputBuilder
      *     17: string,
      *     18: int|null,
      *     19: bool,
-     *     20: string|null,
-     *     21: bool,
-     *     22: string|null,
-     *     23: bool|null,
+     *     20: non-empty-string|null,
+     *     21: non-empty-string|null,
+     *     22: bool|null,
+     *     23: string|null,
      *     24: string|null,
      *     25: string|null,
-     *     26: string|null,
+     *     26: bool,
      *     27: bool,
-     *     28: bool,
+     *     28: string|null,
      *     29: string|null,
      *     30: string|null,
-     *     31: string|null,
-     *     32: string|null
+     *     31: string|null
      * }
      */
     public function build(SchemaConfiguration $schema): array
@@ -392,7 +392,6 @@ final class ConfigurationFactoryInputBuilder
             $this->threadCount,
             $this->dryRun,
             $this->gitDiffFilter,
-            $this->isForGitDiffLines,
             $this->gitDiffBase,
             $this->useGitHubLogger,
             $this->gitlabLogFilePath,

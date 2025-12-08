@@ -51,20 +51,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
 final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
-    /**
-     * @var MetricsCalculator|MockObject
-     */
-    private $metricsCalculatorMock;
+    private MockObject&MetricsCalculator $metricsCalculatorMock;
 
-    /**
-     * @var ResultsCollector|MockObject
-     */
-    private $resultsCollectorMock;
+    private MockObject&ResultsCollector $resultsCollectorMock;
 
-    /**
-     * @var DiffColorizer|MockObject
-     */
-    private $diffColorizerMock;
+    private MockObject&DiffColorizer $diffColorizerMock;
 
     protected function setUp(): void
     {

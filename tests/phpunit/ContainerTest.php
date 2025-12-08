@@ -35,9 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function array_keys;
 use Error;
 use Infection\Container;
-use Infection\FileSystem\Locator\FileNotFound;
+use Infection\FileSystem\SourceFileCollector;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
@@ -57,11 +59,11 @@ final class ContainerTest extends TestCase
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown service "Infection\FileSystem\SourceFileFilter"');
+        $this->expectExceptionMessage('Infection\FileSystem\SourceFileCollector"');
 
         $container = new Container([]);
 
-        $container->getSourceFileFilter();
+        $container->get(SourceFileCollector::class);
     }
 
     public function test_it_can_build_simple_services_without_configuration(): void
@@ -111,8 +113,7 @@ final class ContainerTest extends TestCase
 
         $traces = $newContainer->getUnionTraceProvider()->provideTraces();
 
-        $this->expectException(FileNotFound::class);
-        $this->expectExceptionMessage('Could not find any "index.xml" file in "/path/to/coverage"');
+        $this->expectException(ReportLocationThrowable::class);
 
         foreach ($traces as $trace) {
             $this->fail();
@@ -140,7 +141,7 @@ final class ContainerTest extends TestCase
             SingletonContainer::getContainer(),
         );
 
-        foreach ($reflection->getFactories() as $id => $factory) {
+        foreach (array_keys($reflection->getFactories()) as $id) {
             yield $id => [$id];
         }
     }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\Http;
 
-use Generator;
 use Infection\Framework\Str;
 use Infection\Logger\Http\Response;
 use Infection\Logger\Http\StrykerCurlClient;
@@ -52,20 +51,11 @@ final class StrykerDashboardClientTest extends TestCase
 {
     private const API_KEY = '0e137d38-7611-4157-897b-54791cc1ef97';
 
-    /**
-     * @var StrykerCurlClient|MockObject
-     */
-    private $clientMock;
+    private MockObject&StrykerCurlClient $clientMock;
 
-    /**
-     * @var DummyLogger
-     */
-    private $logger;
+    private DummyLogger $logger;
 
-    /**
-     * @var StrykerDashboardClient
-     */
-    private $dashboardClient;
+    private StrykerDashboardClient $dashboardClient;
 
     protected function setUp(): void
     {
@@ -117,7 +107,7 @@ final class StrykerDashboardClientTest extends TestCase
         );
     }
 
-    public static function provideResponseStatusCodes(): Generator
+    public static function provideResponseStatusCodes(): iterable
     {
         yield '200 OK' => [Response::HTTP_OK];
 

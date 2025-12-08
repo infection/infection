@@ -35,36 +35,178 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function array_filter;
+use function array_map;
+use ArrayIterator;
+use function count;
+use function dirname;
+use function explode;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Iterator\PathFilterIterator;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @final
- *
  * @internal
+ * @final
  */
 class SourceFileCollector
 {
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $excludedFilesOrDirectories
-     *
-     * @return iterable<string, SplFileInfo>
+     * @var iterable<SplFileInfo>
      */
-    public function collectFiles(
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-    ): iterable {
-        if ($sourceDirectories === []) {
-            return [];
+    private ?iterable $sourceFiles = null;
+
+    private readonly bool $filtered;
+
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param non-empty-string[] $filters
+     */
+    public function __construct(
+        private readonly array $sourceDirectories,
+        private readonly array $excludedFilesOrDirectories,
+        private readonly array $filters,
+    ) {
+        $this->filtered = count($this->filters) !== 0;
+    }
+
+    public function isFiltered(): bool
+    {
+        return $this->filtered;
+    }
+
+    /**
+     * @return non-empty-string[]
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    public function collect(): iterable
+    {
+        if ($this->sourceFiles === null) {
+            $this->sourceFiles = $this->doCollect();
         }
 
+        return $this->sourceFiles;
+    }
+
+    /**
+     * @param non-empty-string $configurationPathname
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     */
+    public static function create(
+        string $configurationPathname,
+        array $sourceDirectories,
+        array $excludedFilesOrDirectories,
+        string $filter,
+    ): self {
+        $configurationDirname = dirname($configurationPathname);
+
+        return new self(
+            // We need to make the source file paths absolute, otherwise the
+            // collector will collect the files relative to the current working
+            // directory instead of relative to the location of the configuration
+            // file.
+            self::makePathsAbsolute($configurationDirname, $sourceDirectories),
+            $excludedFilesOrDirectories,
+            self::parseFilter($filter),
+        );
+    }
+
+    /**
+     * @param non-empty-string $configurationDirname
+     * @param non-empty-string[] $sourceDirectories
+     *
+     * @return non-empty-string[]
+     */
+    private static function makePathsAbsolute(
+        string $configurationDirname,
+        array $sourceDirectories,
+    ): array {
+        $mapToAbsolutePath = static fn (string $path) => Path::isAbsolute($path)
+            ? $path
+            : Path::join(
+                $configurationDirname,
+                $path,
+            );
+
+        return array_map(
+            $mapToAbsolutePath(...),
+            $sourceDirectories,
+        );
+    }
+
+    /**
+     * @return non-empty-string[]
+     */
+    private static function parseFilter(string $filter): array
+    {
+        return array_filter(
+            array_map(
+                trim(...),
+                explode(',', $filter),
+            ),
+        );
+    }
+
+    /**
+     * @return Iterator<SplFileInfo>
+     */
+    private function doCollect(): Iterator
+    {
+        if ($this->sourceDirectories === []) {
+            return new ArrayIterator([]);
+        }
+
+        return $this->filter(
+            $this
+                ->createFinder()
+                ->getIterator(),
+        );
+    }
+
+    private function createFinder(): Finder
+    {
         return Finder::create()
-            ->in($sourceDirectories)
-            ->exclude($excludedFilesOrDirectories)
-            ->notPath($excludedFilesOrDirectories)
+            ->in($this->sourceDirectories)
+            ->exclude($this->excludedFilesOrDirectories)
+            ->notPath($this->excludedFilesOrDirectories)
             ->files()
-            ->name('*.php')
-        ;
+            ->name('*.php');
+    }
+
+    /**
+     * @param Iterator<SplFileInfo> $iterator
+     *
+     * @return Iterator<SplFileInfo>
+     */
+    private function filter(Iterator $iterator): Iterator
+    {
+        // TODO: could use Finder::setFilter() instead!
+        if (count($this->filters) !== 0) {
+            $iterator = new RealPathFilterIterator(
+                $iterator,
+                $this->filters,
+                [],
+            );
+        }
+
+        // TODO: to check if we really need to re-apply the excluded files.
+        //   could be necessary due to a Finder bug for example.
+        if (count($this->excludedFilesOrDirectories) !== 0) {
+            $iterator = new PathFilterIterator($iterator, [], $this->excludedFilesOrDirectories);
+        }
+
+        return $iterator;
     }
 }

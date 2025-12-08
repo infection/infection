@@ -5,9 +5,12 @@
          colors="true"
          executionOrder="defects,random"
          failOnWarning="true"
+         failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
+         displayDetailsOnIncompleteTests="true"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnSkippedTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          cacheDirectory="./build/cache/phpunit"
@@ -30,7 +33,7 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
         </include>

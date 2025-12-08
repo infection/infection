@@ -47,15 +47,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(CiInitialTestsConsoleLoggerSubscriber::class)]
 final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $testFramework;
+    private MockObject&AbstractTestFrameworkAdapter $testFramework;
 
     protected function setUp(): void
     {

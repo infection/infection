@@ -49,7 +49,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
     /**
      * @var SimpleMutation[]
      */
-    private $mutations = [];
+    private array $mutations = [];
 
     /**
      * @param Mutator<Node> $mutator

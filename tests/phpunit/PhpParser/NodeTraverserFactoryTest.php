@@ -58,10 +58,7 @@ use ReflectionProperty;
 #[CoversClass(NodeTraverserFactory::class)]
 final class NodeTraverserFactoryTest extends TestCase
 {
-    /**
-     * @var ReflectionProperty|null
-     */
-    private static $visitorsReflection;
+    private static ?ReflectionProperty $visitorsReflection = null;
 
     public function test_it_can_create_a_traverser(): void
     {

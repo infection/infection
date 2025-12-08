@@ -37,8 +37,6 @@ namespace Infection\Configuration;
 
 use function array_map;
 use function explode;
-use Infection\Configuration\Entry\GitOptions;
-use Infection\Configuration\Entry\GitSource;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
@@ -47,7 +45,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use function ltrim;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -63,19 +60,18 @@ readonly class Configuration
     ];
 
     /**
-     * @param string[] $sourceDirectories
-     * @param string[] $sourceFilesExcludes
-     * @param iterable<SplFileInfo> $sourceFiles
-     * @param non-empty-string|null $sourceFilter
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
+     * @param non-empty-string|null $gitDiffBase
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string $configurationPathname
      */
     public function __construct(
         public float $processTimeout,
         public array $sourceDirectories,
-        public iterable $sourceFiles,
-        public string|null $sourceFilter,
-        public ?GitSource $gitSource,
+        public string $sourceFilesFilter,
         public array $sourceFilesExcludes,
         public Logs $logs,
         public string $logVerbosity,
@@ -92,7 +88,7 @@ readonly class Configuration
         public bool $skipCoverage,
         public bool $skipInitialTests,
         public bool $isDebugEnabled,
-        private readonly bool $withUncovered,
+        private bool $withUncovered,
         public bool $noProgress,
         public bool $ignoreMsiWithNoMutations,
         public ?float $minMsi,
@@ -103,10 +99,14 @@ readonly class Configuration
         public bool $isDryRun,
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
+        public bool $isForGitDiffLines,
+        public ?string $gitDiffBase,
+        public ?string $gitDiffFilter,
         public ?string $mapSourceClassToTestStrategy,
         public ?string $loggerProjectRootDirectory,
         public ?string $staticAnalysisTool,
         public ?string $mutantId,
+        public string $configurationPathname,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
         Assert::allString($sourceDirectories);
@@ -138,20 +138,6 @@ readonly class Configuration
     public function mutateOnlyCoveredCode(): bool
     {
         return !$this->withUncovered;
-    }
-
-    public function isForGitDiffLines(): bool
-    {
-        return $this->sourceFilter instanceof GitOptions
-            ? $this->sourceFilter->isForDiffLines
-            : false;
-    }
-
-    public function getGitDiffBase(): ?string
-    {
-        return $this->sourceFilter instanceof GitOptions
-            ? $this->sourceFilter->baseBranch
-            : null;
     }
 
     /**

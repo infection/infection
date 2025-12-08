@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -59,24 +59,15 @@ final class JUnitTestFileDataProviderTest extends TestCase
 
     private const JUNIT_CODECEPTION_CEST_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_codeception_cest.xml';
 
-    /**
-     * @var JUnitReportLocator|MockObject
-     */
-    private $jUnitLocatorMock;
+    private MockObject&ReportLocator $jUnitLocatorMock;
 
-    /**
-     * @var JUnitTestFileDataProvider
-     */
-    private $provider;
+    private JUnitTestFileDataProvider $provider;
 
-    /**
-     * @var string
-     */
-    private $tempfile;
+    private string $tempfile;
 
     protected function setUp(): void
     {
-        $this->jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
+        $this->jUnitLocatorMock = $this->createMock(ReportLocator::class);
 
         $this->provider = new JUnitTestFileDataProvider($this->jUnitLocatorMock);
 

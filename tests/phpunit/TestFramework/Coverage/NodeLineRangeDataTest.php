@@ -50,6 +50,9 @@ final class NodeLineRangeDataTest extends TestCase
         new NodeLineRangeData(20, 10);
     }
 
+    /**
+     * @param int[] $expected
+     */
     #[DataProvider('providesLineRanges')]
     public function test_it_generates_the_correct_range(int $start, int $end, array $expected): void
     {

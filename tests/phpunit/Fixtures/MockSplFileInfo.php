@@ -6,7 +6,6 @@ use RuntimeException;
 use SplFileInfo;
 use ReturnTypeWillChange;
 
-// TODO: to add this to the FS PR...
 final class MockSplFileInfo extends SplFileInfo
 {
     private string|bool $realPath;

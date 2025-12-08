@@ -56,15 +56,9 @@ final class TestFrameworkMutantExecutionResultFactoryTest extends TestCase
 {
     use MutantExecutionResultAssertions;
 
-    /**
-     * @var TestFrameworkAdapter|MockObject
-     */
-    private $testFrameworkAdapterMock;
+    private MockObject&TestFrameworkAdapter $testFrameworkAdapterMock;
 
-    /**
-     * @var TestFrameworkMutantExecutionResultFactory
-     */
-    private $resultFactory;
+    private TestFrameworkMutantExecutionResultFactory $resultFactory;
 
     protected function setUp(): void
     {
