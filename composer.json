@@ -79,7 +79,7 @@
     "require-dev": {
         "ext-simplexml": "*",
         "fidry/makefile": "^1.0",
-        "fig/log-test": "^1.0",
+        "fig/log-test": "^1.2",
         "phpbench/phpbench": "^1.4",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
@@ -88,7 +88,7 @@
         "phpstan/phpstan-webmozart-assert": "^2.0",
         "phpunit/phpunit": "^11.5.27",
         "rector/rector": "^2.2.4",
-        "shipmonk/dead-code-detector": "^0.12.0",
+        "shipmonk/dead-code-detector": "^0.14.0",
         "shipmonk/name-collision-detector": "^2.1",
         "sidz/phpstan-rules": "^0.5.1",
         "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
