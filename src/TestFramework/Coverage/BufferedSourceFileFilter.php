@@ -63,6 +63,9 @@ class BufferedSourceFileFilter implements FileFilter
     ) {
     }
 
+    /**
+     * @param iterable<SplFileInfo> $sourceFiles
+     */
     public static function create(
         iterable $sourceFiles,
     ): self {
