@@ -247,8 +247,8 @@ final class Container extends DIContainer
                 $container->getUncoveredTraceProvider(),
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
-            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
-                $container->getSourceFileCollector(),
+            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => BufferedSourceFileFilter::create(
+                $container->getSourceFileCollector()->collect(),
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),

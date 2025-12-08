@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function array_values;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
@@ -59,11 +58,6 @@ final class BufferedSourceFileFilterTest extends TestCase
             $this->createFileInfoMock('baz.php'),
         ];
 
-        $collectorMock = $this->createMock(SourceFileCollector::class);
-        $collectorMock
-            ->method('collect')
-            ->willReturn($sourceFiles);
-
         $traces = [
             $trace1 = $this->createTraceMock('foo.php'),
             // no trace for bar.php
@@ -76,7 +70,7 @@ final class BufferedSourceFileFilterTest extends TestCase
             $trace2,
         ];
 
-        $bufferedFilter = new BufferedSourceFileFilter($collectorMock);
+        $bufferedFilter = BufferedSourceFileFilter::create($sourceFiles);
 
         $actualTraces = iterator_to_array($bufferedFilter->filter($traces), preserve_keys: false);
         $actualUncoveredFiles = $bufferedFilter->getUnseenInCoverageReportFiles();
