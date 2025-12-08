@@ -156,7 +156,7 @@ final class ConfigurationFactoryTest extends TestCase
                 testFramework: TestFrameworkTypes::PHPUNIT,
                 testFrameworkExtraOptions: null,
                 staticAnalysisToolOptions: null,
-                filter: '',
+                filter: null,
                 threadCount: 0,
                 dryRun: false,
                 gitDiffFilter: null,
@@ -220,7 +220,7 @@ final class ConfigurationFactoryTest extends TestCase
             testFramework: null,
             testFrameworkExtraOptions: null,
             staticAnalysisToolOptions: null,
-            filter: '',
+            filter: null,
             threadCount: 1,
             dryRun: false,
             gitDiffFilter: 'AM',
@@ -1030,10 +1030,10 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'without any filters' => [
             $defaultScenario
                 ->forFilter(
-                    filter: '',
+                    filter: null,
                     gitDiffFilter: null,
                     gitDiffBase: null,
-                    expectedSourceFilesFilter: '',
+                    expectedSourceFilesFilter: null,
                     expectedIsForGitDiffLines: false,
                     expectedDiffBase: null,
                     expectedDiffFilter: null,
@@ -1056,7 +1056,7 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'with git filters' => [
             $defaultScenario
                 ->forFilter(
-                    filter: '',
+                    filter: null,
                     gitDiffFilter: 'AD',
                     gitDiffBase: null,
                     expectedSourceFilesFilter: 'f(AD, reference(test/default), []) = src/a.php,src/b.php',
@@ -1069,7 +1069,7 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'with git filters and base branch' => [
             $defaultScenario
                 ->forFilter(
-                    filter: '',
+                    filter: null,
                     gitDiffFilter: 'AD',
                     gitDiffBase: 'upstream/main',
                     expectedSourceFilesFilter: 'f(AD, reference(upstream/main), []) = src/a.php,src/b.php',

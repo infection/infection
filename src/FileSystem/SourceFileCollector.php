@@ -103,12 +103,13 @@ class SourceFileCollector
      * @param non-empty-string $configurationPathname
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
+     * @param non-empty-string|null $filter
      */
     public static function create(
         string $configurationPathname,
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
-        string $filter,
+        ?string $filter,
     ): self {
         $configurationDirname = dirname($configurationPathname);
 
@@ -147,14 +148,16 @@ class SourceFileCollector
     }
 
     /**
+     * @param non-empty-string|null $filter
+     *
      * @return non-empty-string[]
      */
-    private static function parseFilter(string $filter): array
+    private static function parseFilter(?string $filter): array
     {
         return array_filter(
             array_map(
                 trim(...),
-                explode(',', $filter),
+                explode(',', $filter ?? ''),
             ),
         );
     }
