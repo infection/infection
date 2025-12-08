@@ -61,6 +61,7 @@ readonly class Configuration
 
     /**
      * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string|null $sourceFilesFilter
      * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
@@ -71,7 +72,7 @@ readonly class Configuration
     public function __construct(
         public float $processTimeout,
         public array $sourceDirectories,
-        public string $sourceFilesFilter,
+        public ?string $sourceFilesFilter,
         public array $sourceFilesExcludes,
         public Logs $logs,
         public string $logVerbosity,

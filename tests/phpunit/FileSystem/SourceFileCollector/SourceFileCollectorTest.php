@@ -239,11 +239,12 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     }
 
     /**
+     * @param non-empty-string|null $filter
      * @param non-empty-string[] $expectedFilters
      */
     #[DataProvider('filterProvider')]
     public function test_it_can_parse_and_normalize_string_filter(
-        string $filter,
+        ?string $filter,
         array $expectedFilters,
         bool $expectedIsFiltered,
     ): void {
@@ -262,8 +263,8 @@ final class SourceFileCollectorTest extends FileSystemTestCase
 
     public static function filterProvider(): iterable
     {
-        yield 'empty' => [
-            '',
+        yield 'null' => [
+            null,
             [],
             false,
         ];
@@ -288,12 +289,13 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     }
 
     /**
+     * @param non-empty-string|null $filter
      * @param string[] $filePaths
      * @param string[] $expected
      */
     #[DataProvider('filteredFilesProvider')]
     public function test_it_filters_the_collected_files(
-        string $filter,
+        ?string $filter,
         array $filePaths,
         array $expected,
     ): void {
@@ -336,7 +338,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield [
-            '',
+            null,
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',

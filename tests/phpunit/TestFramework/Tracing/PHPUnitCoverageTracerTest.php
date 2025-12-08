@@ -101,7 +101,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     configurationPathname: self::FIXTURE_DIR,
                     sourceDirectories: [self::FIXTURE_DIR . '/src'],
                     excludedFilesOrDirectories: [],
-                    filter: '',
+                    filter: null,
                 )
                 ->collect(),
             ),

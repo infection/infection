@@ -91,6 +91,7 @@ class ConfigurationFactory
     }
 
     /**
+     * @param non-empty-string|null $filter
      * @param non-empty-string|null $gitDiffFilter
      * @param non-empty-string|null $gitDiffBase
      *
@@ -115,7 +116,7 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         ?string $staticAnalysisToolOptions,
-        string $filter,
+        ?string $filter,
         ?int $threadCount,
         bool $dryRun,
         ?string $gitDiffFilter,
@@ -348,19 +349,22 @@ class ConfigurationFactory
     }
 
     /**
+     * @param non-empty-string|null $filter
      * @param non-empty-string|null $gitDiffFilter
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string|null $gitBase
      *
      * @throws NoSourceFound
+     *
+     * @return non-empty-string|null
      */
     private function retrieveFilter(
-        string $filter,
+        ?string $filter,
         ?string $gitDiffFilter,
         bool $useGitDiff,
         ?string $gitBase,
         array $sourceDirectories,
-    ): string {
+    ): ?string {
         if ($gitDiffFilter === null && !$useGitDiff) {
             return $filter;
         }

@@ -590,16 +590,18 @@ final class ConfigurationFactoryScenario
     }
 
     /**
+     * @param non-empty-string|null $filter
      * @param non-empty-string|null $gitDiffFilter
      * @param non-empty-string|null $gitDiffBase
+     * @param non-empty-string|null $expectedSourceFilesFilter
      * @param non-empty-string|null $expectedDiffBase
      * @param non-empty-string|null $expectedDiffFilter
      */
     public function forFilter(
-        string $filter,
+        ?string $filter,
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
-        string $expectedSourceFilesFilter,
+        ?string $expectedSourceFilesFilter,
         bool $expectedIsForGitDiffLines,
         ?string $expectedDiffBase,
         ?string $expectedDiffFilter,

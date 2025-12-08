@@ -223,7 +223,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
-    public const DEFAULT_FILTER = '';
+    public const DEFAULT_FILTER = null;
 
     public const DEFAULT_THREAD_COUNT = null;
 
@@ -598,6 +598,7 @@ final class Container extends DIContainer
 
     /**
      * @param non-empty-string|null $configFile
+     * @param non-empty-string|null $filter
      * @param non-empty-string|null $gitDiffFilter
      * @param non-empty-string|null $gitDiffBase
      */
@@ -623,7 +624,7 @@ final class Container extends DIContainer
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        string $filter = self::DEFAULT_FILTER,
+        ?string $filter = self::DEFAULT_FILTER,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
         ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,

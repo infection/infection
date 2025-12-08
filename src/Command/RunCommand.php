@@ -683,11 +683,11 @@ final class RunCommand extends BaseCommand
     }
 
     /**
-     * @return array{string, non-empty-string|null, non-empty-string|null}
+     * @return array{non-empty-string|null, non-empty-string|null, non-empty-string|null}
      */
     private static function getSourceFilters(InputInterface $input): array
     {
-        $filter = trim((string) $input->getOption(self::OPTION_FILTER));
+        $filter = self::getPlainFilter($input);
 
         [$gitDiffFilter, $gitDiffBase] = self::getGitOptions($input);
 
@@ -698,6 +698,18 @@ final class RunCommand extends BaseCommand
             $gitDiffFilter,
             $gitDiffBase,
         ];
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    private static function getPlainFilter(InputInterface $input): ?string
+    {
+        $value = trim((string) $input->getOption(self::OPTION_FILTER));
+
+        return $value === ''
+            ? null
+            : $value;
     }
 
     /**
@@ -804,11 +816,15 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @param non-empty-string|null $filter
+     * @param non-empty-string|null $gitDiffFilter
+     */
     private static function assertOnlyOneTypeOfFiltering(
-        string $filter,
+        ?string $filter,
         ?string $gitDiffFilter,
     ): void {
-        if ($filter !== '' && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_BASE) {
+        if ($filter !== null && $gitDiffFilter !== null) {
             throw new InvalidArgumentException(
                 sprintf(
                     'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
