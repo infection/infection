@@ -239,12 +239,13 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string[] $expected
+     * @param non-empty-string[] $expectedFilters
      */
     #[DataProvider('filterProvider')]
     public function test_it_can_parse_and_normalize_string_filter(
         string $filter,
-        array $expected,
+        array $expectedFilters,
+        bool $expectedIsFiltered,
     ): void {
         $collector = SourceFileCollector::create(
             configurationPathname: '/path/to/project',
@@ -255,12 +256,17 @@ final class SourceFileCollectorTest extends FileSystemTestCase
 
         $actual = $collector->getFilters();
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEqualsCanonicalizing($expectedFilters, $actual);
+        $this->assertSame($expectedIsFiltered, $collector->isFiltered());
     }
 
     public static function filterProvider(): iterable
     {
-        yield 'empty' => ['', []];
+        yield 'empty' => [
+            '',
+            [],
+            false,
+        ];
 
         yield 'nominal' => [
             'src/Foo.php, src/Bar.php',
@@ -268,6 +274,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
                 'src/Foo.php',
                 'src/Bar.php',
             ],
+            true,
         ];
 
         yield 'spaces & untrimmed string' => [
@@ -276,6 +283,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
                 'src/Foo.php',
                 'src/Bar.php',
             ],
+            true,
         ];
     }
 
@@ -283,8 +291,8 @@ final class SourceFileCollectorTest extends FileSystemTestCase
      * @param string[] $filePaths
      * @param string[] $expected
      */
-    #[DataProvider('fileListProvider')]
-    public function test_it_filters_traces_traversable(
+    #[DataProvider('filteredFilesProvider')]
+    public function test_it_filters_the_collected_files(
         string $filter,
         array $filePaths,
         array $expected,
@@ -307,7 +315,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
-    public static function fileListProvider(): iterable
+    public static function filteredFilesProvider(): iterable
     {
         yield [
             'src/Example',
