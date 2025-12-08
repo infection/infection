@@ -48,19 +48,27 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Psr\Log\Test\TestLogger;
 
 #[CoversClass(CommandLineGit::class)]
 final class CommandLineGitTest extends TestCase
 {
     private ShellCommandLineExecutor&MockObject $commandLineMock;
 
+    private TestLogger $logger;
+
     private Git $git;
 
     protected function setUp(): void
     {
         $this->commandLineMock = $this->createMock(ShellCommandLineExecutor::class);
+        $this->logger = new TestLogger();
 
-        $this->git = new CommandLineGit($this->commandLineMock);
+        $this->git = new CommandLineGit(
+            $this->commandLineMock,
+            $this->logger,
+        );
     }
 
     public function test_it_throws_no_code_to_mutate_exception_when_diff_is_empty(): void
@@ -90,14 +98,25 @@ final class CommandLineGitTest extends TestCase
 
     public function test_it_falls_back_to_the_given_branch_when_no_merge_base_could_be_found(): void
     {
+        $exception = new GenericProcessException('fatal!');
+
+        $expectedRecords = [
+            [
+                'level' => LogLevel::INFO,
+                'message' => 'Could not find a common ancestor commit between "main" and "HEAD" and fell back to the base "main". This can if there is no common ancestor commit or if we are in a shallow commit.',
+                'context' => ['exception' => $exception],
+            ],
+        ];
+
         $this->commandLineMock
             ->method('execute')
             ->with(['git', 'merge-base', 'main', 'HEAD'])
-            ->willThrowException(new GenericProcessException('fatal!'));
+            ->willThrowException($exception);
 
         $actual = $this->git->getBaseReference('main');
 
         $this->assertSame('main', $actual);
+        $this->assertEquals($expectedRecords, $this->logger->records);
     }
 
     public function test_it_gets_the_relative_paths_of_the_changed_files_as_a_string(): void
@@ -601,11 +620,19 @@ final class CommandLineGitTest extends TestCase
         string|Exception $shellOutputOrException,
         string $expected,
     ): void {
+        $expectedRecords = [];
+
         if (is_string($shellOutputOrException)) {
             $this->commandLineMock
                 ->method('execute')
                 ->willReturn($shellOutputOrException);
         } else {
+            $expectedRecords[] = [
+                'level' => LogLevel::INFO,
+                'message' => 'Could not find a symbolic reference for "refs/remotes/origin/HEAD".',
+                'context' => ['exception' => $shellOutputOrException],
+            ];
+
             $this->commandLineMock
                 ->method('execute')
                 ->willThrowException($shellOutputOrException);
@@ -614,6 +641,7 @@ final class CommandLineGitTest extends TestCase
         $actual = $this->git->getDefaultBase();
 
         $this->assertSame($expected, $actual);
+        $this->assertEquals($expectedRecords, $this->logger->records);
     }
 
     public static function defaultGitBaseProvider(): iterable
