@@ -82,7 +82,6 @@ use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
 use Infection\FileSystem\SourceFileCollector;
-use Infection\FileSystem\SourceFileFilter;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
@@ -249,12 +248,7 @@ final class Container extends DIContainer
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
-                $container->getSourceFileFilter(),
-                $container->getSourceFileCollector()->collect(),
-            ),
-            SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
-                $container->getConfiguration()->sourceFilesFilter,
-                $container->getConfiguration()->sourceFilesExcludes,
+                $container->getSourceFileCollector(),
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
@@ -279,7 +273,6 @@ final class Container extends DIContainer
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
-                    $container->getSourceFileFilter(),
                     $container->getSourceFileCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
@@ -737,11 +730,6 @@ final class Container extends DIContainer
     public function getUnionTraceProvider(): UnionTraceProvider
     {
         return $this->get(UnionTraceProvider::class);
-    }
-
-    public function getSourceFileFilter(): SourceFileFilter
-    {
-        return $this->get(SourceFileFilter::class);
     }
 
     public function getDiffColorizer(): DiffColorizer

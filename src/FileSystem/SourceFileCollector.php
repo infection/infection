@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use ArrayIterator;
-use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Iterator;
-use Symfony\Component\Finder\Iterator\PathFilterIterator;
 use function array_filter;
 use function array_map;
+use ArrayIterator;
 use function count;
 use function dirname;
+use function explode;
+use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Iterator;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\Iterator\PathFilterIterator;
 use Symfony\Component\Finder\SplFileInfo;
-use function explode;
 
 /**
  * @internal
@@ -77,6 +77,14 @@ class SourceFileCollector
     public function isFiltered(): bool
     {
         return $this->filtered;
+    }
+
+    /**
+     * @return non-empty-string[]
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
     }
 
     /**
@@ -184,6 +192,7 @@ class SourceFileCollector
      */
     private function filter(Iterator $iterator): Iterator
     {
+        // TODO: could use Finder::setFilter() instead!
         if (count($this->filters) !== 0) {
             $iterator = new RealPathFilterIterator(
                 $iterator,

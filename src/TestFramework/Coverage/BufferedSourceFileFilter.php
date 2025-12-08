@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
 use Infection\FileSystem\FileFilter;
+use Infection\FileSystem\SourceFileCollector;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -60,20 +61,12 @@ class BufferedSourceFileFilter implements FileFilter
      *
      * @var array<string, SplFileInfo>
      */
-    private array $sourceFiles = [];
+    private array $sourceFiles;
 
-    /**
-     * @param iterable<SplFileInfo> $sourceFiles
-     */
     public function __construct(
-        private readonly FileFilter $filter,
-        iterable $sourceFiles,
+        SourceFileCollector $collector,
     ) {
-        // Make a map of source files so we can check covered files against it.
-        // We don't filter here on the assumption that hash table lookups are faster.
-        foreach ($sourceFiles as $sourceFile) {
-            $this->sourceFiles[(string) $sourceFile->getRealPath()] = $sourceFile;
-        }
+        $this->sourceFiles = self::createSourceFiles($collector);
     }
 
     /**
@@ -82,7 +75,7 @@ class BufferedSourceFileFilter implements FileFilter
      */
     public function filter(iterable $input): iterable
     {
-        return take($this->filter->filter($input))
+        return take($input)
             ->filter(function ($trace): bool {
                 Assert::isInstanceOf($trace, Trace::class);
 
@@ -101,15 +94,30 @@ class BufferedSourceFileFilter implements FileFilter
     }
 
     /**
-     * Returns files that are in source.directories from infection.json.dist but not in coverage report (phpunit's filter.whitelist.directory)
+     * Returns files that are in source.directories from infection.json.dist but not in coverage
+     * report (phpunit's filter.whitelist.directory)
      *
      * @return iterable<SplFileInfo>
      */
     public function getUnseenInCoverageReportFiles(): iterable
     {
-        /** @var iterable<SplFileInfo> $result */
-        $result = $this->filter->filter($this->sourceFiles);
+        // TODO: maybe worth a check that this should be called only once filtered.
+        return $this->sourceFiles;
+    }
 
-        return $result;
+    /**
+     * @return array<string, SplFileInfo>
+     */
+    private static function createSourceFiles(SourceFileCollector $collector): array
+    {
+        $sourceFiles = [];
+
+        // Make a map of source files so we can check covered files against it.
+        // We don't filter here on the assumption that hash table lookups are faster.
+        foreach ($collector->collect() as $fileInfo) {
+            $sourceFiles[(string) $fileInfo->getRealPath()] = $fileInfo;
+        }
+
+        return $sourceFiles;
     }
 }
