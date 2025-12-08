@@ -222,19 +222,20 @@ final readonly class CommandLineGit implements Git
 
         if (count($lineParts) === 1) {
             [$line] = $lineParts;
+            Assert::natural($line);
 
-            return new ChangedLinesRange($line, $line);
+            return ChangedLinesRange::forLine($line);
         }
 
         [$startLine, $newCount] = $lineParts;
+        Assert::natural($startLine);
+        Assert::natural($newCount);
 
         if ($newCount === 0) {
             return null;
         }
 
-        $endLine = $startLine + $newCount - 1;
-
-        return new ChangedLinesRange($startLine, $endLine);
+        return ChangedLinesRange::forRange($startLine, $newCount);
     }
 
     /**
