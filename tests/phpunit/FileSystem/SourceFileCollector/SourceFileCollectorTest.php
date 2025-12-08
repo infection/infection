@@ -36,20 +36,31 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
 use Infection\FileSystem\SourceFileCollector;
+use Infection\Tests\FileSystem\FileSystemTestCase;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 
 #[Group('integration')]
 #[CoversClass(SourceFileCollector::class)]
-final class SourceFileCollectorTest extends TestCase
+final class SourceFileCollectorTest extends FileSystemTestCase
 {
     private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
+
+    private Filesystem $filesystem;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->filesystem = new Filesystem();
+    }
 
     /**
      * @param non-empty-string[] $sourceDirectories
@@ -65,6 +76,7 @@ final class SourceFileCollectorTest extends TestCase
         $collector = new SourceFileCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
+            [],
         );
 
         $files = $collector->collect();
@@ -87,6 +99,7 @@ final class SourceFileCollectorTest extends TestCase
         $collector = new SourceFileCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
+            [],
         );
 
         $first = $collector->collect();
@@ -221,6 +234,131 @@ final class SourceFileCollectorTest extends TestCase
             ],
             [
                 'case0/outside-symlink.php',
+            ],
+        ];
+    }
+
+    /**
+     * @param non-empty-string[] $expectedFilters
+     */
+    #[DataProvider('filterProvider')]
+    public function test_it_can_parse_and_normalize_string_filter(
+        string $filter,
+        array $expectedFilters,
+        bool $expectedIsFiltered,
+    ): void {
+        $collector = SourceFileCollector::create(
+            configurationPathname: '/path/to/project',
+            sourceDirectories: [],
+            excludedFilesOrDirectories: [],
+            filter: $filter,
+        );
+
+        $actual = $collector->getFilters();
+
+        $this->assertEqualsCanonicalizing($expectedFilters, $actual);
+        $this->assertSame($expectedIsFiltered, $collector->isFiltered());
+    }
+
+    public static function filterProvider(): iterable
+    {
+        yield 'empty' => [
+            '',
+            [],
+            false,
+        ];
+
+        yield 'nominal' => [
+            'src/Foo.php, src/Bar.php',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+            true,
+        ];
+
+        yield 'spaces & untrimmed string' => [
+            '  src/Foo.php,, , src/Bar.php  ',
+            [
+                'src/Foo.php',
+                'src/Bar.php',
+            ],
+            true,
+        ];
+    }
+
+    /**
+     * @param string[] $filePaths
+     * @param string[] $expected
+     */
+    #[DataProvider('filteredFilesProvider')]
+    public function test_it_filters_the_collected_files(
+        string $filter,
+        array $filePaths,
+        array $expected,
+    ): void {
+        foreach ($filePaths as $filePath) {
+            $this->filesystem->dumpFile($filePath, '');
+        }
+
+        $collector = SourceFileCollector::create(
+            configurationPathname: '/path/to/project',
+            sourceDirectories: [$this->tmp],
+            excludedFilesOrDirectories: [],
+            filter: $filter,
+        );
+
+        $actual = take($collector->collect())
+            ->map(static fn (FinderSplFileInfo $fileInfo) => $fileInfo->getRelativePathname())
+            ->toList();
+
+        $this->assertEqualsCanonicalizing($expected, $actual);
+    }
+
+    public static function filteredFilesProvider(): iterable
+    {
+        yield [
+            'src/Example',
+            [
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Example/Test.php',
+            ],
+        ];
+
+        yield [
+            'src/Foo',
+            [
+                'src/Example/Test.php',
+            ],
+            [],
+        ];
+
+        yield [
+            '',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+        ];
+
+        yield [
+            'src/Foo,src/Bar',
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
+                'src/Example/Test.php',
+            ],
+            [
+                'src/Foo/Test.php',
+                'src/Bar/Baz.php',
             ],
         ];
     }

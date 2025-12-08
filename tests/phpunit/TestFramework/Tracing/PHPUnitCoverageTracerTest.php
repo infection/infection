@@ -40,7 +40,7 @@ use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
@@ -61,7 +61,6 @@ use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Process;
 
@@ -98,14 +97,12 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 ),
             ),
             new BufferedSourceFileFilter(
-                new SourceFileFilter(
+                SourceFileCollector::create(
+                    configurationPathname: self::FIXTURE_DIR,
+                    sourceDirectories: [self::FIXTURE_DIR . '/src'],
+                    excludedFilesOrDirectories: [],
                     filter: '',
-                    excludeDirectories: [],
                 ),
-                Finder::create()
-                    ->files()
-                    ->depth(0)
-                    ->in(self::FIXTURE_DIR . '/src'),
             ),
         );
 

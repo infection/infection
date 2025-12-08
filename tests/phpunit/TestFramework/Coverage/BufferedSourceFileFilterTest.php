@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function array_values;
-use Infection\FileSystem\FileFilter;
+use Infection\FileSystem\SourceFileCollector;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
@@ -49,36 +49,44 @@ final class BufferedSourceFileFilterTest extends TestCase
 {
     public function test_it_filters_and_collects_unseen(): void
     {
-        $uncoveredFiles = [
+        $expectedUncoveredFiles = [
             'bar.php' => $this->createFileInfoMock('bar.php'),
         ];
 
         $sourceFiles = [
             $this->createFileInfoMock('foo.php'),
-            $uncoveredFiles['bar.php'],
+            $expectedUncoveredFiles['bar.php'],
             $this->createFileInfoMock('baz.php'),
         ];
 
+        $collectorMock = $this->createMock(SourceFileCollector::class);
+        $collectorMock
+            ->method('collect')
+            ->willReturn($sourceFiles);
+
         $traces = [
-            $this->createTraceMock('foo.php'),
-            $this->createTraceMock('baz.php'),
+            $trace1 = $this->createTraceMock('foo.php'),
+            // no trace for bar.php
+            $trace2 = $this->createTraceMock('baz.php'),
+            $this->createTraceMock('not-part-of-source-files.php'),
         ];
 
-        $filter = $this->createMock(FileFilter::class);
-        $filter
-            ->expects($this->exactly(2))
-            ->method('filter')
-            ->willReturnCallback(static fn (array $constraint) => match ($constraint) {
-                $traces => $traces,
-                $uncoveredFiles => $uncoveredFiles,
-                default => 'noop',
-            });
+        $expectedTraces = [
+            $trace1,
+            $trace2,
+        ];
 
-        $bufferedFilter = new BufferedSourceFileFilter($filter, $sourceFiles);
+        $bufferedFilter = new BufferedSourceFileFilter($collectorMock);
 
-        $this->assertSame($traces, iterator_to_array($bufferedFilter->filter($traces), false));
+        $actualTraces = iterator_to_array($bufferedFilter->filter($traces), preserve_keys: false);
+        $actualUncoveredFiles = $bufferedFilter->getUnseenInCoverageReportFiles();
 
-        $this->assertSame(array_values($uncoveredFiles), array_values($bufferedFilter->getUnseenInCoverageReportFiles()));
+        $this->assertSame($expectedTraces, $actualTraces);
+
+        $this->assertSame(
+            array_values($expectedUncoveredFiles),
+            array_values($actualUncoveredFiles),
+        );
     }
 
     private function createTraceMock(string $filename): Trace

@@ -31,12 +31,6 @@ parameters:
 			path: ../src/Differ/DiffColorizer.php
 
 		-
-			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/FileSystem/SourceFileFilter.php
-
-		-
 			message: '#^Offset ''name'' might not exist on array\{0\?\: string, name\?\: non\-falsy\-string, 1\?\: non\-falsy\-string, dataname\?\: non\-falsy\-string, 2\?\: non\-falsy\-string\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -479,30 +473,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<\(int\|string\),string\>\:\:map\(\)$#'
-			identifier: argument.templateType
-			count: 2
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<mixed,Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:map\(\)$#'
-			identifier: argument.templateType
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
@@ -1047,3 +1017,15 @@ parameters:
 			message: '#\$executableFinder of class.*TestFrameworkFinder constructor expects.*MockObject given\.$#'
 			identifier: argument.type
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			message: '#non-empty-string#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
+
+		-
+			message: '#Unable to resolve the template type TMapKey in call to method#'
+			identifier: argument.templateType
+			count: 1
+			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php

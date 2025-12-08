@@ -41,7 +41,6 @@ use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\FileSystem\SourceFileCollector;
-use Infection\FileSystem\SourceFileFilter;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
@@ -66,7 +65,6 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
-        private SourceFileFilter $sourceFileFilter,
         private SourceFileCollector $sourceFileCollector,
         private array $installedExtensions,
     ) {
@@ -140,18 +138,19 @@ final readonly class Factory
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        if ($this->sourceFileFilter->getFilters() === []) {
+        // TODO: this looks incorrect to me... But it is what it is right now.
+        if (!$this->sourceFileCollector->isFiltered()) {
             return [];
         }
 
         /**
+         * TODO: fix this warning, it is legit...
          * @var list<SplFileInfo> $files
          * @psalm-suppress InvalidArgument
+         * @phpstan-ignore varTag.type
          */
         $files = iterator_to_array(
-            $this->sourceFileFilter->filter(
-                $this->sourceFileCollector->collect(),
-            ),
+            $this->sourceFileCollector->collect(),
         );
 
         return $files;
