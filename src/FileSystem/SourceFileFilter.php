@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\Trace;
 use Iterator;
 use SplFileInfo;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
+use function trim;
 
 /**
  * @internal
@@ -63,7 +64,7 @@ class SourceFileFilter implements FileFilter
         private readonly array $excludeDirectories,
     ) {
         $this->filters = array_filter(array_map(
-            'trim',
+            trim(...),
             explode(',', $filter),
         ));
     }
