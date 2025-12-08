@@ -33,55 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Git;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Differ\ChangedLinesRange;
+use Infection\Source\Exception\NoSourceFound;
 
-#[CoversClass(ConfigurationFactoryGit::class)]
-final class ConfigurationFactoryGitTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class ConfiguredGit
 {
     /**
-     * @param non-empty-string $diffFilter
-     * @param non-empty-string $baseBranch
      * @param non-empty-string[] $sourceDirectories
      */
-    #[DataProvider('changedFileRelativePathsProvider')]
-    public function test_it_can_show_the_changed_file_relative_paths(
-        string $changedFileRelativePaths,
-        string $diffFilter,
-        string $baseBranch,
-        array $sourceDirectories,
-        string $expected,
-    ): void {
-        $git = new ConfigurationFactoryGit('unknown', $changedFileRelativePaths);
-
-        $actual = $git->getChangedFileRelativePaths(
-            $diffFilter,
-            $baseBranch,
-            $sourceDirectories,
-        );
-
-        $this->assertSame($expected, $actual);
+    public function __construct(
+        private Git $git,
+        private GitDiffFilter $config,
+        private array $sourceDirectories,
+    ) {
     }
 
-    public static function changedFileRelativePathsProvider(): iterable
+    /**
+     * @throws NoSourceFound
+     *
+     * @return non-empty-string
+     */
+    public function getChangedFileRelativePaths(): string
     {
-        yield 'no source directories' => [
-            'src/a.php,src/b.php',
-            'AM',
-            'main',
-            [],
-            'f(AM, main, []) = src/a.php,src/b.php',
-        ];
+        return $this->git->getChangedFileRelativePaths(
+            $this->config->filter,
+            $this->config->base,
+            $this->sourceDirectories,
+        );
+    }
 
-        yield 'with source directories' => [
-            'src/a.php,src/b.php',
-            'AM',
-            'main',
-            ['src', 'config'],
-            'f(AM, main, [src, config]) = src/a.php,src/b.php',
-        ];
+    /**
+     * @throws NoSourceFound
+     *
+     * @return non-empty-array<string, list<ChangedLinesRange>>
+     */
+    public function getChangedLinesRangesByFileRelativePaths(): array
+    {
+        return $this->git->getChangedLinesRangesByFileRelativePaths(
+            $this->config->filter,
+            $this->config->base,
+            $this->sourceDirectories,
+        );
     }
 }

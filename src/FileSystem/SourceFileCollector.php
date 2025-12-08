@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use Infection\Configuration\SourceFilter\PlainFilter;
 use function array_filter;
 use function array_map;
 use ArrayIterator;
@@ -103,13 +104,12 @@ class SourceFileCollector
      * @param non-empty-string $configurationPathname
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
-     * @param non-empty-string|null $filter
      */
     public static function create(
         string $configurationPathname,
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
-        ?string $filter,
+        ?PlainFilter $filter,
     ): self {
         $configurationDirname = dirname($configurationPathname);
 
@@ -152,12 +152,12 @@ class SourceFileCollector
      *
      * @return non-empty-string[]
      */
-    private static function parseFilter(?string $filter): array
+    private static function parseFilter(?PlainFilter $filter): array
     {
         return array_filter(
             array_map(
                 trim(...),
-                explode(',', $filter ?? ''),
+                explode(',', $filter?->value ?? ''),
             ),
         );
     }

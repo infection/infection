@@ -36,6 +36,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use Infection\Configuration\SourceFilter\PlainFilter;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
@@ -66,7 +67,7 @@ final class ConfigurationBuilder
     private function __construct(
         private float $timeout,
         private array $sourceDirectories,
-        private ?string $sourceFilesFilter,
+        private ?PlainFilter $sourceFilesFilter,
         private array $sourceFilesExcludes,
         private Logs $logs,
         private string $logVerbosity,
@@ -276,10 +277,7 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    /**
-     * @param non-empty-string|null $sourceFilesFilter
-     */
-    public function withSourceFilesFilter(?string $sourceFilesFilter): self
+    public function withSourceFilesFilter(?PlainFilter $sourceFilesFilter): self
     {
         $clone = clone $this;
         $clone->sourceFilesFilter = $sourceFilesFilter;

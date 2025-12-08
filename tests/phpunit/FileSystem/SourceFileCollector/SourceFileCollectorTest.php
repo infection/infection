@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\SourceFileCollector;
 
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\SourceFileCollector;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function ksort;
@@ -239,12 +240,11 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string|null $filter
      * @param non-empty-string[] $expectedFilters
      */
     #[DataProvider('filterProvider')]
     public function test_it_can_parse_and_normalize_string_filter(
-        ?string $filter,
+        ?PlainFilter $filter,
         array $expectedFilters,
         bool $expectedIsFiltered,
     ): void {
@@ -270,7 +270,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield 'nominal' => [
-            'src/Foo.php, src/Bar.php',
+            new PlainFilter('src/Foo.php, src/Bar.php'),
             [
                 'src/Foo.php',
                 'src/Bar.php',
@@ -279,7 +279,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield 'spaces & untrimmed string' => [
-            '  src/Foo.php,, , src/Bar.php  ',
+            new PlainFilter('  src/Foo.php,, , src/Bar.php  '),
             [
                 'src/Foo.php',
                 'src/Bar.php',
@@ -289,13 +289,12 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string|null $filter
      * @param string[] $filePaths
      * @param string[] $expected
      */
     #[DataProvider('filteredFilesProvider')]
     public function test_it_filters_the_collected_files(
-        ?string $filter,
+        ?PlainFilter $filter,
         array $filePaths,
         array $expected,
     ): void {
@@ -320,7 +319,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     public static function filteredFilesProvider(): iterable
     {
         yield [
-            'src/Example',
+            new PlainFilter('src/Example'),
             [
                 'src/Example/Test.php',
             ],
@@ -330,7 +329,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield [
-            'src/Foo',
+            new PlainFilter('src/Foo'),
             [
                 'src/Example/Test.php',
             ],
@@ -352,7 +351,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield [
-            'src/Foo,src/Bar',
+            new PlainFilter('src/Foo,src/Bar'),
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',

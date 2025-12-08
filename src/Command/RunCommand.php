@@ -802,10 +802,10 @@ final class RunCommand extends BaseCommand
     }
 
     private static function assertOnlyOneTypeOfFiltering(
-        ?PlainFilter $filter,
+        ?PlainFilter $plainFilter,
         ?IncompleteGitDiffFilter $gitFilter,
     ): void {
-        if ($filter !== null && $gitFilter !== null) {
+        if ($plainFilter !== null && $gitFilter !== null) {
             throw new InvalidArgumentException(
                 sprintf(
                     'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
