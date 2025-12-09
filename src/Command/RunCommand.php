@@ -798,12 +798,16 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     */
     private static function assertGitBaseHasRequiredFilter(
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
     ): void {
-        if ($gitDiffBase !== Container::DEFAULT_GIT_DIFF_BASE
-            && $gitDiffFilter === Container::DEFAULT_GIT_DIFF_FILTER
+        if ($gitDiffBase !== null
+            && $gitDiffFilter === null
         ) {
             throw new InvalidArgumentException(
                 sprintf(
