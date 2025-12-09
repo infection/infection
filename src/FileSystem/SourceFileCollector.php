@@ -69,7 +69,7 @@ class SourceFileCollector
         private readonly array $excludedFilesOrDirectories,
         private readonly ?PlainFilter $filter,
     ) {
-        $this->filtered = count($this->filter?->values ?? []) !== 0;
+        $this->filtered = count($this->filter->values ?? []) !== 0;
     }
 
     public function isFiltered(): bool
@@ -173,6 +173,7 @@ class SourceFileCollector
         if ($this->isFiltered()) {
             $iterator = new RealPathFilterIterator(
                 $iterator,
+                // @phpstan-ignore property.nonObject
                 $this->filter->values,
                 [],
             );

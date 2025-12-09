@@ -48,7 +48,7 @@ final class PlainFilterTest extends TestCase
      */
     #[DataProvider('valueProvider')]
     public function test_it_can_parse_and_normalize_string_filter(
-        ?string $value,
+        string $value,
         PlainFilter $expected,
     ): void {
         $actual = PlainFilter::create($value);

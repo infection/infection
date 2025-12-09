@@ -61,7 +61,7 @@ final readonly class PlainFilter implements SourceFilter
             array_filter(
                 array_map(
                     trim(...),
-                    explode(',', $value ?? ''),
+                    explode(',', $value),
                 ),
             ),
         );
