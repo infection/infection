@@ -48,6 +48,8 @@ use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Configuration\Source;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -127,6 +129,8 @@ final class ProjectCodeProvider
         FakeLocator::class,
         FileSystem::class,
         FormatterName::class,
+        GitDiffFilter::class,
+        IncompleteGitDiffFilter::class,
         InvalidReportSource::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now

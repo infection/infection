@@ -36,16 +36,18 @@ declare(strict_types=1);
 namespace Infection\Configuration\SourceFilter;
 
 /**
+ * @internal
+ *
  * Represents the information supplied for applying a git diff filter.
  */
 final readonly class GitDiffFilter implements SourceFilter
 {
     /**
-     * @param non-empty-string $filter
+     * @param non-empty-string $value
      * @param non-empty-string $base
      */
     public function __construct(
-        public string $filter,
+        public string $value,
         public string $base,
     ) {
     }

@@ -188,7 +188,10 @@ final class ConfigurationBuilder
                 ['src', 'lib'],
                 ['vendor', 'tests'],
             ),
-            sourceFilter: new PlainFilter('src/Foo.php,src/Bar.php'),
+            sourceFilter: new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
             logs: new Logs(
                 textLogFilePath: 'text.log',
                 htmlLogFilePath: 'report.html',

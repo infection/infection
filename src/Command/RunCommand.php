@@ -271,8 +271,8 @@ final class RunCommand extends BaseCommand
                 self::OPTION_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Filter which files to mutate, e.g. "src/Service/FirstService.php,src/Entity/Event.php"',
-                Container::DEFAULT_SOURCE_FILTER,
+                'Filter which files to mutate. For example "src/Service/Mailer.php,src/Entity/Foobar.php".',
+                Container::DEFAULT_FILTER,
             )
             ->addOption(
                 self::OPTION_FORMATTER,
@@ -693,9 +693,7 @@ final class RunCommand extends BaseCommand
     {
         $value = trim((string) $input->getOption(self::OPTION_FILTER));
 
-        return $value === ''
-            ? null
-            : new PlainFilter($value);
+        return PlainFilter::tryToCreate($value);
     }
 
     private static function getGitFilter(InputInterface $input): ?IncompleteGitDiffFilter
@@ -783,6 +781,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     */
     private static function assertGitBaseHasRequiredFilter(
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
@@ -802,10 +804,10 @@ final class RunCommand extends BaseCommand
     }
 
     private static function assertOnlyOneTypeOfFiltering(
-        ?PlainFilter $filter,
+        ?PlainFilter $plainFilter,
         ?IncompleteGitDiffFilter $gitFilter,
     ): void {
-        if ($filter !== null && $gitFilter !== null) {
+        if ($plainFilter !== null && $gitFilter !== null) {
             throw new InvalidArgumentException(
                 sprintf(
                     'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',

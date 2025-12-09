@@ -33,6 +33,7 @@
 
 declare(strict_types=1);
 
+<<<<<<<< HEAD:src/Git/ConfiguredGit.php
 namespace Infection\Git;
 
 use Infection\Configuration\SourceFilter\GitDiffFilter;
@@ -80,5 +81,53 @@ final readonly class ConfiguredGit
             $this->config->base,
             $this->sourceDirectories,
         );
+========
+namespace Infection\Tests\Configuration\SourceFilter;
+
+use Infection\Configuration\SourceFilter\PlainFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(PlainFilter::class)]
+final class PlainFilterTest extends TestCase
+{
+    /**
+     * @param non-empty-string $value
+     */
+    #[DataProvider('valueProvider')]
+    public function test_it_can_parse_and_normalize_string_filter(
+        string $value,
+        ?PlainFilter $expected,
+    ): void {
+        $actual = PlainFilter::tryToCreate($value);
+
+        $this->assertEqualsCanonicalizing($expected, $actual);
+    }
+
+    public static function valueProvider(): iterable
+    {
+        yield 'nominal' => [
+            'src/Foo.php, src/Bar.php',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
+        ];
+
+        yield 'blank like string' => [
+            ',',
+            null,
+        ];
+
+        yield 'spaces & untrimmed string' => [
+            '  src/Foo.php,, , src/Bar.php , src/File withSpace.php ',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+                'src/File withSpace.php',
+            ]),
+        ];
+>>>>>>>> upstream/master:tests/phpunit/Configuration/SourceFilter/PlainFilterTest.php
     }
 }

@@ -35,13 +35,46 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\SourceFilter;
 
-// TODO: supports globs? To double check... name may change
+use function array_filter;
+use function array_map;
+use function count;
+use function explode;
+
+/**
+ * @internal
+ */
 final readonly class PlainFilter implements SourceFilter
 {
     /**
-     * @param non-empty-string $value A comma separated list of paths to exclude.
+     * @param non-empty-array<non-empty-string> $values
      */
-    public function __construct(public string $value)
+    public function __construct(
+        public array $values,
+    ) {
+    }
+
+    /**
+     * @param string $value A comma separated list of paths to exclude.
+     */
+    public static function tryToCreate(string $value): ?self
     {
+        $values = self::parseValues($value);
+
+        return count($values) === 0
+            ? null
+            : new self($values);
+    }
+
+    /**
+     * @return non-empty-string[]
+     */
+    private static function parseValues(string $value): array
+    {
+        return array_filter(
+            array_map(
+                trim(...),
+                explode(',', $value),
+            ),
+        );
     }
 }
