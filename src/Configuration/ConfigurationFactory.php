@@ -369,7 +369,7 @@ class ConfigurationFactory
         array $sourceDirectories,
     ): ?PlainFilter {
         if ($sourceFilter instanceof GitDiffFilter) {
-            return PlainFilter::create(
+            return PlainFilter::tryToCreate(
                 $this->git->getChangedFileRelativePaths(
                     $sourceFilter->value,
                     $sourceFilter->base,

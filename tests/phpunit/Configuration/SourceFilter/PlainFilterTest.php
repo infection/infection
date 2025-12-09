@@ -49,9 +49,9 @@ final class PlainFilterTest extends TestCase
     #[DataProvider('valueProvider')]
     public function test_it_can_parse_and_normalize_string_filter(
         string $value,
-        PlainFilter $expected,
+        ?PlainFilter $expected,
     ): void {
-        $actual = PlainFilter::create($value);
+        $actual = PlainFilter::tryToCreate($value);
 
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
@@ -68,7 +68,7 @@ final class PlainFilterTest extends TestCase
 
         yield 'blank like string' => [
             ',',
-            new PlainFilter([]),
+            null,
         ];
 
         yield 'spaces & untrimmed string' => [

@@ -238,7 +238,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
             sourceDirectories: [],
-            sourceFilesFilter: PlainFilter::create('f(AM, reference(master), []) = src/a.php,src/b.php'),
+            sourceFilesFilter: PlainFilter::tryToCreate('f(AM, reference(master), []) = src/a.php,src/b.php'),
             sourceFilesExcludes: [],
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
@@ -1057,7 +1057,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
-                    expectedSourceFilesFilter: PlainFilter::create('f(AD, reference(test/default), []) = src/a.php,src/b.php'),
+                    expectedSourceFilesFilter: PlainFilter::tryToCreate('f(AD, reference(test/default), []) = src/a.php,src/b.php'),
                     expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(test/default)',
                     expectedDiffFilter: 'AD',
@@ -1068,7 +1068,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', 'upstream/main'),
-                    expectedSourceFilesFilter: PlainFilter::create('f(AD, reference(upstream/main), []) = src/a.php,src/b.php'),
+                    expectedSourceFilesFilter: PlainFilter::tryToCreate('f(AD, reference(upstream/main), []) = src/a.php,src/b.php'),
                     expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(upstream/main)',
                     expectedDiffFilter: 'AD',
