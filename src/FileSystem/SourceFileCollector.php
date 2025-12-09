@@ -69,7 +69,7 @@ class SourceFileCollector
         private readonly array $excludedFilesOrDirectories,
         private readonly ?PlainFilter $filter,
     ) {
-        $this->filtered = count($this->filter->values ?? []) !== 0;
+        $this->filtered = $this->filter !== null;
     }
 
     public function isFiltered(): bool
@@ -170,10 +170,9 @@ class SourceFileCollector
     private function filter(Iterator $iterator): Iterator
     {
         // TODO: could use Finder::setFilter() instead!
-        if ($this->isFiltered()) {
+        if ($this->filter !== null) {
             $iterator = new RealPathFilterIterator(
                 $iterator,
-                // @phpstan-ignore property.nonObject
                 $this->filter->values,
                 [],
             );
