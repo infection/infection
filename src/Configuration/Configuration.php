@@ -40,6 +40,7 @@ use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -61,7 +62,6 @@ readonly class Configuration
 
     /**
      * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string|null $sourceFilesFilter
      * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
@@ -72,7 +72,7 @@ readonly class Configuration
     public function __construct(
         public float $processTimeout,
         public array $sourceDirectories,
-        public ?string $sourceFilesFilter,
+        public ?PlainFilter $sourceFilesFilter,
         public array $sourceFilesExcludes,
         public Logs $logs,
         public string $logVerbosity,

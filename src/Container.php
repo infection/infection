@@ -46,6 +46,8 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
@@ -598,9 +600,6 @@ final class Container extends DIContainer
 
     /**
      * @param non-empty-string|null $configFile
-     * @param non-empty-string|null $filter
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string|null $gitDiffBase
      */
     public function withValues(
         LoggerInterface $logger,
@@ -624,11 +623,9 @@ final class Container extends DIContainer
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        ?string $filter = self::DEFAULT_FILTER,
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
-        ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
-        ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
         ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
@@ -702,11 +699,9 @@ final class Container extends DIContainer
                 testFramework: $testFramework,
                 testFrameworkExtraOptions: $testFrameworkExtraOptions,
                 staticAnalysisToolOptions: $staticAnalysisToolOptions,
-                filter: $filter,
+                sourceFilter: $sourceFilter,
                 threadCount: $threadCount,
                 dryRun: $dryRun,
-                gitDiffFilter: $gitDiffFilter,
-                gitDiffBase: $gitDiffBase,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,
                 htmlLogFilePath: $htmlLogFilePath,
