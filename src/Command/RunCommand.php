@@ -271,7 +271,7 @@ final class RunCommand extends BaseCommand
                 self::OPTION_FILTER,
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Filter which files to mutate',
+                'Filter which files to mutate. For example "src/Service/Mailer.php,src/Entity/Foobar.php".',
                 Container::DEFAULT_FILTER,
             )
             ->addOption(
