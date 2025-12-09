@@ -50,7 +50,6 @@ use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -143,7 +142,6 @@ final class ProjectCodeProvider
         NonExecutableFinder::class,
         NullSubscriber::class,
         OperatingSystem::class,
-        PlainFilter::class,
         ProgressFormatter::class,
         SchemaConfiguration::class,
         SimpleMutation::class,

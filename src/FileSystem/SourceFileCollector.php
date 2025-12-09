@@ -35,12 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use function array_filter;
 use function array_map;
 use ArrayIterator;
 use function count;
 use function dirname;
-use function explode;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Iterator;
@@ -65,27 +63,18 @@ class SourceFileCollector
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
-     * @param non-empty-string[] $filters
      */
     public function __construct(
         private readonly array $sourceDirectories,
         private readonly array $excludedFilesOrDirectories,
-        private readonly array $filters,
+        private readonly ?PlainFilter $filter,
     ) {
-        $this->filtered = count($this->filters) !== 0;
+        $this->filtered = count($this->filter->values ?? []) !== 0;
     }
 
     public function isFiltered(): bool
     {
         return $this->filtered;
-    }
-
-    /**
-     * @return non-empty-string[]
-     */
-    public function getFilters(): array
-    {
-        return $this->filters;
     }
 
     /**
@@ -120,7 +109,7 @@ class SourceFileCollector
             // file.
             self::makePathsAbsolute($configurationDirname, $sourceDirectories),
             $excludedFilesOrDirectories,
-            self::parseFilter($filter),
+            $filter,
         );
     }
 
@@ -144,19 +133,6 @@ class SourceFileCollector
         return array_map(
             $mapToAbsolutePath(...),
             $sourceDirectories,
-        );
-    }
-
-    /**
-     * @return non-empty-string[]
-     */
-    private static function parseFilter(?PlainFilter $filter): array
-    {
-        return array_filter(
-            array_map(
-                trim(...),
-                explode(',', $filter->value ?? ''),
-            ),
         );
     }
 
@@ -194,10 +170,11 @@ class SourceFileCollector
     private function filter(Iterator $iterator): Iterator
     {
         // TODO: could use Finder::setFilter() instead!
-        if (count($this->filters) !== 0) {
+        if ($this->isFiltered()) {
             $iterator = new RealPathFilterIterator(
                 $iterator,
-                $this->filters,
+                // @phpstan-ignore property.nonObject
+                $this->filter->values,
                 [],
             );
         }

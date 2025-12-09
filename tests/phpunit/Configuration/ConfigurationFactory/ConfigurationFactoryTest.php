@@ -238,7 +238,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
             sourceDirectories: [],
-            sourceFilesFilter: new PlainFilter('f(AM, reference(master), []) = src/a.php,src/b.php'),
+            sourceFilesFilter: PlainFilter::create('f(AM, reference(master), []) = src/a.php,src/b.php'),
             sourceFilesExcludes: [],
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
@@ -1039,8 +1039,14 @@ final class ConfigurationFactoryTest extends TestCase
         yield 'without source files filters' => [
             $defaultScenario
                 ->forSourceFilter(
-                    sourceFilter: new PlainFilter('src/Foo.php, src/Bar.php'),
-                    expectedSourceFilesFilter: new PlainFilter('src/Foo.php, src/Bar.php'),
+                    sourceFilter: new PlainFilter([
+                        'src/Foo.php',
+                        'src/Bar.php',
+                    ]),
+                    expectedSourceFilesFilter: new PlainFilter([
+                        'src/Foo.php',
+                        'src/Bar.php',
+                    ]),
                     expectedIsForGitDiffLines: false,
                     expectedDiffBase: null,
                     expectedDiffFilter: null,
@@ -1051,7 +1057,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
-                    expectedSourceFilesFilter: new PlainFilter('f(AD, reference(test/default), []) = src/a.php,src/b.php'),
+                    expectedSourceFilesFilter: PlainFilter::create('f(AD, reference(test/default), []) = src/a.php,src/b.php'),
                     expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(test/default)',
                     expectedDiffFilter: 'AD',
@@ -1062,7 +1068,7 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', 'upstream/main'),
-                    expectedSourceFilesFilter: new PlainFilter('f(AD, reference(upstream/main), []) = src/a.php,src/b.php'),
+                    expectedSourceFilesFilter: PlainFilter::create('f(AD, reference(upstream/main), []) = src/a.php,src/b.php'),
                     expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(upstream/main)',
                     expectedDiffFilter: 'AD',
@@ -1118,7 +1124,10 @@ final class ConfigurationFactoryTest extends TestCase
                     testFramework: 'phpspec',
                     testFrameworkExtraOptions: '--stop-on-failure',
                     staticAnalysisToolOptions: null,
-                    sourceFilter: new PlainFilter('src/Foo.php, src/Bar.php'),
+                    sourceFilter: new PlainFilter([
+                        'src/Foo.php',
+                        'src/Bar.php',
+                    ]),
                     threadCount: 4,
                     dryRun: true,
                     useGitHubLogger: false,
@@ -1135,7 +1144,12 @@ final class ConfigurationFactoryTest extends TestCase
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
                     ->withSourceDirectories('src/')
-                    ->withSourceFilesFilter(new PlainFilter('src/Foo.php, src/Bar.php'))
+                    ->withSourceFilesFilter(
+                        new PlainFilter([
+                            'src/Foo.php',
+                            'src/Bar.php',
+                        ]),
+                    )
                     ->withSourceFilesExcludes('vendor/')
                     ->withLogs(
                         LogsBuilder::withMinimalTestData()
