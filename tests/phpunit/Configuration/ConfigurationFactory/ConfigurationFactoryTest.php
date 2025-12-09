@@ -219,7 +219,7 @@ final class ConfigurationFactoryTest extends TestCase
             testFramework: null,
             testFrameworkExtraOptions: null,
             staticAnalysisToolOptions: null,
-            sourceFilter: null,
+            sourceFilter: new IncompleteGitDiffFilter('AM', 'master'),
             threadCount: 1,
             dryRun: false,
             useGitHubLogger: true,
