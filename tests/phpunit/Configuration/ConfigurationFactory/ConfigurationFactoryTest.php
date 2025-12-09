@@ -40,10 +40,9 @@ use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Configuration\Entry\Source;
-use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
@@ -78,6 +77,8 @@ use function sys_get_temp_dir;
 final class ConfigurationFactoryTest extends TestCase
 {
     private const GIT_DEFAULT_BASE = 'test/default';
+
+    private const GIT_DIFF_MODIFIED_FILES = 'src/a.php,src/b.php';
 
     /**
      * @var array<string, Mutator>|null
@@ -141,7 +142,6 @@ final class ConfigurationFactoryTest extends TestCase
             )
             ->create(
                 schema: $schema,
-                sourceFilter: null,
                 existingCoveragePath: null,
                 initialTestsPhpOptions: null,
                 skipInitialTests: false,
@@ -158,6 +158,7 @@ final class ConfigurationFactoryTest extends TestCase
                 testFramework: TestFrameworkTypes::PHPUNIT,
                 testFrameworkExtraOptions: null,
                 staticAnalysisToolOptions: null,
+                sourceFilter: null,
                 threadCount: 0,
                 dryRun: false,
                 useGitHubLogger: false,
@@ -1241,7 +1242,10 @@ final class ConfigurationFactoryTest extends TestCase
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
             new DummyCiDetector($ciDetected, $githubActionsDetected),
-            new ConfigurationFactoryGit(self::GIT_DEFAULT_BASE),
+            new ConfigurationFactoryGit(
+                self::GIT_DEFAULT_BASE,
+                self::GIT_DIFF_MODIFIED_FILES,
+            ),
         );
     }
 }

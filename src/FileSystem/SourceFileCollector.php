@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use Infection\Configuration\SourceFilter\PlainFilter;
 use function array_filter;
 use function array_map;
 use ArrayIterator;
 use function count;
 use function dirname;
 use function explode;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Iterator;
 use Symfony\Component\Filesystem\Path;
@@ -148,8 +148,6 @@ class SourceFileCollector
     }
 
     /**
-     * @param non-empty-string|null $filter
-     *
      * @return non-empty-string[]
      */
     private static function parseFilter(?PlainFilter $filter): array
@@ -157,7 +155,7 @@ class SourceFileCollector
         return array_filter(
             array_map(
                 trim(...),
-                explode(',', $filter?->value ?? ''),
+                explode(',', $filter->value ?? ''),
             ),
         );
     }

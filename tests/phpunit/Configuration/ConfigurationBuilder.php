@@ -36,13 +36,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
-use Infection\Configuration\SourceFilter\PlainFilter;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\StrykerConfig;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -56,7 +56,6 @@ final class ConfigurationBuilder
 {
     /**
      * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string|null $sourceFilesFilter
      * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
@@ -201,7 +200,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: 5.0,
             sourceDirectories: ['src', 'lib'],
-            sourceFilesFilter: 'src/Foo.php,src/Bar.php',
+            sourceFilesFilter: new PlainFilter('src/Foo.php,src/Bar.php'),
             sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
                 textLogFilePath: 'text.log',

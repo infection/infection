@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Configuration\SourceFilter;
 
 /**
+ * @internal
+ *
  * Represents the information supplied for applying a git diff filter. However, it may
  * be incomplete or require to refine, e.g. find a better merge base for the base provided.
  */

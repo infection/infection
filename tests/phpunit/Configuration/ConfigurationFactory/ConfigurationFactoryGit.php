@@ -35,7 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
+use function count;
 use DomainException;
+use function implode;
 use Infection\Git\Git;
 use function sprintf;
 
@@ -46,6 +48,7 @@ final readonly class ConfigurationFactoryGit implements Git
      */
     public function __construct(
         private string $defaultBaseBranch,
+        private string $changedFileRelativePaths,
     ) {
     }
 
@@ -59,7 +62,15 @@ final readonly class ConfigurationFactoryGit implements Git
         string $base,
         array $sourceDirectories,
     ): string {
-        throw new DomainException('Not implemented.');
+        return sprintf(
+            'f(%s, %s, [%s]) = %s',
+            $diffFilter,
+            $base,
+            count($sourceDirectories) === 0
+                ? ''
+                : implode(', ', $sourceDirectories),
+            $this->changedFileRelativePaths,
+        );
     }
 
     public function getChangedLinesRangesByFileRelativePaths(
