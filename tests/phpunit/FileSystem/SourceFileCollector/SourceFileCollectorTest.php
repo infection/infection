@@ -77,7 +77,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         $collector = new SourceFileCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
-            [],
+            null,
         );
 
         $files = $collector->collect();
@@ -100,7 +100,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         $collector = new SourceFileCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
-            [],
+            null,
         );
 
         $first = $collector->collect();
@@ -240,55 +240,6 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string[] $expectedFilters
-     */
-    #[DataProvider('filterProvider')]
-    public function test_it_can_parse_and_normalize_string_filter(
-        ?PlainFilter $filter,
-        array $expectedFilters,
-        bool $expectedIsFiltered,
-    ): void {
-        $collector = SourceFileCollector::create(
-            configurationPathname: '/path/to/project',
-            sourceDirectories: [],
-            excludedFilesOrDirectories: [],
-            filter: $filter,
-        );
-
-        $actual = $collector->getFilters();
-
-        $this->assertEqualsCanonicalizing($expectedFilters, $actual);
-        $this->assertSame($expectedIsFiltered, $collector->isFiltered());
-    }
-
-    public static function filterProvider(): iterable
-    {
-        yield 'null' => [
-            null,
-            [],
-            false,
-        ];
-
-        yield 'nominal' => [
-            new PlainFilter('src/Foo.php, src/Bar.php'),
-            [
-                'src/Foo.php',
-                'src/Bar.php',
-            ],
-            true,
-        ];
-
-        yield 'spaces & untrimmed string' => [
-            new PlainFilter('  src/Foo.php,, , src/Bar.php  '),
-            [
-                'src/Foo.php',
-                'src/Bar.php',
-            ],
-            true,
-        ];
-    }
-
-    /**
      * @param string[] $filePaths
      * @param string[] $expected
      */
@@ -319,7 +270,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
     public static function filteredFilesProvider(): iterable
     {
         yield [
-            new PlainFilter('src/Example'),
+            new PlainFilter(['src/Example']),
             [
                 'src/Example/Test.php',
             ],
@@ -329,7 +280,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield [
-            new PlainFilter('src/Foo'),
+            new PlainFilter(['src/Foo']),
             [
                 'src/Example/Test.php',
             ],
@@ -351,7 +302,10 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         ];
 
         yield [
-            new PlainFilter('src/Foo,src/Bar'),
+            new PlainFilter([
+                'src/Foo',
+                'src/Bar',
+            ]),
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',

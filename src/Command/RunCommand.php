@@ -695,7 +695,7 @@ final class RunCommand extends BaseCommand
 
         return $value === ''
             ? null
-            : new PlainFilter($value);
+            : PlainFilter::create($value);
     }
 
     private static function getGitFilter(InputInterface $input): ?IncompleteGitDiffFilter

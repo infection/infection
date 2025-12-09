@@ -200,7 +200,10 @@ final class ConfigurationBuilder
         return new self(
             timeout: 5.0,
             sourceDirectories: ['src', 'lib'],
-            sourceFilesFilter: new PlainFilter('src/Foo.php,src/Bar.php'),
+            sourceFilesFilter: new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
             sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
                 textLogFilePath: 'text.log',

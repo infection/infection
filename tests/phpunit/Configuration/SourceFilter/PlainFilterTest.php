@@ -33,37 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\SourceFilter;
+namespace Infection\Tests\Configuration\SourceFilter;
 
-use function array_filter;
-use function array_map;
-use function explode;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class PlainFilter implements SourceFilter
+#[CoversClass(PlainFilter::class)]
+final class PlainFilterTest extends TestCase
 {
     /**
-     * @param non-empty-string[] $values
+     * @param non-empty-string $value
      */
-    public function __construct(
-        public array $values,
-    ) {
+    #[DataProvider('valueProvider')]
+    public function test_it_can_parse_and_normalize_string_filter(
+        ?string $value,
+        PlainFilter $expected,
+    ): void {
+        $actual = PlainFilter::create($value);
+
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
-    /**
-     * @param non-empty-string $value A comma separated list of paths to exclude.
-     */
-    public static function create(string $value): self
+    public static function valueProvider(): iterable
     {
-        return new self(
-            array_filter(
-                array_map(
-                    trim(...),
-                    explode(',', $value ?? ''),
-                ),
-            ),
-        );
+        yield 'nominal' => [
+            'src/Foo.php, src/Bar.php',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+            ]),
+        ];
+
+        yield 'blank like string' => [
+            ',',
+            new PlainFilter([]),
+        ];
+
+        yield 'spaces & untrimmed string' => [
+            '  src/Foo.php,, , src/Bar.php , src/File withSpace.php ',
+            new PlainFilter([
+                'src/Foo.php',
+                'src/Bar.php',
+                'src/File withSpace.php',
+            ]),
+        ];
     }
 }
