@@ -37,8 +37,8 @@ namespace Infection\Tests;
 
 use function array_keys;
 use Error;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
@@ -59,11 +59,11 @@ final class ContainerTest extends TestCase
     public function test_it_can_be_instantiated_without_any_services(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Infection\FileSystem\SourceFileCollector"');
+        $this->expectExceptionMessage('Unknown service "Infection\Configuration\SourceFilter\PlainFilter"');
 
         $container = new Container([]);
 
-        $container->get(SourceFileCollector::class);
+        $container->get(PlainFilter::class);
     }
 
     public function test_it_can_build_simple_services_without_configuration(): void
