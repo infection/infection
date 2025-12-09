@@ -783,6 +783,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @param non-empty-string|null $gitDiffFilter
+     * @param non-empty-string|null $gitDiffBase
+     */
     private static function assertGitBaseHasRequiredFilter(
         ?string $gitDiffFilter,
         ?string $gitDiffBase,
