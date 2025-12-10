@@ -33,52 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\LazySourceCollector;
+namespace Infection\Source\Collector;
 
-use ArrayIterator;
-use DomainException;
-use Iterator;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @template TKey
- * @template-covariant TValue
- * @template-implements Iterator<TKey, TValue>
+ * @internal
  */
-final class NonRewindableIterator implements Iterator
+final readonly class FixedSourceCollector implements SourceCollector
 {
-    private readonly Iterator $decoratedIterator;
-
     /**
-     * @param non-empty-array<TKey, TValue> $values
+     * @param SplFileInfo[] $files
      */
     public function __construct(
-        array $values,
+        public bool $filtered,
+        public array $files,
     ) {
-        $this->decoratedIterator = new ArrayIterator($values);
     }
 
-    public function current(): mixed
+    public function isFiltered(): bool
     {
-        return $this->decoratedIterator->current();
+        return $this->filtered;
     }
 
-    public function next(): void
+    public function collect(): iterable
     {
-        $this->decoratedIterator->next();
-    }
-
-    public function key(): mixed
-    {
-        return $this->decoratedIterator->key();
-    }
-
-    public function valid(): bool
-    {
-        return $this->decoratedIterator->valid();
-    }
-
-    public function rewind(): void
-    {
-        throw new DomainException('Cannot rewind iterator.');
+        return $this->files;
     }
 }

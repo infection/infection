@@ -33,52 +33,46 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\LazySourceCollector;
+namespace Infection\Tests\Source\Collector\LazyCacheSourceCollector;
 
-use DomainException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
+use Infection\CannotBeInstantiated;
+use Iterator;
 
-#[CoversClass(NonRewindableIterator::class)]
-final class NonRewindableIteratorTest extends TestCase
+/**
+ * @internal
+ */
+final class IteratorConsumer
 {
-    /**
-     * @param non-empty-array<mixed> $values
-     */
-    #[DataProvider('valueProvider')]
-    public function test_it_can_be_consumed_once(array $values): void
-    {
-        $iterator = new NonRewindableIterator($values);
-
-        $actual = IteratorConsumer::consume($iterator);
-
-        $this->assertSame($values, $actual);
-    }
+    use CannotBeInstantiated;
 
     /**
-     * @param non-empty-array<mixed> $values
+     * PHP implementation of iterable_to_array but that does not call
+     * `Iterator::rewind()` initially.
+     *
+     * Beware that it does preserve the keys, and as such, entries with duplicate
+     * keys will be overridden.
+     *
+     * @template TKey
+     * @template TValue
+     *
+     * @param Iterator<TKey, TValue> $iterator
+     *
+     * @return array<array-key,TValue>
      */
-    #[DataProvider('valueProvider')]
-    public function test_it_cannot_be_consumed_more_than_once(array $values): void
+    public static function consume(Iterator $iterator): array
     {
-        $iterator = new NonRewindableIterator($values);
+        if (!$iterator->valid()) {
+            $iterator->rewind();
+        }
 
-        IteratorConsumer::consume($iterator);
+        $values = [];
 
-        $this->expectException(DomainException::class);
+        while ($iterator->valid()) {
+            $values[$iterator->key()] = $iterator->current();
 
-        IteratorConsumer::consume($iterator);
-    }
+            $iterator->next();
+        }
 
-    public static function valueProvider(): iterable
-    {
-        yield [
-            [
-                'value0',
-                'value1',
-                'value2',
-            ],
-        ];
+        return $values;
     }
 }

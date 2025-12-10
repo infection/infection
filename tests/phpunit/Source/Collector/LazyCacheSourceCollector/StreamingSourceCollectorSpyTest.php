@@ -33,67 +33,57 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\LazySourceCollector;
+namespace Infection\Tests\Source\Collector\LazyCacheSourceCollector;
 
-use DomainException;
-use Infection\Source\Collector\SourceCollector;
-use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
+use function array_column;
+use function count;
+use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Iterator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final class NonRewindableStreamingSourceCollector implements SourceCollector
+#[CoversClass(StreamingSourceCollectorSpy::class)]
+final class StreamingSourceCollectorSpyTest extends TestCase
 {
-    private bool $filteredCalled = false;
-
-    private bool $collected = false;
-
-    /**
-     * @var NonRewindableIterator<array-key, SplFileInfo>
-     */
-    private NonRewindableIterator $iterator;
-
-    /**
-     * @param non-empty-array<SplFileInfo> $files
-     */
-    public function __construct(
-        private bool $filtered,
-        array $files,
-    ) {
-        $this->iterator = new NonRewindableIterator($files);
-    }
-
-    public function isFiltered(): bool
+    public function test_it_streams_the_collected_files(): void
     {
-        if ($this->filteredCalled) {
-            throw new DomainException(
-                sprintf(
-                    'Did not expect %s to be called twice.',
-                    __METHOD__,
-                ),
-            );
+        $filePairs = [
+            ['key1', new MockSplFileInfo('src/File1.php')],
+            ['key2', new MockSplFileInfo('src/File2.php')],
+            ['key3', new MockSplFileInfo('src/File3.php')],
+        ];
+
+        $collector = new StreamingSourceCollectorSpy(
+            array_column($filePairs, 1, 0),
+        );
+
+        // Sanity check
+        $this->assertSame(0, $collector->yieldCount);
+
+        $filesIterator = $collector->collect();
+
+        // Sanity check
+        $this->assertInstanceOf(Iterator::class, $filesIterator);
+
+        // Should be lazy: we did not start the iteration
+        $this->assertSame(0, $collector->yieldCount);
+
+        $index = 0;
+
+        while ($filesIterator->valid()) {
+            $pair = [
+                $filesIterator->key(),
+                $filesIterator->current(),
+            ];
+
+            $this->assertSame($filePairs[$index], $pair);
+            $this->assertSame($index + 1, $collector->yieldCount);
+
+            ++$index;
+            $filesIterator->next();
         }
 
-        $filtered = $this->filtered;
-        $this->filteredCalled = true;
-
-        return $filtered;
-    }
-
-    public function collect(): iterable
-    {
-        if ($this->collected) {
-            throw new DomainException(
-                sprintf(
-                    'Did not expect %s to be called twice.',
-                    __METHOD__,
-                ),
-            );
-        }
-
-        $this->collected = true;
-
-        return $this->iterator;
+        // Sanity check
+        $this->assertSame(count($filePairs), $index);
     }
 }

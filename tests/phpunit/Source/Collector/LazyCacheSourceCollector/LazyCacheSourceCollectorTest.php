@@ -33,22 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\LazySourceCollector;
+namespace Infection\Tests\Source\Collector\LazyCacheSourceCollector;
 
 use function count;
-use Infection\Source\Collector\FixedCollector;
-use Infection\Source\Collector\LazySourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
+use Infection\Source\Collector\LazyCacheSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
-use function iterator_to_array;
 use Iterator;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(LazySourceCollector::class)]
-final class LazySourceCollectorTest extends TestCase
+#[CoversClass(LazyCacheSourceCollector::class)]
+final class LazyCacheSourceCollectorTest extends TestCase
 {
     /**
      * @param list<SplFileInfo> $expectedFiles
@@ -59,10 +59,10 @@ final class LazySourceCollectorTest extends TestCase
         bool $expectedIsFiltered,
         array $expectedFiles,
     ): void {
-        $collector = new LazySourceCollector($decoratedCollector);
+        $collector = new LazyCacheSourceCollector($decoratedCollector);
 
         $collected = $collector->collect();
-        self::assertInstanceOf(Iterator::class, $collected);
+        $this->assertInstanceOf(Iterator::class, $collected);
 
         $actualFiles = IteratorConsumer::consume($collected);
 
@@ -73,7 +73,7 @@ final class LazySourceCollectorTest extends TestCase
     public static function sourceFilesProvider(): iterable
     {
         yield [
-            new FixedCollector(
+            new FixedSourceCollector(
                 false,
                 [],
             ),
@@ -82,7 +82,7 @@ final class LazySourceCollectorTest extends TestCase
         ];
 
         yield [
-            new FixedCollector(
+            new FixedSourceCollector(
                 true,
                 [],
             ),
@@ -91,7 +91,7 @@ final class LazySourceCollectorTest extends TestCase
         ];
 
         yield [
-            new FixedCollector(
+            new FixedSourceCollector(
                 true,
                 [
                     'key1' => new MockSplFileInfo('src/Service1.php'),
@@ -115,7 +115,7 @@ final class LazySourceCollectorTest extends TestCase
 
         $decoratedCollector = new StreamingSourceCollectorSpy($files);
 
-        $collector = new LazySourceCollector($decoratedCollector);
+        $collector = new LazyCacheSourceCollector($decoratedCollector);
 
         // Sanity check
         $this->assertSame(0, $decoratedCollector->yieldCount);
@@ -133,8 +133,10 @@ final class LazySourceCollectorTest extends TestCase
         }
 
         // Sanity check
+        // @phpstan-ignore argument.unresolvableType
         $this->assertSame(count($files), $index);
         // No additional yields occurred
+        // @phpstan-ignore argument.unresolvableType
         $this->assertSame(count($files), $decoratedCollector->yieldCount);
     }
 
@@ -147,7 +149,7 @@ final class LazySourceCollectorTest extends TestCase
 
         $decoratedCollector = new StreamingSourceCollectorSpy($files);
 
-        $collector = new LazySourceCollector($decoratedCollector);
+        $collector = new LazyCacheSourceCollector($decoratedCollector);
 
         $collectedFiles1 = iterator_to_array($collector->collect());
         $collectedFiles2 = iterator_to_array($collector->collect());
@@ -167,7 +169,7 @@ final class LazySourceCollectorTest extends TestCase
 
         $decoratedCollector = new StreamingSourceCollectorSpy($files);
 
-        $collector = new LazySourceCollector($decoratedCollector);
+        $collector = new LazyCacheSourceCollector($decoratedCollector);
 
         $source1 = $collector->collect();
         // All items are collected immediately on first collect() call

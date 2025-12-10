@@ -53,7 +53,7 @@ use Symfony\Component\Finder\SplFileInfo;
  *
  * @internal
  */
-final class LazySourceCollector implements SourceCollector
+final class LazyCacheSourceCollector implements SourceCollector
 {
     /**
      * @var list<SplFileInfo>|null
@@ -75,22 +75,23 @@ final class LazySourceCollector implements SourceCollector
         return $this->getCollector()->isFiltered();
     }
 
-    /**
-     * @return iterable<SplFileInfo>
-     */
     public function collect(): iterable
     {
         if ($this->cache === null) {
+            /** @psalm-suppress InvalidArgument */
             $this->cache = iterator_to_array(
                 $this->getCollector()->collect(),
-                false,
+                preserve_keys: false,
             );
         }
 
         return new ArrayIterator($this->cache);
     }
 
-    private function getCollector(): SourceCollector
+    /**
+     * @internal Should only be used for tests.
+     */
+    public function getCollector(): SourceCollector
     {
         if ($this->collector === null) {
             $collectorOrFactory = $this->collectorOrFactory;

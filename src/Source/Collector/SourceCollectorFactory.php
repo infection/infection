@@ -63,7 +63,7 @@ final readonly class SourceCollectorFactory
         Source $source,
         ?SourceFilter $sourceFilter,
     ): SourceCollector {
-        return new LazySourceCollector(
+        return new LazyCacheSourceCollector(
             fn () => $this->createCollector(
                 $configurationPathname,
                 $source,

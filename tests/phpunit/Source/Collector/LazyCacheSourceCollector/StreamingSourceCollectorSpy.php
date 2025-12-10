@@ -33,31 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Collector;
+namespace Infection\Tests\Source\Collector\LazyCacheSourceCollector;
 
+use DomainException;
+use Infection\Source\Collector\SourceCollector;
+use Iterator;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * Test double that tracks when items are yielded.
  * @internal
  */
-final readonly class FixedCollector implements SourceCollector
+final class StreamingSourceCollectorSpy implements SourceCollector
 {
+    public int $yieldCount = 0;
+
     /**
      * @param SplFileInfo[] $files
      */
     public function __construct(
-        public bool $filtered,
-        public array $files,
+        private readonly array $files,
     ) {
     }
 
     public function isFiltered(): bool
     {
-        return $this->filtered;
+        throw new DomainException('Not implemented.');
     }
 
-    public function collect(): iterable
+    // We constrained it to an Iterator here because otherwise it's a pain the
+    // a** to test.
+    // Indeed, we do not have all the necessary, humungous and tedious plugin
+    // to deal with `iterable`.
+    /**
+     * @return Iterator<array-key, SplFileInfo>
+     */
+    public function collect(): Iterator
     {
-        return $this->files;
+        foreach ($this->files as $key => $file) {
+            ++$this->yieldCount;
+
+            yield $key => $file;
+        }
     }
 }
