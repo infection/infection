@@ -42,17 +42,12 @@ use DomainException;
  */
 final class FakeSourceCollector implements SourceCollector
 {
-    public function collect(): iterable
-    {
-        throw new DomainException('Unexpected call.');
-    }
-
-    public function filter(iterable $input): iterable
-    {
-        throw new DomainException('Unexpected call.');
-    }
-
     public function isFiltered(): bool
+    {
+        throw new DomainException('Unexpected call.');
+    }
+
+    public function collect(): iterable
     {
         throw new DomainException('Unexpected call.');
     }

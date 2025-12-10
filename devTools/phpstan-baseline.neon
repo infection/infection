@@ -1022,10 +1022,10 @@ parameters:
 			message: '#non-empty-string#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
+			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
 
 		-
 			message: '#Unable to resolve the template type TMapKey in call to method#'
 			identifier: argument.templateType
 			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileCollector/SourceFileCollectorTest.php
+			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php

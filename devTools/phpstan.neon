@@ -184,13 +184,13 @@ parameters:
 
         # PHPStan cannot really properly infer the types here
         -
-            message: '#SourceFileCollector::makePathsAbsolute\(\)#'
+            message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
             identifier: argument.type
-            path: ../src/FileSystem/SourceFileCollector.php
+            path: ../src/Source/Collector/BasicSourceCollector.php
         -
-            message: '#SourceFileCollector::makePathsAbsolute\(\)#'
+            message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
             identifier: return.type
-            path: ../src/FileSystem/SourceFileCollector.php
+            path: ../src/Source/Collector/BasicSourceCollector.php
 
         # False-positive: the value cannot be -1 with our configuration.
         -
