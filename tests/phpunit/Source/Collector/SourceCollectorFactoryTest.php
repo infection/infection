@@ -37,6 +37,7 @@ namespace Infection\Tests\Source\Collector;
 
 use Exception;
 use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
@@ -45,9 +46,11 @@ use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 #[CoversClass(SourceCollectorFactory::class)]
 final class SourceCollectorFactoryTest extends TestCase
@@ -94,6 +97,16 @@ final class SourceCollectorFactoryTest extends TestCase
         yield 'git diff filter' => [
             new GitDiffFilter('AM', '<merge-base-hash>'),
             GitDiffSourceCollector::class,
+        ];
+
+        yield 'unknown filter' => [
+            new FakeSourceFilter(),
+            new InvalidArgumentException(
+                sprintf(
+                    'Unknown source filter "%s".',
+                    FakeSourceFilter::class,
+                ),
+            ),
         ];
     }
 }
