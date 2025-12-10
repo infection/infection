@@ -72,8 +72,6 @@ final readonly class Factory
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
@@ -90,7 +88,7 @@ final readonly class Factory
                 $this->infectionConfig->source->directories,
                 $skipCoverage,
                 $this->infectionConfig->executeOnlyCoveringTestCases,
-                $filteredSourceFilesToMutate,
+                $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
             );
         }
