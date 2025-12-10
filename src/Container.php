@@ -237,13 +237,9 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            IndexXmlCoverageParser::class => static function (self $container): IndexXmlCoverageParser {
-                $configuration = $container->getConfiguration();
-
-                return new IndexXmlCoverageParser(
-                    $configuration->isForGitDiffLines || $configuration->sourceFilesFilter !== null,
-                );
-            },
+            IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
+                $container->getSourceFileCollector()->isFiltered(),
+            ),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
                 $container->getJUnitTestExecutionInfoAdder(),

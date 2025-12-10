@@ -598,7 +598,6 @@ final class ConfigurationFactoryScenario
     public function forSourceFilter(
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?PlainFilter $expectedSourceFilesFilter,
-        bool $expectedIsForGitDiffLines,
         ?string $expectedDiffBase,
         ?string $expectedDiffFilter,
     ): self {
@@ -610,7 +609,6 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withSourceFilesFilter($expectedSourceFilesFilter)
-                    ->withIsForGitDiffLines($expectedIsForGitDiffLines)
                     ->withGitDiffBase($expectedDiffBase)
                     ->withGitDiffFilter($expectedDiffFilter)
                     ->build(),

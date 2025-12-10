@@ -265,7 +265,6 @@ final class ConfigurationFactoryTest extends TestCase
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
-            isForGitDiffLines: true,
             gitDiffBase: 'reference(master)',
             gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
@@ -1029,7 +1028,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: null,
                     expectedSourceFilesFilter: null,
-                    expectedIsForGitDiffLines: false,
                     expectedDiffBase: null,
                     expectedDiffFilter: null,
                 ),
@@ -1046,7 +1044,6 @@ final class ConfigurationFactoryTest extends TestCase
                         'src/Foo.php',
                         'src/Bar.php',
                     ]),
-                    expectedIsForGitDiffLines: false,
                     expectedDiffBase: null,
                     expectedDiffFilter: null,
                 ),
@@ -1057,7 +1054,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
                     expectedSourceFilesFilter: PlainFilter::tryToCreate('f(AD, reference(test/default), []) = src/a.php,src/b.php'),
-                    expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(test/default)',
                     expectedDiffFilter: 'AD',
                 ),
@@ -1068,7 +1064,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', 'upstream/main'),
                     expectedSourceFilesFilter: PlainFilter::tryToCreate('f(AD, reference(upstream/main), []) = src/a.php,src/b.php'),
-                    expectedIsForGitDiffLines: true,
                     expectedDiffBase: 'reference(upstream/main)',
                     expectedDiffFilter: 'AD',
                 ),
