@@ -102,7 +102,7 @@ class IndexXmlCoverageParser
     /**
      * @throws NoSourceFound
      */
-    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
+    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isSourceFiltered): void
     {
         $lineCoverage = $xPath->queryElement('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines');
 
@@ -111,7 +111,7 @@ class IndexXmlCoverageParser
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
-            throw $isForGitDiffLines
+            throw $isSourceFiltered
                 ? NoSourceFound::noExecutableSourceCodeForDiff()
                 : NoSourceFound::noExecutableSourceCode();
         }
