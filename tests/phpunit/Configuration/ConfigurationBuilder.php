@@ -60,8 +60,6 @@ final class ConfigurationBuilder
     /**
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
-     * @param non-empty-string $gitDiffBase
-     * @param non-empty-string $gitDiffFilter
      * @param non-empty-string $configPathname
      */
     private function __construct(
@@ -94,8 +92,6 @@ final class ConfigurationBuilder
         private bool $dryRun,
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
-        private ?string $gitDiffBase,
-        private ?string $gitDiffFilter,
         private ?string $mapSourceClassToTestStrategy,
         private ?string $loggerProjectRootDirectory,
         private ?string $staticAnalysisTool,
@@ -138,8 +134,6 @@ final class ConfigurationBuilder
             dryRun: $configuration->isDryRun,
             ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
-            gitDiffBase: $configuration->gitDiffBase,
-            gitDiffFilter: $configuration->gitDiffFilter,
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $configuration->loggerProjectRootDirectory,
             staticAnalysisTool: $configuration->staticAnalysisTool,
@@ -180,8 +174,6 @@ final class ConfigurationBuilder
             dryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
-            gitDiffBase: null,
-            gitDiffFilter: null,
             mapSourceClassToTestStrategy: null,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -246,8 +238,6 @@ final class ConfigurationBuilder
                 'Foo\\Bar' => ['.*test.*'],
             ],
             executeOnlyCoveringTestCases: true,
-            gitDiffBase: 'origin/master',
-            gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: '/var/www/project',
             staticAnalysisTool: StaticAnalysisToolTypes::PHPSTAN,
@@ -522,28 +512,6 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    /**
-     * @param non-empty-string|null $gitDiffBase
-     */
-    public function withGitDiffBase(?string $gitDiffBase): self
-    {
-        $clone = clone $this;
-        $clone->gitDiffBase = $gitDiffBase;
-
-        return $clone;
-    }
-
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     */
-    public function withGitDiffFilter(?string $gitDiffFilter): self
-    {
-        $clone = clone $this;
-        $clone->gitDiffFilter = $gitDiffFilter;
-
-        return $clone;
-    }
-
     public function withMapSourceClassToTestStrategy(?string $mapSourceClassToTestStrategy): self
     {
         $clone = clone $this;
@@ -619,8 +587,6 @@ final class ConfigurationBuilder
             isDryRun: $this->dryRun,
             ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
-            gitDiffBase: $this->gitDiffBase,
-            gitDiffFilter: $this->gitDiffFilter,
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $this->loggerProjectRootDirectory,
             staticAnalysisTool: $this->staticAnalysisTool,

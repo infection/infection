@@ -264,8 +264,6 @@ final class ConfigurationFactoryTest extends TestCase
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
-            gitDiffBase: 'reference(master)',
-            gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
@@ -1027,8 +1025,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: null,
                     expectedSourceFilter: null,
-                    expectedDiffBase: null,
-                    expectedDiffFilter: null,
                 ),
         ];
 
@@ -1043,8 +1039,6 @@ final class ConfigurationFactoryTest extends TestCase
                         'src/Foo.php',
                         'src/Bar.php',
                     ]),
-                    expectedDiffBase: null,
-                    expectedDiffFilter: null,
                 ),
         ];
 
@@ -1053,8 +1047,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', null),
                     expectedSourceFilter: new GitDiffFilter('AD', 'reference(test/default)'),
-                    expectedDiffBase: 'reference(test/default)',
-                    expectedDiffFilter: 'AD',
                 ),
         ];
 
@@ -1063,8 +1055,6 @@ final class ConfigurationFactoryTest extends TestCase
                 ->forSourceFilter(
                     sourceFilter: new IncompleteGitDiffFilter('AD', 'upstream/main'),
                     expectedSourceFilter: new GitDiffFilter('AD', 'reference(upstream/main)'),
-                    expectedDiffBase: 'reference(upstream/main)',
-                    expectedDiffFilter: 'AD',
                 ),
         ];
 

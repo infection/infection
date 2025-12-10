@@ -46,6 +46,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
@@ -563,21 +564,17 @@ final class Container extends DIContainer
             ),
             SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
                 $configuration = $container->getConfiguration();
+                $sourceFilter = $configuration->sourceFilter;
 
-                $gitDiffBase = $configuration->gitDiffBase;
-                $gitDiffFilter = $configuration->gitDiffFilter;
-
-                if ($gitDiffBase === null || $gitDiffFilter === null) {
-                    return new NullSourceLineMatcher();
-                }
-
-                return new GitDiffSourceLineMatcher(
-                    $container->getGit(),
-                    $container->getFileSystem(),
-                    $gitDiffBase,
-                    $gitDiffFilter,
-                    $configuration->source->directories,
-                );
+                return $sourceFilter instanceof GitDiffFilter
+                    ? new GitDiffSourceLineMatcher(
+                        $container->getGit(),
+                        $container->getFileSystem(),
+                        $sourceFilter->base,
+                        $sourceFilter->value,
+                        $configuration->source->directories,
+                    )
+                    : new NullSourceLineMatcher();
             },
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
