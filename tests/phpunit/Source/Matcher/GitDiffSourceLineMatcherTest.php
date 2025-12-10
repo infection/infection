@@ -33,22 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Differ;
+namespace Infection\Tests\Source\Matcher;
 
-use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Differ\ChangedLinesRange;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\FileSystem\FileSystem;
-use Infection\Git\ConfiguredGit;
 use Infection\Git\Git;
+use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(FilesDiffChangedLines::class)]
-final class FilesDiffChangedLinesTest extends TestCase
+#[CoversClass(GitDiffSourceLineMatcher::class)]
+final class GitDiffSourceLineMatcherTest extends TestCase
 {
     private FileSystem&MockObject $fileSystemStub;
 
@@ -64,19 +62,18 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     public function test_it_memoizes_parsed_results(): void
     {
-        $filesDiffChangedLines = new FilesDiffChangedLines(
-            new ConfiguredGit(
-                $this->createGitStub([]),
-                new GitDiffFilter('AM', 'main'),
-                ['src', 'lib'],
-            ),
+        $matcher = new GitDiffSourceLineMatcher(
+            $this->createGitStub([]),
             $this->fileSystemStub,
+            'main',
+            'AM',
+            ['src', 'lib'],
         );
 
-        $filesDiffChangedLines->touches('/path/to/File.php', 1, 1);
+        $matcher->touches('/path/to/File.php', 1, 1);
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->touches('/path/to/File.php', 1, 1);
+        $matcher->touches('/path/to/File.php', 1, 1);
     }
 
     /**
@@ -92,16 +89,15 @@ final class FilesDiffChangedLinesTest extends TestCase
         int $mutationEndLine,
         bool $expected,
     ): void {
-        $filesDiffChangedLines = new FilesDiffChangedLines(
-            new ConfiguredGit(
-                $this->createGitStub($changedLinesRangesByFilePathname),
-                new GitDiffFilter('AM', 'main'),
-                ['src', 'lib'],
-            ),
+        $matcher = new GitDiffSourceLineMatcher(
+            $this->createGitStub($changedLinesRangesByFilePathname),
             $this->fileSystemStub,
+            'main',
+            'AM',
+            ['src', 'lib'],
         );
 
-        $actual = $filesDiffChangedLines->touches(
+        $actual = $matcher->touches(
             $fileRealPath,
             $mutationStartLine,
             $mutationEndLine,
