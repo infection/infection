@@ -38,15 +38,15 @@ namespace Infection\Tests\Source\Matcher;
 use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
-use Infection\Source\Matcher\GitDiffChangedLines;
+use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(GitDiffChangedLines::class)]
-final class GitDiffChangedLinesTest extends TestCase
+#[CoversClass(GitDiffSourceLineMatcher::class)]
+final class GitDiffSourceLineMatcherTest extends TestCase
 {
     private FileSystem&MockObject $fileSystemStub;
 
@@ -62,7 +62,7 @@ final class GitDiffChangedLinesTest extends TestCase
 
     public function test_it_memoizes_parsed_results(): void
     {
-        $filesDiffChangedLines = new GitDiffChangedLines(
+        $matcher = new GitDiffSourceLineMatcher(
             $this->createGitStub([]),
             $this->fileSystemStub,
             'main',
@@ -70,10 +70,10 @@ final class GitDiffChangedLinesTest extends TestCase
             ['src', 'lib'],
         );
 
-        $filesDiffChangedLines->touches('/path/to/File.php', 1, 1);
+        $matcher->touches('/path/to/File.php', 1, 1);
 
         // the second call should reuse memoized results cached previously
-        $filesDiffChangedLines->touches('/path/to/File.php', 1, 1);
+        $matcher->touches('/path/to/File.php', 1, 1);
     }
 
     /**
@@ -89,7 +89,7 @@ final class GitDiffChangedLinesTest extends TestCase
         int $mutationEndLine,
         bool $expected,
     ): void {
-        $filesDiffChangedLines = new GitDiffChangedLines(
+        $matcher = new GitDiffSourceLineMatcher(
             $this->createGitStub($changedLinesRangesByFilePathname),
             $this->fileSystemStub,
             'main',
@@ -97,7 +97,7 @@ final class GitDiffChangedLinesTest extends TestCase
             ['src', 'lib'],
         );
 
-        $actual = $filesDiffChangedLines->touches(
+        $actual = $matcher->touches(
             $fileRealPath,
             $mutationStartLine,
             $mutationEndLine,
