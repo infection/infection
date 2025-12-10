@@ -41,7 +41,7 @@ use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
-use LogicException;
+use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +61,10 @@ final class LazySourceCollectorTest extends TestCase
     ): void {
         $collector = new LazySourceCollector($decoratedCollector);
 
-        $actualFiles = IteratorConsumer::consume($collector->collect());
+        $collected = $collector->collect();
+        self::assertInstanceOf(Iterator::class, $collected);
+
+        $actualFiles = IteratorConsumer::consume($collected);
 
         $this->assertSame($expectedIsFiltered, $collector->isFiltered());
         $this->assertEquals($expectedFiles, $actualFiles);
@@ -103,7 +106,7 @@ final class LazySourceCollectorTest extends TestCase
         ];
     }
 
-    public function test_it_streams_the_collected_files_and_collects_them_only_once(): void
+    public function test_it_collects_all_items_at_once_on_first_collect(): void
     {
         $files = [
             new MockSplFileInfo('src/Service1.php'),
@@ -119,19 +122,20 @@ final class LazySourceCollectorTest extends TestCase
 
         $collectedFiles = $collector->collect();
 
-        // We didn't start consuming the iterable yet
-        $this->assertSame(0, $decoratedCollector->yieldCount);
+        // All items are collected immediately on first collect() call
+        $this->assertSame(count($files), $decoratedCollector->yieldCount);
 
+        // Consuming the iterator doesn't trigger additional yields
         $index = 0;
 
         foreach ($collectedFiles as $_file) {
             ++$index;
-
-            $this->assertSame($index, $decoratedCollector->yieldCount);
         }
 
         // Sanity check
         $this->assertSame(count($files), $index);
+        // No additional yields occurred
+        $this->assertSame(count($files), $decoratedCollector->yieldCount);
     }
 
     public function test_it_collects_the_files_only_once(): void
@@ -166,32 +170,22 @@ final class LazySourceCollectorTest extends TestCase
         $collector = new LazySourceCollector($decoratedCollector);
 
         $source1 = $collector->collect();
-        // We get the 2nd source before we traversed anything!
+        // All items are collected immediately on first collect() call
+        $this->assertSame(count($files), $decoratedCollector->yieldCount);
+
+        // We get the 2nd source after the first collect() call
         $source2 = $collector->collect();
+        // No additional yields, still using cached data
+        $this->assertSame(count($files), $decoratedCollector->yieldCount);
 
-        $firstItemSource1 = self::loopFirstItem($source1);
-        $firstItemSource2 = self::loopFirstItem($source2);
+        // Both sources return the same cached data
+        $collectedFiles1 = iterator_to_array($source1);
+        $collectedFiles2 = iterator_to_array($source2);
 
-        $this->assertSame($files[0], $firstItemSource1);
-        $this->assertSame($firstItemSource1, $firstItemSource2);
+        $this->assertSame($files, $collectedFiles1);
+        $this->assertSame($files, $collectedFiles2);
 
-        $this->assertSame(1, $decoratedCollector->yieldCount);
-    }
-
-    /**
-     * @template TKey
-     * @template-covariant TValue
-     *
-     * @param iterable<TKey, TValue> $iterable
-     *
-     * @return TValue
-     */
-    private static function loopFirstItem(iterable $iterable): mixed
-    {
-        foreach ($iterable as $item) {
-            return $item;
-        }
-
-        throw new LogicException('Unreachable statement.');
+        // Still no additional yields - everything is cached
+        $this->assertSame(count($files), $decoratedCollector->yieldCount);
     }
 }

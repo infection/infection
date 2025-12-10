@@ -35,17 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use ArrayIterator;
+use Closure;
+use function iterator_to_array;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Decorator for SourceCollector that lazily collects and caches source files.
  *
- * On the first call to collect(), it yields items from the decorated collector
- * while building a cache. Once the iteration completes, later calls return
- * the cached array directly, avoiding a repeated collection.
+ * The decorated collector is instantiated lazily (if provided as a factory) and
+ * is only iterated once on the first collect() call. All items are collected
+ * at once into an array cache.
  *
- * This is useful when the decorated collector performs expensive operations
- * (e.g. file system traversal, git operations) that should only happen once.
+ * Multiple calls to collect() return independent iterators over the same cached
+ * array, ensuring expensive operations (e.g. file system traversal, git operations)
+ * only happen once.
  *
  * @internal
  */
@@ -54,16 +58,21 @@ final class LazySourceCollector implements SourceCollector
     /**
      * @var list<SplFileInfo>|null
      */
-    private ?array $cachedSourceFiles = null;
+    private ?array $cache = null;
 
+    private ?SourceCollector $collector = null;
+
+    /**
+     * @param SourceCollector|Closure():SourceCollector $collectorOrFactory
+     */
     public function __construct(
-        private readonly SourceCollector $decoratedCollector,
+        private readonly SourceCollector|Closure $collectorOrFactory,
     ) {
     }
 
     public function isFiltered(): bool
     {
-        return $this->decoratedCollector->isFiltered();
+        return $this->getCollector()->isFiltered();
     }
 
     /**
@@ -71,26 +80,26 @@ final class LazySourceCollector implements SourceCollector
      */
     public function collect(): iterable
     {
-        if ($this->cachedSourceFiles !== null) {
-            return $this->cachedSourceFiles;
+        if ($this->cache === null) {
+            $this->cache = iterator_to_array(
+                $this->getCollector()->collect(),
+                false,
+            );
         }
 
-        return $this->collectAndCache();
+        return new ArrayIterator($this->cache);
     }
 
-    /**
-     * @return iterable<SplFileInfo>
-     */
-    private function collectAndCache(): iterable
+    private function getCollector(): SourceCollector
     {
-        $cache = [];
+        if ($this->collector === null) {
+            $collectorOrFactory = $this->collectorOrFactory;
 
-        foreach ($this->decoratedCollector->collect() as $file) {
-            $cache[] = $file;
-
-            yield $file;
+            $this->collector = $collectorOrFactory instanceof SourceCollector
+                ? $collectorOrFactory
+                : $collectorOrFactory();
         }
 
-        $this->cachedSourceFiles = $cache;
+        return $this->collector;
     }
 }
