@@ -85,7 +85,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
                 indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                indexParser: new IndexXmlCoverageParser(areSourcesFiltered: false),
+                indexParser: new IndexXmlCoverageParser(isSourceFiltered: false),
                 parser: new XmlCoverageParser(),
             ),
             new JUnitTestExecutionInfoAdder(

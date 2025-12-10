@@ -48,7 +48,7 @@ use Webmozart\Assert\Assert;
 class IndexXmlCoverageParser
 {
     public function __construct(
-        private readonly bool $areSourcesFiltered,
+        private readonly bool $isSourceFiltered,
     ) {
     }
 
@@ -68,7 +68,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $xPath = SafeDOMXPath::fromFile($coverageIndexPath, 'p');
 
-        self::assertHasExecutedLines($xPath, $this->areSourcesFiltered);
+        self::assertHasExecutedLines($xPath, $this->isSourceFiltered);
 
         return $this->parseNodes($coverageIndexPath, $coverageBasePath, $xPath);
     }
@@ -102,7 +102,7 @@ class IndexXmlCoverageParser
     /**
      * @throws NoSourceFound
      */
-    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
+    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isSourceFiltered): void
     {
         $lineCoverage = $xPath->queryElement('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines');
 
@@ -111,7 +111,7 @@ class IndexXmlCoverageParser
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
-            throw $isForGitDiffLines
+            throw $isSourceFiltered
                 ? NoSourceFound::noExecutableSourceCodeForDiff()
                 : NoSourceFound::noExecutableSourceCode();
         }

@@ -41,7 +41,7 @@ use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\SourceLineFilter;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use function iterator_to_array;
@@ -81,7 +81,7 @@ class NodeMutationGenerator
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineFilter $sourceLineFilter,
+        private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
@@ -108,7 +108,7 @@ class NodeMutationGenerator
             return;
         }
 
-        $isNodeAModifiedLine = $this->sourceLineFilter->touches(
+        $isNodeAModifiedLine = $this->sourceLineMatcher->touches(
             $this->filePath,
             $node->getStartLine(),
             $node->getEndLine(),

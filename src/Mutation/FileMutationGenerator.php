@@ -43,7 +43,7 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\SourceLineFilter;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use PhpParser\Node;
@@ -59,7 +59,7 @@ class FileMutationGenerator
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineFilter $sourceLineFilter,
+        private readonly SourceLineMatcher $sourceLineMatcher,
     ) {
     }
 
@@ -100,7 +100,7 @@ class FileMutationGenerator
                 trace: $trace,
                 onlyCovered: $onlyCovered,
                 lineRangeCalculator: $this->lineRangeCalculator,
-                sourceLineFilter: $this->sourceLineFilter,
+                sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $sourceFile->getContents(),
             ),

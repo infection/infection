@@ -33,17 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Differ;
+namespace Infection\Source\Matcher;
 
+use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\ConfiguredGit;
 use Infection\Source\Exception\NoSourceFound;
 
 /**
  * @internal
- * @final
  */
-class FilesDiffChangedLines
+final class GitDiffChangedLines implements SourceLineMatcher
 {
     /** @var array<string, list<ChangedLinesRange>> */
     private ?array $memoizedFilesChangedLinesMap = null;
@@ -54,16 +54,10 @@ class FilesDiffChangedLines
     ) {
     }
 
-    /**
-     * @param positive-int $mutationStartLine
-     * @param positive-int $mutationEndLine
-     *
-     * @throws NoSourceFound
-     */
-    public function touches(string $fileRealPath, int $mutationStartLine, int $mutationEndLine): bool
+    public function touches(string $fileRealPath, int $startLine, int $endLine): bool
     {
         foreach ($this->getChangedLinesRanges($fileRealPath) as $changedLinesRange) {
-            if ($changedLinesRange->touches($mutationStartLine, $mutationEndLine)) {
+            if ($changedLinesRange->touches($startLine, $endLine)) {
                 return true;
             }
         }

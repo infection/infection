@@ -195,7 +195,7 @@ parameters:
 
         # False-positive: the value cannot be -1 with our configuration.
         -
-            message: '#^.*mutation(Start|End)Line.*FilesDiffChangedLines::touches\(\) expects int\<1\, max\>\, -1\|int\<1\, max\> given\.$#'
+            message: '#^.*(start|end)Line.*SourceLineMatcher::touches\(\) expects int\<1\, max\>\, -1\|int\<1\, max\> given\.$#'
             identifier: argument.type
             path: ../src/Mutator/NodeMutationGenerator.php
 
