@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\FileSystem\SourceFileCollector;
+namespace Infection\Tests\Source\Collector\BasicSourceCollector;
 
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\FileSystem\SourceFileCollector;
+use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,8 +49,8 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 
 #[Group('integration')]
-#[CoversClass(SourceFileCollector::class)]
-final class SourceFileCollectorTest extends FileSystemTestCase
+#[CoversClass(BasicSourceCollector::class)]
+final class BasicSourceCollectorTest extends FileSystemTestCase
 {
     private const FIXTURES_ROOT = __DIR__ . '/Fixtures';
 
@@ -74,7 +74,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         array $excludedFilesOrDirectories,
         array $expectedList,
     ): void {
-        $collector = new SourceFileCollector(
+        $collector = new BasicSourceCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
             null,
@@ -97,7 +97,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
     ): void {
-        $collector = new SourceFileCollector(
+        $collector = new BasicSourceCollector(
             $sourceDirectories,
             $excludedFilesOrDirectories,
             null,
@@ -253,7 +253,7 @@ final class SourceFileCollectorTest extends FileSystemTestCase
             $this->filesystem->dumpFile($filePath, '');
         }
 
-        $collector = SourceFileCollector::create(
+        $collector = BasicSourceCollector::create(
             configurationPathname: '/path/to/project',
             sourceDirectories: [$this->tmp],
             excludedFilesOrDirectories: [],

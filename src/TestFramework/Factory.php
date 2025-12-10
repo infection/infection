@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileCollector;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
@@ -65,16 +65,16 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
-        private SourceFileCollector $sourceFileCollector,
+        private SourceCollector $sourceCollector,
         private array $installedExtensions,
     ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
+            $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
+
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
@@ -139,7 +139,7 @@ final readonly class Factory
     private function getFilteredSourceFilesToMutate(): array
     {
         // TODO: this looks incorrect to me... But it is what it is right now.
-        if (!$this->sourceFileCollector->isFiltered()) {
+        if (!$this->sourceCollector->isFiltered()) {
             return [];
         }
 
@@ -150,7 +150,7 @@ final readonly class Factory
          * @phpstan-ignore varTag.type
          */
         $files = iterator_to_array(
-            $this->sourceFileCollector->collect(),
+            $this->sourceCollector->collect(),
         );
 
         return $files;

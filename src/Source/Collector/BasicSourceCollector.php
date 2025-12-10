@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\FileSystem;
+namespace Infection\Source\Collector;
 
 use function array_map;
 use ArrayIterator;
@@ -51,7 +51,7 @@ use Symfony\Component\Finder\SplFileInfo;
  * @internal
  * @final
  */
-class SourceFileCollector
+class BasicSourceCollector implements SourceCollector
 {
     /**
      * @var iterable<SplFileInfo>
@@ -77,9 +77,6 @@ class SourceFileCollector
         return $this->filtered;
     }
 
-    /**
-     * @return iterable<SplFileInfo>
-     */
     public function collect(): iterable
     {
         if ($this->sourceFiles === null) {
