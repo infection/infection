@@ -108,7 +108,6 @@ jobs:
         run: make test-unit
 
       - name: Run integration tests
-        if: ${{ matrix.operating-system != 'windows-latest' }}
         shell: bash
         run: make test-unit PHPUNIT_GROUP=integration
 
