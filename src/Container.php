@@ -82,7 +82,6 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
@@ -120,6 +119,8 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Source\Collector\BasicSourceCollector;
+use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
@@ -238,7 +239,7 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                $container->getSourceFileCollector()->isFiltered(),
+                $container->getSourceCollector()->isFiltered(),
             ),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
@@ -251,7 +252,7 @@ final class Container extends DIContainer
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
             BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => BufferedSourceFileFilter::create(
-                $container->getSourceFileCollector()->collect(),
+                $container->getSourceCollector()->collect(),
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
@@ -276,7 +277,7 @@ final class Container extends DIContainer
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
-                    $container->getSourceFileCollector(),
+                    $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -578,10 +579,10 @@ final class Container extends DIContainer
                     $configuration->source->directories,
                 );
             },
-            SourceFileCollector::class => static function (self $container): SourceFileCollector {
+            SourceCollector::class => static function (self $container): SourceCollector {
                 $configuration = $container->getConfiguration();
 
-                return SourceFileCollector::create(
+                return BasicSourceCollector::create(
                     $configuration->configurationPathname,
                     $configuration->source->directories,
                     $configuration->source->excludes,
@@ -826,9 +827,9 @@ final class Container extends DIContainer
         return $this->get(PerformanceLoggerSubscriberFactory::class);
     }
 
-    public function getSourceFileCollector(): SourceFileCollector
+    public function getSourceCollector(): SourceCollector
     {
-        return $this->get(SourceFileCollector::class);
+        return $this->get(SourceCollector::class);
     }
 
     public function getNodeTraverserFactory(): NodeTraverserFactory
