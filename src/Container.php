@@ -121,7 +121,7 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Matcher\FilesDiffChangedLines;
+use Infection\Source\Matcher\GitDiffChangedLines;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
@@ -571,7 +571,7 @@ final class Container extends DIContainer
                     return new NullSourceLineMatcher();
                 }
 
-                return new FilesDiffChangedLines(
+                return new GitDiffChangedLines(
                     $container->getGit(),
                     $container->getFileSystem(),
                     $gitDiffBase,

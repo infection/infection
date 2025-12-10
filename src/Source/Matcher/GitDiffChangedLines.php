@@ -43,7 +43,7 @@ use Infection\Source\Exception\NoSourceFound;
 /**
  * @internal
  */
-final class FilesDiffChangedLines implements SourceLineMatcher
+final class GitDiffChangedLines implements SourceLineMatcher
 {
     /** @var array<string, list<ChangedLinesRange>> */
     private ?array $memoizedFilesChangedLinesMap = null;
