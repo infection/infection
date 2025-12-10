@@ -63,6 +63,23 @@ final readonly class SourceCollectorFactory
         Source $source,
         ?SourceFilter $sourceFilter,
     ): SourceCollector {
+        return new LazySourceCollector(
+            fn () => $this->createCollector(
+                $configurationPathname,
+                $source,
+                $sourceFilter,
+            ),
+        );
+    }
+
+    /**
+     * @param non-empty-string $configurationPathname
+     */
+    private function createCollector(
+        string $configurationPathname,
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
         return match (true) {
             $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
                 $this->git,

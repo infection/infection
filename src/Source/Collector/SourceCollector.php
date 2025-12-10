@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use Infection\Source\Exception\NoSourceFound;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -49,10 +50,16 @@ interface SourceCollector
      * Whether the collector collects all the project source files, or if they
      * are filtered, e.g. to match a user input filter or to git added/modified
      * files.
+     *
+     * TODO: check the implications of such a change
+     * @throws NoSourceFound
      */
     public function isFiltered(): bool;
 
     /**
+     * TODO: check the implications of such a change
+     * @throws NoSourceFound
+     *
      * @return iterable<SplFileInfo>
      */
     public function collect(): iterable;
