@@ -51,7 +51,6 @@ interface SourceCollector
      * are filtered, e.g. to match a user input filter or to git added/modified
      * files.
      *
-     * TODO: check the implications of such a change
      * @throws NoSourceFound
      */
     public function isFiltered(): bool;

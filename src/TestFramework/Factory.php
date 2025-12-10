@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework;
 
+use Infection\Source\Exception\NoSourceFound;
 use function implode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
@@ -70,11 +71,12 @@ final readonly class Factory
     ) {
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
@@ -133,6 +135,8 @@ final readonly class Factory
 
     /**
      * Get only those source files that will be mutated to use them in coverage whitelist
+     *
+     * @throws NoSourceFound
      *
      * @return list<SplFileInfo>
      */

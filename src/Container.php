@@ -440,16 +440,12 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
-                $configuration = $container->getConfiguration();
-
-                return new FileMutationGenerator(
-                    $container->getFileParser(),
-                    $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator(),
-                    $container->getSourceLineMatcher(),
-                );
-            },
+            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
+                $container->getFileParser(),
+                $container->getNodeTraverserFactory(),
+                $container->getLineRangeCalculator(),
+                $container->getSourceLineMatcher(),
+            ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
@@ -721,6 +717,9 @@ final class Container extends DIContainer
         return $this->get(FileSystem::class);
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     public function getUnionTraceProvider(): UnionTraceProvider
     {
         return $this->get(UnionTraceProvider::class);
@@ -866,6 +865,9 @@ final class Container extends DIContainer
         return $this->get(FilteringResultsCollectorFactory::class);
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     public function getTestFrameworkAdapter(): TestFrameworkAdapter
     {
         return $this->get(TestFrameworkAdapter::class);
@@ -901,6 +903,9 @@ final class Container extends DIContainer
         return $this->get(MutantProcessContainerFactory::class);
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     public function getMutationGenerator(): MutationGenerator
     {
         return $this->get(MutationGenerator::class);
@@ -1126,6 +1131,9 @@ final class Container extends DIContainer
         return $this->get(StaticAnalysisToolFactory::class);
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     private function getBufferedSourceFileFilter(): BufferedSourceFileFilter
     {
         return $this->get(BufferedSourceFileFilter::class);
@@ -1146,6 +1154,9 @@ final class Container extends DIContainer
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
+    /**
+     * @throws NoSourceFound
+     */
     private function getCoveredTraceProvider(): CoveredTraceProvider
     {
         return $this->get(CoveredTraceProvider::class);
