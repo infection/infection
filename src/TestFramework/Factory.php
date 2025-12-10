@@ -87,7 +87,7 @@ final readonly class Factory
                 (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->sourceDirectories,
+                $this->infectionConfig->source->directories,
                 $skipCoverage,
                 $this->infectionConfig->executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
@@ -118,7 +118,7 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $configuration->sourceDirectories,
+                    $configuration->source->directories,
                     $skipCoverage,
                 );
             }

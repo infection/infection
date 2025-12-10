@@ -40,6 +40,7 @@ use function explode;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
@@ -61,8 +62,6 @@ readonly class Configuration
     ];
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string|null $gitDiffBase
@@ -71,9 +70,8 @@ readonly class Configuration
      */
     public function __construct(
         public float $processTimeout,
-        public array $sourceDirectories,
+        public Source $source,
         public ?PlainFilter $sourceFilesFilter,
-        public array $sourceFilesExcludes,
         public Logs $logs,
         public string $logVerbosity,
         public string $tmpDir,
@@ -110,7 +108,6 @@ readonly class Configuration
         public string $configurationPathname,
     ) {
         Assert::nullOrGreaterThanEq($processTimeout, 0);
-        Assert::allString($sourceDirectories);
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::oneOf($logVerbosity, self::LOG_VERBOSITY);
         Assert::oneOf($testFramework, TestFrameworkTypes::getTypes());
