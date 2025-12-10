@@ -592,15 +592,9 @@ final class ConfigurationFactoryScenario
             );
     }
 
-    /**
-     * @param non-empty-string|null $expectedDiffBase
-     * @param non-empty-string|null $expectedDiffFilter
-     */
     public function forSourceFilter(
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?SourceFilter $expectedSourceFilter,
-        ?string $expectedDiffBase,
-        ?string $expectedDiffFilter,
     ): self {
         return $this
             ->withInput(
@@ -610,8 +604,6 @@ final class ConfigurationFactoryScenario
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
                     ->withSourceFilter($expectedSourceFilter)
-                    ->withGitDiffBase($expectedDiffBase)
-                    ->withGitDiffFilter($expectedDiffFilter)
                     ->build(),
             );
     }

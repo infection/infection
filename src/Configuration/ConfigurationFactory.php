@@ -184,12 +184,6 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            gitDiffBase: $sourceFilter instanceof GitDiffFilter
-                ? $sourceFilter->base
-                : null,
-            gitDiffFilter: $sourceFilter instanceof GitDiffFilter
-                ? $sourceFilter->value
-                : null,
             mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $resultStaticAnalysisTool,
