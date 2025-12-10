@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Configuration;
 
+use Infection\Configuration\SourceFilter\SourceFilter;
 use function array_map;
 use function explode;
 use Infection\Configuration\Entry\Logs;
@@ -71,7 +72,7 @@ readonly class Configuration
     public function __construct(
         public float $processTimeout,
         public Source $source,
-        public ?PlainFilter $sourceFilesFilter,
+        public ?SourceFilter $sourceFilter,
         public Logs $logs,
         public string $logVerbosity,
         public string $tmpDir,

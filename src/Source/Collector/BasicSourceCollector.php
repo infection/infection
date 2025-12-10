@@ -49,9 +49,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
- * @final
  */
-class BasicSourceCollector implements SourceCollector
+final class BasicSourceCollector implements SourceCollector
 {
     /**
      * @var iterable<SplFileInfo>

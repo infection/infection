@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Source\Collector\SourceCollectorFactory;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -579,14 +580,16 @@ final class Container extends DIContainer
                     $configuration->source->directories,
                 );
             },
+            SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
+                $container->getGit(),
+            ),
             SourceCollector::class => static function (self $container): SourceCollector {
                 $configuration = $container->getConfiguration();
 
-                return BasicSourceCollector::create(
+                return $container->get(SourceCollectorFactory::class)->create(
                     $configuration->configurationPathname,
-                    $configuration->source->directories,
-                    $configuration->source->excludes,
-                    $configuration->sourceFilesFilter,
+                    $configuration->source,
+                    $configuration->sourceFilter,
                 );
             },
         ]);

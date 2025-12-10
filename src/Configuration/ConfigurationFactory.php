@@ -157,10 +157,7 @@ class ConfigurationFactory
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
-            sourceFilesFilter: $this->convertToPlainFilter(
-                $sourceFilter,
-                $schema->source->directories,
-            ),
+            sourceFilter: $sourceFilter,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
