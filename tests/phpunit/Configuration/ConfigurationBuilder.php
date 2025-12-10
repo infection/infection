@@ -36,11 +36,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration;
 
+use function array_values;
 use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Mutator\IgnoreConfig;
@@ -55,8 +57,6 @@ use PhpParser\Node;
 final class ConfigurationBuilder
 {
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $sourceFilesExcludes
      * @param array<string, Mutator<Node>> $mutators
      * @param array<string, array<int, string>> $ignoreSourceCodeMutatorsMap
      * @param non-empty-string $gitDiffBase
@@ -65,9 +65,8 @@ final class ConfigurationBuilder
      */
     private function __construct(
         private float $timeout,
-        private array $sourceDirectories,
+        private Source $source,
         private ?PlainFilter $sourceFilesFilter,
-        private array $sourceFilesExcludes,
         private Logs $logs,
         private string $logVerbosity,
         private string $tmpDir,
@@ -109,9 +108,8 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: $configuration->processTimeout,
-            sourceDirectories: $configuration->sourceDirectories,
+            source: $configuration->source,
             sourceFilesFilter: $configuration->sourceFilesFilter,
-            sourceFilesExcludes: $configuration->sourceFilesExcludes,
             logs: $configuration->logs,
             logVerbosity: $configuration->logVerbosity,
             tmpDir: $configuration->tmpDir,
@@ -155,9 +153,8 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 10.0,
-            sourceDirectories: [],
+            source: new Source(),
             sourceFilesFilter: null,
-            sourceFilesExcludes: [],
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
             tmpDir: '/tmp/infection',
@@ -199,12 +196,14 @@ final class ConfigurationBuilder
     {
         return new self(
             timeout: 5.0,
-            sourceDirectories: ['src', 'lib'],
+            source: new Source(
+                ['src', 'lib'],
+                ['vendor', 'tests'],
+            ),
             sourceFilesFilter: new PlainFilter([
                 'src/Foo.php',
                 'src/Bar.php',
             ]),
-            sourceFilesExcludes: ['vendor', 'tests'],
             logs: new Logs(
                 textLogFilePath: 'text.log',
                 htmlLogFilePath: 'report.html',
@@ -268,21 +267,24 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    public function withSource(Source $source): self
+    {
+        $clone = clone $this;
+        $clone->source = $source;
+
+        return $clone;
+    }
+
     /**
      * @param non-empty-string ...$sourceDirectories
      */
     public function withSourceDirectories(string ...$sourceDirectories): self
     {
         $clone = clone $this;
-        $clone->sourceDirectories = $sourceDirectories;
-
-        return $clone;
-    }
-
-    public function withSourceFilesFilter(?PlainFilter $sourceFilesFilter): self
-    {
-        $clone = clone $this;
-        $clone->sourceFilesFilter = $sourceFilesFilter;
+        $clone->source = new Source(
+            array_values($sourceDirectories),
+            $this->source->excludes,
+        );
 
         return $clone;
     }
@@ -293,7 +295,18 @@ final class ConfigurationBuilder
     public function withSourceFilesExcludes(string ...$sourceFilesExcludes): self
     {
         $clone = clone $this;
-        $clone->sourceFilesExcludes = $sourceFilesExcludes;
+        $clone->source = new Source(
+            $this->source->directories,
+            array_values($sourceFilesExcludes),
+        );
+
+        return $clone;
+    }
+
+    public function withSourceFilesFilter(?PlainFilter $sourceFilesFilter): self
+    {
+        $clone = clone $this;
+        $clone->sourceFilesFilter = $sourceFilesFilter;
 
         return $clone;
     }
@@ -589,9 +602,8 @@ final class ConfigurationBuilder
     {
         return new Configuration(
             processTimeout: $this->timeout,
-            sourceDirectories: $this->sourceDirectories,
+            source: $this->source,
             sourceFilesFilter: $this->sourceFilesFilter,
-            sourceFilesExcludes: $this->sourceFilesExcludes,
             logs: $this->logs,
             logVerbosity: $this->logVerbosity,
             tmpDir: $this->tmpDir,

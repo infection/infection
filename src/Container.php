@@ -577,7 +577,7 @@ final class Container extends DIContainer
                     $container->getFileSystem(),
                     $gitDiffBase,
                     $gitDiffFilter,
-                    $configuration->sourceDirectories,
+                    $configuration->source->directories,
                 );
             },
             SourceFileCollector::class => static function (self $container): SourceFileCollector {
@@ -585,8 +585,8 @@ final class Container extends DIContainer
 
                 return SourceFileCollector::create(
                     $configuration->configurationPathname,
-                    $configuration->sourceDirectories,
-                    $configuration->sourceFilesExcludes,
+                    $configuration->source->directories,
+                    $configuration->source->excludes,
                     $configuration->sourceFilesFilter,
                 );
             },
