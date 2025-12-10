@@ -98,7 +98,6 @@ readonly class Configuration
         public bool $isDryRun,
         public array $ignoreSourceCodeMutatorsMap,
         public bool $executeOnlyCoveringTestCases,
-        public bool $isForGitDiffLines,
         public ?string $gitDiffBase,
         public ?string $gitDiffFilter,
         public ?string $mapSourceClassToTestStrategy,

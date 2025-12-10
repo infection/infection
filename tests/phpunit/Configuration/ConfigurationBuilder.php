@@ -93,7 +93,6 @@ final class ConfigurationBuilder
         private bool $dryRun,
         private array $ignoreSourceCodeMutatorsMap,
         private bool $executeOnlyCoveringTestCases,
-        private bool $isForGitDiffLines,
         private ?string $gitDiffBase,
         private ?string $gitDiffFilter,
         private ?string $mapSourceClassToTestStrategy,
@@ -138,7 +137,6 @@ final class ConfigurationBuilder
             dryRun: $configuration->isDryRun,
             ignoreSourceCodeMutatorsMap: $configuration->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $configuration->executeOnlyCoveringTestCases,
-            isForGitDiffLines: $configuration->isForGitDiffLines,
             gitDiffBase: $configuration->gitDiffBase,
             gitDiffFilter: $configuration->gitDiffFilter,
             mapSourceClassToTestStrategy: $configuration->mapSourceClassToTestStrategy,
@@ -181,7 +179,6 @@ final class ConfigurationBuilder
             dryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: false,
-            isForGitDiffLines: false,
             gitDiffBase: null,
             gitDiffFilter: null,
             mapSourceClassToTestStrategy: null,
@@ -248,7 +245,6 @@ final class ConfigurationBuilder
                 'Foo\\Bar' => ['.*test.*'],
             ],
             executeOnlyCoveringTestCases: true,
-            isForGitDiffLines: true,
             gitDiffBase: 'origin/master',
             gitDiffFilter: 'AM',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
@@ -525,14 +521,6 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withIsForGitDiffLines(bool $isForGitDiffLines): self
-    {
-        $clone = clone $this;
-        $clone->isForGitDiffLines = $isForGitDiffLines;
-
-        return $clone;
-    }
-
     /**
      * @param non-empty-string|null $gitDiffBase
      */
@@ -630,7 +618,6 @@ final class ConfigurationBuilder
             isDryRun: $this->dryRun,
             ignoreSourceCodeMutatorsMap: $this->ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $this->executeOnlyCoveringTestCases,
-            isForGitDiffLines: $this->isForGitDiffLines,
             gitDiffBase: $this->gitDiffBase,
             gitDiffFilter: $this->gitDiffFilter,
             mapSourceClassToTestStrategy: $this->mapSourceClassToTestStrategy,

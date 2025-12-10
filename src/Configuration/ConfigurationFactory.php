@@ -187,7 +187,6 @@ class ConfigurationFactory
             isDryRun: $dryRun,
             ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
             executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
-            isForGitDiffLines: $sourceFilter instanceof GitDiffFilter,
             gitDiffBase: $sourceFilter instanceof GitDiffFilter
                 ? $sourceFilter->base
                 : null,
