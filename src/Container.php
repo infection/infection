@@ -119,8 +119,8 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
-use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\SourceCollector;
+use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;
@@ -579,14 +579,16 @@ final class Container extends DIContainer
                     $configuration->source->directories,
                 );
             },
+            SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
+                $container->getGit(),
+            ),
             SourceCollector::class => static function (self $container): SourceCollector {
                 $configuration = $container->getConfiguration();
 
-                return BasicSourceCollector::create(
+                return $container->get(SourceCollectorFactory::class)->create(
                     $configuration->configurationPathname,
-                    $configuration->source->directories,
-                    $configuration->source->excludes,
-                    $configuration->sourceFilesFilter,
+                    $configuration->source,
+                    $configuration->sourceFilter,
                 );
             },
         ]);

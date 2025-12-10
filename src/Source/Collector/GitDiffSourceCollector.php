@@ -33,45 +33,71 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Source\Collector;
 
-use DomainException;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Git\Git;
-use function sprintf;
+use Infection\Source\Exception\NoSourceFound;
 
-final readonly class ConfigurationFactoryGit implements Git
+/**
+ * @internal
+ */
+final readonly class GitDiffSourceCollector implements SourceCollector
 {
-    /**
-     * @param non-empty-string $defaultBaseBranch
-     */
     public function __construct(
-        private string $defaultBaseBranch,
+        private SourceCollector $innerCollector,
     ) {
     }
 
-    public function getDefaultBase(): string
-    {
-        return $this->defaultBaseBranch;
-    }
-
-    public function getChangedFileRelativePaths(
-        string $diffFilter,
-        string $base,
+    /**
+     * @param non-empty-string $configurationPathname
+     * @param non-empty-string[] $sourceDirectories
+     * @param non-empty-string[] $excludedFilesOrDirectories
+     */
+    public static function create(
+        Git $git,
+        string $configurationPathname,
         array $sourceDirectories,
-    ): string {
-        throw new DomainException('Not implemented.');
+        array $excludedFilesOrDirectories,
+        GitDiffFilter $filter,
+    ): self {
+        return new self(
+            BasicSourceCollector::create(
+                $configurationPathname,
+                $sourceDirectories,
+                $excludedFilesOrDirectories,
+                self::convertToPlainFilter($git, $filter, $sourceDirectories),
+            ),
+        );
     }
 
-    public function getChangedLinesRangesByFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): never {
-        throw new DomainException('Not implemented.');
-    }
-
-    public function getBaseReference(string $base): string
+    public function isFiltered(): bool
     {
-        return sprintf('reference(%s)', $base);
+        return $this->innerCollector->isFiltered();
+    }
+
+    public function collect(): iterable
+    {
+        return $this->innerCollector->collect();
+    }
+
+    /**
+     * @param non-empty-string[] $sourceDirectories
+     *
+     * @throws NoSourceFound
+     */
+    private static function convertToPlainFilter(
+        Git $git,
+        GitDiffFilter $sourceFilter,
+        array $sourceDirectories,
+    ): ?PlainFilter {
+        return PlainFilter::tryToCreate(
+            $git->getChangedFileRelativePaths(
+                $sourceFilter->value,
+                $sourceFilter->base,
+                $sourceDirectories,
+            ),
+        );
     }
 }

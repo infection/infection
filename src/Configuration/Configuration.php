@@ -41,7 +41,7 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
-use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
@@ -71,7 +71,7 @@ readonly class Configuration
     public function __construct(
         public float $processTimeout,
         public Source $source,
-        public ?PlainFilter $sourceFilesFilter,
+        public ?SourceFilter $sourceFilter,
         public Logs $logs,
         public string $logVerbosity,
         public string $tmpDir,

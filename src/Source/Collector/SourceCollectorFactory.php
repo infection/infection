@@ -33,45 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Configuration\ConfigurationFactory;
+namespace Infection\Source\Collector;
 
-use DomainException;
+use function get_debug_type;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
+use InvalidArgumentException;
 use function sprintf;
+use const true;
 
-final readonly class ConfigurationFactoryGit implements Git
+/**
+ * @internal
+ */
+final readonly class SourceCollectorFactory
 {
-    /**
-     * @param non-empty-string $defaultBaseBranch
-     */
     public function __construct(
-        private string $defaultBaseBranch,
+        private Git $git,
     ) {
     }
 
-    public function getDefaultBase(): string
-    {
-        return $this->defaultBaseBranch;
-    }
-
-    public function getChangedFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): string {
-        throw new DomainException('Not implemented.');
-    }
-
-    public function getChangedLinesRangesByFileRelativePaths(
-        string $diffFilter,
-        string $base,
-        array $sourceDirectories,
-    ): never {
-        throw new DomainException('Not implemented.');
-    }
-
-    public function getBaseReference(string $base): string
-    {
-        return sprintf('reference(%s)', $base);
+    /**
+     * @param non-empty-string $configurationPathname
+     */
+    public function create(
+        string $configurationPathname,
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
+        return match (true) {
+            $sourceFilter instanceof GitDiffFilter => GitDiffSourceCollector::create(
+                $this->git,
+                $configurationPathname,
+                $source->directories,
+                $source->excludes,
+                $sourceFilter,
+            ),
+            $sourceFilter === null || $sourceFilter instanceof PlainFilter => BasicSourceCollector::create(
+                $configurationPathname,
+                $source->directories,
+                $source->excludes,
+                $sourceFilter,
+            ),
+            default => throw new InvalidArgumentException(
+                sprintf(
+                    'Unknown source filter "%s".',
+                    get_debug_type($sourceFilter),
+                ),
+            ),
+        };
     }
 }

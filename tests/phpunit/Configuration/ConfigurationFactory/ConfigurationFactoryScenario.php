@@ -41,6 +41,7 @@ use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
@@ -597,7 +598,7 @@ final class ConfigurationFactoryScenario
      */
     public function forSourceFilter(
         PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
-        ?PlainFilter $expectedSourceFilesFilter,
+        ?SourceFilter $expectedSourceFilter,
         ?string $expectedDiffBase,
         ?string $expectedDiffFilter,
     ): self {
@@ -608,7 +609,7 @@ final class ConfigurationFactoryScenario
             )
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
-                    ->withSourceFilesFilter($expectedSourceFilesFilter)
+                    ->withSourceFilter($expectedSourceFilter)
                     ->withGitDiffBase($expectedDiffBase)
                     ->withGitDiffFilter($expectedDiffFilter)
                     ->build(),

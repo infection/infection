@@ -157,10 +157,7 @@ class ConfigurationFactory
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
-            sourceFilesFilter: $this->convertToPlainFilter(
-                $sourceFilter,
-                $schema->source->directories,
-            ),
+            sourceFilter: $sourceFilter,
             logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
@@ -353,34 +350,6 @@ class ConfigurationFactory
                 self::refineGitBase($sourceFilter->base),
             );
         }
-
-        return $sourceFilter;
-    }
-
-    /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
-     */
-    private function convertToPlainFilter(
-        ?SourceFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        if ($sourceFilter instanceof GitDiffFilter) {
-            return PlainFilter::tryToCreate(
-                $this->git->getChangedFileRelativePaths(
-                    $sourceFilter->value,
-                    $sourceFilter->base,
-                    $sourceDirectories,
-                ),
-            );
-        }
-
-        if ($sourceFilter instanceof PlainFilter) {
-            return $sourceFilter;
-        }
-
-        Assert::null($sourceFilter);
 
         return $sourceFilter;
     }
