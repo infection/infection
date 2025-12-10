@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Source\Collector\SourceCollectorFactory;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -120,8 +119,8 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
-use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\SourceCollector;
+use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\NullSourceLineMatcher;

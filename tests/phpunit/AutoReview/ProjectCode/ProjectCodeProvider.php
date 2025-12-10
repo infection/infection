@@ -48,6 +48,7 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
@@ -77,6 +78,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
+use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -130,9 +132,11 @@ final class ProjectCodeProvider
         FakeFileSystem::class,
         FakeLocator::class,
         FakeSourceCollector::class,
+        FakeSourceFilter::class,
         FileSystem::class,
         FormatterName::class,
         GitDiffFilter::class,
+        GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
         InvalidReportSource::class,
         Logs::class,

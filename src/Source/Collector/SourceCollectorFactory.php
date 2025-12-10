@@ -35,16 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use function get_debug_type;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
 use InvalidArgumentException;
-use function get_debug_type;
 use function sprintf;
 use const true;
 
+/**
+ * @internal
+ */
 final readonly class SourceCollectorFactory
 {
     public function __construct(
@@ -68,7 +71,7 @@ final readonly class SourceCollectorFactory
                 $source->excludes,
                 $sourceFilter,
             ),
-            null === $sourceFilter || $sourceFilter instanceof PlainFilter =>BasicSourceCollector::create(
+            $sourceFilter === null || $sourceFilter instanceof PlainFilter => BasicSourceCollector::create(
                 $configurationPathname,
                 $source->directories,
                 $source->excludes,

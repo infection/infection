@@ -37,10 +37,8 @@ namespace Infection\Source\Collector;
 
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
 use Infection\Source\Exception\NoSourceFound;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -63,8 +61,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
         GitDiffFilter $filter,
-    ): self
-    {
+    ): self {
         return new self(
             BasicSourceCollector::create(
                 $configurationPathname,
@@ -92,7 +89,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
      */
     private static function convertToPlainFilter(
         Git $git,
-        ?GitDiffFilter $sourceFilter,
+        GitDiffFilter $sourceFilter,
         array $sourceDirectories,
     ): ?PlainFilter {
         return PlainFilter::tryToCreate(

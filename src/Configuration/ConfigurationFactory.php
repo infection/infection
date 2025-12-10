@@ -354,34 +354,6 @@ class ConfigurationFactory
         return $sourceFilter;
     }
 
-    /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
-     */
-    private function convertToPlainFilter(
-        ?SourceFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        if ($sourceFilter instanceof GitDiffFilter) {
-            return PlainFilter::tryToCreate(
-                $this->git->getChangedFileRelativePaths(
-                    $sourceFilter->value,
-                    $sourceFilter->base,
-                    $sourceDirectories,
-                ),
-            );
-        }
-
-        if ($sourceFilter instanceof PlainFilter) {
-            return $sourceFilter;
-        }
-
-        Assert::null($sourceFilter);
-
-        return $sourceFilter;
-    }
-
     private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
