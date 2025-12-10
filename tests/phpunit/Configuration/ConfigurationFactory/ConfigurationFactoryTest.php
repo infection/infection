@@ -238,7 +238,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
             source: new Source(),
-            sourceFilesFilter: PlainFilter::tryToCreate('f(AM, reference(master), []) = src/a.php,src/b.php'),
+            sourceFilter: PlainFilter::tryToCreate('f(AM, reference(master), []) = src/a.php,src/b.php'),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
             tmpDir: sys_get_temp_dir() . '/infection',
@@ -1143,7 +1143,7 @@ final class ConfigurationFactoryTest extends TestCase
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
                     ->withSourceDirectories('src/')
-                    ->withSourceFilesFilter(
+                    ->withSourceFilter(
                         new PlainFilter([
                             'src/Foo.php',
                             'src/Bar.php',

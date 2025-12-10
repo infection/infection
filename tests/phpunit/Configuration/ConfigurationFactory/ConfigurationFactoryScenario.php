@@ -609,7 +609,7 @@ final class ConfigurationFactoryScenario
             )
             ->withExpected(
                 ConfigurationBuilder::from($this->expected)
-                    ->withSourceFilesFilter($expectedSourceFilesFilter)
+                    ->withSourceFilter($expectedSourceFilesFilter)
                     ->withIsForGitDiffLines($expectedIsForGitDiffLines)
                     ->withGitDiffBase($expectedDiffBase)
                     ->withGitDiffFilter($expectedDiffFilter)

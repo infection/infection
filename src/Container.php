@@ -587,7 +587,7 @@ final class Container extends DIContainer
                     $configuration->configurationPathname,
                     $configuration->source->directories,
                     $configuration->source->excludes,
-                    $configuration->sourceFilesFilter,
+                    $configuration->sourceFilter,
                 );
             },
         ]);

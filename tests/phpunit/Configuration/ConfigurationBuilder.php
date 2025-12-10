@@ -45,6 +45,7 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Mutator\Mutator;
@@ -66,7 +67,7 @@ final class ConfigurationBuilder
     private function __construct(
         private float $timeout,
         private Source $source,
-        private ?PlainFilter $sourceFilesFilter,
+        private ?SourceFilter $sourceFilter,
         private Logs $logs,
         private string $logVerbosity,
         private string $tmpDir,
@@ -109,7 +110,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: $configuration->processTimeout,
             source: $configuration->source,
-            sourceFilesFilter: $configuration->sourceFilesFilter,
+            sourceFilter: $configuration->sourceFilter,
             logs: $configuration->logs,
             logVerbosity: $configuration->logVerbosity,
             tmpDir: $configuration->tmpDir,
@@ -154,7 +155,7 @@ final class ConfigurationBuilder
         return new self(
             timeout: 10.0,
             source: new Source(),
-            sourceFilesFilter: null,
+            sourceFilter: null,
             logs: Logs::createEmpty(),
             logVerbosity: 'none',
             tmpDir: '/tmp/infection',
@@ -200,7 +201,7 @@ final class ConfigurationBuilder
                 ['src', 'lib'],
                 ['vendor', 'tests'],
             ),
-            sourceFilesFilter: new PlainFilter([
+            sourceFilter: new PlainFilter([
                 'src/Foo.php',
                 'src/Bar.php',
             ]),
@@ -303,10 +304,10 @@ final class ConfigurationBuilder
         return $clone;
     }
 
-    public function withSourceFilesFilter(?PlainFilter $sourceFilesFilter): self
+    public function withSourceFilter(?SourceFilter $sourceFilter): self
     {
         $clone = clone $this;
-        $clone->sourceFilesFilter = $sourceFilesFilter;
+        $clone->sourceFilter = $sourceFilter;
 
         return $clone;
     }
@@ -603,7 +604,7 @@ final class ConfigurationBuilder
         return new Configuration(
             processTimeout: $this->timeout,
             source: $this->source,
-            sourceFilesFilter: $this->sourceFilesFilter,
+            sourceFilter: $this->sourceFilter,
             logs: $this->logs,
             logVerbosity: $this->logVerbosity,
             tmpDir: $this->tmpDir,

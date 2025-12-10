@@ -157,7 +157,7 @@ class ConfigurationFactory
         return new Configuration(
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
-            sourceFilesFilter: $this->convertToPlainFilter(
+            sourceFilter: $this->convertToPlainFilter(
                 $sourceFilter,
                 $schema->source->directories,
             ),
