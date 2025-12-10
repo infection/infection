@@ -228,7 +228,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
-    public const DEFAULT_SOURCE_FILTER = null;
+    public const DEFAULT_FILTER = null;
 
     public const DEFAULT_THREAD_COUNT = null;
 
