@@ -88,7 +88,6 @@ final class FileMutationGeneratorTest extends TestCase
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
             $this->sourceLineMatcherMock,
-            false,
         );
     }
 
@@ -287,7 +286,6 @@ final class FileMutationGeneratorTest extends TestCase
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
             $this->sourceLineMatcherMock,
-            false,
         );
 
         $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);

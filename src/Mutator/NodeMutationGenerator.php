@@ -80,7 +80,6 @@ class NodeMutationGenerator
         private readonly array $fileNodes,
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
-        private readonly bool $isForGitDiffLines,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly array $originalFileTokens,
@@ -109,8 +108,7 @@ class NodeMutationGenerator
             return;
         }
 
-        /** @psalm-suppress InvalidArgument */
-        if ($this->isForGitDiffLines && !$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
+        if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return;
         }
 

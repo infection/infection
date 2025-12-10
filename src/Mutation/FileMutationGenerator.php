@@ -60,7 +60,6 @@ class FileMutationGenerator
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineMatcher $sourceLineMatcher,
-        private readonly bool $isForGitDiffLines,
     ) {
     }
 
@@ -100,7 +99,6 @@ class FileMutationGenerator
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
-                isForGitDiffLines: $this->isForGitDiffLines,
                 lineRangeCalculator: $this->lineRangeCalculator,
                 sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,

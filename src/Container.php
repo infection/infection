@@ -446,7 +446,6 @@ final class Container extends DIContainer
                     $container->getNodeTraverserFactory(),
                     $container->getLineRangeCalculator(),
                     $container->getSourceLineMatcher(),
-                    $configuration->isForGitDiffLines,
                 );
             },
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
