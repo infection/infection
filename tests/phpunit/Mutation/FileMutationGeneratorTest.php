@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutation;
 
 use function current;
 use function file_exists;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -46,6 +45,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Testing\MutatorName;
@@ -75,20 +75,19 @@ final class FileMutationGeneratorTest extends TestCase
 
     private FileMutationGenerator $mutationGenerator;
 
-    private MockObject&FilesDiffChangedLines $filesDiffChangedLines;
+    private MockObject&SourceLineMatcher $sourceLineMatcherMock;
 
     protected function setUp(): void
     {
         $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
-        $this->filesDiffChangedLines = $this->createMock(FilesDiffChangedLines::class);
+        $this->sourceLineMatcherMock = $this->createMock(SourceLineMatcher::class);
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
-            $this->filesDiffChangedLines,
-            false,
+            $this->sourceLineMatcherMock,
         );
     }
 
@@ -286,8 +285,7 @@ final class FileMutationGeneratorTest extends TestCase
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
-            $this->filesDiffChangedLines,
-            false,
+            $this->sourceLineMatcherMock,
         );
 
         $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);

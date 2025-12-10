@@ -76,6 +76,7 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
@@ -140,6 +141,7 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NoReportFound::class,
         NonExecutableFinder::class,
+        NullSourceLineMatcher::class,
         NullSubscriber::class,
         OperatingSystem::class,
         ProgressFormatter::class,
