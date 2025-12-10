@@ -33,73 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Collector;
+namespace Infection\Tests\Source\Collector\LazySourceCollector;
 
-use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
+use DomainException;
+use Infection\Source\Collector\SourceCollector;
+use function sprintf;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
  */
-final readonly class GitDiffSourceCollector implements SourceCollector
+final class NonRewindableStreamingSourceCollector implements SourceCollector
 {
-    public function __construct(
-        private SourceCollector $innerCollector,
-    ) {
-    }
+    private bool $filteredCalled = false;
+
+    private bool $collected = false;
 
     /**
-     * @param non-empty-string $configurationPathname
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     *
-     * @throws NoSourceFound
+     * @var NonRewindableIterator<array-key, SplFileInfo>
      */
-    public static function create(
-        Git $git,
-        string $configurationPathname,
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-        GitDiffFilter $filter,
-    ): self {
-        return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
-                $sourceDirectories,
-                $excludedFilesOrDirectories,
-                self::convertToPlainFilter($git, $filter, $sourceDirectories),
-            ),
-        );
+    private NonRewindableIterator $iterator;
+
+    /**
+     * @param non-empty-array<SplFileInfo> $files
+     */
+    public function __construct(
+        private bool $filtered,
+        array $files,
+    ) {
+        $this->iterator = new NonRewindableIterator($files);
     }
 
     public function isFiltered(): bool
     {
-        return $this->innerCollector->isFiltered();
+        if ($this->filteredCalled) {
+            throw new DomainException(
+                sprintf(
+                    'Did not expect %s to be called twice.',
+                    __METHOD__,
+                ),
+            );
+        }
+
+        $filtered = $this->filtered;
+        $this->filteredCalled = true;
+
+        return $filtered;
     }
 
     public function collect(): iterable
     {
-        return $this->innerCollector->collect();
-    }
+        if ($this->collected) {
+            throw new DomainException(
+                sprintf(
+                    'Did not expect %s to be called twice.',
+                    __METHOD__,
+                ),
+            );
+        }
 
-    /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
-     */
-    private static function convertToPlainFilter(
-        Git $git,
-        GitDiffFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        return PlainFilter::tryToCreate(
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $sourceDirectories,
-            ),
-        );
+        $this->collected = true;
+
+        return $this->iterator;
     }
 }

@@ -35,71 +35,62 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * Decorator for SourceCollector that lazily collects and caches source files.
+ *
+ * On the first call to collect(), it yields items from the decorated collector
+ * while building a cache. Once the iteration completes, later calls return
+ * the cached array directly, avoiding a repeated collection.
+ *
+ * This is useful when the decorated collector performs expensive operations
+ * (e.g. file system traversal, git operations) that should only happen once.
+ *
  * @internal
  */
-final readonly class GitDiffSourceCollector implements SourceCollector
+final class LazySourceCollector implements SourceCollector
 {
-    public function __construct(
-        private SourceCollector $innerCollector,
-    ) {
-    }
-
     /**
-     * @param non-empty-string $configurationPathname
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     *
-     * @throws NoSourceFound
+     * @var list<SplFileInfo>|null
      */
-    public static function create(
-        Git $git,
-        string $configurationPathname,
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-        GitDiffFilter $filter,
-    ): self {
-        return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
-                $sourceDirectories,
-                $excludedFilesOrDirectories,
-                self::convertToPlainFilter($git, $filter, $sourceDirectories),
-            ),
-        );
+    private ?array $cachedSourceFiles = null;
+
+    public function __construct(
+        private readonly SourceCollector $decoratedCollector,
+    ) {
     }
 
     public function isFiltered(): bool
     {
-        return $this->innerCollector->isFiltered();
-    }
-
-    public function collect(): iterable
-    {
-        return $this->innerCollector->collect();
+        return $this->decoratedCollector->isFiltered();
     }
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
+     * @return iterable<SplFileInfo>
      */
-    private static function convertToPlainFilter(
-        Git $git,
-        GitDiffFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        return PlainFilter::tryToCreate(
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $sourceDirectories,
-            ),
-        );
+    public function collect(): iterable
+    {
+        if ($this->cachedSourceFiles !== null) {
+            return $this->cachedSourceFiles;
+        }
+
+        return $this->collectAndCache();
+    }
+
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    private function collectAndCache(): iterable
+    {
+        $cache = [];
+
+        foreach ($this->decoratedCollector->collect() as $file) {
+            $cache[] = $file;
+
+            yield $file;
+        }
+
+        $this->cachedSourceFiles = $cache;
     }
 }

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\BasicSourceCollector;
+namespace Infection\Tests\Source\Collector\LazySourceCollector\BasicSourceCollector;
 
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Collector\BasicSourceCollector;

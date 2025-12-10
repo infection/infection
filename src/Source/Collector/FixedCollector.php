@@ -35,71 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
  */
-final readonly class GitDiffSourceCollector implements SourceCollector
+final readonly class FixedCollector implements SourceCollector
 {
-    public function __construct(
-        private SourceCollector $innerCollector,
-    ) {
-    }
-
     /**
-     * @param non-empty-string $configurationPathname
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     *
-     * @throws NoSourceFound
+     * @param SplFileInfo[] $files
      */
-    public static function create(
-        Git $git,
-        string $configurationPathname,
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-        GitDiffFilter $filter,
-    ): self {
-        return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
-                $sourceDirectories,
-                $excludedFilesOrDirectories,
-                self::convertToPlainFilter($git, $filter, $sourceDirectories),
-            ),
-        );
+    public function __construct(
+        public bool $filtered,
+        public array $files,
+    ) {
     }
 
     public function isFiltered(): bool
     {
-        return $this->innerCollector->isFiltered();
+        return $this->filtered;
     }
 
     public function collect(): iterable
     {
-        return $this->innerCollector->collect();
-    }
-
-    /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
-     */
-    private static function convertToPlainFilter(
-        Git $git,
-        GitDiffFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        return PlainFilter::tryToCreate(
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $sourceDirectories,
-            ),
-        );
+        return $this->files;
     }
 }

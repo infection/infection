@@ -33,73 +33,52 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Collector;
+namespace Infection\Tests\Source\Collector\LazySourceCollector;
 
-use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
+use ArrayIterator;
+use DomainException;
+use Iterator;
 
 /**
- * @internal
+ * @template TKey
+ * @template-covariant TValue
+ * @template-implements Iterator<TKey, TValue>
  */
-final readonly class GitDiffSourceCollector implements SourceCollector
+final class NonRewindableIterator implements Iterator
 {
+    private readonly Iterator $decoratedIterator;
+
+    /**
+     * @param non-empty-array<TKey, TValue> $values
+     */
     public function __construct(
-        private SourceCollector $innerCollector,
+        array $values,
     ) {
+        $this->decoratedIterator = new ArrayIterator($values);
     }
 
-    /**
-     * @param non-empty-string $configurationPathname
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     *
-     * @throws NoSourceFound
-     */
-    public static function create(
-        Git $git,
-        string $configurationPathname,
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-        GitDiffFilter $filter,
-    ): self {
-        return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
-                $sourceDirectories,
-                $excludedFilesOrDirectories,
-                self::convertToPlainFilter($git, $filter, $sourceDirectories),
-            ),
-        );
-    }
-
-    public function isFiltered(): bool
+    public function current(): mixed
     {
-        return $this->innerCollector->isFiltered();
+        return $this->decoratedIterator->current();
     }
 
-    public function collect(): iterable
+    public function next(): void
     {
-        return $this->innerCollector->collect();
+        $this->decoratedIterator->next();
     }
 
-    /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
-     */
-    private static function convertToPlainFilter(
-        Git $git,
-        GitDiffFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        return PlainFilter::tryToCreate(
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $sourceDirectories,
-            ),
-        );
+    public function key(): mixed
+    {
+        return $this->decoratedIterator->key();
+    }
+
+    public function valid(): bool
+    {
+        return $this->decoratedIterator->valid();
+    }
+
+    public function rewind(): void
+    {
+        throw new DomainException('Cannot rewind iterator.');
     }
 }

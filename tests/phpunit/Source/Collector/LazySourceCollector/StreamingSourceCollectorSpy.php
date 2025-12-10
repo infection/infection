@@ -33,73 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Source\Collector;
+namespace Infection\Tests\Source\Collector\LazySourceCollector;
 
-use Infection\Configuration\SourceFilter\GitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\Git\Git;
-use Infection\Source\Exception\NoSourceFound;
+use DomainException;
+use Infection\Source\Collector\SourceCollector;
+use Iterator;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * Test double that tracks when items are yielded.
  * @internal
  */
-final readonly class GitDiffSourceCollector implements SourceCollector
+final class StreamingSourceCollectorSpy implements SourceCollector
 {
-    public function __construct(
-        private SourceCollector $innerCollector,
-    ) {
-    }
+    public int $yieldCount = 0;
 
     /**
-     * @param non-empty-string $configurationPathname
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     *
-     * @throws NoSourceFound
+     * @param SplFileInfo[] $files
      */
-    public static function create(
-        Git $git,
-        string $configurationPathname,
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-        GitDiffFilter $filter,
-    ): self {
-        return new self(
-            BasicSourceCollector::create(
-                $configurationPathname,
-                $sourceDirectories,
-                $excludedFilesOrDirectories,
-                self::convertToPlainFilter($git, $filter, $sourceDirectories),
-            ),
-        );
+    public function __construct(
+        private readonly array $files,
+    ) {
     }
 
     public function isFiltered(): bool
     {
-        return $this->innerCollector->isFiltered();
+        throw new DomainException('Not implemented.');
     }
 
-    public function collect(): iterable
-    {
-        return $this->innerCollector->collect();
-    }
-
+    // We constrained it to an Iterator here because otherwise it's a pain the
+    // a** to test.
+    // Indeed, we do not have all the necessary, humungous and tedious plugin
+    // to deal with `iterable`.
     /**
-     * @param non-empty-string[] $sourceDirectories
-     *
-     * @throws NoSourceFound
+     * @return Iterator<array-key, SplFileInfo>
      */
-    private static function convertToPlainFilter(
-        Git $git,
-        GitDiffFilter $sourceFilter,
-        array $sourceDirectories,
-    ): ?PlainFilter {
-        return PlainFilter::tryToCreate(
-            $git->getChangedFileRelativePaths(
-                $sourceFilter->value,
-                $sourceFilter->base,
-                $sourceDirectories,
-            ),
-        );
+    public function collect(): Iterator
+    {
+        foreach ($this->files as $key => $file) {
+            ++$this->yieldCount;
+
+            yield $key => $file;
+        }
     }
 }
