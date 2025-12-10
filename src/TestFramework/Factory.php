@@ -90,7 +90,7 @@ final readonly class Factory
                 $this->infectionConfig->source->directories,
                 $skipCoverage,
                 $this->infectionConfig->executeOnlyCoveringTestCases,
-                $filteredSourceFilesToMutate,
+                $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
             );
         }
