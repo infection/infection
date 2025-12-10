@@ -56,7 +56,6 @@ use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -122,6 +121,9 @@ use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\Matcher\FilesDiffChangedLines;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -153,7 +155,6 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ReflectionClass;
 use SebastianBergmann\Diff\Differ as BaseDiffer;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
@@ -444,7 +445,7 @@ final class Container extends DIContainer
                     $container->getFileParser(),
                     $container->getNodeTraverserFactory(),
                     $container->getLineRangeCalculator(),
-                    $container->getFilesDiffChangedLines(),
+                    $container->getSourceLineMatcher(),
                     $configuration->isForGitDiffLines,
                 );
             },
@@ -560,16 +561,14 @@ final class Container extends DIContainer
                 new ShellCommandLineExecutor(),
                 $container->getLogger(),
             ),
-            FilesDiffChangedLines::class => static function (self $container): FilesDiffChangedLines {
+            SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
                 $configuration = $container->getConfiguration();
 
                 $gitDiffBase = $configuration->gitDiffBase;
                 $gitDiffFilter = $configuration->gitDiffFilter;
 
                 if ($gitDiffBase === null || $gitDiffFilter === null) {
-                    // This service should not be used if there is no git base/filter configured.
-                    // TODO: this is quite ugly, but to get rid of this more work is needed.
-                    return (new ReflectionClass(FilesDiffChangedLines::class))->newInstanceWithoutConstructor();
+                    return new NullSourceLineMatcher();
                 }
 
                 return new FilesDiffChangedLines(
@@ -933,9 +932,9 @@ final class Container extends DIContainer
         return $this->get(LineRangeCalculator::class);
     }
 
-    public function getFilesDiffChangedLines(): FilesDiffChangedLines
+    public function getSourceLineMatcher(): SourceLineMatcher
     {
-        return $this->get(FilesDiffChangedLines::class);
+        return $this->get(SourceLineMatcher::class);
     }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder

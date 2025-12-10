@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Differ;
+namespace Infection\Tests\Source\Matcher;
 
 use Infection\Differ\ChangedLinesRange;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
+use Infection\Source\Matcher\FilesDiffChangedLines;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
