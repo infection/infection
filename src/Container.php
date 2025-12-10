@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Source\Matcher\GitDiffSourceLineMatcher;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -124,8 +127,6 @@ use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
-use Infection\Source\NullSourceLineFilter;
-use Infection\Source\SourceLineFilter;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -275,8 +276,8 @@ final class Container extends DIContainer
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
-                    GeneratedExtensionsConfig::EXTENSIONS,
                     $container->getSourceCollector(),
+                    GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
             StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
@@ -441,7 +442,7 @@ final class Container extends DIContainer
                 $container->getFileParser(),
                 $container->getNodeTraverserFactory(),
                 $container->getLineRangeCalculator(),
-                $container->getSourceLineFilter(),
+                $container->getSourceLineMatcher(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -555,6 +556,25 @@ final class Container extends DIContainer
                 new ShellCommandLineExecutor(),
                 $container->getLogger(),
             ),
+
+            SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
+                $configuration = $container->getConfiguration();
+
+                $gitDiffBase = $configuration->gitDiffBase;
+                $gitDiffFilter = $configuration->gitDiffFilter;
+
+                if ($gitDiffBase === null || $gitDiffFilter === null) {
+                    return new NullSourceLineMatcher();
+                }
+
+                return new GitDiffSourceLineMatcher(
+                    $container->getGit(),
+                    $container->getFileSystem(),
+                    $gitDiffBase,
+                    $gitDiffFilter,
+                    $configuration->source->directories,
+                );
+            },
             // TODO: this is ugly... to fix this.
             ConfiguredGit::class => static fn () => (new ReflectionClass(ConfiguredGit::class))->newInstanceWithoutConstructor(),
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
@@ -833,15 +853,6 @@ final class Container extends DIContainer
         return $this->get(PerformanceLoggerSubscriberFactory::class);
     }
 
-    public function getSourceLineFilter(): SourceLineFilter
-    {
-        $sourceCollector = $this->getSourceCollector();
-
-        return $sourceCollector instanceof SourceLineFilter
-            ? $sourceCollector
-            : new NullSourceLineFilter();
-    }
-
     public function getSourceCollector(): SourceCollector
     {
         return $this->get(SourceCollector::class);
@@ -944,6 +955,11 @@ final class Container extends DIContainer
     public function getLineRangeCalculator(): LineRangeCalculator
     {
         return $this->get(LineRangeCalculator::class);
+    }
+
+    public function getSourceLineMatcher(): SourceLineMatcher
+    {
+        return $this->get(SourceLineMatcher::class);
     }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder
