@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use Infection\Source\Matcher\GitDiffSourceLineMatcher;
-use Infection\Source\Matcher\NullSourceLineMatcher;
-use Infection\Source\Matcher\SourceLineMatcher;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -127,6 +124,9 @@ use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Collector\UnseenInCoverageSourceFileSourceCollector;
+use Infection\Source\Matcher\GitDiffSourceLineMatcher;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;

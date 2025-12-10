@@ -88,7 +88,7 @@ final class GitDiffSourceCollector implements SourceCollector, SourceLineFilter
         if ($this->innerCollector === null) {
             $filter = $this->git->getChangedFileRelativePaths();
 
-            $this->innerCollector = SchemaSourceCollector::create(
+            $this->innerCollector = BasicSourceCollector::create(
                 new PlainFilter($filter),
                 $this->sourceDirectories,
                 $this->excludedDirectoriesOrFiles,

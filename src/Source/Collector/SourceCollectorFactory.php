@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Configuration\Source;
+use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Differ\FilesDiffChangedLines;
@@ -74,7 +74,7 @@ final readonly class SourceCollectorFactory
                 $source->directories,
                 $source->excludes,
             ),
-            default => SchemaSourceCollector::create(
+            default => BasicSourceCollector::create(
                 $sourceFilter,
                 $source->directories,
                 $source->excludes,

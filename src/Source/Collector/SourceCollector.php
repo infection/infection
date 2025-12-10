@@ -35,11 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\FileSystem\FileFilter;
-use SplFileInfo;
+use Symfony\Component\Finder\SplFileInfo;
 
-// TODO: I do not think FileFilter should be necessary here. To check how to phase it out.
-interface SourceCollector extends FileFilter
+/**
+ * The SourceCollector is the service responsible for collecting all the source
+ * files that are eligible for being mutated.
+ *
+ * @internal
+ */
+interface SourceCollector
 {
     /**
      * TODO: find a better method name
