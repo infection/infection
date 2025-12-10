@@ -33,20 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Differ;
+namespace Infection\Tests\Source\Matcher;
 
 use Infection\Differ\ChangedLinesRange;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\FileSystem\FileSystem;
 use Infection\Git\Git;
+use Infection\Source\Matcher\GitDiffChangedLines;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(FilesDiffChangedLines::class)]
-final class FilesDiffChangedLinesTest extends TestCase
+#[CoversClass(GitDiffChangedLines::class)]
+final class GitDiffChangedLinesTest extends TestCase
 {
     private FileSystem&MockObject $fileSystemStub;
 
@@ -62,7 +62,7 @@ final class FilesDiffChangedLinesTest extends TestCase
 
     public function test_it_memoizes_parsed_results(): void
     {
-        $filesDiffChangedLines = new FilesDiffChangedLines(
+        $filesDiffChangedLines = new GitDiffChangedLines(
             $this->createGitStub([]),
             $this->fileSystemStub,
             'main',
@@ -89,7 +89,7 @@ final class FilesDiffChangedLinesTest extends TestCase
         int $mutationEndLine,
         bool $expected,
     ): void {
-        $filesDiffChangedLines = new FilesDiffChangedLines(
+        $filesDiffChangedLines = new GitDiffChangedLines(
             $this->createGitStub($changedLinesRangesByFilePathname),
             $this->fileSystemStub,
             'main',
