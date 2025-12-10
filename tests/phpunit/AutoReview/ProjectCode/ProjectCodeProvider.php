@@ -76,6 +76,7 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
@@ -128,6 +129,7 @@ final class ProjectCodeProvider
         DummyFileSystem::class,
         FakeFileSystem::class,
         FakeLocator::class,
+        FakeSourceCollector::class,
         FileSystem::class,
         FormatterName::class,
         GitDiffFilter::class,

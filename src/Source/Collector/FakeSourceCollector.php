@@ -37,6 +37,9 @@ namespace Infection\Source\Collector;
 
 use DomainException;
 
+/**
+ * @internal
+ */
 final class FakeSourceCollector implements SourceCollector
 {
     public function collect(): iterable
