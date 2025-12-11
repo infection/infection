@@ -44,6 +44,7 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
+use Infection\Source\Collector\LazyCacheSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use InvalidArgumentException;
@@ -67,18 +68,22 @@ final class SourceCollectorFactoryTest extends TestCase
             $this->createMock(Git::class),
         );
 
-        if ($exceptionOrExpectedCollectorClassName instanceof Exception) {
-            $this->expectExceptionObject($exceptionOrExpectedCollectorClassName);
-        }
-
         $actual = $factory->create(
             '/path/to/project',
             new Source(['src', 'lib'], ['vendor', 'tests']),
             $sourceFilter,
         );
 
+        $this->assertInstanceOf(LazyCacheSourceCollector::class, $actual);
+
+        if ($exceptionOrExpectedCollectorClassName instanceof Exception) {
+            $this->expectExceptionObject($exceptionOrExpectedCollectorClassName);
+        }
+
+        $innerCollectorClassName = $actual->getCollector();
+
         if (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
-            $this->assertSame($actual::class, $exceptionOrExpectedCollectorClassName);
+            $this->assertInstanceOf($exceptionOrExpectedCollectorClassName, $innerCollectorClassName);
         }
     }
 
