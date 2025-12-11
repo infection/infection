@@ -120,6 +120,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use Infection\Source\Exception\NoSourceFound;
@@ -579,15 +580,17 @@ final class Container extends DIContainer
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
             ),
-            SourceCollector::class => static function (self $container): SourceCollector {
-                $configuration = $container->getConfiguration();
+            SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
+                static function () use ($container): SourceCollector {
+                    $configuration = $container->getConfiguration();
 
-                return $container->get(SourceCollectorFactory::class)->create(
-                    $configuration->configurationPathname,
-                    $configuration->source,
-                    $configuration->sourceFilter,
-                );
-            },
+                    return $container->get(SourceCollectorFactory::class)->create(
+                        $configuration->configurationPathname,
+                        $configuration->source,
+                        $configuration->sourceFilter,
+                    );
+                },
+            ),
         ]);
 
         return $container->withValues(
