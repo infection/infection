@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Source\Collector\LazyCacheSourceCollector;
+namespace Infection\Tests\Source\Collector;
 
 use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
