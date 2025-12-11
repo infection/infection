@@ -73,8 +73,6 @@ final readonly class Factory
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
-            $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
