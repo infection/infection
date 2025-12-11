@@ -142,12 +142,12 @@ final class BasicSourceCollector implements SourceCollector
         }
 
         return take(
-                $this->filter(
-                    $this
-                        ->createFinder()
-                        ->getIterator(),
-                ),
-            )
+            $this->filter(
+                $this
+                    ->createFinder()
+                    ->getIterator(),
+            ),
+        )
             ->toList();
     }
 
