@@ -442,16 +442,12 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
-                $configuration = $container->getConfiguration();
-
-                return new FileMutationGenerator(
-                    $container->getFileParser(),
-                    $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator(),
-                    $container->getSourceLineMatcher(),
-                );
-            },
+            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
+                $container->getFileParser(),
+                $container->getNodeTraverserFactory(),
+                $container->getLineRangeCalculator(),
+                $container->getSourceLineMatcher(),
+            ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
