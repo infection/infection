@@ -50,23 +50,18 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * @internal
  */
-final class BasicSourceCollector implements SourceCollector
+final readonly class BasicSourceCollector implements SourceCollector
 {
-    /**
-     * @var SplFileInfo[]
-     */
-    private ?array $sourceFiles = null;
-
-    private readonly bool $filtered;
+    private bool $filtered;
 
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
      */
     public function __construct(
-        private readonly array $sourceDirectories,
-        private readonly array $excludedFilesOrDirectories,
-        private readonly ?PlainFilter $filter,
+        private array $sourceDirectories,
+        private array $excludedFilesOrDirectories,
+        private ?PlainFilter $filter,
     ) {
         $this->filtered = $this->filter !== null;
     }
@@ -78,11 +73,17 @@ final class BasicSourceCollector implements SourceCollector
 
     public function collect(): array
     {
-        if ($this->sourceFiles === null) {
-            $this->sourceFiles = $this->doCollect();
+        if ($this->sourceDirectories === []) {
+            return [];
         }
 
-        return $this->sourceFiles;
+        $iterator = $this->filter(
+            $this
+                ->createFinder()
+                ->getIterator(),
+        );
+
+        return take($iterator)->toList();
     }
 
     /**
@@ -130,25 +131,6 @@ final class BasicSourceCollector implements SourceCollector
             $mapToAbsolutePath(...),
             $sourceDirectories,
         );
-    }
-
-    /**
-     * @return SplFileInfo[]
-     */
-    private function doCollect(): array
-    {
-        if ($this->sourceDirectories === []) {
-            return [];
-        }
-
-        return take(
-            $this->filter(
-                $this
-                    ->createFinder()
-                    ->getIterator(),
-            ),
-        )
-            ->toList();
     }
 
     private function createFinder(): Finder

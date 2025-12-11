@@ -90,27 +90,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     }
 
     /**
-     * @param non-empty-string[] $sourceDirectories
-     * @param non-empty-string[] $excludedFilesOrDirectories
-     */
-    #[DataProvider('sourceFilesProvider')]
-    public function test_it_memoizes_the_result(
-        array $sourceDirectories,
-        array $excludedFilesOrDirectories,
-    ): void {
-        $collector = new BasicSourceCollector(
-            $sourceDirectories,
-            $excludedFilesOrDirectories,
-            null,
-        );
-
-        $first = $collector->collect();
-        $second = $collector->collect();
-
-        $this->assertSame($first, $second);
-    }
-
-    /**
      * @return iterable<string, array{string[], string[], list<string>}>
      */
     public static function sourceFilesProvider(): iterable
