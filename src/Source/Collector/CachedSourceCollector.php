@@ -35,16 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use function array_map;
-use function count;
-use function dirname;
-use Infection\Configuration\SourceFilter\PlainFilter;
-use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Iterator;
-use function Pipeline\take;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\Iterator\PathFilterIterator;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -66,7 +56,7 @@ final class CachedSourceCollector implements SourceCollector
 
     public function isFiltered(): bool
     {
-        if (null === $this->filtered) {
+        if ($this->filtered === null) {
             $this->filtered = $this->decoratedCollector->isFiltered();
         }
 
