@@ -53,7 +53,7 @@ interface SourceCollector
     public function isFiltered(): bool;
 
     /**
-     * @return iterable<SplFileInfo>
+     * @return SplFileInfo[]
      */
-    public function collect(): iterable;
+    public function collect(): array;
 }
