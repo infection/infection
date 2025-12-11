@@ -133,7 +133,7 @@ final class BasicSourceCollector implements SourceCollector
     }
 
     /**
-     * @return SplFileInfo
+     * @return SplFileInfo[]
      */
     private function doCollect(): array
     {
