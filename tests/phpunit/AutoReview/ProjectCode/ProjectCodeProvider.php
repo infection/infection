@@ -78,6 +78,7 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
@@ -134,6 +135,7 @@ final class ProjectCodeProvider
         FakeSourceCollector::class,
         FakeSourceFilter::class,
         FileSystem::class,
+        FixedSourceCollector::class,
         FormatterName::class,
         GitDiffFilter::class,
         GitDiffSourceCollector::class,

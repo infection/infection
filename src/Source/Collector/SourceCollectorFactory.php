@@ -41,6 +41,7 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
+use Infection\Source\Exception\NoSourceFound;
 use InvalidArgumentException;
 use function sprintf;
 use const true;
@@ -59,6 +60,25 @@ final readonly class SourceCollectorFactory
      * @param non-empty-string $configurationPathname
      */
     public function create(
+        string $configurationPathname,
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
+        return new LazySourceCollector(
+            fn () => $this->createCollector(
+                $configurationPathname,
+                $source,
+                $sourceFilter,
+            ),
+        );
+    }
+
+    /**
+     * @param non-empty-string $configurationPathname
+     *
+     * @throws NoSourceFound
+     */
+    private function createCollector(
         string $configurationPathname,
         Source $source,
         ?SourceFilter $sourceFilter,
