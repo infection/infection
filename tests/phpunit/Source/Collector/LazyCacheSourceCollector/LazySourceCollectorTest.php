@@ -75,7 +75,7 @@ final class LazySourceCollectorTest extends TestCase
     }
 
     /**
-     * @param list<SplFileInfo> $expectedFiles
+     * @param SplFileInfo[] $expectedFiles
      */
     #[DataProvider('decoratedCollectorProvider')]
     public function test_it_decorates_the_given_collector(
@@ -109,7 +109,7 @@ final class LazySourceCollectorTest extends TestCase
             [],
         ];
 
-        yield (static function () {
+        yield (static function (): array {
             $file1 = new MockSplFileInfo('src/Service1.php');
             $file2 = new MockSplFileInfo('src/Service2.php');
 
