@@ -35,72 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use ArrayIterator;
-use Closure;
-use function iterator_to_array;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Decorator for SourceCollector that lazily collects and caches source files.
- *
- * The decorated collector is instantiated lazily (if provided as a factory) and
- * is only iterated once on the first collect() call. All items are collected
- * at once into an array cache.
- *
- * Multiple calls to collect() return independent iterators over the same cached
- * array, ensuring expensive operations (e.g. file system traversal, git operations)
- * only happen once.
- *
  * @internal
  */
-final class LazyCacheSourceCollector implements SourceCollector
+final readonly class FixedSourceCollector implements SourceCollector
 {
     /**
-     * @var list<SplFileInfo>|null
-     */
-    private ?array $cache = null;
-
-    private ?SourceCollector $collector = null;
-
-    /**
-     * @param SourceCollector|Closure():SourceCollector $collectorOrFactory
+     * @param SplFileInfo[] $files
      */
     public function __construct(
-        private readonly SourceCollector|Closure $collectorOrFactory,
+        public bool $filtered,
+        public array $files,
     ) {
     }
 
     public function isFiltered(): bool
     {
-        return $this->getCollector()->isFiltered();
+        return $this->filtered;
     }
 
     public function collect(): iterable
     {
-        if ($this->cache === null) {
-            /** @psalm-suppress InvalidArgument */
-            $this->cache = iterator_to_array(
-                $this->getCollector()->collect(),
-                preserve_keys: false,
-            );
-        }
-
-        return new ArrayIterator($this->cache);
-    }
-
-    /**
-     * @internal Should only be used for tests.
-     */
-    public function getCollector(): SourceCollector
-    {
-        if ($this->collector === null) {
-            $collectorOrFactory = $this->collectorOrFactory;
-
-            $this->collector = $collectorOrFactory instanceof SourceCollector
-                ? $collectorOrFactory
-                : $collectorOrFactory();
-        }
-
-        return $this->collector;
+        return $this->files;
     }
 }

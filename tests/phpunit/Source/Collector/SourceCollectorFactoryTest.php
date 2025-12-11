@@ -44,7 +44,7 @@ use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
-use Infection\Source\Collector\LazyCacheSourceCollector;
+use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
 use InvalidArgumentException;
@@ -74,7 +74,7 @@ final class SourceCollectorFactoryTest extends TestCase
             $sourceFilter,
         );
 
-        $this->assertInstanceOf(LazyCacheSourceCollector::class, $actual);
+        $this->assertInstanceOf(LazySourceCollector::class, $actual);
 
         if ($exceptionOrExpectedCollectorClassName instanceof Exception) {
             $this->expectExceptionObject($exceptionOrExpectedCollectorClassName);
