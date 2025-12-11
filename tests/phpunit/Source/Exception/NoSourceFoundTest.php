@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Source\Exception;
 
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Exception\NoSourceFound;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -109,6 +110,40 @@ final class NoSourceFoundTest extends TestCase
                 @@ -10,5 +12,7 @@ line change example
                 """
                 EOF,
+        ];
+    }
+
+    #[DataProvider('plainFilterProvider')]
+    public function test_it_can_be_created_for_when_no_source_file_was_found(
+        ?PlainFilter $filter,
+        bool $expectedSourceFiltered,
+        string $expectedMessage,
+    ): void {
+        $expected = new NoSourceFound(
+            isSourceFiltered: $expectedSourceFiltered,
+            message: $expectedMessage,
+        );
+
+        $actual = NoSourceFound::noSourceFileFound($filter);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public static function plainFilterProvider(): iterable
+    {
+        yield 'no filter applied' => [
+            null,
+            false,
+            'No source file found for the configured sources.',
+        ];
+
+        yield 'filter applied' => [
+            new PlainFilter([
+                'src/File1.php',
+                'src/File2.php',
+            ]),
+            true,
+            'No source file found for the filter applied to the configured sources. The filter used was: "src/File1.php,src/File2.php".',
         ];
     }
 }

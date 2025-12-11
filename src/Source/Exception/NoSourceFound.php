@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Exception;
 
+use Infection\Configuration\SourceFilter\PlainFilter;
 use RuntimeException;
 use function sprintf;
 use Throwable;
@@ -89,6 +90,19 @@ final class NoSourceFound extends RuntimeException
                 $base,
                 $diff,
             ),
+        );
+    }
+
+    public static function noSourceFileFound(?PlainFilter $filter): self
+    {
+        return new self(
+            isSourceFiltered: $filter !== null,
+            message: $filter !== null
+                ? sprintf(
+                    'No source file found for the filter applied to the configured sources. The filter used was: "%s".',
+                    $filter->toString(),
+                )
+                : 'No source file found for the configured sources.',
         );
     }
 

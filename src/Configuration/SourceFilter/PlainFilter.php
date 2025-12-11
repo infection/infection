@@ -39,6 +39,7 @@ use function array_filter;
 use function array_map;
 use function count;
 use function explode;
+use function implode;
 
 /**
  * @internal
@@ -63,6 +64,14 @@ final readonly class PlainFilter implements SourceFilter
         return count($values) === 0
             ? null
             : new self($values);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function toString(): string
+    {
+        return implode(',', $this->values);
     }
 
     /**
