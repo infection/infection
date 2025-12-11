@@ -77,7 +77,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         return $this->innerCollector->isFiltered();
     }
 
-    public function collect(): iterable
+    public function collect(): array
     {
         return $this->innerCollector->collect();
     }

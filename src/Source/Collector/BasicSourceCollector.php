@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use function array_map;
-use ArrayIterator;
 use function count;
 use function dirname;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Iterator;
+use function Pipeline\take;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\PathFilterIterator;
@@ -53,9 +53,9 @@ use Symfony\Component\Finder\SplFileInfo;
 final class BasicSourceCollector implements SourceCollector
 {
     /**
-     * @var iterable<SplFileInfo>
+     * @var SplFileInfo[]
      */
-    private ?iterable $sourceFiles = null;
+    private ?array $sourceFiles = null;
 
     private readonly bool $filtered;
 
@@ -76,7 +76,7 @@ final class BasicSourceCollector implements SourceCollector
         return $this->filtered;
     }
 
-    public function collect(): iterable
+    public function collect(): array
     {
         if ($this->sourceFiles === null) {
             $this->sourceFiles = $this->doCollect();
@@ -133,19 +133,22 @@ final class BasicSourceCollector implements SourceCollector
     }
 
     /**
-     * @return Iterator<SplFileInfo>
+     * @return SplFileInfo[]
      */
-    private function doCollect(): Iterator
+    private function doCollect(): array
     {
         if ($this->sourceDirectories === []) {
-            return new ArrayIterator([]);
+            return [];
         }
 
-        return $this->filter(
-            $this
-                ->createFinder()
-                ->getIterator(),
-        );
+        return take(
+            $this->filter(
+                $this
+                    ->createFinder()
+                    ->getIterator(),
+            ),
+        )
+            ->toList();
     }
 
     private function createFinder(): Finder

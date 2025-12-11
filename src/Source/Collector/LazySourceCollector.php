@@ -59,7 +59,7 @@ final class LazySourceCollector implements SourceCollector
         return $this->getCollector()->isFiltered();
     }
 
-    public function collect(): iterable
+    public function collect(): array
     {
         return $this->getCollector()->collect();
     }

@@ -35,14 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Source\Collector\BasicSourceCollector;
 
+use function array_map;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Collector\BasicSourceCollector;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function ksort;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Pipeline\take;
+use function sort;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -84,7 +85,7 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
 
         self::assertIsEqualUnorderedLists(
             $expectedList,
-            take($files)->toAssoc(),
+            $files,
         );
     }
 
@@ -331,8 +332,8 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
         $normalizedExpected = self::createExpected($expectedList, $root);
         $normalizedActual = self::normalizePaths($actual, $root);
 
-        ksort($normalizedExpected);
-        ksort($normalizedActual);
+        sort($normalizedExpected);
+        sort($normalizedActual);
 
         self::assertSame($normalizedExpected, $normalizedActual);
     }
@@ -346,16 +347,13 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     {
         $root = Path::normalize($root);
 
-        $result = [];
-
-        foreach ($files as $pathName => $fileInfo) {
-            $result[Path::normalize($pathName)] = Path::makeRelative(
+        return array_map(
+            static fn (SplFileInfo $fileInfo): string => Path::makeRelative(
                 $fileInfo->getPathname(),
                 $root,
-            );
-        }
-
-        return $result;
+            ),
+            $files,
+        );
     }
 
     /**

@@ -47,7 +47,7 @@ final class FakeSourceCollector implements SourceCollector
         throw new DomainException('Unexpected call.');
     }
 
-    public function collect(): iterable
+    public function collect(): array
     {
         throw new DomainException('Unexpected call.');
     }

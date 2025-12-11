@@ -56,7 +56,7 @@ final readonly class FixedSourceCollector implements SourceCollector
         return $this->filtered;
     }
 
-    public function collect(): iterable
+    public function collect(): array
     {
         return $this->files;
     }
