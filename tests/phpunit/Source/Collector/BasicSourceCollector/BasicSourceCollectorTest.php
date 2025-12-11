@@ -36,8 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\Source\Collector\BasicSourceCollector;
 
 use function array_map;
+use Exception;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Source\Collector\BasicSourceCollector;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -67,13 +69,13 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
-     * @param list<non-empty-string> $expectedList
+     * @param list<non-empty-string>|Exception $expected
      */
     #[DataProvider('sourceFilesProvider')]
     public function test_it_can_collect_files(
         array $sourceDirectories,
         array $excludedFilesOrDirectories,
-        array $expectedList,
+        array|Exception $expected,
     ): void {
         $collector = new BasicSourceCollector(
             $sourceDirectories,
@@ -81,23 +83,30 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             null,
         );
 
+        // This must be checked _before_ we configure any expected exception:
+        // this call should not throw.
+        $this->assertFalse($collector->isFiltered());
+
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
         $files = $collector->collect();
 
-        self::assertIsEqualUnorderedLists(
-            $expectedList,
-            $files,
-        );
+        if (!($expected instanceof Exception)) {
+            self::assertIsEqualUnorderedLists($expected, $files);
+        }
     }
 
-    /**
-     * @return iterable<string, array{string[], string[], list<string>}>
-     */
     public static function sourceFilesProvider(): iterable
     {
         yield 'empty' => [
             [],
             [],
-            [],
+            new NoSourceFound(
+                isSourceFiltered: false,
+                message: 'No source file found for the configured sources.',
+            ),
         ];
 
         yield 'one directory' => [
@@ -221,13 +230,14 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
 
     /**
      * @param string[] $filePaths
-     * @param string[] $expected
+     * @param string[]|Exception $expected
      */
     #[DataProvider('filteredFilesProvider')]
     public function test_it_filters_the_collected_files(
         ?PlainFilter $filter,
         array $filePaths,
-        array $expected,
+        bool $expectedIsSourceFiltered,
+        array|Exception $expected,
     ): void {
         foreach ($filePaths as $filePath) {
             $this->filesystem->dumpFile($filePath, '');
@@ -240,11 +250,21 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             filter: $filter,
         );
 
+        // This must be checked _before_ we configure any expected exception:
+        // this call should not throw.
+        $this->assertSame($expectedIsSourceFiltered, $collector->isFiltered());
+
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
         $actual = take($collector->collect())
             ->map(static fn (FinderSplFileInfo $fileInfo) => $fileInfo->getRelativePathname())
             ->toList();
 
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        if (!($expected instanceof Exception)) {
+            $this->assertEqualsCanonicalizing($expected, $actual);
+        }
     }
 
     public static function filteredFilesProvider(): iterable
@@ -254,6 +274,7 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             [
                 'src/Example/Test.php',
             ],
+            true,
             [
                 'src/Example/Test.php',
             ],
@@ -264,7 +285,11 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             [
                 'src/Example/Test.php',
             ],
-            [],
+            true,
+            new NoSourceFound(
+                isSourceFiltered: true,
+                message: 'No source file found for the filter applied to the configured sources. The filter used was: "src/Foo".',
+            ),
         ];
 
         yield [
@@ -274,6 +299,7 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
                 'src/Bar/Baz.php',
                 'src/Example/Test.php',
             ],
+            false,
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',
@@ -291,6 +317,7 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
                 'src/Bar/Baz.php',
                 'src/Example/Test.php',
             ],
+            true,
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',
