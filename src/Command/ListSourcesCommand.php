@@ -35,55 +35,65 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Console\Application;
+use function array_map;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\FilterOptions;
 use Infection\Console\IO;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
+use Infection\Logger\ConsoleLogger;
+use Infection\Source\Collector\SourceCollector;
+use function Safe\getcwd;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @internal
  */
-abstract class BaseCommand extends Command
+final class ListSourcesCommand extends BaseCommand
 {
-    protected ?IO $io = null;
-
-    final public function getApplication(): Application
+    public function __construct()
     {
-        $application = parent::getApplication();
+        parent::__construct('config:list-sources');
+    }
 
-        Assert::isInstanceOf(
-            $application,
-            Application::class,
-            'Cannot access to the command application if the command has not been '
-            . 'registered to the application yet',
+    protected function configure(): void
+    {
+        ConfigurationOption::addOption($this);
+        FilterOptions::addOption($this);
+
+        $this->setDescription(
+            'Finds the paths of the collected source files.',
+        );
+    }
+
+    protected function executeCommand(IO $io): bool
+    {
+        $container = $this->getApplication()->getContainer()->withValues(
+            logger: new ConsoleLogger($io),
+            output: $io->getOutput(),
+            configFile: ConfigurationOption::parse($io),
+            sourceFilter: FilterOptions::getSourceFilter($io),
         );
 
-        return $application;
-    }
-
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        parent::initialize($input, $output);
-
-        $this->io = new IO($input, $output);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        return $this->executeCommand($this->getIO()) ? self::FAILURE : self::SUCCESS;
-    }
-
-    abstract protected function executeCommand(IO $io): bool;
-
-    final protected function getIO(): IO
-    {
-        Assert::notNull(
-            $this->io,
-            'Cannot retrieve the IO object before the command was initialized',
+        $filePaths = self::collectPaths(
+            getcwd(),
+            $container->getSourceCollector(),
         );
 
-        return $this->io;
+        $io->writeln($filePaths);
+
+        return true;
+    }
+
+    private static function collectPaths(
+        string $cwd,
+        SourceCollector $sourceCollector,
+    ): array {
+        return array_map(
+            static fn (SplFileInfo $fileInfo) => Path::makeRelative(
+                $fileInfo->getRealPath(),
+                $cwd,
+            ),
+            $sourceCollector->collect(),
+        );
     }
 }
