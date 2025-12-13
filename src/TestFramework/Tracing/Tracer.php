@@ -33,46 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\TestFramework\Coverage\Trace;
+use SplFileInfo;
 
 /**
- * A Trace is an envelope for a source file which contains comprehensive information about all tests associated with
- * that file.
+ * The test framework Tracer is the service responsible for creating a Trace for a given file, i.e.
+ * to find all the necessary information about the tests for that file.
  *
  * @internal
  */
-interface Trace
+interface Tracer
 {
-    public function getSourceFileInfo(): SplFileInfo;
+    public function hasTrace(SplFileInfo $fileInfo): bool;
 
-    /**
-     * Source file real path. This method is used for two reasons:
-     * - it allows to have a simple type-hinted method as otherwise the fileInfo one might return
-     *   false
-     * - it duck-type SplFileInfo since Trace is used in SourceFileFilter with RealPathFilterIterator
-     *
-     * Hence the name which cannot be changed for something more expressive like getSourceRealPath()
-     *
-     * @see SourceFileFilter
-     * @see RealPathFilterIterator
-     */
-    public function getRealPath(): string;
-
-    /**
-     * This is used by PathFilterIterator to filter out excluded files for mutation testing
-     */
-    public function getRelativePathname(): string;
-
-    public function hasTests(): bool;
-
-    public function getTests(): ?TestLocations;
-
-    /**
-     * @return iterable<TestLocation>
-     */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    public function trace(SplFileInfo $fileInfo): Trace;
 }
