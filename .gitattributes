@@ -22,3 +22,4 @@
 /rector.php             export-ignore
 /scoper.inc.php         export-ignore
 /setup_environment.sh   export-ignore
+/var/                   export-ignore
