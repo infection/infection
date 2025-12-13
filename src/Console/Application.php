@@ -40,6 +40,7 @@ use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\DescribeCommand;
+use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container;
@@ -106,6 +107,7 @@ final class Application extends BaseApplication
                 new ConfigureCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
+                new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
             ],
         );

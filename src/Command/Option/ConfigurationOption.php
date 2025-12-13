@@ -33,57 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command;
+namespace Infection\Command\Option;
 
-use Infection\Console\Application;
+use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
+use Infection\Container;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
+use Symfony\Component\Console\Input\InputOption;
+use function trim;
 
 /**
  * @internal
  */
-abstract class BaseCommand extends Command
+final class ConfigurationOption
 {
-    protected ?IO $io = null;
+    use CannotBeInstantiated;
 
-    final public function getApplication(): Application
+    public const NAME = 'configuration';
+
+    /**
+     * @template T extends Command
+     * @param T $command
+     *
+     * @return T
+     */
+    public static function addOption(Command $command): Command
     {
-        $application = parent::getApplication();
-
-        Assert::isInstanceOf(
-            $application,
-            Application::class,
-            'Cannot access to the command application if the command has not been '
-            . 'registered to the application yet',
+        return $command->addOption(
+            self::NAME,
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'Path to the configuration file to use',
+            Container::DEFAULT_CONFIG_FILE,
         );
-
-        return $application;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
+    public static function parse(IO $io): string
     {
-        parent::initialize($input, $output);
-
-        $this->io = new IO($input, $output);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        return $this->executeCommand($this->getIO()) ? self::FAILURE : self::SUCCESS;
-    }
-
-    abstract protected function executeCommand(IO $io): bool;
-
-    final protected function getIO(): IO
-    {
-        Assert::notNull(
-            $this->io,
-            'Cannot retrieve the IO object before the command was initialized',
-        );
-
-        return $this->io;
+        return trim((string) $io->getInput()->getOption(self::NAME));
     }
 }
