@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\Iterable;
 
+use ArrayIterator;
 use DomainException;
 use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,12 +46,14 @@ use PHPUnit\Framework\TestCase;
 final class NonRewindableIteratorTest extends TestCase
 {
     /**
-     * @param mixed[] $values
+     * @param array<string, string> $values
      */
     #[DataProvider('valuesProvider')]
     public function test_it_can_be_created(array $values): void
     {
-        $iterator = new NonRewindableIterator($values);
+        $iterator = new NonRewindableIterator(
+            new ArrayIterator($values),
+        );
 
         $actual = self::toArrayWithoutRewind($iterator);
 
@@ -58,12 +61,14 @@ final class NonRewindableIteratorTest extends TestCase
     }
 
     /**
-     * @param mixed[] $values
+     * @param array<string, string> $values
      */
     #[DataProvider('valuesProvider')]
     public function test_it_cannot_be_rewind(array $values): void
     {
-        $iterator = new NonRewindableIterator($values);
+        $iterator = new NonRewindableIterator(
+            new ArrayIterator($values),
+        );
 
         self::toArrayWithoutRewind($iterator);
         $resultAfterFirstTraverse = self::toArrayWithoutRewind($iterator);
@@ -91,7 +96,7 @@ final class NonRewindableIteratorTest extends TestCase
     }
 
     /**
-     * @template TKey of array-key
+     * @template TKey extends array-key
      * @template TValue
      *
      * @param Iterator<TKey, TValue> $iterator

@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestingUtility\Iterable;
 
 use ArrayIterator;
-use Iterator;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -46,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 final class TrackableIteratorTest extends TestCase
 {
     /**
-     * @param mixed[] $values
+     * @param array<string, string> $values
      */
     #[DataProvider('valuesProvider')]
     public function test_it_decorates_the_given_iterator(array $values): void
@@ -216,18 +215,18 @@ final class TrackableIteratorTest extends TestCase
     }
 
     /**
-     * @param Iterator<mixed, mixed> $iterator
+     * @param TrackableIterator<array-key, mixed> $iterator
      */
-    private static function assertIteratorStateIs(
-        Iterator $iterator,
+    private function assertIteratorStateIs(
+        TrackableIterator $iterator,
         bool $expectedHasYieldedAnyValue,
         int $expectedIndex,
         mixed $expectedLastYieldedKey,
         mixed $expectedLastYieldedValue,
     ): void {
-        self::assertSame($expectedHasYieldedAnyValue, $iterator->hasYieldedAnyValue());
-        self::assertSame($expectedIndex, $iterator->getIndex());
-        self::assertSame($expectedLastYieldedKey, $iterator->getLastYieldedKey());
-        self::assertSame($expectedLastYieldedValue, $iterator->getLastYieldedValue());
+        $this->assertSame($expectedHasYieldedAnyValue, $iterator->hasYieldedAnyValue());
+        $this->assertSame($expectedIndex, $iterator->getIndex());
+        $this->assertSame($expectedLastYieldedKey, $iterator->getLastYieldedKey());
+        $this->assertSame($expectedLastYieldedValue, $iterator->getLastYieldedValue());
     }
 }

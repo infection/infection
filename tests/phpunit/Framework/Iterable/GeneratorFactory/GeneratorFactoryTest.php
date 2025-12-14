@@ -49,6 +49,10 @@ use Traversable;
 #[CoversClass(GeneratorFactory::class)]
 final class GeneratorFactoryTest extends TestCase
 {
+    /**
+     * @param mixed[] $iterable
+     * @param array<string, string> $expected
+     */
     #[DataProvider('iterableProvider')]
     /**
      * @param iterable<mixed> $iterable
@@ -133,6 +137,9 @@ final class GeneratorFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @param Traversable<string, string> $traversable
+     */
     private static function createIteratorAggregate(Traversable $traversable): IteratorAggregate
     {
         return new SimpleIteratorAggregate($traversable);

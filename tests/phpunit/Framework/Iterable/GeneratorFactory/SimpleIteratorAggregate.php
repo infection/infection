@@ -38,8 +38,16 @@ namespace Infection\Tests\Framework\Iterable\GeneratorFactory;
 use IteratorAggregate;
 use Traversable;
 
+/**
+ * @template TKey of array-key
+ * @template TValue
+ * @implements IteratorAggregate<TKey, TValue>
+ */
 final readonly class SimpleIteratorAggregate implements IteratorAggregate
 {
+    /**
+     * @param Traversable<TKey, TValue> $traversable
+     */
     public function __construct(
         private Traversable $traversable,
     ) {

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\Iterable;
 
-use ArrayIterator;
 use DomainException;
 use Iterator;
 
@@ -46,14 +45,43 @@ use Iterator;
  *
  * @see NoRewindIterator
  *
- * @template TKey of array-key
+ * @template TKey of int|string
  * @template TValue
+ *
  * @implements Iterator<TKey, TValue>
  */
-final class NonRewindableIterator extends ArrayIterator
+final readonly class NonRewindableIterator implements Iterator
 {
+    /**
+     * @param Iterator<TKey, TValue> $iterator
+     */
+    public function __construct(
+        private Iterator $iterator,
+    ) {
+    }
+
     public function rewind(): void
     {
         throw new DomainException('Cannot be rewind.');
+    }
+
+    public function current(): mixed
+    {
+        return $this->iterator->current();
+    }
+
+    public function next(): void
+    {
+        $this->iterator->next();
+    }
+
+    public function key(): mixed
+    {
+        return $this->iterator->key();
+    }
+
+    public function valid(): bool
+    {
+        return $this->iterator->valid();
     }
 }

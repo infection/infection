@@ -45,9 +45,8 @@ use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Tracing\Tracer;
+use Infection\TestFramework\Coverage\Trace;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -61,7 +60,6 @@ class FileMutationGenerator
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineMatcher $sourceLineMatcher,
-        private readonly Tracer $tracer,
     ) {
     }
 
@@ -75,7 +73,7 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        SplFileInfo $sourceFile,
+        Trace $trace,
         bool $onlyCovered,
         array $mutators,
         array $nodeIgnorers,
@@ -83,11 +81,11 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        if ($onlyCovered && !$this->tracer->hasTrace($sourceFile)) {
+        if ($onlyCovered && !$trace->hasTests()) {
             return;
         }
 
-        $trace = $this->tracer->trace($sourceFile);
+        $sourceFile = $trace->getSourceFileInfo();
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
@@ -97,7 +95,7 @@ class FileMutationGenerator
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $sourceFile->getRealPath(),
+                filePath: $trace->getRealPath(),
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,

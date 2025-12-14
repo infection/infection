@@ -48,7 +48,7 @@ final class YieldOnceIteratorTest extends TestCase
     use ThrowableAssertions;
 
     /**
-     * @param mixed[] $values
+     * @param array<string, string> $values
      */
     #[DataProvider('valuesProvider')]
     public function test_it_decorates_the_given_iterator(array $values): void
@@ -63,7 +63,7 @@ final class YieldOnceIteratorTest extends TestCase
     }
 
     /**
-     * @param mixed[] $values
+     * @param array<string, string> $values
      */
     #[DataProvider('valuesProvider')]
     public function test_it_does_not_allow_the_same_key_to_be_fetched_more_than_once(array $values): void
@@ -73,19 +73,19 @@ final class YieldOnceIteratorTest extends TestCase
         );
 
         $iterator->key();
-        $this->expectToThrow(static fn () => $iterator->key());
+        $this->expectToThrow($iterator->key(...));
 
         $iterator->next();
         $iterator->key();
-        $this->expectToThrow(static fn () => $iterator->key());
+        $this->expectToThrow($iterator->key(...));
 
         $iterator->rewind();
         $iterator->key();
-        $this->expectToThrow(static fn () => $iterator->key());
+        $this->expectToThrow($iterator->key(...));
     }
 
     /**
-     * @param mixed[] $values
+     * @param array<string, string> $values
      */
     #[DataProvider('valuesProvider')]
     public function test_it_does_not_allow_the_same_value_to_be_fetched_more_than_once(array $values): void
@@ -95,15 +95,15 @@ final class YieldOnceIteratorTest extends TestCase
         );
 
         $iterator->current();
-        $this->expectToThrow(static fn () => $iterator->current());
+        $this->expectToThrow($iterator->current(...));
 
         $iterator->next();
         $iterator->current();
-        $this->expectToThrow(static fn () => $iterator->current());
+        $this->expectToThrow($iterator->current(...));
 
         $iterator->rewind();
         $iterator->current();
-        $this->expectToThrow(static fn () => $iterator->current());
+        $this->expectToThrow($iterator->current(...));
     }
 
     public static function valuesProvider(): iterable
