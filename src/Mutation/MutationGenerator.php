@@ -48,9 +48,9 @@ use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\TraceProvider;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 

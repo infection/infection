@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\TraceProvider;
+
 /**
  * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
  *

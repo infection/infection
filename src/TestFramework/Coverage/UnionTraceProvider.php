@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\TestFramework\Tracing\TraceProvider;
+
 /**
  * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
  * original source files in order to ensure all the files are included.

@@ -33,20 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use DomainException;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(SourceMethodLineRange::class)]
-final class SourceMethodLineRangeTest extends TestCase
+/**
+ * Represents a Trace state with any dynamic behaviour or laziness of any kind.
+ * This is mostly useful for testing purposes where we want to declare an
+ * expected Trace state.
+ */
+final readonly class SyntheticTrace implements Trace
 {
-    public function test_it_creates_self_with_named_constructor(): void
-    {
-        $range = new SourceMethodLineRange(11, 22);
+    public function __construct(
+        public SplFileInfo $sourceFileInfo,
+        public string $realPath,
+        public string $relativePathname,
+        public bool $hasTest,
+        public ?TestLocations $tests,
+    ) {
+    }
 
-        $this->assertSame(11, $range->getStartLine());
-        $this->assertSame(22, $range->getEndLine());
+    public function getSourceFileInfo(): SplFileInfo
+    {
+        return $this->sourceFileInfo;
+    }
+
+    public function getRealPath(): string
+    {
+        return $this->realPath;
+    }
+
+    public function getRelativePathname(): string
+    {
+        return $this->relativePathname;
+    }
+
+    public function hasTests(): bool
+    {
+        return $this->hasTest;
+    }
+
+    public function getTests(): ?TestLocations
+    {
+        return $this->tests;
+    }
+
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        throw new DomainException('Not implemented.');
     }
 }

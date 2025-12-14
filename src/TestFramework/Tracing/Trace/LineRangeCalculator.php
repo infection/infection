@@ -33,29 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use PhpParser\Node;
 
 /**
  * @internal
  */
-interface TraceProvider
+final class LineRangeCalculator
 {
+    public function calculateRange(Node $originalNode): NodeLineRangeData
+    {
+        if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
+            $startLine = $originalNode->getStartLine();
+
+            // function signature node should always be 1-line range: (start, start)
+            return new NodeLineRangeData($startLine, $startLine);
+        }
+
+        $outerMostArrayNode = $this->getOuterMostArrayNode($originalNode);
+
+        return new NodeLineRangeData($outerMostArrayNode->getStartLine(), $outerMostArrayNode->getEndLine());
+    }
+
     /**
-     * @throws InvalidCoverage
-     * @throws NoSourceFound
-     * @throws NoReportFound
-     * @throws TooManyReportsFound
-     * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
-     *
-     * @return iterable<Trace>
+     * If the node is part of an array, this will find the outermost array.
+     * Otherwise this will return the node itself
      */
-    public function provideTraces(): iterable;
+    private function getOuterMostArrayNode(Node $node): Node
+    {
+        $outerMostArrayParent = $node;
+
+        do {
+            if ($node instanceof Node\Expr\Array_) {
+                $outerMostArrayParent = $node;
+            }
+
+            $node = ParentConnector::findParent($node);
+        } while ($node !== null);
+
+        return $outerMostArrayParent;
+    }
 }

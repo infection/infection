@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Later\Interfaces\Deferred;

@@ -33,44 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
-use Infection\FileSystem\SourceFileFilter;
 use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @internal
- */
-interface Trace
+final readonly class EmptyTrace implements Trace
 {
-    public function getSourceFileInfo(): SplFileInfo;
+    public function __construct(private SplFileInfo $sourceFileInfo)
+    {
+    }
 
-    /**
-     * Source file real path. This method is used for two reasons:
-     * - it allows to have a simple type-hinted method as otherwise the fileInfo one might return
-     *   false
-     * - it duck-type SplFileInfo since Trace is used in SourceFileFilter with RealPathFilterIterator
-     *
-     * Hence the name which cannot be changed for something more expressive like getSourceRealPath()
-     *
-     * @see SourceFileFilter
-     * @see RealPathFilterIterator
-     */
-    public function getRealPath(): string;
+    public function getSourceFileInfo(): SplFileInfo
+    {
+        return $this->sourceFileInfo;
+    }
 
-    /**
-     * This is used by PathFilterIterator to filter out excluded files for mutation testing
-     */
-    public function getRelativePathname(): string;
+    public function getRealPath(): string
+    {
+        return $this->sourceFileInfo->getRealPath();
+    }
 
-    public function hasTests(): bool;
+    public function getRelativePathname(): string
+    {
+        return $this->sourceFileInfo->getRelativePathname();
+    }
 
-    public function getTests(): ?TestLocations;
+    public function hasTests(): bool
+    {
+        return false;
+    }
 
-    /**
-     * @return iterable<TestLocation>
-     */
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable;
+    public function getTests(): TestLocations
+    {
+        return new TestLocations();
+    }
+
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        return [];
+    }
 }

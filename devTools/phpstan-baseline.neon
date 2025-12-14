@@ -547,7 +547,7 @@ parameters:
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
 
 		-
-			message: '#^Parameter \#2 \$lazyTestLocations of class Infection\\TestFramework\\Coverage\\ProxyTrace constructor expects Later\\Interfaces\\Deferred\<Infection\\TestFramework\\Coverage\\TestLocations\>\|null, Later\\Interfaces\\Deferred\<int\> given\.$#'
+			message: '#^Parameter \#2 \$lazyTestLocations of class Infection\\TestFramework\\Tracing\\Trace\\ProxyTrace constructor expects Later\\Interfaces\\Deferred\<Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>\|null, Later\\Interfaces\\Deferred\<int\> given\.$#'
 			identifier: argument.type
 			count: 2
 			path: ../tests/phpunit/Mutation/MutationGeneratorTest.php
@@ -841,7 +841,7 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Coverage\\TestLocations\>, array\<int, Infection\\TestFramework\\Coverage\\TestLocations\|null\> given\.$#'
+			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>, array\<int, Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php
@@ -880,25 +880,25 @@ parameters:
 			message: '#NodeVisitor::\$range#'
 			identifier: property.notFound
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/LineRangeCalculatorTest.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
 
 		-
 			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverser\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/LineRangeCalculatorTest.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:serializeValue\(\) has no return type specified\.$#'
+			message: '#^Method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:serializeValue\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/TestLocationsNormalizer.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:serializeValue\(\) has parameter \$mixed with no type specified\.$#'
+			message: '#^Method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:serializeValue\(\) has parameter \$mixed with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/TestLocationsNormalizer.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
 		-
 			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\XmlReport\\TestLocatorTest\:\:getTestsLocations\(\) return type has no value type specified in iterable type array\.$#'
@@ -907,19 +907,19 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
 
 		-
-			message: '#^Cannot call method getSourceMethodRangeByMethod\(\) on Infection\\TestFramework\\Coverage\\TestLocations\|null\.$#'
+			message: '#^Cannot call method getSourceMethodRangeByMethod\(\) on Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\.$#'
 			identifier: method.nonObject
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Cannot call method getTestsLocationsBySourceLine\(\) on Infection\\TestFramework\\Coverage\\TestLocations\|null\.$#'
+			message: '#^Cannot call method getTestsLocationsBySourceLine\(\) on Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\.$#'
 			identifier: method.nonObject
 			count: 3
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Coverage\\TestLocations\>, array\<int, Infection\\TestFramework\\Coverage\\TestLocations\|null\> given\.$#'
+			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>, array\<int, Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php

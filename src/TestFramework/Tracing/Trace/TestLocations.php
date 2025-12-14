@@ -33,59 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use DomainException;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 
 /**
- * Represents a Trace state with any dynamic behaviour or laziness of any kind.
- * This is mostly useful for testing purposes where we want to declare an
- * expected Trace state.
+ * @internal
  */
-final readonly class SyntheticTrace implements Trace
+final readonly class TestLocations
 {
+    /**
+     * @param array<int, array<int, TestLocation>> $byLine
+     * @param array<string, SourceMethodLineRange> $byMethod
+     */
     public function __construct(
-        public SplFileInfo $sourceFileInfo,
-        public string $realPath,
-        public string $relativePathname,
-        public bool $hasTest,
-        public ?TestLocations $tests,
+        private array $byLine = [],
+        private array $byMethod = [],
     ) {
     }
 
-    public function getSourceFileInfo(): SplFileInfo
+    /**
+     * This method needs to be able to return a reference for performance reasons.
+     *
+     * @see JUnitTestExecutionInfoAdder
+     *
+     * @return array<int, array<int, TestLocation>>
+     */
+    public function &getTestsLocationsBySourceLine(): array
     {
-        return $this->sourceFileInfo;
+        return $this->byLine;
     }
 
-    public function getRealPath(): string
+    /**
+     * @return array<string, SourceMethodLineRange>
+     */
+    public function getSourceMethodRangeByMethod(): array
     {
-        return $this->realPath;
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->relativePathname;
-    }
-
-    public function hasTests(): bool
-    {
-        return $this->hasTest;
-    }
-
-    public function getTests(): ?TestLocations
-    {
-        return $this->tests;
-    }
-
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        throw new DomainException('Not implemented.');
+        return $this->byMethod;
     }
 }

@@ -33,48 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final readonly class EmptyTrace implements Trace
+#[CoversClass(SourceMethodLineRange::class)]
+final class SourceMethodLineRangeTest extends TestCase
 {
-    public function __construct(private SplFileInfo $sourceFileInfo)
+    public function test_it_creates_self_with_named_constructor(): void
     {
-    }
+        $range = new SourceMethodLineRange(11, 22);
 
-    public function getSourceFileInfo(): SplFileInfo
-    {
-        return $this->sourceFileInfo;
-    }
-
-    public function getRealPath(): string
-    {
-        return $this->sourceFileInfo->getRealPath();
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFileInfo->getRelativePathname();
-    }
-
-    public function hasTests(): bool
-    {
-        return false;
-    }
-
-    public function getTests(): TestLocations
-    {
-        return new TestLocations();
-    }
-
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        return [];
+        $this->assertSame(11, $range->getStartLine());
+        $this->assertSame(22, $range->getEndLine());
     }
 }
