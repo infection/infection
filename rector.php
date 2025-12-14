@@ -137,7 +137,7 @@ return RectorConfig::configure()
         LocallyCalledStaticMethodToNonStaticRector::class,
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
-            __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
+            __DIR__ . '/src/TestFramework/Tracing/Trace/TestLocations.php',
         ],
         RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
