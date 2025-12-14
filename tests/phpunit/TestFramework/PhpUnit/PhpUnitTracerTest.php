@@ -39,6 +39,10 @@ use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\PhpUnit\PhpUnitTracer;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
+use Infection\Tests\TestingUtility\Iterable\TrackableIterator;
+use Infection\Tests\TestingUtility\Iterable\YieldOnceIterator;
+use Infection\Tests\TestingUtility\PHPUnit\ThrowableAssertions;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -48,6 +52,8 @@ use Webmozart\Assert\InvalidArgumentException;
 #[CoversClass(PhpUnitTracer::class)]
 final class PhpUnitTracerTest extends TestCase
 {
+    use ThrowableAssertions;
+
     private TraceProvider&MockObject $traceProviderMock;
 
     private PhpUnitTracer $tracer;
@@ -59,239 +65,90 @@ final class PhpUnitTracerTest extends TestCase
         $this->tracer = new PhpUnitTracer($this->traceProviderMock);
     }
 
-    public function test_it_returns_true_when_trace_exists(): void
+    public function test_it_can_trace_files(): void
     {
-        $fileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
+        $fileInfo1 = self::createDummySplFileInfo('src/Service1.php');
+        $fileInfo2 = self::createDummySplFileInfo('src/Service2.php');
+        $unknownFileInfo = self::createDummySplFileInfo('unknown');
 
-        $expectedTrace = $this->createTraceMock($fileInfo);
+        $traces = [
+            $trace1 = $this->createTraceMock($fileInfo1),
+            $trace2 = $this->createTraceMock($fileInfo2),
+            $this->createTraceMock('unused trace'),
+        ];
 
         $this->traceProviderMock
             ->method('provideTraces')
-            ->willReturn([$expectedTrace]);
+            ->willReturn($traces);
 
-        $this->assertTrue($this->tracer->hasTrace($fileInfo));
-    }
+        $this->assertTrue($this->tracer->hasTrace($fileInfo1));
+        $this->assertSame($trace1, $this->tracer->trace($fileInfo1));
 
-    public function test_it_returns_false_when_trace_does_not_exist(): void
-    {
-        $searchFileInfo = new MockSplFileInfo([
-            'name' => 'Bar.php',
-            'realPath' => '/path/to/Bar.php',
-        ]);
+        $this->assertTrue($this->tracer->hasTrace($fileInfo2));
+        $this->assertSame($trace2, $this->tracer->trace($fileInfo2));
 
-        $otherFileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
-
-        $otherTrace = $this->createTraceMock($otherFileInfo);
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturn([$otherTrace]);
-
-        $this->assertFalse($this->tracer->hasTrace($searchFileInfo));
-    }
-
-    public function test_it_returns_trace_when_it_exists(): void
-    {
-        $fileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
-
-        $expectedTrace = $this->createTraceMock($fileInfo);
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturn([$expectedTrace]);
-
-        $actualTrace = $this->tracer->trace($fileInfo);
-
-        $this->assertSame($expectedTrace, $actualTrace);
-    }
-
-    public function test_it_throws_when_trace_does_not_exist(): void
-    {
-        $searchFileInfo = new MockSplFileInfo([
-            'name' => 'Bar.php',
-            'realPath' => '/path/to/Bar.php',
-        ]);
-
-        $otherFileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
-
-        $otherTrace = $this->createTraceMock($otherFileInfo);
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturn([$otherTrace]);
-
+        $this->assertFalse($this->tracer->hasTrace($unknownFileInfo));
         $this->expectException(InvalidArgumentException::class);
-
-        $this->tracer->trace($searchFileInfo);
+        $this->tracer->trace($unknownFileInfo);
     }
 
-    public function test_it_caches_trace_results(): void
+    public function test_it_traverses_and_pauses_the_trace_generator_as_needed_and_caches_the_results(): void
     {
-        $fileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
+        $fileInfo1 = self::createDummySplFileInfo('src/Service1.php');
+        $fileInfo2 = self::createDummySplFileInfo('src/Service2.php');
+        $fileInfo3 = self::createDummySplFileInfo('src/Service3.php');
+        $unknownFileInfo = self::createDummySplFileInfo('unknown');
 
-        $expectedTrace = $this->createTraceMock($fileInfo);
+        // Note: we could make this test unbearably complicated... Or we leverage simple
+        // composable utilities like here to ensure the behaviour is the one we expect.
+        // By using those utilities, we do not need to do any additional check to
+        // ensure that the generator used by the Tracer is not rewind, that the values
+        // are cached, etc.
+        $tracesIterator = new TrackableIterator(
+            new YieldOnceIterator(
+                new NonRewindableIterator([
+                    $trace1 = $this->createTraceMock($fileInfo1),
+                    $trace2 = $this->createTraceMock($fileInfo2),
+                    $trace3 = $this->createTraceMock($fileInfo3),
+                    $this->createTraceMock('unused trace'),
+                ]),
+            ),
+        );
 
         $this->traceProviderMock
             ->expects($this->once())
             ->method('provideTraces')
-            ->willReturn([$expectedTrace]);
+            ->willReturn($tracesIterator);
 
-        // First call
-        $firstTrace = $this->tracer->trace($fileInfo);
-        // Second call should use cache and not call provideTraces again
-        $secondTrace = $this->tracer->trace($fileInfo);
+        // Sanity check
+        $this->assertSame(0, $tracesIterator->getIndex());
+        $this->assertFalse($tracesIterator->hasYieldedAnyValue());
 
-        $this->assertSame($expectedTrace, $firstTrace);
-        $this->assertSame($expectedTrace, $secondTrace);
-        $this->assertSame($firstTrace, $secondTrace);
-    }
+        $this->assertTrue($this->tracer->hasTrace($fileInfo1));
+        $this->assertSame($trace1, $this->tracer->trace($fileInfo1));
 
-    public function test_it_caches_missing_trace_after_full_traversal(): void
-    {
-        $searchFileInfo = new MockSplFileInfo([
-            'name' => 'Bar.php',
-            'realPath' => '/path/to/Bar.php',
-        ]);
+        $this->assertSame(1, $tracesIterator->getIndex());
+        $this->assertTrue($tracesIterator->hasYieldedAnyValue());
 
-        $otherFileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
+        $this->assertTrue($this->tracer->hasTrace($fileInfo2));
+        $this->assertSame($trace2, $this->tracer->trace($fileInfo2));
 
-        $otherTrace = $this->createTraceMock($otherFileInfo);
+        $this->assertSame(2, $tracesIterator->getIndex());
 
-        $this->traceProviderMock
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn([$otherTrace]);
+        $this->assertFalse($this->tracer->hasTrace($unknownFileInfo));
+        // We exhaust the remainder of the iterator by looking for a non-existent trace
+        $this->assertSame(4, $tracesIterator->getIndex());
 
-        // First call - will traverse entire generator
-        $firstResult = $this->tracer->hasTrace($searchFileInfo);
-        // Second call - should use cached null result
-        $secondResult = $this->tracer->hasTrace($searchFileInfo);
+        $this->expectToThrow(static fn () => $this->tracer->trace($unknownFileInfo));
 
-        $this->assertFalse($firstResult);
-        $this->assertFalse($secondResult);
-    }
-
-    public function test_it_stops_traversal_when_trace_is_found(): void
-    {
-        $file1 = new MockSplFileInfo([
-            'name' => 'File1.php',
-            'realPath' => '/path/to/File1.php',
-        ]);
-        $file2 = new MockSplFileInfo([
-            'name' => 'File2.php',
-            'realPath' => '/path/to/File2.php',
-        ]);
-        $file3 = new MockSplFileInfo([
-            'name' => 'File3.php',
-            'realPath' => '/path/to/File3.php',
-        ]);
-
-        $trace1 = $this->createTraceMock($file1);
-        $trace2 = $this->createTraceMock($file2);
-        $trace3 = $this->createTraceMock($file3);
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturn((static function () use ($trace1, $trace2, $trace3) {
-                yield $trace1;
-
-                yield $trace2;
-
-                yield $trace3;
-            })());
-
-        // Find the second file - should stop after finding it
-        $foundTrace = $this->tracer->trace($file2);
-        $this->assertSame($trace2, $foundTrace);
-
-        // Now lookup file1 - should be cached from the partial traversal
-        $this->assertTrue($this->tracer->hasTrace($file1));
-
-        // Now lookup file3 - requires continuing the traversal
-        $this->assertTrue($this->tracer->hasTrace($file3));
-    }
-
-    public function test_it_handles_multiple_files_correctly(): void
-    {
-        $file1 = new MockSplFileInfo([
-            'name' => 'File1.php',
-            'realPath' => '/path/to/File1.php',
-        ]);
-        $file2 = new MockSplFileInfo([
-            'name' => 'File2.php',
-            'realPath' => '/path/to/File2.php',
-        ]);
-
-        $trace1 = $this->createTraceMock($file1);
-        $trace2 = $this->createTraceMock($file2);
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturn([$trace1, $trace2]);
-
-        $this->assertTrue($this->tracer->hasTrace($file1));
-        $this->assertTrue($this->tracer->hasTrace($file2));
-
-        $actualTrace1 = $this->tracer->trace($file1);
-        $actualTrace2 = $this->tracer->trace($file2);
-
-        $this->assertSame($trace1, $actualTrace1);
-        $this->assertSame($trace2, $actualTrace2);
-    }
-
-    public function test_it_indexes_traces_by_pathname(): void
-    {
-        $fileInfo1 = new MockSplFileInfo([
-            'name' => '/path/to/Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
-
-        $fileInfo2 = new MockSplFileInfo([
-            'name' => '/path/to/Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
-
-        $expectedTrace = $this->createTraceMock($fileInfo1);
-
-        $this->traceProviderMock
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn([$expectedTrace]);
-
-        // Lookup with first file info
-        $trace1 = $this->tracer->trace($fileInfo1);
-
-        // Lookup with second file info that has same pathname
-        $trace2 = $this->tracer->trace($fileInfo2);
-
-        $this->assertSame($expectedTrace, $trace1);
-        $this->assertSame($expectedTrace, $trace2);
+        // We still can fetch traces despite the generator being exhausted
+        $this->assertTrue($this->tracer->hasTrace($fileInfo3));
+        $this->assertSame($trace3, $this->tracer->trace($fileInfo3));
     }
 
     public function test_it_handles_empty_trace_provider(): void
     {
-        $fileInfo = new MockSplFileInfo([
-            'name' => 'Foo.php',
-            'realPath' => '/path/to/Foo.php',
-        ]);
+        $fileInfo = self::createDummySplFileInfo('src/Service.php');
 
         $this->traceProviderMock
             ->method('provideTraces')
@@ -300,111 +157,23 @@ final class PhpUnitTracerTest extends TestCase
         $this->assertFalse($this->tracer->hasTrace($fileInfo));
     }
 
-    public function test_it_marks_traversal_as_complete_after_exhausting_generator(): void
+    /**
+     * @param non-empty-string $name
+     */
+    private static function createDummySplFileInfo(string $name): MockSplFileInfo
     {
-        $searchFile1 = new MockSplFileInfo([
-            'name' => 'NotFound1.php',
-            'realPath' => '/path/to/NotFound1.php',
-        ]);
-
-        $searchFile2 = new MockSplFileInfo([
-            'name' => 'NotFound2.php',
-            'realPath' => '/path/to/NotFound2.php',
-        ]);
-
-        $existingFile = new MockSplFileInfo([
-            'name' => 'Existing.php',
-            'realPath' => '/path/to/Existing.php',
-        ]);
-
-        $existingTrace = $this->createTraceMock($existingFile);
-
-        $provideTracesCallCount = 0;
-        $iterationCount = 0;
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturnCallback(static function () use ($existingTrace, &$provideTracesCallCount, &$iterationCount) {
-                ++$provideTracesCallCount;
-
-                ++$iterationCount;
-
-                yield $existingTrace;
-            });
-
-        // First lookup - will exhaust the generator
-        $this->assertFalse($this->tracer->hasTrace($searchFile1));
-
-        // At this point, we should have iterated once
-        $this->assertSame(1, $iterationCount);
-
-        // Second lookup - should not iterate through generator again
-        // because traversed flag should be set
-        $this->assertFalse($this->tracer->hasTrace($searchFile2));
-
-        // Verify we didn't iterate again
-        $this->assertSame(1, $iterationCount);
-
-        // Third lookup for yet another non-existent file
-        // Should also use cached knowledge that we're fully traversed
-        $searchFile3 = new MockSplFileInfo([
-            'name' => 'NotFound3.php',
-            'realPath' => '/path/to/NotFound3.php',
-        ]);
-        $this->assertFalse($this->tracer->hasTrace($searchFile3));
-
-        // Still should not have iterated again
-        $this->assertSame(1, $iterationCount);
-        $this->assertSame(1, $provideTracesCallCount);
+        return new MockSplFileInfo(['name' => $name]);
     }
 
-    public function test_it_stops_iteration_when_generator_is_exhausted_mid_lookup(): void
+    /**
+     * @param SplFileInfo|non-empty-string $fileInfoOrName
+     */
+    private function createTraceMock(SplFileInfo|string $fileInfoOrName): Trace
     {
-        $file1 = new MockSplFileInfo([
-            'name' => 'File1.php',
-            'realPath' => '/path/to/File1.php',
-        ]);
-        $file2 = new MockSplFileInfo([
-            'name' => 'File2.php',
-            'realPath' => '/path/to/File2.php',
-        ]);
+        $fileInfo = $fileInfoOrName instanceof MockSplFileInfo
+            ? $fileInfoOrName
+            : self::createDummySplFileInfo($fileInfoOrName);
 
-        $trace1 = $this->createTraceMock($file1);
-        $trace2 = $this->createTraceMock($file2);
-
-        $yieldCount = 0;
-
-        $this->traceProviderMock
-            ->method('provideTraces')
-            ->willReturnCallback(static function () use ($trace1, $trace2, &$yieldCount) {
-                ++$yieldCount;
-
-                yield $trace1;
-
-                ++$yieldCount;
-
-                yield $trace2;
-                // Generator is exhausted after this point
-            });
-
-        // Lookup a file that doesn't exist - will traverse entire generator
-        $nonExistentFile = new MockSplFileInfo([
-            'name' => 'NonExistent.php',
-            'realPath' => '/path/to/NonExistent.php',
-        ]);
-
-        $this->assertFalse($this->tracer->hasTrace($nonExistentFile));
-
-        // Both traces should have been yielded
-        $this->assertSame(2, $yieldCount);
-
-        // Lookup file1 - should be cached, no additional yields
-        $this->assertTrue($this->tracer->hasTrace($file1));
-        $this->assertSame(2, $yieldCount);
-    }
-
-    private function createTraceMock(SplFileInfo $fileInfo): Trace
-    {
         $trace = $this->createMock(Trace::class);
         $trace->method('getSourceFileInfo')->willReturn($fileInfo);
 

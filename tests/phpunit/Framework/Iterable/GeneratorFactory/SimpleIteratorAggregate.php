@@ -33,37 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Framework;
+namespace Infection\Tests\Framework\Iterable\GeneratorFactory;
 
-use function count;
-use Infection\CannotBeInstantiated;
-use Infection\Console\OutputFormatter\AbstractOutputFormatter;
-use function is_array;
-use function iterator_to_array;
+use IteratorAggregate;
+use Traversable;
 
-/**
- * @internal
- */
-final class IterableCounter
+final readonly class SimpleIteratorAggregate implements IteratorAggregate
 {
-    use CannotBeInstantiated;
+    public function __construct(
+        private Traversable $traversable,
+    ) {
+    }
 
-    /**
-     * @param iterable<mixed> $subjects
-     */
-    public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
+    public function getIterator(): Traversable
     {
-        if ($runConcurrently) {
-            // This number is typically fed to ProgressFormatter/ProgressBar or variants.
-            return AbstractOutputFormatter::UNKNOWN_COUNT;
-        }
-
-        if (is_array($subjects)) {
-            return count($subjects);
-        }
-
-        $subjects = iterator_to_array($subjects, false);
-
-        return count($subjects);
+        return $this->traversable;
     }
 }

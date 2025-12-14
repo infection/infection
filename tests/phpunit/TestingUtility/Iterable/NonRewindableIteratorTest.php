@@ -33,47 +33,80 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\TestingUtility\Iterable;
 
-use ArrayIterator;
-use Infection\Framework\IterableCounter;
+use DomainException;
 use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(IterableCounter::class)]
-final class IterableCounterTest extends TestCase
+#[CoversClass(NonRewindableIterator::class)]
+final class NonRewindableIteratorTest extends TestCase
 {
-    public function test_it_does_not_count_when_not_asked(): void
+    /**
+     * @param mixed[] $values
+     */
+    #[DataProvider('valuesProvider')]
+    public function test_it_can_be_created(array $values): void
     {
-        $iterator = new ArrayIterator();
+        $iterator = new NonRewindableIterator($values);
 
-        $count = IterableCounter::bufferAndCountIfNeeded($iterator, true);
+        $actual = self::toArrayWithoutRewind($iterator);
 
-        $this->assertSame(0, $count);
-        $this->assertInstanceOf(Iterator::class, $iterator);
+        $this->assertSame($values, $actual);
     }
 
-    public function test_it_counts_array(): void
+    /**
+     * @param mixed[] $values
+     */
+    #[DataProvider('valuesProvider')]
+    public function test_it_cannot_be_rewind(array $values): void
     {
-        $array = [1, 2, 3];
+        $iterator = new NonRewindableIterator($values);
 
-        $count = IterableCounter::bufferAndCountIfNeeded($array, false);
+        self::toArrayWithoutRewind($iterator);
+        $resultAfterFirstTraverse = self::toArrayWithoutRewind($iterator);
 
-        $this->assertSame(3, $count);
-        $this->assertSame([1, 2, 3], $array);
+        // The iterator is already exhausted, hence it does not yield any new value
+        $this->assertSame([], $resultAfterFirstTraverse);
+
+        $this->expectException(DomainException::class);
+
+        $iterator->rewind();
     }
 
-    public function test_it_counts_iterator(): void
+    public static function valuesProvider(): iterable
     {
-        $generator = (static function (): iterable {
-            yield from [1 => 1, 2, 3];
-        })();
+        yield [
+            [],
+        ];
 
-        $count = IterableCounter::bufferAndCountIfNeeded($generator, false);
+        yield [
+            [
+                'a' => 'A',
+                'b' => 'B',
+            ],
+        ];
+    }
 
-        $this->assertSame(3, $count);
-        $this->assertIsArray($generator);
-        $this->assertSame([1, 2, 3], $generator);
+    /**
+     * @template TKey of array-key
+     * @template TValue
+     *
+     * @param Iterator<TKey, TValue> $iterator
+     *
+     * @return array<TKey, TValue>
+     */
+    private static function toArrayWithoutRewind(Iterator $iterator): array
+    {
+        $actual = [];
+
+        while ($iterator->valid()) {
+            $actual[$iterator->key()] = $iterator->current();
+            $iterator->next();
+        }
+
+        return $actual;
     }
 }

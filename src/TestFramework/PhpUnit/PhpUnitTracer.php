@@ -37,6 +37,7 @@ namespace Infection\TestFramework\PhpUnit;
 
 use function array_key_exists;
 use Generator;
+use Infection\Framework\Iterable\GeneratorFactory;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Tracing\Tracer;
@@ -71,6 +72,8 @@ final class PhpUnitTracer implements Tracer
     {
         $trace = $this->tryToTrace($fileInfo);
 
+        // We do not bother with a nice error here as `::hasTrace()` should
+        // have been used to ensure a trace exists in the first place.
         Assert::notNull($trace);
 
         return $trace;
@@ -127,21 +130,9 @@ final class PhpUnitTracer implements Tracer
     private function getTraceGenerator(): Generator
     {
         if ($this->traceGenerator === null) {
-            $this->traceGenerator = $this->createTraceGenerator();
+            $this->traceGenerator = GeneratorFactory::fromIterable($this->traceProvider->provideTraces());
         }
 
         return $this->traceGenerator;
-    }
-
-    /**
-     * @return Generator<Trace>
-     */
-    private function createTraceGenerator(): Generator
-    {
-        foreach ($this->traceProvider->provideTraces() as $trace) {
-            yield $trace;
-        }
-
-        $this->traversed = true;
     }
 }
