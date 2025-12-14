@@ -46,7 +46,7 @@ use Throwable;
  *
  * @require-extends TestCase
  */
-trait ThrowableAssertions
+trait ExpectsThrowables
 {
     /**
      * @param Closure():mixed $action

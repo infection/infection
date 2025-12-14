@@ -40,10 +40,10 @@ use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-#[CoversTrait(ThrowableAssertions::class)]
-final class ThrowableAssertionsTest extends TestCase
+#[CoversTrait(ExpectsThrowables::class)]
+final class ExpectsThrowablesTest extends TestCase
 {
-    use ThrowableAssertions;
+    use ExpectsThrowables;
 
     public function test_it_fails_if_the_given_action_does_not_throw(): void
     {

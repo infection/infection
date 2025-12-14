@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestingUtility\Iterable;
 
 use ArrayIterator;
-use Infection\Tests\TestingUtility\PHPUnit\ThrowableAssertions;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -45,7 +45,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(YieldOnceIterator::class)]
 final class YieldOnceIteratorTest extends TestCase
 {
-    use ThrowableAssertions;
+    use ExpectsThrowables;
 
     /**
      * @param array<string, string> $values
