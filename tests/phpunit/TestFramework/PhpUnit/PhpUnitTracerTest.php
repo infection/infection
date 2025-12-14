@@ -175,7 +175,9 @@ final class PhpUnitTracerTest extends TestCase
             : self::createDummySplFileInfo($fileInfoOrName);
 
         $trace = $this->createMock(Trace::class);
-        $trace->method('getSourceFileInfo')->willReturn($fileInfo);
+        $trace
+            ->method('getSourceFileInfo')
+            ->willReturn($fileInfo);
 
         return $trace;
     }
