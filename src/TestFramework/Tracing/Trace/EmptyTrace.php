@@ -37,6 +37,9 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @internal
+ */
 final readonly class EmptyTrace implements Trace
 {
     public function __construct(private SplFileInfo $sourceFileInfo)

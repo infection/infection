@@ -41,7 +41,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 /**
  * @internal
  */
-final readonly class TestLocations
+final class TestLocations
 {
     /**
      * @param array<int, array<int, TestLocation>> $byLine
@@ -49,7 +49,7 @@ final readonly class TestLocations
      */
     public function __construct(
         private array $byLine = [],
-        private array $byMethod = [],
+        private readonly array $byMethod = [],
     ) {
     }
 
