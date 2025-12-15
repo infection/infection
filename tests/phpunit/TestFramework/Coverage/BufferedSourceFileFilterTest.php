@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\Coverage;
 
 use function array_values;
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;

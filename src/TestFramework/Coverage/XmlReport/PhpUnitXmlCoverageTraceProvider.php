@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function dirname;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Tracing\TraceProvider;
 
 /**
  * Provides the traces based on the PHPUnit XML coverage collected.

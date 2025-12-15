@@ -33,34 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\Trace;
-use PHPUnit\Framework\Assert;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 
-final class TraceAssertion
+/**
+ * @internal
+ */
+final class TestLocations
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
+    /**
+     * @param array<int, array<int, TestLocation>> $byLine
+     * @param array<string, SourceMethodLineRange> $byMethod
+     */
+    public function __construct(
+        private array $byLine = [],
+        private readonly array $byMethod = [],
+    ) {
     }
 
     /**
-     * @return array<string, mixed>
+     * This method needs to be able to return a reference for performance reasons.
+     *
+     * @see JUnitTestExecutionInfoAdder
+     *
+     * @return array<int, array<int, TestLocation>>
      */
-    private static function collectState(Trace $trace): array
+    public function &getTestsLocationsBySourceLine(): array
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo(),
-            'realPath' => $trace->getRealPath(),
-            'relativePathname' => $trace->getRelativePathname(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        return $this->byLine;
+    }
+
+    /**
+     * @return array<string, SourceMethodLineRange>
+     */
+    public function getSourceMethodRangeByMethod(): array
+    {
+        return $this->byMethod;
     }
 }

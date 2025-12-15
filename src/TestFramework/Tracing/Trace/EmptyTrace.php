@@ -33,13 +33,13 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\MutationGenerator;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * @internal
+ */
 final readonly class EmptyTrace implements Trace
 {
     public function __construct(private SplFileInfo $sourceFileInfo)

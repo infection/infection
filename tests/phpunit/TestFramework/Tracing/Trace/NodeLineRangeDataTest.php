@@ -33,34 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use function range;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * This class represents the line range for a given node. Indeed some statements can count as one line but be
- * declared over multiple lines, e.g.:
- *
- * ```
- * $x = [
- *  'a',
- *  'b',
- * ];
- * ```
- *
- * @internal
- */
-final class NodeLineRangeData
+#[CoversClass(NodeLineRangeData::class)]
+final class NodeLineRangeDataTest extends TestCase
 {
-    /**
-     * @var array<int, int>
-     */
-    public array $range;
-
-    public function __construct(int $start, int $end)
+    public function test_it_can_not_have_an_incorrect_range(): void
     {
-        Assert::greaterThanEq($end, $start);
-        $this->range = range($start, $end);
+        $this->expectException(InvalidArgumentException::class);
+        new NodeLineRangeData(20, 10);
+    }
+
+    /**
+     * @param int[] $expected
+     */
+    #[DataProvider('providesLineRanges')]
+    public function test_it_generates_the_correct_range(int $start, int $end, array $expected): void
+    {
+        $range = new NodeLineRangeData($start, $end);
+
+        $this->assertSame($expected, $range->range);
+    }
+
+    public static function providesLineRanges(): iterable
+    {
+        yield 'Single line range' => [10, 10, [10]];
+
+        yield 'Multi line range' => [10, 15, [10, 11, 12, 13, 14, 15]];
     }
 }

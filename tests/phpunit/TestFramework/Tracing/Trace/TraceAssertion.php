@@ -33,29 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use PHPUnit\Framework\Assert;
 
-/**
- * @internal
- */
-interface TraceProvider
+final class TraceAssertion
 {
+    public static function assertEquals(
+        Trace $expected,
+        Trace $actual,
+    ): void {
+        Assert::assertEquals(
+            self::collectState($expected),
+            self::collectState($actual),
+        );
+    }
+
     /**
-     * @throws InvalidCoverage
-     * @throws NoSourceFound
-     * @throws NoReportFound
-     * @throws TooManyReportsFound
-     * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
-     *
-     * @return iterable<Trace>
+     * @return array<string, mixed>
      */
-    public function provideTraces(): iterable;
+    private static function collectState(Trace $trace): array
+    {
+        return [
+            'sourceFileInfo' => $trace->getSourceFileInfo(),
+            'realPath' => $trace->getRealPath(),
+            'relativePathname' => $trace->getRelativePathname(),
+            'hasTests' => $trace->hasTests(),
+            'tests' => $trace->getTests(),
+        ];
+    }
 }

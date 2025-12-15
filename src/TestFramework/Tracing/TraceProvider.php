@@ -33,26 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing;
+
+use Infection\Source\Exception\NoSourceFound;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\Tracing\Trace\Trace;
 
 /**
  * @internal
  */
-final readonly class SourceMethodLineRange
+interface TraceProvider
 {
-    public function __construct(
-        private int $startLine,
-        private int $endLine,
-    ) {
-    }
-
-    public function getStartLine(): int
-    {
-        return $this->startLine;
-    }
-
-    public function getEndLine(): int
-    {
-        return $this->endLine;
-    }
+    /**
+     * @throws InvalidCoverage
+     * @throws NoSourceFound
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
+     *
+     * @return iterable<Trace>
+     */
+    public function provideTraces(): iterable;
 }
