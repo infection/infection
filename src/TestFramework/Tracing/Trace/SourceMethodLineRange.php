@@ -33,47 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
-
-use Infection\PhpParser\Visitor\ParentConnector;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use PhpParser\Node;
+namespace Infection\TestFramework\Tracing\Trace;
 
 /**
  * @internal
  */
-final class LineRangeCalculator
+final readonly class SourceMethodLineRange
 {
-    public function calculateRange(Node $originalNode): NodeLineRangeData
-    {
-        if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
-            $startLine = $originalNode->getStartLine();
-
-            // function signature node should always be 1-line range: (start, start)
-            return new NodeLineRangeData($startLine, $startLine);
-        }
-
-        $outerMostArrayNode = $this->getOuterMostArrayNode($originalNode);
-
-        return new NodeLineRangeData($outerMostArrayNode->getStartLine(), $outerMostArrayNode->getEndLine());
+    public function __construct(
+        private int $startLine,
+        private int $endLine,
+    ) {
     }
 
-    /**
-     * If the node is part of an array, this will find the outermost array.
-     * Otherwise this will return the node itself
-     */
-    private function getOuterMostArrayNode(Node $node): Node
+    public function getStartLine(): int
     {
-        $outerMostArrayParent = $node;
+        return $this->startLine;
+    }
 
-        do {
-            if ($node instanceof Node\Expr\Array_) {
-                $outerMostArrayParent = $node;
-            }
-
-            $node = ParentConnector::findParent($node);
-        } while ($node !== null);
-
-        return $outerMostArrayParent;
+    public function getEndLine(): int
+    {
+        return $this->endLine;
     }
 }

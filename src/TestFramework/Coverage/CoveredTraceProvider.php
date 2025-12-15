@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Tracing\TraceProvider;
 
 /**
  * Filters traces and augments them with timing data from JUnit report.

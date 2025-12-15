@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\TestFramework\Coverage\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

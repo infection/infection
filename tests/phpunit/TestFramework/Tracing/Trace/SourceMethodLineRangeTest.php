@@ -33,59 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use DomainException;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
-use Symfony\Component\Finder\SplFileInfo;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Represents a Trace state with any dynamic behaviour or laziness of any kind.
- * This is mostly useful for testing purposes where we want to declare an
- * expected Trace state.
- */
-final readonly class SyntheticTrace implements Trace
+#[CoversClass(SourceMethodLineRange::class)]
+final class SourceMethodLineRangeTest extends TestCase
 {
-    public function __construct(
-        public SplFileInfo $sourceFileInfo,
-        public string $realPath,
-        public string $relativePathname,
-        public bool $hasTest,
-        public ?TestLocations $tests,
-    ) {
-    }
-
-    public function getSourceFileInfo(): SplFileInfo
+    public function test_it_creates_self_with_named_constructor(): void
     {
-        return $this->sourceFileInfo;
-    }
+        $range = new SourceMethodLineRange(11, 22);
 
-    public function getRealPath(): string
-    {
-        return $this->realPath;
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->relativePathname;
-    }
-
-    public function hasTests(): bool
-    {
-        return $this->hasTest;
-    }
-
-    public function getTests(): ?TestLocations
-    {
-        return $this->tests;
-    }
-
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        throw new DomainException('Not implemented.');
+        $this->assertSame(11, $range->getStartLine());
+        $this->assertSame(22, $range->getEndLine());
     }
 }

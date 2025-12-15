@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
-use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
