@@ -60,12 +60,12 @@ final class MutatorProvider
     /**
      * @var string[]|null
      */
-    private static $mutatorClasses;
+    private static ?array $mutatorClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $concreteMutatorClasses;
+    private static ?array $concreteMutatorClasses = null;
 
     /**
      * @var string[]|null

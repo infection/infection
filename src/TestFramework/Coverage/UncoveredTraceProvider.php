@@ -47,9 +47,6 @@ final readonly class UncoveredTraceProvider implements TraceProvider
     ) {
     }
 
-    /**
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
         foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {

@@ -53,20 +53,11 @@ use function Safe\realpath;
 #[CoversClass(SchemaConfigurationFileLoader::class)]
 final class SchemaConfigurationFileLoaderTest extends TestCase
 {
-    /**
-     * @var SchemaValidator|MockObject
-     */
-    private $schemaValidatorStub;
+    private MockObject&SchemaValidator $schemaValidatorStub;
 
-    /**
-     * @var SchemaConfigurationFactory|MockObject
-     */
-    private $configFactoryStub;
+    private MockObject&SchemaConfigurationFactory $configFactoryStub;
 
-    /**
-     * @var SchemaConfigurationFileLoader
-     */
-    private $loader;
+    private SchemaConfigurationFileLoader $loader;
 
     protected function setUp(): void
     {
@@ -106,7 +97,7 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
     private static function createRawConfigWithPathArgument(string $path): Constraint
     {
         return new Callback(static function (SchemaConfigurationFile $config) use ($path): bool {
-            self::assertSame($path, $config->getPath());
+            self::assertSame($path, $config->getPathname());
 
             return true;
         });

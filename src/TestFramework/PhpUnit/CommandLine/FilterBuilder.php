@@ -37,9 +37,9 @@ namespace Infection\TestFramework\PhpUnit\CommandLine;
 
 use function array_key_exists;
 use function count;
-use function end;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Framework\ClassName;
 use function is_numeric;
 use function preg_quote;
 use function sprintf;
@@ -93,7 +93,7 @@ final class FilterBuilder
 
                 // This may or not have the provider key.
                 $testMethod = self::getMethod($rawTestMethod, $testFrameworkVersion, $optimizationLevel);
-                $shortClassName = self::getShortClassName($testCaseClassName);
+                $shortClassName = ClassName::getShortClassName($testCaseClassName);
 
                 $test = $optimizationLevel >= self::DROP_TEST_CASE_OPTIMIZATION_LEVEL
                     ? $testMethod
@@ -165,13 +165,6 @@ final class FilterBuilder
         }
 
         return $rawTestMethod;
-    }
-
-    private static function getShortClassName(string $className): string
-    {
-        $parts = explode('\\', $className);
-
-        return end($parts);
     }
 
     /**

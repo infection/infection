@@ -36,12 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage;
 
 use function extension_loaded;
-use Infection\FileSystem\Locator\FileNotFound;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
-use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Coverage\Locator\FakeLocator;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -53,7 +54,7 @@ use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * All these tests should be ran in separate processes, as otherwise they may rely
+ * All these tests should be run in separate processes, as otherwise they may rely
  * on the internal state of XdebugHandler.
  *
  * Requires some I/O operations
@@ -64,15 +65,9 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private static $coveragePath;
+    private static string $coveragePath;
 
-    /**
-     * @var string
-     */
-    private static $jUnit;
+    private static string $jUnit;
 
     public static function setUpBeforeClass(): void
     {
@@ -88,9 +83,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             '',
             false,
-            $this->createFakeJUnitReportLocatorMock(),
+            new FakeLocator(),
             'unknown',
-            $this->createFakeIndexLocatorMock(),
+            new FakeLocator(),
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -110,9 +105,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             '',
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'unknown',
-            $this->createFakeIndexLocatorMock(),
+            new FakeLocator(),
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -136,9 +131,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             '',
             false,
-            $this->createFakeJUnitReportLocatorMock(),
+            new FakeLocator(),
             'unknown',
-            $this->createFakeIndexLocatorMock(),
+            new FakeLocator(),
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -163,9 +158,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::$coveragePath,
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageExists();
@@ -181,7 +176,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             '/nowhere',
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'unknown',
             $this->createInvalidIndexLocatorMock(),
         );
@@ -197,7 +192,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -209,7 +204,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             '/nowhere',
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'phpunit',
             $this->createInvalidIndexLocatorMock(),
         );
@@ -226,7 +221,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -238,7 +233,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             '/nowhere',
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'codeception',
             $this->createInvalidIndexLocatorMock(),
         );
@@ -255,7 +250,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -267,9 +262,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::$coveragePath,
             false,
-            $this->createFakeJUnitReportLocatorMock(),
+            new FakeLocator(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageExists();
@@ -287,7 +282,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         try {
@@ -301,7 +296,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -318,7 +313,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'phpunit',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         try {
@@ -336,7 +331,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -350,7 +345,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'codeception',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         try {
@@ -365,7 +360,7 @@ final class CoverageCheckerTest extends TestCase
                 $exception->getMessage(),
             );
             $this->assertSame(0, $exception->getCode());
-            $this->assertInstanceOf(FileNotFound::class, $exception->getPrevious());
+            $this->assertInstanceOf(UnknownReportLocatorException::class, $exception->getPrevious());
         }
     }
 
@@ -377,9 +372,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::$coveragePath,
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageHasBeenGenerated(
@@ -398,9 +393,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::$coveragePath,
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageHasBeenGenerated(
@@ -419,7 +414,7 @@ final class CoverageCheckerTest extends TestCase
             '',
             '/nowhere',
             true,
-            $this->createJUnitReportLocatorMock(),
+            new FixedLocator(self::$jUnit),
             'unknown',
             $this->createInvalidIndexLocatorMock(),
         );
@@ -435,7 +430,7 @@ final class CoverageCheckerTest extends TestCase
             ```
 
             Issue(s):
-            - The file "index.xml" could not be found: No index file found
+            - The file "index.xml" could not be found: Could not locate the index.xml coverage report for some reasons!
             TXT
         );
 
@@ -457,7 +452,7 @@ final class CoverageCheckerTest extends TestCase
             true,
             $this->createInvalidJUnitReportLocatorMock(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         $this->expectException(CoverageNotFound::class);
@@ -471,7 +466,7 @@ final class CoverageCheckerTest extends TestCase
             ```
 
             Issue(s):
-            - The JUnit file could not be found: No JUnit file found
+            - The JUnit file could not be found: Could not locate the JUnit coverage report for some reasons!
             TXT
         );
 
@@ -489,9 +484,9 @@ final class CoverageCheckerTest extends TestCase
             '',
             self::$coveragePath,
             false,
-            $this->createFakeJUnitReportLocatorMock(),
+            new FakeLocator(),
             'unknown',
-            $this->createIndexLocatorMock(self::$coveragePath . '/index.xml'),
+            new FixedLocator(self::$coveragePath . '/index.xml'),
         );
 
         $checker->checkCoverageHasBeenGenerated(
@@ -523,85 +518,23 @@ final class CoverageCheckerTest extends TestCase
         }
     }
 
-    /**
-     * @return IndexXmlCoverageLocator|MockObject
-     */
-    private function createFakeIndexLocatorMock(): IndexXmlCoverageLocator
+    private function createInvalidIndexLocatorMock(): ReportLocator&MockObject
     {
-        $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
+        $indexLocatorMock = $this->createMock(ReportLocator::class);
         $indexLocatorMock
-            ->expects($this->never())
-            ->method($this->anything())
+            ->method('locate')
+            ->willThrowException(UnknownReportLocatorException::create('index.xml'))
         ;
 
         return $indexLocatorMock;
     }
 
-    /**
-     * @return JUnitReportLocator|MockObject
-     */
-    private function createFakeJUnitReportLocatorMock(): JUnitReportLocator
+    private function createInvalidJUnitReportLocatorMock(): ReportLocator&MockObject
     {
-        $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
-        $jUnitLocatorMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
-
-        return $jUnitLocatorMock;
-    }
-
-    /**
-     * @return IndexXmlCoverageLocator|MockObject
-     */
-    private function createInvalidIndexLocatorMock(): IndexXmlCoverageLocator
-    {
-        $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
-        $indexLocatorMock
-            ->method('locate')
-            ->willThrowException(new FileNotFound('No index file found'))
-        ;
-
-        return $indexLocatorMock;
-    }
-
-    /**
-     * @return IndexXmlCoverageLocator|MockObject
-     */
-    private function createIndexLocatorMock(string $indexPath): IndexXmlCoverageLocator
-    {
-        $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
-        $indexLocatorMock
-            ->method('locate')
-            ->willReturn($indexPath)
-        ;
-
-        return $indexLocatorMock;
-    }
-
-    /**
-     * @return JUnitReportLocator|MockObject
-     */
-    private function createInvalidJUnitReportLocatorMock(): JUnitReportLocator
-    {
-        $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
+        $jUnitLocatorMock = $this->createMock(ReportLocator::class);
         $jUnitLocatorMock
             ->method('locate')
-            ->willThrowException(new FileNotFound('No JUnit file found'))
-        ;
-
-        return $jUnitLocatorMock;
-    }
-
-    /**
-     * @return JUnitReportLocator|MockObject
-     */
-    private function createJUnitReportLocatorMock(): JUnitReportLocator
-    {
-        $jUnitLocatorMock = $this->createMock(JUnitReportLocator::class);
-        $jUnitLocatorMock
-            ->method('locate')
-            ->willReturn(self::$jUnit)
+            ->willThrowException(UnknownReportLocatorException::create('JUnit'))
         ;
 
         return $jUnitLocatorMock;

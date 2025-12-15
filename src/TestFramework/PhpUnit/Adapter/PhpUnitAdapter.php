@@ -92,12 +92,21 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
-            $extraOptions = trim(sprintf(
-                '%s --coverage-xml=%s --log-junit=%s',
-                $extraOptions,
-                $this->tmpDir . '/' . self::COVERAGE_DIR,
-                $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-            ));
+            if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
+                $extraOptions = trim(sprintf(
+                    '%s --exclude-source-from-xml-coverage --coverage-xml=%s --log-junit=%s',
+                    $extraOptions,
+                    $this->tmpDir . '/' . self::COVERAGE_DIR,
+                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+                ));
+            } else {
+                $extraOptions = trim(sprintf(
+                    '%s --coverage-xml=%s --log-junit=%s',
+                    $extraOptions,
+                    $this->tmpDir . '/' . self::COVERAGE_DIR,
+                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+                ));
+            }
 
             if ($this->pcovDirectoryProvider->shallProvide()) {
                 $phpExtraArgs[] = '-d';
@@ -175,6 +184,14 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         }
 
         return $recommendations;
+    }
+
+    /**
+     * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element from the XML report which contained the list of tokens of the source code file.
+     */
+    public static function supportsExcludingSourceFromCoverage(string $version): bool
+    {
+        return version_compare($version, '12.5', '>=');
     }
 
     public static function supportsExecutionOrderDefectsRandom(string $version): bool

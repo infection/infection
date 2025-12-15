@@ -48,15 +48,10 @@ use function sprintf;
  */
 final readonly class StaticAnalysisToolFactory
 {
-    /**
-     * @param array<string, array<string, mixed>> $installedExtensions
-     */
     public function __construct(
         private Configuration $infectionConfig,
-        private string $projectDir,
         private StaticAnalysisToolExecutableFinder $staticAnalysisToolExecutableFiner,
         private StaticAnalysisConfigLocator $staticAnalysisConfigLocator,
-        private array $installedExtensions,
     ) {
     }
 
@@ -69,10 +64,10 @@ final readonly class StaticAnalysisToolFactory
                 $phpStanConfigPath,
                 $this->staticAnalysisToolExecutableFiner->find(
                     StaticAnalysisToolTypes::PHPSTAN,
-                    (string) $this->infectionConfig->getPhpStan()->getCustomPath(),
+                    (string) $this->infectionConfig->phpStan->customPath,
                 ),
                 $timeout,
-                $this->infectionConfig->getTmpDir(),
+                $this->infectionConfig->tmpDir,
                 $this->infectionConfig->getStaticAnalysisToolOptions(),
             );
         }

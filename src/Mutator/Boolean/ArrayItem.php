@@ -97,7 +97,8 @@ final class ArrayItem implements Mutator
             return false;
         }
 
-        return $this->isNodeWithSideEffects($node->key) || $this->isNodeWithSideEffects($node->value);
+        return $this->isNodeWithSideEffects($node->key)
+            || $this->isNodeWithSideEffects($node->value);
     }
 
     /**
@@ -114,13 +115,7 @@ final class ArrayItem implements Mutator
         }
 
         // these clearly can have side effects
-        if (
-            $node instanceof Node\Expr\MethodCall
-            || $node instanceof Node\Expr\NullsafeMethodCall
-        ) {
-            return true;
-        }
-
-        return false;
+        return $node instanceof Node\Expr\MethodCall
+            || $node instanceof Node\Expr\NullsafeMethodCall;
     }
 }

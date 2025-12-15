@@ -41,10 +41,10 @@ use Infection\Metrics\Collector;
 /**
  * @internal
  */
-final class MutationTestingResultsCollectorSubscriber implements EventSubscriber
+final readonly class MutationTestingResultsCollectorSubscriber implements EventSubscriber
 {
     /** @var Collector[] */
-    private readonly array $collectors;
+    private array $collectors;
 
     public function __construct(Collector ...$collectors)
     {

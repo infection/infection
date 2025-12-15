@@ -49,10 +49,10 @@ use function ucfirst;
 final class BCMathTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = [], array $settings = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = [], array $settings = []): void
     {
         $this->assertMutatesInput($input, $expected, $settings);
     }

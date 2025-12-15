@@ -40,6 +40,7 @@ use function array_key_exists;
 use function array_shift;
 use function count;
 use function implode;
+use Infection\Framework\ClassName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -68,8 +69,12 @@ abstract class BaseMutatorTestCase extends TestCase
      * @param string|string[]|null $expectedCode
      * @param mixed[] $settings
      */
-    final protected function assertMutatesInput(string $inputCode, string|array|null $expectedCode = [], array $settings = [], bool $allowInvalidCode = false): void
-    {
+    final protected function assertMutatesInput(
+        string $inputCode,
+        string|array|null $expectedCode = [],
+        array $settings = [],
+        bool $allowInvalidCode = false,
+    ): void {
         $expectedCodeSamples = (array) $expectedCode;
 
         $inputCode = StringNormalizer::normalizeString($inputCode);
@@ -129,7 +134,21 @@ abstract class BaseMutatorTestCase extends TestCase
 
     protected function getTestedMutatorClassName(): string
     {
-        return SourceTestClassNameScheme::getSourceClassName(static::class);
+        $mutatorClassName = ClassName::getCanonicalSourceClassName(static::class);
+
+        Assert::notNull(
+            $mutatorClassName,
+            sprintf(
+                'Could not find the tested mutator class name for "%s". Ensure the test case follow the Infection naming convention. The expected class name(s) was/were: "%s"',
+                static::class,
+                implode(
+                    ', ',
+                    ClassName::getCanonicalSourceClassNames(static::class),
+                ),
+            ),
+        );
+
+        return $mutatorClassName;
     }
 
     /**
@@ -195,8 +214,9 @@ abstract class BaseMutatorTestCase extends TestCase
         try {
             $tokens = token_get_all($realMutatedCode, TOKEN_PARSE);
 
-            $this->assertTrue(
-                $tokens !== [],
+            $this->assertNotSame(
+                [],
+                $tokens,
                 sprintf(
                     'Mutator %s produces invalid code: %s',
                     $this->mutator->getName(),

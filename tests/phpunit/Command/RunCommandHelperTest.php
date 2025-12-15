@@ -48,10 +48,7 @@ use Symfony\Component\Console\Input\InputInterface;
 #[CoversClass(RunCommandHelper::class)]
 final class RunCommandHelperTest extends TestCase
 {
-    /**
-     * @var InputInterface&MockObject
-     */
-    private InputInterface $inputMock;
+    private InputInterface&MockObject $inputMock;
 
     protected function setUp(): void
     {
@@ -140,5 +137,28 @@ final class RunCommandHelperTest extends TestCase
         yield [5, '5'];
 
         yield [null, 'max'];
+    }
+
+    #[DataProvider('providesIgnoreMsiWithNoMutations')]
+    public function test_it_returns_ignore_msi_with_no_mutations(?bool $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_IGNORE_MSI_WITH_NO_MUTATIONS)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getIgnoreMsiWithNoMutations());
+    }
+
+    public static function providesIgnoreMsiWithNoMutations(): iterable
+    {
+        yield 'not provided' => [null, RunCommand::OPTION_VALUE_NOT_PROVIDED];
+
+        yield 'provided without value' => [true, null];
+
+        yield 'provided with value 1' => [true, '1'];
+
+        yield 'provided with value true' => [true, 'true'];
     }
 }

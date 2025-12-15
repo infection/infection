@@ -39,7 +39,7 @@ use function Safe\realpath;
 
 final class XmlCoverageFixture
 {
-    public $sourceFilePath;
+    public string $sourceFilePath;
 
     /**
      * @param array<string, mixed> $normalizedTests

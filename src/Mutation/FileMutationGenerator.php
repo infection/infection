@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -43,6 +42,8 @@ use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use PhpParser\Node;
@@ -58,9 +59,7 @@ class FileMutationGenerator
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly bool $isForGitDiffLines,
-        private readonly ?string $gitDiffBase,
+        private readonly SourceLineMatcher $sourceLineMatcher,
     ) {
     }
 
@@ -68,6 +67,7 @@ class FileMutationGenerator
      * @param Mutator<Node>[] $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
+     * @throws NoSourceFound
      * @throws UnparsableFile
      *
      * @return iterable<Mutation>
@@ -94,17 +94,15 @@ class FileMutationGenerator
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                $mutators,
-                $trace->getRealPath(),
-                $initialStatements,
-                $trace,
-                $onlyCovered,
-                $this->isForGitDiffLines,
-                $this->gitDiffBase,
-                $this->lineRangeCalculator,
-                $this->filesDiffChangedLines,
-                $originalFileTokens,
-                $sourceFile->getContents(),
+                mutators: $mutators,
+                filePath: $trace->getRealPath(),
+                fileNodes: $initialStatements,
+                trace: $trace,
+                onlyCovered: $onlyCovered,
+                lineRangeCalculator: $this->lineRangeCalculator,
+                sourceLineMatcher: $this->sourceLineMatcher,
+                originalFileTokens: $originalFileTokens,
+                originalFileContent: $sourceFile->getContents(),
             ),
         );
 

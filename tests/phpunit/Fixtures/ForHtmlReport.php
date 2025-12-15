@@ -39,6 +39,9 @@ final class ForHtmlReport
         // do nothing
     }
 
+    /**
+     * @param string[] $keys
+     */
     private function innerArray(array $keys): void
     {
         // do nothing

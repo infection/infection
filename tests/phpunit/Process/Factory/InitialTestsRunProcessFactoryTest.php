@@ -45,15 +45,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InitialTestsRunProcessFactory::class)]
 final class InitialTestsRunProcessFactoryTest extends TestCase
 {
-    /**
-     * @var TestFrameworkAdapter|MockObject
-     */
-    private $testFrameworkAdapterMock;
+    private MockObject&TestFrameworkAdapter $testFrameworkAdapterMock;
 
-    /**
-     * @var InitialTestsRunProcessFactory
-     */
-    private $factory;
+    private InitialTestsRunProcessFactory $factory;
 
     protected function setUp(): void
     {

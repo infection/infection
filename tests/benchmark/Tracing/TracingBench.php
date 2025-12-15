@@ -68,7 +68,7 @@ final class TracingBench
     #[BeforeMethods('setUp')]
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
-    public function benchTracing(): void
+    public function bench(): void
     {
         $this->count = ($this->main)();
     }

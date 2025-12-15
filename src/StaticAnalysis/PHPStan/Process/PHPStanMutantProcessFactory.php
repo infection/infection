@@ -48,20 +48,20 @@ use Symfony\Component\Process\Process;
 /**
  * @internal
  */
-final class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
+final readonly class PHPStanMutantProcessFactory implements LazyMutantProcessFactory
 {
     /**
      * @param list<string> $staticAnalysisToolOptions
      */
     public function __construct(
-        private readonly Filesystem $fileSystem,
-        private readonly PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
-        private readonly string $staticAnalysisConfigPath,
-        private readonly string $staticAnalysisToolExecutable,
-        private readonly CommandLineBuilder $commandLineBuilder,
-        private readonly float $timeout,
-        private readonly string $tmpDir,
-        private readonly array $staticAnalysisToolOptions,
+        private Filesystem $fileSystem,
+        private PHPStanMutantExecutionResultFactory $mutantExecutionResultFactory,
+        private string $staticAnalysisConfigPath,
+        private string $staticAnalysisToolExecutable,
+        private CommandLineBuilder $commandLineBuilder,
+        private float $timeout,
+        private string $tmpDir,
+        private array $staticAnalysisToolOptions,
     ) {
     }
 

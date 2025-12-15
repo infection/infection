@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage;
 
 use function array_key_exists;
-use Infection\FileSystem\FileFilter;
 use function Pipeline\take;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -53,39 +52,36 @@ use Webmozart\Assert\Assert;
  * @internal
  * @final
  */
-class BufferedSourceFileFilter implements FileFilter
+class BufferedSourceFileFilter
 {
     /**
-     * An associative array mapping real paths to SplFileInfo objects.
-     *
-     * @var array<string, SplFileInfo>
+     * @param array<string, SplFileInfo> $sourceFiles
      */
-    private array $sourceFiles = [];
+    private function __construct(
+        private array $sourceFiles,
+    ) {
+    }
 
     /**
      * @param iterable<SplFileInfo> $sourceFiles
      */
-    public function __construct(
-        private readonly FileFilter $filter,
+    public static function create(
         iterable $sourceFiles,
-    ) {
-        // Make a map of source files so we can check covered files against it.
-        // We don't filter here on the assumption that hash table lookups are faster.
-        foreach ($sourceFiles as $sourceFile) {
-            $this->sourceFiles[(string) $sourceFile->getRealPath()] = $sourceFile;
-        }
+    ): self {
+        return new self(
+            self::indexByRealPath($sourceFiles),
+        );
     }
 
     /**
-     * We duck-typed the input to be iterable<SplFileInfo|Trace> in the interface,
-     * but we actually only use iterable<Trace> here.
+     * @param iterable<Trace> $input
+     *
+     * @return iterable<Trace>
      */
     public function filter(iterable $input): iterable
     {
-        return take($this->filter->filter($input))
-            ->filter(function ($trace): bool {
-                Assert::isInstanceOf($trace, Trace::class);
-
+        return take($input)
+            ->filter(function (Trace $trace): bool {
                 $traceRealPath = $trace->getSourceFileInfo()->getRealPath();
 
                 Assert::string($traceRealPath);
@@ -101,15 +97,32 @@ class BufferedSourceFileFilter implements FileFilter
     }
 
     /**
-     * Returns files that are in source.directories from infection.json.dist but not in coverage report (phpunit's filter.whitelist.directory)
+     * Returns files that are in source.directories from infection.json.dist but not in coverage
+     * report (phpunit's filter.whitelist.directory)
      *
      * @return iterable<SplFileInfo>
      */
     public function getUnseenInCoverageReportFiles(): iterable
     {
-        /** @var iterable<SplFileInfo> $result */
-        $result = $this->filter->filter($this->sourceFiles);
+        // TODO: maybe worth a check that this should be called only once filtered.
+        return $this->sourceFiles;
+    }
 
-        return $result;
+    /**
+     * @param iterable<SplFileInfo> $sourceFiles
+     *
+     * @return array<string, SplFileInfo>
+     */
+    private static function indexByRealPath(iterable $sourceFiles): array
+    {
+        $indexedSourceFiles = [];
+
+        // Make a map of source files so we can check covered files against it.
+        // We don't filter here on the assumption that hash table lookups are faster.
+        foreach ($sourceFiles as $fileInfo) {
+            $indexedSourceFiles[(string) $fileInfo->getRealPath()] = $fileInfo;
+        }
+
+        return $indexedSourceFiles;
     }
 }

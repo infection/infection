@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutation;
 
 use function current;
 use function file_exists;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -46,6 +45,7 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\Trace;
 use Infection\Testing\MutatorName;
@@ -69,36 +69,25 @@ final class FileMutationGeneratorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures/Files';
 
-    /**
-     * @var FileParser&MockObject
-     */
-    private $fileParserMock;
+    private MockObject&FileParser $fileParserMock;
 
-    /**
-     * @var NodeTraverserFactory&MockObject
-     */
-    private $traverserFactoryMock;
+    private MockObject&NodeTraverserFactory $traverserFactoryMock;
 
     private FileMutationGenerator $mutationGenerator;
 
-    /**
-     * @var FilesDiffChangedLines&MockObject
-     */
-    private $filesDiffChangedLines;
+    private MockObject&SourceLineMatcher $sourceLineMatcherMock;
 
     protected function setUp(): void
     {
         $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
-        $this->filesDiffChangedLines = $this->createMock(FilesDiffChangedLines::class);
+        $this->sourceLineMatcherMock = $this->createMock(SourceLineMatcher::class);
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
-            $this->filesDiffChangedLines,
-            false,
-            'master',
+            $this->sourceLineMatcherMock,
         );
     }
 
@@ -135,9 +124,7 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutations = iterator_to_array($mutations, false);
 
-        foreach ($mutations as $mutation) {
-            $this->assertInstanceOf(Mutation::class, $mutation);
-        }
+        $this->assertContainsOnlyInstancesOf(Mutation::class, $mutations);
 
         $this->assertCount(1, $mutations);
         $this->assertArrayHasKey(0, $mutations);
@@ -298,9 +285,7 @@ final class FileMutationGeneratorTest extends TestCase
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
-            $this->filesDiffChangedLines,
-            false,
-            'master',
+            $this->sourceLineMatcherMock,
         );
 
         $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);
@@ -392,15 +377,12 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    /**
-     * @return Trace|MockObject
-     */
     private function createTraceMock(
         string $file,
         string $relativePath,
         string $relativePathname,
         ?bool $hasTests = null,
-    ): Trace {
+    ): Trace&MockObject {
         $splFileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
 
         $proxyTraceMock = $this->createMock(Trace::class);

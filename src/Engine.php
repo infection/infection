@@ -45,6 +45,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
+use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
@@ -52,8 +53,14 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
@@ -86,6 +93,13 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
+     * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoSourceFound
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
      */
     public function execute(): void
     {
@@ -117,7 +131,7 @@ final readonly class Engine
 
     private function runInitialTestSuite(): ?string
     {
-        if ($this->config->shouldSkipInitialTests()) {
+        if ($this->config->skipInitialTests) {
             $this->consoleOutput->logSkippingInitialTests();
             $this->coverageChecker->checkCoverageExists();
 
@@ -125,9 +139,9 @@ final readonly class Engine
         }
 
         $initialTestSuiteProcess = $this->initialTestsRunner->run(
-            $this->config->getTestFrameworkExtraOptions(),
+            $this->config->testFrameworkExtraOptions,
             $this->getInitialTestsPhpOptionsArray(),
-            $this->config->shouldSkipCoverage(),
+            $this->config->skipCoverage,
         );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
@@ -183,9 +197,18 @@ final readonly class Engine
      */
     private function getInitialTestsPhpOptionsArray(): array
     {
-        return explode(' ', (string) $this->config->getInitialTestsPhpOptions());
+        return explode(' ', (string) $this->config->initialTestsPhpOptions);
     }
 
+    /**
+     * @throws UnparsableFile
+     * @throws InvalidCoverage
+     * @throws NoSourceFound
+     * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
+     * @throws TestFileNameNotFoundException
+     */
     private function runMutationAnalysis(): void
     {
         $mutations = $this->mutationGenerator->generate(
@@ -215,11 +238,11 @@ final readonly class Engine
     {
         if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
             return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->getTestFrameworkExtraOptions(),
+                $this->config->testFrameworkExtraOptions,
                 $this->adapter->getInitialRunOnlyOptions(),
             );
         }
 
-        return $this->config->getTestFrameworkExtraOptions();
+        return $this->config->testFrameworkExtraOptions;
     }
 }

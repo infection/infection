@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Builder;
 
+use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
@@ -168,13 +169,14 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function setCustomBootstrapPath(string $customAutoloadFilePath, SafeDOMXPath $xPath): void
     {
-        $bootstrap = $xPath->query('/phpunit/@bootstrap');
+        $bootstrap = $xPath->queryAttribute('/phpunit/@bootstrap');
 
-        if ($bootstrap->length > 0) {
-            $bootstrap[0]->nodeValue = $customAutoloadFilePath;
+        if ($bootstrap !== null) {
+            $bootstrap->nodeValue = $customAutoloadFilePath;
         } else {
-            $node = $xPath->query('/phpunit')[0];
-            $node->setAttribute('bootstrap', $customAutoloadFilePath);
+            $xPath
+                ->getElement('/phpunit')
+                ->setAttribute('bootstrap', $customAutoloadFilePath);
         }
     }
 
@@ -191,21 +193,23 @@ class MutationConfigBuilder extends ConfigBuilder
     private function removeExistingTestSuite(SafeDOMXPath $xPath): void
     {
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuites/testsuite'),
+            $xPath->queryList('/phpunit/testsuites/testsuite'),
         );
 
         // Handle situation when test suite is directly inside root node
         $this->removeExistingTestSuiteNodes(
-            $xPath->query('/phpunit/testsuite'),
+            $xPath->queryList('/phpunit/testsuite'),
         );
     }
 
     /**
-     * @param DOMNodeList<DOMNode> $testSuites
+     * @param DOMNodeList<DOMNameSpaceNode|DOMNode> $testSuites
      */
     private function removeExistingTestSuiteNodes(DOMNodeList $testSuites): void
     {
         foreach ($testSuites as $node) {
+            Assert::isInstanceOf($node, DOMNode::class);
+
             $parent = $node->parentNode;
 
             Assert::isInstanceOf($parent, DOMNode::class);
@@ -221,13 +225,11 @@ class MutationConfigBuilder extends ConfigBuilder
         array $tests,
         SafeDOMXPath $xPath,
     ): void {
-        $testSuites = $xPath->query('/phpunit/testsuites');
-
-        $nodeToAppendTestSuite = $testSuites->item(0);
+        $nodeToAppendTestSuite = $xPath->queryElement('/phpunit/testsuites');
 
         // If there is no `testsuites` node, append to root
         if ($nodeToAppendTestSuite === null) {
-            $nodeToAppendTestSuite = $xPath->query('/phpunit')->item(0);
+            $nodeToAppendTestSuite = $xPath->queryElement('/phpunit');
         }
 
         $testSuite = $xPath->document->createElement('testsuite');
@@ -248,10 +250,10 @@ class MutationConfigBuilder extends ConfigBuilder
 
     private function getOriginalBootstrapFilePath(SafeDOMXPath $xPath): string
     {
-        $bootstrap = $xPath->query('/phpunit/@bootstrap');
+        $bootstrap = $xPath->queryAttribute('/phpunit/@bootstrap')?->nodeValue;
 
-        if ($bootstrap->length > 0) {
-            return $bootstrap[0]->nodeValue;
+        if ($bootstrap !== null) {
+            return $bootstrap;
         }
 
         return sprintf('%s/vendor/autoload.php', $this->projectDir);
