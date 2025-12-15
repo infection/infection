@@ -39,8 +39,12 @@ use Closure;
 use function function_exists;
 use Infection\Container;
 use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
+use function iterator_to_array;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -50,6 +54,20 @@ if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
         $trace->getSourceFileInfo();
         $trace->hasTests();
         $trace->getTests();
+    }
+}
+
+if (!function_exists('Infection\Benchmark\Tracing\collectSources')) {
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    function collectSources(): iterable
+    {
+        return Finder::create()
+            ->files()
+            ->in(__DIR__ . '/benchmark-source/src')
+            ->name('*.php')
+        ;
     }
 }
 
@@ -66,12 +84,21 @@ return static function (int $maxCount): Closure {
         existingCoveragePath: __DIR__ . '/coverage',
         useNoopMutators: true,
     );
-    $traceProvider = $container->getUnionTraceProvider();
+    $tracer = $container->get(Tracer::class);
+    $sources = iterator_to_array(
+        collectSources(),
+        false,
+    );
 
-    return static function () use ($maxCount, $traceProvider) {
+    return static function () use ($maxCount, $tracer, $sources) {
         $count = 0;
 
-        foreach ($traceProvider->provideTraces() as $trace) {
+        foreach ($sources as $source) {
+            if (!$tracer->hasTrace($source)) {
+                continue;
+            }
+
+            $trace = $tracer->trace($source);
             fetchTraceLazyState($trace);
 
             ++$count;

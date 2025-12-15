@@ -44,13 +44,11 @@ use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
-use Infection\TestFramework\Tracing\Trace\ProxyTrace;
-use Infection\TestFramework\Tracing\TraceProvider;
+use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\WithConsecutive;
-use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -61,12 +59,20 @@ final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfo = new MockSplFileInfo([
+        $fileInfo1 = new MockSplFileInfo([
+            'file' => 'test.txt',
+        ]);
+        $fileInfo2 = new MockSplFileInfo([
             'file' => 'test.txt',
         ]);
 
-        $proxyTraceA = new ProxyTrace($fileInfo, now(1));
-        $proxyTraceB = new ProxyTrace($fileInfo, now(2));
+        $sourceCollector = new FixedSourceCollector(
+            false,
+            [
+                $fileInfo1,
+                $fileInfo2,
+            ],
+        );
 
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
@@ -82,8 +88,8 @@ final class MutationGeneratorTest extends TestCase
         $fileMutationGenerator->expects($this->exactly(2))
             ->method('generate')
             ->with(...WithConsecutive::create(
-                [$proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers],
-                [$proxyTraceB, $onlyCovered, $mutators, $nodeIgnorers],
+                [$fileInfo1, $onlyCovered, $mutators, $nodeIgnorers],
+                [$fileInfo2, $onlyCovered, $mutators, $nodeIgnorers],
             ))
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
@@ -97,22 +103,11 @@ final class MutationGeneratorTest extends TestCase
             $mutation2,
         ];
 
-        $traceProviderMock = $this->createMock(TraceProvider::class);
-        $traceProviderMock
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn([
-                $proxyTraceA,
-                $proxyTraceB,
-            ])
-        ;
-
         $mutationGenerator = new MutationGenerator(
-            $traceProviderMock,
+            $sourceCollector,
             $mutators,
             $eventDispatcherMock,
             $fileMutationGenerator,
-            false,
         );
 
         $mutations = [];
@@ -144,89 +139,27 @@ final class MutationGeneratorTest extends TestCase
             ->method('generate')->willReturn([])
         ;
 
-        $traceProviderMock = $this->createMock(TraceProvider::class);
-        $traceProviderMock
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn([
-                new ProxyTrace(
-                    new SplFileInfo(
-                        'fileA',
-                        'relativePathToFileA',
-                        'relativePathnameToFileA',
-                    ),
-                ),
-                new ProxyTrace(
-                    new SplFileInfo(
-                        'fileB',
-                        'relativePathToFileB',
-                        'relativePathnameToFileB',
-                    ),
-                ),
-            ])
-        ;
-
-        $mutationGenerator = new MutationGenerator(
-            $traceProviderMock,
-            [],
-            $eventDispatcherMock,
-            $fileMutationGeneratorMock,
+        $sourceCollector = new FixedSourceCollector(
             false,
+            [
+                new SplFileInfo(
+                    'fileA',
+                    'relativePathToFileA',
+                    'relativePathnameToFileA',
+                ),
+                new SplFileInfo(
+                    'fileB',
+                    'relativePathToFileB',
+                    'relativePathnameToFileB',
+                ),
+            ],
         );
 
-        foreach ($mutationGenerator->generate(false, []) as $_) {
-            // We just want to iterate here to trigger the generator
-        }
-    }
-
-    public function test_it_does_not_count_files_in_concurrent_mode(): void
-    {
-        $eventDispatcherMock = $this->createMock(EventDispatcher::class);
-        $eventDispatcherMock
-            ->expects($this->exactly(4))
-            ->method('dispatch')
-            ->with(...WithConsecutive::create(
-                [new MutationGenerationWasStarted(0)],
-                [new MutableFileWasProcessed()],
-                [new MutableFileWasProcessed()],
-                [new MutationGenerationWasFinished()],
-            ))
-        ;
-
-        $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
-        $fileMutationGeneratorMock
-            ->expects($this->exactly(2))
-            ->method('generate')->willReturn([])
-        ;
-
-        $traceProviderMock = $this->createMock(TraceProvider::class);
-        $traceProviderMock
-            ->expects($this->once())
-            ->method('provideTraces')
-            ->willReturn([
-                new ProxyTrace(
-                    new SplFileInfo(
-                        'fileA',
-                        'relativePathToFileA',
-                        'relativePathnameToFileA',
-                    ),
-                ),
-                new ProxyTrace(
-                    new SplFileInfo(
-                        'fileB',
-                        'relativePathToFileB',
-                        'relativePathnameToFileB',
-                    ),
-                ),
-            ])
-        ;
-
         $mutationGenerator = new MutationGenerator(
-            $traceProviderMock,
+            $sourceCollector,
             [],
             $eventDispatcherMock,
             $fileMutationGeneratorMock,
-            true,
         );
 
         foreach ($mutationGenerator->generate(false, []) as $_) {

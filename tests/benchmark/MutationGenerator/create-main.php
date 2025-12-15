@@ -35,15 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\MutationGenerator;
 
-use function array_map;
+use function class_exists;
 use Closure;
 use function function_exists;
 use Infection\Container;
+use Infection\Mutation\FileMutationGenerator;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
+use SplFileInfo;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -52,7 +55,7 @@ require_once __DIR__ . '/sources/autoload.php';
 
 if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
     /**
-     * @return iterable<SplFileInfo>
+     * @return iterable<FinderSplFileInfo>
      */
     function collectSources(): iterable
     {
@@ -64,12 +67,21 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
     }
 }
 
-if (!function_exists('Infection\Benchmark\MutationGenerator\createTrace')) {
-    function createTrace(SplFileInfo $fileInfo): Trace
+if (!class_exists(EmptyTraceTracer::class, false)) {
+    final class EmptyTraceTracer implements Tracer
     {
-        require_once $fileInfo->getRealPath();
+        public function hasTrace(SplFileInfo $fileInfo): bool
+        {
+            return true;
+        }
 
-        return new EmptyTrace($fileInfo);
+        public function trace(SplFileInfo $fileInfo): Trace
+        {
+            require_once $fileInfo->getRealPath();
+
+            // @phpstan-ignore argument.type
+            return new EmptyTrace($fileInfo);
+        }
     }
 }
 
@@ -81,12 +93,9 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\createTrace')) {
 return static function (int $maxCount): Closure {
     $container = Container::create();
 
-    $traces = array_map(
-        createTrace(...),
-        iterator_to_array(
-            collectSources(),
-            false,
-        ),
+    $sources = iterator_to_array(
+        collectSources(),
+        false,
     );
 
     $mutators = $container->getMutatorFactory()->create(
@@ -94,14 +103,20 @@ return static function (int $maxCount): Closure {
         true,
     );
 
-    $fileMutationGenerator = $container->getFileMutationGenerator();
+    $fileMutationGenerator = new FileMutationGenerator(
+        $container->getFileParser(),
+        $container->getNodeTraverserFactory(),
+        $container->getLineRangeCalculator(),
+        $container->getSourceLineMatcher(),
+        new EmptyTraceTracer(),
+    );
 
-    return static function () use ($traces, $fileMutationGenerator, $mutators, $maxCount): int {
+    return static function () use ($sources, $fileMutationGenerator, $mutators, $maxCount): int {
         $count = 0;
 
-        foreach ($traces as $trace) {
+        foreach ($sources as $source) {
             $mutations = $fileMutationGenerator->generate(
-                $trace,
+                $source,
                 false,
                 $mutators,
                 [],

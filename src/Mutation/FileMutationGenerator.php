@@ -45,8 +45,9 @@ use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -60,6 +61,7 @@ class FileMutationGenerator
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineMatcher $sourceLineMatcher,
+        private readonly Tracer $tracer,
     ) {
     }
 
@@ -73,7 +75,7 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        Trace $trace,
+        SplFileInfo $sourceFile,
         bool $onlyCovered,
         array $mutators,
         array $nodeIgnorers,
@@ -81,11 +83,13 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        if ($onlyCovered && !$trace->hasTests()) {
+        // If $onlyCovered, then for a non-covered source file we will
+        // get an empty trace. This is configured at the tracer level.
+        if (!$this->tracer->hasTrace($sourceFile)) {
             return;
         }
 
-        $sourceFile = $trace->getSourceFileInfo();
+        $trace = $this->tracer->trace($sourceFile);
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
@@ -95,7 +99,7 @@ class FileMutationGenerator
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $trace->getRealPath(),
+                filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,

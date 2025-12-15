@@ -149,8 +149,10 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
+use Infection\TestFramework\PhpUnit\PhpUnitTracer;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -248,6 +250,9 @@ final class Container extends DIContainer
                 $container->getPhpUnitXmlCoverageTraceProvider(),
                 $container->getJUnitTestExecutionInfoAdder(),
                 $container->getBufferedSourceFileFilter(),
+            ),
+            Tracer::class => static fn (self $container) => new PhpUnitTracer(
+                $container->getUnionTraceProvider(),
             ),
             UnionTraceProvider::class => static fn (self $container): UnionTraceProvider => new UnionTraceProvider(
                 $container->getCoveredTraceProvider(),
@@ -447,6 +452,7 @@ final class Container extends DIContainer
                 $container->getNodeTraverserFactory(),
                 $container->getLineRangeCalculator(),
                 $container->getSourceLineMatcher(),
+                $container->get(Tracer::class),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -530,11 +536,10 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $container->getUnionTraceProvider(),
+                    $container->getSourceCollector(),
                     $config->mutators,
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $config->noProgress,
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
