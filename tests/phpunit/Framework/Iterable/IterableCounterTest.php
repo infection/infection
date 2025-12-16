@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Framework\Iterable;
 
 use ArrayIterator;
-use Infection\IterableCounter;
+use Infection\Framework\Iterable\IterableCounter;
 use Iterator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

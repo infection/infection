@@ -39,7 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
-use Infection\IterableCounter;
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
