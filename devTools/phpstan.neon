@@ -146,6 +146,12 @@ parameters:
             message: '#::profile\(\) should return int but returns int.*\|null#'
             path: ../tests/benchmark/DummyInstrumentor.php
 
+        # This plugin does not seem to understand the PHPBench data providers
+        -
+            identifier: shipmonk.deadMethod
+            message: '#Unused .+Bench::provide*#'
+            path: ../tests/benchmark/*/*Bench.php
+
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod

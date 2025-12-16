@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Tracing;
 
 use Infection\TestFramework\Tracing\Trace\Trace;
-use SplFileInfo;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * The test framework Tracer is the service responsible for creating a Trace for a given file, i.e.
@@ -48,5 +48,9 @@ interface Tracer
 {
     public function hasTrace(SplFileInfo $fileInfo): bool;
 
+    /**
+     * Beware! Whilst the absence of Trace guarantees the absence of tests, its reciprocal is false.
+     * A trace may end up being empty.
+     */
     public function trace(SplFileInfo $fileInfo): Trace;
 }

@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\PhpUnit;
+namespace Infection\Tests\TestFramework\Tracing;
 
 use ArrayIterator;
-use Infection\TestFramework\PhpUnit\PhpUnitTracer;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProvider;
+use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\TrackableIterator;
@@ -50,20 +50,20 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\InvalidArgumentException;
 
-#[CoversClass(PhpUnitTracer::class)]
-final class PhpUnitTracerTest extends TestCase
+#[CoversClass(TraceProviderAdapterTracer::class)]
+final class TraceProviderAdapterTracerTest extends TestCase
 {
     use ExpectsThrowables;
 
     private TraceProvider&MockObject $traceProviderMock;
 
-    private PhpUnitTracer $tracer;
+    private TraceProviderAdapterTracer $tracer;
 
     protected function setUp(): void
     {
         $this->traceProviderMock = $this->createMock(TraceProvider::class);
 
-        $this->tracer = new PhpUnitTracer($this->traceProviderMock);
+        $this->tracer = new TraceProviderAdapterTracer($this->traceProviderMock);
     }
 
     public function test_it_can_trace_files(): void

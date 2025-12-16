@@ -60,7 +60,7 @@ $input = new ArgvInput(
             MAX_TRACE_COUNT_OPT,
             null,
             InputOption::VALUE_REQUIRED,
-            'Maximum number of traces retrieved. Use -1 for no maximum',
+            'Maximum number of traces retrieved. Use -1 for no maximum.',
             '-1',
         ),
         new InputOption(

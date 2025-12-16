@@ -49,8 +49,8 @@ use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\WithConsecutive;
+use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -59,18 +59,18 @@ final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfo1 = new MockSplFileInfo([
-            'file' => 'test.txt',
+        $fileInfoA = new MockSplFileInfo([
+            'file' => 'testA.txt',
         ]);
-        $fileInfo2 = new MockSplFileInfo([
-            'file' => 'test.txt',
+        $fileInfoB = new MockSplFileInfo([
+            'file' => 'testB.txt',
         ]);
 
         $sourceCollector = new FixedSourceCollector(
             false,
             [
-                $fileInfo1,
-                $fileInfo2,
+                $fileInfoA,
+                $fileInfoB,
             ],
         );
 
@@ -83,14 +83,16 @@ final class MutationGeneratorTest extends TestCase
         $mutation1 = $this->createMock(Mutation::class);
         $mutation2 = $this->createMock(Mutation::class);
 
-        /** @var FileMutationGenerator&MockObject $fileMutationGenerator */
         $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
-        $fileMutationGenerator->expects($this->exactly(2))
+        $fileMutationGenerator
+            ->expects($this->exactly(2))
             ->method('generate')
-            ->with(...WithConsecutive::create(
-                [$fileInfo1, $onlyCovered, $mutators, $nodeIgnorers],
-                [$fileInfo2, $onlyCovered, $mutators, $nodeIgnorers],
-            ))
+            ->with(
+                ...WithConsecutive::create(
+                    [$fileInfoA, $onlyCovered, $mutators, $nodeIgnorers],
+                    [$fileInfoB, $onlyCovered, $mutators, $nodeIgnorers],
+                ),
+            )
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation1, $mutation2],
@@ -110,11 +112,10 @@ final class MutationGeneratorTest extends TestCase
             $fileMutationGenerator,
         );
 
-        $mutations = [];
-
-        foreach ($mutationGenerator->generate($onlyCovered, $nodeIgnorers) as $mutation) {
-            $mutations[] = $mutation;
-        }
+        $mutations = iterator_to_array(
+            $mutationGenerator->generate($onlyCovered, $nodeIgnorers),
+            preserve_keys: false,
+        );
 
         $this->assertSame($expectedMutations, $mutations);
     }

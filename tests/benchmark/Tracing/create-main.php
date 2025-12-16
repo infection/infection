@@ -49,6 +49,7 @@ use function max;
 use function min;
 use Psr\Log\NullLogger;
 use function round;
+use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -129,7 +130,15 @@ return static function (int $maxCount, float $percentage = 1.): Closure {
 
     return static function (?float $dynamicPercentage = null) use ($maxCount, $tracer, $sources, $percentage) {
         $percentage = $dynamicPercentage ?? $percentage;
-        Assert::range($percentage, 0, 1);
+        Assert::range(
+            $percentage,
+            0,
+            1,
+            sprintf(
+                'Expected the percentage to be an element of [0., 1.]. Got "%s".',
+                $percentage,
+            ),
+        );
 
         $sourcesSubset = takePercentageOfSources($percentage, $sources);
 

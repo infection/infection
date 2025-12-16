@@ -66,6 +66,9 @@ final class TracingBench
         );
     }
 
+    /**
+     * @param array{float} $params
+     */
     #[BeforeMethods('setUp')]
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
@@ -77,6 +80,9 @@ final class TracingBench
         $this->count = ($this->main)($percentage);
     }
 
+    /**
+     * @return iterable<array{float}>
+     */
     public static function providePercentile(): iterable
     {
         yield [.1];

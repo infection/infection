@@ -44,9 +44,8 @@ use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
-use SplFileInfo;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
+use Symfony\Component\Finder\SplFileInfo;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -55,7 +54,7 @@ require_once __DIR__ . '/sources/autoload.php';
 
 if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
     /**
-     * @return iterable<FinderSplFileInfo>
+     * @return iterable<SplFileInfo>
      */
     function collectSources(): iterable
     {
@@ -68,7 +67,7 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
 }
 
 if (!class_exists(EmptyTraceTracer::class, false)) {
-    final class EmptyTraceTracer implements Tracer
+    final readonly class EmptyTraceTracer implements Tracer
     {
         public function hasTrace(SplFileInfo $fileInfo): bool
         {
@@ -79,7 +78,6 @@ if (!class_exists(EmptyTraceTracer::class, false)) {
         {
             require_once $fileInfo->getRealPath();
 
-            // @phpstan-ignore argument.type
             return new EmptyTrace($fileInfo);
         }
     }

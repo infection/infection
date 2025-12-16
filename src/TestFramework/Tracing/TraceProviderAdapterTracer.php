@@ -33,21 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\PhpUnit;
+namespace Infection\TestFramework\Tracing;
 
 use function array_key_exists;
 use Generator;
 use Infection\Framework\Iterable\GeneratorFactory;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\TraceProvider;
-use Infection\TestFramework\Tracing\Tracer;
 use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
+ * Note that this implementation is not meant as a long-lived one. The goal
+ * is to phase out TraceProvider.
+ *
  * @internal
  */
-final class PhpUnitTracer implements Tracer
+final class TraceProviderAdapterTracer implements Tracer
 {
     private bool $traversed = false;
 
@@ -57,6 +58,12 @@ final class PhpUnitTracer implements Tracer
     private ?Generator $traceGenerator = null;
 
     /**
+     * This is effectively used as a cache. Note that whilst it would be trivial
+     * to extract a CachedTracer implementation, this would make this implementation
+     * extremely brittle and unusable without the CachedTracer. Since the coupling
+     * is so tight, although we could technically decouple it thanks to interface,
+     * I decided against it to make the coupling explicit.
+     *
      * @var array<string, Trace|null> Traces indexed by their source pathname.
      */
     private array $indexedTraces = [];

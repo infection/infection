@@ -149,9 +149,9 @@ use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
-use Infection\TestFramework\PhpUnit\PhpUnitTracer;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
@@ -251,7 +251,7 @@ final class Container extends DIContainer
                 $container->getJUnitTestExecutionInfoAdder(),
                 $container->getBufferedSourceFileFilter(),
             ),
-            Tracer::class => static fn (self $container) => new PhpUnitTracer(
+            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getUnionTraceProvider(),
             ),
             UnionTraceProvider::class => static fn (self $container): UnionTraceProvider => new UnionTraceProvider(
@@ -452,7 +452,7 @@ final class Container extends DIContainer
                 $container->getNodeTraverserFactory(),
                 $container->getLineRangeCalculator(),
                 $container->getSourceLineMatcher(),
-                $container->get(Tracer::class),
+                $container->getTracer(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -726,6 +726,11 @@ final class Container extends DIContainer
     public function getFileSystem(): FileSystem
     {
         return $this->get(FileSystem::class);
+    }
+
+    public function getTracer(): Tracer
+    {
+        return $this->get(Tracer::class);
     }
 
     public function getUnionTraceProvider(): UnionTraceProvider
