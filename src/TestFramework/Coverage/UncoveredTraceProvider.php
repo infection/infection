@@ -53,7 +53,7 @@ final readonly class UncoveredTraceProvider implements TraceProvider
     public function provideTraces(): iterable
     {
         foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo, null);
+            yield new ProxyTrace($splFileInfo);
         }
     }
 }
