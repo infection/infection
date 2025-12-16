@@ -40,6 +40,9 @@ use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
+ * A Trace is an envelope for a source file which contains comprehensive information about all tests associated with
+ * that file.
+ *
  * @internal
  */
 interface Trace
