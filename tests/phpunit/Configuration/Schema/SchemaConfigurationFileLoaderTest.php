@@ -93,6 +93,7 @@ final class SchemaConfigurationFileLoaderTest extends TestCase
         $this->assertSame($expectedConfig, $actual);
     }
 
+    /** @return Callback<SchemaConfigurationFile> */
     private static function createRawConfigWithPathArgument(string $path): Callback
     {
         return new Callback(static function (SchemaConfigurationFile $config) use ($path): bool {
