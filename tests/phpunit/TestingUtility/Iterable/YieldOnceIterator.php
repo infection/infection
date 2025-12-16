@@ -42,7 +42,7 @@ use Iterator;
  * This iterator is a utility to enrich an existing Iterator.
  *
  * It decorates an iterator and ensures the keys and values can be
- * yield once and only once, unless the iterator is rewind.
+ *  yielded once and only once, unless the iterator is rewind.
  *
  * This aims to mimic an iterable for which the fetching item
  * operation is heavy, hence should not be done more than once, but
@@ -50,6 +50,7 @@ use Iterator;
  *
  * @template TKey of array-key
  * @template TValue
+ *
  * @implements Iterator<TKey, TValue>
  */
 final class YieldOnceIterator implements Iterator

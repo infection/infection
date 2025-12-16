@@ -50,14 +50,10 @@ use Traversable;
 final class GeneratorFactoryTest extends TestCase
 {
     /**
-     * @param mixed[] $iterable
-     * @param array<string, string> $expected
-     */
-    #[DataProvider('iterableProvider')]
-    /**
      * @param iterable<mixed> $iterable
      * @param mixed[] $expected
      */
+    #[DataProvider('iterableProvider')]
     public function test_it_can_generate_a_generator_from_an_iterable(
         iterable $iterable,
         array $expected,

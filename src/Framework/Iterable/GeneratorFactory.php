@@ -41,6 +41,9 @@ use Iterator;
 use IteratorAggregate;
 
 /**
+ * The goal of this utility is to easily convert a generic `iterable` into a `Generator`,
+ * which has a much friendlier API.
+ *
  * @internal
  */
 final class GeneratorFactory
@@ -64,13 +67,19 @@ final class GeneratorFactory
 
                 $iterable->next();
             }
-        } elseif ($iterable instanceof IteratorAggregate) {
+
+            return;
+        }
+
+        if ($iterable instanceof IteratorAggregate) {
             yield from self::fromIterable($iterable->getIterator());
-        } else {
-            // For arrays, Generators, and other iterables, foreach is safe
-            foreach ($iterable as $key => $value) {
-                yield $key => $value;
-            }
+
+            return;
+        }
+
+        // For arrays, Generators, and other iterables, foreach is safe
+        foreach ($iterable as $key => $value) {
+            yield $key => $value;
         }
     }
 }
