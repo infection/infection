@@ -105,7 +105,7 @@ final class InitialTestsRunnerTest extends TestCase
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_values(array_unique(array_map('get_class', $this->eventDispatcher->getEvents()))),
+            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
     }
 
@@ -150,7 +150,7 @@ final class InitialTestsRunnerTest extends TestCase
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents()),
+            array_map(get_class(...), $this->eventDispatcher->getEvents()),
         );
     }
 
