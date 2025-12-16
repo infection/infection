@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Closure;
+use PhpBench\Attributes\ParamProviders;
 use const PHP_INT_MAX;
 use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
@@ -68,8 +69,20 @@ final class TracingBench
     #[BeforeMethods('setUp')]
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
-    public function bench(): void
+    #[ParamProviders('providePercentile')]
+    public function bench(array $params): void
     {
-        $this->count = ($this->main)();
+        $percentage = (float) $params[0];
+
+        $this->count = ($this->main)($percentage);
+    }
+
+    public static function providePercentile(): iterable
+    {
+        yield [.1];
+        yield [.25];
+        yield [.5];
+        yield [.75];
+        yield [1.];
     }
 }

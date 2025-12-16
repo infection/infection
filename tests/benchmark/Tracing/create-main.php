@@ -36,6 +36,13 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Closure;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
+use Webmozart\Assert\Assert;
+use function array_filter;
+use function array_map;
+use function array_slice;
+use function array_splice;
+use function count;
 use function function_exists;
 use Infection\Container;
 use Infection\TestFramework\Tracing\Trace\Trace;
@@ -45,6 +52,9 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use function max;
+use function min;
+use function round;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -57,17 +67,57 @@ if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
     }
 }
 
+if (!function_exists('Infection\Benchmark\Tracing\createContainer')) {
+    function createContainer(): Container
+    {
+        return Container::create()->withValues(
+            logger: new NullLogger(),
+            output: new NullOutput(),
+            configFile: __DIR__ . '/infection.json5',
+            existingCoveragePath: __DIR__ . '/coverage',
+            useNoopMutators: true,
+        );
+    }
+}
+
 if (!function_exists('Infection\Benchmark\Tracing\collectSources')) {
     /**
-     * @return iterable<SplFileInfo>
+     * @return SplFileInfo[]
      */
-    function collectSources(): iterable
+    function collectSources(): array
     {
-        return Finder::create()
-            ->files()
-            ->in(__DIR__ . '/benchmark-source/src')
-            ->name('*.php')
-        ;
+        // We need to use a fresh container instance, otherwise our lovely iterators are going to be consumed...
+        $traceProvider = createContainer()->get(CoveredTraceProvider::class);
+
+        return array_map(
+            static fn (Trace $trace) => $trace->getSourceFileInfo(),
+            iterator_to_array(
+                $traceProvider->provideTraces(),
+                preserve_keys: false,
+            ),
+        );
+    }
+}
+
+if (!function_exists('Infection\Benchmark\Tracing\takePercentageOfSources')) {
+    /**
+     * @param SplFileInfo[] $sources
+     *
+     * @return SplFileInfo[]
+     */
+    function takePercentageOfSources(float $percentage, array $sources): array
+    {
+        $sourcesOffset = (int) max(
+            0,
+            min(
+                count($sources),
+                round(
+                    count($sources) * $percentage,
+                ),
+            ),
+        );
+
+        return array_splice($sources, 0, $sourcesOffset);
     }
 }
 
@@ -76,24 +126,19 @@ if (!function_exists('Infection\Benchmark\Tracing\collectSources')) {
  *
  * @return Closure():(positive-int|0)
  */
-return static function (int $maxCount): Closure {
-    $container = Container::create()->withValues(
-        logger: new NullLogger(),
-        output: new NullOutput(),
-        configFile: __DIR__ . '/infection.json5',
-        existingCoveragePath: __DIR__ . '/coverage',
-        useNoopMutators: true,
-    );
-    $tracer = $container->get(Tracer::class);
-    $sources = iterator_to_array(
-        collectSources(),
-        false,
-    );
+return static function (int $maxCount, float $percentage = 1.): Closure {
+    $tracer = createContainer()->get(Tracer::class);
+    $sources = collectSources();
 
-    return static function () use ($maxCount, $tracer, $sources) {
+    return static function (?float $dynamicPercentage = null) use ($maxCount, $tracer, $sources, $percentage) {
+        $percentage = $dynamicPercentage ?? $percentage;
+        Assert::range($percentage, 0, 1);
+
+        $sourcesSubset = takePercentageOfSources($percentage, $sources);
+
         $count = 0;
 
-        foreach ($sources as $source) {
+        foreach ($sourcesSubset as $source) {
             if (!$tracer->hasTrace($source)) {
                 continue;
             }
