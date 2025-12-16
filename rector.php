@@ -51,7 +51,6 @@ use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveDataProviderParamKeysRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\DataProviderArrayItemsNewLinedRector;
@@ -91,7 +90,6 @@ return RectorConfig::configure()
         typeDeclarations: true,
     )
     ->withRules([
-        AddCoversClassAttributeRector::class,
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
@@ -121,9 +119,6 @@ return RectorConfig::configure()
     ->withSkip([
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
-        AddCoversClassAttributeRector::class => [
-            __DIR__ . '/tests/phpunit/FileSystem/FileSystemTestCase.php',
-        ],
         AddInstanceofAssertForNullableInstanceRector::class,
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
