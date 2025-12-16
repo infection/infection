@@ -125,6 +125,9 @@ return RectorConfig::configure()
             __DIR__ . '/tests/phpunit/FileSystem/FileSystemTestCase.php',
         ],
         AddInstanceofAssertForNullableInstanceRector::class,
+        AddParamArrayDocblockFromDataProviderRector::class => [
+            __DIR__ . '/tests/phpunit/Framework/Iterable/GeneratorFactory/GeneratorFactoryTest.php',
+        ],
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
         ],
