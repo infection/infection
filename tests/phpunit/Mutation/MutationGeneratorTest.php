@@ -50,9 +50,9 @@ use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\WithConsecutive;
+use function iterator_to_array;
 use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -65,8 +65,8 @@ final class MutationGeneratorTest extends TestCase
             'file' => 'test.txt',
         ]);
 
-        $proxyTraceA = new ProxyTrace($fileInfo, now(1));
-        $proxyTraceB = new ProxyTrace($fileInfo, now(2));
+        $traceA = new ProxyTrace($fileInfo, now(1));
+        $traceB = new ProxyTrace($fileInfo, now(2));
 
         $mutators = ['Fake' => new IgnoreMutator(new IgnoreConfig([]), new FakeMutator())];
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
@@ -77,14 +77,16 @@ final class MutationGeneratorTest extends TestCase
         $mutation1 = $this->createMock(Mutation::class);
         $mutation2 = $this->createMock(Mutation::class);
 
-        /** @var FileMutationGenerator&MockObject $fileMutationGenerator */
-        $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
-        $fileMutationGenerator->expects($this->exactly(2))
+        $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGeneratorMock
+            ->expects($this->exactly(2))
             ->method('generate')
-            ->with(...WithConsecutive::create(
-                [$proxyTraceA, $onlyCovered, $mutators, $nodeIgnorers],
-                [$proxyTraceB, $onlyCovered, $mutators, $nodeIgnorers],
-            ))
+            ->with(
+                ...WithConsecutive::create(
+                    [$traceA, $onlyCovered, $mutators, $nodeIgnorers],
+                    [$traceB, $onlyCovered, $mutators, $nodeIgnorers],
+                ),
+            )
             ->willReturnOnConsecutiveCalls(
                 [$mutation0, $mutation1],
                 [$mutation1, $mutation2],
@@ -102,8 +104,8 @@ final class MutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('provideTraces')
             ->willReturn([
-                $proxyTraceA,
-                $proxyTraceB,
+                $traceA,
+                $traceB,
             ])
         ;
 
@@ -111,15 +113,14 @@ final class MutationGeneratorTest extends TestCase
             $traceProviderMock,
             $mutators,
             $eventDispatcherMock,
-            $fileMutationGenerator,
+            $fileMutationGeneratorMock,
             false,
         );
 
-        $mutations = [];
-
-        foreach ($mutationGenerator->generate($onlyCovered, $nodeIgnorers) as $mutation) {
-            $mutations[] = $mutation;
-        }
+        $mutations = iterator_to_array(
+            $mutationGenerator->generate($onlyCovered, $nodeIgnorers),
+            preserve_keys: false,
+        );
 
         $this->assertSame($expectedMutations, $mutations);
     }
