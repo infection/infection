@@ -38,7 +38,7 @@ namespace Infection\Benchmark\Tracing;
 use Closure;
 use function function_exists;
 use Infection\Container;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\NullOutput;
 

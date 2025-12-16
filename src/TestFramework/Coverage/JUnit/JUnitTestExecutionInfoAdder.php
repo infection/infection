@@ -38,7 +38,7 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Tracing\Trace\Trace;
 
 /**
  * Adds test execution info to selected covered file data object.
