@@ -41,6 +41,7 @@ use Traversable;
 /**
  * @template TKey of array-key
  * @template TValue
+ *
  * @implements IteratorAggregate<TKey, TValue>
  */
 final readonly class SimpleIteratorAggregate implements IteratorAggregate

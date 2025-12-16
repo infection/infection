@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Benchmark\Tracing;
 
 use Closure;
-use PhpBench\Attributes\ParamProviders;
 use const PHP_INT_MAX;
 use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
+use PhpBench\Attributes\ParamProviders;
 use Webmozart\Assert\Assert;
 
 /**
@@ -80,9 +80,13 @@ final class TracingBench
     public static function providePercentile(): iterable
     {
         yield [.1];
+
         yield [.25];
+
         yield [.5];
+
         yield [.75];
+
         yield [1.];
     }
 }

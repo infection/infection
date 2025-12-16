@@ -35,26 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Benchmark\Tracing;
 
-use Closure;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
-use Webmozart\Assert\Assert;
-use function array_filter;
 use function array_map;
-use function array_slice;
 use function array_splice;
+use Closure;
 use function count;
 use function function_exists;
 use Infection\Container;
+use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
-use Psr\Log\NullLogger;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use function max;
 use function min;
+use Psr\Log\NullLogger;
 use function round;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Finder\SplFileInfo;
+use Webmozart\Assert\Assert;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 

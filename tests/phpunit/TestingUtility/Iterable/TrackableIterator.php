@@ -40,27 +40,28 @@ use Iterator;
 /**
  * This iterator is a utility to enrich an existing by providing tracking capabilities.
  *
- * It allows to track the last yielded values, without making assumption about the
+ * It allows tracking the last yielded values without making an assumption about the
  * internal logic of the decorated iterator. This is achieved by tracking the yielded
  * values in separate properties.
  *
- * For example, a custom iterator could have a weird logic in which `::current()` can return
+ * For example, a custom iterator could have a unique logic in which `::current()` can return
  * the value only once or trigger various side effects. In which case, we cannot use `::current()`
- * to check what was the last yielded value. This class offers a separate property to achieve this.
+ * to check what the last yielded value was. This class offers a separate property to achieve this.
  *
  * @template TKey of array-key
  * @template TValue
+ *
  * @implements Iterator<TKey, TValue>
  */
 final class TrackableIterator implements Iterator
 {
     // Value representing the absence of a yielded key. We cannot use `null` as it is a result
     // that may be returned by `::key()`.
-    public const EMPTY_KEY = '__ππae5181162f0f0a5daacf223fee61d13d142e276807525867a836d3d6968854a0';
+    public const EMPTY_KEY = '__θθae5181162f0f0a5daacf223fee61d13d142e276807525867a836d3d6968854a0';
 
     // Value representing the absence of a yielded value. We cannot use `null` as it is a result
     // that may be returned by `::value()`.
-    public const EMPTY_VALUE = '__ππfb31e5bcd01897b407311d26f33b78be5b4604f9199fe6e72240c5aee1a2ee44';
+    public const EMPTY_VALUE = '__θθfb31e5bcd01897b407311d26f33b78be5b4604f9199fe6e72240c5aee1a2ee44';
 
     private bool $yieldedAnyValue = false;
 
