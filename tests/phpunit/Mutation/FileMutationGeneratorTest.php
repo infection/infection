@@ -149,11 +149,10 @@ final class FileMutationGeneratorTest extends TestCase
         $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
-            ->willReturnCallback(function (SplFileInfo $fileInfo): array {
-                $this->assertSame('/path/to/file', $fileInfo->getRealPath());
-
-                return [$initialStatements, []];
-            })
+            ->with($this->callback(
+                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === '/path/to/file',
+            ))
+            ->willReturn([$initialStatements, []])
         ;
 
         // Pre-traverser should be created and called first
@@ -212,11 +211,10 @@ final class FileMutationGeneratorTest extends TestCase
         $this->fileParserMock
             ->expects($this->once())
             ->method('parse')
-            ->willReturnCallback(function (SplFileInfo $fileInfo) use ($expectedFilePath): array {
-                $this->assertSame($expectedFilePath, $fileInfo->getRealPath());
-
-                return [$initialStatements, []];
-            })
+            ->with($this->callback(
+                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === $expectedFilePath,
+            ))
+            ->willReturn([$initialStatements, []])
         ;
 
         $preTraverserMock = $this->createMock(NodeTraverserInterface::class);
