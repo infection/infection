@@ -33,66 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Benchmark\Tracing;
+namespace Infection\TestFramework\Tracing;
 
-use Closure;
-use const PHP_INT_MAX;
-use PhpBench\Attributes\AfterMethods;
-use PhpBench\Attributes\BeforeMethods;
-use PhpBench\Attributes\Iterations;
-use PhpBench\Attributes\ParamProviders;
-use Webmozart\Assert\Assert;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * To execute this test run `make benchmark_tracing`
+ * The test framework Tracer is the service responsible for creating a Trace for a given file, i.e.
+ * to find all the necessary information about the tests for that file.
+ *
+ * @internal
  */
-final class TracingBench
+interface Tracer
 {
-    private Closure $main;
-
-    private int $count;
-
-    public function setUp(): void
-    {
-        $this->main = (require __DIR__ . '/create-main.php')(PHP_INT_MAX);
-    }
-
-    public function tearDown(): void
-    {
-        Assert::greaterThan(
-            $this->count,
-            0,
-            'No trace was generated.',
-        );
-    }
+    public function hasTrace(SplFileInfo $fileInfo): bool;
 
     /**
-     * @param array{float} $params
+     * Beware! Whilst the absence of Trace guarantees the absence of tests, its reciprocal is false.
+     * A trace may end up being empty.
      */
-    #[BeforeMethods('setUp')]
-    #[AfterMethods('tearDown')]
-    #[Iterations(5)]
-    #[ParamProviders('providePercentile')]
-    public function bench(array $params): void
-    {
-        $percentage = (float) $params[0];
-
-        $this->count = ($this->main)($percentage);
-    }
-
-    /**
-     * @return iterable<array{float}>
-     */
-    public static function providePercentile(): iterable
-    {
-        yield '10%' => [.1];
-
-        yield '25%' => [.25];
-
-        yield '50%' => [.5];
-
-        yield '75%' => [.75];
-
-        yield '100%' => [1.];
-    }
+    public function trace(SplFileInfo $fileInfo): Trace;
 }

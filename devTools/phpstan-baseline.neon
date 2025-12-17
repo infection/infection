@@ -547,12 +547,6 @@ parameters:
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
 
 		-
-			message: '#^Parameter \#2 \$lazyTestLocations of class Infection\\TestFramework\\Tracing\\Trace\\ProxyTrace constructor expects Later\\Interfaces\\Deferred\<Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>\|null, Later\\Interfaces\\Deferred\<int\> given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Mutation/MutationGeneratorTest.php
-
-		-
 			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
 			identifier: argument.type
 			count: 5
