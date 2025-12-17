@@ -85,14 +85,14 @@ final class TracingBench
      */
     public static function providePercentile(): iterable
     {
-        yield [.1];
+        yield '10%' => [.1];
 
-        yield [.25];
+        yield '25%' => [.25];
 
-        yield [.5];
+        yield '50%' => [.5];
 
-        yield [.75];
+        yield '75%' => [.75];
 
-        yield [1.];
+        yield '100%' => [1.];
     }
 }
