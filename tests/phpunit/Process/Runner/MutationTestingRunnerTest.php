@@ -657,7 +657,7 @@ final class MutationTestingRunnerTest extends TestCase
     ): void {
         $this->assertContains(
             $expectedEventClass,
-            array_map('get_class', $actualEvents),
+            array_map(get_class(...), $actualEvents),
         );
     }
 
@@ -745,7 +745,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         return "\n - " . implode(
             "\n - ",
-            array_map('get_class', $events),
+            array_map(get_class(...), $events),
         );
     }
 

@@ -96,7 +96,7 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
                 InitialStaticAnalysisSubStepWasCompleted::class,
                 InitialStaticAnalysisRunWasFinished::class,
             ],
-            array_values(array_unique(array_map('get_class', $this->eventDispatcher->getEvents()))),
+            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
     }
 

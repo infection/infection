@@ -108,7 +108,7 @@ final class ProxyTraceTest extends TestCase
             'file' => 'test.txt',
         ]);
 
-        $trace = new ProxyTrace($fileInfoMock, null);
+        $trace = new ProxyTrace($fileInfoMock);
 
         $this->assertFalse($trace->hasTests());
 
@@ -121,7 +121,7 @@ final class ProxyTraceTest extends TestCase
             'file' => 'test.txt',
         ]);
 
-        $trace = new ProxyTrace($fileInfoMock, null);
+        $trace = new ProxyTrace($fileInfoMock);
 
         $this->assertCount(0, $trace->getAllTestsForMutation(new NodeLineRangeData(1, 2), false));
     }
