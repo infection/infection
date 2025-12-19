@@ -55,7 +55,7 @@ class CalculatorTest extends TestCase
     {
         $this->assertTrue($this->calculator->isPositive(5));
         $this->assertFalse($this->calculator->isPositive(-5));
-        $this->assertFalse($this->calculator->isPositive(0));
+        $this->assertTrue($this->calculator->isPositive(0));
     }
 
     public function test_absolute(): void

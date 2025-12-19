@@ -27,8 +27,16 @@ test: $(PHPUNIT_BIN)
 .PHONY: phpunit-coverage
 phpunit-coverage: ## Generate coverage
 phpunit-coverage: $(PHPUNIT_BIN)
+	rm -rf $(PHPUNIT_COVERAGE_XML_DIR) || true
 	XDEBUG_MODE=coverage $(PHPUNIT_BIN) --coverage-xml=$(PHPUNIT_COVERAGE_XML_DIR) --log-junit=$(PHPUNIT_COVERAGE_JUNIT)
 
 
-$(PHPUNIT_BIN):
-	composer install
+$(PHPUNIT_BIN): vendor
+
+vendor: composer.lock
+
+composer.lock: composer.json
+	composer update --prefer-dist
+	touch -c vendor
+	touch -c composer.lock
+	touch -c composer.json

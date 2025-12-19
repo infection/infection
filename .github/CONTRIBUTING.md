@@ -48,10 +48,11 @@ vendor/bin/phpunit --group=e2e --list-tests
 Some end-to-end tests are called "non-standard" as in they have their own script. They can be executed with:
 
 ```shell
-./tests/e2e_tests <infection-executable> [<e2e-test>]
+./tests/e2e_tests <infection-executable> [<e2e-test-name>]
 
 # <infection-executable>: defaults to bin/infection, or use build/infection.phar
-# [<e2e-test>]: optional grep pattern to filter tests, e.g. Adapter_Installer
+# [<e2e-test>]: optional grep pattern to filter tests, e.g. Adapter_Installer. The
+#  list of tests available can be found in tests/e2e.
 ```
 
 
