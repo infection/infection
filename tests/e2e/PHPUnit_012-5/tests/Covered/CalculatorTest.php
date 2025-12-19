@@ -1,8 +1,8 @@
 <?php
 
-namespace Infection\E2ETests\PHPUnit_012_0\Tests\Covered;
+namespace Infection\E2ETests\PHPUnit_0125\Tests\Covered;
 
-use Infection\E2ETests\PHPUnit_012_0\Covered\Calculator;
+use Infection\E2ETests\PHPUnit_0125\Covered\Calculator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\E2ETests\PHPUnit_012_0\Uncovered;
+namespace Infection\E2ETests\PHPUnit_0125\Covered;
 
 class Calculator
 {
@@ -30,11 +30,11 @@ class Calculator
 
     public function isPositive(int $number): bool
     {
-        return $number > 0;
+        return $number >= 0;
     }
 
     public function absolute(int $number): int
     {
-        return $number < 0 ? -$number : $number;
+        return $number <= 0 ? -$number : $number;
     }
 }

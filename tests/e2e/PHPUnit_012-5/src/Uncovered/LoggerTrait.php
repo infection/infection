@@ -1,6 +1,6 @@
 <?php
 
-namespace Infection\E2ETests\PHPUnit_012_0\Uncovered;
+namespace Infection\E2ETests\PHPUnit_0125\Uncovered;
 
 trait LoggerTrait
 {

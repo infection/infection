@@ -1,9 +1,9 @@
 <?php
 
-namespace Infection\E2ETests\PHPUnit_012_0\Tests\Covered;
+namespace Infection\E2ETests\PHPUnit_0125\Tests\Covered;
 
-use Infection\E2ETests\PHPUnit_012_0\Covered\LoggerTrait;
-use Infection\E2ETests\PHPUnit_012_0\Covered\UserService;
+use Infection\E2ETests\PHPUnit_0125\Covered\LoggerTrait;
+use Infection\E2ETests\PHPUnit_0125\Covered\UserService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\TestCase;

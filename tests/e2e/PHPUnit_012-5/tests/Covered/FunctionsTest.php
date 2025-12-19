@@ -1,13 +1,13 @@
 <?php
 
-namespace Infection\E2ETests\PHPUnit_012_0\Tests\Covered;
+namespace Infection\E2ETests\PHPUnit_0125\Tests\Covered;
 
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\TestCase;
 
-use function Infection\E2ETests\PHPUnit_012_0\Covered\formatName;
+use function Infection\E2ETests\PHPUnit_0125\Covered\formatName;
 
-#[CoversFunction('Infection\E2ETests\PHPUnit_012_0\Covered\formatName')]
+#[CoversFunction('Infection\E2ETests\PHPUnit_0125\Covered\formatName')]
 class FunctionsTest extends TestCase
 {
     public function test_format_name_with_both_names(): void
