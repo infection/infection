@@ -37,7 +37,6 @@ namespace Infection\Tests\Mutation;
 
 use function current;
 use function file_exists;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
@@ -46,8 +45,11 @@ use Infection\Mutator\IgnoreMutator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
-use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
@@ -73,52 +75,50 @@ final class FileMutationGeneratorTest extends TestCase
 
     private MockObject&NodeTraverserFactory $traverserFactoryMock;
 
-    private FileMutationGenerator $mutationGenerator;
+    private MockObject&Tracer $tracerMock;
 
-    private MockObject&FilesDiffChangedLines $filesDiffChangedLines;
+    private FileMutationGenerator $mutationGenerator;
 
     protected function setUp(): void
     {
         $this->fileParserMock = $this->createMock(FileParser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
-        $this->filesDiffChangedLines = $this->createMock(FilesDiffChangedLines::class);
+        $this->tracerMock = $this->createMock(Tracer::class);
 
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
-            $this->filesDiffChangedLines,
-            false,
-            'master',
+            $this->createMock(SourceLineMatcher::class),
+            $this->tracerMock,
         );
     }
 
     public function test_it_generates_mutations_for_a_given_file(): void
     {
-        $traceMock = $this->createTraceMock(
-            self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php',
-            '',
-            '',
-        );
-        $traceMock
-            ->expects($this->never())
-            ->method('hasTests')
-        ;
-        $traceMock
-            ->expects($this->once())
-            ->method('getAllTestsForMutation')
-            ->willReturn([])
-        ;
-        $traceMock
-            ->expects($this->once())
-            ->method('getRealPath')
-            ->willReturn(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php')
-        ;
+        $fileInfoMock = $this->createSplFileInfoMock(self::FIXTURES_DIR . '/Mutation/OneFile/OneFile.php');
 
-        $mutationGenerator = SingletonContainer::getContainer()->getFileMutationGenerator();
+        $this->tracerMock
+            ->expects($this->once())
+            ->method('hasTrace')
+            ->with($fileInfoMock)
+            ->willReturn(true);
+        $this->tracerMock
+            ->expects($this->once())
+            ->method('trace')
+            ->with($fileInfoMock)
+            ->willReturn(new EmptyTrace($fileInfoMock));
+
+        $mutationGenerator = new FileMutationGenerator(
+            SingletonContainer::getContainer()->getFileParser(),
+            SingletonContainer::getContainer()->getNodeTraverserFactory(),
+            SingletonContainer::getContainer()->getLineRangeCalculator(),
+            SingletonContainer::getContainer()->getSourceLineMatcher(),
+            $this->tracerMock,
+        );
 
         $mutations = $mutationGenerator->generate(
-            $traceMock,
+            $fileInfoMock,
             false,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             [],
@@ -152,7 +152,11 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($this->callback(
-                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === '/path/to/file',
+                function (SplFileInfo $fileInfo): bool {
+                    $this->assertSame('/path/to/file', $fileInfo->getRealPath());
+
+                    return true;
+                },
             ))
             ->willReturn([$initialStatements, []])
         ;
@@ -182,10 +186,23 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock)
         ;
 
-        $trace = $this->createTraceMock('/path/to/file', 'relativePath', 'relativePathName', true);
+        $fileInfoMock = $this->createSplFileInfoMock(
+            '/path/to/file',
+            'relativePath',
+            'relativePathName',
+        );
+
+        $this->tracerMock
+            ->method('hasTrace')
+            ->with($fileInfoMock)
+            ->willReturn(true);
+        $this->tracerMock
+            ->method('trace')
+            ->with($fileInfoMock)
+            ->willReturn(new EmptyTrace($fileInfoMock));
 
         $mutations = $this->mutationGenerator->generate(
-            $trace,
+            $fileInfoMock,
             false,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             $nodeIgnorers,
@@ -214,7 +231,11 @@ final class FileMutationGeneratorTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with($this->callback(
-                static fn (SplFileInfo $fileInfo): bool => $fileInfo->getRealPath() === $expectedFilePath,
+                function (SplFileInfo $fileInfo) use ($expectedFilePath): bool {
+                    $this->assertSame($expectedFilePath, $fileInfo->getRealPath());
+
+                    return true;
+                },
             ))
             ->willReturn([$initialStatements, []])
         ;
@@ -247,10 +268,24 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn($traverserMock)
         ;
 
-        $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);
+        $fileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
+
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->method('hasTests')
+            ->willReturn($hasTests);
+
+        $this->tracerMock
+            ->method('hasTrace')
+            ->with($fileInfoMock)
+            ->willReturn($hasTests);
+        $this->tracerMock
+            ->method('trace')
+            ->with($fileInfoMock)
+            ->willReturn($traceMock);
 
         $mutations = $this->mutationGenerator->generate(
-            $trace,
+            $fileInfoMock,
             $onlyCovered,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             $nodeIgnorers,
@@ -283,19 +318,24 @@ final class FileMutationGeneratorTest extends TestCase
             ->method('createPreTraverser')
         ;
 
-        $mutationGenerator = new FileMutationGenerator(
-            $this->fileParserMock,
-            $this->traverserFactoryMock,
-            new LineRangeCalculator(),
-            $this->filesDiffChangedLines,
-            false,
-            'master',
-        );
+        $fileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
 
-        $trace = $this->createTraceMock($file, $relativePath, $relativePathname, $hasTests);
+        $traceMock = $this->createMock(Trace::class);
+        $traceMock
+            ->method('hasTests')
+            ->willReturn($hasTests);
 
-        $mutations = $mutationGenerator->generate(
-            $trace,
+        $this->tracerMock
+            ->method('hasTrace')
+            ->with($fileInfoMock)
+            ->willReturn($hasTests);
+        $this->tracerMock
+            ->method('trace')
+            ->with($fileInfoMock)
+            ->willReturn($traceMock);
+
+        $mutations = $this->mutationGenerator->generate(
+            $fileInfoMock,
             true,
             [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
             [],
@@ -381,32 +421,11 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    private function createTraceMock(
+    private function createSplFileInfoMock(
         string $file,
-        string $relativePath,
-        string $relativePathname,
-        ?bool $hasTests = null,
-    ): Trace&MockObject {
-        $splFileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
-
-        $proxyTraceMock = $this->createMock(Trace::class);
-        $proxyTraceMock
-            ->method('getSourceFileInfo')
-            ->willReturn($splFileInfoMock)
-        ;
-
-        if ($hasTests !== null) {
-            $proxyTraceMock
-                ->method('hasTests')
-                ->willReturn($hasTests)
-            ;
-        }
-
-        return $proxyTraceMock;
-    }
-
-    private function createSplFileInfoMock(string $file, string $relativePath, string $relativePathname): SplFileInfo&MockObject
-    {
+        string $relativePath = '',
+        string $relativePathname = '',
+    ): SplFileInfo&MockObject {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $splFileInfoMock->method('__toString')->willReturn($file);
         $splFileInfoMock->method('getFilename')->willReturn($file);

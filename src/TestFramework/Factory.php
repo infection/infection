@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
@@ -65,15 +65,13 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
-        private SourceFileFilter $sourceFileFilter,
+        private SourceCollector $sourceCollector,
         private array $installedExtensions,
     ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
@@ -87,10 +85,10 @@ final readonly class Factory
                 (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->sourceDirectories,
+                $this->infectionConfig->source->directories,
                 $skipCoverage,
                 $this->infectionConfig->executeOnlyCoveringTestCases,
-                $filteredSourceFilesToMutate,
+                $this->getFilteredSourceFilesToMutate(),
                 $this->infectionConfig->mapSourceClassToTestStrategy,
             );
         }
@@ -118,7 +116,7 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $configuration->sourceDirectories,
+                    $configuration->source->directories,
                     $skipCoverage,
                 );
             }
@@ -138,15 +136,20 @@ final readonly class Factory
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        if ($this->sourceFileFilter->getFilters() === []) {
+        // TODO: this looks incorrect to me... But it is what it is right now.
+        if (!$this->sourceCollector->isFiltered()) {
             return [];
         }
 
         /**
+         * TODO: fix this warning, it is legit...
          * @var list<SplFileInfo> $files
          * @psalm-suppress InvalidArgument
+         * @phpstan-ignore varTag.type
          */
-        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->sourceFiles));
+        $files = iterator_to_array(
+            $this->sourceCollector->collect(),
+        );
 
         return $files;
     }

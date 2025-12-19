@@ -48,6 +48,9 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Configuration\SourceFilter\FakeSourceFilter;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -73,21 +76,25 @@ use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Collector\FakeSourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
+use Infection\Source\Collector\GitDiffSourceCollector;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
@@ -116,41 +123,48 @@ final class ProjectCodeProvider
      * reasons. This list should never be added to, only removed from.
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
-        ConfigureCommand::class,
-        Application::class,
-        ProgressFormatter::class,
-        ConcreteComposerExecutableFinder::class,
-        InvalidReportSource::class,
-        StrykerCurlClient::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
-        NodeMutationGenerator::class,
-        NonExecutableFinder::class,
         AdapterInstaller::class,
-        DummyFileSystem::class,
-        XdebugHandler::class,
-        NullSubscriber::class,
-        FormatterName::class,
-        ShellCommandLineExecutor::class,
+        Application::class,
+        BaseMutatorTestCase::class,
+        ConcreteComposerExecutableFinder::class,
+        ConfigureCommand::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
-        StopInfectionOnSigintSignalSubscriber::class,
+        DummyFileSystem::class,
+        EmptyTrace::class,
+        FakeFileSystem::class,
+        FakeLocator::class,
+        FakeSourceCollector::class,
+        FakeSourceFilter::class,
+        FileSystem::class,
+        FixedSourceCollector::class,
+        FormatterName::class,
+        GitDiffFilter::class,
+        GitDiffSourceCollector::class,
+        IncompleteGitDiffFilter::class,
+        InvalidReportSource::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutantExecutionResult::class,
+        MutationGeneratingConsoleLoggerSubscriber::class,
         MutatorName::class,
+        NodeMutationGenerator::class,
         NoReportFound::class,
-        BaseMutatorTestCase::class,
+        NonExecutableFinder::class,
+        NullSourceLineMatcher::class,
+        NullSubscriber::class,
         OperatingSystem::class,
+        ProgressFormatter::class,
         SchemaConfiguration::class,
         SimpleMutation::class,
-        StringNormalizer::class,
-        Source::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+        Source::class,
+        StopInfectionOnSigintSignalSubscriber::class,
+        StringNormalizer::class,
+        StrykerCurlClient::class,
         TooManyReportsFound::class,
-        FakeFileSystem::class,
-        FakeLocator::class,
-        FileSystem::class,
+        XdebugHandler::class,
     ];
 
     /**
@@ -168,27 +182,27 @@ final class ProjectCodeProvider
      */
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
-        SourceDirGuesser::class,
-        TestFrameworkFinder::class,
-        StrykerDashboardClient::class,
+        FileSystem::class,
         MetricsCalculator::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
-        FileSystem::class,
+        SourceDirGuesser::class,
+        StrykerDashboardClient::class,
+        TestFrameworkFinder::class,
     ];
 
     /**
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
+        BaseMutatorTestCase::class,
+        Definition::class,
+        Mutator::class,
+        MutatorCategory::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
-        Mutator::class,
-        Definition::class,
-        MutatorCategory::class,
-        BaseMutatorTestCase::class,
     ];
 
     /**

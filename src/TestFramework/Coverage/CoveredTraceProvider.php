@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
-use Infection\FileSystem\FileFilter;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Tracing\TraceProvider;
 
 /**
  * Filters traces and augments them with timing data from JUnit report.
@@ -48,16 +48,12 @@ final readonly class CoveredTraceProvider implements TraceProvider
     public function __construct(
         private TraceProvider $primaryTraceProvider,
         private JUnitTestExecutionInfoAdder $testFileDataAdder,
-        private FileFilter $bufferedFilter,
+        private BufferedSourceFileFilter $bufferedFilter,
     ) {
     }
 
-    /**
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
-        /** @var iterable<Trace> $filteredTraces */
         $filteredTraces = $this->bufferedFilter->filter(
             $this->primaryTraceProvider->provideTraces(),
         );

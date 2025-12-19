@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Configuration\ConfigurationFactory;
 
-use function count;
-use function implode;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Entry\Logs;
@@ -45,10 +43,11 @@ use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Entry\StrykerConfig;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\LogVerbosity;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\Arithmetic\AssignmentEqual;
 use Infection\Mutator\Boolean\EqualIdentical;
 use Infection\Mutator\Boolean\TrueValue;
@@ -68,24 +67,17 @@ use Infection\Tests\Configuration\Entry\LogsBuilder;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use Infection\Tests\Fixtures\DummyCiDetector;
 use Infection\Tests\Fixtures\Mutator\CustomMutator;
-use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
 use function sys_get_temp_dir;
-use function var_export;
 
 #[Group('integration')]
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
-    private const GIT_DEFAULT_BASE_BRANCH = 'test/default';
-
-    private const GIT_DIFF_FILTER_PROVIDER_RESULT = 'src/a.php,src/b.php';
+    private const GIT_DEFAULT_BASE = 'test/default';
 
     /**
      * @var array<string, Mutator>|null
@@ -107,7 +99,6 @@ final class ConfigurationFactoryTest extends TestCase
             ->createConfigurationFactory(
                 $scenario->ciDetected,
                 $scenario->githubActionsDetected,
-                $schema,
             )
             ->create(...$scenario->inputBuilder->build($schema))
         ;
@@ -121,7 +112,7 @@ final class ConfigurationFactoryTest extends TestCase
     public function test_it_throws_exception_when_not_known_static_analysis_tool_used_as_input(): void
     {
         $schema = new SchemaConfiguration(
-            file: '/path/to/infection.json',
+            pathname: '/path/to/infection.json',
             timeout: null,
             source: new Source([], []),
             logs: Logs::createEmpty(),
@@ -147,7 +138,6 @@ final class ConfigurationFactoryTest extends TestCase
             ->createConfigurationFactory(
                 ciDetected: false,
                 githubActionsDetected: false,
-                schema: $schema,
             )
             ->create(
                 schema: $schema,
@@ -167,12 +157,9 @@ final class ConfigurationFactoryTest extends TestCase
                 testFramework: TestFrameworkTypes::PHPUNIT,
                 testFrameworkExtraOptions: null,
                 staticAnalysisToolOptions: null,
-                filter: '',
+                sourceFilter: null,
                 threadCount: 0,
                 dryRun: false,
-                gitDiffFilter: null,
-                isForGitDiffLines: false,
-                gitDiffBase: 'master',
                 useGitHubLogger: false,
                 gitlabLogFilePath: null,
                 htmlLogFilePath: null,
@@ -194,7 +181,7 @@ final class ConfigurationFactoryTest extends TestCase
         $defaultLogs = $defaultLogsBuilder->build();
 
         $defaultSchema = new SchemaConfiguration(
-            file: '/path/to/infection.json',
+            pathname: '/path/to/infection.json',
             timeout: null,
             source: new Source([], []),
             logs: Logs::createEmpty(),
@@ -232,12 +219,9 @@ final class ConfigurationFactoryTest extends TestCase
             testFramework: null,
             testFrameworkExtraOptions: null,
             staticAnalysisToolOptions: null,
-            filter: '',
+            sourceFilter: new IncompleteGitDiffFilter('AM', 'master'),
             threadCount: 1,
             dryRun: false,
-            gitDiffFilter: 'AM',
-            isForGitDiffLines: false,
-            gitDiffBase: 'master',
             useGitHubLogger: true,
             gitlabLogFilePath: null,
             htmlLogFilePath: null,
@@ -252,10 +236,8 @@ final class ConfigurationFactoryTest extends TestCase
 
         $defaultConfiguration = new Configuration(
             processTimeout: 10,
-            sourceDirectories: [],
-            sourceFiles: [],
-            sourceFilesFilter: 'f(AM, master, []) = src/a.php,src/b.php',
-            sourceFilesExcludes: [],
+            source: new Source(),
+            sourceFilter: new GitDiffFilter('AM', 'reference(master)'),
             logs: $defaultLogs,
             logVerbosity: LogVerbosity::NONE,
             tmpDir: sys_get_temp_dir() . '/infection',
@@ -282,12 +264,11 @@ final class ConfigurationFactoryTest extends TestCase
             isDryRun: false,
             ignoreSourceCodeMutatorsMap: [],
             executeOnlyCoveringTestCases: true,
-            isForGitDiffLines: true,
-            gitDiffBase: 'master',
             mapSourceClassToTestStrategy: MapSourceClassToTestStrategy::SIMPLE,
             loggerProjectRootDirectory: null,
             staticAnalysisTool: null,
             mutantId: null,
+            configurationPathname: '/path/to/infection.json',
         );
         $defaultConfigurationBuilder = ConfigurationBuilder::from($defaultConfiguration);
 
@@ -1039,141 +1020,41 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
-        yield 'with source files' => [
-            $defaultScenario
-                ->withSchema(
-                    $defaultSchemaBuilder
-                        ->withSource(new Source(['src/'], ['vendor/']))
-                        ->withLogs(Logs::createEmpty())
-                        ->withThreads(5),
-                )
-                ->withInput(
-                    $defaultInputBuilder
-                        ->withFilter('src/Foo.php, src/Bar.php')
-                        ->withGitDiffFilter(null)
-                        ->withIsForGitDiffLines(false)
-                        ->withUseGitHubLogger(false),
-                )
-                ->withExpected(
-                    $defaultConfigurationBuilder
-                        ->withSourceDirectories('src/')
-                        ->withSourceFiles([
-                            new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                            new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-                        ])
-                        ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
-                        ->withSourceFilesExcludes('vendor/')
-                        ->withIsForGitDiffLines(false)
-                        ->withLogs(Logs::createEmpty())
-                        ->build(),
-                ),
-        ];
-
         yield 'without any filters' => [
             $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: null,
-                    isForGitDiffLines: false,
-                    gitDiffBase: null,
-                    expectedSourceFilesFilter: '',
-                    expectedIsForGitDiffLines: false,
-                    expectedDiffBase: null,
+                ->forSourceFilter(
+                    sourceFilter: null,
+                    expectedSourceFilter: null,
                 ),
         ];
 
         yield 'without source files filters' => [
             $defaultScenario
-                ->forFilter(
-                    filter: 'src/Foo.php, src/Bar.php',
-                    gitDiffFilter: null,
-                    isForGitDiffLines: false,
-                    gitDiffBase: null,
-                    expectedSourceFilesFilter: 'src/Foo.php, src/Bar.php',
-                    expectedIsForGitDiffLines: false,
-                    expectedDiffBase: null,
+                ->forSourceFilter(
+                    sourceFilter: new PlainFilter([
+                        'src/Foo.php',
+                        'src/Bar.php',
+                    ]),
+                    expectedSourceFilter: new PlainFilter([
+                        'src/Foo.php',
+                        'src/Bar.php',
+                    ]),
                 ),
         ];
 
         yield 'with git filters' => [
             $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: 'AD',
-                    isForGitDiffLines: false,
-                    gitDiffBase: null,
-                    expectedSourceFilesFilter: 'f(AD, test/default, []) = src/a.php,src/b.php',
-                    expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'test/default',
+                ->forSourceFilter(
+                    sourceFilter: new IncompleteGitDiffFilter('AD', null),
+                    expectedSourceFilter: new GitDiffFilter('AD', 'reference(test/default)'),
                 ),
         ];
 
         yield 'with git filters and base branch' => [
             $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: 'AD',
-                    isForGitDiffLines: false,
-                    gitDiffBase: 'upstream/main',
-                    expectedSourceFilesFilter: 'f(AD, upstream/main, []) = src/a.php,src/b.php',
-                    expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'upstream/main',
-                ),
-        ];
-
-        yield 'with is for git diff lines' => [
-            $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: null,
-                    isForGitDiffLines: true,
-                    gitDiffBase: null,
-                    expectedSourceFilesFilter: 'f(AM, test/default, []) = src/a.php,src/b.php',
-                    expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'test/default',
-                ),
-        ];
-
-        yield 'with is for git diff lines and base branch' => [
-            $defaultScenario
-                ->forFilter(
-                    filter: '',
-                    gitDiffFilter: null,
-                    isForGitDiffLines: true,
-                    gitDiffBase: 'upstream/main',
-                    expectedSourceFilesFilter: 'f(AM, upstream/main, []) = src/a.php,src/b.php',
-                    expectedIsForGitDiffLines: true,
-                    expectedDiffBase: 'upstream/main',
-                ),
-        ];
-
-        yield 'with absolute source directory paths' => [
-            $defaultScenario
-                ->withSchema(
-                    $defaultSchemaBuilder
-                        ->withSource(new Source(['/absolute/src/'], ['vendor/']))
-                        ->withLogs(Logs::createEmpty())
-                        ->withThreads(5),
-                )
-                ->withInput(
-                    $defaultInputBuilder
-                        ->withFilter('src/Foo.php, src/Bar.php')
-                        ->withGitDiffFilter(null)
-                        ->withIsForGitDiffLines(false)
-                        ->withUseGitHubLogger(false),
-                )
-                ->withExpected(
-                    $defaultConfigurationBuilder
-                        ->withSourceDirectories('/absolute/src/')
-                        ->withSourceFiles([
-                            new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                            new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-                        ])
-                        ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
-                        ->withSourceFilesExcludes('vendor/')
-                        ->withIsForGitDiffLines(false)
-                        ->withLogs(Logs::createEmpty())
-                        ->build(),
+                ->forSourceFilter(
+                    sourceFilter: new IncompleteGitDiffFilter('AD', 'upstream/main'),
+                    expectedSourceFilter: new GitDiffFilter('AD', 'reference(upstream/main)'),
                 ),
         ];
 
@@ -1226,12 +1107,12 @@ final class ConfigurationFactoryTest extends TestCase
                     testFramework: 'phpspec',
                     testFrameworkExtraOptions: '--stop-on-failure',
                     staticAnalysisToolOptions: null,
-                    filter: 'src/Foo.php, src/Bar.php',
+                    sourceFilter: new PlainFilter([
+                        'src/Foo.php',
+                        'src/Bar.php',
+                    ]),
                     threadCount: 4,
                     dryRun: true,
-                    gitDiffFilter: null,
-                    isForGitDiffLines: false,
-                    gitDiffBase: 'master',
                     useGitHubLogger: false,
                     gitlabLogFilePath: null,
                     htmlLogFilePath: null,
@@ -1246,11 +1127,12 @@ final class ConfigurationFactoryTest extends TestCase
                 expected: ConfigurationBuilder::withMinimalTestData()
                     ->withTimeout(10)
                     ->withSourceDirectories('src/')
-                    ->withSourceFiles([
-                        new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                        new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-                    ])
-                    ->withSourceFilesFilter('src/Foo.php, src/Bar.php')
+                    ->withSourceFilter(
+                        new PlainFilter([
+                            'src/Foo.php',
+                            'src/Bar.php',
+                        ]),
+                    )
                     ->withSourceFilesExcludes('vendor/')
                     ->withLogs(
                         LogsBuilder::withMinimalTestData()
@@ -1293,12 +1175,11 @@ final class ConfigurationFactoryTest extends TestCase
                     ->withDryRun(true)
                     ->withIgnoreSourceCodeMutatorsMap([])
                     ->withExecuteOnlyCoveringTestCases(false)
-                    ->withIsForGitDiffLines(false)
-                    ->withGitDiffBase('master')
                     ->withMapSourceClassToTestStrategy(MapSourceClassToTestStrategy::SIMPLE)
                     ->withLoggerProjectRootDirectory(null)
                     ->withStaticAnalysisTool(StaticAnalysisToolTypes::PHPSTAN)
                     ->withMutantId('h4sh')
+                    ->withConfigPathname('/path/to/infection.json')
                     ->build(),
             ),
         ];
@@ -1307,7 +1188,6 @@ final class ConfigurationFactoryTest extends TestCase
             $defaultScenario
                 ->withSchema(
                     $defaultSchemaBuilder
-                        ->withSource(new Source([], []))
                         ->withLogs(LogsBuilder::withMinimalTestData()->build())
                         ->withTmpDir('')
                         ->withMutators(['@default' => false, 'CustomMutator' => true])
@@ -1319,9 +1199,6 @@ final class ConfigurationFactoryTest extends TestCase
                 )
                 ->withExpected(
                     $defaultConfigurationBuilder
-                        ->withSourceDirectories()
-                        ->withSourceFiles([])
-                        ->withSourceFilesExcludes()
                         ->withLogs(Logs::createEmpty())
                         ->withMutators([
                             'CustomMutator' => new CustomMutator(),
@@ -1355,78 +1232,16 @@ final class ConfigurationFactoryTest extends TestCase
     private function createConfigurationFactory(
         bool $ciDetected,
         bool $githubActionsDetected,
-        SchemaConfiguration $schema,
     ): ConfigurationFactory {
-        /** @var SourceFileCollector&MockObject $sourceFilesCollector */
-        $sourceFilesCollector = $this->createMock(SourceFileCollector::class);
-
-        $sourceFilesCollector->expects($this->once())
-            ->method('collectFiles')
-            ->willReturnCallback(
-                static function (array $source, array $excludes) use ($schema) {
-                    $schemaSourceDirs = $schema->source->directories;
-
-                    // ConfigurationFactory::collectFiles() MUST convert relative paths to absolute paths
-                    // relative to the schema file location (e.g., 'src/' → '/path/to/src')
-                    // Absolute paths should be passed through unchanged
-
-                    // For relative paths like ['src/'], expect transformation to ['/path/to/src']
-                    if ($schemaSourceDirs === ['src/'] && $source !== ['/path/to/src']) {
-                        throw new LogicException(
-                            sprintf(
-                                'Expected source directories to be transformed to absolute paths. Expected: ["/path/to/src"], got: %s',
-                                var_export($source, true),
-                            ),
-                        );
-                    }
-
-                    // For absolute paths like ['/absolute/src/'], expect no transformation
-                    if ($schemaSourceDirs === ['/absolute/src/'] && $source !== ['/absolute/src/']) {
-                        throw new LogicException(
-                            sprintf(
-                                'Expected absolute source directories to be passed through unchanged. Expected: ["/absolute/src/"], got: %s',
-                                var_export($source, true),
-                            ),
-                        );
-                    }
-
-                    if ($excludes === ['vendor/']) {
-                        return [
-                            new SplFileInfo('src/Foo.php', 'src/Foo.php', 'src/Foo.php'),
-                            new SplFileInfo('src/Bar.php', 'src/Bar.php', 'src/Bar.php'),
-                        ];
-                    }
-
-                    return [];
-                },
-            );
-
-        $gitDiffFilesProviderMock = $this->createMock(GitDiffFileProvider::class);
-        $gitDiffFilesProviderMock
-            ->method('provideDefaultBase')
-            ->willReturn(self::GIT_DEFAULT_BASE_BRANCH);
-        $gitDiffFilesProviderMock
-            ->method('provide')
-            ->willReturnCallback(
-                static fn (string $gitDiffFilter, string $gitDiffBase, array $sourceDirectories): string => sprintf(
-                    'f(%s, %s, [%s]) = %s',
-                    $gitDiffFilter,
-                    $gitDiffBase,
-                    count($sourceDirectories) === 0
-                        ? ''
-                        : implode(', ', $sourceDirectories),
-                    self::GIT_DIFF_FILTER_PROVIDER_RESULT,
-                ),
-            );
-
         return new ConfigurationFactory(
             new TmpDirProvider(),
             SingletonContainer::getContainer()->getMutatorResolver(),
             SingletonContainer::getContainer()->getMutatorFactory(),
             new MutatorParser(),
-            $sourceFilesCollector,
             new DummyCiDetector($ciDetected, $githubActionsDetected),
-            $gitDiffFilesProviderMock,
+            new ConfigurationFactoryGit(
+                self::GIT_DEFAULT_BASE,
+            ),
         );
     }
 }

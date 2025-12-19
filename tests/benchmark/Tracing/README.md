@@ -22,10 +22,11 @@ This is done by `make tests/benchmark/Tracing/coverage`.
 ## Script
 
 The re-usable code of the benchmark is written in [`create-main.php`](create-main.php). It can be
-orchestrated by [`profile.php`](profile.php), which is also the script used for the profiling. It
+orchestrated by [`profile.php`](profile.php), which is also the script used for the profiling.
 
 ```synospis
 Options:
     --max-trace-count   Maximum number of traces retrieved. Use -1 for no maximum.
+    --percentage        Percentage of sources to process. [0,1], defaults to 1 = 100% of the sources processed.
     --debug             To use to execute the code without actually profiling.
 ```

@@ -46,16 +46,17 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffChangedLinesParser;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Subscriber\ChainSubscriberFactory;
@@ -78,14 +79,14 @@ use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
+use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
-use Infection\FileSystem\SourceFileCollector;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\Git\CommandLineGit;
+use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
@@ -119,6 +120,14 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
+use Infection\Source\Collector\CachedSourceCollector;
+use Infection\Source\Collector\LazySourceCollector;
+use Infection\Source\Collector\SourceCollector;
+use Infection\Source\Collector\SourceCollectorFactory;
+use Infection\Source\Exception\NoSourceFound;
+use Infection\Source\Matcher\GitDiffSourceLineMatcher;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
@@ -133,7 +142,6 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
-use Infection\TestFramework\Coverage\LineRangeCalculator;
 use Infection\TestFramework\Coverage\UncoveredTraceProvider;
 use Infection\TestFramework\Coverage\UnionTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
@@ -142,6 +150,9 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
+use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
 use function php_ini_loaded_file;
 use PhpParser\Parser;
@@ -178,8 +189,6 @@ final class Container extends DIContainer
     public const DEFAULT_MUTANT_ID = null;
 
     public const DEFAULT_GIT_DIFF_FILTER = null;
-
-    public const DEFAULT_GIT_DIFF_LINES = false;
 
     public const DEFAULT_GIT_DIFF_BASE = null;
 
@@ -223,7 +232,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS = null;
 
-    public const DEFAULT_FILTER = '';
+    public const DEFAULT_FILTER = null;
 
     public const DEFAULT_THREAD_COUNT = null;
 
@@ -235,25 +244,23 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                $container->getConfiguration()->isForGitDiffLines,
+                $container->getSourceCollector()->isFiltered(),
             ),
             CoveredTraceProvider::class => static fn (self $container): CoveredTraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
                 $container->getJUnitTestExecutionInfoAdder(),
                 $container->getBufferedSourceFileFilter(),
             ),
+            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
+                $container->getUnionTraceProvider(),
+            ),
             UnionTraceProvider::class => static fn (self $container): UnionTraceProvider => new UnionTraceProvider(
                 $container->getCoveredTraceProvider(),
                 $container->getUncoveredTraceProvider(),
                 $container->getConfiguration()->mutateOnlyCoveredCode(),
             ),
-            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => new BufferedSourceFileFilter(
-                $container->getSourceFileFilter(),
-                $container->getConfiguration()->sourceFiles,
-            ),
-            SourceFileFilter::class => static fn (self $container): SourceFileFilter => new SourceFileFilter(
-                $container->getConfiguration()->sourceFilesFilter,
-                $container->getConfiguration()->sourceFilesExcludes,
+            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => BufferedSourceFileFilter::create(
+                $container->getSourceCollector()->collect(),
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
@@ -278,7 +285,7 @@ final class Container extends DIContainer
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
-                    $container->getSourceFileFilter(),
+                    $container->getSourceCollector(),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -440,18 +447,13 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            FileMutationGenerator::class => static function (self $container): FileMutationGenerator {
-                $configuration = $container->getConfiguration();
-
-                return new FileMutationGenerator(
-                    $container->getFileParser(),
-                    $container->getNodeTraverserFactory(),
-                    $container->getLineRangeCalculator(),
-                    $container->getFilesDiffChangedLines(),
-                    $configuration->isForGitDiffLines,
-                    $configuration->gitDiffBase,
-                );
-            },
+            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
+                $container->getFileParser(),
+                $container->getNodeTraverserFactory(),
+                $container->getLineRangeCalculator(),
+                $container->getSourceLineMatcher(),
+                $container->getTracer(),
+            ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
 
@@ -534,11 +536,10 @@ final class Container extends DIContainer
                 $config = $container->getConfiguration();
 
                 return new MutationGenerator(
-                    $container->getUnionTraceProvider(),
+                    $container->getSourceCollector(),
                     $config->mutators,
                     $container->getEventDispatcher(),
                     $container->getFileMutationGenerator(),
-                    $config->noProgress,
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -560,6 +561,40 @@ final class Container extends DIContainer
                 );
             },
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            Git::class => static fn (self $container): Git => new CommandLineGit(
+                new ShellCommandLineExecutor(),
+                $container->getLogger(),
+            ),
+            SourceLineMatcher::class => static function (self $container): SourceLineMatcher {
+                $configuration = $container->getConfiguration();
+                $sourceFilter = $configuration->sourceFilter;
+
+                return $sourceFilter instanceof GitDiffFilter
+                    ? new GitDiffSourceLineMatcher(
+                        $container->getGit(),
+                        $container->getFileSystem(),
+                        $sourceFilter->base,
+                        $sourceFilter->value,
+                        $configuration->source->directories,
+                    )
+                    : new NullSourceLineMatcher();
+            },
+            SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
+                $container->getGit(),
+            ),
+            SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
+                static function () use ($container): SourceCollector {
+                    $configuration = $container->getConfiguration();
+
+                    return new CachedSourceCollector(
+                        $container->get(SourceCollectorFactory::class)->create(
+                            $configuration->configurationPathname,
+                            $configuration->source,
+                            $configuration->sourceFilter,
+                        ),
+                    );
+                },
+            ),
         ]);
 
         return $container->withValues(
@@ -568,6 +603,9 @@ final class Container extends DIContainer
         );
     }
 
+    /**
+     * @param non-empty-string|null $configFile
+     */
     public function withValues(
         LoggerInterface $logger,
         OutputInterface $output,
@@ -590,12 +628,9 @@ final class Container extends DIContainer
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         ?string $staticAnalysisToolOptions = self::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS,
-        string $filter = self::DEFAULT_FILTER,
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter = null,
         ?int $threadCount = self::DEFAULT_THREAD_COUNT,
         bool $dryRun = self::DEFAULT_DRY_RUN,
-        ?string $gitDiffFilter = self::DEFAULT_GIT_DIFF_FILTER,
-        bool $isForGitDiffLines = self::DEFAULT_GIT_DIFF_LINES,
-        ?string $gitDiffBase = self::DEFAULT_GIT_DIFF_BASE,
         ?bool $useGitHubLogger = self::DEFAULT_USE_GITHUB_LOGGER,
         ?string $gitlabLogFilePath = self::DEFAULT_GITLAB_LOGGER_PATH,
         ?string $htmlLogFilePath = self::DEFAULT_HTML_LOGGER_PATH,
@@ -629,7 +664,7 @@ final class Container extends DIContainer
                 array_filter(
                     [
                         $configFile,
-                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILES,
+                        ...SchemaConfigurationLoader::POSSIBLE_DEFAULT_CONFIG_FILE_NAMES,
                     ],
                 ),
             ),
@@ -647,6 +682,10 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             Configuration::class,
+            /**
+             * @throws FileOrDirectoryNotFound
+             * @throws NoSourceFound
+             */
             static fn (self $container): Configuration => $container->getConfigurationFactory()->create(
                 schema: $container->getSchemaConfiguration(),
                 existingCoveragePath: $existingCoveragePath,
@@ -665,12 +704,9 @@ final class Container extends DIContainer
                 testFramework: $testFramework,
                 testFrameworkExtraOptions: $testFrameworkExtraOptions,
                 staticAnalysisToolOptions: $staticAnalysisToolOptions,
-                filter: $filter,
+                sourceFilter: $sourceFilter,
                 threadCount: $threadCount,
                 dryRun: $dryRun,
-                gitDiffFilter: $gitDiffFilter,
-                isForGitDiffLines: $isForGitDiffLines,
-                gitDiffBase: $gitDiffBase,
                 useGitHubLogger: $useGitHubLogger,
                 gitlabLogFilePath: $gitlabLogFilePath,
                 htmlLogFilePath: $htmlLogFilePath,
@@ -692,14 +728,14 @@ final class Container extends DIContainer
         return $this->get(FileSystem::class);
     }
 
+    public function getTracer(): Tracer
+    {
+        return $this->get(Tracer::class);
+    }
+
     public function getUnionTraceProvider(): UnionTraceProvider
     {
         return $this->get(UnionTraceProvider::class);
-    }
-
-    public function getSourceFileFilter(): SourceFileFilter
-    {
-        return $this->get(SourceFileFilter::class);
     }
 
     public function getDiffColorizer(): DiffColorizer
@@ -802,9 +838,9 @@ final class Container extends DIContainer
         return $this->get(PerformanceLoggerSubscriberFactory::class);
     }
 
-    public function getSourceFileCollector(): SourceFileCollector
+    public function getSourceCollector(): SourceCollector
     {
-        return $this->get(SourceFileCollector::class);
+        return $this->get(SourceCollector::class);
     }
 
     public function getNodeTraverserFactory(): NodeTraverserFactory
@@ -892,6 +928,11 @@ final class Container extends DIContainer
         return $this->get(SchemaConfiguration::class);
     }
 
+    // Should throw all the exceptions ConfigurationFactory::create() can throw.
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     public function getConfiguration(): Configuration
     {
         return $this->get(Configuration::class);
@@ -902,14 +943,9 @@ final class Container extends DIContainer
         return $this->get(LineRangeCalculator::class);
     }
 
-    public function getFilesDiffChangedLines(): FilesDiffChangedLines
+    public function getSourceLineMatcher(): SourceLineMatcher
     {
-        return $this->get(FilesDiffChangedLines::class);
-    }
-
-    public function getDiffChangedLinesParser(): DiffChangedLinesParser
-    {
-        return $this->get(DiffChangedLinesParser::class);
+        return $this->get(SourceLineMatcher::class);
     }
 
     public function getTestFrameworkFinder(): TestFrameworkFinder
@@ -977,9 +1013,9 @@ final class Container extends DIContainer
         return $this->get(ShellCommandLineExecutor::class);
     }
 
-    public function getGitDiffFileProvider(): GitDiffFileProvider
+    public function getGit(): Git
     {
-        return $this->get(GitDiffFileProvider::class);
+        return $this->get(Git::class);
     }
 
     public function getStrykerHtmlReportBuilder(): StrykerHtmlReportBuilder

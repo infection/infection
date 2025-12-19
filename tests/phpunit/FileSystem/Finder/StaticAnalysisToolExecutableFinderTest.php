@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use function explode;
-use Generator;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
@@ -207,7 +206,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         );
     }
 
-    public static function providesMockSetup(): Generator
+    public static function providesMockSetup(): iterable
     {
         yield 'composer-bat' => ['setUpComposerBatchTest'];
 

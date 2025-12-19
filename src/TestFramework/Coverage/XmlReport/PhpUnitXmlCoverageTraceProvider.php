@@ -37,8 +37,7 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function dirname;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\Tracing\TraceProvider;
 
 /**
  * Provides the traces based on the PHPUnit XML coverage collected.
@@ -55,12 +54,6 @@ class PhpUnitXmlCoverageTraceProvider implements TraceProvider
     ) {
     }
 
-    /**
-     * @throws InvalidCoverage
-     * @throws NoLineExecuted
-     *
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
         // The existence of the file should have already been checked. Hence in theory we should not

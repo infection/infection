@@ -53,9 +53,6 @@ final class JUnitTestFileDataProvider implements TestFileDataProvider
     ) {
     }
 
-    /**
-     * @throws TestFileNameNotFoundException
-     */
     public function getTestFileInfo(string $fullyQualifiedClassName): TestFileTimeData
     {
         $xPath = $this->getXPath();

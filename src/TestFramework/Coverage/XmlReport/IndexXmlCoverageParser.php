@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\SafeDOMXPath;
 use function sprintf;
 use Webmozart\Assert\Assert;
@@ -47,7 +48,7 @@ use Webmozart\Assert\Assert;
 class IndexXmlCoverageParser
 {
     public function __construct(
-        private readonly bool $isForGitDiffLines,
+        private readonly bool $isSourceFiltered,
     ) {
     }
 
@@ -57,7 +58,7 @@ class IndexXmlCoverageParser
      * need to be enriched to contain all the desired data.
      *
      * @throws InvalidCoverage
-     * @throws NoLineExecuted
+     * @throws NoSourceFound
      *
      * @return iterable<SourceFileInfoProvider>
      */
@@ -67,7 +68,7 @@ class IndexXmlCoverageParser
     ): iterable {
         $xPath = SafeDOMXPath::fromFile($coverageIndexPath, 'p');
 
-        self::assertHasExecutedLines($xPath, $this->isForGitDiffLines);
+        self::assertHasExecutedLines($xPath, $this->isSourceFiltered);
 
         return $this->parseNodes($coverageIndexPath, $coverageBasePath, $xPath);
     }
@@ -99,9 +100,9 @@ class IndexXmlCoverageParser
     }
 
     /**
-     * @throws NoLineExecuted
+     * @throws NoSourceFound
      */
-    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isForGitDiffLines): void
+    private static function assertHasExecutedLines(SafeDOMXPath $xPath, bool $isSourceFiltered): void
     {
         $lineCoverage = $xPath->queryElement('/p:phpunit/p:project/p:directory[1]/p:totals/p:lines');
 
@@ -110,9 +111,9 @@ class IndexXmlCoverageParser
             || ($coverageCount = $lineCoverage->getAttribute('executed')) === '0'
             || $coverageCount === ''
         ) {
-            throw $isForGitDiffLines
-                ? NoLineExecutedInDiffLinesMode::create()
-                : NoLineExecuted::create();
+            throw $isSourceFiltered
+                ? NoSourceFound::noExecutableSourceCodeForDiff()
+                : NoSourceFound::noExecutableSourceCode();
         }
     }
 

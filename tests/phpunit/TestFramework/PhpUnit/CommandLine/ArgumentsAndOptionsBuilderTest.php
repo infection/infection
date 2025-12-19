@@ -38,7 +38,6 @@ namespace Infection\Tests\TestFramework\PhpUnit\CommandLine;
 use function array_map;
 use function array_merge;
 use Closure;
-use Generator;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\PhpUnit\CommandLine\ArgumentsAndOptionsBuilder;
@@ -160,7 +159,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         $this->assertSame($expectedArgumentsAndOptions, $actual);
     }
 
-    public static function provideTestCases(): Generator
+    public static function provideTestCases(): iterable
     {
         $phpunit9 = '9.5';
         $phpunit10 = '10.1';
