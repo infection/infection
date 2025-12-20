@@ -1162,16 +1162,16 @@
         },
         {
             "name": "sanmai/pipeline",
-            "version": "7.5",
+            "version": "7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/pipeline.git",
-                "reference": "c3b87db671ee0bc286860bd13bdb7cfc108b7d7e"
+                "reference": "f7aeb6e1c9572f366c6035c79d715a2a73eeb1c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/c3b87db671ee0bc286860bd13bdb7cfc108b7d7e",
-                "reference": "c3b87db671ee0bc286860bd13bdb7cfc108b7d7e",
+                "url": "https://api.github.com/repos/sanmai/pipeline/zipball/f7aeb6e1c9572f366c6035c79d715a2a73eeb1c9",
+                "reference": "f7aeb6e1c9572f366c6035c79d715a2a73eeb1c9",
                 "shasum": ""
             },
             "require": {
@@ -1218,7 +1218,7 @@
             "description": "General-purpose collections pipeline",
             "support": {
                 "issues": "https://github.com/sanmai/pipeline/issues",
-                "source": "https://github.com/sanmai/pipeline/tree/7.5"
+                "source": "https://github.com/sanmai/pipeline/tree/7.6"
             },
             "funding": [
                 {
@@ -1226,7 +1226,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-05T10:54:07+00:00"
+            "time": "2025-12-20T07:22:08+00:00"
         },
         {
             "name": "sebastian/diff",
