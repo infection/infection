@@ -6,4 +6,4 @@ set -e pipefail
 
 php $INFECTION --no-progress --threads=2
 
-diff -w expected-output.txt infection.log
+diff --ignore-all-space expected-output.txt infection.log
