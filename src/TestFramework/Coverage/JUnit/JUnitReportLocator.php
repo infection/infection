@@ -37,12 +37,12 @@ namespace Infection\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
 use function implode;
-use Infection\FileSystem\Filesystem;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
-use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -50,17 +50,18 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final readonly class JUnitReportLocator extends BaseReportLocator implements ReportLocator
+final class JUnitReportLocator extends BaseReportLocator implements ReportLocator
 {
     public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
     private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
     public static function create(
-        Filesystem $filesystem,
+        FileSystem $filesystem,
         string $coverageDirectory,
         ?string $defaultJUnitPathname = null,
     ): self {
+        // TODO: ensure the default path is in the coverage dir or make the path absolute?
         return new self(
             $filesystem,
             $coverageDirectory,

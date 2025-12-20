@@ -31,12 +31,6 @@ parameters:
 			path: ../src/Differ/DiffColorizer.php
 
 		-
-			message: '#^Parameter \#1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\PathFilterIterator constructor expects Iterator\<string, Symfony\\Component\\Finder\\SplFileInfo\>, Iterator\<mixed, Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/FileSystem/SourceFileFilter.php
-
-		-
 			message: '#^Offset ''name'' might not exist on array\{0\?\: string, name\?\: non\-falsy\-string, 1\?\: non\-falsy\-string, dataname\?\: non\-falsy\-string, 2\?\: non\-falsy\-string\}\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
@@ -133,18 +127,6 @@ parameters:
 			path: ../src/StaticAnalysis/StaticAnalysisToolAdapterFactory.php
 
 		-
-			message: '#^Property Infection\\StaticAnalysis\\StaticAnalysisToolFactory\:\:\$installedExtensions is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
-
-		-
-			message: '#^Property Infection\\StaticAnalysis\\StaticAnalysisToolFactory\:\:\$projectDir is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: ../src/StaticAnalysis/StaticAnalysisToolFactory.php
-
-		-
 			message: '#^Parameter \#2 \$paths of method Composer\\Autoload\\ClassLoader\:\:setPsr4\(\) expects list\<string\>\|string, array\<string\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -221,12 +203,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Method Infection\\Tests\\AutoReview\\BuildConfigYmlTest\:\:test_valid_yaml_has_key\(\) has parameter \$filePath with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/AutoReview/BuildConfigYmlTest.php
 
 		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
@@ -349,12 +325,6 @@ parameters:
 			path: ../tests/phpunit/AutoReview/Mutator/MutatorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\AutoReview\\PhpDoc\\PHPDocParserTest\:\:test_it_can_parse_phpdoc\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/AutoReview/PhpDoc/PHPDocParserTest.php
-
-		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -373,238 +343,34 @@ parameters:
 			path: ../tests/phpunit/CI/MemoizedCiDetectorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Config\\ValueProvider\\ExcludeDirsProviderTest\:\:test_it_contains_vendors_when_sources_contains_current_dir\(\) has parameter \$dirsInCurrentFolder with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Config/ValueProvider/ExcludeDirsProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForCoveragePath\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForGithubActionsDetected\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForGitlabLogger\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForHtmlLogFilePath\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForIgnoreMsiWithNoMutations\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForIgnoreSourceCodeByRegex\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForInitialTestsPhpOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMinCoveredMsi\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMinMsi\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMutators\(\) has parameter \$configMutators with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMutators\(\) has parameter \$expectedMutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
+			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:getDefaultMutators\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForMutators\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForNoProgress\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForPhpUnitConfigDir\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisTool\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForStaticAnalysisToolOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFramework\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFrameworkExtraOptions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTestFrameworkKey\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTimeout\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:createValueForTmpDir\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:getDefaultMutators\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			message: '#^Property Infection\\Tests\\Configuration\\ConfigurationFactory\\ConfigurationFactoryTest\:\:\$mutators with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:test_it_can_create_a_configuration\(\) has parameter \$expectedIgnoreSourceCodeMutatorsMap with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:test_it_can_create_a_configuration\(\) has parameter \$expectedMutators with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationFactory\ConfigurationFactoryScenario::forValueForMutators() has parameter $expectedMutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
+			path: ../tests/phpunit/Configuration/ConfigurationFactory/ConfigurationFactoryScenario.php
 
 		-
-			message: '#^Parameter \#1 \$fileInfos of static method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:normalizePaths\(\) expects array\<Symfony\\Component\\Finder\\SplFileInfo\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Parameter \#8 \$expectedLogVerbosity of method Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:assertConfigurationStateIs\(\) expects string, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\Configuration\\ConfigurationFactoryTest\:\:\$mutators with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			rawMessage: 'Method Infection\Tests\Configuration\ConfigurationBuilder::withMutators() has parameter $mutators with generic interface Infection\Mutator\Mutator but does not specify its types: TNode'
 			identifier: missingType.generics
 			count: 1
-			path: ../tests/phpunit/Configuration/ConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Schema\\InvalidSchemaTest\:\:test_it_can_be_instantiated\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/InvalidSchemaTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Configuration\\Schema\\SchemaConfigurationFactoryTest\:\:createConfig\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Configuration/Schema/SchemaConfigurationFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Console\\E2ETest\:\:runInfection\(\) has parameter \$argvExtra with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Console\\E2ETest\:\:runOnE2EFixture\(\) has parameter \$path with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
-			message: '#^Parameter \#1 \$argv of class Symfony\\Component\\Console\\Input\\ArgvInput constructor expects list\<string\>\|null, non\-empty\-array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Console/E2ETest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Console\\LogVerbosityTest\:\:test_it_converts_int_version_to_string_version_of_verbosity\(\) has parameter \$inputVerbosity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Console/LogVerbosityTest.php
+			path: ../tests/phpunit/Configuration/ConfigurationBuilder.php
 
 		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Differ\\DiffChangedLinesParserTest\:\:convertToArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Differ/DiffChangedLinesParserTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Differ\\DiffChangedLinesParserTest\:\:test_it_converts_diff_to_files_and_changed_lines_map\(\) has parameter \$expectedMap with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Differ/DiffChangedLinesParserTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Differ\\FilesDiffChangedLinesTest\:\:prepareServices\(\) has parameter \$returnedFilesDiffChangedLinesMap with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Differ/FilesDiffChangedLinesTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Differ\\FilesDiffChangedLinesTest\:\:test_it_finds_line_in_changed_lines_from_diff\(\) has parameter \$returnedFilesDiffChangedLinesMap with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Differ/FilesDiffChangedLinesTest.php
 
 		-
 			message: '#^Parameter \#1 \$environment of method Infection\\Environment\\StrykerApiKeyResolver\:\:resolve\(\) expects array\<string, string\>, array\<string, int\|stdClass\|string\> given\.$#'
@@ -673,36 +439,6 @@ parameters:
 			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\Iterator\\RealPathFilterIteratorTest\:\:providesFinders\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/Iterator/RealPathFilterIteratorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getComposerBatProxy\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getComposerBatProxy\(\) has parameter \$binaryPath with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getProjectBatProxy\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Finder\\MockVendor\:\:getProjectBatProxy\(\) has parameter \$binaryPath with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/FileSystem/Finder/MockVendor.php
-
-		-
 			message: '#^Only booleans are allowed in a ternary operator condition, string\|false given\.$#'
 			identifier: ternary.condNotBoolean
 			count: 1
@@ -737,78 +473,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_it_can_locate_files\(\) has parameter \$roots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_it_can_locate_one_of_the_given_files\(\) has parameter \$files with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_it_can_locate_one_of_the_given_files\(\) has parameter \$roots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_it_throws_an_exception_if_file_or_folder_does_not_exist\(\) has parameter \$roots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_locate_any_throws_exception_if_no_file_could_be_found\(\) has parameter \$files with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\FileSystem\\Locator\\RootsFileOrDirectoryLocatorTest\:\:test_locate_any_throws_exception_if_no_file_could_be_found\(\) has parameter \$roots with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/FileSystem/Locator/RootsFileOrDirectoryLocatorTest.php
-
-		-
-			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, IteratorIterator\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\>\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Parameter \#2 \$input of method Infection\\Tests\\FileSystem\\SourceFileFilterTest\:\:assertFiltersExpectedInput\(\) expects iterable\<Infection\\TestFramework\\Coverage\\Trace\>, Traversable\<mixed, Infection\\Tests\\Fixtures\\MockSplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<\(int\|string\),string\>\:\:map\(\)$#'
-			identifier: argument.templateType
-			count: 2
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
-
-		-
-			message: '#^Unable to resolve the template type TMapKey in call to method Pipeline\\Standard\<mixed,Infection\\TestFramework\\Coverage\\Trace\|SplFileInfo\>\:\:map\(\)$#'
-			identifier: argument.templateType
-			count: 1
-			path: ../tests/phpunit/FileSystem/SourceFileFilterTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\ConsoleLoggerTest\:\:test_it_casts_the_context_values_into_strings\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: ../tests/phpunit/Logger/ConsoleLoggerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\DummyLogger\:\:getLogs\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/DummyLogger.php
 
 		-
 			message: '#^Method Infection\\Tests\\Logger\\FileLoggerFactoryTest\:\:assertRegisteredLoggersAre\(\) has parameter \$expectedLoggerClasses with no value type specified in iterable type array\.$#'
@@ -823,76 +493,16 @@ parameters:
 			path: ../tests/phpunit/Logger/FileLoggerFactoryTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\GitHubAnnotationsLoggerTest\:\:test_it_logs_correctly_with_mutations\(\) has parameter \$expectedLines with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/GitHubAnnotationsLoggerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\GitLabCodeQualityLoggerTest\:\:assertLoggedContentIs\(\) has parameter \$expectedJson with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/GitLabCodeQualityLoggerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\GitLabCodeQualityLoggerTest\:\:test_it_logs_correctly_with_mutations\(\) has parameter \$expectedContents with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/GitLabCodeQualityLoggerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\Html\\StrykerHtmlReportBuilderTest\:\:assertJsonDocumentMatchesSchema\(\) has parameter \$report with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\Html\\StrykerHtmlReportBuilderTest\:\:metricsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\Html\\StrykerHtmlReportBuilderTest\:\:test_it_logs_correctly_with_mutations\(\) has parameter \$expectedReport with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
-
-		-
 			message: '#^Parameter \#2 \$processOutput of class Infection\\Mutant\\MutantExecutionResult constructor expects string, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Logger/Html/StrykerHtmlReportBuilderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Logger\\JsonLoggerTest\:\:assertLoggedContentIs\(\) has parameter \$expectedJson with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/JsonLoggerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\JsonLoggerTest\:\:test_it_logs_correctly_with_mutations\(\) has parameter \$expectedContents with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/JsonLoggerTest.php
-
-		-
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Logger/StrykerLoggerFactoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\SummaryJsonLoggerTest\:\:assertLoggedContentIs\(\) has parameter \$expectedJson with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/SummaryJsonLoggerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Logger\\SummaryJsonLoggerTest\:\:test_it_logs_correctly_with_mutations\(\) has parameter \$expectedContents with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Logger/SummaryJsonLoggerTest.php
 
 		-
 			message: '#^Parameter \#4 \$mutantDiff of class Infection\\Mutant\\MutantExecutionResult constructor expects Later\\Interfaces\\Deferred\<string\>, Later\\Interfaces\\Deferred\<non\-falsy\-string\> given\.$#'
@@ -925,30 +535,6 @@ parameters:
 			path: ../tests/phpunit/Metrics/SortableMutantExecutionResultsTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvides\(\) has parameter \$actual with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvides\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvidesExcluding\(\) has parameter \$actual with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Metrics\\TargetDetectionStatusesProviderTest\:\:assertProvidesExcluding\(\) has parameter \$excluding with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Metrics/TargetDetectionStatusesProviderTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\MockedContainer\:\:createWithServices\(\) has parameter \$values with no value type specified in iterable type array\<class\-string\<object\>, mixed\>\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -959,12 +545,6 @@ parameters:
 			identifier: argument.type
 			count: 4
 			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
-
-		-
-			message: '#^Parameter \#2 \$lazyTestLocations of class Infection\\TestFramework\\Coverage\\ProxyTrace constructor expects Later\\Interfaces\\Deferred\<Infection\\TestFramework\\Coverage\\TestLocations\>\|null, Later\\Interfaces\\Deferred\<int\> given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Mutation/MutationGeneratorTest.php
 
 		-
 			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
@@ -979,28 +559,10 @@ parameters:
 			path: ../tests/phpunit/Mutator/Arithmetic/PlusTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\Boolean\\TrueValueConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Boolean/TrueValueConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Boolean\\TrueValueConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Boolean/TrueValueConfigTest.php
-
-		-
 			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Boolean\\TrueValueConfig constructor expects array\<string, bool\>, array\<string, string\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/Boolean/TrueValueConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Boolean\\TrueValueTest\:\:test_it_can_mutate\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Boolean/TrueValueTest.php
 
 		-
 			message: '#^Method Infection\\Tests\\Mutator\\DefinitionTest\:\:test_it_must_define_remedies\(\) has parameter \$mutator with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
@@ -1021,18 +583,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/DefinitionTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\Extensions\\BCMathConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/BCMathConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Extensions\\BCMathConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/BCMathConfigTest.php
-
-		-
 			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Extensions\\BCMathConfig constructor expects array\<string, bool\>, array\<string, string\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -1051,46 +601,10 @@ parameters:
 			path: ../tests/phpunit/Mutator/Extensions/BCMathTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\Extensions\\MBStringConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Extensions\\MBStringConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
-
-		-
 			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Extensions\\MBStringConfig constructor expects array\<string, bool\>, array\<string, string\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/Mutator/Extensions/MBStringConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Extensions\\MBStringTest\:\:mutationsProviderForStrSplit\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/MBStringTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Extensions\\MBStringTest\:\:test_it_can_mutate\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Extensions/MBStringTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\IgnoreConfigTest\:\:test_it_can_check_that_the_given_elements_are_ignored\(\) has parameter \$ignored with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/IgnoreConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\IgnoreConfigTest\:\:test_it_can_check_that_the_given_elements_are_not_ignored\(\) has parameter \$ignored with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/IgnoreConfigTest.php
 
 		-
 			message: '#^Property Infection\\Tests\\Mutator\\IgnoreMutatorTest\:\:\$mutatorMock with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
@@ -1102,24 +616,6 @@ parameters:
 			message: '#^Cannot call method isPublic\(\) on ReflectionClassConstant\|false\.$#'
 			identifier: method.nonObject
 			count: 2
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\MutatorCategoryTest\:\:assertAllDoesNotHaveDuplicatedValues\(\) has parameter \$constants with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\MutatorCategoryTest\:\:assertAllListTheExposedConstants\(\) has parameter \$constants with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\MutatorCategoryTest\:\:assertExposedConstantsArePublic\(\) has parameter \$constants with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
 			path: ../tests/phpunit/Mutator/MutatorCategoryTest.php
 
 		-
@@ -1261,90 +757,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/ProfileListTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveCaretTest\:\:test_mutator\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveCaretTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveCaretTest\:\:test_mutator\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveCaretTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveDollarTest\:\:test_mutator\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveDollarTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveDollarTest\:\:test_mutator\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveDollarTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveFlagsTest\:\:test_mutator\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveFlagsTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Regex\\PregMatchRemoveFlagsTest\:\:test_mutator\(\) has parameter \$input with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Regex/PregMatchRemoveFlagsTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Removal\\ArrayItemRemovalConfigTest\:\:test_it_can_create_a_config\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
-
-		-
-			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Removal\\ArrayItemRemovalConfig constructor expects array\{remove\: string\|null, limit\: int\|null\}, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
-
-		-
-			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Removal\\ArrayItemRemovalConfig constructor expects array\{remove\: string\|null, limit\: int\|null\}, array\{limit\: ''foo''\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
-
-		-
-			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Removal\\ArrayItemRemovalConfig constructor expects array\{remove\: string\|null, limit\: int\|null\}, array\{limit\: 0\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
-
-		-
-			message: '#^Parameter \#1 \$settings of class Infection\\Mutator\\Removal\\ArrayItemRemovalConfig constructor expects array\{remove\: string\|null, limit\: int\|null\}, array\{remove\: ''unknown''\} given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:invokeMethod\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:mockFunction\(\) has parameter \$returnValue with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:mockNode\(\) has parameter \$returnValue with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\Mutator\\Util\\AbstractValueToNullReturnValueTest\:\:\$testSubject with generic class Infection\\Mutator\\Util\\AbstractValueToNullReturnValue does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
@@ -1365,12 +777,6 @@ parameters:
 		-
 			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:emptyIterable\(\) return type with generic class PHPUnit\\Framework\\Constraint\\Callback does not specify its types\: CallbackInput$#'
 			identifier: missingType.generics
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:iterableContaining\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
@@ -1429,7 +835,7 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Coverage\\TestLocations\>, array\<int, Infection\\TestFramework\\Coverage\\TestLocations\|null\> given\.$#'
+			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>, array\<int, Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php
@@ -1465,52 +871,28 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/JUnit/TestLocationBucketSorterTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\LineRangeCalculatorTest\:\:createSpyTraverser\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#NodeVisitor::\$range#'
+			identifier: property.notFound
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/LineRangeCalculatorTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\LineRangeCalculatorTest\:\:test_it_can_find_the_outer_most_array\(\) has parameter \$nodeRange with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/LineRangeCalculatorTest.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
 
 		-
 			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverser\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/LineRangeCalculatorTest.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/LineRangeCalculatorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\NodeLineRangeDataTest\:\:test_it_generates_the_correct_range\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/NodeLineRangeDataTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:serializeValue\(\) has no return type specified\.$#'
+			message: '#^Method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:serializeValue\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/TestLocationsNormalizer.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:serializeValue\(\) has parameter \$mixed with no type specified\.$#'
+			message: '#^Method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:serializeValue\(\) has parameter \$mixed with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/TestLocationsNormalizer.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizerTest\:\:test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/TestLocationsNormalizerTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizerTest\:\:test_it_can_convert_an_associative_array_of_test_locations_into_an_associative_array_of_scalar_values\(\) has parameter \$value with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/TestLocationsNormalizerTest.php
+			path: ../tests/phpunit/TestFramework/Tracing/Trace/TestLocationsNormalizer.php
 
 		-
 			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\XmlReport\\TestLocatorTest\:\:getTestsLocations\(\) return type has no value type specified in iterable type array\.$#'
@@ -1519,74 +901,32 @@ parameters:
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
 
 		-
-			message: '#^Cannot call method getSourceMethodRangeByMethod\(\) on Infection\\TestFramework\\Coverage\\TestLocations\|null\.$#'
+			message: '#^Cannot call method getSourceMethodRangeByMethod\(\) on Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\.$#'
 			identifier: method.nonObject
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Cannot call method getTestsLocationsBySourceLine\(\) on Infection\\TestFramework\\Coverage\\TestLocations\|null\.$#'
+			message: '#^Cannot call method getTestsLocationsBySourceLine\(\) on Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\.$#'
 			identifier: method.nonObject
 			count: 3
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Coverage\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Coverage\\TestLocations\>, array\<int, Infection\\TestFramework\\Coverage\\TestLocations\|null\> given\.$#'
+			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>, array\<int, Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\> given\.$#'
 			identifier: argument.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$cliArgumentsBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$commandLineBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$initialConfigBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$mutationConfigBuilder has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Property Infection\\Tests\\TestFramework\\PhpUnit\\Adapter\\PhpUnitAdapterTest\:\:\$pcovDirectoryProvider has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Adapter/PhpUnitAdapterTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\CommandLine\\ArgumentsAndOptionsBuilderTest\:\:test_it_can_build_the_command_with_filter_option_for_covering_tests_for_mutant\(\) has parameter \$testCases with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/CommandLine/ArgumentsAndOptionsBuilderTest.php
-
-		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilderTest\:\:createConfigBuilder\(\) has parameter \$filteredSourceFilesToMutate with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
+			message: '#InitialConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'
+			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilderTest\:\:queryXpath\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
-
-		-
-			message: '#^Parameter \#6 \$filteredSourceFilesToMutate of class Infection\\TestFramework\\PhpUnit\\Config\\Builder\\InitialConfigBuilder constructor expects list\<string\>, array given\.$#'
-			identifier: argument.type
+			message: '#InitialConfigBuilderTest::queryXpath.* should return DOMNodeList#'
+			identifier: return.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/InitialConfigBuilderTest.php
 
@@ -1597,8 +937,20 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\Builder\\MutationConfigBuilderTest\:\:queryXpath\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#\$callback of function array_map expects#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			message: '#MutationConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
+
+		-
+			message: '#MutationConfigBuilderTest::queryXpath.* should return DOMNodeList#'
+			identifier: return.type
 			count: 1
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
@@ -1615,31 +967,59 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:configurationsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#getShortClassName#'
+			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+			path: ../src/TestFramework/PhpUnit/CommandLine/FilterBuilder.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:legacyConfigurationsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#has parameter \$node with no value type specified in iterable type array#'
+			identifier: missingType.iterableValue
 			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
 
 		-
-			message: '#^Method Infection\\Tests\\TestFramework\\PhpUnit\\Config\\XmlConfigurationVersionProviderTest\:\:mainlineConfigurationsProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
+			message: '#Node is not subtype of native type#'
+			identifier: parameter.phpDocType
 			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+			path: ../tests/phpunit/PhpParser/MutatedNodeTest.php
 
 		-
-			message: '#^Unable to resolve the template type TKey in call to function Pipeline\\take$#'
+			message: '#with true will always evaluate to true.#'
+			identifier: method.alreadyNarrowedType
+			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationManipulatorTest.php
+
+		-
+			message: '#getCanonicalTestClassName#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/ProjectCode/ProjectCodeTest.php
+
+		-
+			message: '#getCanonicalTestClassName#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/IntegrationGroup/IntegrationGroupProvider.php
+
+		-
+			message: '#getCanonicalTestClassName#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/AutoReview/EnvVariableManipulation/EnvTestCasesProvider.php
+
+		-
+			message: '#\$executableFinder of class.*TestFrameworkFinder constructor expects.*MockObject given\.$#'
+			identifier: argument.type
+			path: ../tests/phpunit/FileSystem/Finder/TestFrameworkFinderTest.php
+
+		-
+			message: '#non-empty-string#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			message: '#Unable to resolve the template type TMapKey in call to method#'
 			identifier: argument.templateType
-			count: 2
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
-
-		-
-			message: '#^Unable to resolve the template type TTake in call to function Pipeline\\take$#'
-			identifier: argument.templateType
-			count: 2
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/XmlConfigurationVersionProviderTest.php
+			count: 1
+			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php

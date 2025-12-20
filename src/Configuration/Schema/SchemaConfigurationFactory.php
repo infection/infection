@@ -54,27 +54,30 @@ use Webmozart\Assert\Assert;
  */
 class SchemaConfigurationFactory
 {
-    public function create(string $path, stdClass $rawConfig): SchemaConfiguration
+    /**
+     * @param non-empty-string $pathname
+     */
+    public function create(string $pathname, stdClass $rawConfig): SchemaConfiguration
     {
         return new SchemaConfiguration(
-            $path,
-            self::getTimeout($rawConfig),
-            self::createSource($rawConfig->source),
-            self::createLogs($rawConfig->logs ?? new stdClass()),
-            self::normalizeString($rawConfig->tmpDir ?? null),
-            self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
-            self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
-            $rawConfig->ignoreMsiWithNoMutations ?? null,
-            $rawConfig->minMsi ?? null,
-            $rawConfig->minCoveredMsi ?? null,
-            (array) ($rawConfig->mutators ?? []),
-            self::getTestFramework($rawConfig),
-            self::normalizeString($rawConfig->bootstrap ?? null),
-            self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
-            self::normalizeString($rawConfig->testFrameworkOptions ?? null),
-            self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
-            $rawConfig->threads ?? null,
-            self::getStaticAnalysisTool($rawConfig),
+            pathname: $pathname,
+            timeout: self::getTimeout($rawConfig),
+            source: self::createSource($rawConfig->source),
+            logs: self::createLogs($rawConfig->logs ?? new stdClass()),
+            tmpDir: self::normalizeString($rawConfig->tmpDir ?? null),
+            phpUnit: self::createPhpUnit($rawConfig->phpUnit ?? new stdClass()),
+            phpStan: self::createPhpStan($rawConfig->phpStan ?? new stdClass()),
+            ignoreMsiWithNoMutations: $rawConfig->ignoreMsiWithNoMutations ?? null,
+            minMsi: $rawConfig->minMsi ?? null,
+            minCoveredMsi: $rawConfig->minCoveredMsi ?? null,
+            mutators: (array) ($rawConfig->mutators ?? []),
+            testFramework: self::getTestFramework($rawConfig),
+            bootstrap: self::normalizeString($rawConfig->bootstrap ?? null),
+            initialTestsPhpOptions: self::normalizeString($rawConfig->initialTestsPhpOptions ?? null),
+            testFrameworkExtraOptions: self::normalizeString($rawConfig->testFrameworkOptions ?? null),
+            staticAnalysisToolOptions: self::normalizeString($rawConfig->staticAnalysisToolOptions ?? null),
+            threads: $rawConfig->threads ?? null,
+            staticAnalysisTool: self::getStaticAnalysisTool($rawConfig),
         );
     }
 
@@ -183,11 +186,11 @@ class SchemaConfigurationFactory
     /**
      * @param string[] $values
      *
-     * @return string[]
+     * @return list<non-empty-string>
      */
     private static function normalizeStringArray(array $values): array
     {
-        $normalizedValue = array_filter(array_map('trim', $values));
+        $normalizedValue = array_filter(array_map(trim(...), $values));
 
         return array_values($normalizedValue);
     }

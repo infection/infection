@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config;
 
-use Infection\TestFramework\XML\SafeDOMXPath;
+use Infection\TestFramework\SafeDOMXPath;
 use function Safe\preg_match;
 
 /**
@@ -50,22 +50,22 @@ final class XmlConfigurationVersionProvider
     public function provide(SafeDOMXPath $xPath): string
     {
         // <coverage>
-        if ($xPath->queryList('/phpunit/coverage')->length > 0) {
+        if ($xPath->queryCount('/phpunit/coverage') > 0) {
             return self::NEXT_MAINSTREAM_VERSION;
         }
 
         // <logging><log type="*">
-        if ($xPath->queryList('/phpunit/logging/log')->length > 0) {
+        if ($xPath->queryCount('/phpunit/logging/log') > 0) {
             return self::LAST_LEGACY_VERSION;
         }
 
         // <logging><*> where <*> isn't <log>
-        if ($xPath->queryList('/phpunit/logging/*[name(.) != "log"]')->length > 0) {
+        if ($xPath->queryCount('/phpunit/logging/*[name(.) != "log"]') > 0) {
             return self::NEXT_MAINSTREAM_VERSION;
         }
 
         // <filter><whitelist>
-        if ($xPath->queryList('/phpunit/filter')->length > 0) {
+        if ($xPath->queryCount('/phpunit/filter') > 0) {
             return self::LAST_LEGACY_VERSION;
         }
 
@@ -104,16 +104,12 @@ final class XmlConfigurationVersionProvider
 
     private function getSchemaURI(SafeDOMXPath $xPath): ?string
     {
-        if ($xPath->queryList('namespace::xsi')->length === 0) {
+        if ($xPath->queryCount('namespace::xsi') === 0) {
             return null;
         }
 
-        $schema = $xPath->queryList('/phpunit/@xsi:noNamespaceSchemaLocation');
+        $schema = $xPath->queryAttribute('/phpunit/@xsi:noNamespaceSchemaLocation');
 
-        if ($schema->length === 0) {
-            return null;
-        }
-
-        return $schema[0]->nodeValue;
+        return $schema?->nodeValue;
     }
 }

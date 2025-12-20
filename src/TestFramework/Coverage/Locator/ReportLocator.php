@@ -35,12 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\Locator;
 
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 
+/**
+ * @internal
+ */
 interface ReportLocator
 {
     /**
      * @throws NoReportFound
+     * @throws TooManyReportsFound
+     * @throws ReportLocationThrowable
      */
     public function locate(): string;
 

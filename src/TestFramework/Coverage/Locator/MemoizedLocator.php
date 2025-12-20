@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\Locator;
 
+/**
+ * @internal
+ */
 final class MemoizedLocator implements ReportLocator
 {
     private string $location;

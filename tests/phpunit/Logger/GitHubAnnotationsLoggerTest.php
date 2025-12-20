@@ -65,6 +65,9 @@ final class GitHubAnnotationsLoggerTest extends TestCase
         self::resetOriginalFilePrefix();
     }
 
+    /**
+     * @param string[] $expectedLines
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,

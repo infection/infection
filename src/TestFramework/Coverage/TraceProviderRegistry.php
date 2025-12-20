@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage;
 
+use Infection\TestFramework\Tracing\TraceProvider;
+
 /**
  * @internal
  */
@@ -51,9 +53,6 @@ final readonly class TraceProviderRegistry implements TraceProvider
         $this->providers = $providers;
     }
 
-    /**
-     * @return iterable<Trace>
-     */
     public function provideTraces(): iterable
     {
         foreach ($this->providers as $provider) {

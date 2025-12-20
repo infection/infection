@@ -180,9 +180,14 @@ final readonly class StrykerHtmlReportBuilder
 
     /**
      * @param array<string, MutantExecutionResult[]> $resultsByPath
+     *
+     * @return ArrayObject<string, array<mixed>|string>
      */
     private function retrieveFiles(array $resultsByPath, string $basePath): ArrayObject
     {
+        /**
+         * @var ArrayObject<string, array<mixed>|string> $files
+         */
         $files = new ArrayObject();
 
         foreach ($resultsByPath as $path => $results) {

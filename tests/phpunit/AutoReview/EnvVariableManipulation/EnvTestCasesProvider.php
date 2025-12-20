@@ -40,7 +40,7 @@ use function array_map;
 use function array_values;
 use function class_exists;
 use Infection\CannotBeInstantiated;
-use Infection\Testing\SourceTestClassNameScheme;
+use Infection\Framework\ClassName;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use function iterator_to_array;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ final class EnvTestCasesProvider
     /**
      * @var string[][]|null
      */
-    private static $envTestCaseClassesTuple;
+    private static ?array $envTestCaseClassesTuple = null;
 
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now
@@ -88,7 +88,11 @@ final class EnvTestCasesProvider
      */
     private static function envTestCaseTuple(string $className): ?array
     {
-        $testCaseClass = SourceTestClassNameScheme::getTestClassName($className);
+        $testCaseClass = ClassName::getCanonicalTestClassName($className);
+
+        if ($testCaseClass === null) {
+            return null;
+        }
 
         if (!class_exists($testCaseClass)) {
             // No test case could be find for this source file

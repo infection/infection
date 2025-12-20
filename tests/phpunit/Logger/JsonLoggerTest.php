@@ -56,6 +56,9 @@ final class JsonLoggerTest extends TestCase
 {
     use CreateMetricsCalculator;
 
+    /**
+     * @param array<string, array<int|string, array<string, array<string, int|string>|string>|int|float>> $expectedContents
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         bool $onlyCovered,
@@ -444,6 +447,9 @@ final class JsonLoggerTest extends TestCase
         ];
     }
 
+    /**
+     * @param array<string, array<int|string, array<string, array<string, int|string>|string>|float|int>> $expectedJson
+     */
     private function assertLoggedContentIs(array $expectedJson, JsonLogger $logger): void
     {
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));

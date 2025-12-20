@@ -35,67 +35,47 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem;
 
-use function getenv;
-use Infection\FileSystem\Filesystem;
-use function Infection\Tests\make_tmp_dir;
-use PHPUnit\Framework\Attributes\CoversClass;
+use Infection\Tests\TestingUtility\FS;
 use PHPUnit\Framework\TestCase;
+use function Safe\chdir;
 use function Safe\getcwd;
 use function Safe\realpath;
-use function sprintf;
-use Symfony\Component\Filesystem\Path;
-use function sys_get_temp_dir;
+use function str_replace;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @private
  */
-#[CoversClass(Filesystem::class)]
 abstract class FileSystemTestCase extends TestCase
 {
-    private const TMP_DIR_NAME = 'infection-test';
-
     protected string $cwd = '';
 
     protected string $tmp = '';
 
-    protected Filesystem $filesystem;
-
-    public static function tearDownAfterClass(): void
-    {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-    }
-
     protected function setUp(): void
     {
-        // Cleans up whatever was there before. Indeed upon failure PHPUnit fails to trigger the
-        // `tearDown()` method and as a result some temporary files may still remain.
-        self::removeTmpDir();
-
         $this->cwd = getcwd();
-        $this->tmp = make_tmp_dir(self::TMP_DIR_NAME, self::class);
-        $this->filesystem = new Filesystem();
+        $this->tmp = realpath(
+            FS::tmpDir(
+                $this->getTmpDirPrefix(),
+            ),
+        );
+
+        chdir($this->tmp);
     }
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove($this->tmp);
+        chdir($this->cwd);
+
+        (new Filesystem())->remove($this->tmp);
     }
 
-    final protected static function removeTmpDir(): void
+    /**
+     * If the test case is `App\Tests\MyFilesystemServiceTestCase`, the default prefix will be "App\Tests\MyFilesystemServiceTestCase".
+     */
+    protected function getTmpDirPrefix(): string
     {
-        $testToken = getenv('TEST_TOKEN');
-
-        (new Filesystem())->remove(
-            Path::normalize(
-                sprintf(
-                    '%s/%s/%s',
-                    realpath(sys_get_temp_dir()),
-                    self::TMP_DIR_NAME,
-                    $testToken === false || $testToken === '' ? '1' : $testToken,
-                ),
-            ),
-        );
+        return str_replace('\\', '', static::class);
     }
 }

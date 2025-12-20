@@ -37,10 +37,10 @@ namespace Infection\TestFramework\Coverage\Locator;
 
 use function array_first;
 use function count;
-use Infection\FileSystem\Filesystem;
-use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
+use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use function Pipeline\take;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
@@ -53,22 +53,28 @@ use Symfony\Component\Finder\Finder;
  *
  * @internal
  */
-abstract readonly class BaseReportLocator implements ReportLocator
+abstract class BaseReportLocator implements ReportLocator
 {
-    protected function __construct(
-        private Filesystem $filesystem,
-        private string $sourceDirectory,
-        private string $defaultPathname,
+    private ?string $report = null;
+
+    public function __construct(
+        private readonly FileSystem $filesystem,
+        private readonly string $sourceDirectory,
+        private readonly string $defaultPathname,
     ) {
     }
 
     final public function locate(): string
     {
-        if ($this->filesystem->isReadableFile($this->defaultPathname)) {
-            return $this->defaultPathname;
+        if ($this->report !== null) {
+            return $this->report;
         }
 
-        return $this->lookup();
+        $this->report = $this->filesystem->isReadableFile($this->defaultPathname)
+            ? $this->defaultPathname
+            : $this->lookup();
+
+        return $this->report;
     }
 
     public function getDefaultLocation(): string
@@ -104,6 +110,8 @@ abstract readonly class BaseReportLocator implements ReportLocator
             throw $this->createInvalidReportSource($this->sourceDirectory);
         }
 
+        // TODO: address this... eventually
+        // @phpstan-ignore argument.templateType
         $reportPathnames = take($this->createIndexFinder($this->sourceDirectory))
             ->map(static fn (SplFileInfo $fileInfo) => Path::canonicalize($fileInfo->getPathname()))
             ->toList();

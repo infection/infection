@@ -69,20 +69,11 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(FileLoggerFactory::class)]
 final class FileLoggerFactoryTest extends TestCase
 {
-    /**
-     * @var MetricsCalculator
-     */
-    private $metricsCalculator;
+    private MetricsCalculator $metricsCalculator;
 
-    /**
-     * @var ResultsCollector
-     */
-    private $resultsCollector;
+    private ResultsCollector $resultsCollector;
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
     protected function setUp(): void
     {

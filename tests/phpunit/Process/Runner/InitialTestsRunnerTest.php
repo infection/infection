@@ -60,20 +60,11 @@ use Symfony\Component\Process\Process;
 #[CoversClass(InitialTestsRunner::class)]
 final class InitialTestsRunnerTest extends TestCase
 {
-    /**
-     * @var InitialTestsRunProcessFactory|MockObject
-     */
-    private $processFactoryMock;
+    private MockObject&InitialTestsRunProcessFactory $processFactoryMock;
 
-    /**
-     * @var EventDispatcherCollector
-     */
-    private $eventDispatcher;
+    private EventDispatcherCollector $eventDispatcher;
 
-    /**
-     * @var InitialTestsRunner
-     */
-    private $runner;
+    private InitialTestsRunner $runner;
 
     protected function setUp(): void
     {
@@ -114,7 +105,7 @@ final class InitialTestsRunnerTest extends TestCase
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_values(array_unique(array_map('get_class', $this->eventDispatcher->getEvents()))),
+            array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
     }
 
@@ -159,7 +150,7 @@ final class InitialTestsRunnerTest extends TestCase
                 InitialTestCaseWasCompleted::class,
                 InitialTestSuiteWasFinished::class,
             ],
-            array_map('get_class', $this->eventDispatcher->getEvents()),
+            array_map(get_class(...), $this->eventDispatcher->getEvents()),
         );
     }
 

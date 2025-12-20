@@ -48,6 +48,8 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -65,17 +67,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;
 
-    /**
-     * @var string
-     */
-    private static $pathName;
+    private static string $pathName;
 
-    /**
-     * @var Filesystem
-     */
-    private $fileSystem;
+    private Filesystem $fileSystem;
 
-    private ComposerExecutableFinder $composerFinder;
+    private MockObject $composerFinder;
 
     /**
      * Saves the current environment
@@ -90,6 +86,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $this->backupEnvironmentVariables();
 
         parent::setUp();
+
+        // This test relies on the current working directory to be the project
+        // root.
+        chdir(__DIR__ . '/../../../../');
 
         $this->fileSystem = new Filesystem();
 
@@ -206,11 +206,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
-    public static function providesMockSetup(): array
+    public static function providesMockSetup(): iterable
     {
-        return [
-            'composer-bat' => ['setUpComposerBatchTest'],
-            'project-bat' => ['setUpProjectBatchTest'],
-        ];
+        yield 'composer-bat' => ['setUpComposerBatchTest'];
+
+        yield 'project-bat' => ['setUpProjectBatchTest'];
     }
 }
