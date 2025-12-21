@@ -69,11 +69,6 @@ if (!function_exists('Infection\Benchmark\MutationGenerator\collectSources')) {
 if (!class_exists(EmptyTraceTracer::class, false)) {
     final readonly class EmptyTraceTracer implements Tracer
     {
-        public function hasTrace(SplFileInfo $fileInfo): bool
-        {
-            return true;
-        }
-
         public function trace(SplFileInfo $fileInfo): Trace
         {
             require_once $fileInfo->getRealPath();

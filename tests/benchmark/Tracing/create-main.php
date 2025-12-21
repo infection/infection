@@ -42,6 +42,7 @@ use function count;
 use function function_exists;
 use Infection\Container;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
@@ -60,7 +61,6 @@ if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
     function fetchTraceLazyState(Trace $trace): void
     {
         $trace->getSourceFileInfo();
-        $trace->hasTests();
         $trace->getTests();
     }
 }
@@ -145,11 +145,12 @@ return static function (int $maxCount, float $percentage = 1.): Closure {
         $count = 0;
 
         foreach ($sourcesSubset as $source) {
-            if (!$tracer->hasTrace($source)) {
+            $trace = $tracer->trace($source);
+
+            if ($trace instanceof EmptyTrace) {
                 continue;
             }
 
-            $trace = $tracer->trace($source);
             fetchTraceLazyState($trace);
 
             ++$count;

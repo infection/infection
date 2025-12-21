@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing;
 
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -46,11 +47,11 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 interface Tracer
 {
-    public function hasTrace(SplFileInfo $fileInfo): bool;
-
     /**
      * Beware! Whilst the absence of Trace guarantees the absence of tests, its reciprocal is false.
      * A trace may end up being empty.
+     *
+     * @throws NoTraceFound
      */
     public function trace(SplFileInfo $fileInfo): Trace;
 }

@@ -33,41 +33,38 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
-use Infection\TestFramework\Coverage\UncoveredTraceProvider;
-use Infection\TestFramework\Tracing\Trace\ProxyTrace;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
-use function iterator_to_array;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use DomainException;
+use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(UncoveredTraceProvider::class)]
-final class UncoveredTraceProviderTest extends TestCase
+/**
+ * @internal
+ */
+final class FakeTrace implements Trace
 {
-    public function test_it_provides_traces(): void
+    public function getSourceFileInfo(): SplFileInfo
     {
-        $filter = $this->createMock(BufferedSourceFileFilter::class);
-        $fileInfo = new MockSplFileInfo([
-            'file' => 'test.txt',
-        ]);
+        throw new DomainException('Unexpected call.');
+    }
 
-        $filter
-            ->expects($this->once())
-            ->method('getUnseenInCoverageReportFiles')
-            ->willReturn([$fileInfo])
-        ;
+    public function getRealPath(): string
+    {
+        throw new DomainException('Unexpected call.');
+    }
 
-        $provider = new UncoveredTraceProvider($filter);
+    public function getRelativePathname(): string
+    {
+        throw new DomainException('Unexpected call.');
+    }
 
-        /** @var Trace[] $traces */
-        $traces = iterator_to_array($provider->provideTraces(), false);
+    public function getTests(): TestLocations
+    {
+        throw new DomainException('Unexpected call.');
+    }
 
-        $this->assertCount(1, $traces);
-        $this->assertInstanceOf(ProxyTrace::class, $traces[0]);
-        $this->assertSame($fileInfo, $traces[0]->getSourceFileInfo());
-        $this->assertFalse($traces[0]->hasTests());
+    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
+    {
+        throw new DomainException('Unexpected call.');
     }
 }

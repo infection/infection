@@ -79,18 +79,9 @@ class ProxyTrace implements Trace
         return $this->sourceFile->getRelativePathname();
     }
 
-    public function hasTests(): bool
+    public function getTests(): TestLocations
     {
-        if ($this->lazyTestLocations === null) {
-            return false;
-        }
-
-        return $this->getTestLocator()->hasTests();
-    }
-
-    public function getTests(): ?TestLocations
-    {
-        return $this->lazyTestLocations?->get();
+        return $this->lazyTestLocations?->get() ?? new TestLocations();
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
@@ -109,8 +100,6 @@ class ProxyTrace implements Trace
         }
 
         $testLocations = $this->getTests();
-
-        Assert::notNull($testLocations);
 
         $this->tests = new TestLocator($testLocations);
 

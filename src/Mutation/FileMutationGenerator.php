@@ -44,6 +44,8 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
@@ -83,13 +85,15 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        // If $onlyCovered, then for a non-covered source file we will
-        // get an empty trace. This is configured at the tracer level.
-        if (!$this->tracer->hasTrace($sourceFile)) {
-            return;
+        try {
+            $trace = $this->tracer->trace($sourceFile);
+        } catch (NoTraceFound) {
+            if ($onlyCovered) {
+                return; // Skip this file
+            }
+            $trace = new EmptyTrace($sourceFile);
         }
 
-        $trace = $this->tracer->trace($sourceFile);
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them

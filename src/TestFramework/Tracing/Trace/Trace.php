@@ -67,9 +67,7 @@ interface Trace
      */
     public function getRelativePathname(): string;
 
-    public function hasTests(): bool;
-
-    public function getTests(): ?TestLocations;
+    public function getTests(): TestLocations;
 
     /**
      * @return iterable<TestLocation>

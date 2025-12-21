@@ -33,27 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing\Throwable;
 
-use Infection\TestFramework\Tracing\Trace\ProxyTrace;
-use Infection\TestFramework\Tracing\TraceProvider;
+use RuntimeException;
+use function sprintf;
 
 /**
- * Adds empty coverage report to uncovered files provided by BufferedSourceFileFilter.
- *
  * @internal
  */
-final readonly class UncoveredTraceProvider implements TraceProvider
+final class NoTraceFound extends RuntimeException
 {
-    public function __construct(
-        private BufferedSourceFileFilter $bufferedFilter,
-    ) {
-    }
-
-    public function provideTraces(): iterable
+    public static function forFile(string $pathname): self
     {
-        foreach ($this->bufferedFilter->getUnseenInCoverageReportFiles() as $splFileInfo) {
-            yield new ProxyTrace($splFileInfo);
-        }
+        return new self(
+            sprintf(
+                'Could not find any trace for file "%s".',
+                $pathname,
+            ),
+        );
     }
 }
