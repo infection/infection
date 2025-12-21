@@ -70,7 +70,7 @@
         "symfony/polyfill-php85": "^1.33",
         "symfony/process": "^6.4 || ^7.0 || ^8.0",
         "thecodingmachine/safe": "^v3.0",
-        "webmozart/assert": "^1.11"
+        "webmozart/assert": "^1.11 || ^2.0"
     },
     "conflict": {
         "antecedent/patchwork": "<2.1.25",
