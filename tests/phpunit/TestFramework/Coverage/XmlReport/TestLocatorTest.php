@@ -39,8 +39,8 @@ use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
 use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -210,9 +210,9 @@ final class TestLocatorTest extends TestCase
                     ],
                 ],
                 [
-                    'do0' => new SourceMethodLineRange(19, 22),
-                    'do1' => new SourceMethodLineRange(24, 35),
-                    'doSomethingUncovered' => new SourceMethodLineRange(3, 5),
+                    'do0' => MethodLineRangeFactory::create('do0', 19, 22),
+                    'do1' => MethodLineRangeFactory::create('do1', 24, 35),
+                    'doSomethingUncovered' => MethodLineRangeFactory::create('doSomethingUncovered', 3, 5),
                 ],
             ),
         ];

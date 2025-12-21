@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Tracing;
 
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Tracing\Trace\Trace;
 
@@ -49,13 +49,13 @@ use Infection\TestFramework\Tracing\Trace\Trace;
 interface TraceProvider
 {
     /**
-     * @throws InvalidCoverage
      * @throws NoSourceFound
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      *
+     * @throws InvalidCoverage
      * @return iterable<Trace>
      */
     public function provideTraces(): iterable;

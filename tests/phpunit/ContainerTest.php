@@ -39,7 +39,6 @@ use function array_keys;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
 use InvalidArgumentException;
@@ -101,23 +100,6 @@ final class ContainerTest extends TestCase
         $container->getFileSystem();
 
         $this->addToAssertionCount(1);
-    }
-
-    public function test_it_can_build_lazy_source_file_data_factory_that_fails_on_use(): void
-    {
-        $newContainer = SingletonContainer::getContainer()->withValues(
-            new NullLogger(),
-            new NullOutput(),
-            existingCoveragePath: '/path/to/coverage',
-        );
-
-        $traces = $newContainer->getUnionTraceProvider()->provideTraces();
-
-        $this->expectException(ReportLocationThrowable::class);
-
-        foreach ($traces as $trace) {
-            $this->fail();
-        }
     }
 
     public function test_it_provides_a_friendly_error_when_attempting_to_configure_it_with_both_no_progress_and_force_progress(): void

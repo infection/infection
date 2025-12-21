@@ -1,0 +1,412 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="DemoCounterService.php" path="/">
+    <totals>
+      <lines total="67" comments="31" code="36" executable="6" executed="6" percent="100.00"/>
+      <methods count="4" tested="4" percent="100.00"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="1" tested="1" percent="100.00"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <class name="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\src\DemoCounterService" start="38" executable="6" executed="6" crap="4">
+      <namespace name="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\src"/>
+      <method name="count" signature="count(): int" start="44" end="50" crap="1" executable="3" executed="3" coverage="100"/>
+      <method name="startCount" signature="startCount(int $start): void" start="52" end="55" crap="1" executable="1" executed="1" coverage="100"/>
+      <method name="setStep" signature="setStep(int $step): void" start="57" end="60" crap="1" executable="1" executed="1" coverage="100"/>
+      <method name="get" signature="get(): int" start="62" end="65" crap="1" executable="1" executed="1" coverage="100"/>
+    </class>
+    <coverage>
+      <line nr="46">
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
+      </line>
+      <line nr="47">
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
+      </line>
+      <line nr="49">
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
+      </line>
+      <line nr="54">
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_sets_initial_value"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
+      </line>
+      <line nr="59">
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_with_default_resets_to_one"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+      </line>
+      <line nr="64">
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_set_step_changes_increment_amount"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_custom_step_with_multiple_counts"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_sets_initial_value"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_count_increments_by_step_and_returns_new_value"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_initial_counter_is_zero"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_negative_step_decreases_counter"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_multiple_counts_increment_correctly"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_complex_scenario"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_with_default_sets_to_zero"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_zero_step_keeps_counter_unchanged"/>
+        <covered by="Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest::test_start_count_affects_subsequent_counts"/>
+      </line>
+    </coverage>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2">
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="3">
+        <token name="T_DOC_COMMENT"> * This code is licensed under the BSD 3-Clause License.</token>
+      </line>
+      <line no="4">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="5">
+        <token name="T_DOC_COMMENT"> * Copyright (c) 2017, Maks Rafalko</token>
+      </line>
+      <line no="6">
+        <token name="T_DOC_COMMENT"> * All rights reserved.</token>
+      </line>
+      <line no="7">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="8">
+        <token name="T_DOC_COMMENT"> * Redistribution and use in source and binary forms, with or without</token>
+      </line>
+      <line no="9">
+        <token name="T_DOC_COMMENT"> * modification, are permitted provided that the following conditions are met:</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT"> * * Redistributions of source code must retain the above copyright notice, this</token>
+      </line>
+      <line no="12">
+        <token name="T_DOC_COMMENT"> *   list of conditions and the following disclaimer.</token>
+      </line>
+      <line no="13">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="14">
+        <token name="T_DOC_COMMENT"> * * Redistributions in binary form must reproduce the above copyright notice,</token>
+      </line>
+      <line no="15">
+        <token name="T_DOC_COMMENT"> *   this list of conditions and the following disclaimer in the documentation</token>
+      </line>
+      <line no="16">
+        <token name="T_DOC_COMMENT"> *   and/or other materials provided with the distribution.</token>
+      </line>
+      <line no="17">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="18">
+        <token name="T_DOC_COMMENT"> * * Neither the name of the copyright holder nor the names of its</token>
+      </line>
+      <line no="19">
+        <token name="T_DOC_COMMENT"> *   contributors may be used to endorse or promote products derived from</token>
+      </line>
+      <line no="20">
+        <token name="T_DOC_COMMENT"> *   this software without specific prior written permission.</token>
+      </line>
+      <line no="21">
+        <token name="T_DOC_COMMENT"> *</token>
+      </line>
+      <line no="22">
+        <token name="T_DOC_COMMENT"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"</token>
+      </line>
+      <line no="23">
+        <token name="T_DOC_COMMENT"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</token>
+      </line>
+      <line no="24">
+        <token name="T_DOC_COMMENT"> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</token>
+      </line>
+      <line no="25">
+        <token name="T_DOC_COMMENT"> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</token>
+      </line>
+      <line no="26">
+        <token name="T_DOC_COMMENT"> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</token>
+      </line>
+      <line no="27">
+        <token name="T_DOC_COMMENT"> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</token>
+      </line>
+      <line no="28">
+        <token name="T_DOC_COMMENT"> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</token>
+      </line>
+      <line no="29">
+        <token name="T_DOC_COMMENT"> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</token>
+      </line>
+      <line no="30">
+        <token name="T_DOC_COMMENT"> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</token>
+      </line>
+      <line no="31">
+        <token name="T_DOC_COMMENT"> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</token>
+      </line>
+      <line no="32">
+        <token name="T_DOC_COMMENT"> */</token>
+      </line>
+      <line no="33"/>
+      <line no="34">
+        <token name="T_DECLARE">declare</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">strict_types</token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_LNUMBER">1</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="35"/>
+      <line no="36">
+        <token name="T_NAMESPACE">namespace</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NAME_QUALIFIED">Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\src</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="37"/>
+      <line no="38">
+        <token name="T_FINAL">final</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLASS">class</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">DemoCounterService</token>
+      </line>
+      <line no="39">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="40">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">int</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$counter</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">0</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="41"/>
+      <line no="42">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">int</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$step</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">1</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="43"/>
+      <line no="44">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">count</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">int</token>
+      </line>
+      <line no="45">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="46">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$count</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">counter</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_PLUS">+</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">step</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="47">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">counter</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$count</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="48"/>
+      <line no="49">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$count</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="50">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="51"/>
+      <line no="52">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">startCount</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">int</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$start</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">0</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">void</token>
+      </line>
+      <line no="53">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="54">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">counter</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$start</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="55">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="56"/>
+      <line no="57">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">setStep</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">int</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$step</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">1</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">void</token>
+      </line>
+      <line no="58">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="59">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">step</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$step</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="60">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="61"/>
+      <line no="62">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">get</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">int</token>
+      </line>
+      <line no="63">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="64">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">counter</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="65">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="66">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="67"/>
+    </source>
+  </file>
+</phpunit>

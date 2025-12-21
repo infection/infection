@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+    <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+        <totals>
+            <lines total="1e7" comments="0" code="1" executable="1" executed="1" percent="1.0%"/>
+        </totals>
+        <coverage>
+            <line nr="11">
+                <covered by="ExampleTest::test_it_just_works"/>
+            </line>
+        </coverage>
+    </file>
+</phpunit>

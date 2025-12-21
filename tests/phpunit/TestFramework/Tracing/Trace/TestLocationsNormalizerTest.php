@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing\Trace;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -110,7 +110,8 @@ final class TestLocationsNormalizerTest extends TestCase
                 '/path/to/acme/Foo.php' => new TestLocations(
                     [],
                     [
-                        '__construct' => new SourceMethodLineRange(
+                        '__construct' => MethodLineRangeFactory::create(
+                            '__construct',
                             19,
                             22,
                         ),
@@ -122,6 +123,7 @@ final class TestLocationsNormalizerTest extends TestCase
                     'byLine' => [],
                     'byMethod' => [
                         '__construct' => [
+                            'methodName' => '__construct',
                             'startLine' => 19,
                             'endLine' => 22,
                         ],
@@ -143,7 +145,8 @@ final class TestLocationsNormalizerTest extends TestCase
                         ],
                     ],
                     [
-                        '__construct' => new SourceMethodLineRange(
+                        '__construct' => MethodLineRangeFactory::create(
+                            '__construct',
                             19,
                             22,
                         ),
@@ -163,6 +166,7 @@ final class TestLocationsNormalizerTest extends TestCase
                     ],
                     'byMethod' => [
                         '__construct' => [
+                            'methodName' => '__construct',
                             'startLine' => 19,
                             'endLine' => 22,
                         ],

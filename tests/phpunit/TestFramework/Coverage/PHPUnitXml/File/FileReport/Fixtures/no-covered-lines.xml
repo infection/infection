@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+    <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+        <totals>
+            <lines total="1" comments="0" code="1" executable="1" executed="1" percent="100"/>
+        </totals>
+        <coverage>
+        </coverage>
+    </file>
+</phpunit>

@@ -45,10 +45,10 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
@@ -85,8 +85,7 @@ class MutationGenerator
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
-     *
+     * @throws TestNotFound
      * @return iterable<Mutation>
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
