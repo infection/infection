@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use function array_key_exists;
 use DOMElement;
 use DOMNodeList;
+use Infection\TestFramework\Coverage\Exception\TestNotFound;
 use Infection\TestFramework\XML\SafeDOMXPath;
+use Webmozart\Assert\Assert;
+use function array_key_exists;
 use function preg_replace;
 use function sprintf;
-use Webmozart\Assert\Assert;
 
 /**
  * @phpstan-type TestInfo = array{location: string, executionTime: float}
@@ -53,7 +54,7 @@ final class JUnitReport
     /**
      * @var array<string, TestInfo>
      */
-    private array $indexedExecutionTimes = [];
+    private array $indexedTestInfos = [];
 
     private bool $traversed = false;
 
@@ -68,7 +69,10 @@ final class JUnitReport
      * The form of the test string depends of the JUnit format of the test
      * framework used. For example:
      *
-     * - PHPUnit JUnit: 'App\Tests\DemoTest::test_it_works#item 0'.
+     * - PHPUnit JUnit:
+     *      - 'App\Tests\DemoTest::test_it_works#item 0': a PHPUnit test ID.
+     *      - 'App\Tests\DemoTest::test_it_works': a PHPUnit test suite (i.e. contains multiple test IDs).
+     *      - 'App\Tests\DemoTest': another PHPUnit test suite.
      * - Codeception BDD: 'FeatureA:Scenario A1'
      *
      * The output is the location of the test and time of execution. The location
@@ -79,29 +83,29 @@ final class JUnitReport
      *
      * TODO: complete the docs here; the docs of the CoverageReport (calling class).
      *
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      *
      * @return TestInfo
      */
-    public function getTestInfo(string $test): array
+    public function getTestInfo(string $testId): array
     {
-        return array_key_exists($test, $this->indexedExecutionTimes)
-            ? $this->indexedExecutionTimes[$test]
-            : $this->lookup($test);
+        return array_key_exists($testId, $this->indexedTestInfos)
+            ? $this->indexedTestInfos[$testId]
+            : $this->lookup($testId);
     }
 
     /**
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      *
      * @return TestInfo
      */
-    private function lookup(string $testCaseClassName): array
+    private function lookup(string $testId): array
     {
-        $nodes = $this->findNode($testCaseClassName);
+        $nodes = $this->findNode($testId);
 
         if ($nodes->length === 0) {
-            throw TestFileNameNotFoundException::notFoundFromFQN(
-                $testCaseClassName,
+            throw TestNotFound::forTestId(
+                $testId,
                 $this->pathname,
             );
         }
@@ -115,7 +119,7 @@ final class JUnitReport
             'executionTime' => (float) $node->getAttribute('time'),
         ];
 
-        $this->indexedExecutionTimes[$testCaseClassName] = $testInfo;
+        $this->indexedTestInfos[$testId] = $testInfo;
 
         return $testInfo;
     }
@@ -182,19 +186,7 @@ final class JUnitReport
     {
         $this->assertFileWasNotTraversed();
 
-        $xPath = SafeDOMXPath::fromFile($this->pathname);
-
-        // The default PHPUnit namespace is "https://schema.phpunit.de/coverage/1.0".
-        // It is quite verbose and would be annoying to use it everywhere.
-        // Instead, it is better to introduce an easy to write and read namespace
-        // that we can use in the queries.
-        // TODO: to check if there is any requiring a namespace
-        //        $xPath->registerNamespace(
-        //            'coverage',
-        //            $xPath->document->documentElement->namespaceURI,
-        //        );
-
-        return $xPath;
+        return SafeDOMXPath::fromFile($this->pathname);
     }
 
     private function assertFileWasNotTraversed(): void

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
@@ -45,13 +44,14 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Exception\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
+use function count;
 
 /**
  * @internal
@@ -79,15 +79,15 @@ class MutationGenerator
      * @param bool $onlyCovered Mutates only covered by tests lines of code
      * @param NodeIgnorer[] $nodeIgnorers
      *
-     * @throws UnparsableFile
+     * @return iterable<Mutation>
+     *@throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      *
-     * @return iterable<Mutation>
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {

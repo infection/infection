@@ -35,20 +35,35 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\Locator;
 
-final readonly class HardcodedLocator implements ReportLocator
+/**
+ * @internal
+ */
+final class CachedLocator implements ReportLocator
 {
+    private string $location;
+
+    private string $defaultLocation;
+
     public function __construct(
-        private string $location,
+        private readonly ReportLocator $decoratedLocator,
     ) {
     }
 
     public function locate(): string
     {
+        if (!isset($this->location)) {
+            $this->location = $this->decoratedLocator->locate();
+        }
+
         return $this->location;
     }
 
     public function getDefaultLocation(): string
     {
-        return $this->location;
+        if (!isset($this->defaultLocation)) {
+            $this->defaultLocation = $this->decoratedLocator->getDefaultLocation();
+        }
+
+        return $this->defaultLocation;
     }
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection;
 
-use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
@@ -56,7 +55,7 @@ use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\Exception\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
@@ -65,6 +64,7 @@ use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Webmozart\Assert\Assert;
+use function explode;
 
 /**
  * @internal
@@ -99,7 +99,7 @@ final readonly class Engine
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      */
     public function execute(): void
     {
@@ -207,7 +207,7 @@ final readonly class Engine
      * @throws NoReportFound
      * @throws TooManyReportsFound
      * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
+     * @throws TestNotFound
      */
     private function runMutationAnalysis(): void
     {

@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\Locator;
 
-use Infection\TestFramework\Coverage\Locator\MemoizedLocator;
+use Infection\TestFramework\Coverage\Locator\CachedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MemoizedLocator::class)]
-final class MemoizedLocatorTest extends TestCase
+#[CoversClass(CachedLocator::class)]
+final class CachedLocatorTest extends TestCase
 {
     public function test_it_delegates_to_decorated_locator_on_first_call_and_delegate_the_cached_result_on_subsequent_calls(): void
     {
@@ -59,7 +59,7 @@ final class MemoizedLocatorTest extends TestCase
             ->method('getDefaultLocation')
             ->willReturn($expectedDefaultLocation);
 
-        $memoizedLocator = new MemoizedLocator($decoratedLocator);
+        $memoizedLocator = new CachedLocator($decoratedLocator);
 
         $this->assertSame($expectedLocation, $memoizedLocator->locate());
         $this->assertSame($expectedLocation, $memoizedLocator->locate());
@@ -78,7 +78,7 @@ final class MemoizedLocatorTest extends TestCase
             ->method('locate')
             ->willThrowException($exception);
 
-        $memoizedLocator = new MemoizedLocator($decoratedLocator);
+        $memoizedLocator = new CachedLocator($decoratedLocator);
 
         $this->expectExceptionObject($exception);
 
@@ -99,7 +99,7 @@ final class MemoizedLocatorTest extends TestCase
                 $expected,
             );
 
-        $memoizedLocator = new MemoizedLocator($decoratedLocator);
+        $memoizedLocator = new CachedLocator($decoratedLocator);
 
         try {
             $memoizedLocator->locate();
