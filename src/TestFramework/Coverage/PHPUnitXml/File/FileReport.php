@@ -136,17 +136,13 @@ final class FileReport
 
     private function createXPath(): SafeDOMXPath
     {
-        $xPath = SafeDOMXPath::fromFile($this->pathname);
-
         // The default PHPUnit namespace is "https://schema.phpunit.de/coverage/1.0".
         // It is quite verbose and would be annoying to use it everywhere.
         // Instead, it is better to introduce an easy to write and read namespace
         // that we can use in the queries.
-        $xPath->registerNamespace(
+        return SafeDOMXPath::fromFile(
+            $this->pathname,
             'coverage',
-            $xPath->document->documentElement->namespaceURI,
         );
-
-        return $xPath;
     }
 }

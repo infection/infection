@@ -91,7 +91,7 @@ final class TestLocationsNormalizer
         if ($mixed instanceof TestLocations) {
             return [
                 'byLine' => self::serializeValue($mixed->getTestsLocationsBySourceLine()),
-                'byMethod' => self::serializeValue($mixed->getMethodLineRangesByMethodName()),
+                'byMethod' => self::serializeValue($mixed->methodLineRangesByMethodName),
             ];
         }
 

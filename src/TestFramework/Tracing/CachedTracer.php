@@ -33,34 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\TestFramework\Tracing;
 
-use Infection\TestFramework\Tracing\TraceProvider;
+use function array_key_exists;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use RuntimeException;
+use SplFileInfo;
+use Throwable;
 
 /**
+ * Note that this implementation is not meant as a long-lived one. The goal
+ * is to phase out TraceProvider.
+ *
  * @internal
  */
-final readonly class TraceProviderRegistry implements TraceProvider
+final class CachedTracer implements Tracer
 {
     /**
-     * @var list<TraceProvider>
+     * This is effectively used as a cache. Note that whilst it would be trivial
+     * to extract a CachedTracer implementation, this would make this implementation
+     * extremely brittle and unusable without the CachedTracer. Since the coupling
+     * is so tight, although we could technically decouple it thanks to interface,
+     * I decided against it to make the coupling explicit.
+     *
+     * @var array<string, Trace|RuntimeException> Traces indexed by their source pathname.
      */
-    private array $providers;
+    private array $indexedTraces = [];
 
     public function __construct(
-        TraceProvider ...$providers,
+        private readonly Tracer $decoratedTracer,
     ) {
-        $this->providers = $providers;
     }
 
-    public function provideTraces(): iterable
+    public function hasTrace(SplFileInfo $fileInfo): bool
     {
-        foreach ($this->providers as $provider) {
-            // We cannot use yield from here as otherwise some traces may
-            // be erased due to having the same key.
-            foreach ($provider->provideTraces() as $trace) {
-                yield $trace;
+        return $this->tryToTrace($fileInfo) instanceof Trace;
+    }
+
+    public function trace(SplFileInfo $fileInfo): Trace
+    {
+        $trace = $this->tryToTrace($fileInfo);
+
+        if ($trace instanceof Throwable) {
+            throw $trace;
+        }
+
+        return $trace;
+    }
+
+    private function tryToTrace(SplFileInfo $fileInfo): Trace
+    {
+        $sourcePathname = $fileInfo->getPathname();
+
+        if (!array_key_exists($sourcePathname, $this->indexedTraces)) {
+            try {
+                $this->indexedTraces[$sourcePathname] = $this->decoratedTracer->trace($fileInfo);
+            } catch (RuntimeException $exception) {
+                $this->indexedTraces[$sourcePathname] = $exception;
             }
         }
+
+        return $this->indexedTraces[$sourcePathname];
     }
 }

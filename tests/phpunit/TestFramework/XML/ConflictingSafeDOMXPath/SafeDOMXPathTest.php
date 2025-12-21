@@ -37,7 +37,7 @@ namespace Infection\Tests\TestFramework\SafeDOMXPath;
 
 use DOMDocument;
 use DOMNode;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\XML\SafeDOMXPath;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

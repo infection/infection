@@ -33,20 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\src;
 
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(SourceMethodLineRange::class)]
-final class SourceMethodLineRangeTest extends TestCase
+final class DemoCounterService
 {
-    public function test_it_creates_self_with_named_constructor(): void
-    {
-        $range = new SourceMethodLineRange(11, 22);
+    private int $counter = 0;
 
-        $this->assertSame(11, $range->getStartLine());
-        $this->assertSame(22, $range->getEndLine());
+    private int $step = 1;
+
+    public function count(): int
+    {
+        $count = $this->counter + $this->step;
+        $this->counter = $count;
+
+        return $count;
+    }
+
+    public function startCount(int $start = 0): void
+    {
+        $this->counter = $start;
+    }
+
+    public function setStep(int $step = 1): void
+    {
+        $this->step = $step;
+    }
+
+    public function get(): int
+    {
+        return $this->counter;
     }
 }

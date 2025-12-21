@@ -38,6 +38,8 @@ namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Exception;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\LineCoverageFactory;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -80,52 +82,34 @@ final class FileReportTest extends TestCase
         yield 'file from PHPUnit XML coverage' => [
             Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/FirstLevel/firstLevel.php.xml'),
             [
-                self::createLineCoverage(
-                    26,
-                    [
-                        'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                        'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                    ],
-                ),
-                self::createLineCoverage(
-                    30,
-                    [
-                        'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                        'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                    ],
-                ),
-                self::createLineCoverage(
-                    31,
-                    [
-                        'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
-                    ],
-                ),
-                self::createLineCoverage(
-                    34,
-                    [
-                        'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
-                    ],
-                ),
+                LineCoverageFactory::create(26, [
+                    'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                    'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                ]),
+                LineCoverageFactory::create(30, [
+                    'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                    'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                ]),
+                LineCoverageFactory::create(31, [
+                    'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays',
+                ]),
+                LineCoverageFactory::create(34, [
+                    'Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression',
+                ]),
             ],
         ];
 
         yield 'file from PHPUnit 6.x<= XML coverage' => [
             Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/Middleware/ReleaseRecordedEventsMiddleware.php.xml'),
             [
-                self::createLineCoverage(
-                    29,
-                    [
-                        'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
-                        'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
-                    ],
-                ),
-                self::createLineCoverage(
-                    30,
-                    [
-                        'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
-                        'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
-                    ],
-                ),
+                LineCoverageFactory::create(29, [
+                    'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
+                    'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
+                ]),
+                LineCoverageFactory::create(30, [
+                    'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
+                    'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
+                ]),
             ],
         ];
 
@@ -137,10 +121,7 @@ final class FileReportTest extends TestCase
         yield 'file with precent signs' => [
             self::FIXTURES_DIR . '/file-with-percent-signs.xml',
             [
-                self::createLineCoverage(
-                    11,
-                    ['ExampleTest::test_it_just_works'],
-                ),
+                LineCoverageFactory::create(11, ['ExampleTest::test_it_just_works']),
             ],
         ];
 
@@ -148,10 +129,7 @@ final class FileReportTest extends TestCase
         yield 'file with empty precent signs' => [
             self::FIXTURES_DIR . '/file-with-empty-percentage.xml',
             [
-                self::createLineCoverage(
-                    11,
-                    ['ExampleTest::test_it_just_works'],
-                ),
+                LineCoverageFactory::create(11, ['ExampleTest::test_it_just_works']),
             ],
         ];
     }
@@ -182,27 +160,15 @@ final class FileReportTest extends TestCase
         yield 'file from PHPUnit XML coverage' => [
             Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/FirstLevel/firstLevel.php.xml'),
             [
-                'shouldMutate' => self::createMethodLineRange(
-                    'shouldMutate',
-                    24,
-                    35,
-                ),
+                'shouldMutate' => MethodLineRangeFactory::create('shouldMutate', 24, 35),
             ],
         ];
 
         yield 'file from PHPUnit 6.x<= XML coverage' => [
             Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/Middleware/ReleaseRecordedEventsMiddleware.php.xml'),
             [
-                '__construct' => self::createMethodLineRange(
-                    '__construct',
-                    27,
-                    31,
-                ),
-                'execute' => self::createMethodLineRange(
-                    'execute',
-                    43,
-                    60,
-                ),
+                '__construct' => MethodLineRangeFactory::create('__construct', 27, 31),
+                'execute' => MethodLineRangeFactory::create('execute', 43, 60),
             ],
         ];
 
@@ -212,39 +178,5 @@ final class FileReportTest extends TestCase
         ];
 
         // TODO: more tests
-    }
-
-    /**
-     * @param int<0, max> $lineNumber
-     * @param non-empty-list<string> $coveredBy
-     *
-     * @return LineCoverage
-     */
-    private static function createLineCoverage(
-        int $lineNumber,
-        array $coveredBy,
-    ): array {
-        return [
-            'lineNumber' => $lineNumber,
-            'coveredBy' => $coveredBy,
-        ];
-    }
-
-    /**
-     * @param positive-int $startLine
-     * @param positive-int $endLine
-     *
-     * @return MethodLineRange
-     */
-    private static function createMethodLineRange(
-        string $methodName,
-        int $startLine,
-        int $endLine,
-    ): array {
-        return [
-            'methodName' => $methodName,
-            'startLine' => $startLine,
-            'endLine' => $endLine,
-        ];
     }
 }

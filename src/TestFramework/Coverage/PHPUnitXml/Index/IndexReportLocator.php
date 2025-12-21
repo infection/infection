@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\PHPUnitXml\Index;
 
-use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use const DIRECTORY_SEPARATOR;
 use function implode;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;

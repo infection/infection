@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -69,6 +70,10 @@ interface Trace
 
     public function hasTests(): bool;
 
+    /**
+     * TODO: to double check; seems weird
+     * @throws TestNotFound
+     */
     public function getTests(): ?TestLocations;
 
     /**

@@ -38,9 +38,9 @@ namespace Infection\Tests\TestFramework\Tracing\Trace;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
 use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -139,7 +139,8 @@ final class ProxyTraceTest extends TestCase
                 ],
             ],
             [
-                '__construct' => new SourceMethodLineRange(
+                '__construct' => MethodLineRangeFactory::create(
+                    '__construct',
                     19,
                     22,
                 ),

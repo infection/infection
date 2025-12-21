@@ -37,8 +37,9 @@ namespace Infection\TestFramework\Tracing;
 
 use Infection\FileSystem\SplFileInfoFactory;
 use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReport;
-use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportFactory;
 use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\TestFramework\PhpUnit\PHPUnitCoverageTracer;
 
 /**
  * @internal
@@ -48,7 +49,7 @@ final readonly class PHPUnitCoverageTraceProvider implements TraceProvider
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private PHPUnitXmlReportProvider $parser,
+        private PHPUnitXmlReportFactory $parser,
         private PHPUnitCoverageTracer $tracer,
     ) {
     }

@@ -41,6 +41,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 
 /**
  * @phpstan-import-type TestInfo from JUnitReport
@@ -109,6 +110,8 @@ final class PHPUnitXmlReport
 
     /**
      * For example, 'App\Tests\DemoTest::test_it_works#item 0'.
+     *
+     * @throws TestNotFound
      *
      * @return TestInfo
      */

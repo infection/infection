@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
+use function array_key_exists;
 use DOMElement;
 use DOMNodeList;
 use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\TestFramework\XML\SafeDOMXPath;
-use Webmozart\Assert\Assert;
-use function array_key_exists;
 use function preg_replace;
 use function sprintf;
+use Webmozart\Assert\Assert;
 
 /**
  * This implementation lazy loads the XML file and looks up the information as needed.
@@ -111,9 +111,9 @@ final class JUnitReport
     /**
      * @throws TestNotFound
      *
-     * @return TestInfo|TestNotFound
+     * @return Infection\TestFramework\Coverage\JUnit\TestInfo|\TestNotFound
      */
-    private function lookup(string $testId): array|TestNotFound
+    private function lookup(string $testId): array
     {
         $nodes = $this->findNode($testId);
 

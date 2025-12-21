@@ -33,18 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing;
+namespace Infection\TestFramework\PhpUnit;
 
 use function array_map;
+use DomainException;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\JUnit\JUnitReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\SourceFileIndexXmlInfo;
 use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReport;
-use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportProvider;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportFactory;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LazyTrace;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -54,13 +59,18 @@ use Symfony\Component\Finder\SplFileInfo;
  * @phpstan-import-type LineCoverage from FileReport
  * @phpstan-import-type MethodLineRange from FileReport
  */
-final class PHPUnitCoverageTracer
+final class PHPUnitCoverageTracer implements Tracer
 {
     private PHPUnitXmlReport $report;
 
     public function __construct(
-        private readonly PHPUnitXmlReportProvider $parser,
+        private readonly PHPUnitXmlReportFactory $parser,
     ) {
+    }
+
+    public function hasTrace(SplFileInfo $fileInfo): bool
+    {
+        throw new DomainException('Not implemented.');
     }
 
     public function trace(SplFileInfo $fileInfo): Trace
@@ -79,6 +89,9 @@ final class PHPUnitCoverageTracer
         );
     }
 
+    /**
+     * @throws TestNotFound
+     */
     private function createTestLocations(SourceFileIndexXmlInfo $fileInfo): TestLocations
     {
         return new TestLocations(
@@ -90,7 +103,8 @@ final class PHPUnitCoverageTracer
     }
 
     /**
-     * @return array<int, list<TestLocation>>
+     * @throws TestNotFound
+     * @return TestLocation
      */
     private function createTestLocationsByLine(SourceFileIndexXmlInfo $fileInfo): array
     {
@@ -109,6 +123,9 @@ final class PHPUnitCoverageTracer
         return $lines;
     }
 
+    /**
+     * @throws TestNotFound
+     */
     private function createTestLocation(string $test): TestLocation
     {
         $testCaseClassName = explode('::', $test, 2)[0];

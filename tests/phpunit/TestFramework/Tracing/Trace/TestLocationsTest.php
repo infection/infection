@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing\Trace;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -49,7 +49,7 @@ final class TestLocationsTest extends TestCase
         $testLocations = new TestLocations();
 
         $this->assertSame([], $testLocations->getTestsLocationsBySourceLine());
-        $this->assertSame([], $testLocations->getMethodLineRangesByMethodName());
+        $this->assertSame([], $testLocations->methodLineRangesByMethodName);
     }
 
     public function test_it_can_be_instantiated(): void
@@ -65,8 +65,8 @@ final class TestLocationsTest extends TestCase
                 ],
             ],
             [
-                'mutate' => new SourceMethodLineRange(12, 16),
-                'createNode' => new SourceMethodLineRange(32, 33),
+                'mutate' => MethodLineRangeFactory::create('mutate', 12, 16),
+                'createNode' => MethodLineRangeFactory::create('createNode', 32, 33),
             ],
         );
 
@@ -84,10 +84,12 @@ final class TestLocationsTest extends TestCase
                     ],
                     'byMethod' => [
                         'mutate' => [
+                            'methodName' => 'mutate',
                             'startLine' => 12,
                             'endLine' => 16,
                         ],
                         'createNode' => [
+                            'methodName' => 'createNode',
                             'startLine' => 32,
                             'endLine' => 33,
                         ],
@@ -111,8 +113,8 @@ final class TestLocationsTest extends TestCase
                 ],
             ],
             [
-                'mutate' => new SourceMethodLineRange(12, 16),
-                'createNode' => new SourceMethodLineRange(32, 33),
+                'mutate' => MethodLineRangeFactory::create('mutate', 12, 16),
+                'createNode' => MethodLineRangeFactory::create('createNode', 32, 33),
             ],
         );
 
@@ -136,10 +138,12 @@ final class TestLocationsTest extends TestCase
                     ],
                     'byMethod' => [
                         'mutate' => [
+                            'methodName' => 'mutate',
                             'startLine' => 12,
                             'endLine' => 16,
                         ],
                         'createNode' => [
+                            'methodName' => 'createNode',
                             'startLine' => 32,
                             'endLine' => 33,
                         ],
@@ -164,10 +168,12 @@ final class TestLocationsTest extends TestCase
                     ],
                     'byMethod' => [
                         'mutate' => [
+                            'methodName' => 'mutate',
                             'startLine' => 12,
                             'endLine' => 16,
                         ],
                         'createNode' => [
+                            'methodName' => 'createNode',
                             'startLine' => 32,
                             'endLine' => 33,
                         ],

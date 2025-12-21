@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 
 /**
@@ -55,7 +54,7 @@ final class TestLocations
      */
     public function __construct(
         public array $testLocationsByLine = [],
-        public array $methodLineRangesByMethodName = [],
+        public readonly array $methodLineRangesByMethodName = [],
     ) {
     }
 

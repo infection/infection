@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\Index;
 
+use function basename;
+use const DIRECTORY_SEPARATOR;
+use function dirname;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
@@ -46,12 +49,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\Filesystem\Path;
-use function basename;
-use function dirname;
 use function sprintf;
 use function strtoupper;
-use const DIRECTORY_SEPARATOR;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(IndexReportLocator::class)]

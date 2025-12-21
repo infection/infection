@@ -33,27 +33,29 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing\Trace;
+namespace Infection\TestFramework\Coverage\PHPUnitXml;
 
-/**
- * TODO: remove
- * @internal
- */
-final readonly class SourceMethodLineRange
+use Infection\TestFramework\Coverage\JUnit\JUnitReport;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReport;
+
+final readonly class PHPUnitXmlReportFactory
 {
+    private PHPUnitXmlReport $report;
+
     public function __construct(
-        private int $startLine,
-        private int $endLine,
+        private ReportLocator $indexReportLocator,
+        private ReportLocator $jUnitReportLocator,
     ) {
+        // The report instantiation is free – everything is done lazily.
+        $this->report = new PHPUnitXmlReport(
+            fn () => new IndexReport($this->indexReportLocator->locate()),
+            fn () => new JUnitReport($this->jUnitReportLocator->locate()),
+        );
     }
 
-    public function getStartLine(): int
+    public function get(): PHPUnitXmlReport
     {
-        return $this->startLine;
-    }
-
-    public function getEndLine(): int
-    {
-        return $this->endLine;
+        return $this->report;
     }
 }

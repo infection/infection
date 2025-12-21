@@ -33,17 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing;
+namespace Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer;
 
-use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
-use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportProvider;
+use Infection\TestFramework\Coverage\PHPUnitXml\PHPUnitXmlReportFactory;
+use Infection\TestFramework\PhpUnit\PHPUnitCoverageTracer;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
-use Infection\TestFramework\Tracing\Trace;
-use Infection\TestFramework\Tracing\PHPUnitCoverageTracer;
-use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\Tests\TestFramework\Coverage\PHPUnitXml\File\MethodLineRangeFactory;
+use Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests\DemoCounterServiceTest;
+use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
+use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -68,7 +71,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
     protected function setUp(): void
     {
         $this->tracer = new PHPUnitCoverageTracer(
-            new PHPUnitXmlReportProvider(
+            new PHPUnitXmlReportFactory(
                 indexReportLocator: new FixedLocator(
                     self::COVERAGE_REPORT_DIR . '/xml/index.xml',
                 ),
@@ -390,26 +393,10 @@ final class PHPUnitCoverageTracerTest extends TestCase
                         ],
                     ],
                     [
-                        'count' => self::createMethodLineRange(
-                            'count',
-                            44,
-                            50,
-                        ),
-                        'startCount' => self::createMethodLineRange(
-                            'startCount',
-                            52,
-                            55,
-                        ),
-                        'setStep' => self::createMethodLineRange(
-                            'setStep',
-                            57,
-                            60,
-                        ),
-                        'get' => self::createMethodLineRange(
-                            'get',
-                            62,
-                            65,
-                        ),
+                        'count' => MethodLineRangeFactory::create('count', 44, 50),
+                        'startCount' => MethodLineRangeFactory::create('startCount', 52, 55),
+                        'setStep' => MethodLineRangeFactory::create('setStep', 57, 60),
+                        'get' => MethodLineRangeFactory::create('get', 62, 65),
                     ],
                 ),
             ),
@@ -431,23 +418,5 @@ final class PHPUnitCoverageTracerTest extends TestCase
             timeout: 5,
         );
         $process->mustRun();
-    }
-
-    /**
-     * @param positive-int $startLine
-     * @param positive-int $endLine
-     *
-     * @return MethodLineRange
-     */
-    private static function createMethodLineRange(
-        string $methodName,
-        int $startLine,
-        int $endLine,
-    ): array {
-        return [
-            'methodName' => $methodName,
-            'startLine' => $startLine,
-            'endLine' => $endLine,
-        ];
     }
 }

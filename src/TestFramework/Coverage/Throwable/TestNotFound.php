@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\Throwable;
 
-use Exception;
 use RuntimeException;
 use function sprintf;
 
@@ -47,8 +46,7 @@ final class TestNotFound extends RuntimeException
     public static function forTestId(
         string $testId,
         string $reportPathname,
-    ): self
-    {
+    ): self {
         return new self(
             sprintf(
                 'Could not find any information for the test "%s" in the coverage file "%s".',

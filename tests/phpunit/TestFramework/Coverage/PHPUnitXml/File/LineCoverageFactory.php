@@ -33,23 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\TraceProviderRegistry;
+namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\File;
 
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
+use Infection\CannotBeInstantiated;
+use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
 
-final readonly class DummyTraceProvider implements TraceProvider
+/**
+ * @phpstan-import-type LineCoverage from FileReport
+ */
+final class LineCoverageFactory
 {
-    /**
-     * @param Trace $traces
-     */
-    public function __construct(
-        private array $traces,
-    ) {
-    }
+    use CannotBeInstantiated;
 
-    public function provideTraces(): iterable
-    {
-        yield from $this->traces;
+    /**
+     * @param int<0, max> $lineNumber
+     * @param non-empty-list<string> $coveredBy
+     *
+     * @return LineCoverageFactory
+     */
+    public static function create(
+        int $lineNumber,
+        array $coveredBy,
+    ): array {
+        return [
+            'lineNumber' => $lineNumber,
+            'coveredBy' => $coveredBy,
+        ];
     }
 }

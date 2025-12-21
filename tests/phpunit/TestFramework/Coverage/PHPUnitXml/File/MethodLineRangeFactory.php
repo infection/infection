@@ -33,34 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Fixtures\src;
+namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\File;
 
-final class DemoCounterService
+use Infection\CannotBeInstantiated;
+use Infection\TestFramework\Coverage\PHPUnitXml\File\FileReport;
+
+/**
+ * @phpstan-import-type MethodLineRange from FileReport
+ */
+final class MethodLineRangeFactory
 {
-    private int $counter = 0;
+    use CannotBeInstantiated;
 
-    private int $step = 1;
-
-    public function count(): int
-    {
-        $count = $this->counter + $this->step;
-        $this->counter = $count;
-
-        return $count;
-    }
-
-    public function startCount(int $start = 0): void
-    {
-        $this->counter = $start;
-    }
-
-    public function setStep(int $step = 1): void
-    {
-        $this->step = $step;
-    }
-
-    public function get(): int
-    {
-        return $this->counter;
+    /**
+     * @param positive-int $startLine
+     * @param positive-int $endLine
+     *
+     * @return MethodLineRange
+     */
+    public static function create(
+        string $methodName,
+        int $startLine,
+        int $endLine,
+    ): array {
+        return [
+            'methodName' => $methodName,
+            'startLine' => $startLine,
+            'endLine' => $endLine,
+        ];
     }
 }

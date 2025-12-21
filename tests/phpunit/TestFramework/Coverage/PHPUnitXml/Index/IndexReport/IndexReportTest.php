@@ -255,14 +255,14 @@ final class IndexReportTest extends TestCase
             self::FIXTURES_DIR . '/no-lines-executed-index.xml',
             // TODO: exception should be thrown; unless it is the JUnit report that should throw it now
             [],
-            //new NoLineExecuted('foo'),
+            // new NoLineExecuted('foo'),
         ];
 
         yield 'lines is not present' => [
             self::FIXTURES_DIR . '/lines-not-present-index.xml',
             // TODO: exception should be thrown; unless it is the JUnit report that should throw it now
             [],
-            //new NoLineExecuted('foo'),
+            // new NoLineExecuted('foo'),
         ];
     }
 
@@ -282,7 +282,7 @@ final class IndexReportTest extends TestCase
         );
 
         $actual = array_map(
-            static fn (string $sourcePathname) => $report->findSourceFileInfo($sourcePathname),
+            $report->findSourceFileInfo(...),
             $expectedSourcePathNames,
         );
 

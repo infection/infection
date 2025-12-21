@@ -35,21 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit\JUnitReport;
 
-use Exception;
-use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\TestFramework\Coverage\JUnit\JUnitReport;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\Tests\Mutator\FunctionSignature\ProtectedVisibilityTest;
 use Infection\Tests\Mutator\Unwrap\UnwrapArrayIntersectUassocTest;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
+use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
-use function array_keys;
-use function is_string;
-use function sprintf;
 
 /**
  * @phpstan-import-type TestInfo from JUnitReport

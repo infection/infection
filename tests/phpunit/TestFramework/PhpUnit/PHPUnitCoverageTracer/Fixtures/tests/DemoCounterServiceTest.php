@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Fixtures\tests;
+namespace Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\tests;
 
-use Infection\Tests\TestFramework\Tracing\Fixtures\src\DemoCounterService;
+use Infection\Tests\TestFramework\PhpUnit\PHPUnitCoverageTracer\Fixtures\src\DemoCounterService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

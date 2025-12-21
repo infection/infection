@@ -33,23 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing;
+namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
+use Closure;
+use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
-/**
- * This trace is meant for source files which have no test whatsoever.
- */
-final class EmptyTrace implements Trace
+final class LazyTrace implements Trace
 {
     private string $realPath;
 
+    private ?TestLocations $testLocations = null;
+
+    private ?TestLocator $testLocator = null;
+
+    /**
+     * @param Closure():TestLocations|null $lazyTestLocations
+     */
     public function __construct(
         public readonly SplFileInfo $sourceFileInfo,
+        private readonly Closure $lazyTestLocations,
     ) {
     }
 
@@ -77,16 +81,33 @@ final class EmptyTrace implements Trace
 
     public function hasTests(): bool
     {
-        return false;
+        return $this->getTestLocator()->hasTests();
     }
 
     public function getTests(): ?TestLocations
     {
-        return null;
+        if ($this->testLocations === null) {
+            $this->testLocations = ($this->lazyTestLocations)();
+        }
+
+        return $this->testLocations;
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
     {
-        return [];
+        return $this->getTestLocator()?->getAllTestsForMutation($lineRange, $isOnFunctionSignature) ?? [];
+    }
+
+    private function getTestLocator(): ?TestLocator
+    {
+        if ($this->testLocator === null) {
+            $testLocations = $this->getTests();
+
+            $this->testLocator = $testLocations === null
+                ? null
+                : new TestLocator($testLocations);
+        }
+
+        return $this->testLocator;
     }
 }
