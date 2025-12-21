@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\PHPUnitXml\Index;
 
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use const DIRECTORY_SEPARATOR;
 use function implode;
-use Infection\FileSystem\Filesystem;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
-use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -50,14 +50,14 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final readonly class IndexReportLocator extends BaseReportLocator implements ReportLocator
+final class IndexReportLocator extends BaseReportLocator implements ReportLocator
 {
     public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 
     private const DEFAULT_INDEX_RELATIVE_PATHNAME = 'coverage-xml/index.xml';
 
     public static function create(
-        Filesystem $filesystem,
+        FileSystem $filesystem,
         string $coverageDirectory,
         ?string $defaultPHPUnitXmlCoverageIndexPathname = null,
     ): self {

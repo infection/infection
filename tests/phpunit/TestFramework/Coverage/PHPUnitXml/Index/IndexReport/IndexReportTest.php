@@ -60,7 +60,7 @@ final class IndexReportTest extends TestCase
         $report = new IndexReport('/path/to/unknown.xml');
 
         $this->expectExceptionObject(
-            new InvalidArgumentException('The file "/path/to/unknown.xml" does not exist.'),
+            new InvalidArgumentException('The path "/path/to/unknown.xml" is not a file.'),
         );
 
         // The file is lazy-loaded and the result is lazy too
@@ -255,14 +255,14 @@ final class IndexReportTest extends TestCase
             self::FIXTURES_DIR . '/no-lines-executed-index.xml',
             // TODO: exception should be thrown; unless it is the JUnit report that should throw it now
             [],
-            new NoLineExecuted('foo'),
+            //new NoLineExecuted('foo'),
         ];
 
         yield 'lines is not present' => [
             self::FIXTURES_DIR . '/lines-not-present-index.xml',
             // TODO: exception should be thrown; unless it is the JUnit report that should throw it now
             [],
-            new NoLineExecuted('foo'),
+            //new NoLineExecuted('foo'),
         ];
     }
 

@@ -33,20 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator\Exception;
+namespace Infection\Tests\TestFramework\Coverage\Throwable;
 
-use RuntimeException;
-use function sprintf;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final class InvalidReportSource extends RuntimeException
+#[CoversClass(TestNotFound::class)]
+final class TestNotFoundTest extends TestCase
 {
-    public static function create(string $pathname): self
+    public function test_it_can_be_created_for_a_test_id(): void
     {
-        return new self(
-            sprintf(
-                'The pathname "%s" is not a valid or readable directory.',
-                $pathname,
-            ),
+        $exception = TestNotFound::forTestId('Foo\Bar', '/path/to/junit/xml');
+
+        $this->assertSame(
+            'Could not find any information for the test "Foo\Bar" in the coverage file "/path/to/junit/xml".',
+            $exception->getMessage(),
         );
     }
 }

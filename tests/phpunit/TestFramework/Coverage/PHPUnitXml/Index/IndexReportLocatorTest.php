@@ -35,118 +35,210 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\PHPUnitXml\Index;
 
-use const DIRECTORY_SEPARATOR;
-use Infection\FileSystem\FakeFilesystem;
+use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
-use Infection\TestFramework\Coverage\Locator\Exception\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Exception\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Exception\TooManyReportsFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\PHPUnitXml\Index\IndexReportLocator;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
-use function Safe\chdir;
-use function sprintf;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Path;
+use function basename;
+use function dirname;
+use function sprintf;
+use function strtoupper;
+use const DIRECTORY_SEPARATOR;
 
+#[Group('integration')]
 #[CoversClass(IndexReportLocator::class)]
 final class IndexReportLocatorTest extends FileSystemTestCase
 {
+    private const TEST_DEFAULT_RELATIVE_PATHNAME = 'coverage-xml/non-standard/test-index.xml';
+
+    private FileSystem $fileSystem;
+
     private IndexReportLocator $locator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        chdir($this->tmp);
+        $this->fileSystem = new FileSystem();
 
         $this->locator = IndexReportLocator::create(
-            $this->filesystem,
+            $this->fileSystem,
             $this->tmp,
-            $this->tmp . '/coverage-xml/index.xml',
+            $this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME,
         );
     }
 
-    protected function tearDown(): void
+    // This is a sanity check to ensure we have the test correctly configured.
+    #[CoversNothing]
+    public function test_it_the_default_path_of_this_test_is_not_the_standard_location(): void
     {
-        chdir($this->cwd);
-
-        parent::tearDown();
-    }
-
-    public function test_it_infers_a_default_pathname_from_the_coverage_directory(): void
-    {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/coverage/coverage-xml/index.xml';
+        $this->fileSystem->dumpFile(self::TEST_DEFAULT_RELATIVE_PATHNAME, '');
 
         $locator = IndexReportLocator::create(
-            new FakeFilesystem(),
-            $coverageDirectory,
+            $this->fileSystem,
+            $this->tmp,
         );
 
-        $actual = $locator->getDefaultLocation();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_picks_the_default_pathname_given(): void
-    {
-        $coverageDirectory = '/path/to/coverage';
-        $expected = '/path/to/another-coverage/default-junit.xml';
-
-        $locator = IndexReportLocator::create(
-            new FakeFilesystem(),
-            $coverageDirectory,
-            defaultPHPUnitXmlCoverageIndexPathname: $expected,
-        );
-
-        $actual = $locator->getDefaultLocation();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void
-    {
-        $unknownDir = $this->tmp . '/unknown-dir';
-
-        $locator = IndexReportLocator::create(
-            $this->filesystem,
-            $unknownDir,
-            '/path/to/unknown-file',
-        );
-
-        $this->expectExceptionObject(
-            new InvalidReportSource(
-                sprintf(
-                    'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
-                    $unknownDir,
-                ),
-            ),
-        );
+        $this->expectException(NoReportFound::class);
 
         $locator->locate();
     }
 
-    // This does not work on macOS as both files appear to be the same.
-    #[RequiresOperatingSystem('/^(?!Darwin)$/')]
+    #[DataProvider('defaultLocationProvider')]
+    public function test_it_exposes_the_default_location_used(
+        string $defaultLocation,
+        string $expected,
+    ): void {
+        $coverageDirectory = '/path/to/random-coverage';
+
+        $locator = IndexReportLocator::create(
+            $this->fileSystem,
+            $coverageDirectory,
+            defaultPHPUnitXmlCoverageIndexPathname: $defaultLocation,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultLocationProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage/default-index.xml',
+            '/path/to/coverage/default-index.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/../default-index.xml',
+            '/path/to/coverage/default-index.xml',
+        ];
+    }
+
+    #[DataProvider('defaultCovergageDirectoryProvider')]
+    public function test_it_infers_a_default_pathname_from_the_coverage_directory(
+        string $coverageDirectory,
+        string $expected,
+    ): void {
+        $locator = IndexReportLocator::create(
+            $this->fileSystem,
+            $coverageDirectory,
+        );
+
+        $actual = $locator->getDefaultLocation();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function defaultCovergageDirectoryProvider(): iterable
+    {
+        yield 'canonical pathname' => [
+            '/path/to/coverage',
+            '/path/to/coverage/coverage-xml/index.xml',
+        ];
+
+        yield 'non-canonical pathname' => [
+            '/path/to/coverage/dir/..',
+            '/path/to/coverage/coverage-xml/index.xml',
+        ];
+    }
+
+    #[DataProvider('reportPathnameProvider')]
+    public function test_it_can_find_a_report_pathname(
+        string $relativePathname,
+        ?string $expectedRelativePathname = null,
+    ): void {
+        $expectedRelativePathname ??= $relativePathname;
+
+        $this->fileSystem->dumpFile($relativePathname, '');
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . $expectedRelativePathname);
+
+        $actual = $this->locator->locate();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function reportPathnameProvider(): iterable
+    {
+        yield 'exact match with the default location' => [self::TEST_DEFAULT_RELATIVE_PATHNAME];
+
+        yield 'in sub-directory' => ['sub-dir/index.xml'];
+
+        yield 'all caps in sub-directory' => ['sub-dir/INDEX.xml'];
+    }
+
+    public function test_it_can_locate_the_default_report_with_the_wrong_case_on_a_case_insensitive_system(): void
+    {
+        if (!OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-insensitive system.');
+        }
+
+        $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
+
+        $this->fileSystem->dumpFile($relativePathname, '');
+
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . self::TEST_DEFAULT_RELATIVE_PATHNAME);
+
+        $actual = $this->locator->locate();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function test_it_cannot_locate_the_default_report_with_the_wrong_case_on_a_case_sensitive_system(): void
+    {
+        if (OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-sensitive system.');
+        }
+
+        $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
+
+        $this->fileSystem->dumpFile($relativePathname, '');
+
+        $this->expectException(NoReportFound::class);
+
+        $this->locator->locate();
+    }
+
+    public function test_it_can_locate_the_report_with_the_wrong_case(): void
+    {
+        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'INDEX.xml');
+        $this->fileSystem->dumpFile($expected, '');
+
+        $locator = IndexReportLocator::create(
+            $this->fileSystem,
+            $this->tmp,
+            $this->tmp . '/unknown-file.xml',
+        );
+
+        $actual = $locator->locate();
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void
     {
-        $this->filesystem->touch('index.xml');
-        $this->filesystem->touch('INDEX.xml');
+        if (OperatingSystem::isMacOs()) {
+            $this->markTestSkipped('Requires a case-sensitive system.');
+        }
+
+        $this->fileSystem->touch('index.xml');
+        $this->fileSystem->dumpFile('sub-dir/index.xml', '');
 
         $expectedReportsPathnames = [
             Path::normalize($this->tmp . '/index.xml'),
-            Path::normalize($this->tmp . '/INDEX.xml'),
+            Path::normalize($this->tmp . '/sub-dir/index.xml'),
         ];
 
-        try {
-            $this->locator->locate();
-
-            $this->fail('Expected an exception to be thrown.');
-        } catch (TooManyReportsFound $exception) {
-            $this->assertEqualsCanonicalizing($expectedReportsPathnames, $exception->reportPathnames);
-            $this->assertSame(
+        $this->expectExceptionObject(
+            new TooManyReportsFound(
                 sprintf(
                     'Could not find the XML coverage index report in "%s": more than one file with the pattern "%s" was found. Found: "%s", "%s".',
                     $this->tmp,
@@ -154,9 +246,10 @@ final class IndexReportLocatorTest extends FileSystemTestCase
                     $expectedReportsPathnames[0],
                     $expectedReportsPathnames[1],
                 ),
-                $exception->getMessage(),
-            );
-        }
+            ),
+        );
+
+        $this->locator->locate();
     }
 
     public function test_it_cannot_find_the_report_if_no_file_was_found(): void
@@ -174,56 +267,63 @@ final class IndexReportLocatorTest extends FileSystemTestCase
         $this->locator->locate();
     }
 
-    #[DataProvider('indexPathnameProvider')]
-    public function test_it_can_find_a_report_pathname(
-        string $relativePathname,
-        ?string $expectedRelativePathname = null,
-    ): void {
-        $expectedRelativePathname ??= $relativePathname;
+    public function test_it_cannot_find_the_report_no_suitable_file_was_found(): void
+    {
+        $this->fileSystem->touch('not-a-matching-file.txt');
 
-        $this->filesystem->dumpFile($relativePathname, '');
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . $expectedRelativePathname);
+        $this->expectExceptionObject(
+            new NoReportFound(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": no file with the pattern "%s" was found.',
+                    $this->tmp,
+                    IndexReportLocator::INDEX_FILENAME_REGEX,
+                ),
+            ),
+        );
 
-        $actual = $this->locator->locate();
-
-        $this->assertSame($expected, $actual);
+        $this->locator->locate();
     }
 
-    public static function indexPathnameProvider(): iterable
+    public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void
     {
-        yield 'default name' => ['coverage-xml/index.xml'];
+        $unknownDir = $this->tmp . '/unknown-dir';
 
-        yield 'default name in directory outside of the default path' => ['index.xml'];
+        $this->locator = IndexReportLocator::create(
+            $this->fileSystem,
+            $unknownDir,
+        );
 
-        yield 'all caps default name' => [
-            'COVERAGE-XML/INDEX.XML',
-            // On macOS (or case-insensitive systems), the default path will
-            // match hence will be picked; Hence the case of the default path
-            // is picked over the actual case of the file.
-            OperatingSystem::isMacOs()
-                ? 'coverage-xml/index.xml'
-                : 'COVERAGE-XML/INDEX.XML',
-        ];
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
+                    $unknownDir,
+                ),
+            ),
+        );
 
-        yield 'in sub-directory' => ['sub-dir/index.xml'];
-
-        yield 'all caps in sub-directory' => ['sub-dir/INDEX.xml'];
+        $this->locator->locate();
     }
 
-    #[DataProvider('invalidJunitPathnameProvider')]
-    public function test_it_cannot_find_junit_files_with_invalid_names(string $relativeJUnitPathname): void
+    public function test_it_cannot_locate_the_report_if_the_source_directory_is_not_a_directory(): void
     {
-        $this->filesystem->dumpFile($relativeJUnitPathname, '');
+        $file = $this->fileSystem->tempnam($this->tmp, 'default-');
+        $this->fileSystem->touch($file);
 
-        $this->expectException(NoReportFound::class);
+        $locator = IndexReportLocator::create(
+            $this->fileSystem,
+            $file,
+        );
 
-        $actual = $this->locator->locate();
+        $this->expectExceptionObject(
+            new InvalidReportSource(
+                sprintf(
+                    'Could not find the XML coverage index report in "%s": the pathname is not a valid or readable directory.',
+                    $file,
+                ),
+            ),
+        );
 
-        $this->assertSame([], $actual);
-    }
-
-    public static function invalidJunitPathnameProvider(): iterable
-    {
-        yield 'with the wrong file ending' => ['junit.xml.dist'];
+        $locator->locate();
     }
 }

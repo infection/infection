@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\PHPUnitXml\Index;
 
-// TODO: rather than converting directly to iterable<SourceFileInfoProvider>, this adds a layer of abstraction to expose the report as a PHP object.
-//  Need to be revisted.
-
 use function array_key_exists;
 use function dirname;
 use DOMElement;

@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Coverage\JUnit;
 
 use DOMElement;
 use DOMNodeList;
-use Infection\TestFramework\Coverage\Exception\TestNotFound;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\TestFramework\XML\SafeDOMXPath;
 use Webmozart\Assert\Assert;
 use function array_key_exists;
@@ -45,6 +45,14 @@ use function preg_replace;
 use function sprintf;
 
 /**
+ * This implementation lazy loads the XML file and looks up the information as needed.
+ *
+ * There is two axis of improvements for this current implementation:
+ * - To not use XPath and instead use the XMLReader to load only the section of the file needed.
+ * - Currently because we just fetch arbitrary values, we do not know when we read through
+ *   the file and close it, which means we may keep the loaded file in memory longer than necessary.
+ * - To check, but it could be that creating a TestInfo class would actually be more performant.
+ *
  * @phpstan-type TestInfo = array{location: string, executionTime: float}
  */
 final class JUnitReport
@@ -52,7 +60,7 @@ final class JUnitReport
     private SafeDOMXPath $xPath;
 
     /**
-     * @var array<string, TestInfo>
+     * @var array<string, TestInfo|null>
      */
     private array $indexedTestInfos = [];
 
@@ -89,17 +97,23 @@ final class JUnitReport
      */
     public function getTestInfo(string $testId): array
     {
-        return array_key_exists($testId, $this->indexedTestInfos)
+        $value = array_key_exists($testId, $this->indexedTestInfos)
             ? $this->indexedTestInfos[$testId]
             : $this->lookup($testId);
+
+        if ($value instanceof TestNotFound) {
+            throw $value;
+        }
+
+        return $value;
     }
 
     /**
      * @throws TestNotFound
      *
-     * @return TestInfo
+     * @return TestInfo|TestNotFound
      */
-    private function lookup(string $testId): array
+    private function lookup(string $testId): array|TestNotFound
     {
         $nodes = $this->findNode($testId);
 

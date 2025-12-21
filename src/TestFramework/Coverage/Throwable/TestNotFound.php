@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Exception;
+namespace Infection\TestFramework\Coverage\Throwable;
 
 use Exception;
 use RuntimeException;

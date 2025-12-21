@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Tracing;
 
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\Exception\TestNotFound;
+use Infection\TestFramework\Coverage\Throwable\TestNotFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
