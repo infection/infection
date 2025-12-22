@@ -84,10 +84,6 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        if ($onlyCovered && !$this->tracer->hasTrace($sourceFile)) {
-            return;
-        }
-
         $trace = $this->tracer->hasTrace($sourceFile)
             ? $this->tracer->trace($sourceFile)
             : new EmptyTrace($sourceFile);
