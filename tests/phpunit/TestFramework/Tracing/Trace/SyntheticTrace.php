@@ -53,7 +53,7 @@ final readonly class SyntheticTrace implements Trace
         public string $realPath,
         public string $relativePathname,
         public bool $hasTest,
-        public ?TestLocations $tests,
+        public TestLocations $tests,
     ) {
     }
 
@@ -77,7 +77,7 @@ final readonly class SyntheticTrace implements Trace
         return $this->hasTest;
     }
 
-    public function getTests(): ?TestLocations
+    public function getTests(): TestLocations
     {
         return $this->tests;
     }
