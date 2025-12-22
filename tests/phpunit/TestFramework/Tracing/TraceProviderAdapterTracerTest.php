@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing;
 
 use ArrayIterator;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
@@ -48,7 +49,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\InvalidArgumentException;
 
 #[CoversClass(TraceProviderAdapterTracer::class)]
 final class TraceProviderAdapterTracerTest extends TestCase
@@ -89,7 +89,13 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $this->assertSame($trace2, $this->tracer->trace($fileInfo2));
 
         $this->assertFalse($this->tracer->hasTrace($unknownFileInfo));
-        $this->expectException(InvalidArgumentException::class);
+
+        $this->expectExceptionObject(
+            new NoTraceFound(
+                'Could not find any trace for file "unknown".',
+            ),
+        );
+
         $this->tracer->trace($unknownFileInfo);
     }
 
@@ -157,7 +163,15 @@ final class TraceProviderAdapterTracerTest extends TestCase
             ->method('provideTraces')
             ->willReturn([]);
 
-        $this->assertFalse($this->tracer->hasTrace($fileInfo));
+        $this->tracer->hasTrace($fileInfo);
+
+        $this->expectExceptionObject(
+            new NoTraceFound(
+                'Could not find any trace.',
+            ),
+        );
+
+        $this->tracer->trace($fileInfo);
     }
 
     /**
