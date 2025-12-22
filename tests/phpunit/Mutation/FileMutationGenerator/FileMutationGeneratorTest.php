@@ -278,9 +278,10 @@ final class FileMutationGeneratorTest extends TestCase
 
         yield 'nominal' => [$nominalScenario];
 
-        yield 'onlyCovered=true: do not skip generation if no tests' => [
+        yield 'onlyCovered=true: skip generation if no tests' => [
             $nominalScenario
-                ->withTraceHasTests(false),
+                ->withTraceHasTests(false)
+                ->withExpected(false),
         ];
 
         yield 'onlyCovered=true: skip generation if no trace' => [
@@ -295,11 +296,17 @@ final class FileMutationGeneratorTest extends TestCase
                 ->withTraceHasTests(false),
         ];
 
-        yield 'onlyCovered=false: skip generation if no trace' => [
+        yield 'onlyCovered=false: do not skip generation if no trace' => [
+            $nominalScenario
+                ->withOnlyCovered(false)
+                ->withHasTrace(false),
+        ];
+
+        yield 'onlyCovered=false: do not skip generation if no trace and no tests' => [
             $nominalScenario
                 ->withOnlyCovered(false)
                 ->withHasTrace(false)
-                ->withExpected(false),
+                ->withTraceHasTests(false),
         ];
     }
 
