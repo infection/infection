@@ -33,24 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Mutation\FileMutationGenerator\Fixtures;
 
-use DomainException;
-use function sprintf;
-
-/**
- * @internal
- */
-final class UnsupportedMethod extends DomainException
+final readonly class TwoAdditions
 {
-    public static function method(string $class, string $method): self
+    public function first(): int
     {
-        return new self(
-            sprintf(
-                'Did not expect "%s::%s()" to be called',
-                $class,
-                $method,
-            ),
-        );
+        return 1 + 2;
+    }
+
+    public function second(): int
+    {
+        return 1 - 2;
     }
 }
