@@ -57,6 +57,6 @@ tputx sgr0
 
 PATH=$PATH:bin run "../../../bin/infection --quiet"
 
-diff -w expected-output.txt infection.log
+diff --ignore-all-space expected-output.txt infection.log
 
 rm -vfr coverage

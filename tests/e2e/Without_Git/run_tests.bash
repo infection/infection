@@ -31,4 +31,4 @@ composer install
 
 docker run -t -v "$PWD":/opt -w /opt php:8.2-alpine vendor/bin/infection --coverage=infection-coverage
 
-diff -w expected-output.txt infection.log
+diff --ignore-all-space expected-output.txt infection.log

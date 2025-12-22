@@ -8,4 +8,4 @@ composer install --no-interaction --working-dir=tools
 
 php $INFECTION --static-analysis-tool=phpstan --no-progress --threads=2
 
-diff -w expected-output.txt infection.log
+diff --ignore-all-space expected-output.txt infection.log
