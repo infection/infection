@@ -102,19 +102,6 @@ final class ProxyTraceTest extends TestCase
         $this->assertFalse($trace->hasTests());
     }
 
-    public function test_it_returns_null_for_no_tests(): void
-    {
-        $fileInfoMock = new MockSplFileInfo([
-            'file' => 'test.txt',
-        ]);
-
-        $trace = new ProxyTrace($fileInfoMock);
-
-        $this->assertFalse($trace->hasTests());
-
-        $this->assertNull($trace->getTests());
-    }
-
     public function test_it_returns_empty_iterable_for_no_tests(): void
     {
         $fileInfoMock = new MockSplFileInfo([
