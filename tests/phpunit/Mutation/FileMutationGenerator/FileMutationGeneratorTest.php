@@ -301,6 +301,13 @@ final class FileMutationGeneratorTest extends TestCase
                 ->withOnlyCovered(false)
                 ->withHasTrace(false),
         ];
+
+        yield 'onlyCovered=false: do not skip generation if no trace and no tests' => [
+            $nominalScenario
+                ->withOnlyCovered(false)
+                ->withHasTrace(false)
+                ->withTraceHasTests(false),
+        ];
     }
 
     private function createSplFileInfoMock(string $file): SplFileInfo&MockObject
