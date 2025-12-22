@@ -829,6 +829,12 @@ parameters:
 			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
 
 		-
+			message: '#^Parameter \#1 \$array of function array_values expects array\<T\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
+
+		-
 			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\JUnit\\TestLocationBucketSorterTest\:\:quicksort\(\) has parameter \$uniqueTestLocations with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
