@@ -40,9 +40,11 @@ use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ProxyTrace::class)]
@@ -91,15 +93,27 @@ final class ProxyTraceTest extends TestCase
         $this->assertSame($tests, $actual);
     }
 
-    public function test_it_has_no_tests_if_no_covered(): void
+    #[DataProvider('noTestTrace')]
+    public function test_it_has_no_tests_if_no_covered(Trace $trace): void
     {
-        $fileInfoMock = new MockSplFileInfo([
-            'file' => 'test.txt',
-        ]);
-
-        $trace = new ProxyTrace($fileInfoMock, now(new TestLocations()));
-
         $this->assertFalse($trace->hasTests());
+        $this->assertEquals(new TestLocations(), $trace->getTests());
+    }
+
+    public static function noTestTrace(): iterable
+    {
+        yield [
+            new ProxyTrace(
+                new MockSplFileInfo(['file' => 'test.txt']),
+            ),
+        ];
+
+        yield [
+            new ProxyTrace(
+                new MockSplFileInfo(['file' => 'test.txt']),
+                now(new TestLocations()),
+            ),
+        ];
     }
 
     public function test_it_returns_empty_iterable_for_no_tests(): void
