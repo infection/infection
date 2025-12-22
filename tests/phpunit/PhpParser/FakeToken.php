@@ -33,24 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\PhpParser;
 
-use DomainException;
-use function sprintf;
+use Infection\Tests\UnsupportedMethod;
+use PhpParser\Token;
 
-/**
- * @internal
- */
-final class UnsupportedMethod extends DomainException
+final class FakeToken extends Token
 {
-    public static function method(string $class, string $method): self
+    public function __toString(): string
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public static function create(): self
     {
         return new self(
-            sprintf(
-                'Did not expect "%s::%s()" to be called',
-                $class,
-                $method,
-            ),
+            3_14159265359,
+            '<should not be used!>',
+            0,
+            0,
         );
+    }
+
+    public function getTokenName(): ?string
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    /**
+     * @param int|string|(int|string)[] $kind
+     */
+    public function is($kind): bool
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function isIgnorable(): bool
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public static function tokenize(string $code, int $flags = 0): array
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function getEndPos(): int
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function getEndLine(): int
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

@@ -33,24 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\TestFramework\Tracing;
 
-use DomainException;
-use function sprintf;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
+use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @internal
- */
-final class UnsupportedMethod extends DomainException
+final class DummyTracer implements Tracer
 {
-    public static function method(string $class, string $method): self
+    public function hasTrace(SplFileInfo $fileInfo): bool
     {
-        return new self(
-            sprintf(
-                'Did not expect "%s::%s()" to be called',
-                $class,
-                $method,
-            ),
-        );
+        return true;
+    }
+
+    public function trace(SplFileInfo $fileInfo): Trace
+    {
+        return new EmptyTrace($fileInfo);
     }
 }
