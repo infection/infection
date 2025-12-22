@@ -186,11 +186,7 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturnOnConsecutiveCalls($preTraverserMock, $traverserMock)
         ;
 
-        $fileInfoMock = $this->createSplFileInfoMock(
-            '/path/to/file',
-            'relativePath',
-            'relativePathName',
-        );
+        $fileInfoMock = $this->createSplFileInfoMock('/path/to/file');
 
         $this->tracerMock
             ->method('hasTrace')
@@ -214,10 +210,7 @@ final class FileMutationGeneratorTest extends TestCase
     #[DataProvider('parsedFilesProvider')]
     public function test_it_attempts_to_generate_mutations_for_the_file_if_covered_or_not_only_covered_code(
         string $file,
-        string $relativePath,
-        string $relativePathname,
-        bool $hasTrace,
-        ?bool $hasTests,
+        bool $hasTests,
         bool $onlyCovered,
         string $expectedFilePath,
     ): void {
@@ -269,7 +262,7 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn($traverserMock)
         ;
 
-        $fileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
+        $fileInfoMock = $this->createSplFileInfoMock($file);
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
@@ -297,51 +290,10 @@ final class FileMutationGeneratorTest extends TestCase
         $this->assertSame([], $mutations);
     }
 
-    public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_trace(): void {
-        $this->fileParserMock
-            ->expects($this->never())
-            ->method('parse')
-        ;
-
-        $this->traverserFactoryMock
-            ->expects($this->never())
-            ->method('create')
-        ;
-
-        $this->traverserFactoryMock
-            ->expects($this->never())
-            ->method('createPreTraverser')
-        ;
-
-        $fileInfoMock = $this->createSplFileInfoMock(
-            '/path/to/file',
-            'relativePath',
-            'relativePathName',
-        );
-
-        $this->tracerMock
-            ->method('hasTrace')
-            ->with($fileInfoMock)
-            ->willReturn(false);
-
-        $mutations = $this->mutationGenerator->generate(
-            $fileInfoMock,
-            true,
-            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
-            [],
-        );
-
-        $mutations = iterator_to_array($mutations, false);
-
-        $this->assertSame([], $mutations);
-    }
-
     #[DataProvider('skippedFilesProvider')]
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
         string $file,
-        string $relativePath,
-        string $relativePathname,
-        ?bool $hasTests = null,
+        bool $hasTests,
     ): void {
         $this->fileParserMock
             ->expects($this->never())
@@ -358,12 +310,12 @@ final class FileMutationGeneratorTest extends TestCase
             ->method('createPreTraverser')
         ;
 
-        $fileInfoMock = $this->createSplFileInfoMock($file, $relativePath, $relativePathname);
+        $fileInfoMock = $this->createSplFileInfoMock($file);
 
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->method('hasTests')
-            ->willReturn(true);
+            ->willReturn($hasTests);
 
         $this->tracerMock
             ->method('hasTrace')
@@ -390,15 +342,12 @@ final class FileMutationGeneratorTest extends TestCase
     {
         foreach (self::provideBoolean() as $hasTests) {
             $title = sprintf(
-                'onlyCovered=false, hasTrace=true, hasTests=%s',
+                'path - only covered: false - has tests: %s',
                 $hasTests ? 'true' : 'false',
             );
 
             yield $title => [
                 '/path/to/file',
-                'relativePath',
-                'relativePathName',
-                true,
                 true,
                 false,
                 '/path/to/file',
@@ -413,27 +362,21 @@ final class FileMutationGeneratorTest extends TestCase
 
             yield $title => [
                 __FILE__,
-                'relativePath',
-                'relativePathName',
                 true,
                 false,
                 __FILE__,
             ];
         }
 
-        yield 'path - only covered: true - has tests: %s' => [
+        yield 'path - only covered: true - has tests: true' => [
             '/path/to/file',
-            'relativePath',
-            'relativePathName',
             true,
             true,
             '/path/to/file',
         ];
 
-        yield 'real path - only covered: true - has tests: %s' => [
+        yield 'real path - only covered: true - has tests: true' => [
             __FILE__,
-            'relativePath',
-            'relativePathName',
             true,
             true,
             __FILE__,
@@ -442,17 +385,13 @@ final class FileMutationGeneratorTest extends TestCase
 
     public static function skippedFilesProvider(): iterable
     {
-        yield 'path - only covered: true - has tests: %s' => [
+        yield 'path - only covered: true - has tests: false' => [
             '/path/to/file',
-            'relativePath',
-            'relativePathName',
             false,
         ];
 
-        yield 'real path - only covered: true - has tests: %s' => [
+        yield 'real path - only covered: true - has tests: false' => [
             __FILE__,
-            'relativePath',
-            'relativePathName',
             false,
         ];
     }
@@ -462,11 +401,8 @@ final class FileMutationGeneratorTest extends TestCase
         yield from [true, false];
     }
 
-    private function createSplFileInfoMock(
-        string $file,
-        string $relativePath = '',
-        string $relativePathname = '',
-    ): SplFileInfo&MockObject {
+    private function createSplFileInfoMock(string $file): SplFileInfo&MockObject
+    {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
         $splFileInfoMock->method('__toString')->willReturn($file);
         $splFileInfoMock->method('getFilename')->willReturn($file);
@@ -474,8 +410,6 @@ final class FileMutationGeneratorTest extends TestCase
         $splFileInfoMock->method('getContents')->willReturn(
             file_exists($file) ? file_get_contents($file) : 'content',
         );
-        $splFileInfoMock->method('getRelativePath')->willReturn($relativePath);
-        $splFileInfoMock->method('getRelativePathname')->willReturn($relativePathname);
 
         return $splFileInfoMock;
     }

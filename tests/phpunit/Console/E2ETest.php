@@ -208,7 +208,18 @@ final class E2ETest extends TestCase
         $expected = file_get_contents('expected-output.txt');
         $expected = Str::toSystemLineEndings($expected);
 
-        $this->assertStringEqualsFile('infection.log', $expected, sprintf('%s/expected-output.txt is not same as infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)', getcwd()));
+        $expectedFile = file_exists('var/infection.log')
+            ? 'var/infection.log'
+            : 'infection.log';
+
+        $this->assertStringEqualsFile(
+            $expectedFile,
+            $expected,
+            sprintf(
+                '%s/expected-output.txt is not same as var/infection.log or infection.log (if that is OK, run GOLDEN=1 vendor/bin/phpunit)',
+                getcwd(),
+            ),
+        );
 
         return $output;
     }
