@@ -33,24 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests;
+namespace Infection\Tests\Mutation\FileMutationGenerator;
 
-use DomainException;
-use function sprintf;
-
-/**
- * @internal
- */
-final class UnsupportedMethod extends DomainException
+final class Scenario
 {
-    public static function method(string $class, string $method): self
+    public function __construct(
+        public bool $onlyCovered,
+        public bool $hasTrace,
+        public bool $traceHasTests,
+        public bool $expected,
+    ) {
+    }
+
+    public function withOnlyCovered(bool $onlyCovered): self
     {
-        return new self(
-            sprintf(
-                'Did not expect "%s::%s()" to be called',
-                $class,
-                $method,
-            ),
-        );
+        $clone = clone $this;
+        $clone->onlyCovered = $onlyCovered;
+
+        return $clone;
+    }
+
+    public function withHasTrace(bool $hasTrace): self
+    {
+        $clone = clone $this;
+        $clone->hasTrace = $hasTrace;
+
+        return $clone;
+    }
+
+    public function withTraceHasTests(bool $traceHasTests): self
+    {
+        $clone = clone $this;
+        $clone->traceHasTests = $traceHasTests;
+
+        return $clone;
+    }
+
+    public function withExpected(bool $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
     }
 }
