@@ -90,6 +90,11 @@ class FileMutationGenerator
         }
 
         $trace = $this->tracer->trace($sourceFile);
+
+        if ($onlyCovered && !$trace->hasTests()) {
+            return;
+        }
+
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them

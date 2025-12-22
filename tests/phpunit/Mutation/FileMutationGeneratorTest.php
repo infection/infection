@@ -216,6 +216,7 @@ final class FileMutationGeneratorTest extends TestCase
         string $file,
         string $relativePath,
         string $relativePathname,
+        bool $hasTrace,
         ?bool $hasTests,
         bool $onlyCovered,
         string $expectedFilePath,
@@ -296,6 +297,45 @@ final class FileMutationGeneratorTest extends TestCase
         $this->assertSame([], $mutations);
     }
 
+    public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_trace(): void {
+        $this->fileParserMock
+            ->expects($this->never())
+            ->method('parse')
+        ;
+
+        $this->traverserFactoryMock
+            ->expects($this->never())
+            ->method('create')
+        ;
+
+        $this->traverserFactoryMock
+            ->expects($this->never())
+            ->method('createPreTraverser')
+        ;
+
+        $fileInfoMock = $this->createSplFileInfoMock(
+            '/path/to/file',
+            'relativePath',
+            'relativePathName',
+        );
+
+        $this->tracerMock
+            ->method('hasTrace')
+            ->with($fileInfoMock)
+            ->willReturn(false);
+
+        $mutations = $this->mutationGenerator->generate(
+            $fileInfoMock,
+            true,
+            [new IgnoreMutator(new IgnoreConfig([]), new Plus())],
+            [],
+        );
+
+        $mutations = iterator_to_array($mutations, false);
+
+        $this->assertSame([], $mutations);
+    }
+
     #[DataProvider('skippedFilesProvider')]
     public function test_it_skips_the_mutation_generation_if_checks_only_covered_code_and_the_file_has_no_tests(
         string $file,
@@ -323,7 +363,7 @@ final class FileMutationGeneratorTest extends TestCase
         $traceMock = $this->createMock(Trace::class);
         $traceMock
             ->method('hasTests')
-            ->willReturn($hasTests);
+            ->willReturn(true);
 
         $this->tracerMock
             ->method('hasTrace')
@@ -350,7 +390,7 @@ final class FileMutationGeneratorTest extends TestCase
     {
         foreach (self::provideBoolean() as $hasTests) {
             $title = sprintf(
-                'path - only covered: false - has tests: %s',
+                'onlyCovered=false, hasTrace=true, hasTests=%s',
                 $hasTests ? 'true' : 'false',
             );
 
@@ -358,6 +398,7 @@ final class FileMutationGeneratorTest extends TestCase
                 '/path/to/file',
                 'relativePath',
                 'relativePathName',
+                true,
                 true,
                 false,
                 '/path/to/file',
