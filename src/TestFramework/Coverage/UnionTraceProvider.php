@@ -33,34 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\TestFramework\Coverage;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
+use Infection\TestFramework\Tracing\TraceProvider;
 
-final class TraceAssertion
+/**
+ * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
+ * original source files in order to ensure all the files are included.
+ *
+ * @internal
+ */
+final readonly class UnionTraceProvider implements TraceProvider
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
+    public function __construct(
+        private TraceProvider $coveredTraceProvider,
+        private TraceProvider $uncoveredTraceProvider,
+        private bool $onlyCovered,
+    ) {
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public function provideTraces(): iterable
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo(),
-            'realPath' => $trace->getRealPath(),
-            'relativePathname' => $trace->getRelativePathname(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        yield from $this->coveredTraceProvider->provideTraces();
+
+        if ($this->onlyCovered === false) {
+            yield from $this->uncoveredTraceProvider->provideTraces();
+        }
     }
 }

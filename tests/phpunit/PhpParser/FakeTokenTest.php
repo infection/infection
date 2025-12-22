@@ -33,59 +33,66 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator;
+namespace Infection\Tests\PhpParser;
 
 use function array_key_exists;
-use function end;
-use function explode;
-use Infection\CannotBeInstantiated;
-use Infection\Testing\BaseMutatorTestCase;
-use function Safe\file_get_contents;
-use function sprintf;
-use function substr;
-use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
+use Closure;
+use function in_array;
+use Infection\Tests\UnsupportedMethod;
+use function is_string;
+use PhpParser\Token;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
 
-final class MutatorFixturesProvider
+#[CoversClass(FakeToken::class)]
+final class FakeTokenTest extends TestCase
 {
-    use CannotBeInstantiated;
-
-    private const MUTATOR_FIXTURES_DIR = __DIR__ . '/../../autoloaded/mutator-fixtures';
-
     /**
-     * @var array<string, string>
+     * @param string|Closure(Token):mixed $method
      */
-    private static array $testCaseFixtureDirMapping = [];
+    #[DataProvider('methodProvider')]
+    public function test_it_does_not_allow_any_of_its_methods_to_be_called(
+        string|Closure $method,
+    ): void {
+        $token = FakeToken::create();
 
-    /**
-     * @param class-string $class
-     */
-    public static function getFixtureFileContent(string $class, string $file): string
-    {
-        Assert::isAOf($class, BaseMutatorTestCase::class);
+        $this->expectException(UnsupportedMethod::class);
 
-        return file_get_contents(sprintf(
-            '%s/%s',
-            self::getTestCaseFixtureDir($class),
-            $file,
-        ));
+        if (is_string($method)) {
+            $token->$method();
+        } else {
+            $method($token);
+        }
     }
 
-    /**
-     * @param class-string $testCaseClass
-     */
-    private static function getTestCaseFixtureDir(string $testCaseClass): string
+    public static function methodProvider(): iterable
     {
-        if (array_key_exists($testCaseClass, self::$testCaseFixtureDirMapping)) {
-            return self::$testCaseFixtureDirMapping[$testCaseClass];
+        $methods = (new ReflectionClass(Token::class))->getMethods(
+            ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC,
+        );
+
+        $predefinedMethods = [
+            'tokenize' => static fn (Token $token) => $token::tokenize(''),
+            'is' => static fn (Token $token) => $token->is(10),
+        ];
+
+        $skippedMethods = [
+            '__construct',
+        ];
+
+        foreach ($methods as $method) {
+            $methodName = $method->getName();
+
+            if (array_key_exists($methodName, $predefinedMethods)) {
+                yield $methodName => [$predefinedMethods[$methodName]];
+            } elseif (in_array($methodName, $skippedMethods, true)) {
+                continue;
+            } else {
+                yield $methodName => [$methodName];
+            }
         }
-
-        $testCaseClassParts = explode('\\', $testCaseClass);
-
-        return self::$testCaseFixtureDirMapping[$testCaseClass] = Path::canonicalize(sprintf(
-            '%s/%s',
-            self::MUTATOR_FIXTURES_DIR,
-            substr(end($testCaseClassParts), 0, -4),
-        ));
     }
 }

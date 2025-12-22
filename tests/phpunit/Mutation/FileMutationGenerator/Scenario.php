@@ -33,34 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\Mutation\FileMutationGenerator;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
-
-final class TraceAssertion
+final class Scenario
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
+    public function __construct(
+        public bool $onlyCovered,
+        public bool $hasTrace,
+        public bool $traceHasTests,
+        public bool $expected,
+    ) {
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public function withOnlyCovered(bool $onlyCovered): self
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo(),
-            'realPath' => $trace->getRealPath(),
-            'relativePathname' => $trace->getRelativePathname(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        $clone = clone $this;
+        $clone->onlyCovered = $onlyCovered;
+
+        return $clone;
+    }
+
+    public function withHasTrace(bool $hasTrace): self
+    {
+        $clone = clone $this;
+        $clone->hasTrace = $hasTrace;
+
+        return $clone;
+    }
+
+    public function withTraceHasTests(bool $traceHasTests): self
+    {
+        $clone = clone $this;
+        $clone->traceHasTests = $traceHasTests;
+
+        return $clone;
+    }
+
+    public function withExpected(bool $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
     }
 }

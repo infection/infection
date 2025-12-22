@@ -33,34 +33,58 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\PhpParser;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
+use Infection\Tests\UnsupportedMethod;
+use PhpParser\Token;
 
-final class TraceAssertion
+final class FakeToken extends Token
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
+    public function __toString(): string
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public static function create(): self
+    {
+        return new self(
+            3_14159265359,
+            '<should not be used!>',
+            0,
+            0,
         );
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public function getTokenName(): ?string
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo(),
-            'realPath' => $trace->getRealPath(),
-            'relativePathname' => $trace->getRelativePathname(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    /**
+     * @param int|string|(int|string)[] $kind
+     */
+    public function is($kind): bool
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function isIgnorable(): bool
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public static function tokenize(string $code, int $flags = 0): array
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function getEndPos(): int
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function getEndLine(): int
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

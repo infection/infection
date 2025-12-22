@@ -33,34 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\Mutation\FileMutationGenerator\Fixtures;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
-use PHPUnit\Framework\Assert;
-
-final class TraceAssertion
+final readonly class TwoAdditions
 {
-    public static function assertEquals(
-        Trace $expected,
-        Trace $actual,
-    ): void {
-        Assert::assertEquals(
-            self::collectState($expected),
-            self::collectState($actual),
-        );
+    public function first(): int
+    {
+        return 1 + 2;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private static function collectState(Trace $trace): array
+    public function second(): int
     {
-        return [
-            'sourceFileInfo' => $trace->getSourceFileInfo(),
-            'realPath' => $trace->getRealPath(),
-            'relativePathname' => $trace->getRelativePathname(),
-            'hasTests' => $trace->hasTests(),
-            'tests' => $trace->getTests(),
-        ];
+        return 1 - 2;
     }
 }

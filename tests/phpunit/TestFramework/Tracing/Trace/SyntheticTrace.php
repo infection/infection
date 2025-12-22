@@ -72,6 +72,11 @@ final readonly class SyntheticTrace implements Trace
         return $this->relativePathname;
     }
 
+    public function hasTests(): bool
+    {
+        return $this->hasTest;
+    }
+
     public function getTests(): TestLocations
     {
         return $this->tests;

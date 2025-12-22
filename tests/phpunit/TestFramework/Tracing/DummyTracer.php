@@ -33,38 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing\Trace;
+namespace Infection\Tests\TestFramework\Tracing;
 
-use DomainException;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
 use Symfony\Component\Finder\SplFileInfo;
 
-/**
- * @internal
- */
-final class FakeTrace implements Trace
+final class DummyTracer implements Tracer
 {
-    public function getSourceFileInfo(): SplFileInfo
+    public function hasTrace(SplFileInfo $fileInfo): bool
     {
-        throw new DomainException('Unexpected call.');
+        return true;
     }
 
-    public function getRealPath(): string
+    public function trace(SplFileInfo $fileInfo): Trace
     {
-        throw new DomainException('Unexpected call.');
-    }
-
-    public function getRelativePathname(): string
-    {
-        throw new DomainException('Unexpected call.');
-    }
-
-    public function getTests(): TestLocations
-    {
-        throw new DomainException('Unexpected call.');
-    }
-
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
-    {
-        throw new DomainException('Unexpected call.');
+        return new EmptyTrace($fileInfo);
     }
 }
