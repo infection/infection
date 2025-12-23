@@ -134,7 +134,6 @@ use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
@@ -251,10 +250,6 @@ final class Container extends DIContainer
             TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
                 $container->getJUnitTestExecutionInfoAdder(),
-                $container->getBufferedSourceFileFilter(),
-            ),
-            BufferedSourceFileFilter::class => static fn (self $container): BufferedSourceFileFilter => BufferedSourceFileFilter::create(
-                $container->getSourceCollector()->collect(),
             ),
             PhpUnitXmlCoverageTraceProvider::class => static fn (self $container): PhpUnitXmlCoverageTraceProvider => new PhpUnitXmlCoverageTraceProvider(
                 $container->getIndexXmlCoverageLocator(),
@@ -1130,11 +1125,6 @@ final class Container extends DIContainer
     private function getStaticAnalysisToolFactory(): StaticAnalysisToolFactory
     {
         return $this->get(StaticAnalysisToolFactory::class);
-    }
-
-    private function getBufferedSourceFileFilter(): BufferedSourceFileFilter
-    {
-        return $this->get(BufferedSourceFileFilter::class);
     }
 
     private function getJUnitTestExecutionInfoAdder(): JUnitTestExecutionInfoAdder
