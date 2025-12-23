@@ -37,10 +37,10 @@ namespace Infection\Command;
 
 use function extension_loaded;
 use function implode;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\FilterOptions;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
-use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
-use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
@@ -53,7 +53,6 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Git\Git;
 use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -68,7 +67,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -116,28 +114,13 @@ final class RunCommand extends BaseCommand
     private const OPTION_FORCE_PROGRESS = 'force-progress';
 
     /** @var string */
-    private const OPTION_CONFIGURATION = 'configuration';
-
-    /** @var string */
     private const OPTION_COVERAGE = 'coverage';
 
     /** @var string */
     private const OPTION_MUTATORS = 'mutators';
 
     /** @var string */
-    private const OPTION_FILTER = 'filter';
-
-    /** @var string */
     private const OPTION_FORMATTER = 'formatter';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_FILTER = 'git-diff-filter';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_LINES = 'git-diff-lines';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
 
     /** @var string */
     private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
@@ -174,16 +157,6 @@ final class RunCommand extends BaseCommand
     private const OPTION_DRY_RUN = 'dry-run';
 
     private const OPTION_MUTANT_ID = 'id';
-
-    /**
-     * @return non-empty-string|null
-     */
-    public static function parseConfigFile(IO $io): ?string
-    {
-        $value = trim((string) $io->getInput()->getOption(self::OPTION_CONFIGURATION));
-
-        return $value === '' ? null : $value;
-    }
 
     protected function configure(): void
     {
@@ -255,14 +228,9 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Output progress bars and mutation count during progress even if a CI is detected',
-            )
-            ->addOption(
-                self::OPTION_CONFIGURATION,
-                'c',
-                InputOption::VALUE_REQUIRED,
-                'Path to the configuration file to use',
-                Container::DEFAULT_CONFIG_FILE,
-            )
+            );
+
+        ConfigurationOption::addOption($this)
             ->addOption(
                 self::OPTION_COVERAGE,
                 null,
@@ -276,14 +244,9 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf('Specify particular mutators, e.g. <comment>"--%s=Plus,PublicVisibility"</comment>', self::OPTION_MUTATORS),
                 Container::DEFAULT_MUTATORS_INPUT,
-            )
-            ->addOption(
-                self::OPTION_FILTER,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Filter which files to mutate. For example "src/Service/Mailer.php,src/Entity/Foobar.php".',
-                Container::DEFAULT_FILTER,
-            )
+            );
+
+        FilterOptions::addOption($this)
             ->addOption(
                 self::OPTION_FORMATTER,
                 null,
@@ -293,30 +256,6 @@ final class RunCommand extends BaseCommand
                     FormatterName::quotedCommaSeparatedList(),
                 ),
                 Container::DEFAULT_FORMATTER_NAME->value,
-            )
-            ->addOption(
-                self::OPTION_GIT_DIFF_FILTER,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Filter files to mutate by git <comment>"--diff-filter"</comment> option. <comment>A</comment> - only for added files, <comment>AM</comment> - for added and modified.',
-                Container::DEFAULT_GIT_DIFF_FILTER,
-            )
-            ->addOption(
-                self::OPTION_GIT_DIFF_LINES,
-                null,
-                InputOption::VALUE_NONE,
-                sprintf(
-                    'Mutates only added and modified <comment>lines</comment> in files (applies the git diff filter "%s").',
-                    Git::DEFAULT_GIT_DIFF_FILTER,
-                ),
-                Container::DEFAULT_GIT_DIFF_FILTER,
-            )
-            ->addOption(
-                self::OPTION_GIT_DIFF_BASE,
-                null,
-                InputOption::VALUE_REQUIRED,
-                sprintf('Base for <comment>"--%1$s"</comment> option. Can be the git branch short name, full name or a commit hash. Must be used only together with <comment>"--%1$s"</comment>.', self::OPTION_GIT_DIFF_FILTER),
-                Container::DEFAULT_GIT_DIFF_BASE,
             )
             ->addOption(
                 self::OPTION_LOGGER_GITHUB,
@@ -443,7 +382,7 @@ final class RunCommand extends BaseCommand
         // say "do not use a config". If this becomes possible in the future,
         // though, it will likely be a `--no-config` option rather than relying
         // on this value to be set to an empty string.
-        $configFile = self::parseConfigFile($io);
+        $configFile = ConfigurationOption::parse($io);
 
         $container = $this->createContainer($configFile, $io, $logger);
 
@@ -530,8 +469,6 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $sourceFilter = self::getSourceFilter($input);
-
         $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
@@ -571,7 +508,7 @@ final class RunCommand extends BaseCommand
             staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            sourceFilter: $sourceFilter,
+            sourceFilter: FilterOptions::getSourceFilter($io),
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
@@ -698,146 +635,5 @@ final class RunCommand extends BaseCommand
         $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
 
         return FormatterName::from($value);
-    }
-
-    private static function getSourceFilter(InputInterface $input): PlainFilter|IncompleteGitDiffFilter|null
-    {
-        $filter = self::getPlainFilter($input);
-        $gitFilter = self::getGitFilter($input);
-
-        self::assertOnlyOneTypeOfFiltering($filter, $gitFilter);
-
-        return $filter ?? $gitFilter;
-    }
-
-    private static function getPlainFilter(InputInterface $input): ?PlainFilter
-    {
-        $value = trim((string) $input->getOption(self::OPTION_FILTER));
-
-        return PlainFilter::tryToCreate($value);
-    }
-
-    private static function getGitFilter(InputInterface $input): ?IncompleteGitDiffFilter
-    {
-        $gitDiffFilter = self::getGitDiffFilter($input);
-
-        $isForGitDiffLines = (bool) $input->getOption(self::OPTION_GIT_DIFF_LINES);
-        $gitDiffBase = self::getGitDiffBase($input);
-
-        self::assertOnlyOneTypeOfGitFiltering($gitDiffFilter, $isForGitDiffLines);
-
-        if ($isForGitDiffLines) {
-            $gitDiffFilter = Git::DEFAULT_GIT_DIFF_FILTER;
-        }
-
-        self::assertGitBaseHasRequiredFilter($gitDiffFilter, $gitDiffBase);
-
-        return $gitDiffFilter !== null
-            ? new IncompleteGitDiffFilter($gitDiffFilter, $gitDiffBase)
-            : null;
-    }
-
-    /**
-     * @return non-empty-string|null
-     */
-    private static function getGitDiffFilter(InputInterface $input): ?string
-    {
-        $value = $input->getOption(self::OPTION_GIT_DIFF_FILTER);
-
-        if ($value === null) {
-            return null;
-        }
-
-        $trimmedValue = trim((string) $value);
-
-        Assert::stringNotEmpty(
-            $trimmedValue,
-            sprintf(
-                'Expected a non-blank value for the option "--%s".',
-                self::OPTION_GIT_DIFF_FILTER,
-            ),
-        );
-
-        return $trimmedValue;
-    }
-
-    /**
-     * @return non-empty-string|null
-     */
-    private static function getGitDiffBase(InputInterface $input): ?string
-    {
-        $value = $input->getOption(self::OPTION_GIT_DIFF_BASE);
-
-        if ($value === null) {
-            return null;
-        }
-
-        $trimmedValue = trim((string) $value);
-
-        Assert::stringNotEmpty(
-            $trimmedValue,
-            sprintf(
-                'Expected a non-blank value for the option "--%s".',
-                self::OPTION_GIT_DIFF_BASE,
-            ),
-        );
-
-        return $trimmedValue;
-    }
-
-    private static function assertOnlyOneTypeOfGitFiltering(
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-    ): void {
-        if ($isForGitDiffLines
-            && $gitDiffFilter !== Container::DEFAULT_GIT_DIFF_FILTER
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Please use only one of them.',
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
-    }
-
-    /**
-     * @param non-empty-string|null $gitDiffFilter
-     * @param non-empty-string|null $gitDiffBase
-     */
-    private static function assertGitBaseHasRequiredFilter(
-        ?string $gitDiffFilter,
-        ?string $gitDiffBase,
-    ): void {
-        if ($gitDiffBase !== null
-            && $gitDiffFilter === null
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The option "--%s" cannot be used without the option "--%s" or "--%s".',
-                    self::OPTION_GIT_DIFF_BASE,
-                    self::OPTION_GIT_DIFF_LINES,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
-    }
-
-    private static function assertOnlyOneTypeOfFiltering(
-        ?PlainFilter $plainFilter,
-        ?IncompleteGitDiffFilter $gitFilter,
-    ): void {
-        if ($plainFilter !== null && $gitFilter !== null) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The options "--%s" and "--%s" are mutually exclusive. Use "--%s" for regular filtering or "--%s" for Git-based filtering.',
-                    self::OPTION_FILTER,
-                    self::OPTION_GIT_DIFF_FILTER,
-                    self::OPTION_FILTER,
-                    self::OPTION_GIT_DIFF_FILTER,
-                ),
-            );
-        }
     }
 }
