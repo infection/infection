@@ -33,74 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Command\ListSourcesCommand;
+namespace App\Mutator;
 
-use Infection\Command\ListSourcesCommand;
-use Infection\Console\Application;
-use Infection\Container;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
-use function Safe\chdir;
-use function Safe\getcwd;
-use Symfony\Component\Console\Tester\CommandTester;
+use Infection\Mutator\Definition;
+use Infection\Mutator\Mutator;
+use PhpParser\Node;
 
-#[Group('integration')]
-#[CoversClass(ListSourcesCommand::class)]
-final class ListSourcesCommandTest extends TestCase
+class NewMutator implements Mutator
 {
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
-
-    private string $cwd;
-
-    protected function setUp(): void
+    public static function getDefinition(): Definition
     {
-        $this->cwd = getcwd();
-        chdir(self::FIXTURES_DIR);
+        return new Definition(
+            <<<'TXT'
+                TODO: add description of this mutator here
+                TXT,
+            MutatorCategory::ORTHOGONAL_REPLACEMENT,
+            null,
+            <<<'DIFF'
+                - TODO: show the source code before mutation
+                + TODO: show the source code after mutation
+                DIFF,
+        );
     }
 
-    protected function tearDown(): void
+    public function canMutate(Node $node): bool
     {
-        chdir($this->cwd);
+        // TODO: update the logic to decide if this mutator can mutate $node
+        return false;
     }
 
     /**
-     * @param array<string, string> $input
+     * @psalm-mutation-free
+     *
+     * @return iterable<TODO>
      */
-    #[DataProvider('inputProvider')]
-    public function test_it_lists_source_files(
-        array $input,
-        string $expected,
-    ): void {
-        $application = new Application(Container::create());
-        $tester = new CommandTester($application->find('config:list-sources'));
-
-        $tester->execute($input);
-
-        $actual = $tester->getDisplay();
-
-        $this->assertSame($expected, $actual);
-        $tester->assertCommandIsSuccessful();
+    public function mutate(Node $node): iterable
+    {
+        // TODO: update the logic to return mutated nodes
+        yield $node;
     }
 
-    public static function inputProvider(): iterable
+    public function getName(): string
     {
-        yield 'no filter' => [
-            [],
-            <<<'STDOUT'
-                File1.php
-                File2.php
-
-                STDOUT,
-        ];
-
-        yield 'with plain filter' => [
-            ['--filter' => 'File1'],
-            <<<'STDOUT'
-                File1.php
-
-                STDOUT,
-        ];
+        return self::class;
     }
 }
