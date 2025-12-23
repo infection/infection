@@ -87,13 +87,14 @@ use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
@@ -130,6 +131,7 @@ final class ProjectCodeProvider
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         DummyFileSystem::class,
+        EmptyTrace::class,
         FakeFileSystem::class,
         FakeLocator::class,
         FakeSourceCollector::class,

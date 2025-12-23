@@ -58,7 +58,7 @@ final class DocBlockParser
 
         /** @var string[] $lines */
         $lines = array_map(
-            'trim',
+            trim(...),
             explode("\n", $docblock),
         );
 
@@ -87,7 +87,7 @@ final class DocBlockParser
         return implode(
             "\n",
             array_filter(
-                array_map('trim', $lines),
+                array_map(trim(...), $lines),
             ),
         );
     }

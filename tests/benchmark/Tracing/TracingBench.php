@@ -40,6 +40,7 @@ use const PHP_INT_MAX;
 use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
+use PhpBench\Attributes\ParamProviders;
 use Webmozart\Assert\Assert;
 
 /**
@@ -65,11 +66,33 @@ final class TracingBench
         );
     }
 
+    /**
+     * @param array{float} $params
+     */
     #[BeforeMethods('setUp')]
     #[AfterMethods('tearDown')]
     #[Iterations(5)]
-    public function bench(): void
+    #[ParamProviders('providePercentile')]
+    public function bench(array $params): void
     {
-        $this->count = ($this->main)();
+        $percentage = (float) $params[0];
+
+        $this->count = ($this->main)($percentage);
+    }
+
+    /**
+     * @return iterable<array{float}>
+     */
+    public static function providePercentile(): iterable
+    {
+        yield '10%' => [.1];
+
+        yield '25%' => [.25];
+
+        yield '50%' => [.5];
+
+        yield '75%' => [.75];
+
+        yield '100%' => [1.];
     }
 }
