@@ -40,6 +40,7 @@ use function count;
 use function dirname;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\Source\Exception\NoSourceFound;
 use Iterator;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Path;
@@ -50,23 +51,18 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * @internal
  */
-final class BasicSourceCollector implements SourceCollector
+final readonly class BasicSourceCollector implements SourceCollector
 {
-    /**
-     * @var SplFileInfo[]
-     */
-    private ?array $sourceFiles = null;
-
-    private readonly bool $filtered;
+    private bool $filtered;
 
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
      */
     public function __construct(
-        private readonly array $sourceDirectories,
-        private readonly array $excludedFilesOrDirectories,
-        private readonly ?PlainFilter $filter,
+        private array $sourceDirectories,
+        private array $excludedFilesOrDirectories,
+        private ?PlainFilter $filter,
     ) {
         $this->filtered = $this->filter !== null;
     }
@@ -78,11 +74,13 @@ final class BasicSourceCollector implements SourceCollector
 
     public function collect(): array
     {
-        if ($this->sourceFiles === null) {
-            $this->sourceFiles = $this->doCollect();
+        $files = $this->doCollect();
+
+        if (count($files) === 0) {
+            throw NoSourceFound::noSourceFileFound($this->filter);
         }
 
-        return $this->sourceFiles;
+        return $files;
     }
 
     /**
@@ -110,6 +108,24 @@ final class BasicSourceCollector implements SourceCollector
     }
 
     /**
+     * @return SplFileInfo[]
+     */
+    private function doCollect(): array
+    {
+        if ($this->sourceDirectories === []) {
+            return [];
+        }
+
+        $iterator = $this->filter(
+            $this
+                ->createFinder()
+                ->getIterator(),
+        );
+
+        return take($iterator)->toList();
+    }
+
+    /**
      * @param non-empty-string $configurationDirname
      * @param non-empty-string[] $sourceDirectories
      *
@@ -130,25 +146,6 @@ final class BasicSourceCollector implements SourceCollector
             $mapToAbsolutePath(...),
             $sourceDirectories,
         );
-    }
-
-    /**
-     * @return SplFileInfo[]
-     */
-    private function doCollect(): array
-    {
-        if ($this->sourceDirectories === []) {
-            return [];
-        }
-
-        return take(
-            $this->filter(
-                $this
-                    ->createFinder()
-                    ->getIterator(),
-            ),
-        )
-            ->toList();
     }
 
     private function createFinder(): Finder

@@ -42,6 +42,7 @@ use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
 use function Safe\getcwd;
+use function sort;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 
@@ -88,12 +89,16 @@ final class ListSourcesCommand extends BaseCommand
         string $cwd,
         SourceCollector $sourceCollector,
     ): array {
-        return array_map(
+        $paths = array_map(
             static fn (SplFileInfo $fileInfo) => Path::makeRelative(
                 $fileInfo->getRealPath(),
                 $cwd,
             ),
             $sourceCollector->collect(),
         );
+
+        sort($paths);
+
+        return $paths;
     }
 }

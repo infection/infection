@@ -146,6 +146,12 @@ parameters:
             message: '#::profile\(\) should return int but returns int.*\|null#'
             path: ../tests/benchmark/DummyInstrumentor.php
 
+        # This plugin does not seem to understand the PHPBench data providers
+        -
+            identifier: shipmonk.deadMethod
+            message: '#Unused .+Bench::provide*#'
+            path: ../tests/benchmark/*/*Bench.php
+
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod
@@ -210,6 +216,7 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
         - ../tests/benchmark/MutationGenerator/sources (?)

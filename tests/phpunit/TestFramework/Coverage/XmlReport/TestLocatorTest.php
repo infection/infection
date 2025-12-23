@@ -37,11 +37,11 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
-use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

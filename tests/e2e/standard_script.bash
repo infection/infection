@@ -11,4 +11,8 @@ else
     php $INFECTION
 fi
 
-diff -w expected-output.txt infection.log
+if [ -f "var/infection.log" ]; then
+    diff --ignore-all-space expected-output.txt var/infection.log
+else
+    diff --ignore-all-space expected-output.txt infection.log
+fi

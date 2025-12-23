@@ -80,4 +80,32 @@ final class PlainFilterTest extends TestCase
             ]),
         ];
     }
+
+    #[DataProvider('filterToStringProvider')]
+    public function test_it_can_be_transformed_into_a_string(
+        PlainFilter $filter,
+        string $expected,
+    ): void {
+        $actual = $filter->toString();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function filterToStringProvider(): iterable
+    {
+        yield 'single file' => [
+            new PlainFilter([
+                'src/File1.php',
+            ]),
+            'src/File1.php',
+        ];
+
+        yield 'multiple files' => [
+            new PlainFilter([
+                'src/File1.php',
+                'src/File2.php',
+            ]),
+            'src/File1.php,src/File2.php',
+        ];
+    }
 }

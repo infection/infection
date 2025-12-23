@@ -35,21 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
-use Infection\IterableCounter;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
@@ -67,11 +66,10 @@ class MutationGenerator
      * @param Mutator<Node>[] $mutators
      */
     public function __construct(
-        private readonly TraceProvider $traceProvider,
+        private readonly SourceCollector $sourceCollector,
         array $mutators,
         private readonly EventDispatcher $eventDispatcher,
         private readonly FileMutationGenerator $fileMutationGenerator,
-        private readonly bool $runConcurrently,
     ) {
         Assert::allIsInstanceOf($mutators, Mutator::class);
         $this->mutators = $mutators;
@@ -93,16 +91,14 @@ class MutationGenerator
      */
     public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
     {
-        $traces = $this->traceProvider->provideTraces();
-
-        $numberOfFiles = IterableCounter::bufferAndCountIfNeeded($traces, $this->runConcurrently);
+        $sources = $this->sourceCollector->collect();
+        $numberOfFiles = count($sources);
 
         $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
 
-        /** @var Trace $trace */
-        foreach ($traces as $trace) {
+        foreach ($sources as $source) {
             yield from $this->fileMutationGenerator->generate(
-                $trace,
+                $source,
                 $onlyCovered,
                 $this->mutators,
                 $nodeIgnorers,

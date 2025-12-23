@@ -40,21 +40,21 @@ use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Source\Collector\BasicSourceCollector;
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
+use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
+use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -95,15 +95,6 @@ final class PHPUnitCoverageTracerTest extends TestCase
                         new FixedLocator($coveragePath . '/junit.xml'),
                     ),
                 ),
-            ),
-            BufferedSourceFileFilter::create(
-                BasicSourceCollector::create(
-                    configurationPathname: self::FIXTURE_DIR,
-                    sourceDirectories: [self::FIXTURE_DIR . '/src'],
-                    excludedFilesOrDirectories: [],
-                    filter: null,
-                )
-                ->collect(),
             ),
         );
 
