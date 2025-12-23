@@ -82,13 +82,8 @@ final class TraceProviderAdapterTracerTest extends TestCase
             ->method('provideTraces')
             ->willReturn($traces);
 
-        $this->assertTrue($this->tracer->hasTrace($fileInfo1));
         $this->assertSame($trace1, $this->tracer->trace($fileInfo1));
-
-        $this->assertTrue($this->tracer->hasTrace($fileInfo2));
         $this->assertSame($trace2, $this->tracer->trace($fileInfo2));
-
-        $this->assertFalse($this->tracer->hasTrace($unknownFileInfo));
 
         $this->expectExceptionObject(
             new NoTraceFound(
@@ -133,25 +128,20 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $this->assertSame(0, $tracesIterator->getIndex());
         $this->assertFalse($tracesIterator->hasYieldedAnyValue());
 
-        $this->assertTrue($this->tracer->hasTrace($fileInfo1));
         $this->assertSame($trace1, $this->tracer->trace($fileInfo1));
-
-        $this->assertSame(1, $tracesIterator->getIndex());
         $this->assertTrue($tracesIterator->hasYieldedAnyValue());
 
-        $this->assertTrue($this->tracer->hasTrace($fileInfo2));
         $this->assertSame($trace2, $this->tracer->trace($fileInfo2));
 
         $this->assertSame(2, $tracesIterator->getIndex());
 
-        $this->assertFalse($this->tracer->hasTrace($unknownFileInfo));
         // We exhaust the remainder of the iterator by looking for a non-existent trace
+        $this->expectToThrow(fn () => $this->tracer->trace($unknownFileInfo));
         $this->assertSame(4, $tracesIterator->getIndex());
 
         $this->expectToThrow(fn () => $this->tracer->trace($unknownFileInfo));
 
         // We still can fetch traces despite the generator being exhausted
-        $this->assertTrue($this->tracer->hasTrace($fileInfo3));
         $this->assertSame($trace3, $this->tracer->trace($fileInfo3));
     }
 
@@ -162,8 +152,6 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $this->traceProviderMock
             ->method('provideTraces')
             ->willReturn([]);
-
-        $this->tracer->hasTrace($fileInfo);
 
         $this->expectExceptionObject(
             new NoTraceFound(

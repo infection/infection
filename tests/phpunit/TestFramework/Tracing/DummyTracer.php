@@ -42,11 +42,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 final class DummyTracer implements Tracer
 {
-    public function hasTrace(SplFileInfo $fileInfo): bool
-    {
-        return true;
-    }
-
     public function trace(SplFileInfo $fileInfo): Trace
     {
         return new EmptyTrace($fileInfo);
