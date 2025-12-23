@@ -160,25 +160,17 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             ->willReturn(true)
         ;
 
-        $this->testFileDataProviderMock
-            ->expects($this->once())
-            ->method('getTestFileInfo')
-            ->with('Acme\FooTest')
-            ->willReturn(new TestFileTimeData(
-                '/path/to/acme/FooTest.php',
-                0.000234,
-            ))
-        ;
-
         $sourceFile = new SplFileInfo(__FILE__, 'JUnitTestExecutionInfoAdder.php', 'JUnitTestExecutionInfoAdder.php');
-
-        $testsCalled = false;
 
         $proxyTrace = new ProxyTrace(
             $sourceFile,
-            lazy((static function () use (&$testsCalled) {
+            // @phpstan-ignore argument.templateType,argument.type,callable.void
+            lazy((static function () {
                 throw new Exception();
 
+                // We need to include a yield statement to make it a generator even though
+                // it is not reachable.
+                // @phpstan-ignore deadCode.unreachable
                 yield new TestLocations();
             })()),
         );

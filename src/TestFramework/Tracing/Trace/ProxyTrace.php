@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing\Trace;
 
-use Closure;
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Later\Interfaces\Deferred;
 use Symfony\Component\Finder\SplFileInfo;
@@ -50,7 +49,6 @@ use Webmozart\Assert\Assert;
  */
 class ProxyTrace implements Trace
 {
-    private ?TestLocations $testLocations = null;
     private ?TestLocator $tests = null;
 
     /**
@@ -58,7 +56,7 @@ class ProxyTrace implements Trace
      */
     public function __construct(
         private readonly SplFileInfo $sourceFile,
-        private readonly Deferred|Closure|TestLocations|null $lazyTestLocations = null,
+        private readonly ?Deferred $lazyTestLocations = null,
     ) {
     }
 
