@@ -111,7 +111,7 @@ final class ContainerTest extends TestCase
             existingCoveragePath: '/path/to/coverage',
         );
 
-        $traces = $newContainer->getUnionTraceProvider()->provideTraces();
+        $traces = $newContainer->getTraceProvider()->provideTraces();
 
         $this->expectException(ReportLocationThrowable::class);
 
