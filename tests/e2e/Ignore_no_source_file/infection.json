@@ -10,7 +10,7 @@
         "summary": "var/infection.log"
     },
     "mutators": {
-        "Plus": true
+        "PublicVisibility": true
     },
     "tmpDir": "var/infection"
 }

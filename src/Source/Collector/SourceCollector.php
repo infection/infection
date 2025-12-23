@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use Infection\Source\Exception\NoSourceFound;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -53,6 +54,8 @@ interface SourceCollector
     public function isFiltered(): bool;
 
     /**
+     * @throws NoSourceFound
+     *
      * @return SplFileInfo[]
      */
     public function collect(): array;
