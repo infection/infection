@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Command\Git;
 
-use Infection\Git\Git;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Command\BaseCommand;
+use Infection\Console\IO;
 
-final class GitDefaultBaseCommand extends Command
+/**
+ * @internal
+ */
+final class GitDefaultBaseCommand extends BaseCommand
 {
-    public function __construct(
-        private readonly Git $git,
-    ) {
+    public function __construct()
+    {
         parent::__construct('git:default-base');
     }
 
@@ -55,12 +55,12 @@ final class GitDefaultBaseCommand extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): bool
     {
-        $output->writeln(
-            $this->git->getDefaultBase(),
+        $io->writeln(
+            $this->getApplication()->getContainer()->getGit()->getDefaultBase(),
         );
 
-        return self::SUCCESS;
+        return true;
     }
 }

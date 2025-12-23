@@ -33,48 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Option;
+namespace Infection\Command\Git;
 
+use function array_fill_keys;
 use Infection\CannotBeInstantiated;
-use Infection\Console\IO;
-use Infection\Container;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
-use function trim;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class ConfigurationOption
+final class LoggerFactory
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'configuration';
-
-    /**
-     * @template T of Command
-     * @param T $command
-     *
-     * @return T
-     */
-    public static function addOption(Command $command): Command
+    public static function create(OutputInterface $output): LoggerInterface
     {
-        return $command->addOption(
-            self::NAME,
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'Path to the configuration file to use',
-            Container::DEFAULT_CONFIG_FILE,
+        return new ConsoleLogger(
+            $output,
+            // We use this logger purely for logging extra info to the user and
+            // keep the STDOUT clean for allowing copy/paste.
+            formatLevelMap: array_fill_keys(
+                [
+                    LogLevel::EMERGENCY,
+                    LogLevel::ALERT,
+                    LogLevel::CRITICAL,
+                    LogLevel::ERROR,
+                    LogLevel::WARNING,
+                    LogLevel::NOTICE,
+                    LogLevel::INFO,
+                    LogLevel::DEBUG,
+                ],
+                ConsoleLogger::ERROR,
+            ),
         );
-    }
-
-    /**
-     * @return non-empty-string|null
-     */
-    public static function get(IO $io): ?string
-    {
-        $value = trim((string) $io->getInput()->getOption(self::NAME));
-
-        return $value === '' ? null : $value;
     }
 }

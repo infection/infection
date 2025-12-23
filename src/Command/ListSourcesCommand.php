@@ -37,7 +37,7 @@ namespace Infection\Command;
 
 use function array_map;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\FilterOptions;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
@@ -59,7 +59,7 @@ final class ListSourcesCommand extends BaseCommand
     protected function configure(): void
     {
         ConfigurationOption::addOption($this);
-        FilterOptions::addOption($this);
+        SourceFilterOptions::addOption($this);
 
         $this->setDescription(
             'Finds the paths of the collected source files.',
@@ -71,8 +71,8 @@ final class ListSourcesCommand extends BaseCommand
         $container = $this->getApplication()->getContainer()->withValues(
             logger: new ConsoleLogger($io),
             output: $io->getOutput(),
-            configFile: ConfigurationOption::parse($io),
-            sourceFilter: FilterOptions::getSourceFilter($io),
+            configFile: ConfigurationOption::get($io),
+            sourceFilter: SourceFilterOptions::getSourceFilter($io),
         );
 
         $filePaths = self::collectPaths(

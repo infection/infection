@@ -36,49 +36,43 @@ declare(strict_types=1);
 namespace Infection\Command\Git;
 
 use function array_fill_keys;
-use Infection\Git\Git;
+use Infection\Command\BaseCommand;
+use Infection\Command\Git\Option\BaseOption;
+use Infection\Console\IO;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use function sprintf;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
-use function trim;
-use Webmozart\Assert\Assert;
 
-final class GitBaseReferenceCommand extends Command
+/**
+ * @internal
+ */
+final class GitBaseReferenceCommand extends BaseCommand
 {
-    private const BASE_OPTION = 'base';
-
-    public function __construct(
-        private readonly Git $git,
-    ) {
+    public function __construct()
+    {
         parent::__construct('git:base-reference');
     }
 
     protected function configure(): void
     {
-        $this
-            ->setDescription(
-                'Gives the reference to the best common ancestors as possible with HEAD for a merge and falls back to the given base otherwise.',
-            )
-            ->addOption(
-                self::BASE_OPTION,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Git base, can be a commit hash, a short name or full name. Will lookup for the default base branch if none provided.',
-            );
+        $this->setDescription(
+            'Gives the reference to the best common ancestors as possible with HEAD for a merge and falls back to the given base otherwise.',
+        );
+
+        BaseOption::addOption($this);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function executeCommand(IO $io): bool
     {
-        $logger = self::createLogger($output);
-        $base = self::getBase($input);
+        $logger = self::createLogger($io);
+        $base = BaseOption::get($io);
+
+        $git = $this->getApplication()->getContainer()->getGit();
 
         if ($base === null) {
-            $base = $this->git->getDefaultBase();
+            $base = $git->getDefaultBase();
 
             $logger->notice(
                 sprintf(
@@ -88,35 +82,11 @@ final class GitBaseReferenceCommand extends Command
             );
         }
 
-        $output->writeln(
-            $this->git->getBaseReference($base),
+        $io->writeln(
+            $git->getBaseReference($base),
         );
 
-        return self::SUCCESS;
-    }
-
-    /**
-     * @return non-empty-string|null
-     */
-    private static function getBase(InputInterface $input): ?string
-    {
-        $value = $input->getOption(self::BASE_OPTION);
-
-        if ($value === null) {
-            return null;
-        }
-
-        $trimmedValue = trim($value);
-
-        Assert::stringNotEmpty(
-            $trimmedValue,
-            sprintf(
-                'Expected a non-blank value for the option "--%s".',
-                self::BASE_OPTION,
-            ),
-        );
-
-        return $trimmedValue;
+        return true;
     }
 
     private static function createLogger(OutputInterface $output): LoggerInterface

@@ -33,38 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Option;
+namespace Infection\Command\Git\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use Infection\Container;
+use Infection\Git\Git;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class ConfigurationOption
+final class FilterOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'configuration';
+    public const NAME = 'filter';
 
     /**
      * @template T of Command
-     * @param T $command
-     *
-     * @return T
      */
     public static function addOption(Command $command): Command
     {
         return $command->addOption(
             self::NAME,
-            'c',
+            null,
             InputOption::VALUE_REQUIRED,
-            'Path to the configuration file to use',
-            Container::DEFAULT_CONFIG_FILE,
+            'Git diff filter to apply.',
+            Git::DEFAULT_GIT_DIFF_FILTER,
         );
     }
 
@@ -73,8 +72,17 @@ final class ConfigurationOption
      */
     public static function get(IO $io): ?string
     {
-        $value = trim((string) $io->getInput()->getOption(self::NAME));
+        $value = $io->getInput()->getOption(self::NAME);
+        $trimmedValue = trim($value);
 
-        return $value === '' ? null : $value;
+        Assert::stringNotEmpty(
+            $trimmedValue,
+            sprintf(
+                'Expected a non-blank value for the option "--%s".',
+                BaseOption::NAME,
+            ),
+        );
+
+        return $trimmedValue;
     }
 }

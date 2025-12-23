@@ -52,7 +52,7 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class FilterOptions
+final class SourceFilterOptions
 {
     use CannotBeInstantiated;
 
