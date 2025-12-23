@@ -376,24 +376,18 @@ final class RunCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
+        $consoleOutput = new ConsoleOutput($logger);
 
-        // Currently the configuration is mandatory hence there is no way to
-        // say "do not use a config". If this becomes possible in the future
+        // Currently, the configuration is mandatory, hence there is no way to
+        // say "do not use a config". If this becomes possible in the future,
         // though, it will likely be a `--no-config` option rather than relying
         // on this value to be set to an empty string.
         $configFile = ConfigurationOption::parse($io);
 
         $container = $this->createContainer($configFile, $io, $logger);
-        $consoleOutput = new ConsoleOutput($logger);
 
         try {
-            $this->startUp(
-                $container,
-                $configFile,
-                $consoleOutput,
-                $logger,
-                $io,
-            );
+            $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
             $config = $container->getConfiguration();
 
