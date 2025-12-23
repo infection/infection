@@ -40,8 +40,6 @@ use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Source\Collector\BasicSourceCollector;
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -97,15 +95,6 @@ final class PHPUnitCoverageTracerTest extends TestCase
                         new FixedLocator($coveragePath . '/junit.xml'),
                     ),
                 ),
-            ),
-            BufferedSourceFileFilter::create(
-                BasicSourceCollector::create(
-                    configurationPathname: self::FIXTURE_DIR,
-                    sourceDirectories: [self::FIXTURE_DIR . '/src'],
-                    excludedFilesOrDirectories: [],
-                    filter: null,
-                )
-                ->collect(),
             ),
         );
 
