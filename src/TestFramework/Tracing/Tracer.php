@@ -47,8 +47,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 interface Tracer
 {
-    public function hasTrace(SplFileInfo $fileInfo): bool;
-
     /**
      * Beware! Whilst the absence of Trace guarantees the absence of tests, its reciprocal is false.
      * A trace may end up being empty.

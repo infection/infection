@@ -77,11 +77,6 @@ final class TraceProviderAdapterTracer implements Tracer
     ) {
     }
 
-    public function hasTrace(SplFileInfo $fileInfo): bool
-    {
-        return $this->tryToTrace($fileInfo) !== null;
-    }
-
     public function trace(SplFileInfo $fileInfo): Trace
     {
         $trace = $this->tryToTrace($fileInfo);

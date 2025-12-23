@@ -158,10 +158,6 @@ final class FileMutationGeneratorTest extends TestCase
             ->method('hasTests');
 
         $this->tracerMock
-            ->method('hasTrace')
-            ->with($fileInfoMock)
-            ->willReturn(true);
-        $this->tracerMock
             ->method('trace')
             ->with($fileInfoMock)
             ->willReturn($traceMock);
