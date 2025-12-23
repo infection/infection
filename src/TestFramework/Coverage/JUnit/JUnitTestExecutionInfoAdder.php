@@ -98,11 +98,8 @@ class JUnitTestExecutionInfoAdder
      */
     private function createCompleteTestLocationsGenerator(Trace $trace): iterable
     {
-        yield $this->retrieveCompleteTestLocations($trace->getTests());
-    }
+        $incompleteTestLocations = $trace->getTests();
 
-    private function retrieveCompleteTestLocations(TestLocations $incompleteTestLocations): TestLocations
-    {
         foreach ($incompleteTestLocations->getTestsLocationsBySourceLine() as &$testsLocations) {
             foreach ($testsLocations as $line => $test) {
                 $testsLocations[$line] = $this->createCompleteTestLocation($test);
@@ -110,7 +107,7 @@ class JUnitTestExecutionInfoAdder
         }
         unset($testsLocations);
 
-        return $incompleteTestLocations;
+        yield $incompleteTestLocations;
     }
 
     /**
