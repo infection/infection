@@ -38,8 +38,10 @@ namespace Infection\TestFramework\Tracing;
 use function array_key_exists;
 use Generator;
 use Infection\Framework\Iterable\GeneratorFactory;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 /**
@@ -51,6 +53,8 @@ use Webmozart\Assert\Assert;
 final class TraceProviderAdapterTracer implements Tracer
 {
     private bool $traversed = false;
+
+    private bool $isEmpty = true;
 
     /**
      * @var Generator<Trace>|null
@@ -82,11 +86,29 @@ final class TraceProviderAdapterTracer implements Tracer
     {
         $trace = $this->tryToTrace($fileInfo);
 
-        // We do not bother with a nice error here as `::hasTrace()` should
-        // have been used to ensure a trace exists in the first place.
-        Assert::notNull($trace);
+        $this->assertTraceWasFound($trace, $fileInfo);
 
         return $trace;
+    }
+
+    /**
+     * @phpstan-assert Trace $trace
+     *
+     * @throws NoTraceFound
+     */
+    private function assertTraceWasFound(
+        ?Trace $trace,
+        SplFileInfo $fileInfo,
+    ): void {
+        if ($trace !== null) {
+            return;
+        }
+
+        throw $this->isEmpty
+            ? new NoTraceFound('Could not find any trace.')
+            : NoTraceFound::forFile(
+                Path::canonicalize($fileInfo->getPathname()),
+            );
     }
 
     private function tryToTrace(SplFileInfo $fileInfo): ?Trace
@@ -116,6 +138,8 @@ final class TraceProviderAdapterTracer implements Tracer
             /** @var Trace $trace */
             $trace = $traces->current();
             $traces->next();
+
+            $this->isEmpty = false;
 
             $traceSourcePathname = $trace->getSourceFileInfo()->getPathname();
             $this->indexedTraces[$traceSourcePathname] = $trace;
