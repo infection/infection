@@ -47,6 +47,7 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\ConstFetch\RemovePhpVersionIdCheckRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
+use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
@@ -147,6 +148,9 @@ return RectorConfig::configure()
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
         RemovePhpVersionIdCheckRector::class => true,
+        RemoveUnreachableStatementRector::class => [
+            __DIR__ . '/tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php',
+        ],
         RemoveUnusedConstructorParamRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
