@@ -39,6 +39,7 @@ use Infection\Mutation\FileMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
@@ -240,18 +241,12 @@ final class FileMutationGeneratorTest extends TestCase
 
         if ($scenario->hasTrace) {
             $this->tracerMock
-                ->method('hasTrace')
-                ->willReturn(true);
-            $this->tracerMock
                 ->method('trace')
                 ->willReturn($traceMock);
         } else {
             $this->tracerMock
-                ->method('hasTrace')
-                ->willReturn(false);
-            $this->tracerMock
-                ->expects($this->never())
-                ->method('trace');
+                ->method('trace')
+                ->willThrowException(new NoTraceFound());
         }
 
         $mutations = $this->mutationGenerator->generate(
