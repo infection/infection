@@ -175,6 +175,16 @@ final class RunCommand extends BaseCommand
 
     private const OPTION_MUTANT_ID = 'id';
 
+    /**
+     * @return non-empty-string|null
+     */
+    public static function parseConfigFile(IO $io): ?string
+    {
+        $value = trim((string) $io->getInput()->getOption(self::OPTION_CONFIGURATION));
+
+        return $value === '' ? null : $value;
+    }
+
     protected function configure(): void
     {
         $this
@@ -427,11 +437,18 @@ final class RunCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
-        $container = $this->createContainer($io, $logger);
         $consoleOutput = new ConsoleOutput($logger);
 
+        // Currently, the configuration is mandatory, hence there is no way to
+        // say "do not use a config". If this becomes possible in the future,
+        // though, it will likely be a `--no-config` option rather than relying
+        // on this value to be set to an empty string.
+        $configFile = self::parseConfigFile($io);
+
+        $container = $this->createContainer($configFile, $io, $logger);
+
         try {
-            $this->startUp($container, $consoleOutput, $logger, $io);
+            $this->startUp($container, $configFile, $consoleOutput, $logger, $io);
 
             $config = $container->getConfiguration();
 
@@ -473,15 +490,15 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private function createContainer(IO $io, LoggerInterface $logger): Container
-    {
+    /**
+     * @param non-empty-string|null $configFile
+     */
+    private function createContainer(
+        ?string $configFile,
+        IO $io,
+        LoggerInterface $logger,
+    ): Container {
         $input = $io->getInput();
-
-        // Currently the configuration is mandatory hence there is no way to
-        // say "do not use a config". If this becomes possible in the future
-        // though, it will likely be a `--no-config` option rather than relying
-        // on this value to be set to an empty string.
-        $configFile = trim((string) $input->getOption(self::OPTION_CONFIGURATION));
 
         $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
@@ -520,7 +537,7 @@ final class RunCommand extends BaseCommand
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
-            configFile: $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
+            configFile: $configFile,
             mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
             numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
             logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
@@ -592,16 +609,20 @@ final class RunCommand extends BaseCommand
         $container->getAdapterInstaller()->install($adapterName);
     }
 
+    /**
+     * @param non-empty-string|null $configFile
+     */
     private function startUp(
         Container $container,
+        ?string $configFile,
         ConsoleOutput $consoleOutput,
         LoggerInterface $logger,
         IO $io,
     ): void {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if (($customConfigPath = (string) $io->getInput()->getOption(self::OPTION_CONFIGURATION)) !== '') {
-            $locator->locate($customConfigPath);
+        if ($configFile !== null) {
+            $locator->locate($configFile);
         } else {
             $this->runConfigurationCommand($locator, $io);
         }
