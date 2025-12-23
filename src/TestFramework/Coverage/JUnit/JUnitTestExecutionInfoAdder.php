@@ -38,7 +38,10 @@ namespace Infection\TestFramework\Coverage\JUnit;
 use function explode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
+use function Later\lazy;
 
 /**
  * Adds test execution info to selected covered file data object.
@@ -83,21 +86,31 @@ class JUnitTestExecutionInfoAdder
     {
         /** @var Trace $trace */
         foreach ($traces as $trace) {
-            $tests = $trace->getTests();
-
-            if ($tests === null) {
-                continue;
-            }
-
-            foreach ($tests->getTestsLocationsBySourceLine() as &$testsLocations) {
-                foreach ($testsLocations as $line => $test) {
-                    $testsLocations[$line] = $this->createCompleteTestLocation($test);
-                }
-            }
-            unset($testsLocations);
-
-            yield $trace;
+            yield new ProxyTrace(
+                $trace->getSourceFileInfo(),
+                lazy(self::createCompleteTestLocationsGenerator($trace)),
+            );
         }
+    }
+
+    /**
+     * @return iterable<TestLocations>
+     */
+    private function createCompleteTestLocationsGenerator(Trace $trace): iterable
+    {
+        yield $this->retrieveCompleteTestLocations($trace);
+    }
+
+    private function retrieveCompleteTestLocations(Trace $trace): TestLocations
+    {
+        foreach ($trace->getTests()->getTestsLocationsBySourceLine() as &$testsLocations) {
+            foreach ($testsLocations as $line => $test) {
+                $testsLocations[$line] = $this->createCompleteTestLocation($test);
+            }
+        }
+        unset($testsLocations);
+
+        return $incompleteTestLocations;
     }
 
     /**

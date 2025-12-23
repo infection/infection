@@ -33,87 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing\Trace;
+namespace Infection\Tests\TestFramework\Tracing\Trace;
 
-use Closure;
-use Infection\TestFramework\Coverage\XmlReport\TestLocator;
-use Later\Interfaces\Deferred;
+use DomainException;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\Tests\UnsupportedMethod;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 
 /**
- * Full-pledge trace that acts as a proxy i.e. for which the tracing of the test files will be done
- * lazily.
- *
  * @internal
- * @final
  */
-class ProxyTrace implements Trace
+final readonly class FakeTrace implements Trace
 {
-    private ?TestLocations $testLocations = null;
-    private ?TestLocator $tests = null;
-
-    /**
-     * @param Deferred<TestLocations> $lazyTestLocations
-     */
-    public function __construct(
-        private readonly SplFileInfo $sourceFile,
-        private readonly Deferred|Closure|TestLocations|null $lazyTestLocations = null,
-    ) {
-    }
-
     public function getSourceFileInfo(): SplFileInfo
     {
-        return $this->sourceFile;
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function getRealPath(): string
     {
-        $realPath = $this->sourceFile->getRealPath();
-
-        Assert::string($realPath);
-
-        return $realPath;
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function getRelativePathname(): string
     {
-        return $this->sourceFile->getRelativePathname();
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function hasTests(): bool
     {
-        if ($this->lazyTestLocations === null) {
-            return false;
-        }
-
-        return $this->getTestLocator()->hasTests();
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function getTests(): TestLocations
     {
-        return $this->lazyTestLocations?->get() ?? new TestLocations();
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
     public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
     {
-        if ($this->lazyTestLocations === null) {
-            return [];
-        }
-
-        return $this->getTestLocator()->getAllTestsForMutation($lineRange, $isOnFunctionSignature);
-    }
-
-    private function getTestLocator(): TestLocator
-    {
-        if ($this->tests !== null) {
-            return $this->tests;
-        }
-
-        $testLocations = $this->getTests();
-
-        $this->tests = new TestLocator($testLocations);
-
-        return $this->tests;
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }
