@@ -98,18 +98,6 @@ class BufferedSourceFileFilter
     }
 
     /**
-     * Returns files that are in source.directories from infection.json.dist but not in coverage
-     * report (phpunit's filter.whitelist.directory)
-     *
-     * @return iterable<SplFileInfo>
-     */
-    public function getUnseenInCoverageReportFiles(): iterable
-    {
-        // TODO: maybe worth a check that this should be called only once filtered.
-        return $this->sourceFiles;
-    }
-
-    /**
      * @param iterable<SplFileInfo> $sourceFiles
      *
      * @return array<string, SplFileInfo>
