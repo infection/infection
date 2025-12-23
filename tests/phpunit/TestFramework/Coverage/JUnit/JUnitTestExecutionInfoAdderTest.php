@@ -43,6 +43,7 @@ use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use function iterator_to_array;
@@ -174,9 +175,16 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
             })()),
         );
 
-        // TODO: fix this; we want it lazy!
+        $completedTraces = iterator_to_array($this->infoAdder->addTestExecutionInfo([$proxyTrace]), false);
+
+        $this->assertCount(1, $completedTraces);
+        $this->assertArrayHasKey(0, $completedTraces);
+
+        /** @var Trace $actual */
+        $actual = $completedTraces[0];
+
         $this->expectException(Exception::class);
 
-        iterator_to_array($this->infoAdder->addTestExecutionInfo([$proxyTrace]), false);
+        $actual->getTests();
     }
 }
