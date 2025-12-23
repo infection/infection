@@ -6,7 +6,7 @@
         ]
     },
     "logs": {
-        "summary": "infection.log"
+        "summary": "var/infection.log"
     },
     "mutators": {
         "PublicVisibility": true

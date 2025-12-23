@@ -37,13 +37,13 @@ namespace Infection\Mutator;
 
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use function iterator_to_array;
 use PhpParser\Node;
 use PhpParser\Token;
@@ -80,9 +80,8 @@ class NodeMutationGenerator
         private readonly array $fileNodes,
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
-        private readonly bool $isForGitDiffLines,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines,
+        private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
@@ -109,7 +108,8 @@ class NodeMutationGenerator
             return;
         }
 
-        if ($this->isForGitDiffLines && !$this->filesDiffChangedLines->contains($this->filePath, $node->getStartLine(), $node->getEndLine())) {
+        /** @psalm-suppress InvalidArgument */
+        if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return;
         }
 

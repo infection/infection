@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use Infection\Differ\FilesDiffChangedLines;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -44,9 +43,14 @@ use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\LineRangeCalculator;
-use Infection\TestFramework\Coverage\Trace;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -59,8 +63,8 @@ class FileMutationGenerator
         private readonly FileParser $parser,
         private readonly NodeTraverserFactory $traverserFactory,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly FilesDiffChangedLines $filesDiffChangedLines,
-        private readonly bool $isForGitDiffLines,
+        private readonly SourceLineMatcher $sourceLineMatcher,
+        private readonly Tracer $tracer,
     ) {
     }
 
@@ -74,7 +78,7 @@ class FileMutationGenerator
      * @return iterable<Mutation>
      */
     public function generate(
-        Trace $trace,
+        SplFileInfo $sourceFile,
         bool $onlyCovered,
         array $mutators,
         array $nodeIgnorers,
@@ -82,11 +86,12 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
+        $trace = $this->trace($sourceFile);
+
         if ($onlyCovered && !$trace->hasTests()) {
             return;
         }
 
-        $sourceFile = $trace->getSourceFileInfo();
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
@@ -96,13 +101,12 @@ class FileMutationGenerator
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $trace->getRealPath(),
+                filePath: $sourceFile->getRealPath(),
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
-                isForGitDiffLines: $this->isForGitDiffLines,
                 lineRangeCalculator: $this->lineRangeCalculator,
-                filesDiffChangedLines: $this->filesDiffChangedLines,
+                sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,
                 originalFileContent: $sourceFile->getContents(),
             ),
@@ -112,5 +116,14 @@ class FileMutationGenerator
         $traverser->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();
+    }
+
+    private function trace(SplFileInfo $sourceFile): Trace
+    {
+        try {
+            return $this->tracer->trace($sourceFile);
+        } catch (NoTraceFound) {
+            return new EmptyTrace($sourceFile);
+        }
     }
 }

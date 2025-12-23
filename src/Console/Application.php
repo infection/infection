@@ -44,6 +44,7 @@ use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Command\Git\GitChangedLinesCommand;
 use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container;
@@ -116,6 +117,7 @@ final class Application extends BaseApplication
                 new GitDefaultBaseCommand($git),
                 new RunCommand(),
                 new DescribeCommand(),
+                new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
             ],
         );

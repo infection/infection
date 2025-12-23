@@ -39,7 +39,6 @@ use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(GitDefaultBaseCommand::class)]

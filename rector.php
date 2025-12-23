@@ -47,17 +47,17 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\ConstFetch\RemovePhpVersionIdCheckRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
+use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\AddCoversClassAttributeRector;
-use Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveDataProviderParamKeysRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\DataProviderArrayItemsNewLinedRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertCompareOnCountableWithMethodToAssertCountRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEmptyNullableObjectToAssertInstanceofRector;
 use Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector;
+use Rector\PHPUnit\CodeQuality\Rector\MethodCall\MergeWithCallableAndWillReturnRector;
 use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Privatization\Rector\Property\PrivatizeFinalClassPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
@@ -91,7 +91,6 @@ return RectorConfig::configure()
         typeDeclarations: true,
     )
     ->withRules([
-        AddCoversClassAttributeRector::class,
         AddParamArrayDocblockFromAssignsParamToParamReferenceRector::class,
         AddParamArrayDocblockFromDataProviderRector::class,
         AddReturnDocblockForArrayDimAssignedObjectRector::class,
@@ -121,10 +120,10 @@ return RectorConfig::configure()
     ->withSkip([
         AbsolutizeRequireAndIncludePathRector::class,
         AddArrowFunctionReturnTypeRector::class,
-        AddCoversClassAttributeRector::class => [
-            __DIR__ . '/tests/phpunit/FileSystem/FileSystemTestCase.php',
-        ],
         AddInstanceofAssertForNullableInstanceRector::class,
+        AddParamArrayDocblockFromDataProviderRector::class => [
+            __DIR__ . '/tests/phpunit/Framework/Iterable/GeneratorFactory/GeneratorFactoryTest.php',
+        ],
         AddReturnTypeDeclarationBasedOnParentClassMethodRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/Console/FakeOutputSymfony5.php',
         ],
@@ -135,18 +134,23 @@ return RectorConfig::configure()
         DataProviderArrayItemsNewLinedRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
+        MergeWithCallableAndWillReturnRector::class => [
+            __DIR__ . '/tests/phpunit/Mutation/FileMutationGeneratorTest.php',
+        ],
         ReadOnlyPropertyRector::class => [
             // property can't be readonly as it's returned by reference and may be updated
-            __DIR__ . '/src/TestFramework/Coverage/TestLocations.php',
+            __DIR__ . '/src/TestFramework/Tracing/Trace/TestLocations.php',
         ],
         RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
-        RemoveDataProviderParamKeysRector::class,
         RemoveDuplicatedCaseInSwitchRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
         RemovePhpVersionIdCheckRector::class => true,
+        RemoveUnreachableStatementRector::class => [
+            __DIR__ . '/tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php',
+        ],
         RemoveUnusedConstructorParamRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],

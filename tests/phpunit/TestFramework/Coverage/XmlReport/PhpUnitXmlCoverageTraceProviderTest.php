@@ -36,11 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;

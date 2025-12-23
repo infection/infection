@@ -40,11 +40,11 @@ use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\ProxyTrace;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
 use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Tracing\Trace\ProxyTrace;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use function Later\lazy;
 use Webmozart\Assert\Assert;
 

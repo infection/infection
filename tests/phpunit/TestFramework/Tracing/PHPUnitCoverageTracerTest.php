@@ -40,28 +40,27 @@ use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\FileSystem\SourceFileFilter;
-use Infection\TestFramework\Coverage\BufferedSourceFileFilter;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\TraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
+use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
+use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Process;
 
@@ -86,7 +85,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
                 indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                indexParser: new IndexXmlCoverageParser(isForGitDiffLines: false),
+                indexParser: new IndexXmlCoverageParser(isSourceFiltered: false),
                 parser: new XmlCoverageParser(),
             ),
             new JUnitTestExecutionInfoAdder(
@@ -96,16 +95,6 @@ final class PHPUnitCoverageTracerTest extends TestCase
                         new FixedLocator($coveragePath . '/junit.xml'),
                     ),
                 ),
-            ),
-            new BufferedSourceFileFilter(
-                new SourceFileFilter(
-                    filter: '',
-                    excludeDirectories: [],
-                ),
-                Finder::create()
-                    ->files()
-                    ->depth(0)
-                    ->in(self::FIXTURE_DIR . '/src'),
             ),
         );
 

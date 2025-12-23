@@ -40,6 +40,8 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\FilterOptions;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
@@ -48,6 +50,9 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Configuration\SourceFilter\FakeSourceFilter;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -74,19 +79,24 @@ use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Collector\FakeSourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
+use Infection\Source\Collector\GitDiffSourceCollector;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
@@ -120,13 +130,22 @@ final class ProjectCodeProvider
         BaseMutatorTestCase::class,
         ConcreteComposerExecutableFinder::class,
         ConfigureCommand::class,
+        ConfigurationOption::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         DummyFileSystem::class,
+        EmptyTrace::class,
         FakeFileSystem::class,
         FakeLocator::class,
+        FakeSourceCollector::class,
+        FakeSourceFilter::class,
         FileSystem::class,
+        FixedSourceCollector::class,
+        FilterOptions::class,
         FormatterName::class,
+        GitDiffFilter::class,
+        GitDiffSourceCollector::class,
+        IncompleteGitDiffFilter::class,
         InvalidReportSource::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
@@ -136,6 +155,7 @@ final class ProjectCodeProvider
         NodeMutationGenerator::class,
         NoReportFound::class,
         NonExecutableFinder::class,
+        NullSourceLineMatcher::class,
         NullSubscriber::class,
         OperatingSystem::class,
         ProgressFormatter::class,
