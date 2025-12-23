@@ -105,7 +105,7 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
-        $git = Container::create()->getGit();
+        Container::create()->getGit();
 
         return array_merge(
             parent::getDefaultCommands(),

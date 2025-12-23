@@ -76,7 +76,7 @@ final class BaseOption
             return null;
         }
 
-        $trimmedValue = trim($value);
+        $trimmedValue = trim((string) $value);
 
         Assert::stringNotEmpty(
             $trimmedValue,

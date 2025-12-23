@@ -68,12 +68,12 @@ final class FilterOption
     }
 
     /**
-     * @return non-empty-string|null
+     * @return non-empty-string
      */
-    public static function get(IO $io): ?string
+    public static function get(IO $io): string
     {
         $value = $io->getInput()->getOption(self::NAME);
-        $trimmedValue = trim($value);
+        $trimmedValue = trim((string) $value);
 
         Assert::stringNotEmpty(
             $trimmedValue,

@@ -38,10 +38,14 @@ namespace Infection\Command\Git;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Differ\ChangedLinesRange;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -80,6 +84,7 @@ final class GitChangedLinesCommand extends BaseCommand
             'Finds the list of relative paths (relative to the current working directory) of the changed files that changed compared to the base branch used and matching the given filter.',
         );
 
+        ConfigurationOption::addOption($this);
         BaseOption::addOption($this);
         FilterOption::addOption($this);
     }
@@ -87,37 +92,44 @@ final class GitChangedLinesCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logger = LoggerFactory::create($io);
-        $base = BaseOption::get($io);
-        $filter = FilterOption::get($io);
 
-        $git = $this->getApplication()->getContainer()->getGit();
+        $inputBase = BaseOption::get($io);
+        $inputFilter = FilterOption::get($io);
 
-        if ($base === null) {
-            $base = $git->getDefaultBase();
+        $container = $this->getApplication()->getContainer()->withValues(
+            logger: $logger,
+            output: $io->getOutput(),
+            configFile: ConfigurationOption::get($io),
+            sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
+        );
+
+        $git = $container->getGit();
+
+        if ($inputBase === null) {
+            $inputBase = $git->getDefaultBase();
 
             $logger->notice(
                 sprintf(
                     'No base found. Using the default base "%s".',
-                    $base,
+                    $inputBase,
                 ),
             );
         }
 
-        $reference = $git->getBaseReference($base);
+        $sourceFilter = $container->getConfiguration()->sourceFilter;
+        Assert::isInstanceOf($sourceFilter, GitDiffFilter::class);
 
         $logger->notice(
             sprintf(
                 'Using the reference "%s".',
-                $reference,
+                $sourceFilter->base,
             ),
         );
 
-        // TODO: would be good to add the src from the configuration...
-        //   currently it's a bit too complicated.
         $changedLines = $git->getChangedLinesRangesByFileRelativePaths(
-            $filter,
-            $reference,
-            [],
+            $sourceFilter->value,
+            $sourceFilter->base,
+            $container->getConfiguration()->source->directories,
         );
 
         self::printChangedLines($changedLines, $io);

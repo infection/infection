@@ -38,13 +38,14 @@ namespace Infection\Tests\Command\Git;
 use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 #[CoversClass(GitDefaultBaseCommand::class)]
 final class GitDefaultBaseCommandTest extends TestCase
 {
-    private Git $git;
+    private MockObject $git;
 
     protected function setUp(): void
     {

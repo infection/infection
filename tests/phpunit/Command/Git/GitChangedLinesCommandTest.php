@@ -40,6 +40,7 @@ use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,7 +49,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(GitChangedLinesCommand::class)]
 final class GitChangedLinesCommandTest extends TestCase
 {
-    private Git $git;
+    private MockObject $git;
 
     protected function setUp(): void
     {
