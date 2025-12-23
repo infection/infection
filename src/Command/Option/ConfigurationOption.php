@@ -52,7 +52,7 @@ final class ConfigurationOption
     public const NAME = 'configuration';
 
     /**
-     * @template T extends Command
+     * @template T of Command
      * @param T $command
      *
      * @return T
@@ -68,8 +68,13 @@ final class ConfigurationOption
         );
     }
 
-    public static function parse(IO $io): string
+    /**
+     * @return non-empty-string|null
+     */
+    public static function parse(IO $io): ?string
     {
-        return trim((string) $io->getInput()->getOption(self::NAME));
+        $value = trim((string) $io->getInput()->getOption(self::NAME));
+
+        return $value === '' ? null : $value;
     }
 }

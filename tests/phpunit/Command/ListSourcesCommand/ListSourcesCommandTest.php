@@ -65,6 +65,9 @@ final class ListSourcesCommandTest extends TestCase
         chdir($this->cwd);
     }
 
+    /**
+     * @param array<string, string> $input
+     */
     #[DataProvider('inputProvider')]
     public function test_it_lists_source_files(
         array $input,

@@ -40,6 +40,8 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\FilterOptions;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
@@ -128,6 +130,7 @@ final class ProjectCodeProvider
         BaseMutatorTestCase::class,
         ConcreteComposerExecutableFinder::class,
         ConfigureCommand::class,
+        ConfigurationOption::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
         DummyFileSystem::class,
@@ -138,6 +141,7 @@ final class ProjectCodeProvider
         FakeSourceFilter::class,
         FileSystem::class,
         FixedSourceCollector::class,
+        FilterOptions::class,
         FormatterName::class,
         GitDiffFilter::class,
         GitDiffSourceCollector::class,

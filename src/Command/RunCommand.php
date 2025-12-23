@@ -114,28 +114,13 @@ final class RunCommand extends BaseCommand
     private const OPTION_FORCE_PROGRESS = 'force-progress';
 
     /** @var string */
-    private const OPTION_CONFIGURATION = 'configuration';
-
-    /** @var string */
     private const OPTION_COVERAGE = 'coverage';
 
     /** @var string */
     private const OPTION_MUTATORS = 'mutators';
 
     /** @var string */
-    private const OPTION_FILTER = 'filter';
-
-    /** @var string */
     private const OPTION_FORMATTER = 'formatter';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_FILTER = 'git-diff-filter';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_LINES = 'git-diff-lines';
-
-    /** @var string */
-    private const OPTION_GIT_DIFF_BASE = 'git-diff-base';
 
     /** @var string */
     private const OPTION_LOGGER_GITLAB = 'logger-gitlab';
@@ -450,8 +435,11 @@ final class RunCommand extends BaseCommand
         }
     }
 
+    /**
+     * @param non-empty-string|null $configFile
+     */
     private function createContainer(
-        string $configFile,
+        ?string $configFile,
         IO $io,
         LoggerInterface $logger,
     ): Container {
@@ -492,7 +480,7 @@ final class RunCommand extends BaseCommand
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
-            configFile: $configFile === '' ? Container::DEFAULT_CONFIG_FILE : $configFile,
+            configFile: $configFile,
             mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
             numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
             logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
@@ -564,16 +552,19 @@ final class RunCommand extends BaseCommand
         $container->getAdapterInstaller()->install($adapterName);
     }
 
+    /**
+     * @param non-empty-string|null $configFile
+     */
     private function startUp(
         Container $container,
-        string $configFile,
+        ?string $configFile,
         ConsoleOutput $consoleOutput,
         LoggerInterface $logger,
         IO $io,
     ): void {
         $locator = $container->getRootsFileOrDirectoryLocator();
 
-        if ($configFile !== '') {
+        if ($configFile !== null) {
             $locator->locate($configFile);
         } else {
             $this->runConfigurationCommand($locator, $io);

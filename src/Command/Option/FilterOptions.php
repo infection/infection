@@ -65,7 +65,7 @@ final class FilterOptions
     private const GIT_DIFF_BASE_NAME = 'git-diff-base';
 
     /**
-     * @template T extends Command
+     * @template T of Command
      * @param T $command
      *
      * @return T

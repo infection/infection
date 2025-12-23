@@ -85,6 +85,9 @@ final class ListSourcesCommand extends BaseCommand
         return true;
     }
 
+    /**
+     * @return string[]
+     */
     private static function collectPaths(
         string $cwd,
         SourceCollector $sourceCollector,
