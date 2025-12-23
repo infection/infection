@@ -61,6 +61,7 @@ if (!function_exists('Infection\Benchmark\Tracing\fetchTraceLazyState')) {
     function fetchTraceLazyState(Trace $trace): void
     {
         $trace->getSourceFileInfo();
+        $trace->hasTests();
         $trace->getTests();
     }
 }
