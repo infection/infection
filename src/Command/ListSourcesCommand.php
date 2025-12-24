@@ -72,7 +72,7 @@ final class ListSourcesCommand extends BaseCommand
             logger: new ConsoleLogger($io),
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
-            sourceFilter: SourceFilterOptions::getSourceFilter($io),
+            sourceFilter: SourceFilterOptions::get($io),
         );
 
         $filePaths = self::collectPaths(

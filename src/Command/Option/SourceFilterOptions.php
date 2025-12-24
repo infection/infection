@@ -106,7 +106,7 @@ final class SourceFilterOptions
             );
     }
 
-    public static function getSourceFilter(IO $io): PlainFilter|IncompleteGitDiffFilter|null
+    public static function get(IO $io): PlainFilter|IncompleteGitDiffFilter|null
     {
         $input = $io->getInput();
 
