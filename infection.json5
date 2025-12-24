@@ -33,6 +33,11 @@
                 "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
             ]
         },
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                ".*\\$this\\->setDescription\\(.*"
+            ]
+        },
         "ProtectedVisibility": {
             "ignore": [
                 // The mutations are not covered because this would require more tweaks in the

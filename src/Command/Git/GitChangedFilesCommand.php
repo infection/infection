@@ -102,8 +102,6 @@ final class GitChangedFilesCommand extends BaseCommand
             ),
         );
 
-        $container->getConfiguration();
-
         $files = explode(
             ',',
             $git->getChangedFileRelativePaths(
