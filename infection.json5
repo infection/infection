@@ -35,6 +35,7 @@
         },
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
+                // This is for the Symfony Console commands: the description is purely for documentation purposes.
                 ".*\\$this\\->setDescription\\(.*"
             ]
         },
