@@ -35,15 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Command\Git;
 
-use function array_fill_keys;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Console\IO;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use function sprintf;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
@@ -66,7 +61,7 @@ final class GitBaseReferenceCommand extends BaseCommand
 
     protected function executeCommand(IO $io): bool
     {
-        $logger = self::createLogger($io->getOutput());
+        $logger = LoggerFactory::create($io->getOutput());
         $base = BaseOption::get($io);
 
         $git = $this->getApplication()->getContainer()->getGit();
@@ -87,27 +82,5 @@ final class GitBaseReferenceCommand extends BaseCommand
         );
 
         return true;
-    }
-
-    private static function createLogger(OutputInterface $output): LoggerInterface
-    {
-        return new ConsoleLogger(
-            $output,
-            // We use this logger purely for logging extra info to the user and
-            // keep the STDOUT clean for allowing copy/paste.
-            formatLevelMap: array_fill_keys(
-                [
-                    LogLevel::EMERGENCY,
-                    LogLevel::ALERT,
-                    LogLevel::CRITICAL,
-                    LogLevel::ERROR,
-                    LogLevel::WARNING,
-                    LogLevel::NOTICE,
-                    LogLevel::INFO,
-                    LogLevel::DEBUG,
-                ],
-                ConsoleLogger::ERROR,
-            ),
-        );
     }
 }
