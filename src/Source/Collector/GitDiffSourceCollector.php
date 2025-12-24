@@ -95,7 +95,7 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         return PlainFilter::tryToCreate(
             $git->getChangedFileRelativePaths(
                 $sourceFilter->value,
-                $sourceFilter->base,
+                $sourceFilter->reference,
                 $sourceDirectories,
             ),
         );

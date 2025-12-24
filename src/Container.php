@@ -43,7 +43,6 @@ use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\ConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfiguration;
-use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
@@ -562,7 +561,7 @@ final class Container extends DIContainer
                     ? new GitDiffSourceLineMatcher(
                         $container->getGit(),
                         $container->getFileSystem(),
-                        $sourceFilter->base,
+                        $sourceFilter->reference,
                         $sourceFilter->value,
                         $configuration->source->directories,
                     )
@@ -755,11 +754,6 @@ final class Container extends DIContainer
     public function getMemoryLimiter(): MemoryLimiter
     {
         return $this->get(MemoryLimiter::class);
-    }
-
-    public function getSchemaConfigurationFactory(): SchemaConfigurationFactory
-    {
-        return $this->get(SchemaConfigurationFactory::class);
     }
 
     public function getMutatorResolver(): MutatorResolver

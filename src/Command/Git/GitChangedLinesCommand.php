@@ -57,27 +57,6 @@ final class GitChangedLinesCommand extends BaseCommand
         parent::__construct('git:changed-lines');
     }
 
-    /**
-     * @param non-empty-array<string, list<ChangedLinesRange>> $changedLines
-     */
-    public static function printChangedLines(
-        array $changedLines,
-        OutputInterface $output,
-    ): void {
-        foreach ($changedLines as $file => $fileChangedLines) {
-            foreach ($fileChangedLines as $fileChangedLine) {
-                $output->writeln(
-                    sprintf(
-                        '%s: [%s,%s]',
-                        $file,
-                        $fileChangedLine->startLine,
-                        $fileChangedLine->endLine,
-                    ),
-                );
-            }
-        }
-    }
-
     protected function configure(): void
     {
         $this->setDescription(
@@ -106,12 +85,10 @@ final class GitChangedLinesCommand extends BaseCommand
         $git = $container->getGit();
 
         if ($inputBase === null) {
-            $inputBase = $git->getDefaultBase();
-
             $logger->notice(
                 sprintf(
                     'No base found. Using the default base "%s".',
-                    $inputBase,
+                    $git->getDefaultBase(),
                 ),
             );
         }
@@ -122,18 +99,39 @@ final class GitChangedLinesCommand extends BaseCommand
         $logger->notice(
             sprintf(
                 'Using the reference "%s".',
-                $sourceFilter->base,
+                $sourceFilter->reference,
             ),
         );
 
         $changedLines = $git->getChangedLinesRangesByFileRelativePaths(
             $sourceFilter->value,
-            $sourceFilter->base,
+            $sourceFilter->reference,
             $container->getConfiguration()->source->directories,
         );
 
         self::printChangedLines($changedLines, $io);
 
         return true;
+    }
+
+    /**
+     * @param non-empty-array<string, list<ChangedLinesRange>> $changedLines
+     */
+    private static function printChangedLines(
+        array $changedLines,
+        OutputInterface $output,
+    ): void {
+        foreach ($changedLines as $file => $fileChangedLines) {
+            foreach ($fileChangedLines as $fileChangedLine) {
+                $output->writeln(
+                    sprintf(
+                        '%s: [%s,%s]',
+                        $file,
+                        $fileChangedLine->startLine,
+                        $fileChangedLine->endLine,
+                    ),
+                );
+            }
+        }
     }
 }

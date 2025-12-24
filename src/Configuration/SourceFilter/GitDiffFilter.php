@@ -43,12 +43,12 @@ namespace Infection\Configuration\SourceFilter;
 final readonly class GitDiffFilter implements SourceFilter
 {
     /**
-     * @param non-empty-string $value
-     * @param non-empty-string $base
+     * @param non-empty-string $value E.g. 'AMD'
+     * @param non-empty-string $reference The best common ancestor git reference when possible.
      */
     public function __construct(
         public string $value,
-        public string $base,
+        public string $reference,
     ) {
     }
 }

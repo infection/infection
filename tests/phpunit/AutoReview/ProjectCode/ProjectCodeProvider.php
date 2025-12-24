@@ -40,6 +40,9 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Git\LoggerFactory;
+use Infection\Command\Git\Option\BaseOption;
+use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Config\ConsoleHelper;
@@ -128,6 +131,7 @@ final class ProjectCodeProvider
         AdapterInstaller::class,
         Application::class,
         BaseMutatorTestCase::class,
+        BaseOption::class,
         ConcreteComposerExecutableFinder::class,
         ConfigureCommand::class,
         ConfigurationOption::class,
@@ -140,6 +144,7 @@ final class ProjectCodeProvider
         FakeSourceCollector::class,
         FakeSourceFilter::class,
         FileSystem::class,
+        FilterOption::class,
         FixedSourceCollector::class,
         SourceFilterOptions::class,
         FormatterName::class,
@@ -147,6 +152,7 @@ final class ProjectCodeProvider
         GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
         InvalidReportSource::class,
+        LoggerFactory::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutantExecutionResult::class,

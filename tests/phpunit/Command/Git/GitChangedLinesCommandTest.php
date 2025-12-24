@@ -35,173 +35,211 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Git;
 
-use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Configuration\Entry\Source;
+use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
 use Infection\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
+use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use function Safe\chdir;
+use function Safe\getcwd;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
+#[Group('integration')]
 #[CoversClass(GitChangedLinesCommand::class)]
 final class GitChangedLinesCommandTest extends TestCase
 {
-    private Git&MockObject $git;
+    private const REFERENCE = 'xyz1234';
+
+    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+
+    private const SOURCE_DIRECTORIES = ['src', 'lib'];
+
+    private string $cwd = '';
 
     protected function setUp(): void
     {
-        $this->git = $this->createMock(Git::class);
+        $this->cwd = getcwd();
+        chdir(self::FIXTURES_DIR);
     }
 
-    public function test_it_outputs_changed_lines_with_provided_base_and_default_filter(): void
+    protected function tearDown(): void
     {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->once())
+        chdir($this->cwd);
+    }
+
+    /**
+     * @param array<string, string> $arguments
+     * @param array<string, ChangedLinesRange[]> $changedLines
+     */
+    #[DataProvider('commandExecutionProvider')]
+    public function test_it_outputs_changed_lines(
+        array $arguments,
+        string $defaultBase,
+        array $changedLines,
+        string $expectedBase,
+        string $expectedFilter,
+        string $expectedStdout,
+        string $expectedStderr,
+        string $expectedDisplay,
+    ): void {
+        $gitMock = $this->createMock(Git::class);
+        $gitMock->method('getDefaultBase')->willReturn($defaultBase);
+        $gitMock
             ->method('getBaseReference')
-            ->with('origin/main')
-            ->willReturn('abc123');
-        $this->git
-            ->expects($this->once())
+            ->with($expectedBase)
+            ->willReturn(self::REFERENCE);
+        $gitMock
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'abc123', ['src'])
-            ->willReturn([
+            ->with($expectedFilter, self::REFERENCE, self::SOURCE_DIRECTORIES)
+            ->willReturn($changedLines);
+
+        $tester = $this->createCommandTester($gitMock);
+
+        $tester->execute(
+            $arguments,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                'capture_stderr_separately' => true,
+            ],
+        );
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($expectedStdout, $tester->getDisplay());
+        $this->assertSame($expectedStderr, $tester->getErrorOutput());
+
+        $tester->execute(
+            $arguments,
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+            ],
+        );
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($expectedDisplay, $tester->getDisplay());
+    }
+
+    public static function commandExecutionProvider(): iterable
+    {
+        yield 'provided base and default filter' => [
+            [
+                '--base' => 'origin/main',
+            ],
+            'defaultBase' => 'origin/default',
+            'changedLines' => [
                 'src/File1.php' => [ChangedLinesRange::create(1, 5), ChangedLinesRange::create(10, 15)],
                 'src/File2.php' => [ChangedLinesRange::create(20, 20)],
-            ]);
+            ],
+            'expectedBase' => 'origin/main',
+            'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
+            'expectedStdout' => <<<STDOUT
+                src/File1.php: [1,5]
+                src/File1.php: [10,15]
+                src/File2.php: [20,20]
 
-        $tester = $this->createCommandTester();
+                STDOUT,
+            'expectedStderr' => <<<STDERR
+                [notice] Using the reference "xyz1234".
 
-        $result = $tester->execute([
-            '--base' => 'origin/main',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+                STDERR,
+            'expectedDisplay' => <<<DISPLAY
+                [notice] Using the reference "xyz1234".
+                src/File1.php: [1,5]
+                src/File1.php: [10,15]
+                src/File2.php: [20,20]
 
-        $this->assertSame(0, $result);
-        $this->assertSame("src/File1.php: [1,5]\nsrc/File1.php: [10,15]\nsrc/File2.php: [20,20]\n", $tester->getDisplay());
-        $this->assertStringContainsString('[notice] Using the reference', $tester->getErrorOutput());
-    }
+                DISPLAY,
+        ];
 
-    public function test_it_outputs_changed_lines_with_default_base_and_default_filter(): void
-    {
-        $this->git
-            ->expects($this->atLeastOnce())
-            ->method('getDefaultBase')
-            ->willReturn('origin/master');
-        $this->git
-            ->expects($this->once())
-            ->method('getBaseReference')
-            ->with('origin/master')
-            ->willReturn('def456');
-        $this->git
-            ->expects($this->once())
-            ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'def456', ['src'])
-            ->willReturn([
+        yield 'default base and default filter' => [
+            [],
+            'defaultBase' => 'origin/default',
+            'changedLines' => [
                 'tests/File1Test.php' => [ChangedLinesRange::create(1, 10)],
-            ]);
+            ],
+            'expectedBase' => 'origin/default',
+            'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
+            'expectedStdout' => <<<STDOUT
+                tests/File1Test.php: [1,10]
 
-        $tester = $this->createCommandTester();
+                STDOUT,
+            'expectedStderr' => <<<STDERR
+                [notice] No base found. Using the default base "origin/default".
+                [notice] Using the reference "xyz1234".
 
-        $result = $tester->execute([], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+                STDERR,
+            'expectedDisplay' => <<<DISPLAY
+                [notice] No base found. Using the default base "origin/default".
+                [notice] Using the reference "xyz1234".
+                tests/File1Test.php: [1,10]
 
-        $this->assertSame(0, $result);
-        $this->assertSame("tests/File1Test.php: [1,10]\n", $tester->getDisplay());
-        $this->assertStringContainsString('[notice] No base found.', $tester->getErrorOutput());
-        $this->assertStringContainsString('[notice] Using the reference', $tester->getErrorOutput());
-    }
+                DISPLAY,
+        ];
 
-    public function test_it_trims_the_base_option(): void
-    {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->once())
-            ->method('getBaseReference')
-            ->with('feature/test')
-            ->willReturn('xyz123');
-        $this->git
-            ->expects($this->once())
-            ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'xyz123', ['src'])
-            ->willReturn([
+        yield 'trimmed base option' => [
+            [
+                '--base' => '  feature/test  ',
+            ],
+            'defaultBase' => 'origin/default',
+            'changedLines' => [
                 'src/Test.php' => [ChangedLinesRange::create(1, 1)],
-            ]);
+            ],
+            'expectedBase' => 'feature/test',
+            'expectedFilter' => Git::DEFAULT_GIT_DIFF_FILTER,
+            'expectedStdout' => <<<STDOUT
+                src/Test.php: [1,1]
 
-        $tester = $this->createCommandTester();
+                STDOUT,
+            'expectedStderr' => <<<STDERR
+                [notice] Using the reference "xyz1234".
 
-        $result = $tester->execute([
-            '--base' => '  feature/test  ',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+                STDERR,
+            'expectedDisplay' => <<<DISPLAY
+                [notice] Using the reference "xyz1234".
+                src/Test.php: [1,1]
 
-        $this->assertSame(0, $result);
-        $this->assertSame("src/Test.php: [1,1]\n", $tester->getDisplay());
-        $this->assertStringContainsString('[notice] Using the reference', $tester->getErrorOutput());
-    }
+                DISPLAY,
+        ];
 
-    public function test_it_trims_the_filter_option(): void
-    {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->once())
-            ->method('getBaseReference')
-            ->with('origin/main')
-            ->willReturn('abc999');
-        $this->git
-            ->expects($this->once())
-            ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('D', 'abc999', ['src'])
-            ->willReturn([
+        yield 'trimmed filter option' => [
+            [
+                '--base' => 'origin/main',
+                '--filter' => '  D  ',
+            ],
+            'defaultBase' => 'origin/default',
+            'changedLines' => [
                 'src/Deleted.php' => [ChangedLinesRange::create(1, 100)],
-            ]);
+            ],
+            'expectedBase' => 'origin/main',
+            'expectedFilter' => 'D',
+            'expectedStdout' => <<<STDOUT
+                src/Deleted.php: [1,100]
 
-        $tester = $this->createCommandTester();
+                STDOUT,
+            'expectedStderr' => <<<STDERR
+                [notice] Using the reference "xyz1234".
 
-        $result = $tester->execute([
-            '--base' => 'origin/main',
-            '--filter' => '  D  ',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+                STDERR,
+            'expectedDisplay' => <<<DISPLAY
+                [notice] Using the reference "xyz1234".
+                src/Deleted.php: [1,100]
 
-        $this->assertSame(0, $result);
-        $this->assertSame("src/Deleted.php: [1,100]\n", $tester->getDisplay());
-        $this->assertStringContainsString('[notice] Using the reference', $tester->getErrorOutput());
+                DISPLAY,
+        ];
     }
 
     public function test_it_rejects_blank_base_option(): void
     {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->never())
-            ->method('getBaseReference');
-        $this->git
-            ->expects($this->never())
-            ->method('getChangedLinesRangesByFileRelativePaths');
-
-        $tester = $this->createCommandTester();
+        $git = $this->createStub(Git::class);
+        $tester = $this->createCommandTester($git);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a non-blank value for the option "--base".');
@@ -216,17 +254,8 @@ final class GitChangedLinesCommandTest extends TestCase
 
     public function test_it_rejects_blank_filter_option(): void
     {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->never())
-            ->method('getBaseReference');
-        $this->git
-            ->expects($this->never())
-            ->method('getChangedLinesRangesByFileRelativePaths');
-
-        $tester = $this->createCommandTester();
+        $git = $this->createStub(Git::class);
+        $tester = $this->createCommandTester($git);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a non-blank value for the option "--base".');
@@ -240,80 +269,11 @@ final class GitChangedLinesCommandTest extends TestCase
         ]);
     }
 
-    public function test_print_changed_lines_outputs_single_range(): void
-    {
-        $output = new BufferedOutput();
-
-        GitChangedLinesCommand::printChangedLines(
-            [
-                'src/File.php' => [ChangedLinesRange::create(5, 10)],
-            ],
-            $output,
-        );
-
-        $display = $output->fetch();
-        $this->assertStringContainsString('src/File.php: [5,10]', $display);
-    }
-
-    public function test_print_changed_lines_outputs_multiple_ranges_for_same_file(): void
-    {
-        $output = new BufferedOutput();
-
-        GitChangedLinesCommand::printChangedLines(
-            [
-                'src/File.php' => [
-                    ChangedLinesRange::create(1, 5),
-                    ChangedLinesRange::create(10, 15),
-                    ChangedLinesRange::create(20, 20),
-                ],
-            ],
-            $output,
-        );
-
-        $display = $output->fetch();
-        $this->assertStringContainsString('src/File.php: [1,5]', $display);
-        $this->assertStringContainsString('src/File.php: [10,15]', $display);
-        $this->assertStringContainsString('src/File.php: [20,20]', $display);
-    }
-
-    public function test_print_changed_lines_outputs_multiple_files(): void
-    {
-        $output = new BufferedOutput();
-
-        GitChangedLinesCommand::printChangedLines(
-            [
-                'src/File1.php' => [ChangedLinesRange::create(1, 2)],
-                'src/File2.php' => [ChangedLinesRange::create(3, 4)],
-                'tests/FileTest.php' => [ChangedLinesRange::create(10, 20)],
-            ],
-            $output,
-        );
-
-        $display = $output->fetch();
-        $this->assertStringContainsString('src/File1.php: [1,2]', $display);
-        $this->assertStringContainsString('src/File2.php: [3,4]', $display);
-        $this->assertStringContainsString('tests/FileTest.php: [10,20]', $display);
-    }
-
-    public function test_print_changed_lines_outputs_single_line_range(): void
-    {
-        $output = new BufferedOutput();
-
-        GitChangedLinesCommand::printChangedLines(
-            [
-                'src/SingleLine.php' => [ChangedLinesRange::create(42, 42)],
-            ],
-            $output,
-        );
-
-        $display = $output->fetch();
-        $this->assertStringContainsString('src/SingleLine.php: [42,42]', $display);
-    }
-
-    private function createCommandTester(): CommandTester
+    private function createCommandTester(Git $git): CommandTester
     {
         $container = Container::create();
-        $container->set(Git::class, fn () => $this->git);
+        $container->set(Git::class, static fn () => $git);
+        $container->set(SchemaConfiguration::class, self::createSchemaConfiguration(...));
 
         $application = new Application($container);
 
@@ -321,5 +281,17 @@ final class GitChangedLinesCommandTest extends TestCase
         $command->setApplication($application);
 
         return new CommandTester($command);
+    }
+
+    private function createSchemaConfiguration(): SchemaConfiguration
+    {
+        return SchemaConfigurationBuilder::withMinimalTestData()
+            ->withSource(
+                new Source(
+                    self::SOURCE_DIRECTORIES,
+                    ['tests'],
+                ),
+            )
+            ->build();
     }
 }

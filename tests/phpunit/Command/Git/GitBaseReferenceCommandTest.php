@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Command\Git;
 
 use Infection\Command\Git\GitBaseReferenceCommand;
-use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Console\Application;
 use Infection\Container;
 use Infection\Git\Git;
