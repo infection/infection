@@ -4,17 +4,16 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          cacheDirectory="var/phpunit-cache"
-         testdoxSummary="true"
 >
     <testsuites>
         <testsuite name="Test Suite">
-            <directory>./tests/</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 
     <source>
         <include>
-            <directory>./src/</directory>
+            <directory>src</directory>
         </include>
     </source>
 </phpunit>

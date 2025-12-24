@@ -4,12 +4,19 @@
     },
     "autoload": {
         "psr-4": {
-            "PHPUnit101\\": "src/"
-        }
+            "Infection\\E2ETests\\PHPUnit_10_1\\": "src/"
+        },
+        "files": [
+            "src/Covered/functions.php",
+            "src/Uncovered/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "PHPUnit101\\Test\\": "tests/"
+            "Infection\\E2ETests\\PHPUnit_10_1\\Tests\\": "tests/"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
