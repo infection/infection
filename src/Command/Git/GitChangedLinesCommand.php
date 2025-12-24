@@ -91,7 +91,7 @@ final class GitChangedLinesCommand extends BaseCommand
 
     protected function executeCommand(IO $io): bool
     {
-        $logger = LoggerFactory::create($io);
+        $logger = LoggerFactory::create($io->getOutput());
 
         $inputBase = BaseOption::get($io);
         $inputFilter = FilterOption::get($io);

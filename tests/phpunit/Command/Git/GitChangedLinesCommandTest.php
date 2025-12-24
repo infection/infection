@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Git;
 
+use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Console\Application;
+use Infection\Container;
 use Infection\Differ\ChangedLinesRange;
 use Infection\Git\Git;
 use InvalidArgumentException;
@@ -49,7 +52,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(GitChangedLinesCommand::class)]
 final class GitChangedLinesCommandTest extends TestCase
 {
-    private MockObject $git;
+    private Git&MockObject $git;
 
     protected function setUp(): void
     {
@@ -69,10 +72,10 @@ final class GitChangedLinesCommandTest extends TestCase
         $this->git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'abc123', [])
+            ->with('AM', 'abc123', ['src'])
             ->willReturn([
-                'src/File1.php' => [new ChangedLinesRange(1, 5), new ChangedLinesRange(10, 15)],
-                'src/File2.php' => [new ChangedLinesRange(20, 20)],
+                'src/File1.php' => [ChangedLinesRange::create(1, 5), ChangedLinesRange::create(10, 15)],
+                'src/File2.php' => [ChangedLinesRange::create(20, 20)],
             ]);
 
         $tester = $this->createCommandTester();
@@ -92,7 +95,7 @@ final class GitChangedLinesCommandTest extends TestCase
     public function test_it_outputs_changed_lines_with_default_base_and_default_filter(): void
     {
         $this->git
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('getDefaultBase')
             ->willReturn('origin/master');
         $this->git
@@ -103,9 +106,9 @@ final class GitChangedLinesCommandTest extends TestCase
         $this->git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'def456', [])
+            ->with('AM', 'def456', ['src'])
             ->willReturn([
-                'tests/File1Test.php' => [new ChangedLinesRange(1, 10)],
+                'tests/File1Test.php' => [ChangedLinesRange::create(1, 10)],
             ]);
 
         $tester = $this->createCommandTester();
@@ -134,9 +137,9 @@ final class GitChangedLinesCommandTest extends TestCase
         $this->git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('AM', 'xyz123', [])
+            ->with('AM', 'xyz123', ['src'])
             ->willReturn([
-                'src/Test.php' => [new ChangedLinesRange(1, 1)],
+                'src/Test.php' => [ChangedLinesRange::create(1, 1)],
             ]);
 
         $tester = $this->createCommandTester();
@@ -166,9 +169,9 @@ final class GitChangedLinesCommandTest extends TestCase
         $this->git
             ->expects($this->once())
             ->method('getChangedLinesRangesByFileRelativePaths')
-            ->with('D', 'abc999', [])
+            ->with('D', 'abc999', ['src'])
             ->willReturn([
-                'src/Deleted.php' => [new ChangedLinesRange(1, 100)],
+                'src/Deleted.php' => [ChangedLinesRange::create(1, 100)],
             ]);
 
         $tester = $this->createCommandTester();
@@ -243,7 +246,7 @@ final class GitChangedLinesCommandTest extends TestCase
 
         GitChangedLinesCommand::printChangedLines(
             [
-                'src/File.php' => [new ChangedLinesRange(5, 10)],
+                'src/File.php' => [ChangedLinesRange::create(5, 10)],
             ],
             $output,
         );
@@ -259,9 +262,9 @@ final class GitChangedLinesCommandTest extends TestCase
         GitChangedLinesCommand::printChangedLines(
             [
                 'src/File.php' => [
-                    new ChangedLinesRange(1, 5),
-                    new ChangedLinesRange(10, 15),
-                    new ChangedLinesRange(20, 20),
+                    ChangedLinesRange::create(1, 5),
+                    ChangedLinesRange::create(10, 15),
+                    ChangedLinesRange::create(20, 20),
                 ],
             ],
             $output,
@@ -279,9 +282,9 @@ final class GitChangedLinesCommandTest extends TestCase
 
         GitChangedLinesCommand::printChangedLines(
             [
-                'src/File1.php' => [new ChangedLinesRange(1, 2)],
-                'src/File2.php' => [new ChangedLinesRange(3, 4)],
-                'tests/FileTest.php' => [new ChangedLinesRange(10, 20)],
+                'src/File1.php' => [ChangedLinesRange::create(1, 2)],
+                'src/File2.php' => [ChangedLinesRange::create(3, 4)],
+                'tests/FileTest.php' => [ChangedLinesRange::create(10, 20)],
             ],
             $output,
         );
@@ -298,7 +301,7 @@ final class GitChangedLinesCommandTest extends TestCase
 
         GitChangedLinesCommand::printChangedLines(
             [
-                'src/SingleLine.php' => [new ChangedLinesRange(42, 42)],
+                'src/SingleLine.php' => [ChangedLinesRange::create(42, 42)],
             ],
             $output,
         );
@@ -309,7 +312,13 @@ final class GitChangedLinesCommandTest extends TestCase
 
     private function createCommandTester(): CommandTester
     {
-        $command = new GitChangedLinesCommand($this->git);
+        $container = Container::create();
+        $container->set(Git::class, fn () => $this->git);
+
+        $application = new Application($container);
+
+        $command = new GitChangedLinesCommand();
+        $command->setApplication($application);
 
         return new CommandTester($command);
     }

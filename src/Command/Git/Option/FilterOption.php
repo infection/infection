@@ -55,6 +55,9 @@ final class FilterOption
 
     /**
      * @template T of Command
+     * @param T $command
+     *
+     * @return T
      */
     public static function addOption(Command $command): Command
     {

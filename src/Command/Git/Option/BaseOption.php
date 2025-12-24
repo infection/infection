@@ -54,6 +54,9 @@ final class BaseOption
 
     /**
      * @template T of Command
+     * @param T $command
+     *
+     * @return T
      */
     public static function addOption(Command $command): Command
     {

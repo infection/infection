@@ -66,7 +66,7 @@ final class GitBaseReferenceCommand extends BaseCommand
 
     protected function executeCommand(IO $io): bool
     {
-        $logger = self::createLogger($io);
+        $logger = self::createLogger($io->getOutput());
         $base = BaseOption::get($io);
 
         $git = $this->getApplication()->getContainer()->getGit();

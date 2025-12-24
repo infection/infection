@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Command\Git;
 
+use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
+use Infection\Console\Application;
+use Infection\Container;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,7 +50,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(GitChangedFilesCommand::class)]
 final class GitChangedFilesCommandTest extends TestCase
 {
-    private MockObject $git;
+    private Git&MockObject $git;
 
     protected function setUp(): void
     {
@@ -258,7 +261,13 @@ final class GitChangedFilesCommandTest extends TestCase
 
     private function createCommandTester(): CommandTester
     {
-        $command = new GitChangedFilesCommand($this->git);
+        $container = Container::create();
+        $container->set(Git::class, fn () => $this->git);
+
+        $application = new Application($container);
+
+        $command = new GitChangedFilesCommand();
+        $command->setApplication($application);
 
         return new CommandTester($command);
     }

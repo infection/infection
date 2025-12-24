@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Command\Git;
 
 use Infection\Command\Git\GitBaseReferenceCommand;
+use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Console\Application;
+use Infection\Container;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,7 +50,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(GitBaseReferenceCommand::class)]
 final class GitBaseReferenceCommandTest extends TestCase
 {
-    private MockObject $git;
+    private Git&MockObject $git;
 
     protected function setUp(): void
     {
@@ -202,7 +205,13 @@ final class GitBaseReferenceCommandTest extends TestCase
 
     private function createCommandTester(): CommandTester
     {
-        $command = new GitBaseReferenceCommand($this->git);
+        $container = Container::create();
+        $container->set(Git::class, fn () => $this->git);
+
+        $application = new Application($container);
+
+        $command = new GitBaseReferenceCommand();
+        $command->setApplication($application);
 
         return new CommandTester($command);
     }

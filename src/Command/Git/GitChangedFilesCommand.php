@@ -64,7 +64,7 @@ final class GitChangedFilesCommand extends BaseCommand
 
     protected function executeCommand(IO $io): bool
     {
-        $logger = LoggerFactory::create($io);
+        $logger = LoggerFactory::create($io->getOutput());
         $base = BaseOption::get($io);
         $filter = FilterOption::get($io);
 
