@@ -44,11 +44,11 @@ final readonly class GitDiffFilter implements SourceFilter
 {
     /**
      * @param non-empty-string $value E.g. 'AMD'
-     * @param non-empty-string $reference The best common ancestor git reference when possible.
+     * @param non-empty-string $base The best common ancestor git reference when possible.
      */
     public function __construct(
         public string $value,
-        public string $reference,
+        public string $base,
     ) {
     }
 }
