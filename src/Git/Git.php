@@ -125,7 +125,7 @@ interface Git
     ): array;
 
     /**
-     * Find as good common ancestors as possible for a merge and falls back to the given base otherwise.
+     * Find as good common ancestors as possible with HEAD for a merge and falls back to the given base otherwise.
      *
      * Returns either the commit hash, e.g. '8af25a159143aadacf4d875a3114014e99053430' or the fallback value.
      *
