@@ -33,6 +33,12 @@
                 "Infection\\Logger\\GitHub\\GitDiffFileProvider::provideDefaultBase"
             ]
         },
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                // This is for the Symfony Console commands: the description is purely for documentation purposes.
+                ".*\\$this\\->setDescription\\(.*"
+            ]
+        },
         "ProtectedVisibility": {
             "ignore": [
                 // The mutations are not covered because this would require more tweaks in the
