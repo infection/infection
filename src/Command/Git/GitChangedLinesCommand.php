@@ -99,13 +99,13 @@ final class GitChangedLinesCommand extends BaseCommand
         $logger->notice(
             sprintf(
                 'Using the reference "%s".',
-                $sourceFilter->reference,
+                $sourceFilter->base,
             ),
         );
 
         $changedLines = $git->getChangedLinesRangesByFileRelativePaths(
             $sourceFilter->value,
-            $sourceFilter->reference,
+            $sourceFilter->base,
             $container->getConfiguration()->source->directories,
         );
 

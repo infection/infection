@@ -98,7 +98,7 @@ final class GitChangedFilesCommand extends BaseCommand
         $logger->notice(
             sprintf(
                 'Using the reference "%s".',
-                $sourceFilter->reference,
+                $sourceFilter->base,
             ),
         );
 
@@ -106,7 +106,7 @@ final class GitChangedFilesCommand extends BaseCommand
             ',',
             $git->getChangedFileRelativePaths(
                 $sourceFilter->value,
-                $sourceFilter->reference,
+                $sourceFilter->base,
                 $container->getConfiguration()->source->directories,
             ),
         );

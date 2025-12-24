@@ -561,7 +561,7 @@ final class Container extends DIContainer
                     ? new GitDiffSourceLineMatcher(
                         $container->getGit(),
                         $container->getFileSystem(),
-                        $sourceFilter->reference,
+                        $sourceFilter->base,
                         $sourceFilter->value,
                         $configuration->source->directories,
                     )
