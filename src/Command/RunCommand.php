@@ -38,7 +38,7 @@ namespace Infection\Command;
 use function extension_loaded;
 use function implode;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\FilterOptions;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
@@ -246,7 +246,7 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_MUTATORS_INPUT,
             );
 
-        FilterOptions::addOption($this)
+        SourceFilterOptions::addOption($this)
             ->addOption(
                 self::OPTION_FORMATTER,
                 null,
@@ -382,7 +382,7 @@ final class RunCommand extends BaseCommand
         // say "do not use a config". If this becomes possible in the future,
         // though, it will likely be a `--no-config` option rather than relying
         // on this value to be set to an empty string.
-        $configFile = ConfigurationOption::parse($io);
+        $configFile = ConfigurationOption::get($io);
 
         $container = $this->createContainer($configFile, $io, $logger);
 
@@ -508,7 +508,7 @@ final class RunCommand extends BaseCommand
             staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
-            sourceFilter: FilterOptions::getSourceFilter($io),
+            sourceFilter: SourceFilterOptions::get($io),
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),

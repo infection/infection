@@ -41,7 +41,7 @@ use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\FilterOptions;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
@@ -141,7 +141,7 @@ final class ProjectCodeProvider
         FakeSourceFilter::class,
         FileSystem::class,
         FixedSourceCollector::class,
-        FilterOptions::class,
+        SourceFilterOptions::class,
         FormatterName::class,
         GitDiffFilter::class,
         GitDiffSourceCollector::class,
