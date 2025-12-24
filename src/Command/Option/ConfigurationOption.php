@@ -71,7 +71,7 @@ final class ConfigurationOption
     /**
      * @return non-empty-string|null
      */
-    public static function parse(IO $io): ?string
+    public static function get(IO $io): ?string
     {
         $value = trim((string) $io->getInput()->getOption(self::NAME));
 
