@@ -111,8 +111,8 @@ final class GitChangedFilesCommandTest extends TestCase
         );
 
         $tester->assertCommandIsSuccessful();
-        $this->assertSame($expectedStdout, $tester->getDisplay());
-        $this->assertSame($expectedStderr, $tester->getErrorOutput());
+        $this->assertSame($expectedStdout, $tester->getDisplay(normalize: true));
+        $this->assertSame($expectedStderr, $tester->getErrorOutput(normalize: true));
 
         $tester->execute(
             $arguments,
@@ -122,7 +122,7 @@ final class GitChangedFilesCommandTest extends TestCase
         );
 
         $tester->assertCommandIsSuccessful();
-        $this->assertSame($expectedDisplay, $tester->getDisplay());
+        $this->assertSame($expectedDisplay, $tester->getDisplay(normalize: true));
     }
 
     public static function commandExecutionProvider(): iterable
