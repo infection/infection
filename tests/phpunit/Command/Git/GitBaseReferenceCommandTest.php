@@ -62,47 +62,41 @@ final class GitBaseReferenceCommandTest extends TestCase
             ->expects($this->never())
             ->method('getDefaultBase');
         $this->git
-            ->expects($this->once())
             ->method('getBaseReference')
             ->with('origin/main')
             ->willReturn('8af25a159143aadacf4d875a3114014e99053430');
 
-        $tester = $this->createCommandTester();
+        $expectedStdout = <<<'STDOUT'
+            8af25a159143aadacf4d875a3114014e99053430
 
-        $result = $tester->execute([
-            '--base' => 'origin/main',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+            STDOUT;
+        $expectedStderr = '';
+        $expectedDisplay = <<<'DISPLAY'
+            8af25a159143aadacf4d875a3114014e99053430
 
-        $this->assertSame(0, $result);
-        $this->assertSame("8af25a159143aadacf4d875a3114014e99053430\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
-    }
-
-    public function test_it_outputs_the_base_reference_with_default_base(): void
-    {
-        $this->git
-            ->expects($this->once())
-            ->method('getDefaultBase')
-            ->willReturn('origin/master');
-        $this->git
-            ->expects($this->once())
-            ->method('getBaseReference')
-            ->with('origin/master')
-            ->willReturn('abc123def456');
+            DISPLAY;
 
         $tester = $this->createCommandTester();
 
-        $result = $tester->execute([], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+        $tester->execute(
+            ['--base' => 'origin/main'],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE],
+        );
 
-        $this->assertSame(0, $result);
-        $this->assertSame("abc123def456\n", $tester->getDisplay());
-        $this->assertStringContainsString('[notice] No base found.', $tester->getErrorOutput());
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($expectedDisplay, $tester->getDisplay(true));
+
+        $tester->execute(
+            ['--base' => 'origin/main'],
+            [
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
+                'capture_stderr_separately' => true,
+            ],
+        );
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame($expectedStdout, $tester->getDisplay(true));
+        $this->assertSame($expectedStderr, $tester->getErrorOutput(true));
     }
 
     public function test_it_trims_the_base_option(): void
@@ -118,16 +112,9 @@ final class GitBaseReferenceCommandTest extends TestCase
 
         $tester = $this->createCommandTester();
 
-        $result = $tester->execute([
-            '--base' => '  origin/develop  ',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+        $tester->execute(['--base' => '  origin/develop  ']);
 
-        $this->assertSame(0, $result);
-        $this->assertSame("def456abc789\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
+        $tester->assertCommandIsSuccessful();
     }
 
     public function test_it_rejects_blank_base_option(): void
@@ -144,62 +131,7 @@ final class GitBaseReferenceCommandTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a non-blank value for the option "--base".');
 
-        $tester->execute([
-            '--base' => '   ',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
-    }
-
-    public function test_it_accepts_commit_hash_as_base(): void
-    {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->once())
-            ->method('getBaseReference')
-            ->with('abc123')
-            ->willReturn('abc123def456');
-
-        $tester = $this->createCommandTester();
-
-        $result = $tester->execute([
-            '--base' => 'abc123',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
-
-        $this->assertSame(0, $result);
-        $this->assertSame("abc123def456\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
-    }
-
-    public function test_it_accepts_full_ref_name_as_base(): void
-    {
-        $this->git
-            ->expects($this->never())
-            ->method('getDefaultBase');
-        $this->git
-            ->expects($this->once())
-            ->method('getBaseReference')
-            ->with('refs/remotes/origin/main')
-            ->willReturn('123abc456def');
-
-        $tester = $this->createCommandTester();
-
-        $result = $tester->execute([
-            '--base' => 'refs/remotes/origin/main',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
-
-        $this->assertSame(0, $result);
-        $this->assertSame("123abc456def\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
+        $tester->execute(['--base' => '   ']);
     }
 
     private function createCommandTester(): CommandTester

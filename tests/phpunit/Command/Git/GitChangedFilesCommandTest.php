@@ -254,12 +254,7 @@ final class GitChangedFilesCommandTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a non-blank value for the option "--base".');
 
-        $tester->execute([
-            '--base' => '   ',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
-        ]);
+        $tester->execute(['--base' => '   ']);
     }
 
     public function test_it_rejects_blank_filter_option(): void
@@ -273,9 +268,6 @@ final class GitChangedFilesCommandTest extends TestCase
         $tester->execute([
             '--base' => 'origin/main',
             '--filter' => '   ',
-        ], [
-            'verbosity' => OutputInterface::VERBOSITY_VERBOSE,
-            'capture_stderr_separately' => true,
         ]);
     }
 

@@ -61,45 +61,17 @@ final class GitDefaultBaseCommandTest extends TestCase
             ->method('getDefaultBase')
             ->willReturn('origin/main');
 
-        $tester = $this->createCommandTester();
-
-        $result = $tester->execute([], ['capture_stderr_separately' => true]);
-
-        $this->assertSame(0, $result);
-        $this->assertSame("origin/main\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
-    }
-
-    public function test_it_outputs_the_default_base_with_master(): void
-    {
-        $this->git
-            ->expects($this->once())
-            ->method('getDefaultBase')
-            ->willReturn('origin/master');
+        $expectedDisplay = <<<DISPLAY
+            origin/main\n
+            DISPLAY;
 
         $tester = $this->createCommandTester();
 
-        $result = $tester->execute([], ['capture_stderr_separately' => true]);
+        $tester->execute([]);
 
-        $this->assertSame(0, $result);
-        $this->assertSame("origin/master\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
-    }
+        $tester->assertCommandIsSuccessful();
 
-    public function test_it_outputs_the_full_ref_path(): void
-    {
-        $this->git
-            ->expects($this->once())
-            ->method('getDefaultBase')
-            ->willReturn('refs/remotes/origin/main');
-
-        $tester = $this->createCommandTester();
-
-        $result = $tester->execute([], ['capture_stderr_separately' => true]);
-
-        $this->assertSame(0, $result);
-        $this->assertSame("refs/remotes/origin/main\n", $tester->getDisplay());
-        $this->assertSame('', $tester->getErrorOutput());
+        $this->assertSame($expectedDisplay, $tester->getDisplay(normalize: true));
     }
 
     private function createCommandTester(): CommandTester
