@@ -44,7 +44,10 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
 use Symfony\Component\Finder\SplFileInfo;
@@ -83,13 +86,12 @@ class FileMutationGenerator
         Assert::allIsInstanceOf($mutators, Mutator::class);
         Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
-        // If $onlyCovered, then for a non-covered source file we will
-        // get an empty trace. This is configured at the tracer level.
-        if (!$this->tracer->hasTrace($sourceFile)) {
+        $trace = $this->trace($sourceFile);
+
+        if ($onlyCovered && !$trace->hasTests()) {
             return;
         }
 
-        $trace = $this->tracer->trace($sourceFile);
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
@@ -114,5 +116,14 @@ class FileMutationGenerator
         $traverser->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();
+    }
+
+    private function trace(SplFileInfo $sourceFile): Trace
+    {
+        try {
+            return $this->tracer->trace($sourceFile);
+        } catch (NoTraceFound) {
+            return new EmptyTrace($sourceFile);
+        }
     }
 }

@@ -541,10 +541,10 @@ parameters:
 			path: ../tests/phpunit/MockedContainer.php
 
 		-
-			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects array\<Infection\\Mutator\\Mutator\<PhpParser\\Node\>\>, array\{Infection\\Mutator\\IgnoreMutator\<PhpParser\\Node\\Expr\\BinaryOp\\Plus\>\} given\.$#'
+			message: '#^Parameter \#3 \$mutators of method Infection\\Mutation\\FileMutationGenerator\:\:generate\(\) expects .* given\.$#'
 			identifier: argument.type
-			count: 4
-			path: ../tests/phpunit/Mutation/FileMutationGeneratorTest.php
+			count: 1
+			path: ../tests/phpunit/Mutation/FileMutationGenerator/FileMutationGeneratorIntegrationTest.php
 
 		-
 			message: '#^Parameter \#2 \$stmts of class PhpParser\\Node\\Stmt\\Namespace_ constructor expects array\<PhpParser\\Node\\Stmt\>\|null, array\<int, PhpParser\\Node\\Scalar\\Int_\> given\.$#'
@@ -829,18 +829,6 @@ parameters:
 			path: ../tests/phpunit/Reflection/CoreClassReflectionTest.php
 
 		-
-			message: '#^Parameter \#1 \$array of function array_values expects array\<T\>, iterable\<Symfony\\Component\\Finder\\SplFileInfo\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/BufferedSourceFileFilterTest.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>, array\<int, Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/JUnit/JUnitTestExecutionInfoAdderTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\TestFramework\\Coverage\\JUnit\\TestLocationBucketSorterTest\:\:quicksort\(\) has parameter \$uniqueTestLocations with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -899,24 +887,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/TestLocatorTest.php
-
-		-
-			message: '#^Cannot call method getSourceMethodRangeByMethod\(\) on Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
-
-		-
-			message: '#^Cannot call method getTestsLocationsBySourceLine\(\) on Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
-
-		-
-			message: '#^Parameter \#1 \$value of static method Infection\\Tests\\TestFramework\\Tracing\\Trace\\TestLocationsNormalizer\:\:normalize\(\) expects iterable\<Infection\\AbstractTestFramework\\Coverage\\TestLocation\|Infection\\TestFramework\\Tracing\\Trace\\TestLocations\>, array\<int, Infection\\TestFramework\\Tracing\\Trace\\TestLocations\|null\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/Coverage/XmlReport/XmlCoverageParserTest.php
 
 		-
 			message: '#InitialConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'

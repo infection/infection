@@ -41,8 +41,9 @@ use Closure;
 use function count;
 use function function_exists;
 use Infection\Container;
-use Infection\TestFramework\Coverage\CoveredTraceProvider;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\Tracer;
 use function iterator_to_array;
 use function max;
@@ -85,7 +86,7 @@ if (!function_exists('Infection\Benchmark\Tracing\collectSources')) {
     function collectSources(): array
     {
         // We need to use a fresh container instance, otherwise our lovely iterators are going to be consumed...
-        $traceProvider = createContainer()->get(CoveredTraceProvider::class);
+        $traceProvider = createContainer()->get(TraceProvider::class);
 
         return array_map(
             static fn (Trace $trace) => $trace->getSourceFileInfo(),
@@ -145,11 +146,12 @@ return static function (int $maxCount, float $percentage = 1.): Closure {
         $count = 0;
 
         foreach ($sourcesSubset as $source) {
-            if (!$tracer->hasTrace($source)) {
+            $trace = $tracer->trace($source);
+
+            if ($trace instanceof EmptyTrace) {
                 continue;
             }
 
-            $trace = $tracer->trace($source);
             fetchTraceLazyState($trace);
 
             ++$count;

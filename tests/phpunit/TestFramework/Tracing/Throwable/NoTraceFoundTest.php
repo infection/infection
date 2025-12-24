@@ -33,31 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage;
+namespace Infection\Tests\TestFramework\Tracing\Throwable;
 
-use Infection\TestFramework\Tracing\TraceProvider;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Leverages a decorated trace provider in order to provide the traces but fall-backs on the
- * original source files in order to ensure all the files are included.
- *
- * @internal
- */
-final readonly class UnionTraceProvider implements TraceProvider
+#[CoversClass(NoTraceFound::class)]
+final class NoTraceFoundTest extends TestCase
 {
-    public function __construct(
-        private TraceProvider $coveredTraceProvider,
-        private TraceProvider $uncoveredTraceProvider,
-        private bool $onlyCovered,
-    ) {
-    }
-
-    public function provideTraces(): iterable
+    public function test_it_can_be_created_for_a_file_not_found(): void
     {
-        yield from $this->coveredTraceProvider->provideTraces();
+        $expected = new NoTraceFound(
+            'Could not find any trace for file "/path/to/file.php".',
+        );
 
-        if ($this->onlyCovered === false) {
-            yield from $this->uncoveredTraceProvider->provideTraces();
-        }
+        $actual = NoTraceFound::forFile('/path/to/file.php');
+
+        $this->assertEquals($expected, $actual);
     }
 }
