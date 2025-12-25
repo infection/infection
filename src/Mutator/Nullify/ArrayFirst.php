@@ -54,12 +54,12 @@ final class ArrayFirst implements Mutator
     {
         return new Definition(
             <<<'TXT'
-                Replaces a function call `array_first()` with boolean `null`.
+                Replaces a function call `array_first()` with `null`.
                 TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                 To kill this mutant, provide different values for the array so that your tests check
-                both cases: when `array_first()` returns `null` and returns first value.
+                both cases: when `array_first()` returns `null` and when it returns the first value.
                 TXT,
             <<<'DIFF'
                 - $firstElement = array_first($array);

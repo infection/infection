@@ -54,12 +54,12 @@ final class ArrayLast implements Mutator
     {
         return new Definition(
             <<<'TXT'
-                Replaces a function call `array_last()` with boolean `null`.
+                Replaces a function call `array_last()` with `null`.
                 TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             <<<'TXT'
                 To kill this mutant, provide different values for the array so that your tests check
-                both cases: when `array_last()` returns `null` and returns last value.
+                both cases: when `array_last()` returns `null` and when it returns the last value.
                 TXT,
             <<<'DIFF'
                 - $lastElement = array_last($array);
