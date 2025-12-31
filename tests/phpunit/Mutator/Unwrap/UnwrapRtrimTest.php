@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapRtrimTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 <?php
 
                 $a = rtrim(' Good Afternoon! ');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 <?php
 
                 $a = rtrim(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \rtrim(' Good Afternoon! ');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -104,8 +101,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 if (rtrim($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -121,8 +117,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 <?php
 
                 $a = RtRiM(' Good Afternoon! ');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -135,8 +130,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 <?php
 
                 $a = rtrim($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -151,8 +145,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 $a = rtrim(array_reduce($words, function (string $carry, string $item) {
                     return $carry . substr($item, 0, 1);
                 }));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -187,8 +180,7 @@ final class UnwrapRtrimTest extends BaseMutatorTestCase
                 $a = 'rtrim';
 
                 $b = $a(' FooBar ');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

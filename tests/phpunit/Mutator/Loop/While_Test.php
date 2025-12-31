@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class While_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -63,14 +63,15 @@ final class While_Test extends BaseMutatorTestCase
                 while ($condition) {
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $condition = true;
+
                 while (false) {
                 }
+
                 PHP,
         ];
 
@@ -81,13 +82,13 @@ final class While_Test extends BaseMutatorTestCase
                 while (true) {
                 }
 
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 while (false) {
                 }
+
                 PHP,
         ];
 

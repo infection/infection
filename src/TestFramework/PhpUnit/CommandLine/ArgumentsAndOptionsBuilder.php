@@ -35,31 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\CommandLine;
 
-use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function count;
-use function end;
 use function explode;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use function is_numeric;
 use function ltrim;
-use function preg_quote;
-use function rtrim;
 use SplFileInfo;
 use function sprintf;
-use function version_compare;
 
 /**
  * @internal
  */
 final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    private const MAX_EXPLODE_PARTS = 2;
-
     /**
      * @param list<SplFileInfo> $filteredSourceFilesToMutate
      */
@@ -104,38 +96,15 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
         if ($this->executeOnlyCoveringTestCases && count($tests) > 0) {
-            $filterString = '/';
-            $usedTestCases = [];
+            $filter = $this->createFilterString(
+                $tests,
+                $testFrameworkVersion,
+            );
 
-            foreach ($tests as $testLocation) {
-                $testCaseString = $testLocation->getMethod();
-
-                $partsDelimitedByColons = explode('::', $testCaseString, self::MAX_EXPLODE_PARTS);
-
-                if (count($partsDelimitedByColons) > 1) {
-                    $methodNameWithDataProvider = $this->getMethodNameWithDataProvider($partsDelimitedByColons[1], $testFrameworkVersion);
-
-                    $testClassFullyQualifiedClassName = $partsDelimitedByColons[0];
-
-                    $parts = explode('\\', $testClassFullyQualifiedClassName);
-                    $classNameWithoutNamespace = end($parts);
-
-                    $testCaseString = sprintf('%s::%s', $classNameWithoutNamespace, $methodNameWithDataProvider);
-                }
-
-                if (array_key_exists($testCaseString, $usedTestCases)) {
-                    continue;
-                }
-
-                $usedTestCases[$testCaseString] = true;
-
-                $filterString .= preg_quote($testCaseString, '/') . '|';
+            if ($filter !== null) {
+                $options[] = '--filter';
+                $options[] = $filter;
             }
-
-            $filterString = rtrim($filterString, '|') . '/';
-
-            $options[] = '--filter';
-            $options[] = $filterString;
         }
 
         return $options;
@@ -169,30 +138,25 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         return $options;
     }
 
-    private function getMethodNameWithDataProvider(string $methodNameWithDataProvider, string $testFrameworkVersion): string
-    {
-        $methodNameWithDataProviderResult = $methodNameWithDataProvider;
+    /**
+     * @param non-empty-array<TestLocation> $tests
+     *
+     * @return non-empty-string
+     */
+    private function createFilterString(
+        array $tests,
+        string $testFrameworkVersion,
+    ): ?string {
+        $filters = FilterBuilder::createFilters($tests, $testFrameworkVersion);
 
-        /*
-         * in PHPUnit >=10 data providers with keys are stored as `Class\\test_method#some key` or `Class\\test_method#0`
-         * in PHPUnit <10 data providers with keys are stored as `Class\\test_method with data set "some key"` or `Class\\test_method with data set #0`
-         *
-         * we need to translate to the old format because this is what PHPUnit <10 and >=10 understands from CLI `--filter` option
-         */
-        if (version_compare($testFrameworkVersion, '10', '>=')) {
-            $methodNameParts = explode('#', $methodNameWithDataProviderResult, self::MAX_EXPLODE_PARTS);
-
-            if (count($methodNameParts) > 1) {
-                [$methodName, $dataProviderKey] = $methodNameParts;
-
-                if (!is_numeric($dataProviderKey)) {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set "%s"', $methodName, $dataProviderKey);
-                } else {
-                    $methodNameWithDataProviderResult = sprintf('%s with data set #%s', $methodName, $dataProviderKey);
-                }
-            }
-        }
-
-        return $methodNameWithDataProviderResult;
+        return count($filters) === 0
+            ? null
+            : sprintf(
+                '/%s/',
+                implode(
+                    '|',
+                    $filters,
+                ),
+            );
     }
 }

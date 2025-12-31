@@ -35,20 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger;
 
+use Infection\Framework\Str;
 use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutator\Loop\For_;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
 use const JSON_THROW_ON_ERROR;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\base64_decode;
 use function Safe\json_decode;
-use function str_replace;
 
 #[Group('integration')]
 #[CoversClass(GitLabCodeQualityLogger::class)]
@@ -72,6 +71,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         self::resetOriginalFilePrefix();
     }
 
+    /**
+     * @param array<int, array<string, string|array<int|string, array<string, int>|string>>> $expectedContents
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
@@ -97,7 +99,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'PregQuote',
                     'description' => 'Escaped Mutant for Mutator PregQuote',
-                    'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';"),
+                    'content' => Str::toSystemLineEndings(
+                        "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#1';",
+                    ),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -112,7 +116,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';"),
+                    'content' => Str::toSystemLineEndings(
+                        "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'escaped#0';",
+                    ),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -133,7 +139,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
                     'fingerprint' => 'a1b2c3',
                     'check_name' => 'For_',
                     'description' => 'Escaped Mutant for Mutator For_',
-                    'content' => str_replace("\n", PHP_EOL, "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';"),
+                    'content' => Str::toSystemLineEndings(
+                        "--- Original\n+++ New\n@@ @@\n\n- echo 'original';\n+ echo 'i?';",
+                    ),
                     'categories' => ['Escaped Mutant'],
                     'location' => [
                         'path' => 'foo/bar',
@@ -171,6 +179,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
     }
 
+    /**
+     * @param array<int, array<string, array<int|string, array<string, int>|string>|string>> $expectedJson
+     */
     private function assertLoggedContentIs(array $expectedJson, GitLabCodeQualityLogger $logger): void
     {
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));

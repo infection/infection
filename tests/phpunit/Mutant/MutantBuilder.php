@@ -37,12 +37,42 @@ namespace Infection\Tests\Mutant;
 
 use Infection\Mutant\Mutant;
 use Infection\Mutation\Mutation;
+use Infection\Tests\Mutation\MutationBuilder;
 use InvalidArgumentException;
+use Later\Interfaces\Deferred;
 use function Later\now;
 
 final class MutantBuilder
 {
-    public static function build(
+    /**
+     * @param Deferred<string> $mutatedCode
+     * @param Deferred<string> $diff
+     * @param Deferred<string> $prettyPrintedOriginalCode
+     */
+    private function __construct(
+        private string $mutantFilePath,
+        private Mutation $mutation,
+        private Deferred $mutatedCode,
+        private Deferred $diff,
+        private Deferred $prettyPrintedOriginalCode,
+    ) {
+    }
+
+    public static function from(Mutant $mutant): self
+    {
+        return new self(
+            $mutant->getFilePath(),
+            $mutant->getMutation(),
+            $mutant->getMutatedCode(),
+            $mutant->getDiff(),
+            $mutant->getPrettyPrintedOriginalCode(),
+        );
+    }
+
+    /**
+     * @deprecated use `::withMinimalTestData()` or `::withCompleteTestData()` instead
+     */
+    public static function materialize(
         string $mutantFilePath = '/path/to/mutant',
         ?Mutation $mutation = null,
         string $mutatedCode = 'mutated code',
@@ -53,6 +83,152 @@ final class MutantBuilder
             throw new InvalidArgumentException('Mutation cannot be null');
         }
 
-        return new Mutant($mutantFilePath, $mutation, now($mutatedCode), now($diff), now($prettyPrintedOriginalCode));
+        return self::withMinimalTestData()
+            ->withMutantFilePath($mutantFilePath)
+            ->withMutation($mutation)
+            ->withMutatedCode(now($mutatedCode))
+            ->withDiff(now($diff))
+            ->withPrettyPrintedOriginalCode(now($prettyPrintedOriginalCode))
+            ->build();
+    }
+
+    public static function withMinimalTestData(): self
+    {
+        return new self(
+            mutantFilePath: '/path/to/mutant',
+            mutation: MutationBuilder::withMinimalTestData()->build(),
+            mutatedCode: now(
+                <<<'PHP'
+                    <?php $a = 2;
+                    PHP,
+            ),
+            diff: now(
+                <<<'PHP'
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -$a = 1;
+                    +$a = 2;
+                    PHP,
+            ),
+            prettyPrintedOriginalCode: now(
+                <<<'PHP'
+                    <?php $a = 1;
+                    PHP,
+            ),
+        );
+    }
+
+    public static function withCompleteTestData(): self
+    {
+        return new self(
+            mutantFilePath: '/path/to/src/mutants/Foo_mutant_0.php',
+            mutation: MutationBuilder::withCompleteTestData()->build(),
+            mutatedCode: now(
+                <<<'PHP'
+                    <?php
+
+                    namespace Acme;
+
+                    class Foo
+                    {
+                        public function bar(): void
+                        {
+                            // Mutated: removed for loop
+                        }
+                    }
+
+                    PHP,
+            ),
+            diff: now(
+                <<<'PHP'
+                    --- Original
+                    +++ Mutated
+                    @@ @@
+                    -        for ($i = 0; $i < 10; $i++) {
+                    -            echo $i;
+                    -        }
+                    +        // Mutated: removed for loop
+                    PHP,
+            ),
+            prettyPrintedOriginalCode: now(
+                <<<'PHP'
+                    <?php
+
+                    namespace Acme;
+
+                    class Foo
+                    {
+                        public function bar(): void
+                        {
+                            for ($i = 0; $i < 10; $i++) {
+                                echo $i;
+                            }
+                        }
+                    }
+
+                    PHP,
+            ),
+        );
+    }
+
+    public function withMutantFilePath(string $mutantFilePath): self
+    {
+        $clone = clone $this;
+        $clone->mutantFilePath = $mutantFilePath;
+
+        return $clone;
+    }
+
+    public function withMutation(Mutation $mutation): self
+    {
+        $clone = clone $this;
+        $clone->mutation = $mutation;
+
+        return $clone;
+    }
+
+    /**
+     * @param Deferred<string> $mutatedCode
+     */
+    public function withMutatedCode(Deferred $mutatedCode): self
+    {
+        $clone = clone $this;
+        $clone->mutatedCode = $mutatedCode;
+
+        return $clone;
+    }
+
+    /**
+     * @param Deferred<string> $diff
+     */
+    public function withDiff(Deferred $diff): self
+    {
+        $clone = clone $this;
+        $clone->diff = $diff;
+
+        return $clone;
+    }
+
+    /**
+     * @param Deferred<string> $prettyPrintedOriginalCode
+     */
+    public function withPrettyPrintedOriginalCode(Deferred $prettyPrintedOriginalCode): self
+    {
+        $clone = clone $this;
+        $clone->prettyPrintedOriginalCode = $prettyPrintedOriginalCode;
+
+        return $clone;
+    }
+
+    public function build(): Mutant
+    {
+        return new Mutant(
+            $this->mutantFilePath,
+            $this->mutation,
+            $this->mutatedCode,
+            $this->diff,
+            $this->prettyPrintedOriginalCode,
+        );
     }
 }

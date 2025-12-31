@@ -35,29 +35,39 @@ declare(strict_types=1);
 
 namespace Infection\Configuration\Entry;
 
+use Symfony\Component\Filesystem\Path;
+
 /**
  * @internal
  */
-final class PhpStan
+final readonly class PhpStan
 {
     public function __construct(
-        private ?string $configDir,
-        private readonly ?string $customPath,
+        public ?string $configDir,
+        public ?string $customPath,
     ) {
     }
 
-    public function withConfigDir(string $dir): void
+    public function withAbsolutePaths(string $basePath): self
     {
-        $this->configDir = $dir;
+        $configDir = $this->configDir;
+        $customPath = $this->customPath;
+
+        $newConfigDir = $configDir === null
+            ? $basePath
+            : self::makeAbsolute($configDir, $basePath);
+
+        $newCustomPath = $customPath === null
+            ? null
+            : self::makeAbsolute($customPath, $basePath);
+
+        return new self($newConfigDir, $newCustomPath);
     }
 
-    public function getConfigDir(): ?string
+    private static function makeAbsolute(string $path, string $basePath): string
     {
-        return $this->configDir;
-    }
-
-    public function getCustomPath(): ?string
-    {
-        return $this->customPath;
+        return Path::isAbsolute($path)
+            ? $path
+            : Path::join($basePath, $path);
     }
 }

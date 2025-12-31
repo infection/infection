@@ -39,11 +39,10 @@ use function array_filter;
 use function array_flip;
 use function array_key_exists;
 use function array_map;
-use function class_exists;
 use function in_array;
+use Infection\Framework\ClassName;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\SourceTestClassNameScheme;
 use function is_executable;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
@@ -61,9 +60,6 @@ use function sprintf;
 #[CoversNothing]
 final class ProjectCodeTest extends TestCase
 {
-    /**
-     * @requires OSFAMILY Windows Cannot check if the file is executable on Windows
-     */
     public function test_infection_bin_is_executable(): void
     {
         $infectionFile = __DIR__ . '/../../../../bin/infection';
@@ -75,14 +71,16 @@ final class ProjectCodeTest extends TestCase
     #[DataProviderExternal(ProjectCodeProvider::class, 'concreteSourceClassesProvider')]
     public function test_all_concrete_classes_have_tests(string $className): void
     {
-        $testClassName = SourceTestClassNameScheme::getTestClassName($className);
+        $testClassName = ClassName::getCanonicalTestClassName($className);
 
-        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false) {
-            $this->assertTrue(
-                class_exists($testClassName, true),
+        if (in_array($className, ProjectCodeProvider::NON_TESTED_CONCRETE_CLASSES, true) === false
+            && in_array($className, ProjectCodeProvider::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION, true) === false
+        ) {
+            $this->assertNotNull(
+                $testClassName,
                 sprintf(
                     'Could not find the test "%s" for the class "%s". Please either add it'
-                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES',
+                    . ' or add it to %s::NON_TESTED_CONCRETE_CLASSES or ::CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION',
                     $testClassName,
                     $className,
                     ProjectCodeProvider::class,
@@ -92,8 +90,8 @@ final class ProjectCodeTest extends TestCase
             return;
         }
 
-        $this->assertFalse(
-            class_exists($testClassName, true),
+        $this->assertNull(
+            $testClassName,
             sprintf(
                 'The class "%s" has a test "%s". Please remove it from the list of non '
                 . 'tested concrete classes in %s::NON_TESTED_CONCRETE_CLASSES',
@@ -240,7 +238,8 @@ final class ProjectCodeTest extends TestCase
             ),
             array_filter(
                 $properties,
-                static fn (ReflectionProperty $property): bool => $property->class === $className,
+                static fn (ReflectionProperty $property): bool => $property->class === $className
+                    && !$property->isReadOnly(),
             ),
         );
 

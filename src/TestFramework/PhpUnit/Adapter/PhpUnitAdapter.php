@@ -92,12 +92,21 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         bool $skipCoverage,
     ): array {
         if ($skipCoverage === false) {
-            $extraOptions = trim(sprintf(
-                '%s --coverage-xml=%s --log-junit=%s',
-                $extraOptions,
-                $this->tmpDir . '/' . self::COVERAGE_DIR,
-                $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
-            ));
+            if (self::supportsExcludingSourceFromCoverage($this->getVersion())) {
+                $extraOptions = trim(sprintf(
+                    '%s --exclude-source-from-xml-coverage --coverage-xml=%s --log-junit=%s',
+                    $extraOptions,
+                    $this->tmpDir . '/' . self::COVERAGE_DIR,
+                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+                ));
+            } else {
+                $extraOptions = trim(sprintf(
+                    '%s --coverage-xml=%s --log-junit=%s',
+                    $extraOptions,
+                    $this->tmpDir . '/' . self::COVERAGE_DIR,
+                    $this->jUnitFilePath, // escapeshellarg() is done up the stack in ArgumentsAndOptionsBuilder
+                ));
+            }
 
             if ($this->pcovDirectoryProvider->shallProvide()) {
                 $phpExtraArgs[] = '-d';
@@ -156,7 +165,15 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
     {
         $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
 
-        if (version_compare($this->getVersion(), '7.2', '>=')) {
+        if (self::supportsExecutionOrderDefectsRandom($this->getVersion())) {
+            $recommendations = sprintf(
+                "%s\n\n%s\n\n%s",
+                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
+                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
+                'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
+                parent::getInitialTestsFailRecommendations($commandLine),
+            );
+        } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
                 "%s\n\n%s\n\n%s",
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
@@ -167,6 +184,23 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         }
 
         return $recommendations;
+    }
+
+    /**
+     * As of PHPUnit 12.5, the `--exclude-source-from-xml-coverage` is available which removes the `source` element from the XML report which contained the list of tokens of the source code file.
+     */
+    public static function supportsExcludingSourceFromCoverage(string $version): bool
+    {
+        return version_compare($version, '12.5', '>=');
+    }
+
+    public static function supportsExecutionOrderDefectsRandom(string $version): bool
+    {
+        return
+            version_compare($version, '10.5.48', '>=') && version_compare($version, '11.0', '<')
+            || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
+            || version_compare($version, '12.2.7', '>=')
+        ;
     }
 
     /**

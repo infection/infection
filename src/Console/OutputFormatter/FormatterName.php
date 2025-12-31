@@ -35,21 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
+use Infection\Framework\Enum\ImplodableEnum;
+
 /**
  * @internal
  */
-final class FormatterName
+enum FormatterName: string
 {
-    public const DOT = 'dot';
+    use ImplodableEnum;
 
-    public const PROGRESS = 'progress';
-
-    public const ALL = [
-        self::DOT,
-        self::PROGRESS,
-    ];
-
-    private function __construct()
-    {
-    }
+    case DOT = 'dot';
+    case PROGRESS = 'progress';
 }

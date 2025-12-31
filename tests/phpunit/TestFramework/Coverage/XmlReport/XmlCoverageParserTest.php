@@ -37,10 +37,10 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\XPathFactory;
+use Infection\TestFramework\SafeDOMXPath;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use Infection\Tests\TestFramework\Coverage\TestLocationsNormalizer;
+use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -172,12 +172,9 @@ final class XmlCoverageParserTest extends TestCase
         }
     }
 
-    /**
-     * @return SourceFileInfoProvider|MockObject
-     */
-    private function createSourceFileInfoProvider(string $xml)
+    private function createSourceFileInfoProvider(string $xml): SourceFileInfoProvider&MockObject
     {
-        $xPath = XPathFactory::createXPath($xml);
+        $xPath = SafeDOMXPath::fromString($xml, 'p');
 
         $providerMock = $this->createMock(SourceFileInfoProvider::class);
 

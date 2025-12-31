@@ -1,0 +1,20 @@
+{
+    "$schema": "../../../resources/schema.json",
+    "timeout": 25,
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "ToExclude"
+        ]
+    },
+    "logs": {
+        "summary": "infection.log"
+    },
+    "mutators": {
+        "PublicVisibility": true,
+        "Plus": true
+    },
+    "tmpDir": "."
+}

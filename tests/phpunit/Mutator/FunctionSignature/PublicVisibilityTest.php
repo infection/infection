@@ -54,27 +54,34 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
         $this->assertMutatesInput($code);
     }
 
-    public static function blacklistedProvider(): array
+    public static function blacklistedProvider(): iterable
     {
-        return [
-            ['__construct'],
-            ['__invoke'],
-            ['__call', '$n, $v'],
-            ['__callStatic', '$n, $v', 'static '],
-            ['__get', '$n'],
-            ['__set', '$n, $v'],
-            ['__isset', '$n'],
-            ['__unset', '$n'],
-            ['__toString'],
-            ['__debugInfo'],
-        ];
+        yield ['__construct'];
+
+        yield ['__invoke'];
+
+        yield ['__call'];
+
+        yield ['__callStatic'];
+
+        yield ['__get'];
+
+        yield ['__set'];
+
+        yield ['__isset'];
+
+        yield ['__unset'];
+
+        yield ['__toString'];
+
+        yield ['__debugInfo'];
     }
 
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -96,6 +103,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
+
                 PHP,
         ];
 
@@ -126,7 +134,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 abstract class Test
                 {
-                    protected function foo(int $param, $test = 1): bool
+                    protected function foo(int $param, $test = 1) : bool
                     {
                         echo 1;
                         return false;
@@ -162,9 +170,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class Test
                 {
-                    protected function foo()
-                    {
-                    }
+                    protected function foo() {}
                 }
                 PHP,
         ];
@@ -208,8 +214,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                     {
                     }
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'it does not mutate if grandparent class has same public method' => [
@@ -221,18 +226,16 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 class GrandParent
                 {
-                    protected function foo()
-                    {
-                    }
+                    protected function foo() {}
                 }
+
                 class SameParent extends GrandParent
                 {
                 }
+
                 class Child extends SameParent
                 {
-                    public function foo()
-                    {
-                    }
+                    public function foo() {}
                 }
                 PHP,
         ];
@@ -246,7 +249,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 abstract class NonSameAbstract
                 {
-                    abstract public function foo();
+                    public abstract function foo();
                 }
                 class Child extends NonSameAbstract
                 {
@@ -257,6 +260,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                     {
                     }
                 }
+
                 PHP,
         ];
 
@@ -300,7 +304,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
 
                 abstract class SameAbstract
                 {
-                    abstract protected function foo();
+                    protected abstract function foo();
                 }
                 class Child extends SameAbstract
                 {
@@ -308,6 +312,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                     {
                     }
                 }
+
                 PHP,
         ];
 
@@ -327,18 +332,19 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
             <<<'PHP'
                 <?php
 
-                $var = ['class' => new class
-                {
-                    protected function foo(): bool
-                    {
-                        return true;
-                    }
-                }];
+                $var = [
+                    'class' => new class() {
+                        protected function foo(): bool
+                        {
+                            return true;
+                        }
+                    },
+                ];
                 PHP,
         ];
 
         yield 'It does not remove attributes' => [
-            <<<'PHP'
+            <<<'PHP_WRAP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
@@ -353,8 +359,8 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP,
-            <<<'PHP'
+                PHP_WRAP,
+            <<<'PHP_WRAP'
                 <?php
 
                 namespace PublicVisibilityOneClass;
@@ -369,7 +375,7 @@ final class PublicVisibilityTest extends BaseMutatorTestCase
                         return false;
                     }
                 }
-                PHP,
+                PHP_WRAP,
         ];
     }
 }

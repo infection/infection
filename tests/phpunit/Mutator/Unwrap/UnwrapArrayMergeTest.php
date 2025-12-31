@@ -47,7 +47,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
      * @param string|string[] $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,21 +59,18 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -82,21 +79,18 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge(\Class_With_Const::Const, ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -105,21 +99,18 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_merge(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -131,8 +122,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 if (array_merge($a, ['D']) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -141,8 +131,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                     if ($a === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -150,8 +139,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                     if (['D'] === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -160,21 +148,18 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_MeRgE(['A', 1, 'C'], ['D']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -183,21 +168,18 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge($foo->bar(), $foo->baz());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->baz();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -206,15 +188,13 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_merge(['A', 1, 'C'], ['D']));
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['A', 1, 'C']);
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -228,8 +208,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge(['A', 1, 'C']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -242,21 +221,18 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge(['A', 1, 'C'], ['D'], ['E', 'F']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['A', 1, 'C'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['D'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -290,8 +266,7 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 $a = 'array_merge';
 
                 $b = $a([1,2,3], [3,4,5]);
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate when the input array is unpacked' => [
@@ -299,25 +274,25 @@ final class UnwrapArrayMergeTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_merge(...$classes);
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does mutate the elements that are not unpacked' => [
             <<<'PHP'
                 <?php
+
                 $first = [1, 2, 3, 4, 5];
                 $other = [[6, 7], [8]];
 
                 $result = array_merge($first, ...$other);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $first = [1, 2, 3, 4, 5];
                     $other = [[6, 7], [8]];
+
                     $result = $first;
                     PHP,
             ],

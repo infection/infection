@@ -47,7 +47,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
      * @param string|string[] $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,21 +59,18 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -82,21 +79,18 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_intersect_key(\Class_With_Const::Const, ['bar' => 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = \Class_With_Const::Const;
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -105,21 +99,18 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -131,8 +122,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 if (array_intersect_key($a, ['bar' => 'baz']) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -141,8 +131,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                     if ($a === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -150,8 +139,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                     if (['bar' => 'baz'] === $a) {
                         return true;
                     }
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -160,21 +148,18 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_InTeRsEcT_kEy(['foo' => 'bar'], ['bar' => 'baz']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -183,21 +168,18 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_intersect_key($foo->bar(), $foo->baz());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = $foo->bar();
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = $foo->baz();
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -206,15 +188,13 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_intersect_key(['foo' => 'bar'], ['bar' => 'baz']));
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = array_map('strtolower', ['foo' => 'bar']);
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -228,8 +208,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_intersect_key(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -242,21 +221,18 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_intersect_key(['foo' => 'bar'], ['bar' => 'baz'], ['E', 'F']);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $a = ['foo' => 'bar'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
                     $a = ['bar' => 'baz'];
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -290,8 +266,7 @@ final class UnwrapArrayIntersectKeyTest extends BaseMutatorTestCase
                 $a = 'array_intersect_key';
 
                 $b = $a([1,2,3], [3,4,5]);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

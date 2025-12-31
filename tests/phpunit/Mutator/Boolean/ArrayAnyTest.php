@@ -45,10 +45,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class ArrayAnyTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -60,14 +60,12 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 <?php
 
                 $anyPositive = array_any($numbers, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $anyPositive = true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates correctly when provided with an array' => [
@@ -75,8 +73,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 <?php
 
                 $anyPositive = array_any(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -89,8 +86,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 <?php
 
                 $anyPositive = array_any(\Class_With_Const::Const, fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -103,8 +99,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 <?php
 
                 $anyPositive = \array_any(['A', 1, 'C'], fn ($number) => $number > 0);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -137,8 +132,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 if (array_any(['A', 1, 'C'], fn ($number) => $number > 0)) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +147,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = arRay_aNy(['A', 1, 'C'], 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +160,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_any($foo->bar(), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -183,8 +175,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 $a = array_any(array_filter(['A', 1, 'C'], function($char): bool {
                     return !is_int($char);
                 }), 'is_int');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -199,8 +190,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                 $a = 'array_any';
 
                 $b = $a([1, 2, 3], 'is_int');
-                PHP
-            ,
+                PHP,
         ];
 
         if (PHP_VERSION_ID >= 80400) {
@@ -218,8 +208,7 @@ final class ArrayAnyTest extends BaseMutatorTestCase
 
                         public bool $anyPositive { get => array_any(fn (int $number) => $number > 0); }
                     };
-                    PHP
-                ,
+                    PHP,
                 <<<'PHP'
                     <?php
 
@@ -230,9 +219,8 @@ final class ArrayAnyTest extends BaseMutatorTestCase
                         {
                             $this->numbers = $numbers;
                         }
-                        public bool $anyPositive {
-                            get => true;
-                        }
+
+                        public bool $anyPositive { get => true; }
                     };
                     PHP,
             ];

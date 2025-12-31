@@ -46,8 +46,7 @@ class __Name__ implements Mutator
         return new Definition(
             <<<'TXT'
                 TODO: add description of this mutator here
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'

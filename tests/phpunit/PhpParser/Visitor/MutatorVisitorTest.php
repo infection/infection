@@ -42,9 +42,11 @@ use Infection\PhpParser\Visitor\MutatorVisitor;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Testing\StringNormalizer;
+use LogicException;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Nop;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -63,20 +65,23 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
         string $expectedCodeOutput,
         Mutation $mutation,
     ): void {
-        $this->traverse(
+        $updatedNodes = $this->traverse(
             $nodes,
-            [new MutatorVisitor($mutation)],
+            [
+                new CloningVisitor(),
+                new MutatorVisitor($mutation),
+            ],
         );
 
-        $output = SingletonContainer::getPrinter()->prettyPrintFile($nodes);
+        $output = SingletonContainer::getPrinter()->print($updatedNodes, $mutation);
 
         $this->assertSame($expectedCodeOutput, StringNormalizer::normalizeString($output));
     }
 
     public static function providesMutationCases(): iterable
     {
-        yield 'it mutates the correct node' => (static fn (): iterable => [
-            $nodes = self::parseCode(<<<'PHP'
+        yield 'it mutates the correct node' => (static function (): iterable {
+            $code = <<<'PHP'
                 <?php
 
                 class Test
@@ -90,43 +95,49 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                         return 'bye';
                     }
                 }
-                PHP
-            ),
-            <<<'PHP'
-                <?php
+                PHP;
 
-                class Test
-                {
-                    public function hello(): string
-                    {
-                        return 'hello';
-                    }
+            [$nodes, $tokens] = self::parseCode($code);
 
-                }
-                PHP
-            ,
-            new Mutation(
-                'path/to/file',
+            return [
                 $nodes,
-                PublicVisibility::class,
-                MutatorName::getName(PublicVisibility::class),
-                [
-                    'startTokenPos' => 28,
-                    'endTokenPos' => 46,
-                    'startLine' => -1,
-                    'endLine' => -1,
-                    'startFilePos' => -1,
-                    'endFilePos' => -1,
-                ],
-                ClassMethod::class,
-                MutatedNode::wrap(new Nop()),
-                0,
-                [],
-            ),
-        ])();
+                <<<'PHP'
+                    <?php
 
-        yield 'it can mutate the node with multiple-ones' => (static fn (): iterable => [
-            $nodes = self::parseCode(<<<'PHP'
+                    class Test
+                    {
+                        public function hello(): string
+                        {
+                            return 'hello';
+                        }
+
+                    }
+                    PHP,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    PublicVisibility::class,
+                    MutatorName::getName(PublicVisibility::class),
+                    [
+                        'startTokenPos' => 28,
+                        'endTokenPos' => 46,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
+                    ],
+                    ClassMethod::class,
+                    MutatedNode::wrap(new Nop()),
+                    0,
+                    [],
+                    $tokens,
+                    $code,
+                ),
+            ];
+        })();
+
+        yield 'it can mutate the node with multiple-ones' => (static function (): iterable {
+            $code = <<<'PHP'
                 <?php
 
                 class Test
@@ -140,44 +151,50 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                         return 'bye';
                     }
                 }
-                PHP
-            ),
-            <<<'PHP'
-                <?php
+                PHP;
 
-                class Test
-                {
-                    public function hello(): string
-                    {
-                        return 'hello';
-                    }
+            [$nodes, $tokens] = self::parseCode($code);
 
-
-                }
-                PHP
-            ,
-            new Mutation(
-                'path/to/file',
+            return [
                 $nodes,
-                PublicVisibility::class,
-                MutatorName::getName(PublicVisibility::class),
-                [
-                    'startTokenPos' => 28,
-                    'endTokenPos' => 46,
-                    'startLine' => -1,
-                    'endLine' => -1,
-                    'startFilePos' => -1,
-                    'endFilePos' => -1,
-                ],
-                ClassMethod::class,
-                MutatedNode::wrap([new Nop(), new Nop()]),
-                0,
-                [],
-            ),
-        ])();
+                <<<'PHP'
+                    <?php
 
-        yield 'it does not mutate if only one of start or end position is correctly set' => (static fn (): iterable => [
-            $nodes = self::parseCode(<<<'PHP'
+                    class Test
+                    {
+                        public function hello(): string
+                        {
+                            return 'hello';
+                        }
+
+
+                    }
+                    PHP,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    PublicVisibility::class,
+                    MutatorName::getName(PublicVisibility::class),
+                    [
+                        'startTokenPos' => 28,
+                        'endTokenPos' => 46,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
+                    ],
+                    ClassMethod::class,
+                    MutatedNode::wrap([new Nop(), new Nop()]),
+                    0,
+                    [],
+                    $tokens,
+                    $code,
+                ),
+            ];
+        })();
+
+        yield 'it does not mutate if only one of start or end position is correctly set' => (static function (): iterable {
+            $code = <<<'PHP'
                 <?php
 
                 class Test
@@ -191,43 +208,49 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                         return 'bye';
                     }
                 }
-                PHP
-            ),
-            <<<'PHP'
-                <?php
+                PHP;
 
-                class Test
-                {
-                    public function hello(): string
-                    {
-                        return 'hello';
-                    }
-                    public function bye(): string
-                    {
-                        return 'bye';
-                    }
-                }
-                PHP
-            ,
-            new Mutation(
-                'path/to/file',
+            [$nodes, $tokens] = self::parseCode($code);
+
+            return [
                 $nodes,
-                PublicVisibility::class,
-                MutatorName::getName(PublicVisibility::class),
-                [
-                    'startTokenPos' => 29,
-                    'endTokenPos' => 50,
-                    'startLine' => -1,
-                    'endLine' => -1,
-                    'startFilePos' => -1,
-                    'endFilePos' => -1,
-                ],
-                ClassMethod::class,
-                MutatedNode::wrap(new Nop()),
-                0,
-                [],
-            ),
-        ])();
+                <<<'PHP'
+                    <?php
+
+                    class Test
+                    {
+                        public function hello(): string
+                        {
+                            return 'hello';
+                        }
+                        public function bye(): string
+                        {
+                            return 'bye';
+                        }
+                    }
+                    PHP,
+                new Mutation(
+                    'path/to/file',
+                    $nodes,
+                    PublicVisibility::class,
+                    MutatorName::getName(PublicVisibility::class),
+                    [
+                        'startTokenPos' => 29,
+                        'endTokenPos' => 50,
+                        'startLine' => -1,
+                        'endLine' => -1,
+                        'startFilePos' => -1,
+                        'endFilePos' => -1,
+                    ],
+                    ClassMethod::class,
+                    MutatedNode::wrap(new Nop()),
+                    0,
+                    [],
+                    $tokens,
+                    $code,
+                ),
+            ];
+        })();
 
         yield 'it does not mutate if the parser does not contain startTokenPos' => (static function (): iterable {
             $badParser = (new ParserFactory())->createForNewestSupportedVersion();
@@ -248,7 +271,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                         }
                     }
                     PHP
-                ),
+                ) ?? throw new LogicException(),
                 <<<'PHP'
                     <?php
 
@@ -263,8 +286,7 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                             return 'bye';
                         }
                     }
-                    PHP
-                ,
+                    PHP,
                 new Mutation(
                     'path/to/file',
                     $nodes,
@@ -282,6 +304,8 @@ final class MutatorVisitorTest extends BaseVisitorTestCase
                     MutatedNode::wrap(new Nop()),
                     0,
                     [],
+                    $badParser->getTokens(),
+                    '',
                 ),
             ];
         })();

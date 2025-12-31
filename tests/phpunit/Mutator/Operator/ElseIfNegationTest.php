@@ -47,7 +47,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
      * @param string|string[] $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -65,8 +65,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 } else {
                     return 3;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +86,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif ($array[0]) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -107,8 +105,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif ($foo) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -127,8 +124,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif ($this->foo()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -147,8 +143,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif (self::foo()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -167,8 +162,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif (self::FOO) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -187,8 +181,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif ($foo()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -207,8 +200,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif (($this->foo)()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -227,8 +219,7 @@ final class ElseIfNegationTest extends BaseMutatorTestCase
                 if (true) {
                 } elseif (a()) {
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

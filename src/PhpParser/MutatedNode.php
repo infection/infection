@@ -36,29 +36,22 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use function is_array;
-use function is_int;
 use PhpParser\Node;
 use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final class MutatedNode
+final readonly class MutatedNode
 {
-    private $value;
-
     /**
      * @param int|Node|Node[] $value
      */
-    private function __construct($value)
+    private function __construct(private int|Node|array $value)
     {
         if (is_array($value)) {
             Assert::allIsInstanceOf($value, Node::class);
-        } elseif (!is_int($value)) {
-            Assert::isInstanceOf($value, Node::class);
         }
-
-        $this->value = $value;
     }
 
     /**

@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis;
 
-use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\StaticAnalysisToolExecutableFinder;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -49,11 +49,9 @@ final class StaticAnalysisToolFactoryTest extends TestCase
     public function test_it_throws_an_exception_if_it_cant_find_sa_tool(): void
     {
         $factory = new StaticAnalysisToolFactory(
-            $this->createMock(Configuration::class),
-            '/project',
+            ConfigurationBuilder::withMinimalTestData()->build(),
             $this->createMock(StaticAnalysisToolExecutableFinder::class),
             $this->createMock(StaticAnalysisConfigLocator::class),
-            [],
         );
 
         $this->expectException(InvalidArgumentException::class);

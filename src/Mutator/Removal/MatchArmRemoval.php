@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Mutator\Removal;
 
+use function array_keys;
 use function array_values;
 use function count;
 use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -120,14 +122,15 @@ final class MatchArmRemoval implements Mutator
             $armConds = $arm->conds ?? [];
 
             if (count($armConds) > 1) {
-                foreach ($armConds as $j => $cond) {
+                foreach (array_keys($armConds) as $j) {
                     $conds = $armConds;
 
+                    /** @psalm-suppress InvalidArrayOffset */
                     unset($conds[$j]);
 
-                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, $node->getAttributes());
+                    $arms[$i] = new Node\MatchArm(array_values($conds), $arm->body, NodeAttributes::getAllExceptOriginalNode($node));
 
-                    yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
+                    yield new Node\Expr\Match_($node->cond, $arms, NodeAttributes::getAllExceptOriginalNode($node));
                 }
 
                 continue;
@@ -135,7 +138,7 @@ final class MatchArmRemoval implements Mutator
 
             unset($arms[$i]);
 
-            yield new Node\Expr\Match_($node->cond, $arms, $node->getAttributes());
+            yield new Node\Expr\Match_($node->cond, $arms, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 }

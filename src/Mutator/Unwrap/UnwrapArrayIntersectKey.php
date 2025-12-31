@@ -67,8 +67,7 @@ final class UnwrapArrayIntersectKey extends AbstractFunctionUnwrapMutator
                 $x = $array2;
                 ```
 
-                TXT
-            ,
+                TXT,
             MutatorCategory::SEMANTIC_REDUCTION,
             null,
             <<<'DIFF'

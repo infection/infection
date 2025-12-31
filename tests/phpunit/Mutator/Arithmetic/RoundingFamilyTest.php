@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class RoundingFamilyTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
                 <?php
 
                 $var = round(1.23);
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -149,8 +148,7 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
                 <?php
 
                 $var = round(1.23, 2, PHP_ROUND_HALF_UP);
-                PHP_WRAP
-            ,
+                PHP_WRAP,
             [
                 <<<'PHP'
                     <?php
@@ -223,8 +221,7 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
                 <?php
 
                 echo ceil($result = $this->average());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

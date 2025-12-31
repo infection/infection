@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -55,8 +56,7 @@ final class ShiftLeft implements Mutator
         return new Definition(
             <<<'TXT'
                 Replaces a bitwise shift left operator (`<<`) with a bitwise shift right operator (`>>`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -73,7 +73,7 @@ final class ShiftLeft implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BinaryOp\ShiftRight($node->left, $node->right, $node->getAttributes());
+        yield new Node\Expr\BinaryOp\ShiftRight($node->left, $node->right, NodeAttributes::getAllExceptOriginalNode($node));
     }
 
     public function canMutate(Node $node): bool

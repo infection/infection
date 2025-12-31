@@ -40,8 +40,8 @@ use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
-use function Infection\Tests\generator_to_phpunit_data_provider;
 use Infection\Tests\Mutator\ProfileListProvider;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use function Safe\class_implements;
@@ -60,12 +60,12 @@ final class MutatorProvider
     /**
      * @var string[]|null
      */
-    private static $mutatorClasses;
+    private static ?array $mutatorClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $concreteMutatorClasses;
+    private static ?array $concreteMutatorClasses = null;
 
     /**
      * @var string[]|null
@@ -112,16 +112,16 @@ final class MutatorProvider
 
     public static function mutatorClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideMutatorClasses());
+        yield from DataProviderFactory::fromIterable(self::provideMutatorClasses());
     }
 
     public static function concreteMutatorClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideConcreteMutatorClasses());
+        yield from DataProviderFactory::fromIterable(self::provideConcreteMutatorClasses());
     }
 
     public static function configurableMutatorClassesProvider(): iterable
     {
-        yield from generator_to_phpunit_data_provider(self::provideConfigurableMutatorClasses());
+        yield from DataProviderFactory::fromIterable(self::provideConfigurableMutatorClasses());
     }
 }

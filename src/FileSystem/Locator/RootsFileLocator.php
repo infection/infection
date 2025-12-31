@@ -45,21 +45,16 @@ use Webmozart\Assert\Assert;
 /**
  * @internal
  */
-final class RootsFileLocator implements Locator
+final readonly class RootsFileLocator implements Locator
 {
-    /** @var string[] */
-    private readonly array $roots;
-
     /**
      * @param string[] $roots
      */
     public function __construct(
-        array $roots,
-        private readonly Filesystem $filesystem,
+        private array $roots,
+        private Filesystem $filesystem,
     ) {
         Assert::allString($roots);
-
-        $this->roots = $roots;
     }
 
     public function locate(string $fileName): string
@@ -99,7 +94,9 @@ final class RootsFileLocator implements Locator
     }
 
     /**
-     * @param string[] $fileNames
+     * @param non-empty-string[] $fileNames
+     *
+     * @return non-empty-string|null
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {

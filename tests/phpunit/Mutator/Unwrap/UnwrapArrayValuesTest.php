@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayValuesTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_values(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_values(\Class_With_Const::Const);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_values(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 if (array_values($a) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_VaLuEs(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_values($foo->bar());
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_values(['foo' => 'bar']));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -183,8 +176,7 @@ final class UnwrapArrayValuesTest extends BaseMutatorTestCase
                 $a = 'array_values';
 
                 $b = $a(['foo' => 'bar']);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

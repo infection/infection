@@ -49,7 +49,6 @@ use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use function iterator_to_array;
 use LogicException;
 use function sprintf;
 use function str_pad;
@@ -82,7 +81,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly DiffColorizer $diffColorizer,
         private readonly FederatedLogger $mutationTestingResultsLogger,
         private readonly ?int $numberOfShownMutations,
-        private readonly bool $showMutationScoreIndicator,
+        private readonly bool $withUncovered,
     ) {
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
@@ -108,7 +107,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         if ($this->numberOfMutationsBudget !== 0) {
             $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');
 
-            if ($this->output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+            if ($this->withUncovered) {
                 $this->showMutations($this->resultsCollector->getNotCoveredExecutionResults(), 'Not covered');
             }
         }
@@ -229,7 +228,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
         $this->output->writeln(['', 'Metrics:']);
 
-        if ($this->showMutationScoreIndicator) {
+        if ($this->withUncovered) {
             $this->output->writeln(
                 $this->addIndentation("Mutation Score Indicator (MSI): <{$msiTag}>{$mutationScoreIndicator}%</{$msiTag}>"),
             );
@@ -246,18 +245,20 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     private function showGeneratedLogFiles(): void
     {
-        /** @var FileLogger[] $fileLoggers */
-        $fileLoggers = iterator_to_array($this->getFileLoggers($this->mutationTestingResultsLogger->getLoggers()));
+        $hasLoggers = false;
 
-        if ($fileLoggers !== []) {
-            $this->output->writeln(['', 'Generated Reports:']);
-
-            foreach ($fileLoggers as $fileLogger) {
-                $this->output->writeln(
-                    $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
-                );
+        /** @var FileLogger $fileLogger */
+        foreach ($this->getFileLoggers($this->mutationTestingResultsLogger->loggers) as $fileLogger) {
+            if (!$hasLoggers) {
+                $this->output->writeln(['', 'Generated Reports:']);
             }
+            $this->output->writeln(
+                $this->addIndentation(sprintf('- %s', $fileLogger->getFilePath())),
+            );
+            $hasLoggers = true;
+        }
 
+        if ($hasLoggers) {
             return;
         }
 
@@ -276,7 +277,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         foreach ($allLoggers as $logger) {
             if ($logger instanceof FederatedLogger) {
-                yield from $this->getFileLoggers($logger->getLoggers());
+                yield from $this->getFileLoggers($logger->loggers);
             } elseif ($logger instanceof FileLogger && !str_starts_with($logger->getFilePath(), 'php://')) {
                 yield $logger;
             }

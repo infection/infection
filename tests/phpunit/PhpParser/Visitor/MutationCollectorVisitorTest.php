@@ -74,7 +74,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         $visitor = new MutagenesisVisitor($nodeMutationGeneratorMock);
 
         $this->traverse(
-            self::parseCode(self::CODE),
+            self::parseCode(self::CODE)[0],
             [$visitor],
         );
 
@@ -113,7 +113,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         $visitor = new MutagenesisVisitor($nodeMutationGeneratorMock);
 
         $this->traverse(
-            self::parseCode(self::CODE),
+            self::parseCode(self::CODE)[0],
             [$visitor],
         );
 
@@ -128,7 +128,7 @@ final class MutationCollectorVisitorTest extends BaseVisitorTestCase
         );
 
         $this->traverse(
-            self::parseCode(self::CODE),
+            self::parseCode(self::CODE)[0],
             [$visitor],
         );
 

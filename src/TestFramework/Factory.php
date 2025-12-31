@@ -40,7 +40,7 @@ use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\AbstractTestFramework\TestFrameworkAdapterFactory;
 use Infection\Configuration\Configuration;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileFilter;
+use Infection\Source\Collector\SourceCollector;
 use Infection\TestFramework\Config\TestFrameworkConfigLocatorInterface;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapterFactory;
 use InvalidArgumentException;
@@ -65,33 +65,31 @@ final readonly class Factory
         private TestFrameworkFinder $testFrameworkFinder,
         private string $jUnitFilePath,
         private Configuration $infectionConfig,
-        private SourceFileFilter $sourceFileFilter,
+        private SourceCollector $sourceCollector,
         private array $installedExtensions,
     ) {
     }
 
     public function create(string $adapterName, bool $skipCoverage): TestFrameworkAdapter
     {
-        $filteredSourceFilesToMutate = $this->getFilteredSourceFilesToMutate();
-
         if ($adapterName === TestFrameworkTypes::PHPUNIT) {
             $phpUnitConfigPath = $this->configLocator->locate(TestFrameworkTypes::PHPUNIT);
 
             return PhpUnitAdapterFactory::create(
                 $this->testFrameworkFinder->find(
                     TestFrameworkTypes::PHPUNIT,
-                    (string) $this->infectionConfig->getPhpUnit()->getCustomPath(),
+                    (string) $this->infectionConfig->phpUnit->customPath,
                 ),
                 $this->tmpDir,
                 $phpUnitConfigPath,
-                (string) $this->infectionConfig->getPhpUnit()->getConfigDir(),
+                (string) $this->infectionConfig->phpUnit->configDir,
                 $this->jUnitFilePath,
                 $this->projectDir,
-                $this->infectionConfig->getSourceDirectories(),
+                $this->infectionConfig->source->directories,
                 $skipCoverage,
-                $this->infectionConfig->getExecuteOnlyCoveringTestCases(),
-                $filteredSourceFilesToMutate,
-                $this->infectionConfig->getMapSourceClassToTestStrategy(),
+                $this->infectionConfig->executeOnlyCoveringTestCases,
+                $this->getFilteredSourceFilesToMutate(),
+                $this->infectionConfig->mapSourceClassToTestStrategy,
             );
         }
 
@@ -109,6 +107,8 @@ final readonly class Factory
             $availableTestFrameworks[] = $factory::getAdapterName();
 
             if ($adapterName === $factory::getAdapterName()) {
+                $configuration = $this->infectionConfig;
+
                 return $factory::create(
                     $this->testFrameworkFinder->find($factory::getExecutableName()),
                     $this->tmpDir,
@@ -116,7 +116,7 @@ final readonly class Factory
                     null,
                     $this->jUnitFilePath,
                     $this->projectDir,
-                    $this->infectionConfig->getSourceDirectories(),
+                    $configuration->source->directories,
                     $skipCoverage,
                 );
             }
@@ -136,12 +136,20 @@ final readonly class Factory
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        if ($this->sourceFileFilter->getFilters() === []) {
+        // TODO: this looks incorrect to me... But it is what it is right now.
+        if (!$this->sourceCollector->isFiltered()) {
             return [];
         }
 
-        /** @var list<SplFileInfo> $files */
-        $files = iterator_to_array($this->sourceFileFilter->filter($this->infectionConfig->getSourceFiles()));
+        /**
+         * TODO: fix this warning, it is legit...
+         * @var list<SplFileInfo> $files
+         * @psalm-suppress InvalidArgument
+         * @phpstan-ignore varTag.type
+         */
+        $files = iterator_to_array(
+            $this->sourceCollector->collect(),
+        );
 
         return $files;
     }

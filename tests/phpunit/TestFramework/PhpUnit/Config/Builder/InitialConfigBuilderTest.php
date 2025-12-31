@@ -44,17 +44,16 @@ use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
 use Infection\Tests\FileSystem\FileSystemTestCase;
-use function Infection\Tests\normalizePath as p;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_get_contents;
-use function Safe\realpath;
 use function Safe\simplexml_load_string;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(InitialConfigBuilder::class)]
@@ -62,21 +61,15 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
 
-    /**
-     * @var string
-     */
-    private $projectPath;
+    private string $projectPath;
 
-    /**
-     * @var InitialConfigBuilder
-     */
-    private $builder;
+    private InitialConfigBuilder $builder;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->projectPath = p(realpath(self::FIXTURES . '/project-path'));
+        $this->projectPath = Path::canonicalize(self::FIXTURES . '/project-path');
 
         $this->builder = $this->createConfigBuilder();
     }
@@ -164,7 +157,10 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         $this->assertInstanceOf(DOMNodeList::class, $directories);
 
         $this->assertSame(1, $directories->length);
-        $this->assertSame($this->projectPath . '/*Bundle', p($directories[0]->nodeValue));
+        $this->assertSame(
+            $this->projectPath . '/*Bundle',
+            Path::normalize($directories[0]->nodeValue),
+        );
     }
 
     public function test_it_sets_stops_on_failure(): void
@@ -207,7 +203,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
     {
         $xml = file_get_contents($this->builder->build('6.5'));
 
-        $bootstrap = p($this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue);
+        $bootstrap = Path::normalize(
+            $this->queryXpath($xml, '/phpunit/@bootstrap')[0]->nodeValue,
+        );
 
         $this->assertSame($this->projectPath . '/app/autoload2.php', $bootstrap);
     }
@@ -471,8 +469,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
                   </filter>
                 </phpunit>
 
-                XML
-            ,
+                XML,
             file_get_contents($configurationPath),
         );
     }
@@ -555,7 +552,8 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         ];
     }
 
-    private function queryXpath(string $xml, string $query)
+    // TODO: at this point it is better to use the SafeDOMXPath...
+    private function queryXpath(string $xml, string $query): DOMNodeList
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml);
@@ -568,6 +566,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
     }
 
+    /**
+     * @param list<string> $filteredSourceFilesToMutate
+     */
     private function createConfigBuilder(
         ?string $originalPhpUnitXmlConfigPath = null,
         array $filteredSourceFilesToMutate = [],

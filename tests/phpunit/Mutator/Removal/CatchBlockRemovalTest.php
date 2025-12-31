@@ -67,8 +67,7 @@ final class CatchBlockRemovalTest extends BaseMutatorTestCase
                 } catch (\Throwable $e) {
                     throw new \RuntimeException();
                 }
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -115,8 +114,7 @@ final class CatchBlockRemovalTest extends BaseMutatorTestCase
                 } catch (\DomainException $e) {
                     $logger->log($e);
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if catch block does not contain statements' => [
@@ -130,8 +128,7 @@ final class CatchBlockRemovalTest extends BaseMutatorTestCase
                 } catch (\Throwable $e) {
                     throw new \RuntimeException();
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 

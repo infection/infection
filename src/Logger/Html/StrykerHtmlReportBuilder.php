@@ -48,6 +48,7 @@ use function current;
 use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\Framework\Str;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\DetectionStatus;
@@ -59,7 +60,6 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\Mutator\ProfileList;
 use Infection\Mutator\Removal\MethodCallRemoval;
-use Infection\Str;
 use function ltrim;
 use function md5;
 use const PHP_EOL;
@@ -80,15 +80,15 @@ use Webmozart\Assert\Assert;
 final readonly class StrykerHtmlReportBuilder
 {
     private const DETECTION_STATUS_MAP = [
-        DetectionStatus::KILLED_BY_TESTS => 'Killed',
-        DetectionStatus::KILLED_BY_STATIC_ANALYSIS => 'Killed',
-        DetectionStatus::ESCAPED => 'Survived',
-        DetectionStatus::ERROR => 'RuntimeError',
-        DetectionStatus::TIMED_OUT => 'Timeout',
-        DetectionStatus::NOT_COVERED => 'NoCoverage',
-        DetectionStatus::SYNTAX_ERROR => 'CompileError',
-        DetectionStatus::IGNORED => 'Ignored',
-        DetectionStatus::SKIPPED => 'Ignored',
+        DetectionStatus::KILLED_BY_TESTS->value => 'Killed',
+        DetectionStatus::KILLED_BY_STATIC_ANALYSIS->value => 'Killed',
+        DetectionStatus::ESCAPED->value => 'Survived',
+        DetectionStatus::ERROR->value => 'RuntimeError',
+        DetectionStatus::TIMED_OUT->value => 'Timeout',
+        DetectionStatus::NOT_COVERED->value => 'NoCoverage',
+        DetectionStatus::SYNTAX_ERROR->value => 'CompileError',
+        DetectionStatus::IGNORED->value => 'Ignored',
+        DetectionStatus::SKIPPED->value => 'Ignored',
     ];
 
     private const PLUS_LENGTH = 1;
@@ -180,9 +180,14 @@ final readonly class StrykerHtmlReportBuilder
 
     /**
      * @param array<string, MutantExecutionResult[]> $resultsByPath
+     *
+     * @return ArrayObject<string, array<mixed>|string>
      */
     private function retrieveFiles(array $resultsByPath, string $basePath): ArrayObject
     {
+        /**
+         * @var ArrayObject<string, array<mixed>|string> $files
+         */
         $files = new ArrayObject();
 
         foreach ($resultsByPath as $path => $results) {
@@ -252,14 +257,16 @@ final readonly class StrykerHtmlReportBuilder
                 return [
                     'id' => $result->getMutantHash(),
                     'mutatorName' => $result->getMutatorName(),
-                    'replacement' => Str::convertToUtf8(Str::trimLineReturns(ltrim($replacement))),
+                    'replacement' => Str::convertToUtf8(Str::cleanForDisplay(ltrim($replacement))),
                     'description' => $this->getMutatorDescription($result->getMutatorName(), $result->getMutatorClass()),
                     'location' => [
                         'start' => ['line' => $result->getOriginalStartingLine(), 'column' => $startingColumn],
                         'end' => ['line' => $endingLine, 'column' => $endingColumn],
                     ],
-                    'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()],
-                    'statusReason' => Str::convertToUtf8(Str::trimLineReturns($result->getProcessOutput())),
+                    'status' => self::DETECTION_STATUS_MAP[$result->getDetectionStatus()->value],
+                    'statusReason' => Str::convertToUtf8(
+                        Str::cleanForDisplay($result->getProcessOutput()),
+                    ),
                     'coveredBy' => array_unique(array_map(
                         fn (TestLocation $testLocation): string => $this->buildTestMethodId($testLocation->getMethod()),
                         $result->getTests(),

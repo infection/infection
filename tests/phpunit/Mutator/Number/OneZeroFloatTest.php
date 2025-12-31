@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class OneZeroFloatTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
                 <?php
 
                 10 + 1.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 10 + 0.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates float zero to one' => [
@@ -74,14 +72,12 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
                 <?php
 
                 10 + 0.0;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 10 + 1.0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate int zero to one' => [
@@ -89,8 +85,7 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
                 <?php
 
                 10 + 0;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate int one to zer0' => [
@@ -98,8 +93,7 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
                 <?php
 
                 10 + 1;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate the string 0.0' => [
@@ -117,8 +111,7 @@ final class OneZeroFloatTest extends BaseMutatorTestCase
                 10 + 2.0;
                 10 + 1.1;
                 10 + 0.5;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate in a comparison' => [

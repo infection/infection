@@ -49,10 +49,10 @@ final class SpaceshipTest extends BaseMutatorTestCase
     }
 
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -64,14 +64,12 @@ final class SpaceshipTest extends BaseMutatorTestCase
                 <?php
 
                 $a <=> $b;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $b <=> $a;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not swap operators when result is identical zero on the right side' => [

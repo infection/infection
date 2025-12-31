@@ -47,10 +47,10 @@ use PHPUnit\Framework\Attributes\Group;
 final class NewObjectTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = [], bool $allowed = true, string $message = ''): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = [], bool $allowed = true, string $message = ''): void
     {
         if (!$allowed) {
             $this->markTestSkipped($message);
@@ -88,6 +88,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_MutatesWithoutTypehint;
 
                 use stdClass;
+
                 class Test
                 {
                     function test()
@@ -96,6 +97,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
+
                 PHP,
         ];
 
@@ -111,19 +113,19 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_ContainsAnotherFunctionAndNullAllowed;
 
                 use stdClass;
+
                 class Test
                 {
                     function test()
                     {
-                        \$a = function (\$element): ?stdClass {
+                        \$a = function (\$element) : ?stdClass {
                             return \$element;
                         };
                         new stdClass();
                         return null;
                     }
                 }
-                CODE
-            ,
+                CODE,
         ];
 
         yield 'It does not mutate when function contains another function but return null is not allowed' => [
@@ -139,6 +141,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_ReturnTypehintFqcnAllowsNull;
 
                 use stdClass;
+
                 class Test
                 {
                     function test(): ?stdClass
@@ -147,8 +150,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
-                CODE
-            ,
+                CODE,
         ];
 
         yield 'It mutates when scalar return typehint allows null' => [
@@ -159,6 +161,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                 namespace NewObject_ScalarReturnTypehintsAllowsNull;
 
                 use stdClass;
+
                 class Test
                 {
                     function test(): ?int
@@ -167,8 +170,7 @@ final class NewObjectTest extends BaseMutatorTestCase
                         return null;
                     }
                 }
-                CODE
-            ,
+                CODE,
         ];
 
         yield 'It does not mutate the return of an anonymous class' => [

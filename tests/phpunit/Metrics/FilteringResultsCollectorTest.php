@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use function array_flip;
 use Infection\Metrics\Collector;
 use Infection\Metrics\FilteringResultsCollector;
 use Infection\Mutant\DetectionStatus;
@@ -72,7 +71,7 @@ final class FilteringResultsCollectorTest extends TestCase
             ->method('collect')
         ;
 
-        $targetDetectionStatuses = array_flip(DetectionStatus::ALL);
+        $targetDetectionStatuses = DetectionStatus::cases();
 
         $collector = new FilteringResultsCollector($targetCollector, $targetDetectionStatuses);
 
@@ -87,8 +86,9 @@ final class FilteringResultsCollectorTest extends TestCase
             ->method('collect')
         ;
 
-        $targetDetectionStatuses = array_flip(DetectionStatus::ALL);
-        unset($targetDetectionStatuses[DetectionStatus::KILLED_BY_TESTS]);
+        $targetDetectionStatuses = DetectionStatus::getCasesExcluding(
+            DetectionStatus::KILLED_BY_TESTS,
+        );
 
         $collector = new FilteringResultsCollector($targetCollector, $targetDetectionStatuses);
 

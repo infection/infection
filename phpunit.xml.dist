@@ -5,9 +5,12 @@
          colors="true"
          executionOrder="defects,random"
          failOnWarning="true"
+         failOnDeprecation="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
+         displayDetailsOnIncompleteTests="true"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnSkippedTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          cacheDirectory="./build/cache/phpunit"
@@ -16,6 +19,10 @@
     <php>
         <env name="COLUMNS" value="100" force="true" />
     </php>
+
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
 
     <testsuites>
         <testsuite name="Infection Test Suite">
@@ -26,7 +33,7 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <source ignoreIndirectDeprecations="true">
         <include>
             <directory>src</directory>
             <file>tests/NewSrc/PhpParser/Visitor/TrackTraverseVisitor.php</file>
@@ -35,6 +42,7 @@
 
     <groups>
         <exclude>
+            <group>benchmark</group>
             <group>e2e</group>
         </exclude>
     </groups>

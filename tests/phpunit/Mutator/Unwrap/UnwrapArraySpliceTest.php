@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArraySpliceTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_splice(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_splice(\Class_With_Const::Const, 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_splice(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 if (array_splice($a, 1) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_SpLiCe(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_splice($foo->bar(), 1);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_splice(['foo', 'bar', 'baz'], 1));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_splice(['foo', 'bar', 'baz'], 1, $length);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -195,8 +187,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_splice(['foo', 'bar', 'baz'], 1, $length, $replacement);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -211,8 +202,7 @@ final class UnwrapArraySpliceTest extends BaseMutatorTestCase
                 $a = 'array_splice';
 
                 $b = $a(['foo', 'bar', 'baz'], 1);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

@@ -46,17 +46,21 @@ use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
 use Infection\Configuration\Schema\SchemaConfiguration;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
-use Infection\FileSystem\SourceFileCollector;
 use Infection\FileSystem\TmpDirProvider;
+use Infection\Git\Git;
 use Infection\Logger\FileLogger;
-use Infection\Logger\GitHub\GitDiffFileProvider;
 use Infection\Mutator\ConfigurableMutator;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\TestFrameworkTypes;
 use function is_numeric;
 use function max;
@@ -85,12 +89,15 @@ class ConfigurationFactory
         private readonly MutatorResolver $mutatorResolver,
         private readonly MutatorFactory $mutatorFactory,
         private readonly MutatorParser $mutatorParser,
-        private readonly SourceFileCollector $sourceFileCollector,
         private readonly CiDetectorInterface $ciDetector,
-        private readonly GitDiffFileProvider $gitDiffFileProvider,
+        private readonly Git $git,
     ) {
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     * @throws NoSourceFound
+     */
     public function create(
         SchemaConfiguration $schema,
         ?string $existingCoveragePath,
@@ -109,15 +116,13 @@ class ConfigurationFactory
         ?string $testFramework,
         ?string $testFrameworkExtraOptions,
         ?string $staticAnalysisToolOptions,
-        string $filter,
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
         ?int $threadCount,
         bool $dryRun,
-        ?string $gitDiffFilter,
-        bool $isForGitDiffLines,
-        ?string $gitDiffBase,
         ?bool $useGitHubLogger,
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
+        ?string $textLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
@@ -125,12 +130,12 @@ class ConfigurationFactory
         ?string $staticAnalysisTool,
         ?string $mutantId,
     ): Configuration {
-        $configDir = dirname($schema->getFile());
+        $configDir = dirname($schema->pathname);
 
         $namespacedTmpDir = $this->retrieveTmpDir($schema, $configDir);
 
-        $testFramework ??= $schema->getTestFramework() ?? TestFrameworkTypes::PHPUNIT;
-        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->getStaticAnalysisTool();
+        $testFramework ??= $schema->testFramework ?? TestFrameworkTypes::PHPUNIT;
+        $resultStaticAnalysisTool = $staticAnalysisTool ?? $schema->staticAnalysisTool;
 
         $skipCoverage = $existingCoveragePath !== null;
 
@@ -140,57 +145,56 @@ class ConfigurationFactory
             $namespacedTmpDir,
         );
 
-        $this->includeUserBootstrap($schema->getBootstrap());
+        $this->includeUserBootstrap($schema->bootstrap);
 
-        $resolvedMutatorsArray = $this->resolveMutators($schema->getMutators(), $mutatorsInput);
+        $resolvedMutatorsArray = $this->resolveMutators($schema->mutators, $mutatorsInput);
 
         $mutators = $this->mutatorFactory->create($resolvedMutatorsArray, $useNoopMutators);
         $ignoreSourceCodeMutatorsMap = $this->retrieveIgnoreSourceCodeMutatorsMap($resolvedMutatorsArray);
 
+        $sourceFilter = $this->refineFilterIfNecessary($sourceFilter);
+
         return new Configuration(
-            $schema->getTimeout() ?? self::DEFAULT_TIMEOUT,
-            $schema->getSource()->getDirectories(),
-            $this->sourceFileCollector->collectFiles(
-                $schema->getSource()->getDirectories(),
-                $schema->getSource()->getExcludes(),
-            ),
-            $this->retrieveFilter($filter, $gitDiffFilter, $isForGitDiffLines, $gitDiffBase, $schema->getSource()->getDirectories()),
-            $schema->getSource()->getExcludes(),
-            $this->retrieveLogs($schema->getLogs(), $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath),
-            $logVerbosity,
-            $namespacedTmpDir,
-            $this->retrievePhpUnit($schema, $configDir),
-            $this->retrievePhpStan($schema, $configDir),
-            $mutators,
-            $testFramework,
-            $schema->getBootstrap(),
-            $initialTestsPhpOptions ?? $schema->getInitialTestsPhpOptions(),
-            self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
-            self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
-            $coverageBasePath,
-            $skipCoverage,
-            $skipInitialTests,
-            $debug,
-            $withUncovered,
-            $this->retrieveNoProgress($noProgress),
-            self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
-            self::retrieveMinMsi($minMsi, $schema),
-            $numberOfShownMutations,
-            self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
-            $msiPrecision,
-            $this->retrieveThreadCount($threadCount, $schema),
-            $dryRun,
-            $ignoreSourceCodeMutatorsMap,
-            $executeOnlyCoveringTestCases,
-            $isForGitDiffLines,
-            $gitDiffBase,
-            $mapSourceClassToTestStrategy,
-            $loggerProjectRootDirectory,
-            $resultStaticAnalysisTool,
-            $mutantId,
+            processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
+            source: $schema->source,
+            sourceFilter: $sourceFilter,
+            logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
+            logVerbosity: $logVerbosity,
+            tmpDir: $namespacedTmpDir,
+            phpUnit: $this->retrievePhpUnit($schema, $configDir),
+            phpStan: $this->retrievePhpStan($schema, $configDir),
+            mutators: $mutators,
+            testFramework: $testFramework,
+            bootstrap: $schema->bootstrap,
+            initialTestsPhpOptions: $initialTestsPhpOptions ?? $schema->initialTestsPhpOptions,
+            testFrameworkExtraOptions: self::retrieveTestFrameworkExtraOptions($testFrameworkExtraOptions, $schema),
+            staticAnalysisToolOptions: self::retrieveStaticAnalysisToolOptions($staticAnalysisToolOptions, $schema),
+            coveragePath: $coverageBasePath,
+            skipCoverage: $skipCoverage,
+            skipInitialTests: $skipInitialTests,
+            isDebugEnabled: $debug,
+            withUncovered: $withUncovered,
+            noProgress: $this->retrieveNoProgress($noProgress),
+            ignoreMsiWithNoMutations: self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
+            minMsi: self::retrieveMinMsi($minMsi, $schema),
+            numberOfShownMutations: $numberOfShownMutations,
+            minCoveredMsi: self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
+            msiPrecision: $msiPrecision,
+            threadCount: $this->retrieveThreadCount($threadCount, $schema),
+            isDryRun: $dryRun,
+            ignoreSourceCodeMutatorsMap: $ignoreSourceCodeMutatorsMap,
+            executeOnlyCoveringTestCases: $executeOnlyCoveringTestCases,
+            mapSourceClassToTestStrategy: $mapSourceClassToTestStrategy,
+            loggerProjectRootDirectory: $loggerProjectRootDirectory,
+            staticAnalysisTool: $resultStaticAnalysisTool,
+            mutantId: $mutantId,
+            configurationPathname: $schema->pathname,
         );
     }
 
+    /**
+     * @throws FileOrDirectoryNotFound
+     */
     private function includeUserBootstrap(?string $bootstrap): void
     {
         if ($bootstrap === null) {
@@ -236,7 +240,7 @@ class ConfigurationFactory
         SchemaConfiguration $schema,
         string $configDir,
     ): string {
-        $tmpDir = (string) $schema->getTmpDir();
+        $tmpDir = (string) $schema->tmpDir;
 
         if ($tmpDir === '') {
             $tmpDir = sys_get_temp_dir();
@@ -249,36 +253,12 @@ class ConfigurationFactory
 
     private function retrievePhpUnit(SchemaConfiguration $schema, string $configDir): PhpUnit
     {
-        $phpUnit = clone $schema->getPhpUnit();
-
-        $phpUnitConfigDir = $phpUnit->getConfigDir();
-
-        if ($phpUnitConfigDir === null) {
-            $phpUnit->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpUnitConfigDir)) {
-            $phpUnit->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpUnitConfigDir,
-            ));
-        }
-
-        return $phpUnit;
+        return $schema->phpUnit->withAbsolutePaths($configDir);
     }
 
     private function retrievePhpStan(SchemaConfiguration $schema, string $configDir): PhpStan
     {
-        $phpStan = clone $schema->getPhpStan();
-
-        $phpStanConfigDir = $phpStan->getConfigDir();
-
-        if ($phpStanConfigDir === null) {
-            $phpStan->withConfigDir($configDir);
-        } elseif (!Path::isAbsolute($phpStanConfigDir)) {
-            $phpStan->withConfigDir(sprintf(
-                '%s/%s', $configDir, $phpStanConfigDir,
-            ));
-        }
-
-        return $phpStan;
+        return $schema->phpStan->withAbsolutePaths($configDir);
     }
 
     private static function retrieveCoverageBasePath(
@@ -301,14 +281,14 @@ class ConfigurationFactory
         ?string $testFrameworkExtraOptions,
         SchemaConfiguration $schema,
     ): string {
-        return $testFrameworkExtraOptions ?? $schema->getTestFrameworkExtraOptions() ?? '';
+        return $testFrameworkExtraOptions ?? $schema->testFrameworkExtraOptions ?? '';
     }
 
     private static function retrieveStaticAnalysisToolOptions(
         ?string $staticAnalysisToolOptions,
         SchemaConfiguration $schema,
     ): ?string {
-        return $staticAnalysisToolOptions ?? $schema->getStaticAnalysisToolOptions();
+        return $staticAnalysisToolOptions ?? $schema->staticAnalysisToolOptions;
     }
 
     private function retrieveNoProgress(bool $noProgress): bool
@@ -320,21 +300,21 @@ class ConfigurationFactory
         ?bool $ignoreMsiWithNoMutations,
         SchemaConfiguration $schema,
     ): bool {
-        return $ignoreMsiWithNoMutations ?? $schema->getIgnoreMsiWithNoMutations() ?? false;
+        return $ignoreMsiWithNoMutations ?? $schema->ignoreMsiWithNoMutations ?? false;
     }
 
     private static function retrieveMinMsi(?float $minMsi, SchemaConfiguration $schema): ?float
     {
-        return $minMsi ?? $schema->getMinMsi();
+        return $minMsi ?? $schema->minMsi;
     }
 
     private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float
     {
-        return $minCoveredMsi ?? $schema->getMinCoveredMsi();
+        return $minCoveredMsi ?? $schema->minCoveredMsi;
     }
 
     /**
-     * @param array<string, mixed[]> $resolvedMutatorsMap
+     * @param array<class-string, mixed[]> $resolvedMutatorsMap
      *
      * @return array<string, array<int, string>>
      */
@@ -355,25 +335,20 @@ class ConfigurationFactory
         return $map;
     }
 
-    /**
-     * @param string[] $sourceDirectories
-     */
-    private function retrieveFilter(string $filter, ?string $gitDiffFilter, bool $isForGitDiffLines, ?string $gitDiffBase, array $sourceDirectories): string
-    {
-        if ($gitDiffFilter === null && !$isForGitDiffLines) {
-            return $filter;
+    private function refineFilterIfNecessary(
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+    ): ?SourceFilter {
+        if ($sourceFilter instanceof IncompleteGitDiffFilter) {
+            return new GitDiffFilter(
+                $sourceFilter->value,
+                self::refineGitBase($sourceFilter->base),
+            );
         }
 
-        $baseBranch = $gitDiffBase ?? $this->gitDiffFileProvider->provideDefaultBase();
-
-        if ($isForGitDiffLines) {
-            return $this->gitDiffFileProvider->provide('AM', $baseBranch, $sourceDirectories);
-        }
-
-        return $this->gitDiffFileProvider->provide($gitDiffFilter, $baseBranch, $sourceDirectories);
+        return $sourceFilter;
     }
 
-    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -389,6 +364,10 @@ class ConfigurationFactory
 
         if ($htmlLogFilePath !== null) {
             $logs->setHtmlLogFilePath($htmlLogFilePath);
+        }
+
+        if ($textLogFilePath !== null) {
+            $logs->setTextLogFilePath($textLogFilePath);
         }
 
         return new Logs(
@@ -442,7 +421,7 @@ class ConfigurationFactory
             return $threadCount;
         }
 
-        $threadsFromSchema = $schema->getThreads();
+        $threadsFromSchema = $schema->threads;
 
         if ($threadsFromSchema === null) {
             return 1;
@@ -458,5 +437,33 @@ class ConfigurationFactory
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
+    }
+
+    /**
+     * @param non-empty-string|null $base
+     *
+     * @return non-empty-string
+     */
+    private function refineGitBase(?string $base): string
+    {
+        // When the user gives a base, we need to try to refine it.
+        // For example, if the user created their feature branch:
+        //
+        //  main:     A --- B --- C
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Later, after others push to main
+        //
+        //  main:     A --- B --- C --- F --- G --- H
+        //                         \
+        //  feature:                D --- E  (user changes)
+        //
+        // Then `git diff main HEAD` will give (D,E,F,G,H). So infection would
+        // touch code the user did not touch.
+        //
+        // To prevent this, we try to find the best common ancestor, here C.
+        // As a result, we would do `git diff C HEAD` which would give (D,E).
+        return $this->git->getBaseReference($base ?? $this->git->getDefaultBase());
     }
 }

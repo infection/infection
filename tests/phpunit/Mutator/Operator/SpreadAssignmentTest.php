@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class SpreadAssignmentTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...[1, 2, 3]];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [1, 2, 3];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread assignment for a raw empty array' => [
@@ -74,14 +72,12 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...[]];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = [];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread assignment for a variable' => [
@@ -89,14 +85,12 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...$collection];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = $collection;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread assignment for a function call' => [
@@ -104,14 +98,12 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...getCollection()];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = getCollection();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread assignment for a method call' => [
@@ -119,14 +111,12 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...$object->getCollection()];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = $object->getCollection();
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'Spread assignment for a new iterator object' => [
@@ -134,14 +124,12 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...new ArrayIterator(['a', 'b', 'c'])];
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = new ArrayIterator(['a', 'b', 'c']);
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate argument unpacking' => [
@@ -149,8 +137,7 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 function foo(...$array) {}
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate list construct' => [
@@ -158,8 +145,7 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 [$left, $right] = ['left', 'right'];
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate spread expression in array with more than one element' => [
@@ -167,8 +153,7 @@ final class SpreadAssignmentTest extends BaseMutatorTestCase
                 <?php
 
                 $a = [...[1, 2, 3], 4];
-                PHP
-            ,
+                PHP,
         ];
     }
 }

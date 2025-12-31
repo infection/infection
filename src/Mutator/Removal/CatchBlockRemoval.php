@@ -40,6 +40,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use PhpParser\Node;
 
 /**
@@ -102,7 +103,7 @@ final class CatchBlockRemoval implements Mutator
 
             unset($catches[$i]);
 
-            yield new Node\Stmt\TryCatch($node->stmts, $catches, $node->finally, $node->getAttributes());
+            yield new Node\Stmt\TryCatch($node->stmts, $catches, $node->finally, NodeAttributes::getAllExceptOriginalNode($node));
         }
     }
 

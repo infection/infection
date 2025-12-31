@@ -44,10 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TmpDirProvider::class)]
 final class TmpDirProviderTest extends TestCase
 {
-    /**
-     * @var TmpDirProvider
-     */
-    private $tmpDirProvider;
+    private TmpDirProvider $tmpDirProvider;
 
     protected function setUp(): void
     {

@@ -43,6 +43,7 @@ use Infection\Logger\DebugFileLogger;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\FileLoggerFactory;
+use Infection\Logger\GitHubActionsLogTextFileLogger;
 use Infection\Logger\GitHubAnnotationsLogger;
 use Infection\Logger\GitLabCodeQualityLogger;
 use Infection\Logger\Html\HtmlFileLogger;
@@ -68,20 +69,11 @@ use Symfony\Component\Filesystem\Filesystem;
 #[CoversClass(FileLoggerFactory::class)]
 final class FileLoggerFactoryTest extends TestCase
 {
-    /**
-     * @var MetricsCalculator
-     */
-    private $metricsCalculator;
+    private MetricsCalculator $metricsCalculator;
 
-    /**
-     * @var ResultsCollector
-     */
-    private $resultsCollector;
+    private ResultsCollector $resultsCollector;
 
-    /**
-     * @var Filesystem|MockObject
-     */
-    private $fileSystemMock;
+    private MockObject&Filesystem $fileSystemMock;
 
     protected function setUp(): void
     {
@@ -154,6 +146,38 @@ final class FileLoggerFactoryTest extends TestCase
                 null,
             ),
             [TextFileLogger::class],
+        ];
+
+        yield 'text logger outside of github actions' => [
+            new Logs(
+                'php://stdout',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                null,
+                null,
+            ),
+            [TextFileLogger::class],
+        ];
+
+        yield 'text logger in github actions' => [
+            new Logs(
+                'php://stdout',
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null,
+                null,
+            ),
+            [GitHubActionsLogTextFileLogger::class, GitHubAnnotationsLogger::class],
         ];
 
         yield 'html logger' => [

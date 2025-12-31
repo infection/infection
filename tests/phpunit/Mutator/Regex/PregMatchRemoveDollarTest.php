@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Generator;
 use Infection\Mutator\Regex\PregMatchRemoveDollar;
 use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,20 +47,19 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
 {
     #[DataProvider('provideMutationCases')]
-    public function test_mutator($input, $expected = null): void
+    public function test_mutator(string $input, ?string $expected = null): void
     {
         $this->assertMutatesInput($input, $expected);
     }
 
-    public static function provideMutationCases(): Generator
+    public static function provideMutationCases(): iterable
     {
         yield 'It mutates correctly removing dollar when provided with a string and flags' => [
             <<<'PHP'
                 <?php
 
                 preg_match('~some-regexp$~ig', 'irrelevant');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -74,8 +72,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 pReG_MaTcH('~some-regexp$~ig', 'irrelevant');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -88,8 +85,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('~some-regexp$~', 'irrelevant');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -102,8 +98,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('^some-regexp$^i', 'irrelevant');
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -116,8 +111,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match("/^-\s*{$regexWithEscapedDelimiters}$/mu", $diff);
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate regular expression when no "$" is present' => [
@@ -125,8 +119,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('~some-regexp~ig', 'irrelevant');
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate regular expression when "$" is used as an exact character' => [
@@ -134,8 +127,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match('~some-reg\$exp~ig', 'irrelevant');
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate regular expression when provided with an unpacked array' => [
@@ -143,8 +135,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match(...foo());
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate regular expression when provided with a variable' => [
@@ -152,8 +143,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 <?php
 
                 preg_match($regex, 'irrelevant');
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate when provided with a variable function name' => [
@@ -163,8 +153,7 @@ final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
                 $f = 'preg_match';
 
                 $f('~some-regexp$~ig', 'irrelevant');
-                PHP
-            ,
+                PHP,
         ];
     }
 }

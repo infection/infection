@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\PhpParser\Visitor\ParentConnector;
 use PhpParser\Node;
 
@@ -56,8 +57,7 @@ final class LogicalOrNegation implements Mutator
         return new Definition(
             <<<'TXT'
                 Negates a whole OR expression (`||`).
-                TXT
-            ,
+                TXT,
             MutatorCategory::ORTHOGONAL_REPLACEMENT,
             null,
             <<<'DIFF'
@@ -76,7 +76,16 @@ final class LogicalOrNegation implements Mutator
      */
     public function mutate(Node $node): iterable
     {
-        yield new Node\Expr\BooleanNot($node);
+        // Clone the node to remove the origNode from the wrapped expression
+        // see bug https://github.com/nikic/PHP-Parser/issues/1119
+        $wrappedNode = clone $node;
+        $wrappedNode->getAttributes();
+        $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
+
+        yield new Node\Expr\BooleanNot(
+            $wrappedNode,
+            //            NodeAttributes::getAllExceptOriginalNode($node)
+        );
     }
 
     public function canMutate(Node $node): bool
@@ -91,10 +100,6 @@ final class LogicalOrNegation implements Mutator
             return false;
         }
 
-        if ($parent instanceof Node\Expr\BooleanNot) {
-            return false;
-        }
-
-        return true;
+        return !$parent instanceof Node\Expr\BooleanNot;
     }
 }

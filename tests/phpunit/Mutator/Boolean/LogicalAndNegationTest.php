@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class LogicalAndNegationTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,11 +59,39 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
+
+                    $var = !(a() && b());
+                    PHP,
+            ],
+        ];
+
+        yield 'It preserves formatting for non-modified code' => [
+            <<<'PHP'
+                <?php
+
+                class TestFormatPreserving {
+                    public function test(): bool {
+                        return 1
+                          || 2;
+                    }
+                }
+
+                $var = a() && b();
+                PHP,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        public function test(): bool {
+                            return 1
+                              || 2;
+                        }
+                    }
 
                     $var = !(a() && b());
                     PHP,
@@ -75,8 +103,7 @@ final class LogicalAndNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b() && c() && d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php

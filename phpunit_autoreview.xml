@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/schema/10.4.xsd"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="./vendor/autoload.php"
          colors="true"
          executionOrder="random"
          stopOnFailure="true"
          failOnWarning="true"
          failOnRisky="true"
+         requireCoverageMetadata="true"
+         displayDetailsOnIncompleteTests="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnSkippedTests="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
          cacheDirectory="./build/cache/phpunit-autoreview"
 >
+
+    <extensions>
+        <bootstrap class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
+    </extensions>
 
     <testsuites>
         <testsuite name="Auto-Review Test Suite">

@@ -67,7 +67,7 @@ class NodeTraverserFactory
         $nodeIgnorers[] = new InterfaceIgnorer();
         $nodeIgnorers[] = new AbstractMethodIgnorer();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
 
         $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));

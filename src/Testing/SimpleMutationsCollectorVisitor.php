@@ -39,6 +39,7 @@ use Infection\Mutator\Mutator;
 use Infection\PhpParser\MutatedNode;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\Token;
 
 /**
  * @internal
@@ -48,7 +49,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
     /**
      * @var SimpleMutation[]
      */
-    private $mutations = [];
+    private array $mutations = [];
 
     /**
      * @param Mutator<Node> $mutator
@@ -59,6 +60,11 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
          * @var Node[]
          */
         private readonly array $fileAst,
+        /**
+         * @var Token[]
+         */
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
     ) {
     }
 
@@ -73,6 +79,8 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
         foreach ($this->mutator->mutate($node) as $mutatedNode) {
             $this->mutations[] = new SimpleMutation(
                 $this->fileAst,
+                $this->originalFileTokens,
+                $this->originalFileContent,
                 $this->mutator,
                 MutatedNode::wrap($mutatedNode),
                 $node->getAttributes(),

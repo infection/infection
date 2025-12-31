@@ -53,15 +53,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(IgnoreMutator::class)]
 final class IgnoreMutatorTest extends TestCase
 {
-    /**
-     * @var MockObject&Mutator
-     */
-    private $mutatorMock;
+    private MockObject&Mutator $mutatorMock;
 
-    /**
-     * @var MockObject&Node
-     */
-    private $nodeMock;
+    private MockObject&Node $nodeMock;
 
     protected function setUp(): void
     {
@@ -134,10 +128,12 @@ final class IgnoreMutatorTest extends TestCase
         $this->nodeMock
             ->expects($this->exactly(2))
             ->method('getAttribute')
-            ->with(...WithConsecutive::create(
-                [ReflectionVisitor::REFLECTION_CLASS_KEY, false],
-                [ReflectionVisitor::FUNCTION_NAME, ''],
-            ))
+            ->with(
+                ...WithConsecutive::create(
+                    [ReflectionVisitor::REFLECTION_CLASS_KEY, null],
+                    [ReflectionVisitor::FUNCTION_NAME, ''],
+                ),
+            )
             ->willReturnOnConsecutiveCalls(
                 CoreClassReflection::fromClassName(self::class),
                 'foo',

@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class IncrementTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -60,15 +60,13 @@ final class IncrementTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a++;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a--;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It replaces pre increment' => [
@@ -77,15 +75,13 @@ final class IncrementTest extends BaseMutatorTestCase
 
                 $a = 1;
                 ++$a;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 --$a;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not change when its not a real increment' => [
@@ -93,8 +89,7 @@ final class IncrementTest extends BaseMutatorTestCase
                 <?php
 
                 $b + +$a;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate pre decrement' => [
@@ -103,8 +98,7 @@ final class IncrementTest extends BaseMutatorTestCase
 
                 $a = 1;
                 --$a;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate post decrement' => [
@@ -113,8 +107,7 @@ final class IncrementTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a--;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not increment in for-loops to prevent endless loops' => [

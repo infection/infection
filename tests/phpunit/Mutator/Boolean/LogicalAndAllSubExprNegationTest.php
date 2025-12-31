@@ -47,7 +47,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
      * @param string|string[] $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,14 +59,12 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !$node instanceof Node\Expr\PostDec && !$node instanceof Infection\Tests\Mutant\MutantAssertions;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node instanceof Node\Expr\PostDec && $node instanceof Infection\Tests\Mutant\MutantAssertions;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates negated instanceof with 1 concrete class and 1 interface' => [
@@ -74,14 +72,12 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !$node instanceof \Countable && !$node instanceof Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node instanceof \Countable && $node instanceof Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates negated instanceof with 2 concrete classes (different variables)' => [
@@ -89,14 +85,12 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !$node1 instanceof PhpParser\Node\Expr\PreDec && !$node2 instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $var = $node1 instanceof PhpParser\Node\Expr\PreDec && $node2 instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate negated instanceof with 2 concrete classes (same variable)' => [
@@ -104,8 +98,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate negated instanceof with 3 concrete classes' => [
@@ -113,8 +106,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !$node instanceof PhpParser\Node\Expr\PreDec && !$node instanceof PhpParser\Node\Expr\PostDec && !$node instanceof PhpParser\Node\Expr\BooleanNot;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates and with two expressions' => [
@@ -122,8 +114,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -138,8 +129,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = a() && b() && c() && d();
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -154,8 +144,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = !(a() && !b());
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -170,8 +159,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = ($a = 1) && $b;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
@@ -186,15 +174,13 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $A > 1 && $this->foo() === false && self::bar() >= 10;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !($A > 1) && $this->foo() === false && !(self::bar() >= 10);
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -203,8 +189,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() === false && $c !== false && d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with first OR' => [
@@ -212,8 +197,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false || b() === false && $c !== false && d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with second OR' => [
@@ -221,8 +205,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() === false || $c !== false && d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate if all are identical comparisons - with third OR' => [
@@ -230,8 +213,7 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() === false && $c !== false || d() !== true;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It mutates the only one mutable expression on the left when others are not mutable' => [
@@ -239,15 +221,13 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a && b() === false && $c !== false;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = !$a && b() === false && $c !== false;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -256,15 +236,13 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() && $c !== false;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = $a === false && !b() && $c !== false;
-                    PHP
-                ,
+                    PHP,
             ],
         ];
 
@@ -273,15 +251,46 @@ final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
                 <?php
 
                 $var = $a === false && b() === false && $c;
-                PHP
-            ,
+                PHP,
             [
                 <<<'PHP'
                     <?php
 
                     $var = $a === false && b() === false && !$c;
-                    PHP
-                ,
+                    PHP,
+            ],
+        ];
+
+        yield 'It preserves formatting for non-modified code' => [
+            <<<'PHP'
+                <?php
+
+                class TestFormatPreserving {
+                    // some comment
+                    public function test(): bool { // and comment here
+                        return 1
+
+                          || 2;
+                    }
+                }
+
+                $var = a() && b();
+                PHP,
+            [
+                <<<'PHP'
+                    <?php
+
+                    class TestFormatPreserving {
+                        // some comment
+                        public function test(): bool { // and comment here
+                            return 1
+
+                              || 2;
+                        }
+                    }
+
+                    $var = !a() && !b();
+                    PHP,
             ],
         ];
     }

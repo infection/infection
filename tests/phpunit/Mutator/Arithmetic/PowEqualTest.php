@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class PowEqualTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -60,15 +60,13 @@ final class PowEqualTest extends BaseMutatorTestCase
 
                 $a = 1;
                 $a **= 2;
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 $a = 1;
                 $a /= 2;
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not mutate normal pow' => [
@@ -76,8 +74,7 @@ final class PowEqualTest extends BaseMutatorTestCase
                 <?php
 
                 $a = 10 ** 3;
-                PHP
-            ,
+                PHP,
         ];
     }
 }

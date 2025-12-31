@@ -39,6 +39,7 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\GetMutatorName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
+use Infection\Mutator\NodeAttributes;
 use Infection\Mutator\SimpleExpression;
 use PhpParser\Node;
 
@@ -79,7 +80,7 @@ final class ElseIfNegation implements Mutator
         yield new Node\Stmt\ElseIf_(
             new Node\Expr\BooleanNot($node->cond),
             $node->stmts,
-            $node->getAttributes(),
+            NodeAttributes::getAllExceptOriginalNode($node),
         );
     }
 

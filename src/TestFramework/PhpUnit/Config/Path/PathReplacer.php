@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\PhpUnit\Config\Path;
 
-use DOMElement;
+use DOMNameSpaceNode;
 use DOMNode;
 use function ltrim;
 use function sprintf;
@@ -50,11 +50,11 @@ final readonly class PathReplacer
 {
     public function __construct(
         private Filesystem $filesystem,
-        private ?string $phpUnitConfigDir = null,
+        private string $phpUnitConfigDir = '',
     ) {
     }
 
-    public function replaceInNode(DOMElement|DOMNode $domElement): void
+    public function replaceInNode(DOMNameSpaceNode|DOMNode $domElement): void
     {
         $path = trim((string) $domElement->nodeValue);
 

@@ -35,11 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Console\OutputFormatter;
 
-use function implode;
-use function sprintf;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -51,17 +48,8 @@ final readonly class FormatterFactory
     ) {
     }
 
-    public function create(string $formatterName): OutputFormatter
+    public function create(FormatterName $formatterName): OutputFormatter
     {
-        Assert::oneOf(
-            $formatterName,
-            FormatterName::ALL,
-            sprintf(
-                'Unknown formatter %%s. The known formatters are: "%s"',
-                implode('", "', FormatterName::ALL),
-            ),
-        );
-
         return match ($formatterName) {
             FormatterName::PROGRESS => new ProgressFormatter(new ProgressBar($this->output)),
             FormatterName::DOT => new DotFormatter($this->output),

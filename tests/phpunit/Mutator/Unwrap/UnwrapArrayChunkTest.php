@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class UnwrapArrayChunkTest extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -59,8 +59,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_chunk(['A', 1, 'C'], 2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -73,8 +72,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_chunk(\Class_With_Const::Const, 2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -87,8 +85,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = \array_chunk(['A', 1, 'C'], 2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -122,8 +119,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 if (array_chunk($a, 2) === $a) {
                     return true;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -139,8 +135,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = aRrAy_ChUnK(['A', 1, 'C'], 2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -153,8 +148,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_chunk($foo->bar(), 2);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -167,8 +161,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_map('strtolower', array_chunk(['A', 1, 'C'], 2));
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -181,8 +174,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 <?php
 
                 $a = array_chunk(['A', 1, 'C'], 2, $preserveKeys);
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
@@ -197,8 +189,7 @@ final class UnwrapArrayChunkTest extends BaseMutatorTestCase
                 $a = 'array_chunk';
 
                 $b = $a([1,2,3]);
-                PHP
-            ,
+                PHP,
         ];
     }
 }

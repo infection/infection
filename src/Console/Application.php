@@ -40,6 +40,11 @@ use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\DescribeCommand;
+use Infection\Command\Git\GitBaseReferenceCommand;
+use Infection\Command\Git\GitChangedFilesCommand;
+use Infection\Command\Git\GitChangedLinesCommand;
+use Infection\Command\Git\GitDefaultBaseCommand;
+use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
 use Infection\Container;
@@ -100,17 +105,22 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
-        $commands = array_merge(
+        Container::create()->getGit();
+
+        return array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
+                new GitBaseReferenceCommand(),
+                new GitChangedFilesCommand(),
+                new GitChangedLinesCommand(),
+                new GitDefaultBaseCommand(),
                 new RunCommand(),
                 new DescribeCommand(),
+                new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
             ],
         );
-
-        return $commands;
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output): void

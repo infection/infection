@@ -44,10 +44,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class Continue_Test extends BaseMutatorTestCase
 {
     /**
-     * @param string|string[] $expected
+     * @param string|string[]|null $expected
      */
     #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, $expected = []): void
+    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
     {
         $this->assertMutatesInput($input, $expected);
     }
@@ -61,16 +61,14 @@ final class Continue_Test extends BaseMutatorTestCase
                 while (true) {
                     continue;
                 }
-                PHP
-            ,
+                PHP,
             <<<'PHP'
                 <?php
 
                 while (true) {
                     break;
                 }
-                PHP
-            ,
+                PHP,
         ];
 
         yield 'It does not replaces continue with break in switch' => [
@@ -81,8 +79,7 @@ final class Continue_Test extends BaseMutatorTestCase
                     case 1:
                         continue;
                 }
-                PHP
-            ,
+                PHP,
         ];
     }
 }
