@@ -7,6 +7,7 @@
             "src"
         ],
         excludes: [
+            "/^Container.php$/",
             "FileSystem/DummyFileSystem.php",
             "FileSystem/DummySymfony5FileSystem.php",
             "FileSystem/DummySymfony6FileSystem.php",
