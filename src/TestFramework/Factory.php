@@ -129,14 +129,16 @@ final readonly class Factory
     }
 
     /**
-     * Get only those source files that will be mutated to use them in coverage whitelist
+     * Get only those source files that will be mutated. If the source is filtered by the user,
+     * we do not need to execute the initial test run against all the sources, only the necessary
+     * subset.
      *
      * @return SplFileInfo[]
      */
     private function getFilteredSourceFilesToMutate(): array
     {
-        return $this->sourceCollector->isFiltered()
-            ? $this->sourceCollector->collect()
-            : [];
+        return $this->infectionConfig->sourceFilter === null
+            ? []
+            : $this->sourceCollector->collect();
     }
 }

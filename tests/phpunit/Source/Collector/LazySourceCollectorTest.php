@@ -60,7 +60,7 @@ final class LazySourceCollectorTest extends TestCase
         $this->expectExceptionObject($exception);
 
         // Only now it consumes the factory.
-        $collector->isFiltered();
+        $collector->collect();
     }
 
     public function test_it_exposes_its_decorated_collector(): void
@@ -80,32 +80,17 @@ final class LazySourceCollectorTest extends TestCase
     #[DataProvider('decoratedCollectorProvider')]
     public function test_it_decorates_the_given_collector(
         SourceCollector $decoratedCollector,
-        bool $expectedIsFiltered,
         array $expectedFiles,
     ): void {
         $collector = new LazySourceCollector($decoratedCollector);
 
-        $this->assertSame($expectedIsFiltered, $collector->isFiltered());
         $this->assertSame($expectedFiles, $collector->collect());
     }
 
     public static function decoratedCollectorProvider(): iterable
     {
         yield [
-            new FixedSourceCollector(
-                false,
-                [],
-            ),
-            false,
-            [],
-        ];
-
-        yield [
-            new FixedSourceCollector(
-                true,
-                [],
-            ),
-            true,
+            new FixedSourceCollector([]),
             [],
         ];
 
@@ -115,13 +100,11 @@ final class LazySourceCollectorTest extends TestCase
 
             return [
                 new FixedSourceCollector(
-                    true,
                     [
                         'key1' => $file1,
                         'key2' => $file2,
                     ],
                 ),
-                true,
                 [
                     'key1' => $file1,
                     'key2' => $file2,
