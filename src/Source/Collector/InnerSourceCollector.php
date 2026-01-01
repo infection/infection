@@ -35,21 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Source\Exception\NoSourceFound;
-use Symfony\Component\Finder\SplFileInfo;
-
 /**
- * The SourceCollector is the service responsible for collecting all the source
- * files that are eligible for being mutated.
+ * This interface is only here to be able to offer another service ID for the SourceCollector.
+ *
+ * @see https://github.com/sanmai/di-container/issues/25
  *
  * @internal
  */
-interface SourceCollector extends InnerSourceCollector
+interface InnerSourceCollector
 {
-    /**
-     * @throws NoSourceFound
-     *
-     * @return SplFileInfo[]
-     */
-    public function collect(): array;
 }

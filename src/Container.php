@@ -121,6 +121,7 @@ use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\CachedSourceCollector;
 use Infection\Source\Collector\CoveredSourceCollector;
+use Infection\Source\Collector\InnerSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
@@ -274,7 +275,7 @@ final class Container extends DIContainer
                     $container->getTestFrameworkFinder(),
                     $container->getJUnitReportLocator()->getDefaultLocation(),
                     $config,
-                    $container->getSourceCollector(),
+                    $container->get(InnerSourceCollector::class),
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
@@ -571,23 +572,30 @@ final class Container extends DIContainer
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
             ),
+            InnerSourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
+                static function () use ($container): SourceCollector {
+                    $configuration = $container->getConfiguration();
+
+                    return new CachedSourceCollector(
+                        $container->get(SourceCollectorFactory::class)->create(
+                            $configuration->configurationPathname,
+                            $configuration->source,
+                            $configuration->sourceFilter,
+                        ),
+                    );
+                },
+            ),
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {
                     $configuration = $container->getConfiguration();
 
-                    $innerCollector = $container->get(SourceCollectorFactory::class)->create(
-                        $configuration->configurationPathname,
-                        $configuration->source,
-                        $configuration->sourceFilter,
-                    );
-
                     return new CachedSourceCollector(
                         $configuration->mutateOnlyCoveredCode()
                             ? new CoveredSourceCollector(
-                                $innerCollector,
+                                $container->get(InnerSourceCollector::class),
                                 $container->getTracer(),
                             )
-                            : $innerCollector,
+                            : $container->get(InnerSourceCollector::class),
                     );
                 },
             ),
