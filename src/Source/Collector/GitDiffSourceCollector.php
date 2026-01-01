@@ -72,11 +72,6 @@ final readonly class GitDiffSourceCollector implements SourceCollector
         );
     }
 
-    public function isFiltered(): bool
-    {
-        return $this->innerCollector->isFiltered();
-    }
-
     public function collect(): array
     {
         return $this->innerCollector->collect();
