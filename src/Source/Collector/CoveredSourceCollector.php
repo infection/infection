@@ -37,8 +37,6 @@ namespace Infection\Source\Collector;
 
 use function array_filter;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -74,15 +72,10 @@ final class CoveredSourceCollector implements SourceCollector
 
     private function filter(SplFileInfo $sourceFile): bool
     {
-        return $this->trace($sourceFile)->hasTests();
-    }
-
-    private function trace(SplFileInfo $sourceFile): Trace
-    {
         try {
-            return $this->tracer->trace($sourceFile);
+            return $this->tracer->trace($sourceFile)->hasTests();
         } catch (NoTraceFound) {
-            return new EmptyTrace($sourceFile);
+            return false;
         }
     }
 }

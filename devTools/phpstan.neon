@@ -204,6 +204,13 @@ parameters:
             identifier: argument.type
             path: ../src/Mutator/NodeMutationGenerator.php
 
+        # False-positive: this is due to hacking a limitation of the Container
+        # See InnerSourceCollector.
+        -
+            message: '#InnerSourceCollector#'
+            identifier: argument.type
+            path: ../src/Container.php
+
     level: 8
     paths:
         - ../src
