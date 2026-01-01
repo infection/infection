@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Mutation;
+namespace Infection\Ast;
 
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -55,27 +56,24 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class FileMutationGenerator
+final readonly class AstCollector
 {
     public function __construct(
-        private readonly FileParser $parser,
-        private readonly NodeTraverserFactory $traverserFactory,
-        private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineMatcher $sourceLineMatcher,
-        private readonly Tracer $tracer,
+        private FileParser $parser,
+        private NodeTraverserFactory $traverserFactory,
+        private Tracer $tracer,
     ) {
     }
 
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param Mutator $mutators
      * @param NodeIgnorer[] $nodeIgnorers
      *
-     * @throws NoSourceFound
      * @throws UnparsableFile
+     * @throws NoSourceFound
      *
-     * @return iterable<Mutation>
+     * @return iterable<Ast>
      */
     public function generate(
         SplFileInfo $sourceFile,
@@ -92,30 +90,26 @@ class FileMutationGenerator
             return;
         }
 
+        // TODO: forward the originalFileTokens!
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
         $preTraverser->traverse($initialStatements);
 
-        $mutationCollectorVisitor = new MutationCollectorVisitor(
-            new NodeMutationGenerator(
-                mutators: $mutators,
-                filePath: $sourceFile->getRealPath(),
-                fileNodes: $initialStatements,
-                trace: $trace,
-                onlyCovered: $onlyCovered,
-                lineRangeCalculator: $this->lineRangeCalculator,
-                sourceLineMatcher: $this->sourceLineMatcher,
-                originalFileTokens: $originalFileTokens,
-                originalFileContent: $sourceFile->getContents(),
-            ),
+        // TODO
+        // TODO: add trace too
+        $traverser = $this->traverserFactory->create(
+            $trace,
+            $originalFileTokens,
+            /*$mutationCollectorVisitor, $nodeIgnorers*/
         );
 
-        $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);
-        $traverser->traverse($initialStatements);
-
-        yield from $mutationCollectorVisitor->getMutations();
+        yield new Ast(
+            $trace,
+            $originalFileTokens,
+            $traverser->traverse($initialStatements),
+        );
     }
 
     private function trace(SplFileInfo $sourceFile): Trace

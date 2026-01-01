@@ -37,7 +37,7 @@ namespace Infection\Tests\Mutation\FileMutationGenerator;
 
 use function current;
 use function file_exists;
-use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Testing\MutatorName;
@@ -52,7 +52,7 @@ use function Safe\file_get_contents;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
-#[CoversClass(FileMutationGenerator::class)]
+#[CoversClass(MutationGenerator::class)]
 final class FileMutationGeneratorIntegrationTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
@@ -63,7 +63,7 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
 
         $mutators = [new Plus()];
 
-        $mutationGenerator = new FileMutationGenerator(
+        $mutationGenerator = new MutationGenerator(
             SingletonContainer::getContainer()->getFileParser(),
             SingletonContainer::getContainer()->getNodeTraverserFactory(),
             SingletonContainer::getContainer()->getLineRangeCalculator(),

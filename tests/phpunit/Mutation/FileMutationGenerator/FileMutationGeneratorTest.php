@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
-use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Source\Matcher\SourceLineMatcher;
@@ -55,7 +55,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-#[CoversClass(FileMutationGenerator::class)]
+#[CoversClass(MutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
 {
     private MockObject&FileParser $fileParserMock;
@@ -64,7 +64,7 @@ final class FileMutationGeneratorTest extends TestCase
 
     private MockObject&Tracer $tracerMock;
 
-    private FileMutationGenerator $mutationGenerator;
+    private MutationGenerator $mutationGenerator;
 
     protected function setUp(): void
     {
@@ -72,7 +72,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
 
-        $this->mutationGenerator = new FileMutationGenerator(
+        $this->mutationGenerator = new MutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),

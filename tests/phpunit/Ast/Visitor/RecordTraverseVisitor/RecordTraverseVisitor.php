@@ -33,49 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\Ast\Visitor\RecordTraverseVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use SplObjectStorage;
-use function str_contains;
+use function func_get_args;
 
-/**
- * @internal
- */
-final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstract
+final class RecordTraverseVisitor extends NodeVisitorAbstract
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
-
     /**
-     * @param SplObjectStorage<object, mixed> $ignoredNodes
+     * @var list<array{string, list<mixed>}>
      */
-    public function __construct(
-        private readonly ChangingIgnorer $changingIgnorer,
-        private readonly SplObjectStorage $ignoredNodes,
-    ) {
+    private array $records = [];
+
+    public function fetch(): array
+    {
+        $records = $this->records;
+        $this->records = [];
+
+        return $records;
     }
 
-    public function enterNode(Node $node): ?Node
+    public function beforeTraverse(array $nodes): void
     {
-        foreach ($node->getComments() as $comment) {
-            if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
-                $this->changingIgnorer->startIgnoring();
-                $this->ignoredNodes->offsetSet($node);
-            }
-        }
-
-        return null;
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 
-    public function leaveNode(Node $node): ?Node
+    public function enterNode(Node $node): void
     {
-        if ($this->ignoredNodes->offsetExists($node)) {
-            $this->ignoredNodes->offsetUnset($node);
-            $this->changingIgnorer->stopIgnoring();
-        }
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
 
-        return null;
+    public function leaveNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function afterTraverse(array $nodes): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 }

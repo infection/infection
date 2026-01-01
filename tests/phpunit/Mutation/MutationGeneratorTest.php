@@ -39,7 +39,7 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutableFileWasProcessed;
 use Infection\Event\MutationGenerationWasFinished;
 use Infection\Event\MutationGenerationWasStarted;
-use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
@@ -82,7 +82,7 @@ final class MutationGeneratorTest extends TestCase
         $mutation1 = $this->createMock(Mutation::class);
         $mutation2 = $this->createMock(Mutation::class);
 
-        $fileMutationGenerator = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGenerator = $this->createMock(MutationGenerator::class);
         $fileMutationGenerator
             ->expects($this->exactly(2))
             ->method('generate')
@@ -133,7 +133,7 @@ final class MutationGeneratorTest extends TestCase
             ))
         ;
 
-        $fileMutationGeneratorMock = $this->createMock(FileMutationGenerator::class);
+        $fileMutationGeneratorMock = $this->createMock(MutationGenerator::class);
         $fileMutationGeneratorMock
             ->expects($this->exactly(2))
             ->method('generate')->willReturn([])

@@ -33,32 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Ast\NodeVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use newSrc\AST\NodeLabeler;
 use PhpParser\Node;
-use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
-/**
- * @internal
- */
-final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
+// Add types based on either stubs or PHPStan or other.
+final class AddTypesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
     public function __construct(
-        private readonly array $nodeIgnorers,
+        private NodeLabeler $nodeStateTracker,
     ) {
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): ?Node
     {
-        foreach ($this->nodeIgnorers as $nodeIgnorer) {
-            if ($nodeIgnorer->ignores($node)) {
-                return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-            }
+        if ($this->nodeStateTracker->isEligible($node)) {
+            // I would add those types in a way that it is lazily evaluated, i.e. we do not try to get the types for the node unless necessary.
         }
 
         return null;

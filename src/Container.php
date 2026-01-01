@@ -98,7 +98,7 @@ use Infection\Mutant\MutantCodeFactory;
 use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
-use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
@@ -435,7 +435,7 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
+            MutationGenerator::class => static fn (self $container): MutationGenerator => new MutationGenerator(
                 $container->getFileParser(),
                 $container->getNodeTraverserFactory(),
                 $container->getLineRangeCalculator(),
@@ -831,9 +831,9 @@ final class Container extends DIContainer
         return $this->get(NodeTraverserFactory::class);
     }
 
-    public function getFileMutationGenerator(): FileMutationGenerator
+    public function getFileMutationGenerator(): MutationGenerator
     {
-        return $this->get(FileMutationGenerator::class);
+        return $this->get(MutationGenerator::class);
     }
 
     public function getFileLoggerFactory(): FileLoggerFactory

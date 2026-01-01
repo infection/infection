@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use Infection\Ast\Metadata\NodeAnnotator;
 use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
@@ -81,7 +82,6 @@ class NodeMutationGenerator
         private readonly Trace $trace,
         private readonly bool $onlyCovered,
         private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
@@ -97,6 +97,10 @@ class NodeMutationGenerator
      */
     public function generate(Node $node): iterable
     {
+        if (!NodeAnnotator::isEligible($node)) {
+            return;
+        }
+
         $this->currentNode = $node;
         $this->testsMemoized = null;
         $this->isOnFunctionSignatureMemoized = null;
@@ -105,11 +109,6 @@ class NodeMutationGenerator
         if (!$this->isOnFunctionSignature()
             && !$this->isInsideFunction()
         ) {
-            return;
-        }
-
-        /** @psalm-suppress InvalidArgument */
-        if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
             return;
         }
 

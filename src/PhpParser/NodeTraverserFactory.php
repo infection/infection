@@ -35,6 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser;
 
+use Infection\Ast\Metadata\TraverseContext;
+use Infection\Ast\NodeVisitor\ExcludeUnchangedNodesVisitor;
+use Infection\Ast\NodeVisitor\ExcludeUncoveredNodesVisitor;
+use Infection\Ast\NodeVisitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
@@ -43,11 +47,15 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\Trace;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
+use PhpParser\Token;
 use SplObjectStorage;
 
 /**
@@ -56,10 +64,16 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
+    public function __construct(
+        private readonly SourceLineMatcher $sourceLineMatcher,
+    ) {
+
+    }
+
     /**
      * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
+    public function legacyCreate(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
         $nodeIgnorers[] = $changingIgnorer;
@@ -86,12 +100,40 @@ class NodeTraverserFactory
 
         return $traverser;
     }
+    /**
+     * @param Token[] $originalFileTokens
+     * @param NodeIgnorer[] $nodeIgnorers
+     */
+    public function create(
+        Trace $trace,
+        array $originalFileTokens,
+    ): NodeTraverserInterface
+    {
+        $context = new TraverseContext(
+            $trace->getRealPath(),
+        );
+
+        return new NodeTraverser(
+            NameResolverFactory::create(),
+            new ParentConnectingVisitor(),
+            new ReflectionVisitor(),
+
+            // We need to place if after other annotated elements.
+            // It would be nicer to have it before, to be able to skip non-relevant nodes,
+            // but currently, it skips anything not touched, e.g. even the class name although
+            // a node of a method of the class is touched.
+            // TODO: review this implementation
+            new ExcludeUnchangedNodesVisitor(
+                $this->sourceLineMatcher,
+                $context,
+            ),
+        );
+    }
 
     public function createPreTraverser(): NodeTraverserInterface
     {
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NextConnectingVisitor());
-
-        return $traverser;
+        return new NodeTraverser(
+            new NextConnectingVisitor(),
+        );
     }
 }
