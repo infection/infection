@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests;
 
+use function file_exists;
 use Infection\Framework\OperatingSystem;
 use Infection\Testing\StringNormalizer;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
-use function is_dir;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -73,7 +73,7 @@ final class BenchmarkSmokeTest extends TestCase
             $this->markTestSkipped('This test requires running without PHPDBG.');
         }
 
-        if (!is_dir($sourcesLocation)) {
+        if (!file_exists($sourcesLocation)) {
             $this->markTestIncomplete('Benchmark requires sources to be prepared.');
         }
 
@@ -103,6 +103,18 @@ final class BenchmarkSmokeTest extends TestCase
             self::BENCHMARK_DIR . '/MutationGenerator/sources',
             <<<'STDOUT'
                 1 mutation(s) generated.
+
+                STDOUT,
+        ];
+
+        yield 'ParseGitDiff' => [
+            [
+                Path::canonicalize(self::BENCHMARK_DIR . '/ParseGitDiff/profile.php'),
+                '--debug',
+            ],
+            self::BENCHMARK_DIR . '/ParseGitDiff/diff',
+            <<<'STDOUT'
+                10000 changed line range(s) generated.
 
                 STDOUT,
         ];

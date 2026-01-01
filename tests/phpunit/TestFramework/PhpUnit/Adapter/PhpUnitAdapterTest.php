@@ -46,46 +46,27 @@ use Infection\TestFramework\VersionParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PhpUnitAdapter::class)]
 final class PhpUnitAdapterTest extends TestCase
 {
-    /**
-     * @var PhpUnitAdapter
-     */
-    private $adapter;
+    private PhpUnitAdapter $adapter;
 
-    private $pcovDirectoryProvider;
+    private MockObject&PCOVDirectoryProvider $pcovDirectoryProvider;
 
-    private $initialConfigBuilder;
+    private MockObject&CommandLineArgumentsAndOptionsBuilder $cliArgumentsBuilder;
 
-    private $mutationConfigBuilder;
-
-    private $cliArgumentsBuilder;
-
-    private $commandLineBuilder;
+    private MockObject&CommandLineBuilder $commandLineBuilder;
 
     protected function setUp(): void
     {
         $this->pcovDirectoryProvider = $this->createMock(PCOVDirectoryProvider::class);
-        $this->initialConfigBuilder = $this->createMock(InitialConfigBuilder::class);
-        $this->mutationConfigBuilder = $this->createMock(MutationConfigBuilder::class);
         $this->cliArgumentsBuilder = $this->createMock(CommandLineArgumentsAndOptionsBuilder::class);
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
 
-        $this->adapter = new PhpUnitAdapter(
-            '/path/to/phpunit',
-            '/tmp',
-            '/tmp/infection/junit.xml',
-            $this->pcovDirectoryProvider,
-            $this->initialConfigBuilder,
-            $this->mutationConfigBuilder,
-            $this->cliArgumentsBuilder,
-            new VersionParser(),
-            $this->commandLineBuilder,
-            '9.0',
-        );
+        $this->adapter = $this->getPHPUnitAdapter();
     }
 
     public function test_it_has_a_name(): void
@@ -219,6 +200,60 @@ final class PhpUnitAdapterTest extends TestCase
     }
 
     #[Group('integration')]
+    public function test_it_provides_initial_test_run_command_line_with_fast_path_when_coverage_report_is_requested(): void
+    {
+        $this->adapter = $this->getPHPUnitAdapter('12.5');
+
+        $this->cliArgumentsBuilder
+            ->expects($this->once())
+            ->method('buildForInitialTestsRun')
+            ->with('', '--group=default --exclude-source-from-xml-coverage --coverage-xml=/tmp/coverage-xml --log-junit=/tmp/infection/junit.xml')
+            ->willReturn([
+                '--group=default', '--exclude-source-from-xml-coverage --coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->commandLineBuilder
+            ->expects($this->once())
+            ->method('build')
+            ->with('/path/to/phpunit', ['-d', 'memory_limit=-1'], [
+                '--group=default', '--exclude-source-from-xml-coverage --coverage-xml=/tmp/coverage-xml', '--log-junit=/tmp/infection/junit.xml',
+            ])
+            ->willReturn([
+                '/path/to/phpunit',
+                '--group=default',
+                '--exclude-source-from-xml-coverage',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ])
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->once())
+            ->method('shallProvide')
+            ->willReturn(false)
+        ;
+
+        $this->pcovDirectoryProvider
+            ->expects($this->never())
+            ->method('getDirectory')
+        ;
+
+        $initialTestRunCommandLine = $this->adapter->getInitialTestRunCommandLine('--group=default', ['-d', 'memory_limit=-1'], false);
+
+        $this->assertSame(
+            [
+                '/path/to/phpunit',
+                '--group=default',
+                '--exclude-source-from-xml-coverage',
+                '--coverage-xml=/tmp/coverage-xml',
+                '--log-junit=/tmp/infection/junit.xml',
+            ],
+            $initialTestRunCommandLine,
+        );
+    }
+
+    #[Group('integration')]
     public function test_it_provides_initial_test_run_command_line_when_coverage_report_is_requested_and_pcov_is_in_use(): void
     {
         $this->cliArgumentsBuilder
@@ -340,5 +375,38 @@ final class PhpUnitAdapterTest extends TestCase
         yield [true, '12.2.99'];
 
         yield [true, '13.0'];
+    }
+
+    #[DataProvider('coverageWithoutSourceProvider')]
+    public function test_supports_coverage_without_source(string $version, bool $expected): void
+    {
+        $this->assertSame($expected, PhpUnitAdapter::supportsExcludingSourceFromCoverage($version));
+    }
+
+    public static function coverageWithoutSourceProvider(): iterable
+    {
+        yield ['11.5.599', false];
+
+        yield ['12.0', false];
+
+        yield ['12.5', true];
+
+        yield ['13.0', true];
+    }
+
+    private function getPHPUnitAdapter(string $version = '9.0'): PhpUnitAdapter
+    {
+        return new PhpUnitAdapter(
+            '/path/to/phpunit',
+            '/tmp',
+            '/tmp/infection/junit.xml',
+            $this->pcovDirectoryProvider,
+            $this->createMock(InitialConfigBuilder::class),
+            $this->createMock(MutationConfigBuilder::class),
+            $this->cliArgumentsBuilder,
+            new VersionParser(),
+            $this->commandLineBuilder,
+            $version,
+        );
     }
 }

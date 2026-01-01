@@ -141,7 +141,7 @@ final class IoCodeDetector
     /**
      * @var string[]|null
      */
-    private static $statements;
+    private static ?array $statements = null;
 
     public static function codeContainsIoOperations(string $code): bool
     {

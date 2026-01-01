@@ -44,10 +44,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MemoryFormatter::class)]
 final class MemoryFormatterTest extends TestCase
 {
-    /**
-     * @var MemoryFormatter
-     */
-    private $memoryFormatter;
+    private MemoryFormatter $memoryFormatter;
 
     protected function setUp(): void
     {

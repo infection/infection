@@ -49,10 +49,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(InitialTestsConsoleLoggerSubscriberFactory::class)]
 final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
 {
-    /**
-     * @var TestFrameworkAdapter|MockObject
-     */
-    private $testFrameworkAdapterMock;
+    private MockObject&TestFrameworkAdapter $testFrameworkAdapterMock;
 
     protected function setUp(): void
     {

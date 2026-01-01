@@ -45,6 +45,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InvalidSchema::class)]
 final class InvalidSchemaTest extends TestCase
 {
+    /**
+     * @param string[] $errors
+     */
     #[DataProvider('configWithErrorsProvider')]
     public function test_it_can_be_instantiated(
         SchemaConfigurationFile $config,
@@ -63,22 +66,22 @@ final class InvalidSchemaTest extends TestCase
 
     public static function configWithErrorsProvider(): iterable
     {
-        $path = '/path/to/config';
+        $pathname = '/path/to/config';
 
         yield 'no error' => [
-            new SchemaConfigurationFile($path),
+            new SchemaConfigurationFile($pathname),
             [],
             '"/path/to/config" does not match the expected JSON schema.',
         ];
 
         yield 'pseudo empty error' => [
-            new SchemaConfigurationFile($path),
+            new SchemaConfigurationFile($pathname),
             ['', ''],
             '"/path/to/config" does not match the expected JSON schema.',
         ];
 
         yield 'one error' => [
-            new SchemaConfigurationFile($path),
+            new SchemaConfigurationFile($pathname),
             ['Error message'],
             <<<'ERROR'
                 "/path/to/config" does not match the expected JSON schema:
@@ -87,7 +90,7 @@ final class InvalidSchemaTest extends TestCase
         ];
 
         yield 'multiple errors' => [
-            new SchemaConfigurationFile($path),
+            new SchemaConfigurationFile($pathname),
             [
                 'First error message',
                 'Second error message',
@@ -100,7 +103,7 @@ final class InvalidSchemaTest extends TestCase
         ];
 
         yield 'worst case' => [
-            new SchemaConfigurationFile($path),
+            new SchemaConfigurationFile($pathname),
             [
                 ' First error message ',
                 '',

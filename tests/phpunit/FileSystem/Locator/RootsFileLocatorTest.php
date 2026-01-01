@@ -57,10 +57,7 @@ final class RootsFileLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private Filesystem $filesystem;
 
     protected function setUp(): void
     {
@@ -69,34 +66,36 @@ final class RootsFileLocatorTest extends TestCase
 
     /**
      * @param string[] $roots
+     * @param non-empty-string $fileName
      */
     #[DataProvider('pathsProvider')]
     public function test_it_can_locate_files(
         array $roots,
-        string $file,
+        string $fileName,
         string $expected,
     ): void {
-        $path = (new RootsFileLocator($roots, $this->filesystem))->locate($file);
+        $actual = (new RootsFileLocator($roots, $this->filesystem))->locate($fileName);
 
         $this->assertSame(
             Path::normalize($expected),
-            Path::normalize($path),
+            Path::normalize($actual),
         );
     }
 
     /**
      * @param string[] $roots
+     * @param non-empty-string $fileName
      */
     #[DataProvider('invalidPathsProvider')]
     public function test_it_throws_an_exception_if_file_or_folder_does_not_exist(
         array $roots,
-        string $file,
+        string $fileName,
         string $expectedErrorMessage,
     ): void {
         $locator = new RootsFileLocator($roots, $this->filesystem);
 
         try {
-            $locator->locate($file);
+            $locator->locate($fileName);
 
             $this->fail('Expected an exception to be thrown.');
         } catch (FileNotFound $exception) {
@@ -108,36 +107,36 @@ final class RootsFileLocatorTest extends TestCase
 
     /**
      * @param string[] $roots
-     * @param string[] $files
+     * @param non-empty-string[] $fileNames
      */
     #[DataProvider('multiplePathsProvider')]
     public function test_it_can_locate_one_of_the_given_files(
         array $roots,
-        array $files,
+        array $fileNames,
         string $expected,
     ): void {
-        $path = (new RootsFileLocator($roots, $this->filesystem))->locateOneOf($files);
+        $actual = (new RootsFileLocator($roots, $this->filesystem))->locateOneOf($fileNames);
 
         $this->assertSame(
             Path::normalize($expected),
-            Path::normalize($path),
+            Path::normalize($actual),
         );
     }
 
     /**
      * @param string[] $roots
-     * @param string[] $files
+     * @param non-empty-string[] $fileNames
      */
     #[DataProvider('multipleInvalidPathsProvider')]
     public function test_locate_any_throws_exception_if_no_file_could_be_found(
         array $roots,
-        array $files,
+        array $fileNames,
         string $expectedErrorMessage,
     ): void {
         $locator = new RootsFileLocator($roots, $this->filesystem);
 
         try {
-            $locator->locateOneOf($files);
+            $locator->locateOneOf($fileNames);
 
             $this->fail('Expected an exception to be thrown.');
         } catch (FileNotFound $exception) {

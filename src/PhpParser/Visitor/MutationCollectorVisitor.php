@@ -37,6 +37,7 @@ namespace Infection\PhpParser\Visitor;
 
 use Infection\Mutation\Mutation;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\Source\Exception\NoSourceFound;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -62,6 +63,11 @@ final class MutationCollectorVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws NoSourceFound
+     */
     public function leaveNode(Node $node): ?Node
     {
         $this->mutationChunks[] = $this->mutationGenerator->generate($node);

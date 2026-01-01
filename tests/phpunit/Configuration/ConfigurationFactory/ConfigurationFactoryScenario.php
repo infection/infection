@@ -39,6 +39,9 @@ use Infection\Configuration\Configuration;
 use Infection\Configuration\Entry\Logs;
 use Infection\Configuration\Entry\PhpStan;
 use Infection\Configuration\Entry\PhpUnit;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\Removal\MethodCallRemoval;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
@@ -585,6 +588,22 @@ final class ConfigurationFactoryScenario
                         'MethodCallRemoval' => new MethodCallRemoval(),
                     ])
                     ->withIgnoreSourceCodeMutatorsMap($expectedIgnoreSourceCodeMutatorsMap)
+                    ->build(),
+            );
+    }
+
+    public function forSourceFilter(
+        PlainFilter|IncompleteGitDiffFilter|null $sourceFilter,
+        ?SourceFilter $expectedSourceFilter,
+    ): self {
+        return $this
+            ->withInput(
+                $this->inputBuilder
+                ->withSourceFilter($sourceFilter),
+            )
+            ->withExpected(
+                ConfigurationBuilder::from($this->expected)
+                    ->withSourceFilter($expectedSourceFilter)
                     ->build(),
             );
     }

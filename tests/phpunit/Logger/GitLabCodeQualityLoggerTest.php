@@ -71,6 +71,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         self::resetOriginalFilePrefix();
     }
 
+    /**
+     * @param array<int, array<string, string|array<int|string, array<string, int>|string>>> $expectedContents
+     */
     #[DataProvider('metricsProvider')]
     public function test_it_logs_correctly_with_mutations(
         ResultsCollector $resultsCollector,
@@ -176,6 +179,9 @@ final class GitLabCodeQualityLoggerTest extends TestCase
         $this->assertStringContainsString('"path":"foo\/bar"', $logger->getLogLines()[0]);
     }
 
+    /**
+     * @param array<int, array<string, array<int|string, array<string, int>|string>|string>> $expectedJson
+     */
     private function assertLoggedContentIs(array $expectedJson, GitLabCodeQualityLogger $logger): void
     {
         $this->assertSame($expectedJson, json_decode($logger->getLogLines()[0], true, JSON_THROW_ON_ERROR));

@@ -72,7 +72,9 @@ abstract class BaseCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        return $this->executeCommand($this->getIO()) ? 0 : 1;
+        return $this->executeCommand($this->getIO())
+            ? self::SUCCESS
+            : self::FAILURE;
     }
 
     abstract protected function executeCommand(IO $io): bool;

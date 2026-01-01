@@ -30,10 +30,6 @@ parameters:
         -
             path: '../src/Logger/Html/StrykerHtmlReportBuilder.php'
             message: '#return type with generic class ArrayObject does not specify its types\: TKey, TValue#'
-        -
-            message: "#^ArrayObject\\<\\*NEVER\\*, \\*NEVER\\*\\> does not accept array\\<string, array\\|string\\>\\.$#"
-            count: 1
-            path: ../src/Logger/Html/StrykerHtmlReportBuilder.php
 
         -
             message: "#^Generator expects value type list\\<PhpParser\\\\Node\\\\Stmt\\>, array\\<PhpParser\\\\Node\\\\Stmt\\> given\\.$#"
@@ -44,11 +40,6 @@ parameters:
             message: "#^Generator expects value type list\\<PhpParser\\\\Node\\\\Stmt\\>, non\\-empty\\-array\\<PhpParser\\\\Node\\\\Stmt\\> given\\.$#"
             count: 1
             path: ../src/Mutator/Unwrap/UnwrapFinally.php
-
-        -
-            message: "#^Method Infection\\\\TestFramework\\\\SafeDOMXPath\\:\\:query\\(\\) should return DOMNodeList\\<DOMElement\\> but returns DOMNodeList\\<DOMNameSpaceNode\\|DOMNode\\>\\.$#"
-            count: 1
-            path: ../src/TestFramework/SafeDOMXPath.php
 
         -
             message: "#Do not use magic number (.*)#"
@@ -122,6 +113,31 @@ parameters:
             count: 1
             path: ../tests/phpunit/MockedContainer.php
 
+        -
+            message: "#queryCount#"
+            identifier: return.type
+            count: 1
+            path: ../src/TestFramework/SafeDOMXPath.php
+
+        -
+            message: "#FS::tmpFile#"
+            identifier: shipmonk.deadMethod
+            count: 1
+            path: ../tests/phpunit/TestingUtility/FS.php
+
+        # We are explicitly testing the guards here
+        -
+            identifier: argument.type
+            path: ../tests/phpunit/Mutator/Removal/ArrayItemRemovalConfigTest.php
+
+        # We are not too interested in making the FakeFileSystem correct typewise.
+        -
+            message: "#Do not use magic number as default parameter#"
+            path: ../src/FileSystem/FakeFileSystem.php
+        -
+            identifier: missingType.iterableValue
+            path: ../src/FileSystem/FakeFileSystem.php
+
         # PHPStan fails to detect that we have at least one loop hence the result cannot be null.
         -
             message: '#::profile\(\) should return int but returns int\|null#'
@@ -130,19 +146,63 @@ parameters:
             message: '#::profile\(\) should return int but returns int.*\|null#'
             path: ../tests/benchmark/DummyInstrumentor.php
 
+        # This plugin does not seem to understand the PHPBench data providers
+        -
+            identifier: shipmonk.deadMethod
+            message: '#Unused .+Bench::provide*#'
+            path: ../tests/benchmark/*/*Bench.php
+
         # Test builders provide fluent API methods that may not be used immediately
         -
             identifier: shipmonk.deadMethod
             path: ../tests/phpunit/**/*Builder.php
-        # PHPBench benchmarks are not meant to be exposed.
-        -
-            identifier: shipmonk.deadMethod
-            path: ../tests/benchmark/*/*Bench.php
 
         # PHPStan is (understandably) a bit confused at class-names of classes that do not exist.
         -
             identifier: argument.type
             path: ../tests/phpunit/Framework/ClassNameTest.php
+
+        # Those magic numbers are related to the class name manipulation, they are not very interesting
+        # to extract into named constants.
+        -
+            message: '#Do not use magic number as a function argument.#'
+            path: ../src/Framework/ClassName.php
+
+        # Those cannot be avoided as ClassName does some class-string manipulation.
+        -
+            message: '#should return .*class-string.* but returns .*string#'
+            path: ../src/Framework/ClassName.php
+        -
+            message: '#expects class-string, string given#'
+            path: ../src/Framework/ClassName.php
+
+        # This is a valid case of magic number
+        -
+            message: "#Do not use magic number as a function argument. Move to constant with a suitable name.#"
+            count: 1
+            path: ../src/Git/CommandLineGit.php
+
+        # PHPStan cannot really properly infer that we throw those here
+        -
+            message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoSourceFound) in PHPDoc \@throws tag but it.+s not thrown\.$#'
+            identifier: throws.unusedType
+            path: ../src/Container.php
+
+        # PHPStan cannot really properly infer the types here
+        -
+            message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
+            identifier: argument.type
+            path: ../src/Source/Collector/BasicSourceCollector.php
+        -
+            message: '#BasicSourceCollector::makePathsAbsolute\(\)#'
+            identifier: return.type
+            path: ../src/Source/Collector/BasicSourceCollector.php
+
+        # False-positive: the value cannot be -1 with our configuration.
+        -
+            message: '#^.*(start|end)Line.*SourceLineMatcher::touches\(\) expects int\<1\, max\>\, -1\|int\<1\, max\> given\.$#'
+            identifier: argument.type
+            path: ../src/Mutator/NodeMutationGenerator.php
 
     level: 8
     paths:
@@ -156,6 +216,7 @@ parameters:
         - %currentWorkingDirectory%/src/CustomMutator/templates/__Name__Test.php
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
+        - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
         - ../tests/benchmark/MutationGenerator/sources (?)

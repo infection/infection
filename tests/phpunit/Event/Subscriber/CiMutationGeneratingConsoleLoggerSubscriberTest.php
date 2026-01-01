@@ -46,10 +46,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(CiMutationGeneratingConsoleLoggerSubscriber::class)]
 final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
     protected function setUp(): void
     {

@@ -306,11 +306,19 @@ final class TargetDetectionStatusesProviderTest extends TestCase
         $this->assertSame([], $provider->get());
     }
 
+    /**
+     * @param DetectionStatus[] $expected
+     * @param DetectionStatus[] $actual
+     */
     private function assertProvides(array $expected, array $actual): void
     {
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
+    /**
+     * @param DetectionStatus[] $excluding
+     * @param DetectionStatus[] $actual
+     */
     private function assertProvidesExcluding(array $excluding, array $actual): void
     {
         $expected = DetectionStatus::getCasesExcluding(...$excluding);
