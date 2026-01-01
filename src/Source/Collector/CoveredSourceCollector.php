@@ -33,47 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator;
+namespace Infection\Source\Collector;
 
-final class Scenario
+use function array_filter;
+use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\TestFramework\Tracing\Tracer;
+use Symfony\Component\Finder\SplFileInfo;
+
+/**
+ * Decorates a source collector to filter out the sources that are not covered.
+ *
+ * @internal
+ */
+final class CoveredSourceCollector implements SourceCollector
 {
+    /**
+     * @var SplFileInfo[]
+     */
+    private ?array $sourceFiles = null;
+
     public function __construct(
-        public bool $onlyCovered,
-        public bool $hasTrace,
-        public bool $traceHasTests,
-        public bool $expected,
+        private readonly SourceCollector $decoratedCollector,
+        private readonly Tracer $tracer,
     ) {
     }
 
-    public function withOnlyCovered(bool $onlyCovered): self
+    public function collect(): array
     {
-        $clone = clone $this;
-        $clone->onlyCovered = $onlyCovered;
+        if ($this->sourceFiles === null) {
+            $this->sourceFiles = array_filter(
+                $this->decoratedCollector->collect(),
+                $this->filter(...),
+            );
+        }
 
-        return $clone;
+        return $this->sourceFiles;
     }
 
-    public function withHasTrace(bool $hasTrace): self
+    private function filter(SplFileInfo $sourceFile): bool
     {
-        $clone = clone $this;
-        $clone->hasTrace = $hasTrace;
-
-        return $clone;
+        return $this->trace($sourceFile)->hasTests();
     }
 
-    public function withTraceHasTests(bool $traceHasTests): self
+    private function trace(SplFileInfo $sourceFile): Trace
     {
-        $clone = clone $this;
-        $clone->traceHasTests = $traceHasTests;
-
-        return $clone;
-    }
-
-    public function withExpected(bool $expected): self
-    {
-        $clone = clone $this;
-        $clone->expected = $expected;
-
-        return $clone;
+        try {
+            return $this->tracer->trace($sourceFile);
+        } catch (NoTraceFound) {
+            return new EmptyTrace($sourceFile);
+        }
     }
 }
