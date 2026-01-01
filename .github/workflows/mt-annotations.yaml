@@ -23,11 +23,11 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
               with:
                   fetch-depth: 0
             - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+              uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
               with:
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2.1
@@ -41,7 +41,7 @@ jobs:
               run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
             - name: Cache dependencies
-              uses: actions/cache@v4
+              uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
                   key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
