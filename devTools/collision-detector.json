@@ -1,5 +1,8 @@
 {
-	"scanPaths": ["../src", "../build", "../tests", "../var"],
+	"scanPaths": [
+        "../src",
+        "../tests"
+    ],
 	"excludePaths": [
         "../tests/e2e/",
         "../tests/benchmark/"
