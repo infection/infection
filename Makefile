@@ -222,7 +222,7 @@ test-benchmark: $(PHPUNIT) \
 
 .PHONY: test-e2e
 test-e2e: 	 	## Runs the end-to-end tests
-test-e2e: test-e2e-phpunit
+test-e2e:
 	./tests/e2e_tests $(INFECTION)
 
 .PHONY: test-e2e-phpunit
