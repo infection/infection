@@ -28,7 +28,7 @@ jobs:
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection' ]
         include:
-          - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', locked: true }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -47,15 +47,6 @@ jobs:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Remove the configured PHP platform
-        if: matrix.dependencies != 'locked'
-        run: composer config --unset platform.php
-
-      - name: Configure for PHP >= 8.4
-        if: "matrix.php-version >= '8.4'"
-        run: |
-          composer config platform.php 8.4.99
-
       - name: Get composer cache directory
         id: composer-cache
         shell: bash
@@ -73,16 +64,7 @@ jobs:
             composer-
 
       - name: Install dependencies
-        if: ${{ matrix.dependencies == 'locked' }}
         run: composer install --no-interaction --prefer-dist --no-progress
-
-      - name: Install highest dependencies
-        if: ${{ matrix.dependencies == 'highest' }}
-        run: composer update --no-interaction --prefer-dist --no-progress
-
-      - name: Install lowest dependencies
-        if: ${{ matrix.dependencies == 'lowest' }}
-        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
