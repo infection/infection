@@ -49,6 +49,7 @@ use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Matcher\SourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
@@ -61,17 +62,17 @@ use SplObjectStorage;
 
 /**
  * @internal
- * @final
  */
-class NodeTraverserFactory
+final readonly class NodeTraverserFactory
 {
     public function __construct(
-        private readonly SourceLineMatcher $sourceLineMatcher,
+        private SourceLineMatcher $sourceLineMatcher,
+        private LineRangeCalculator $lineRangeCalculator,
     ) {
-
     }
 
     /**
+     * @deprecated
      * @param NodeIgnorer[] $nodeIgnorers
      */
     public function legacyCreate(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
@@ -102,10 +103,13 @@ class NodeTraverserFactory
         return $traverser;
     }
     /**
+     * TODO: this replaces the "createPreTraverser": this "pre" traverse, which
+     *   is the first one, is where we enrich all the AST.
+     *
      * @param Token[] $originalFileTokens
      * @param NodeIgnorer[] $nodeIgnorers
      */
-    public function create(
+    public function createFirstTraverser(
         Trace $trace,
         array $originalFileTokens,
     ): NodeTraverserInterface
@@ -118,6 +122,7 @@ class NodeTraverserFactory
         return new NodeTraverser(
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
+            new NextConnectingVisitor(),
             new ReflectionVisitor(),
 
             // We need to place if after other annotated elements.
@@ -126,13 +131,30 @@ class NodeTraverserFactory
             // a node of a method of the class is touched.
             // TODO: review this implementation
             new ExcludeUnchangedNodesVisitor(
-                $this->sourceLineMatcher,
                 $context,
+                $this->sourceLineMatcher,
             ),
-            new AddTestsVisitor($context),
+            new AddTestsVisitor(
+                $context,
+                $this->lineRangeCalculator,
+            ),
         );
     }
 
+    /**
+     * TODO: replaces the `::create()`.
+     */
+    public function createSecondTraverser(NodeVisitor $mutationVisitor): NodeTraverserInterface
+    {
+        return new NodeTraverser(
+            new CloningVisitor(),
+            $mutationVisitor,
+        );
+    }
+
+    /**
+     * @deprecated
+     */
     public function createPreTraverser(): NodeTraverserInterface
     {
         return new NodeTraverser(

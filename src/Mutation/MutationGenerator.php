@@ -69,9 +69,11 @@ use Webmozart\Assert\Assert;
 final readonly class MutationGenerator
 {
     public function __construct(
-        private readonly LineRangeCalculator $lineRangeCalculator,
-        private readonly SourceLineMatcher $sourceLineMatcher,
+        private LineRangeCalculator $lineRangeCalculator,
+        private SourceLineMatcher $sourceLineMatcher,
         private MutatorFactory $mutatorFactory,
+        private NodeTraverserFactory $traverserFactory,
+        private bool $onlyCovered,
     ) {
     }
 
@@ -91,22 +93,17 @@ final readonly class MutationGenerator
         $visitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $sourceFile->getRealPath(),
-                fileNodes: $initialStatements,
-                trace: $trace,
-                onlyCovered: $onlyCovered,
-                lineRangeCalculator: $this->lineRangeCalculator,
-                sourceLineMatcher: $this->sourceLineMatcher,
-                originalFileTokens: $originalFileTokens,
-                originalFileContent: $sourceFile->getContents(),
+                filePath: $ast->trace->getRealPath(),
+                fileNodes: $ast->initialStatements,
+                onlyCovered: $this->onlyCovered,
+                originalFileTokens: $ast->originalFileTokens,
+                originalFileContent: $ast->trace->getSourceFileInfo()->getContents(),
             ),
         );
 
-        $traverser = new NodeTraverser(
-            new CloningVisitor(),
-            $visitor,
-        );
-        $traverser->traverse($ast->nodes);
+        $this->traverserFactory
+            ->createSecondTraverser($visitor)
+            ->traverse($ast->nodes);
 
         // TODO: in the future this is where we would apply the strategy selection.
         yield from $visitor->getMutations();

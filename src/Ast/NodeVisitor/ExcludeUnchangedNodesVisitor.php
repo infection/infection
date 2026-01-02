@@ -48,8 +48,8 @@ use PhpParser\NodeVisitorAbstract;
 final class ExcludeUnchangedNodesVisitor extends NodeVisitorAbstract
 {
     public function __construct(
-        private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly TraverseContext $context,
+        private readonly SourceLineMatcher $sourceLineMatcher,
     ) {
 
     }

@@ -71,8 +71,8 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
 
         $traverser = new NodeTraverser(
             new ExcludeUnchangedNodesVisitor(
-                $this->createSourceLineMatcher($changedLinesByPaths),
                 $context,
+                $this->createSourceLineMatcher($changedLinesByPaths),
             ),
             new MarkTraversedNodesAsVisitedVisitor(),
         );

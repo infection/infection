@@ -99,7 +99,7 @@ final readonly class AstCollector
 
         // TODO
         // TODO: add trace too
-        $traverser = $this->traverserFactory->create(
+        $traverser = $this->traverserFactory->createFirstTraverser(
             $trace,
             $originalFileTokens,
             /*$mutationCollectorVisitor, $nodeIgnorers*/
@@ -107,6 +107,7 @@ final readonly class AstCollector
 
         yield new Ast(
             $trace,
+            $initialStatements,
             $originalFileTokens,
             $traverser->traverse($initialStatements),
         );

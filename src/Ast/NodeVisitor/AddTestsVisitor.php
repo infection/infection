@@ -39,8 +39,10 @@ use Infection\Ast\Metadata\Annotation;
 use Infection\Ast\Metadata\NodeAnnotator;
 use Infection\Ast\Metadata\TraverseContext;
 use Infection\TestFramework\Tracing\Test\TestLocator\TestLocator;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use function Later\later;
 use function Later\lazy;
 
 /**
@@ -50,6 +52,7 @@ final class AddTestsVisitor extends NodeVisitorAbstract
 {
     public function __construct(
         private readonly TraverseContext $context,
+        private readonly LineRangeCalculator $lineRangeCalculator,
     ) {
     }
 
@@ -58,11 +61,18 @@ final class AddTestsVisitor extends NodeVisitorAbstract
         NodeAnnotator::annotate(
             $node,
             Annotation::TESTS,
-            lazy(
-                static fn () => $this->context->trace->getAllTestsForMutation(
-                    $this->lineRangeCalculator->calculateRange($this->currentNode),
-                    $this->isOnFunctionSignature(),
-                ),
+            later(
+                function () use ($node) {
+                    $isOnFunctionSignature = NodeAnnotator::isOnFunctionSignature($node);
+
+                    return yield from $this->context->trace->getAllTestsForMutation(
+                        $this->lineRangeCalculator->calculateRange(
+                            $node,
+                            $isOnFunctionSignature,
+                        ),
+                        $isOnFunctionSignature,
+                    );
+                },
             )
         );
 

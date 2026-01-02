@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Ast\Metadata;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 final class NodeAnnotator
@@ -54,5 +56,18 @@ final class NodeAnnotator
     public static function isEligible(Node $node): bool
     {
         return $node->hasAttribute(Annotation::ELIGIBLE->name);
+    }
+
+    public static function isOnFunctionSignature(Node $node): bool
+    {
+        return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+    }
+
+    /**
+     * @return iterable<TestLocation>
+     */
+    public static function getTests(Node $node): iterable
+    {
+        return $node->getAttribute(Annotation::TESTS->name);
     }
 }

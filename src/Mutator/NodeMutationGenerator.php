@@ -63,9 +63,6 @@ class NodeMutationGenerator
 
     private Node $currentNode;
 
-    /** @var TestLocation[]|null */
-    private ?array $testsMemoized = null;
-
     private ?bool $isOnFunctionSignatureMemoized = null;
 
     private ?bool $isInsideFunctionMemoized = null;
@@ -79,9 +76,7 @@ class NodeMutationGenerator
         array $mutators,
         private readonly string $filePath,
         private readonly array $fileNodes,
-        private readonly Trace $trace,
         private readonly bool $onlyCovered,
-        private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly array $originalFileTokens,
         private readonly string $originalFileContent,
     ) {
@@ -136,7 +131,7 @@ class NodeMutationGenerator
             );
         }
 
-        $tests = $this->getAllTestsForCurrentNode();
+        $tests = NodeAnnotator::getTests($node);
 
         if ($this->onlyCovered && count($tests) === 0) {
             return;
@@ -173,24 +168,4 @@ class NodeMutationGenerator
         return $this->isInsideFunctionMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 
-    /**
-     * @return TestLocation[]
-     */
-    private function getAllTestsForCurrentNode(): array
-    {
-        if ($this->testsMemoized !== null) {
-            return $this->testsMemoized;
-        }
-
-        $testsMemoized = $this->trace->getAllTestsForMutation(
-            $this->lineRangeCalculator->calculateRange($this->currentNode),
-            $this->isOnFunctionSignature(),
-        );
-
-        if ($testsMemoized instanceof Traversable) {
-            $testsMemoized = iterator_to_array($testsMemoized, false);
-        }
-
-        return $this->testsMemoized = $testsMemoized;
-    }
 }

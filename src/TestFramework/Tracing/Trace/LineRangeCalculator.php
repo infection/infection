@@ -44,9 +44,12 @@ use PhpParser\Node;
  */
 final class LineRangeCalculator
 {
-    public function calculateRange(Node $originalNode): NodeLineRangeData
+    public function calculateRange(
+        Node $originalNode,
+        bool $isOnFunctionSignature,
+    ): NodeLineRangeData
     {
-        if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
+        if ($isOnFunctionSignature) {
             $startLine = $originalNode->getStartLine();
 
             // function signature node should always be 1-line range: (start, start)
