@@ -81,7 +81,7 @@ final class LabelNodeAsEligibleVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name(
@@ -113,7 +113,7 @@ final class LabelNodeAsEligibleVisitorTest extends AstTestCase
                         ELIGIBLE: -1
                     )
                 )
-                OUT,
+                AST,
         ];
     }
 }

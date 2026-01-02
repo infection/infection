@@ -99,7 +99,6 @@ use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\MutationGenerator;
-use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
@@ -435,12 +434,14 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            MutationGenerator::class => static fn (self $container): MutationGenerator => new MutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
+            NodeTraverserFactory::class => static fn (self $container): NodeTraverserFactory => new NodeTraverserFactory(
                 $container->getSourceLineMatcher(),
-                $container->getTracer(),
+                $container->getLineRangeCalculator(),
+                $container->getConfiguration()->mutateOnlyCoveredCode(),
+            ),
+            MutationGenerator::class => static fn (self $container): MutationGenerator => new MutationGenerator(
+                $container->getConfiguration()->mutators,
+                $container->getNodeTraverserFactory(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -518,16 +519,6 @@ final class Container extends DIContainer
                     $container->getMutantExecutionResultFactory(),
                     $mutantProcessKillerFactories,
                     $container->getConfiguration(),
-                );
-            },
-            MutationGenerator::class => static function (self $container): MutationGenerator {
-                $config = $container->getConfiguration();
-
-                return new MutationGenerator(
-                    $container->getSourceCollector(),
-                    $config->mutators,
-                    $container->getEventDispatcher(),
-                    $container->getFileMutationGenerator(),
                 );
             },
             MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
@@ -829,11 +820,6 @@ final class Container extends DIContainer
     public function getNodeTraverserFactory(): NodeTraverserFactory
     {
         return $this->get(NodeTraverserFactory::class);
-    }
-
-    public function getFileMutationGenerator(): MutationGenerator
-    {
-        return $this->get(MutationGenerator::class);
     }
 
     public function getFileLoggerFactory(): FileLoggerFactory

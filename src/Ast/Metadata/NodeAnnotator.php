@@ -37,6 +37,7 @@ namespace Infection\Ast\Metadata;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Later\Interfaces\Deferred;
 use PhpParser\Node;
 
 final class NodeAnnotator
@@ -69,10 +70,10 @@ final class NodeAnnotator
     }
 
     /**
-     * @return iterable<TestLocation>
+     * @return Deferred<TestLocation[]>
      */
-    public static function getTests(Node $node): iterable
+    public static function getTests(Node $node): array
     {
-        return $node->getAttribute(Annotation::TESTS->name);
+        return $node->getAttribute(Annotation::TESTS->name)->get() ?? [];
     }
 }

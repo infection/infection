@@ -121,7 +121,7 @@ final class ExcludeNonSupportedNodesVisitorTest extends AstTestCase
                 \class_alias('Humbug\Infection\Tests\Virtual\GreatService', 'Infection\Tests\Virtual\GreatService', \false);
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name(
@@ -368,7 +368,7 @@ final class ExcludeNonSupportedNodesVisitorTest extends AstTestCase
                         NOT_SUPPORTED: 5
                     )
                 )
-                OUT,
+                AST,
         ];
     }
 }

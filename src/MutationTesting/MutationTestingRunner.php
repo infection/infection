@@ -77,6 +77,7 @@ final readonly class MutationTestingRunner
     {
         return take($this->sourceCollector->collect())
             ->map($this->astCollector->generate(...))
+            ->filter(static fn ($ast) => $ast !== null)
             ->unpack($this->mutationGenerator->generate(...))
             ->map($this->mutationAnalyzer->analyze(...))
             ->toList();

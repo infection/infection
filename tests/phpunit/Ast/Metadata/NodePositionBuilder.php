@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\AST\Metadata;
+namespace Infection\Tests\Ast\Metadata;
 
-use newSrc\AST\Metadata\NodePosition;
+use Infection\Ast\Metadata\NodePosition;
 
 final class NodePositionBuilder
 {

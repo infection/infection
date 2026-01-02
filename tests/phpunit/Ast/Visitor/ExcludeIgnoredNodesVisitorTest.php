@@ -79,7 +79,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name
@@ -99,7 +99,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
 
         yield 'comment on a method' => [
@@ -116,7 +116,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name
@@ -134,7 +134,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
 
         yield 'phpdoc on a method' => [
@@ -151,7 +151,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name
@@ -169,7 +169,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
 
         yield 'comment on the class' => [
@@ -186,7 +186,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name
@@ -196,7 +196,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
 
         yield 'comment on an expression' => [
@@ -213,7 +213,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                 );
 
                 PHP,
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name
@@ -249,7 +249,7 @@ final class ExcludeIgnoredNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
     }
 }

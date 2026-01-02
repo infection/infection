@@ -35,18 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Ast;
 
-use Infection\Mutator\Mutator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -61,49 +58,30 @@ final readonly class AstCollector
     }
 
     /**
-     * @param Mutator $mutators
-     * @param NodeIgnorer[] $nodeIgnorers
-     *
      * @throws UnparsableFile
      * @throws NoSourceFound
-     *
-     * @return iterable<Ast>
      */
     public function generate(
         SplFileInfo $sourceFile,
         bool $onlyCovered,
-        array $mutators,
-        array $nodeIgnorers,
-    ): iterable {
-        Assert::allIsInstanceOf($mutators, Mutator::class);
-        Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
-
+    ): ?Ast {
         $trace = $this->trace($sourceFile);
 
         if ($onlyCovered && !$trace->hasTests()) {
-            return;
+            return null;
         }
 
-        // TODO: forward the originalFileTokens!
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
-        // Pre-traverse the nodes to connect them
-        $preTraverser = $this->traverserFactory->createPreTraverser();
-        $preTraverser->traverse($initialStatements);
+        $nodes = $this->traverserFactory
+            ->createFirstTraverser($trace)
+            ->traverse($initialStatements);
 
-        // TODO
-        // TODO: add trace too
-        $traverser = $this->traverserFactory->createFirstTraverser(
-            $trace,
-            $originalFileTokens,
-            /* $mutationCollectorVisitor, $nodeIgnorers */
-        );
-
-        yield new Ast(
+        return new Ast(
             $trace,
             $initialStatements,
             $originalFileTokens,
-            $traverser->traverse($initialStatements),
+            $nodes,
         );
     }
 

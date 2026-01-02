@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Ast\NodeDumper;
 
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Later\Interfaces\Deferred;
 use function get_debug_type;
 use function implode;
 use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
@@ -42,6 +44,7 @@ use InvalidArgumentException;
 use function is_array;
 use function is_float;
 use function is_int;
+use function is_object;
 use function is_string;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Comment;
@@ -77,6 +80,8 @@ final class NodeDumper
         // TODO: new
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
         'parent' => true,
+        'next' => true,
+        ReflectionVisitor::FUNCTION_SCOPE_KEY => true,
     ];
 
     // Removed instance properties for stateless refactor
@@ -362,9 +367,29 @@ final class NodeDumper
             $result .= 'false';
         } elseif ($node === true) {
             $result .= 'true';
-        } elseif ($node instanceof Symbol) {
+        } elseif ($node instanceof Deferred) {
             // TODO: this condition was changed compared to the original PHP-Parser code.
-            $result .= $node->toString();
+            $result .= 'Deferred(';
+
+            $deferredValue = $node->get();
+
+            if (null === $deferredValue) {
+                $result .= 'null)';
+            } else {
+                Assert::isIterable($deferredValue);
+
+                $result .= 'array(';
+
+                foreach ($deferredValue as $key => $value) {
+                    $result .= "$newLine    " . $key . ': ';
+
+                    $this->dumpRecursive($value, $code, $result, $newLine);
+                }
+
+                $result .= "$newLine))";
+            }
+        } elseif (is_object($node)) {
+            $result .= $node::class;
         } else {
             throw new InvalidArgumentException(
                 sprintf(

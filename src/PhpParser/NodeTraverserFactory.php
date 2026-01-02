@@ -41,13 +41,7 @@ use Infection\Ast\NodeVisitor\ExcludeNonSupportedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUnchangedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUncoveredNodesVisitor;
 use Infection\Ast\NodeVisitor\NameResolverFactory;
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
@@ -56,15 +50,13 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitor\CloningVisitor;
-use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
-use PhpParser\Token;
-use SplObjectStorage;
 
 /**
  * @internal
+ * @final
  */
-final readonly class NodeTraverserFactory
+readonly class NodeTraverserFactory
 {
     public function __construct(
         private SourceLineMatcher $sourceLineMatcher,
@@ -74,47 +66,11 @@ final readonly class NodeTraverserFactory
     }
 
     /**
-     * @deprecated
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function legacyCreate(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
-    {
-        $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
-
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
-
-        $traverser = new NodeTraverser(new CloningVisitor());
-
-        $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
-        $traverser->addVisitor(new NameResolver(
-            null,
-            [
-                'preserveOriginalNames' => true,
-                // must be `false` for pretty-printing to work properly
-                // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
-                'replaceNodes' => false,
-            ]),
-        );
-        $traverser->addVisitor(new ParentConnectingVisitor());
-        $traverser->addVisitor(new ReflectionVisitor());
-        $traverser->addVisitor($mutationVisitor);
-
-        return $traverser;
-    }
-
-    /**
      * TODO: this replaces the "createPreTraverser": this "pre" traverse, which
      *   is the first one, is where we enrich all the AST.
-     *
-     * @param Token[] $originalFileTokens
      */
-    public function createFirstTraverser(
-        Trace $trace,
-        array $originalFileTokens,
-    ): NodeTraverserInterface {
+    public function createFirstTraverser(Trace $trace): NodeTraverserInterface
+    {
         $context = new TraverseContext(
             $trace->getRealPath(),
             $trace,
@@ -157,16 +113,6 @@ final readonly class NodeTraverserFactory
         return new NodeTraverser(
             new CloningVisitor(),
             $mutationVisitor,
-        );
-    }
-
-    /**
-     * @deprecated
-     */
-    public function createPreTraverser(): NodeTraverserInterface
-    {
-        return new NodeTraverser(
-            new NextConnectingVisitor(),
         );
     }
 }

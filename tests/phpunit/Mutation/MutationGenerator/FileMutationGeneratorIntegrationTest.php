@@ -33,10 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator;
+namespace Infection\Tests\Mutation\MutationGenerator;
 
 use function current;
 use function file_exists;
+use Infection\Ast\AstCollector;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\Arithmetic\Plus;
@@ -63,20 +64,23 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
 
         $mutators = [new Plus()];
 
-        $mutationGenerator = new MutationGenerator(
+        $astCollector = new AstCollector(
             SingletonContainer::getContainer()->getFileParser(),
             SingletonContainer::getContainer()->getNodeTraverserFactory(),
-            SingletonContainer::getContainer()->getLineRangeCalculator(),
-            SingletonContainer::getContainer()->getSourceLineMatcher(),
             new DummyTracer(),
         );
 
-        $mutations = $mutationGenerator->generate(
-            $fileInfoMock,
-            false,
-            $mutators,
-            [],
+        $ast = $astCollector->generate(
+            sourceFile: $fileInfoMock,
+            onlyCovered: false,
         );
+
+        $mutationGenerator = new MutationGenerator(
+            $mutators,
+            SingletonContainer::getContainer()->getNodeTraverserFactory(),
+        );
+
+        $mutations = $mutationGenerator->generate($ast);
 
         $mutations = iterator_to_array($mutations, false);
 

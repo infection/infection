@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator;
+namespace Infection\Tests\Mutation\AstCollector;
 
 final class Scenario
 {

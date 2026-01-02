@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator\Fixtures;
+namespace Infection\Tests\Mutation\MutationGenerator\Fixtures;
 
 final readonly class TwoAdditions
 {

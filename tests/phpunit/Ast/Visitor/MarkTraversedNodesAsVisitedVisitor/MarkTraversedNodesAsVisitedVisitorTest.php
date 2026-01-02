@@ -74,7 +74,7 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends AstTestCase
         // Stop at the first argument
         StopAtSkippedArgVisitor::markNodeAsSkipped($newStmt->args[1]);
 
-        $expectedFullyTraversed = <<<'OUT'
+        $expectedFullyTraversed = <<<'AST'
             array(
                 0: Stmt_Namespace(
                     name: Name
@@ -118,7 +118,7 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends AstTestCase
                     kind: 1
                 )
             )
-            OUT;
+            AST;
 
         $fullTraverseNodes = self::cloneNodes($nodes);
         $fullTraverseVisitor = new MarkTraversedNodesAsVisitedVisitor();
@@ -131,7 +131,7 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends AstTestCase
             $this->dumper->dump($fullTraverseNodes),
         );
 
-        $expectedPartialTraversed = <<<'OUT'
+        $expectedPartialTraversed = <<<'AST'
             array(
                 0: Stmt_Namespace(
                     name: Name
@@ -167,7 +167,7 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends AstTestCase
                     kind: 1
                 )
             )
-            OUT;
+            AST;
 
         $partialTraverseNodes = self::cloneNodes($nodes);
         $partialTraverseVisitor = new MarkTraversedNodesAsVisitedVisitor();

@@ -33,23 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Ast;
+namespace Infection\Tests\Ast\AstCollector\Fixtures;
 
-use newSrc\AST\SymbolResolver;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-
-#[CoversClass(SymbolResolver::class)]
-final class SymbolResolverTest extends TestCase
+final readonly class TwoAdditions
 {
-    public function test_it_can_resolve_a_symbol(): void
+    public function first(): int
     {
+        return 1 + 2;
     }
 
-    public static function symbolProvider(): iterable
+    public function second(): int
     {
-        // We only provide minimal tests here. A more complete suite is provided with its
-        // corresponding visitor.
-        yield [];
+        return 1 - 2;
     }
 }

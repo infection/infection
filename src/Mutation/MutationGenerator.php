@@ -36,14 +36,12 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Ast\Ast;
-use Infection\Mutator\MutatorFactory;
+use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Matcher\SourceLineMatcher;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 
 /**
  * TODO: this was the previous FileMutationGenerator. Renamed it to MutationGenerator as the
@@ -56,12 +54,12 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
  */
 final readonly class MutationGenerator
 {
+    /**
+     * @param Mutator[] $mutators
+     */
     public function __construct(
-        private LineRangeCalculator $lineRangeCalculator,
-        private SourceLineMatcher $sourceLineMatcher,
-        private MutatorFactory $mutatorFactory,
+        private array $mutators,
         private NodeTraverserFactory $traverserFactory,
-        private bool $onlyCovered,
     ) {
     }
 
@@ -73,14 +71,11 @@ final readonly class MutationGenerator
      */
     public function generate(Ast $ast): iterable
     {
-        $mutators = $this->mutatorFactory->createForFile($ast->trace->getSourceFileInfo());
-
         $visitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
-                mutators: $mutators,
+                mutators: $this->mutators,
                 filePath: $ast->trace->getRealPath(),
                 fileNodes: $ast->initialStatements,
-                onlyCovered: $this->onlyCovered,
                 originalFileTokens: $ast->originalFileTokens,
                 originalFileContent: $ast->trace->getSourceFileInfo()->getContents(),
             ),

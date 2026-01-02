@@ -54,7 +54,7 @@ final readonly class NodeMutationGenerator
      * @param Token[] $originalFileTokens
      */
     public function __construct(
-        private Mutators $mutators,
+        private array $mutators,
         private string $filePath,
         private array $fileNodes,
         private array $originalFileTokens,

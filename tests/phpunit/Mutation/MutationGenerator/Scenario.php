@@ -33,33 +33,47 @@
 
 declare(strict_types=1);
 
-namespace Infection\Ast;
+namespace Infection\Tests\Mutation\MutationGenerator;
 
-use Infection\PhpParser\FileParser;
-use Infection\PhpParser\NodeTraverserFactory;
-use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
-
-/**
- * @internal
- */
-final readonly class PocAstCollector
+final class Scenario
 {
     public function __construct(
-        private FileParser $parser,
-        private NodeTraverserFactory $traverserFactory,
+        public bool $onlyCovered,
+        public bool $hasTrace,
+        public bool $traceHasTests,
+        public bool $expected,
     ) {
     }
 
-    /**
-     * @return iterable<Node[]>
-     */
-    public function collect(SplFileInfo $sourceFile): iterable
+    public function withOnlyCovered(bool $onlyCovered): self
     {
-        $statements = $this->parser->parse($sourceFile);
+        $clone = clone $this;
+        $clone->onlyCovered = $onlyCovered;
 
-        yield $this->traverserFactory
-            ->legacyCreate(Path::canonicalize($sourceFile->getPathname()))
-            ->traverse($statements);
+        return $clone;
+    }
+
+    public function withHasTrace(bool $hasTrace): self
+    {
+        $clone = clone $this;
+        $clone->hasTrace = $hasTrace;
+
+        return $clone;
+    }
+
+    public function withTraceHasTests(bool $traceHasTests): self
+    {
+        $clone = clone $this;
+        $clone->traceHasTests = $traceHasTests;
+
+        return $clone;
+    }
+
+    public function withExpected(bool $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
     }
 }

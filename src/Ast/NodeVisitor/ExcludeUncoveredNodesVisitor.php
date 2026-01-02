@@ -61,9 +61,6 @@ final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
         // that within the tracer if we want to take PHPStan as a full-fledged test framework.
         if (!$hasTests) {
             NodeAnnotator::annotate($node, Annotation::NOT_COVERED_BY_TESTS);
-
-            // TODO: not sure we can skip things like that.
-            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
         return null;

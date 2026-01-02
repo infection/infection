@@ -104,7 +104,7 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                     ChangedLinesRange::forRange(0, PHP_INT_MAX),
                 ],
             ],
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: Name
@@ -124,7 +124,7 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
 
         // This is an artificial case: if the file wasn't touched, it would not be part
@@ -147,11 +147,11 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                 new FakeTrace(),
             ),
             [],
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: <skipped>
                 )
-                OUT,
+                AST,
         ];
 
         yield 'a node of the method was changed' => [
@@ -182,7 +182,7 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                     ChangedLinesRange::forLine(7),
                 ],
             ],
-            <<<'OUT'
+            <<<'AST'
                 array(
                     0: Stmt_Namespace(
                         name: <skipped>
@@ -214,7 +214,7 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                         kind: 1
                     )
                 )
-                OUT,
+                AST,
         ];
     }
 

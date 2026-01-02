@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator;
+namespace Infection\Tests\Mutation\MutationGenerator;
 
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\FileParser;

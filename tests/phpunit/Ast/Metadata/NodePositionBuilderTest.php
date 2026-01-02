@@ -33,9 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\AST\Metadata;
+namespace Infection\Tests\Ast\Metadata;
 
-use newSrc\AST\Metadata\NodePosition;
+use Infection\Ast\Metadata\NodePosition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -53,12 +53,12 @@ final class NodePositionBuilderTest extends TestCase
             ->withEndTokenPosition(132);
 
         // Test immutability
-        $this->assertSame(
+        $this->assertEquals(
             NodePositionBuilder::multiLineWithTestData()->build(),
             $builder->build(),
         );
 
-        $this->assertSame(
+        $this->assertEquals(
             new NodePosition(20, 5, 30, 132),
             $newBuilder->build(),
         );
@@ -70,6 +70,6 @@ final class NodePositionBuilderTest extends TestCase
 
         $actual = NodePositionBuilder::from($expected)->build();
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 }
