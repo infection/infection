@@ -116,7 +116,7 @@ jobs:
       - name: Run the whole set of E2E tests
         env:
           TERM: xterm-256color
-        run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
+        run: ./tests/e2e_tests bin/infection Exclude_By_Folder
 
       - name: Run the whole set of E2E tests with prefixed PHAR
         if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && matrix.php-version == '8.2'
