@@ -35,78 +35,57 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
-use function count;
-use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Ast\Ast;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeMutationGenerator;
+use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\Source\Collector\SourceCollector;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use PhpParser\Node;
-use Webmozart\Assert\Assert;
 
 /**
+ * TODO: this was the previous FileMutationGenerator. Renamed it to MutationGenerator as the
+ *   latter no longer really makes sense. The only thing it did was dispatching the events
+ *   as it was starting the loop, but now the loop is started earlier.
+ *   I'll have to review the events eventually as the sequence is at which the events are dispatched
+ *   is no longer the same.
+ *
  * @internal
- * @final
  */
-class MutationGenerator
+final readonly class MutationGenerator
 {
-    /** @var Mutator<Node>[] */
-    private readonly array $mutators;
-
     /**
-     * @param Mutator<Node>[] $mutators
+     * @param Mutator[] $mutators
      */
     public function __construct(
-        private readonly SourceCollector $sourceCollector,
-        array $mutators,
-        private readonly EventDispatcher $eventDispatcher,
-        private readonly FileMutationGenerator $fileMutationGenerator,
+        private array $mutators,
+        private NodeTraverserFactory $traverserFactory,
     ) {
-        Assert::allIsInstanceOf($mutators, Mutator::class);
-        $this->mutators = $mutators;
     }
 
     /**
-     * @param bool $onlyCovered Mutates only covered by tests lines of code
-     * @param NodeIgnorer[] $nodeIgnorers
-     *
-     * @throws UnparsableFile
-     * @throws InvalidCoverage
      * @throws NoSourceFound
-     * @throws NoReportFound
-     * @throws TooManyReportsFound
-     * @throws ReportLocationThrowable
-     * @throws TestFileNameNotFoundException
+     * @throws UnparsableFile
      *
      * @return iterable<Mutation>
      */
-    public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
+    public function generate(Ast $ast): iterable
     {
-        $sources = $this->sourceCollector->collect();
-        $numberOfFiles = count($sources);
+        $visitor = new MutationCollectorVisitor(
+            new NodeMutationGenerator(
+                mutators: $this->mutators,
+                filePath: $ast->trace->getRealPath(),
+                fileNodes: $ast->initialStatements,
+                originalFileTokens: $ast->originalFileTokens,
+                originalFileContent: $ast->trace->getSourceFileInfo()->getContents(),
+            ),
+        );
 
-        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
+        $this->traverserFactory
+            ->createSecondTraverser($visitor)
+            ->traverse($ast->nodes);
 
-        foreach ($sources as $source) {
-            yield from $this->fileMutationGenerator->generate(
-                $source,
-                $onlyCovered,
-                $this->mutators,
-                $nodeIgnorers,
-            );
-
-            $this->eventDispatcher->dispatch(new MutableFileWasProcessed());
-        }
-
-        $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
+        // TODO: in the future this is where we would apply the strategy selection.
+        yield from $visitor->getMutations();
     }
 }

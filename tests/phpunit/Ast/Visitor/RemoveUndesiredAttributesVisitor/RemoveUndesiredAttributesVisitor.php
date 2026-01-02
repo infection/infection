@@ -33,17 +33,61 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator\Fixtures;
+namespace Infection\Tests\Ast\Visitor\RemoveUndesiredAttributesVisitor;
 
-final readonly class TwoAdditions
+use function array_intersect_key;
+use function array_map;
+use Infection\Ast\Metadata\Annotation;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use function Safe\array_flip;
+
+/**
+ * Some tests may leverage existing visitors for the tests which may add various annotations
+ * which are uninteresting for the test.
+ */
+final class RemoveUndesiredAttributesVisitor extends NodeVisitorAbstract
 {
-    public function first(): int
-    {
-        return 1 + 2;
+    /**
+     * @var array<string, mixed>
+     */
+    private readonly array $desiredAttributeKeys;
+
+    public function __construct(
+        Annotation|string ...$desired,
+    ) {
+        $this->desiredAttributeKeys = self::getDesiredAttributeKeys($desired);
     }
 
-    public function second(): int
+    public function enterNode(Node $node): void
     {
-        return 1 - 2;
+        $this->removeUndesiredAttributes($node);
+    }
+
+    /**
+     * @param array<Annotation|string> $desired
+     *
+     * @return array<string, mixed>
+     */
+    private static function getDesiredAttributeKeys(array $desired): array
+    {
+        return array_flip(
+            array_map(
+                static fn (Annotation|string $attribute) => $attribute instanceof Annotation
+                    ? $attribute->name
+                    : $attribute,
+                $desired,
+            ),
+        );
+    }
+
+    private function removeUndesiredAttributes(Node $node): void
+    {
+        $desiredAttributes = array_intersect_key(
+            $node->getAttributes(),
+            $this->desiredAttributeKeys,
+        );
+
+        $node->setAttributes($desiredAttributes);
     }
 }

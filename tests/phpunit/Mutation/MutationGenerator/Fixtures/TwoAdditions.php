@@ -33,34 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Tests\Mutation\MutationGenerator\Fixtures;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use PhpParser\Node;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitorAbstract;
-
-/**
- * @internal
- */
-final class NonMutableNodesIgnorerVisitor extends NodeVisitorAbstract
+final readonly class TwoAdditions
 {
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
-     */
-    public function __construct(
-        private readonly array $nodeIgnorers,
-    ) {
+    public function first(): int
+    {
+        return 1 + 2;
     }
 
-    public function enterNode(Node $node)
+    public function second(): int
     {
-        foreach ($this->nodeIgnorers as $nodeIgnorer) {
-            if ($nodeIgnorer->ignores($node)) {
-                return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-            }
-        }
-
-        return null;
+        return 1 - 2;
     }
 }

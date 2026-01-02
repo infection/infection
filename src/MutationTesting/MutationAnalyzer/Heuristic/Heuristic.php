@@ -33,47 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutation\FileMutationGenerator;
+namespace Infection\MutationTesting\MutationAnalyzer\Heuristic;
 
-final class Scenario
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
+
+/**
+ * A heuristic is a quick in-memory to attempt to determine the result of a mutation
+ * without running a more expensive process to know if it is covered or not.
+ */
+interface Heuristic
 {
-    public function __construct(
-        public bool $onlyCovered,
-        public bool $hasTrace,
-        public bool $traceHasTests,
-        public bool $expected,
-    ) {
-    }
-
-    public function withOnlyCovered(bool $onlyCovered): self
-    {
-        $clone = clone $this;
-        $clone->onlyCovered = $onlyCovered;
-
-        return $clone;
-    }
-
-    public function withHasTrace(bool $hasTrace): self
-    {
-        $clone = clone $this;
-        $clone->hasTrace = $hasTrace;
-
-        return $clone;
-    }
-
-    public function withTraceHasTests(bool $traceHasTests): self
-    {
-        $clone = clone $this;
-        $clone->traceHasTests = $traceHasTests;
-
-        return $clone;
-    }
-
-    public function withExpected(bool $expected): self
-    {
-        $clone = clone $this;
-        $clone->expected = $expected;
-
-        return $clone;
-    }
+    /**
+     * If the returned value is `null`, it means the result could not be determined
+     * and further (more expensive) evaluations must be done.
+     */
+    public function evaluate(Mutation $mutation): ?MutantExecutionResult;
 }

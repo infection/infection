@@ -33,49 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace Infection\Ast\NodeVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+use Infection\Ast\Metadata\Annotation;
+use Infection\Ast\Metadata\NodeAnnotator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use SplObjectStorage;
-use function str_contains;
 
 /**
- * @internal
+ * Excludes nodes that infection does not support.
+ *
+ * @see https://github.com/infection/infection/issues/1482
  */
-final class IgnoreAllMutationsAnnotationReaderVisitor extends NodeVisitorAbstract
+final class ExcludeNonSupportedNodesVisitor extends NodeVisitorAbstract
 {
-    private const IGNORE_ALL_MUTATIONS_ANNOTATION = '@infection-ignore-all';
-
-    /**
-     * @param SplObjectStorage<object, mixed> $ignoredNodes
-     */
-    public function __construct(
-        private readonly ChangingIgnorer $changingIgnorer,
-        private readonly SplObjectStorage $ignoredNodes,
-    ) {
-    }
-
-    public function enterNode(Node $node): ?Node
+    public function enterNode(Node $node): ?int
     {
-        foreach ($node->getComments() as $comment) {
-            if (str_contains($comment->getText(), self::IGNORE_ALL_MUTATIONS_ANNOTATION)) {
-                $this->changingIgnorer->startIgnoring();
-                $this->ignoredNodes->offsetSet($node);
-            }
+        if (!$this->isSupported($node)) {
+            NodeAnnotator::annotate($node, Annotation::NOT_SUPPORTED);
         }
 
         return null;
     }
 
-    public function leaveNode(Node $node): ?Node
+    private function isSupported(Node $node): bool
     {
-        if ($this->ignoredNodes->offsetExists($node)) {
-            $this->ignoredNodes->offsetUnset($node);
-            $this->changingIgnorer->stopIgnoring();
-        }
-
-        return null;
+        // TODO: this is taken from NodeMutationGenerator.
+        //  there is also a skip happening in ReflectionVisitor for functions; may need to be moved
+        return NodeAnnotator::isOnFunctionSignature($node)
+            || NodeAnnotator::isInsideFunction($node);
     }
 }

@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing\Trace;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Tracing\Test\TestLocations;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

@@ -62,7 +62,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
+        $traverser = (new NodeTraverserFactory())->legacyCreate(new FakeVisitor(), []);
 
         $visitors = array_map(
             get_class(...),
@@ -85,7 +85,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_with_node_ignorers(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(
+        $traverser = (new NodeTraverserFactory())->legacyCreate(
             new FakeVisitor(),
             [
                 new FakeIgnorer(),

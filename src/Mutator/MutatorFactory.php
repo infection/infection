@@ -38,6 +38,7 @@ namespace Infection\Mutator;
 use Infection\Framework\ClassName;
 use function is_a;
 use PhpParser\Node;
+use SplFileInfo;
 use function sprintf;
 use Webmozart\Assert\Assert;
 
@@ -46,6 +47,15 @@ use Webmozart\Assert\Assert;
  */
 final class MutatorFactory
 {
+    public function createForFile(SplFileInfo $sourceFile): Mutators
+    {
+        // TODO: I am thinking probably we need to adjust which mutators is registered on
+        //  a file basis in case we allow to ignore mutators for some files.
+        //  the mutators should be stateless though, hence they are not re-created each time.
+
+        return new Mutators();
+    }
+
     /**
      * @param array<class-string<Mutator<Node>&ConfigurableMutator<Node>>, mixed[]> $resolvedMutators
      *

@@ -33,76 +33,67 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\Ast;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use function array_map;
+use Infection\Tests\Ast\NodeDumper\NodeDumper;
+use function is_array;
 use PhpParser\Node;
-use PhpParser\NodeVisitor;
-use PhpParser\NodeVisitorAbstract;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+use PHPUnit\Framework\TestCase;
 
-#[Group('integration')]
-#[CoversClass(NonMutableNodesIgnorerVisitor::class)]
-final class NonMutableNodesIgnorerVisitorTest extends BaseVisitorTestCase
+abstract class AstTestCase extends TestCase
 {
-    /**
-     * @var NodeVisitor&object{nodesVisitedCount: int}
-     */
-    private NodeVisitor $spyVisitor;
+    protected Parser $parser;
+
+    protected NodeDumper $dumper;
 
     protected function setUp(): void
     {
-        $this->spyVisitor = $this->getSpyVisitor();
+        $this->parser = $this->createParser();
+        $this->dumper = $this->createDumper();
     }
 
-    public function test_it_does_not_traverse_after_ignore(): void
+    protected function createParser(): Parser
     {
-        $this->parseAndTraverse(<<<'PHP'
-            <?php
+        return (new ParserFactory())->createForNewestSupportedVersion();
+    }
 
-            class Foo
-            {
-                public function bar(): void
-                {
-                }
-            }
-            PHP
-        );
-        $this->assertSame(0, $this->spyVisitor->nodesVisitedCount);
+    protected function createDumper(): NodeDumper
+    {
+        return new NodeDumper();
     }
 
     /**
-     * @return NodeVisitor&object{nodesVisitedCount: int}
+     * @param array<string, list<mixed>> $records
+     * @return array<string, list<string|list<string>>>
      */
-    private function getSpyVisitor(): NodeVisitor
+    final protected function dumpRecordNodes(array $records): array
     {
-        return new class extends NodeVisitorAbstract {
-            public int $nodesVisitedCount = 0;
-
-            public function leaveNode(Node $node): void
-            {
-                ++$this->nodesVisitedCount;
-            }
-        };
+        return array_map(
+            fn (array $record) => [
+                $record[0],
+                $this->dumpRecursively($record[1]),
+            ],
+            $records,
+        );
     }
 
-    private function parseAndTraverse(string $code): void
+    /**
+     * @return array<string, list<string|list<string>>>
+     */
+    private function dumpRecursively(mixed $potentialNodes): array|string
     {
-        [$nodes] = self::parseCode($code);
+        if (is_array($potentialNodes)) {
+            return array_map(
+                $this->dumpRecursively(...),
+                $potentialNodes,
+            );
+        }
 
-        $this->traverse(
-            $nodes,
-            [
-                new NonMutableNodesIgnorerVisitor([new class implements NodeIgnorer {
-                    public function ignores(Node $node): bool
-                    {
-                        return true;
-                    }
-                }]),
-                $this->spyVisitor,
-            ],
-        );
+        $this->assertInstanceOf(Node::class, $potentialNodes);
+
+        return $this->dumper->dump($potentialNodes);
     }
 }

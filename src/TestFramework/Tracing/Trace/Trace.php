@@ -37,6 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\FileSystem\Finder\Iterator\RealPathFilterIterator;
+use Infection\TestFramework\Tracing\Test\TestLocations;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**

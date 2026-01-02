@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\PhpParser\Visitor\ParentConnector;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 
 /**
@@ -44,9 +43,11 @@ use PhpParser\Node;
  */
 final class LineRangeCalculator
 {
-    public function calculateRange(Node $originalNode): NodeLineRangeData
-    {
-        if ($originalNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false) === true) {
+    public function calculateRange(
+        Node $originalNode,
+        bool $isOnFunctionSignature,
+    ): NodeLineRangeData {
+        if ($isOnFunctionSignature) {
             $startLine = $originalNode->getStartLine();
 
             // function signature node should always be 1-line range: (start, start)

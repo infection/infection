@@ -39,7 +39,7 @@ use function class_exists;
 use Closure;
 use function function_exists;
 use Infection\Container;
-use Infection\Mutation\FileMutationGenerator;
+use Infection\Mutation\MutationGenerator;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
@@ -96,7 +96,7 @@ return static function (int $maxCount): Closure {
         true,
     );
 
-    $fileMutationGenerator = new FileMutationGenerator(
+    $fileMutationGenerator = new MutationGenerator(
         $container->getFileParser(),
         $container->getNodeTraverserFactory(),
         $container->getLineRangeCalculator(),

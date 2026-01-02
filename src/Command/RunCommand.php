@@ -398,12 +398,10 @@ final class RunCommand extends BaseCommand
                 $container->getEventDispatcher(),
                 $container->getInitialTestsRunner(),
                 $container->getMemoryLimiter(),
-                $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
-                $container->getTestFrameworkExtraOptionsFilter(),
                 // do not create a chain of classes for SA if not enabled
                 $config->isStaticAnalysisEnabled() ? $container->getInitialStaticAnalysisRunner() : null,
                 $config->isStaticAnalysisEnabled() ? $container->getStaticAnalysisToolAdapter() : null,

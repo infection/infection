@@ -33,43 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing\Trace;
+namespace Infection\Ast;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Tracing\Trace\Trace;
+use PhpParser\Node;
+use PhpParser\Node\Stmt;
+use PhpParser\Token;
 
-/**
- * @internal
- */
-final class TestLocations
+final readonly class Ast
 {
     /**
-     * @param array<int, array<int, TestLocation>> $byLine
-     * @param array<string, SourceMethodLineRange> $byMethod
+     * @param Stmt[] $initialStatements
+     * @param Token[] $originalFileTokens
+     * @param Node[] $nodes
      */
     public function __construct(
-        private array $byLine = [],
-        private readonly array $byMethod = [],
+        public Trace $trace,
+        public array $initialStatements,
+        public array $originalFileTokens,
+        public array $nodes,
     ) {
-    }
-
-    /**
-     * This method needs to be able to return a reference for performance reasons.
-     *
-     * @see JUnitTestExecutionInfoAdder
-     *
-     * @return array<int, array<int, TestLocation>>
-     */
-    public function &getTestsLocationsBySourceLine(): array
-    {
-        return $this->byLine;
-    }
-
-    /**
-     * @return array<string, SourceMethodLineRange>
-     */
-    public function getSourceMethodRangeByMethod(): array
-    {
-        return $this->byMethod;
     }
 }

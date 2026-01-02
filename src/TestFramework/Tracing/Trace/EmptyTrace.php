@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing\Trace;
 
+use Infection\TestFramework\Tracing\Test\TestLocations;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
