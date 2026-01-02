@@ -1,6 +1,9 @@
 ---
-name: "\U0001F680 Feature Request or RFC"
-about: "I have a suggestion (and may want to implement it \U0001F642)!"
+name: "\U0001F680 Feature request"
+about: "Suggest an idea for this project (and may want to implement it \U0001F642)!"
+title: 'feat: '
+labels: Feature Request
+assignees: ''
 
 ---
 
