@@ -33,43 +33,76 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing\Trace;
+namespace Infection\TestFramework\Tracing\Test\TestLocator;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Tracing\Test\TestLocations;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Webmozart\Assert\Assert;
+use function array_key_exists;
+use function array_values;
+use function implode;
 
 /**
  * @internal
  */
-final class TestLocations
+final class CachedTestLocator implements TestLocator
 {
+    private ?bool $hasTests = null;
+
     /**
-     * @param array<int, array<int, TestLocation>> $byLine
-     * @param array<string, SourceMethodLineRange> $byMethod
+     * @var array<string, array<TestLocation>>
      */
+    private array $tests = [];
+
     public function __construct(
-        private array $byLine = [],
-        private readonly array $byMethod = [],
+        private readonly TestLocator $decoratedTestLocator,
     ) {
     }
 
-    /**
-     * This method needs to be able to return a reference for performance reasons.
-     *
-     * @see JUnitTestExecutionInfoAdder
-     *
-     * @return array<int, array<int, TestLocation>>
-     */
-    public function &getTestsLocationsBySourceLine(): array
+    public function hasTests(): bool
     {
-        return $this->byLine;
+        if (null === $this->hasTests) {
+            $this->hasTests = $this->decoratedTestLocator->hasTests();
+        }
+
+        return $this->hasTests;
     }
 
-    /**
-     * @return array<string, SourceMethodLineRange>
-     */
-    public function getSourceMethodRangeByMethod(): array
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable {
+        $hash = self::createHash($lineRange, $isOnFunctionSignature);
+
+        if (array_key_exists($hash, $this->tests)) {
+            return $this->tests[$hash];
+        }
+
+        $tests = [];
+
+        foreach ($this->decoratedTestLocator->getAllTestsForMutation($lineRange, $isOnFunctionSignature) as $test) {
+            $tests[$hash] = $test;
+
+            yield $test;
+        }
+
+        $this->tests[$hash] = $tests;
+    }
+
+    private static function createHash(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): string
     {
-        return $this->byMethod;
+        return implode(
+            ':',
+            [
+                $lineRange->start,
+                $lineRange->end,
+                $isOnFunctionSignature,
+            ],
+        );
     }
 }

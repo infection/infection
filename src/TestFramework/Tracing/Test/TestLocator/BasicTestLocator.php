@@ -33,35 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\TestFramework\Tracing\Test\TestLocator;
 
-use function array_values;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Tracing\Test\TestLocations;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Webmozart\Assert\Assert;
+use function array_values;
+use function count;
+use function iter\any;
 
 /**
  * @internal
  * @final
  */
-class TestLocator
+final readonly class BasicTestLocator implements TestLocator
 {
     public function __construct(
-        private readonly TestLocations $testLocations,
+        private TestLocations $testLocations,
     ) {
     }
 
     public function hasTests(): bool
     {
-        foreach ($this->testLocations->getTestsLocationsBySourceLine() as $testLocations) {
-            if ($testLocations !== []) {
-                return true;
-            }
-        }
-
-        return false;
+        return any(
+            static fn (array $testLocations) => count($testLocations) > 0,
+            $this->testLocations->getTestsLocationsBySourceLine(),
+        );
     }
 
     /**

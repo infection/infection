@@ -35,10 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Ast\Metadata;
 
+use Infection\TestFramework\Tracing\Trace\Trace;
+
 final readonly class TraverseContext
 {
     public function __construct(
         public string $filePathname,
+        public Trace $trace,
     ) {
     }
 }

@@ -35,7 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing\Trace;
 
-use Infection\TestFramework\Coverage\XmlReport\TestLocator;
+use Infection\TestFramework\Tracing\Test\TestLocations;
+use Infection\TestFramework\Tracing\Test\TestLocator\BasicTestLocator;
+use Infection\TestFramework\Tracing\Test\TestLocator\CachedTestLocator;
+use Infection\TestFramework\Tracing\Test\TestLocator\TestLocator;
 use Later\Interfaces\Deferred;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
@@ -110,7 +113,9 @@ class ProxyTrace implements Trace
 
         $testLocations = $this->getTests();
 
-        $this->tests = new TestLocator($testLocations);
+        $this->tests = new CachedTestLocator(
+            new BasicTestLocator($testLocations),
+        );
 
         return $this->tests;
     }

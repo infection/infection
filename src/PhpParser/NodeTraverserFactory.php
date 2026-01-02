@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\PhpParser;
 
 use Infection\Ast\Metadata\TraverseContext;
+use Infection\Ast\NodeVisitor\AddTestsVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUnchangedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUncoveredNodesVisitor;
 use Infection\Ast\NodeVisitor\NameResolverFactory;
@@ -111,6 +112,7 @@ class NodeTraverserFactory
     {
         $context = new TraverseContext(
             $trace->getRealPath(),
+            $trace,
         );
 
         return new NodeTraverser(
@@ -127,6 +129,7 @@ class NodeTraverserFactory
                 $this->sourceLineMatcher,
                 $context,
             ),
+            new AddTestsVisitor($context),
         );
     }
 

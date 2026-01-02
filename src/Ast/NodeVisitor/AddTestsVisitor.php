@@ -35,23 +35,36 @@ declare(strict_types=1);
 
 namespace Infection\Ast\NodeVisitor;
 
-use newSrc\AST\NodeLabeler;
+use Infection\Ast\Metadata\Annotation;
+use Infection\Ast\Metadata\NodeAnnotator;
+use Infection\Ast\Metadata\TraverseContext;
+use Infection\TestFramework\Tracing\Test\TestLocator\TestLocator;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use function Later\lazy;
 
-// Add types based on either stubs or PHPStan or other.
-final class AddTypesVisitor extends NodeVisitorAbstract
+/**
+ * Annotates which tests covers the entered nodes.
+ */
+final class AddTestsVisitor extends NodeVisitorAbstract
 {
     public function __construct(
-        private NodeLabeler $nodeStateTracker,
+        private readonly TraverseContext $context,
     ) {
     }
 
     public function enterNode(Node $node): ?Node
     {
-        if ($this->nodeStateTracker->isEligible($node)) {
-            // I would add those types in a way that it is lazily evaluated, i.e. we do not try to get the types for the node unless necessary.
-        }
+        NodeAnnotator::annotate(
+            $node,
+            Annotation::TESTS,
+            lazy(
+                static fn () => $this->context->trace->getAllTestsForMutation(
+                    $this->lineRangeCalculator->calculateRange($this->currentNode),
+                    $this->isOnFunctionSignature(),
+                ),
+            )
+        );
 
         return null;
     }

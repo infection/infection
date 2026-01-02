@@ -33,47 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Ast\NodeVisitor;
+namespace Infection\TestFramework\Tracing\Test\TestLocator;
 
-use Infection\Ast\Metadata\SymbolAnnotator;
-use newSrc\AST\SymbolResolver;
-use newSrc\TestFramework\Trace\Symbol\Symbol;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-use function spl_object_id;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 
-final class AddNodesSymbolsVisitor extends NodeVisitorAbstract
+interface TestLocator
 {
+    public function hasTests(): bool;
+
     /**
-     * @var array<string, Symbol>
+     * @return iterable<TestLocation>
      */
-    private array $symbols = [];
-
-    public function __construct(
-        private readonly SymbolResolver $resolver,
-    ) {
-    }
-
-    public function enterNode(Node $node): ?int
-    {
-        $symbol = $this->resolver->tryToResolve($node);
-
-        if ($symbol !== null) {
-            $this->symbols[spl_object_id($node)] = $symbol;
-        }
-
-        SymbolAnnotator::annotate(
-            $node,
-            $this->symbols,
-        );
-
-        return null;
-    }
-
-    public function leaveNode(Node $node): ?Node
-    {
-        unset($this->symbols[spl_object_id($node)]);
-
-        return null;
-    }
+    public function getAllTestsForMutation(
+        NodeLineRangeData $lineRange,
+        bool $isOnFunctionSignature,
+    ): iterable;
 }

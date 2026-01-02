@@ -41,12 +41,12 @@ use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Tracing\Test\TestLocations;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use function Later\lazy;
 use Webmozart\Assert\Assert;
+use function Later\lazy;
 
 /**
  * @internal

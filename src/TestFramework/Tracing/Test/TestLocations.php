@@ -33,35 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Ast\NodeVisitor;
+namespace Infection\TestFramework\Tracing\Test;
 
-use newSrc\TestFramework\Trace\Symbol\Symbol;
-use PhpParser\NodeVisitorAbstract;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 
 /**
- * A user can select a piece of source code to mutation. For example "*Str::trim*()". When
- * such a selection is provided, this visitor will exclude any node that do not belong to
- * this selection.
- *
- * Note that this strategy is incompatible with LabelNodesAsEligibleVisitor.
- *
- * @see LabelNodesAsEligibleVisitor
+ * @internal
  */
-final class ApplyUserSelectionVisitor extends NodeVisitorAbstract
+final class TestLocations
 {
-    // TODO
-    // Will make use of the SymbolAnnotator.
-    // A few examples of how it should work:
-    //
-    // Case: "Acme\Str::trimLineReturns()" -> MethodReference Symbol
-    //      - we enter a namespace Foo -> stop the the traversal of the current node & children
-    //      - we enter the namespace "Acme": continue
-    //      - we enter a class A -> stop the the traversal of the current node & children
-    //      - we enter a class Str: continue
-    //      - we enter a method "::bar()": stop the the traversal of the current node & children
-    //      - we enter a method "::trimLineReturns()": start to mark nodes as eligible
-    //      - we leave the method "::trimLineReturns()": stop the the traversal of the current node & children?
-    //
-    // Case: to specify how it works with patterns
-    // Note that maybe we should allow multiple selections in which case there is a bit more to figure out/specify.
+    /**
+     * @param TestLocation $byLine
+     * @param array<string, SourceMethodLineRange> $byMethod
+     */
+    public function __construct(
+        private array $byLine = [],
+        private readonly array $byMethod = [],
+    ) {
+    }
+
+    /**
+     * This method needs to be able to return a reference for performance reasons.
+     *
+     * @see JUnitTestExecutionInfoAdder
+     *
+     * @return array<int, array<int, TestLocation>>
+     */
+    public function &getTestsLocationsBySourceLine(): array
+    {
+        return $this->byLine;
+    }
+
+    /**
+     * @return array<string, SourceMethodLineRange>
+     */
+    public function getSourceMethodRangeByMethod(): array
+    {
+        return $this->byMethod;
+    }
 }

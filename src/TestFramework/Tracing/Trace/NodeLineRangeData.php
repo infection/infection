@@ -51,16 +51,19 @@ use Webmozart\Assert\Assert;
  *
  * @internal
  */
-final class NodeLineRangeData
+final readonly class NodeLineRangeData
 {
     /**
      * @var array<int, int>
      */
     public array $range;
 
-    public function __construct(int $start, int $end)
-    {
+    public function __construct(
+        public int $start,
+        public int $end,
+    ) {
         Assert::greaterThanEq($end, $start);
+
         $this->range = range($start, $end);
     }
 }

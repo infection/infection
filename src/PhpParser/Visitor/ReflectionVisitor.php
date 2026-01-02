@@ -48,6 +48,8 @@ use ReflectionException;
 use Webmozart\Assert\Assert;
 
 /**
+ * TODO: each type here should be moved to the NodeAnnotator.
+ *
  * @internal
  */
 final class ReflectionVisitor extends NodeVisitorAbstract
