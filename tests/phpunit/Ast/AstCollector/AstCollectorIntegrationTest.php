@@ -35,13 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Ast\AstCollector;
 
-use Infection\PhpParser\NodeTraverserFactory;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use function file_exists;
 use Infection\Ast\AstCollector;
+use Infection\PhpParser\NodeTraverserFactory;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Ast\AstTestCase;
+use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -63,12 +63,10 @@ final class AstCollectorIntegrationTest extends AstTestCase
             SingletonContainer::getContainer()->getFileParser(),
             $this->createNodeTraverserFactory($fileInfoMock),
             new DummyTracer(),
-        );
-
-        $ast = $astCollector->generate(
-            sourceFile: $fileInfoMock,
             onlyCovered: false,
         );
+
+        $ast = $astCollector->generate($fileInfoMock);
 
         $expected = <<<'AST'
             array(
@@ -77,37 +75,49 @@ final class AstCollectorIntegrationTest extends AstTestCase
                         0: DeclareItem(
                             key: Identifier(
                                 NOT_SUPPORTED: 5
-                                TESTS: Deferred(null)
+                                TESTS: Deferred(array(
+                                ))
                                 NOT_COVERED_BY_TESTS: 0
+                                ELIGIBLE: -1
                             )
                             value: Scalar_Int(
                                 rawValue: 1
                                 kind: KIND_DEC (10)
                                 NOT_SUPPORTED: 5
-                                TESTS: Deferred(null)
+                                TESTS: Deferred(array(
+                                ))
                                 NOT_COVERED_BY_TESTS: 0
+                                ELIGIBLE: -1
                             )
                             NOT_SUPPORTED: 5
-                            TESTS: Deferred(null)
+                            TESTS: Deferred(array(
+                            ))
                             NOT_COVERED_BY_TESTS: 0
+                            ELIGIBLE: -1
                         )
                     )
                     NOT_SUPPORTED: 5
-                    TESTS: Deferred(null)
+                    TESTS: Deferred(array(
+                    ))
                     NOT_COVERED_BY_TESTS: 0
+                    ELIGIBLE: -1
                 )
                 1: Stmt_Namespace(
                     name: Name(
                         NOT_SUPPORTED: 5
-                        TESTS: Deferred(null)
+                        TESTS: Deferred(array(
+                        ))
                         NOT_COVERED_BY_TESTS: 0
+                        ELIGIBLE: -1
                     )
                     stmts: array(
                         0: Stmt_Class(
                             name: Identifier(
                                 NOT_SUPPORTED: 5
-                                TESTS: Deferred(null)
+                                TESTS: Deferred(array(
+                                ))
                                 NOT_COVERED_BY_TESTS: 0
+                                ELIGIBLE: -1
                             )
                             stmts: array(
                                 0: Stmt_ClassMethod(
@@ -116,16 +126,20 @@ final class AstCollectorIntegrationTest extends AstTestCase
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: first
-                                        TESTS: Deferred(null)
+                                        TESTS: Deferred(array(
+                                        ))
                                         NOT_COVERED_BY_TESTS: 0
+                                        ELIGIBLE: -1
                                     )
                                     returnType: Identifier(
                                         isInsideFunction: true
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: first
-                                        TESTS: Deferred(null)
+                                        TESTS: Deferred(array(
+                                        ))
                                         NOT_COVERED_BY_TESTS: 0
+                                        ELIGIBLE: -1
                                     )
                                     stmts: array(
                                         0: Stmt_Return(
@@ -137,8 +151,10 @@ final class AstCollectorIntegrationTest extends AstTestCase
                                                     isStrictTypes: true
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: first
-                                                    TESTS: Deferred(null)
+                                                    TESTS: Deferred(array(
+                                                    ))
                                                     NOT_COVERED_BY_TESTS: 0
+                                                    ELIGIBLE: -1
                                                 )
                                                 right: Scalar_Int(
                                                     rawValue: 2
@@ -147,30 +163,38 @@ final class AstCollectorIntegrationTest extends AstTestCase
                                                     isStrictTypes: true
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: first
-                                                    TESTS: Deferred(null)
+                                                    TESTS: Deferred(array(
+                                                    ))
                                                     NOT_COVERED_BY_TESTS: 0
+                                                    ELIGIBLE: -1
                                                 )
                                                 isInsideFunction: true
                                                 isStrictTypes: true
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: first
-                                                TESTS: Deferred(null)
+                                                TESTS: Deferred(array(
+                                                ))
                                                 NOT_COVERED_BY_TESTS: 0
+                                                ELIGIBLE: -1
                                             )
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: first
-                                            TESTS: Deferred(null)
+                                            TESTS: Deferred(array(
+                                            ))
                                             NOT_COVERED_BY_TESTS: 0
+                                            ELIGIBLE: -1
                                         )
                                     )
                                     isOnFunctionSignature: true
                                     isStrictTypes: true
                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                     functionName: first
-                                    TESTS: Deferred(null)
+                                    TESTS: Deferred(array(
+                                    ))
                                     NOT_COVERED_BY_TESTS: 0
+                                    ELIGIBLE: -1
                                 )
                                 1: Stmt_ClassMethod(
                                     name: Identifier(
@@ -178,16 +202,20 @@ final class AstCollectorIntegrationTest extends AstTestCase
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: second
-                                        TESTS: Deferred(null)
+                                        TESTS: Deferred(array(
+                                        ))
                                         NOT_COVERED_BY_TESTS: 0
+                                        ELIGIBLE: -1
                                     )
                                     returnType: Identifier(
                                         isInsideFunction: true
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: second
-                                        TESTS: Deferred(null)
+                                        TESTS: Deferred(array(
+                                        ))
                                         NOT_COVERED_BY_TESTS: 0
+                                        ELIGIBLE: -1
                                     )
                                     stmts: array(
                                         0: Stmt_Return(
@@ -199,8 +227,10 @@ final class AstCollectorIntegrationTest extends AstTestCase
                                                     isStrictTypes: true
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: second
-                                                    TESTS: Deferred(null)
+                                                    TESTS: Deferred(array(
+                                                    ))
                                                     NOT_COVERED_BY_TESTS: 0
+                                                    ELIGIBLE: -1
                                                 )
                                                 right: Scalar_Int(
                                                     rawValue: 2
@@ -209,41 +239,53 @@ final class AstCollectorIntegrationTest extends AstTestCase
                                                     isStrictTypes: true
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: second
-                                                    TESTS: Deferred(null)
+                                                    TESTS: Deferred(array(
+                                                    ))
                                                     NOT_COVERED_BY_TESTS: 0
+                                                    ELIGIBLE: -1
                                                 )
                                                 isInsideFunction: true
                                                 isStrictTypes: true
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: second
-                                                TESTS: Deferred(null)
+                                                TESTS: Deferred(array(
+                                                ))
                                                 NOT_COVERED_BY_TESTS: 0
+                                                ELIGIBLE: -1
                                             )
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: second
-                                            TESTS: Deferred(null)
+                                            TESTS: Deferred(array(
+                                            ))
                                             NOT_COVERED_BY_TESTS: 0
+                                            ELIGIBLE: -1
                                         )
                                     )
                                     isOnFunctionSignature: true
                                     isStrictTypes: true
                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                     functionName: second
-                                    TESTS: Deferred(null)
+                                    TESTS: Deferred(array(
+                                    ))
                                     NOT_COVERED_BY_TESTS: 0
+                                    ELIGIBLE: -1
                                 )
                             )
                             NOT_SUPPORTED: 5
-                            TESTS: Deferred(null)
+                            TESTS: Deferred(array(
+                            ))
                             NOT_COVERED_BY_TESTS: 0
+                            ELIGIBLE: -1
                         )
                     )
                     kind: 1
                     NOT_SUPPORTED: 5
-                    TESTS: Deferred(null)
+                    TESTS: Deferred(array(
+                    ))
                     NOT_COVERED_BY_TESTS: 0
+                    ELIGIBLE: -1
                 )
             )
             AST;

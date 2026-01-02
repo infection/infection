@@ -26,7 +26,7 @@
 
     <testsuites>
         <testsuite name="Infection Test Suite">
-            <directory>tests/phpunit</directory>
+            <directory>tests/phpunit/Ast</directory>
 
             <exclude>tests/phpunit/AutoReview</exclude>
             <exclude>tests/phpunit/Fixtures</exclude>

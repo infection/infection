@@ -40,6 +40,7 @@ use Infection\Ast\NodeVisitor\AddTestsVisitor;
 use Infection\Ast\NodeVisitor\ExcludeNonSupportedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUnchangedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUncoveredNodesVisitor;
+use Infection\Ast\NodeVisitor\LabelNodesAsEligibleVisitor;
 use Infection\Ast\NodeVisitor\NameResolverFactory;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
@@ -101,6 +102,8 @@ readonly class NodeTraverserFactory
         if ($this->onlyCovered) {
             $traverser->addVisitor(new ExcludeUncoveredNodesVisitor());
         }
+
+        $traverser->addVisitor(new LabelNodesAsEligibleVisitor());
 
         return $traverser;
     }

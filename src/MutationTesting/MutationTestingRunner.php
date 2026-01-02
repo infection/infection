@@ -35,11 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\MutationTesting;
 
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Ast\AstCollector;
+use Infection\Configuration\Configuration;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\MutationGenerator;
 use Infection\MutationTesting\MutationAnalyzer\MutationAnalyzer;
 use Infection\PhpParser\UnparsableFile;
+use Infection\Process\Runner\MutationTestingRunner as LegacyMutationTestingRunner;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
@@ -47,6 +50,8 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
+use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
+use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use function Pipeline\take;
 
 /**
@@ -58,7 +63,11 @@ final readonly class MutationTestingRunner
         private SourceCollector $sourceCollector,
         private AstCollector $astCollector,
         private MutationGenerator $mutationGenerator,
-        private MutationAnalyzer $mutationAnalyzer,
+        // private MutationAnalyzer                $mutationAnalyzer,
+        private LegacyMutationTestingRunner $legacyRunner,
+        private Configuration $config,
+        private TestFrameworkAdapter $adapter,
+        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
     ) {
     }
 
@@ -73,13 +82,33 @@ final readonly class MutationTestingRunner
      *
      * @return list<MutantExecutionResult>
      */
-    private function runMutationAnalysis(): array
+    public function runMutationAnalysis(): array
     {
-        return take($this->sourceCollector->collect())
+        $mutations = take($this->sourceCollector->collect())
             ->map($this->astCollector->generate(...))
             ->filter(static fn ($ast) => $ast !== null)
-            ->unpack($this->mutationGenerator->generate(...))
-            ->map($this->mutationAnalyzer->analyze(...))
-            ->toList();
+            ->map($this->mutationGenerator->generate(...));
+        // TODO: should use that instead of the legacy runner
+        // ->map($this->mutationAnalyzer->analyze(...));
+
+        $this->legacyRunner->run(
+            $mutations,
+            $this->getFilteredExtraOptionsForMutant(),
+        );
+
+        // TODO: currently we dispatch the events, we do not return the results
+        return [];
+    }
+
+    private function getFilteredExtraOptionsForMutant(): string
+    {
+        if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
+            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
+                $this->config->testFrameworkExtraOptions,
+                $this->adapter->getInitialRunOnlyOptions(),
+            );
+        }
+
+        return $this->config->testFrameworkExtraOptions;
     }
 }

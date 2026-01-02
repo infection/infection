@@ -44,14 +44,12 @@ use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
-use Infection\Mutation\MutationGenerator;
+use Infection\MutationTesting\MutationTestingRunner;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
@@ -61,9 +59,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\IgnoresAdditionalNodes;
-use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
-use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Webmozart\Assert\Assert;
 
 /**
@@ -78,12 +73,10 @@ final readonly class Engine
         private EventDispatcher $eventDispatcher,
         private InitialTestsRunner $initialTestsRunner,
         private MemoryLimiter $memoryLimiter,
-        private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
-        private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
         private ?InitialStaticAnalysisRunner $initialStaticAnalysisRunner = null,
         private ?StaticAnalysisToolAdapter $staticAnalysisToolAdapter = null,
     ) {
@@ -211,38 +204,6 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
-        $mutations = $this->mutationGenerator->generate(
-            $this->config->mutateOnlyCoveredCode(),
-            $this->getNodeIgnorers(),
-        );
-
-        $this->mutationTestingRunner->run(
-            $mutations,
-            $this->getFilteredExtraOptionsForMutant(),
-        );
-    }
-
-    /**
-     * @return NodeIgnorer[]
-     */
-    private function getNodeIgnorers(): array
-    {
-        if ($this->adapter instanceof IgnoresAdditionalNodes) {
-            return $this->adapter->getNodeIgnorers();
-        }
-
-        return [];
-    }
-
-    private function getFilteredExtraOptionsForMutant(): string
-    {
-        if ($this->adapter instanceof ProvidesInitialRunOnlyOptions) {
-            return $this->testFrameworkExtraOptionsFilter->filterForMutantProcess(
-                $this->config->testFrameworkExtraOptions,
-                $this->adapter->getInitialRunOnlyOptions(),
-            );
-        }
-
-        return $this->config->testFrameworkExtraOptions;
+        $this->mutationTestingRunner->runMutationAnalysis();
     }
 }

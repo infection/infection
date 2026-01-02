@@ -39,6 +39,7 @@ use Infection\Ast\Metadata\Annotation;
 use Infection\Ast\Metadata\NodeAnnotator;
 use Infection\Ast\Metadata\TraverseContext;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use function iter\toArray;
 use function Later\later;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -63,12 +64,14 @@ final class AddTestsVisitor extends NodeVisitorAbstract
                 function () use ($node) {
                     $isOnFunctionSignature = NodeAnnotator::isOnFunctionSignature($node);
 
-                    return yield from $this->context->trace->getAllTestsForMutation(
-                        $this->lineRangeCalculator->calculateRange(
-                            $node,
+                    yield toArray(
+                        $this->context->trace->getAllTestsForMutation(
+                            $this->lineRangeCalculator->calculateRange(
+                                $node,
+                                $isOnFunctionSignature,
+                            ),
                             $isOnFunctionSignature,
                         ),
-                        $isOnFunctionSignature,
                     );
                 },
             ),

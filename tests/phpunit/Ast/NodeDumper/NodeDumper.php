@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Ast\NodeDumper;
 
-use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Later\Interfaces\Deferred;
 use function get_debug_type;
 use function implode;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;
@@ -46,7 +45,7 @@ use function is_float;
 use function is_int;
 use function is_object;
 use function is_string;
-use newSrc\TestFramework\Trace\Symbol\Symbol;
+use Later\Interfaces\Deferred;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
 use PhpParser\Node;
@@ -373,7 +372,7 @@ final class NodeDumper
 
             $deferredValue = $node->get();
 
-            if (null === $deferredValue) {
+            if ($deferredValue === null) {
                 $result .= 'null)';
             } else {
                 Assert::isIterable($deferredValue);

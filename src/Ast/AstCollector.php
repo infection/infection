@@ -54,6 +54,7 @@ final readonly class AstCollector
         private FileParser $parser,
         private NodeTraverserFactory $traverserFactory,
         private Tracer $tracer,
+        private bool $onlyCovered,
     ) {
     }
 
@@ -63,11 +64,10 @@ final readonly class AstCollector
      */
     public function generate(
         SplFileInfo $sourceFile,
-        bool $onlyCovered,
     ): ?Ast {
         $trace = $this->trace($sourceFile);
 
-        if ($onlyCovered && !$trace->hasTests()) {
+        if ($this->onlyCovered && !$trace->hasTests()) {
             return null;
         }
 

@@ -38,6 +38,7 @@ namespace Infection;
 use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Ast\AstCollector;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
 use Infection\Configuration\Configuration;
@@ -99,6 +100,7 @@ use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\MutationGenerator;
+use Infection\MutationTesting\MutationTestingRunner;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
@@ -109,7 +111,7 @@ use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\Runner\DryProcessRunner;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsRunner;
-use Infection\Process\Runner\MutationTestingRunner;
+use Infection\Process\Runner\MutationTestingRunner as LegacyMutationTestingRunner;
 use Infection\Process\Runner\ParallelProcessRunner;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Process\ShellCommandLineExecutor;
@@ -428,6 +430,14 @@ final class Container extends DIContainer
                     !$config->mutateOnlyCoveredCode(),
                 );
             },
+            AstCollector::class => static function (self $container): AstCollector {
+                return new AstCollector(
+                    $container->getFileParser(),
+                    $container->getNodeTraverserFactory(),
+                    $container->getTracer(),
+                    $container->getConfiguration()->mutateOnlyCoveredCode(),
+                );
+            },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
                 $container->getStopwatch(),
                 $container->getTimeFormatter(),
@@ -521,10 +531,10 @@ final class Container extends DIContainer
                     $container->getConfiguration(),
                 );
             },
-            MutationTestingRunner::class => static function (self $container): MutationTestingRunner {
+            LegacyMutationTestingRunner::class => static function (self $container): LegacyMutationTestingRunner {
                 $configuration = $container->getConfiguration();
 
-                return new MutationTestingRunner(
+                return new LegacyMutationTestingRunner(
                     $container->getMutantProcessContainerFactory(),
                     $container->getMutantFactory(),
                     $container->getProcessRunner(),
@@ -539,6 +549,15 @@ final class Container extends DIContainer
                     $configuration->mutantId,
                 );
             },
+            MutationTestingRunner::class => static fn (self $container): MutationTestingRunner => new MutationTestingRunner(
+                $container->getSourceCollector(),
+                $container->get(AstCollector::class),
+                $container->getMutationGenerator(),
+                $container->getLegacyMutationTestingRunner(),
+                $container->getConfiguration(),
+                $container->getTestFrameworkAdapter(),
+                $container->getTestFrameworkExtraOptionsFilter(),
+            ),
             MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
             Git::class => static fn (self $container): Git => new CommandLineGit(
                 new ShellCommandLineExecutor(),
@@ -822,6 +841,11 @@ final class Container extends DIContainer
         return $this->get(NodeTraverserFactory::class);
     }
 
+    public function getMutationGenerator(): MutationGenerator
+    {
+        return $this->get(MutationGenerator::class);
+    }
+
     public function getFileLoggerFactory(): FileLoggerFactory
     {
         return $this->get(FileLoggerFactory::class);
@@ -882,9 +906,9 @@ final class Container extends DIContainer
         return $this->get(MutantProcessContainerFactory::class);
     }
 
-    public function getMutationGenerator(): MutationGenerator
+    public function getLegacyMutationTestingRunner(): LegacyMutationTestingRunner
     {
-        return $this->get(MutationGenerator::class);
+        return $this->get(LegacyMutationTestingRunner::class);
     }
 
     public function getMutationTestingRunner(): MutationTestingRunner

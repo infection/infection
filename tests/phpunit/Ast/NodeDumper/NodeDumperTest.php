@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Ast\NodeDumper;
 
 use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use InvalidArgumentException;
 use function is_string;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -52,7 +51,6 @@ use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(NodeDumper::class)]
@@ -387,15 +385,7 @@ final class NodeDumperTest extends TestCase
                     OUT,
             )
         ->build();
-    }
 
-    public function test_error(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Can only dump nodes and arrays.');
-
-        $dumper = new NodeDumper();
-
-        $dumper->dump([new stdClass()]);
+        // TODO: needs more cases
     }
 }

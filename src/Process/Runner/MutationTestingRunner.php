@@ -52,6 +52,8 @@ use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
+ * TODO: should be phased out for the MutationAnalyzer
+ *
  * @internal
  * @final
  */
