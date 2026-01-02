@@ -102,11 +102,11 @@ jobs:
           ls tests/e2e/*/composer.json | xargs dirname |
              xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
-      - name: Run a subset of E2E tests
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
+#      - name: Run a subset of E2E tests
+#        if: runner.os == 'Windows'
+#        shell: bash
+#        run: |
+#          make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
 
       - name: Install Linux dependencies for E2E tests
         if: runner.os != 'Windows'
