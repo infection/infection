@@ -29,7 +29,7 @@ jobs:
           # versions.
           php-version: 8.2
 
-      - name: Configure PHP-CS-Fixer
+      - name: Configure PHP-CS-Fixer GitHub Actions cache
         uses: actions/cache@v4
         with:
           path: ./var/cache/php-cs-fixer

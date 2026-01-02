@@ -39,28 +39,28 @@ jobs:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure PHP-CS-Fixer
+      - name: Configure PHP-CS-Fixer GitHub Actions cache
         uses: actions/cache@v4
         with:
           path: ./var/cache/php-cs-fixer
           key: "php-cs-fixer-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-php-cs-fixer"
 
-      - name: Configure Rector
+      - name: Configure Rector GitHub Actions cache
         uses: actions/cache@v4
         with:
           path: ./var/cache/rector
           key: "${{ matrix.php-version }}-rector-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-rector"
 
-      - name: Configure PHPStan
+      - name: Configure PHPStan GitHub Actions cache
         uses: actions/cache@v4
         with:
           path: ./var/cache/phpstan
           key: "${{ matrix.php-version }}-phpstan-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-phpstan"
 
-      - name: Configure Psalm
+      - name: Configure Psalm GitHub Actions cache
         uses: actions/cache@v4
         with:
           path: ./var/cache/psalm
