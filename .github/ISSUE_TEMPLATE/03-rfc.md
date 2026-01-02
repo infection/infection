@@ -8,16 +8,17 @@ assignees: ''
 
 ---
 
-# Summary
+## Summary
 
 A brief, one-paragraph explanation of what this RFC proposes.
 
 
-# Motivation
+## Motivation
 
 Why are we doing this? What problem does it solve? What use cases does it support?
 
-# Proposed Solution
+## Proposed Solution
+
 A detailed explanation of the proposed change or feature. Include:
 
 High-level design and architecture (mermaid files recommended – it is best to attach their source code in a `<details>` tag too).
@@ -25,12 +26,11 @@ Key components and their interactions.
 Any new APIs, interfaces, or data structures.
 
 
-# Alternatives Considered
+## Alternatives Considered
 
 What other approaches were considered and why were they not chosen?
 
-#
-Implementation Plan
+## Implementation Plan
 
 How will this be built? Include:
 
@@ -39,15 +39,15 @@ How will this be built? Include:
 - Dependencies on other work
 - Testing strategy
 
-# Risks and Mitigations
+## Risks and Mitigations
 
 What could go wrong? How do we address potential issues?
 
-# Open Questions
+## Open Questions
 
 What remains to be resolved or decided?
 
-# References
+## References
 
 Related issues, PRs, or documentation
 External resources or research
