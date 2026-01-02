@@ -66,18 +66,6 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Cache E2E tests dependencies
-        if: runner.os == 'Windows'
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-        with:
-          path: tests/e2e/*/vendor
-          key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}
-          restore-keys: |
-            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-
-            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-
-            e2e-vendor-${{ runner.os }}-
-            composer-
-
       - name: Install Composer dependencies for E2E tests
         shell: bash
         run: |
