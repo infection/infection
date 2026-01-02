@@ -1,6 +1,7 @@
 !/.tools/.gitkeep
 !/build/.gitkeep
 !/build/cache/.gitkeep
+!/var/cache/.gitkeep
 .phpunit.*
 /*.phar
 /.box_dump/
@@ -33,5 +34,4 @@
 /tests/error.log
 /tests/phpunit/**/*/generated_index.xml
 /var/
-!/var/cache/.gitkeep
 /vendor/
