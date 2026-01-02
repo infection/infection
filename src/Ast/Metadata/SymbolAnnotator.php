@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Ast\Metadata;
 
+use function array_values;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Node;
-use function array_values;
 
 final class SymbolAnnotator
 {

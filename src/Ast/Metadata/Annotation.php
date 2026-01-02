@@ -43,4 +43,5 @@ enum Annotation: int
     case NOT_PART_OF_THE_DIFF = 3;      // The file is included in the diff, but not this part of the code. This can happen with git diffs typically.
     case ARID_CODE = 2;                 // Maybe in the future we want different level of aridness.
     case TESTS = 4;                     // Tests covering the node.
+    case NOT_SUPPORTED = 5;             // A node that cannot be mutated.
 }

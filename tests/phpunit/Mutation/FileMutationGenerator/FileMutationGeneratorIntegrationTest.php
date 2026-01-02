@@ -37,8 +37,8 @@ namespace Infection\Tests\Mutation\FileMutationGenerator;
 
 use function current;
 use function file_exists;
-use Infection\Mutation\MutationGenerator;
 use Infection\Mutation\Mutation;
+use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;

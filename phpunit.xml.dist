@@ -7,7 +7,7 @@
          failOnWarning="true"
          failOnDeprecation="true"
          failOnRisky="true"
-         requireCoverageMetadata="false"
+         requireCoverageMetadata="true"
          displayDetailsOnIncompleteTests="true"
          displayDetailsOnPhpunitDeprecations="true"
          displayDetailsOnSkippedTests="true"

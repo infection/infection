@@ -35,18 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing\Test\TestLocator;
 
+use function array_values;
+use function count;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\Test\TestLocations;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Webmozart\Assert\Assert;
-use function array_values;
-use function count;
 use function iter\any;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
 final readonly class BasicTestLocator implements TestLocator
 {

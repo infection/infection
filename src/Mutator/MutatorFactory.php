@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use Infection\Framework\ClassName;
-use SplFileInfo;
 use function is_a;
 use PhpParser\Node;
+use SplFileInfo;
 use function sprintf;
 use Webmozart\Assert\Assert;
 

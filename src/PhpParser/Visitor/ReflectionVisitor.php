@@ -107,6 +107,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
 
         // No need to traverse outside of classes
         if (count($this->classScopeStack) === 0) {
+            // TODO: ideally should be part of ExcludeNonSupportedNodesVisitor
             return null;
         }
 
@@ -119,6 +120,7 @@ final class ReflectionVisitor extends NodeVisitorAbstract
         if ($isInsideFunction) {
             $node->setAttribute(self::IS_INSIDE_FUNCTION_KEY, true);
         } elseif ($node instanceof Node\Stmt\Function_) {
+            // TODO: ideally should be part of ExcludeNonSupportedNodesVisitor
             return NodeVisitor::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 

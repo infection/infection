@@ -35,22 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Ast;
 
-use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
-use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
-use PhpParser\Node;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -102,7 +96,7 @@ final readonly class AstCollector
         $traverser = $this->traverserFactory->createFirstTraverser(
             $trace,
             $originalFileTokens,
-            /*$mutationCollectorVisitor, $nodeIgnorers*/
+            /* $mutationCollectorVisitor, $nodeIgnorers */
         );
 
         yield new Ast(

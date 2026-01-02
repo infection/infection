@@ -36,26 +36,14 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Ast\Ast;
-use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
-use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\Tracer;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\CloningVisitor;
-use Symfony\Component\Finder\SplFileInfo;
-use Webmozart\Assert\Assert;
 
 /**
  * TODO: this was the previous FileMutationGenerator. Renamed it to MutationGenerator as the
@@ -78,9 +66,6 @@ final readonly class MutationGenerator
     }
 
     /**
-     * @param Mutator<Node>[] $mutators
-     * @param NodeIgnorer[] $nodeIgnorers
-     *
      * @throws NoSourceFound
      * @throws UnparsableFile
      *

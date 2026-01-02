@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\Ast\Visitor;
 
 use Infection\Ast\Metadata\TraverseContext;
-use Infection\Ast\NodeVisitor\ExcludeIgnoredNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUnchangedNodesVisitor;
 use Infection\Differ\ChangedLinesRange;
 use Infection\FileSystem\FileSystem;
@@ -45,26 +44,23 @@ use Infection\Source\Matcher\GitDiffSourceLineMatcher;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\Tests\Ast\AstTestCase;
 use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
+use const PHP_INT_MAX;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use const PHP_INT_MAX;
-use const PHP_INT_MIN;
 
 #[CoversClass(ExcludeUnchangedNodesVisitor::class)]
 final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
 {
     /**
-     * @param string $code
      * @param non-empty-array<string, list<ChangedLinesRange>> $changedLinesByPaths
-     * @param string $expected
-     * @return void
      */
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
         string $code,
         TraverseContext $context,
-        array  $changedLinesByPaths,
+        array $changedLinesByPaths,
         string $expected,
     ): void {
         $nodes = $this->createParser()->parse($code);
@@ -99,7 +95,10 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            new TraverseContext('/path/to/Canary.php'),
+            new TraverseContext(
+                '/path/to/Canary.php',
+                new FakeTrace(),
+            ),
             [
                 '/path/to/Canary.php' => [
                     ChangedLinesRange::forRange(0, PHP_INT_MAX),
@@ -143,7 +142,10 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                 }
 
                 PHP,
-            new TraverseContext('/path/to/Canary.php'),
+            new TraverseContext(
+                '/path/to/Canary.php',
+                new FakeTrace(),
+            ),
             [],
             <<<'OUT'
                 array(
@@ -171,7 +173,10 @@ final class ExcludeUnchangedNodesVisitorTest extends AstTestCase
                 }                                   // L15
 
                 PHP,
-            new TraverseContext('/path/to/MyService.php'),
+            new TraverseContext(
+                '/path/to/MyService.php',
+                new FakeTrace(),
+            ),
             [
                 '/path/to/MyService.php' => [
                     ChangedLinesRange::forLine(7),

@@ -45,8 +45,8 @@ use Infection\TestFramework\Tracing\Test\TestLocations;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Webmozart\Assert\Assert;
 use function Later\lazy;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal

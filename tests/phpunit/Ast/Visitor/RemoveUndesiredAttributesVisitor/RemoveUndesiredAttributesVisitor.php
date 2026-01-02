@@ -33,25 +33,61 @@
 
 declare(strict_types=1);
 
-namespace Infection\Ast;
+namespace Infection\Tests\Ast\Visitor\RemoveUndesiredAttributesVisitor;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
+use function array_intersect_key;
+use function array_map;
+use Infection\Ast\Metadata\Annotation;
 use PhpParser\Node;
-use PhpParser\Node\Stmt;
-use PhpParser\Token;
+use PhpParser\NodeVisitorAbstract;
+use function Safe\array_flip;
 
-final readonly class Ast
+/**
+ * Some tests may leverage existing visitors for the tests which may add various annotations
+ * which are uninteresting for the test.
+ */
+final class RemoveUndesiredAttributesVisitor extends NodeVisitorAbstract
 {
     /**
-     * @param Stmt[] $initialStatements
-     * @param Token[] $originalFileTokens
-     * @param Node[] $nodes
+     * @var array<string, mixed>
      */
+    private readonly array $desiredAttributeKeys;
+
     public function __construct(
-        public Trace $trace,
-        public array $initialStatements,
-        public array $originalFileTokens,
-        public array $nodes,
+        Annotation|string ...$desired,
     ) {
+        $this->desiredAttributeKeys = self::getDesiredAttributeKeys($desired);
+    }
+
+    public function enterNode(Node $node): void
+    {
+        $this->removeUndesiredAttributes($node);
+    }
+
+    /**
+     * @param array<Annotation|string> $desired
+     *
+     * @return array<string, mixed>
+     */
+    private static function getDesiredAttributeKeys(array $desired): array
+    {
+        return array_flip(
+            array_map(
+                static fn (Annotation|string $attribute) => $attribute instanceof Annotation
+                    ? $attribute->name
+                    : $attribute,
+                $desired,
+            ),
+        );
+    }
+
+    private function removeUndesiredAttributes(Node $node): void
+    {
+        $desiredAttributes = array_intersect_key(
+            $node->getAttributes(),
+            $this->desiredAttributeKeys,
+        );
+
+        $node->setAttributes($desiredAttributes);
     }
 }

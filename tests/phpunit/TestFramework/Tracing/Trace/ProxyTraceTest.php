@@ -42,10 +42,10 @@ use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function Later\now;
 
 #[CoversClass(ProxyTrace::class)]
 final class ProxyTraceTest extends TestCase

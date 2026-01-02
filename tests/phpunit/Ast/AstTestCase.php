@@ -35,17 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Ast;
 
+use function array_map;
 use Infection\Tests\Ast\NodeDumper\NodeDumper;
+use function is_array;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
-use function array_map;
-use function is_array;
 
 abstract class AstTestCase extends TestCase
 {
     protected Parser $parser;
+
     protected NodeDumper $dumper;
 
     protected function setUp(): void

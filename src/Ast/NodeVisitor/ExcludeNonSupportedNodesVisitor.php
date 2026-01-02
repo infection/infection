@@ -33,25 +33,34 @@
 
 declare(strict_types=1);
 
-namespace Infection\Ast;
+namespace Infection\Ast\NodeVisitor;
 
-use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\Ast\Metadata\Annotation;
+use Infection\Ast\Metadata\NodeAnnotator;
 use PhpParser\Node;
-use PhpParser\Node\Stmt;
-use PhpParser\Token;
+use PhpParser\NodeVisitorAbstract;
 
-final readonly class Ast
+/**
+ * Excludes nodes that infection does not support.
+ *
+ * @see https://github.com/infection/infection/issues/1482
+ */
+final class ExcludeNonSupportedNodesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @param Stmt[] $initialStatements
-     * @param Token[] $originalFileTokens
-     * @param Node[] $nodes
-     */
-    public function __construct(
-        public Trace $trace,
-        public array $initialStatements,
-        public array $originalFileTokens,
-        public array $nodes,
-    ) {
+    public function enterNode(Node $node): ?int
+    {
+        if (!$this->isSupported($node)) {
+            NodeAnnotator::annotate($node, Annotation::NOT_SUPPORTED);
+        }
+
+        return null;
+    }
+
+    private function isSupported(Node $node): bool
+    {
+        // TODO: this is taken from NodeMutationGenerator.
+        //  there is also a skip happening in ReflectionVisitor for functions; may need to be moved
+        return NodeAnnotator::isOnFunctionSignature($node)
+            || NodeAnnotator::isInsideFunction($node);
     }
 }

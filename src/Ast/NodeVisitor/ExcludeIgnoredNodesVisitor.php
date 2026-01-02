@@ -37,10 +37,10 @@ namespace Infection\Ast\NodeVisitor;
 
 use Infection\Ast\Metadata\Annotation;
 use Infection\Ast\Metadata\NodeAnnotator;
+use function iter\any;
 use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function iter\any;
 use function str_contains;
 
 // TODO: replaces IgnoreAllMutationsAnnotationReaderVisitor

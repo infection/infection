@@ -51,7 +51,6 @@ final class ExcludeUnchangedNodesVisitor extends NodeVisitorAbstract
         private readonly TraverseContext $context,
         private readonly SourceLineMatcher $sourceLineMatcher,
     ) {
-
     }
 
     public function enterNode(Node $node): ?int

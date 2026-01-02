@@ -36,53 +36,30 @@ declare(strict_types=1);
 namespace Infection\Mutator;
 
 use Infection\Ast\Metadata\NodeAnnotator;
-use function count;
-use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\Mutation\Mutation;
 use Infection\PhpParser\MutatedNode;
-use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Source\Exception\NoSourceFound;
-use Infection\Source\Matcher\SourceLineMatcher;
-use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use function iterator_to_array;
 use PhpParser\Node;
 use PhpParser\Token;
 use Throwable;
-use Traversable;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @final
  */
-class NodeMutationGenerator
+final readonly class NodeMutationGenerator
 {
-    /** @var Mutator<Node>[] */
-    private readonly array $mutators;
-
-    private Node $currentNode;
-
-    private ?bool $isOnFunctionSignatureMemoized = null;
-
-    private ?bool $isInsideFunctionMemoized = null;
-
     /**
      * @param Mutator<Node>[] $mutators
      * @param Node[] $fileNodes
      * @param Token[] $originalFileTokens
      */
     public function __construct(
-        array $mutators,
-        private readonly string $filePath,
-        private readonly array $fileNodes,
-        private readonly bool $onlyCovered,
-        private readonly array $originalFileTokens,
-        private readonly string $originalFileContent,
+        private Mutators $mutators,
+        private string $filePath,
+        private array $fileNodes,
+        private array $originalFileTokens,
+        private string $originalFileContent,
     ) {
-        Assert::allIsInstanceOf($mutators, Mutator::class);
-
-        $this->mutators = $mutators;
     }
 
     /**
@@ -92,23 +69,10 @@ class NodeMutationGenerator
      */
     public function generate(Node $node): iterable
     {
-        if (!NodeAnnotator::isEligible($node)) {
-            return;
-        }
-
-        $this->currentNode = $node;
-        $this->testsMemoized = null;
-        $this->isOnFunctionSignatureMemoized = null;
-        $this->isInsideFunctionMemoized = null;
-
-        if (!$this->isOnFunctionSignature()
-            && !$this->isInsideFunction()
-        ) {
-            return;
-        }
-
-        foreach ($this->mutators as $mutator) {
-            yield from $this->generateForMutator($node, $mutator);
+        if (NodeAnnotator::isEligible($node)) {
+            foreach ($this->mutators as $mutator) {
+                yield from $this->generateForMutator($node, $mutator);
+            }
         }
     }
 
@@ -131,12 +95,6 @@ class NodeMutationGenerator
             );
         }
 
-        $tests = NodeAnnotator::getTests($node);
-
-        if ($this->onlyCovered && count($tests) === 0) {
-            return;
-        }
-
         $mutationByMutatorIndex = 0;
 
         foreach ($mutator->mutate($node) as $mutatedNode) {
@@ -149,7 +107,7 @@ class NodeMutationGenerator
                 $node::class,
                 MutatedNode::wrap($mutatedNode),
                 $mutationByMutatorIndex,
-                $tests,
+                NodeAnnotator::getTests($node),
                 $this->originalFileTokens,
                 $this->originalFileContent,
             );
@@ -157,15 +115,4 @@ class NodeMutationGenerator
             ++$mutationByMutatorIndex;
         }
     }
-
-    private function isOnFunctionSignature(): bool
-    {
-        return $this->isOnFunctionSignatureMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
-    }
-
-    private function isInsideFunction(): bool
-    {
-        return $this->isInsideFunctionMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
-    }
-
 }

@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\NewSrc\AST\Visitor;
+namespace Infection\Tests\Ast\Visitor;
 
+use Infection\Ast\NodeVisitor\LabelNodesAsEligibleVisitor;
 use Infection\Tests\Ast\AstTestCase;
 use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use newSrc\AST\NodeVisitor\LabelNodesAsEligibleVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

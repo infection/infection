@@ -38,12 +38,10 @@ namespace Infection\Ast\NodeVisitor;
 use Infection\Ast\Metadata\Annotation;
 use Infection\Ast\Metadata\NodeAnnotator;
 use Infection\Ast\Metadata\TraverseContext;
-use Infection\TestFramework\Tracing\Test\TestLocator\TestLocator;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use function Later\later;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function Later\later;
-use function Later\lazy;
 
 /**
  * Annotates which tests covers the entered nodes.
@@ -73,7 +71,7 @@ final class AddTestsVisitor extends NodeVisitorAbstract
                         $isOnFunctionSignature,
                     );
                 },
-            )
+            ),
         );
 
         return null;

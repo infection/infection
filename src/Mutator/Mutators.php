@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutator;
 
+use ArrayIterator;
 use Infection\Mutation\Mutation;
-use newSrc\Mutator\FirstOrder\ConditionalNegotiation\Equal;
 use PhpParser\Node;
 
-final class Mutators
+final class Mutators extends ArrayIterator
 {
     /**
      * @param Mutator[] $mutators

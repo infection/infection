@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use function array_key_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Tracing\Test\TestLocations;
 use Infection\TestFramework\Tracing\Test\TestLocator\TestLocator;
@@ -44,7 +45,6 @@ use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function array_key_exists;
 
 #[CoversClass(TestLocator::class)]
 final class TestLocatorTest extends TestCase

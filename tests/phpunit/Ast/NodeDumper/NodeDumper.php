@@ -35,8 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Ast\NodeDumper;
 
+use function get_debug_type;
+use function implode;
 use Infection\Tests\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
+use function is_array;
+use function is_float;
+use function is_int;
+use function is_string;
 use newSrc\TestFramework\Trace\Symbol\Symbol;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -51,16 +57,12 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
-use Webmozart\Assert\Assert;
-use function implode;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_string;
+use function sprintf;
 use function str_replace;
 use function strlen;
 use function strrpos;
 use function substr;
+use Webmozart\Assert\Assert;
 
 final class NodeDumper
 {
@@ -364,7 +366,12 @@ final class NodeDumper
             // TODO: this condition was changed compared to the original PHP-Parser code.
             $result .= $node->toString();
         } else {
-            throw new InvalidArgumentException('Can only dump nodes and arrays.');
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Can only dump nodes and arrays. Got "%s".',
+                    get_debug_type($node),
+                ),
+            );
         }
 
         if ($indent) {

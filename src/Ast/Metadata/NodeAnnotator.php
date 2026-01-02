@@ -63,6 +63,11 @@ final class NodeAnnotator
         return $node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
     }
 
+    public static function isInsideFunction(Node $node): bool
+    {
+        return $node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
+    }
+
     /**
      * @return iterable<TestLocation>
      */

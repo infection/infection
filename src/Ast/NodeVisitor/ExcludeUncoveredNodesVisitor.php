@@ -35,11 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Ast\NodeVisitor;
 
+use function count;
 use Infection\Ast\Metadata\Annotation;
 use Infection\Ast\Metadata\NodeAnnotator;
-use Infection\Ast\Metadata\TraverseContext;
-use newSrc\TestFramework\Trace\Symbol\Symbol;
-use newSrc\TestFramework\Tracing\Tracer;
+use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -50,24 +49,20 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class ExcludeUncoveredNodesVisitor extends NodeVisitorAbstract
 {
-    public function __construct(
-        private readonly Tracer $tracer,
-        private readonly TraverseContext $context,
-    ) {
+    public function __construct()
+    {
     }
 
     public function enterNode(Node $node): ?int
     {
-        $hasTests = $this->tracer->hasTests(
-            $this->context->filePathname,
-            $node,
-        );
+        $hasTests = count(NodeAnnotator::getTests($node)) > 0;
 
         // Note that, for instance, a static Analyser may or may not cover a symbol. We could configure
         // that within the tracer if we want to take PHPStan as a full-fledged test framework.
         if (!$hasTests) {
             NodeAnnotator::annotate($node, Annotation::NOT_COVERED_BY_TESTS);
 
+            // TODO: not sure we can skip things like that.
             return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 

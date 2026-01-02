@@ -60,7 +60,7 @@ final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
         return $node;
     }
 
-    public function leaveNode(Node $node): void
+    public function enterNode(Node $node): void
     {
         self::markAsVisited($node);
     }

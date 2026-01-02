@@ -37,6 +37,7 @@ namespace Infection\PhpParser;
 
 use Infection\Ast\Metadata\TraverseContext;
 use Infection\Ast\NodeVisitor\AddTestsVisitor;
+use Infection\Ast\NodeVisitor\ExcludeNonSupportedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUnchangedNodesVisitor;
 use Infection\Ast\NodeVisitor\ExcludeUncoveredNodesVisitor;
 use Infection\Ast\NodeVisitor\NameResolverFactory;
@@ -68,6 +69,7 @@ final readonly class NodeTraverserFactory
     public function __construct(
         private SourceLineMatcher $sourceLineMatcher,
         private LineRangeCalculator $lineRangeCalculator,
+        private bool $onlyCovered,
     ) {
     }
 
@@ -83,7 +85,7 @@ final readonly class NodeTraverserFactory
         $nodeIgnorers[] = new InterfaceIgnorer();
         $nodeIgnorers[] = new AbstractMethodIgnorer();
 
-        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
+        $traverser = new NodeTraverser(new CloningVisitor());
 
         $traverser->addVisitor(new IgnoreAllMutationsAnnotationReaderVisitor($changingIgnorer, new SplObjectStorage()));
         $traverser->addVisitor(new NonMutableNodesIgnorerVisitor($nodeIgnorers));
@@ -102,24 +104,23 @@ final readonly class NodeTraverserFactory
 
         return $traverser;
     }
+
     /**
      * TODO: this replaces the "createPreTraverser": this "pre" traverse, which
      *   is the first one, is where we enrich all the AST.
      *
      * @param Token[] $originalFileTokens
-     * @param NodeIgnorer[] $nodeIgnorers
      */
     public function createFirstTraverser(
         Trace $trace,
         array $originalFileTokens,
-    ): NodeTraverserInterface
-    {
+    ): NodeTraverserInterface {
         $context = new TraverseContext(
             $trace->getRealPath(),
             $trace,
         );
 
-        return new NodeTraverser(
+        $traverser = new NodeTraverser(
             NameResolverFactory::create(),
             new ParentConnectingVisitor(),
             new NextConnectingVisitor(),
@@ -134,11 +135,18 @@ final readonly class NodeTraverserFactory
                 $context,
                 $this->sourceLineMatcher,
             ),
+            new ExcludeNonSupportedNodesVisitor(),
             new AddTestsVisitor(
                 $context,
                 $this->lineRangeCalculator,
             ),
         );
+
+        if ($this->onlyCovered) {
+            $traverser->addVisitor(new ExcludeUncoveredNodesVisitor());
+        }
+
+        return $traverser;
     }
 
     /**

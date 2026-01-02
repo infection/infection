@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Tracing\Test\TestLocator;
 
-use Infection\AbstractTestFramework\Coverage\TestLocation;
-use Infection\TestFramework\Tracing\Test\TestLocations;
-use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
-use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
-use Webmozart\Assert\Assert;
 use function array_key_exists;
-use function array_values;
 use function implode;
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 
 /**
  * @internal
@@ -63,7 +59,7 @@ final class CachedTestLocator implements TestLocator
 
     public function hasTests(): bool
     {
-        if (null === $this->hasTests) {
+        if ($this->hasTests === null) {
             $this->hasTests = $this->decoratedTestLocator->hasTests();
         }
 
@@ -94,8 +90,7 @@ final class CachedTestLocator implements TestLocator
     private static function createHash(
         NodeLineRangeData $lineRange,
         bool $isOnFunctionSignature,
-    ): string
-    {
+    ): string {
         return implode(
             ':',
             [
