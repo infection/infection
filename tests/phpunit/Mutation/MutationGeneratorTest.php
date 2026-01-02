@@ -67,7 +67,6 @@ final class MutationGeneratorTest extends TestCase
         ]);
 
         $sourceCollector = new FixedSourceCollector(
-            false,
             [
                 $fileInfoA,
                 $fileInfoB,
@@ -141,7 +140,6 @@ final class MutationGeneratorTest extends TestCase
         ;
 
         $sourceCollector = new FixedSourceCollector(
-            false,
             [
                 new SplFileInfo(
                     'fileA',

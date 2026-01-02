@@ -19,12 +19,12 @@ jobs:
       COMPOSER_AUTH: ${{ secrets.CONDUCTOR_COMPOSER_AUTH }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Install PHP
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1" # master
         with:
           php-version: "8.2"
 
       - name: "Running Conductor"
-        uses: packagist/conductor-github-action@v1
+        uses: packagist/conductor-github-action@9f06e0b595f87422b21cb853a5ae2ffd4f9e06b8 # 1.5.3

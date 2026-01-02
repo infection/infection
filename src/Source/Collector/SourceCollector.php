@@ -47,13 +47,6 @@ use Symfony\Component\Finder\SplFileInfo;
 interface SourceCollector
 {
     /**
-     * Whether the collector collects all the project source files, or if they
-     * are filtered, e.g. to match a user input filter or to git added/modified
-     * files.
-     */
-    public function isFiltered(): bool;
-
-    /**
      * @throws NoSourceFound
      *
      * @return SplFileInfo[]
