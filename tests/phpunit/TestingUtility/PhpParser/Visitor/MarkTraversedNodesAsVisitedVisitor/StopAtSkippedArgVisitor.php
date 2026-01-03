@@ -33,24 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-final class Sequence
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var positive-int|0
-     */
-    private int $value = 0;
+    public const SKIP_ATTRIBUTE = 'skip';
 
-    /**
-     * @return positive-int|0
-     */
-    public function next(): int
+    public static function markNodeAsSkipped(Node $node): Node
     {
-        $value = $this->value;
+        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
 
-        ++$this->value;
+        return $node;
+    }
 
-        return $value;
+    public static function isNodeMarkedAsSkipped(Node $node): bool
+    {
+        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+    }
+
+    public function enterNode(Node $node): ?int
+    {
+        if (self::isNodeMarkedAsSkipped($node)) {
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
+
+        return null;
     }
 }

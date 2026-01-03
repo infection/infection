@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\NodeDumper;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
-use Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use Later\Interfaces\Deferred;
 use PhpParser\Comment;
@@ -111,9 +111,8 @@ final class NodeDumper
         'endFilePos' => true,
         'startTokenPos' => true,
         'endTokenPos' => true,
-        // The following attributes are Infection specific
+        // The following attribute(s) is/are Infection specific
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
-        // 'parent' => true,
     ];
 
     // Removed instance properties for stateless refactor
@@ -128,7 +127,7 @@ final class NodeDumper
         private readonly bool $dumpComments = false,
         private bool $dumpPositions = false,
         private readonly bool $dumpOtherAttributes = true,
-        // Infection specific parameters
+        // Infection specific parameter(s)
         private bool $onlyVisitedNodes = true,
     ) {
     }
@@ -149,7 +148,7 @@ final class NodeDumper
         array|Node $node,
         ?string $code = null,
         ?bool $dumpPositions = null,
-        // Infection specific parameters
+        // Infection specific parameter(s)
         ?bool $onlyVisitedNodes = null,
     ): string {
         $result = '';

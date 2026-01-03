@@ -33,41 +33,91 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\RemoveUndesiredAttributesVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
+use Exception;
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-use function array_diff_key;
-use function Safe\array_flip;
 
-/**
- * Utility visitor which allows removing the specified attributes.
- */
-final class RemoveUndesiredAttributesVisitor extends NodeVisitorAbstract
+final class NodeDumperScenario
 {
     /**
-     * @var array<string, mixed>
+     * @param list<Node>|Node $node
      */
-    private readonly array $undesiredAttributesAsKeys;
-
     public function __construct(
-        string ...$attributes,
+        public array|Node|string $node,
+        public string|Exception $expected = '',
+        // It should have the same defaults as NodeDumper
+        public bool $dumpProperties = false,
+        public bool $dumpComments = false,
+        public bool $dumpPositions = false,
+        public bool $dumpOtherAttributes = false,
+        public bool $onlyVisitedNodes = true,
     ) {
-        $this->undesiredAttributesAsKeys = array_flip($attributes);
     }
 
-    public function enterNode(Node $node): void
+    /**
+     * @param list<Node>|Node $node
+     */
+    public static function forNode(array|Node $node): self
     {
-        $this->removeUndesiredAttributes($node);
+        return new self($node);
     }
 
-    private function removeUndesiredAttributes(Node $node): void
+    public static function forCode(string $code): self
     {
-        $desiredAttributes = array_diff_key(
-            $node->getAttributes(),
-            $this->undesiredAttributesAsKeys,
-        );
+        return new self($code);
+    }
 
-        $node->setAttributes($desiredAttributes);
+    public function withDumpProperties(): self
+    {
+        $clone = clone $this;
+        $clone->dumpProperties = true;
+
+        return $clone;
+    }
+
+    public function withDumpComments(): self
+    {
+        $clone = clone $this;
+        $clone->dumpComments = true;
+
+        return $clone;
+    }
+
+    public function withDumpPositions(): self
+    {
+        $clone = clone $this;
+        $clone->dumpPositions = true;
+
+        return $clone;
+    }
+
+    public function withDumpOtherAttributes(): self
+    {
+        $clone = clone $this;
+        $clone->dumpOtherAttributes = true;
+
+        return $clone;
+    }
+
+    public function withShowAllNodes(): self
+    {
+        $clone = clone $this;
+        $clone->onlyVisitedNodes = false;
+
+        return $clone;
+    }
+
+    public function withExpected(string|Exception $expected): self
+    {
+        $clone = clone $this;
+        $clone->expected = $expected;
+
+        return $clone;
+    }
+
+    public function build(): array
+    {
+        return [$this];
     }
 }

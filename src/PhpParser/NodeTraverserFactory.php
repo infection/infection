@@ -61,7 +61,7 @@ class NodeTraverserFactory
      *
      * @return NodeIgnorer[]
      */
-    public static function createNodeIgnorers(
+    private static function createNodeIgnorers(
         ChangingIgnorer $changingIgnorer,
         array $nodeIgnorers = [],
     ): array {

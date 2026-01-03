@@ -36,10 +36,10 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\PhpParser\NodeDumper\NodeDumper;
-use Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
-use Infection\Tests\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;

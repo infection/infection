@@ -33,42 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-
-/**
- * Test Utility. This visitor adds an ID to the node in the attributes to be able to
- * more easily identify the nodes and more predictably than with `spl_object_id()`.
- */
-final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
+final class Sequence
 {
-    public const NODE_ID_ATTRIBUTE = 'nodeId';
-
-    public function __construct(
-        private readonly Sequence $sequence = new Sequence(),
-    ) {
-    }
+    /**
+     * @var positive-int|0
+     */
+    private int $value = 0;
 
     /**
-     * @return positive-int|null
+     * @return positive-int|0
      */
-    public static function getNodeId(Node $node): ?int
+    public function next(): int
     {
-        return $node->getAttribute(self::NODE_ID_ATTRIBUTE);
-    }
+        $value = $this->value;
 
-    public function enterNode(Node $node): void
-    {
-        $this->addId($node);
-    }
+        ++$this->value;
 
-    private function addId(Node $node): void
-    {
-        $node->setAttribute(
-            self::NODE_ID_ATTRIBUTE,
-            $this->sequence->next(),
-        );
+        return $value;
     }
 }

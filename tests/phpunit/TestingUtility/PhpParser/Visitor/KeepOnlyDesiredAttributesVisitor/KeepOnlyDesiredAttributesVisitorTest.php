@@ -33,32 +33,59 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\NodeDumper;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
 
-use PhpParser\Node\Expr\Variable;
+use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use function spl_object_id;
-use function sprintf;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(PotentialCircularDependencyDetected::class)]
-final class PotentialCircularDependencyDetectedTest extends TestCase
+#[CoversClass(KeepOnlyDesiredAttributesVisitor::class)]
+final class KeepOnlyDesiredAttributesVisitorTest extends VisitorTestCase
 {
-    public function test_it_can_create_an_instance_for_an_attribute(): void
-    {
-        $node = new Variable('x');
-
-        $exception = PotentialCircularDependencyDetected::forAttribute(
-            'next',
-            $node,
-        );
-
-        $this->assertSame(
-            sprintf(
-                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID the node.',
-                spl_object_id($node),
+    #[DataProvider('attributeProvider')]
+    public function test_it_keeps_the_desired_attributes(
+        array $initialAttributes,
+        array $desiredAttributes,
+        array $expectedAttributes,
+    ): void {
+        $node = new Node\Stmt\Expression(
+            new Node\Expr\Assign(
+                new Node\Expr\Variable('x'),
+                new Node\Scalar\Int_(42),
             ),
-            $exception->getMessage(),
+            $initialAttributes,
         );
+
+        $visitor = new KeepOnlyDesiredAttributesVisitor(...$desiredAttributes);
+
+        (new NodeTraverser($visitor))->traverse([$node]);
+
+        $actualAttributes = $node->getAttributes();
+
+        $this->assertSame($expectedAttributes, $actualAttributes);
+    }
+
+    public static function attributeProvider(): iterable
+    {
+        yield 'no attributes' => [
+            'initialAttributes' => [],
+            'desiredAttributes' => [],
+            'expectedAttributes' => [],
+        ];
+
+        yield 'keep some attributes' => [
+            'initialAttributes' => [
+                'custom_key_1' => 'value1',
+                'custom_key_2' => 'value2',
+                'custom_key_3' => 'value3',
+            ],
+            'desiredAttributes' => ['custom_key_1', 'custom_key_3'],
+            'expectedAttributes' => [
+                'custom_key_1' => 'value1',
+                'custom_key_3' => 'value3',
+            ],
+        ];
     }
 }

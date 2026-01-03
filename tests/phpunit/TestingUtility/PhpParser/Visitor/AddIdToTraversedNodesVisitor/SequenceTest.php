@@ -33,35 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
+#[CoversClass(Sequence::class)]
+final class SequenceTest extends TestCase
 {
-    public const VISITED_ATTRIBUTE = 'visited';
-
-    public static function wasVisited(Node $node): bool
+    public function test_it_gives_a_sequence(): void
     {
-        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
-    }
+        $sequence = new Sequence();
 
-    /**
-     * @template T extends Node
-     *
-     * @param T $node
-     * @return T
-     */
-    public static function markAsVisited(Node $node): Node
-    {
-        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
+        for ($i = 0; $i < 10; ++$i) {
+            $value = $sequence->next();
 
-        return $node;
-    }
-
-    public function enterNode(Node $node): void
-    {
-        self::markAsVisited($node);
+            $this->assertSame($i, $value);
+        }
     }
 }

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 use PhpParser\NodeTraverser;

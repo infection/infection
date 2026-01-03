@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\NodeDumper;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
 use PhpParser\Node;
 use UnexpectedValueException;

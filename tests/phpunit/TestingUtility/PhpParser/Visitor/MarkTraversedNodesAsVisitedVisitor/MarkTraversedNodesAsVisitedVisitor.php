@@ -33,44 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\RecordTraverseVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function func_get_args;
 
-final class RecordTraverseVisitor extends NodeVisitorAbstract
+/**
+ * Utility that adds an attribute to each node it visits. Unless configured to show all nodes,
+ * the node dumper will render nodes that do not have this attribute as `<skipped>`, allowing
+ * to easily identify that some nodes have not been visited.
+ */
+final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var list<array{string, list<mixed>}>
-     */
-    private array $records = [];
+    public const VISITED_ATTRIBUTE = 'visited';
 
-    public function fetch(): array
+    public static function wasVisited(Node $node): bool
     {
-        $records = $this->records;
-        $this->records = [];
-
-        return $records;
+        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
     }
 
-    public function beforeTraverse(array $nodes): void
+    /**
+     * @template T extends Node
+     *
+     * @param T $node
+     * @return T
+     */
+    public static function markAsVisited(Node $node): Node
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
+
+        return $node;
     }
 
     public function enterNode(Node $node): void
     {
-        $this->records[] = [__FUNCTION__, func_get_args()];
-    }
-
-    public function leaveNode(Node $node): void
-    {
-        $this->records[] = [__FUNCTION__, func_get_args()];
-    }
-
-    public function afterTraverse(array $nodes): void
-    {
-        $this->records[] = [__FUNCTION__, func_get_args()];
+        self::markAsVisited($node);
     }
 }

@@ -33,22 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use function array_intersect_key;
+use function Safe\array_flip;
 
-#[CoversClass(Sequence::class)]
-final class SequenceTest extends TestCase
+/**
+ * Utility visitor which allows keeping only the specified attributes.
+ */
+final class KeepOnlyDesiredAttributesVisitor extends NodeVisitorAbstract
 {
-    public function test_it_gives_a_sequence(): void
+    /**
+     * @var array<string, mixed>
+     */
+    private readonly array $desiredAttributeKeys;
+
+    public function __construct(
+        string ...$attributes,
+    ) {
+        $this->desiredAttributeKeys = array_flip($attributes);
+    }
+
+    public function enterNode(Node $node): void
     {
-        $sequence = new Sequence();
+        $this->removeUndesiredAttributes($node);
+    }
 
-        for ($i = 0; $i < 10; ++$i) {
-            $value = $sequence->next();
+    private function removeUndesiredAttributes(Node $node): void
+    {
+        $desiredAttributes = array_intersect_key(
+            $node->getAttributes(),
+            $this->desiredAttributeKeys,
+        );
 
-            $this->assertSame($i, $value);
-        }
+        $node->setAttributes($desiredAttributes);
     }
 }

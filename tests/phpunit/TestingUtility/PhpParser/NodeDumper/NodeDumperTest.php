@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\NodeDumper;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
 use Exception;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
-use Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;

@@ -33,41 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function array_intersect_key;
-use function Safe\array_flip;
 
 /**
- * Utility visitor which allows keeping only the specified attributes.
+ * Utility visitor which adds an ID to each node as a sequence. This allows easily identifying a
+ * node and more predictably than with `spl_object_id()`.
+ *
+ * The node dumper will also leverage this property to render nodes that are found in attributes
+ * to both reduce noise and avoid circular dependencies.
  */
-final class KeepOnlyDesiredAttributesVisitor extends NodeVisitorAbstract
+final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @var array<string, mixed>
-     */
-    private readonly array $desiredAttributeKeys;
+    public const NODE_ID_ATTRIBUTE = 'nodeId';
 
     public function __construct(
-        string ...$attributes,
+        private readonly Sequence $sequence = new Sequence(),
     ) {
-        $this->desiredAttributeKeys = array_flip($attributes);
+    }
+
+    /**
+     * @return positive-int|0|null
+     */
+    public static function getNodeId(Node $node): ?int
+    {
+        return $node->getAttribute(self::NODE_ID_ATTRIBUTE);
     }
 
     public function enterNode(Node $node): void
     {
-        $this->removeUndesiredAttributes($node);
+        $this->addId($node);
     }
 
-    private function removeUndesiredAttributes(Node $node): void
+    private function addId(Node $node): void
     {
-        $desiredAttributes = array_intersect_key(
-            $node->getAttributes(),
-            $this->desiredAttributeKeys,
+        $node->setAttribute(
+            self::NODE_ID_ATTRIBUTE,
+            $this->sequence->next(),
         );
-
-        $node->setAttributes($desiredAttributes);
     }
 }

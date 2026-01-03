@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\AstCollector;
 
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
