@@ -41,7 +41,8 @@ use PhpParser\NodeVisitorAbstract;
 use function Safe\array_flip;
 
 /**
- * Utility visitor which allows keeping only the specified attributes.
+ * Utility visitor which allows keeping only the specified attributes. This can, for example, help
+ * to reduce noise in the test by removing uninteresting attributes.
  */
 final class KeepOnlyDesiredAttributesVisitor extends NodeVisitorAbstract
 {
