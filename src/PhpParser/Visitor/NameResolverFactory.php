@@ -33,58 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\DevTools\PHPStan\Rules;
+namespace Infection\PhpParser\Visitor;
 
-use Infection\Container;
-use Infection\Testing\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\Node\Expr\New_;
-use PHPStan\Analyser\Scope;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
-use Symfony\Component\Filesystem\Path;
-use function realpath;
-use function sprintf;
+use Infection\CannotBeInstantiated;
+use PhpParser\NodeVisitor\NameResolver;
 
 /**
- * @implements Rule<New_>
+ * @internal
  */
-final class InfectionContainerRule implements Rule {
-    /**
-     * @var string[]|null
-     */
-    private static $containerFiles;
+final class NameResolverFactory
+{
+    use CannotBeInstantiated;
 
-    public function getNodeType(): string {
-        return New_::class;
-    }
-
-    public function processNode(Node $node, Scope $scope): array {
-        if (
-            $node->class instanceof Node\Name
-            && $node->class->toString() === Container::class
-            && !in_array($scope->getFile(), $this->getContainerFiles(), true)
-        ) {
-            return [RuleErrorBuilder::message(
-                sprintf(
-                    'Did not expect to find a usage of the Infection container. Please use "%s::getContainer() instead.',
-                    SingletonContainer::class,
-                ))->identifier('infection.container')->build()];
-        }
-
-        return [];
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getContainerFiles(): array
+    public static function create(): NameResolver
     {
-        return self::$containerFiles ??= array_map(
-            static fn (string $path): string => Path::canonicalize($path),
-            [
-                __DIR__ . '/../../../tests/phpunit/ContainerTest.php',
-                __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
+        return new NameResolver(
+            errorHandler: null, // Ensure we throw.
+            options: [
+                'preserveOriginalNames' => true,
+                // must be `false` for pretty-printing to work properly
+                // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
+                'replaceNodes' => false,
             ],
         );
     }
