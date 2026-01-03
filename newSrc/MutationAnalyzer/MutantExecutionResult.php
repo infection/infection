@@ -33,18 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+final class MutantExecutionResult
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @param self[] $results
+     */
+    public static function aggregate(array $results): self
+    {
+    }
+
+    public function getStatus(): MutantExecutionStatus
     {
     }
 }

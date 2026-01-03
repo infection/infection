@@ -33,18 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\AridCodeDetector;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\Node;
+
+interface AridCodeDetector
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function isArid(Node $node): bool;
 }

@@ -84,11 +84,13 @@ class MutationTestingRunner
 
         $processContainers = take($mutations)
             ->stream()
+            // Start of heuristics
             ->filter($this->ignoredByMutantId(...))
             ->cast($this->mutationToMutant(...))
             ->filter($this->ignoredByRegex(...))
             ->filter($this->uncoveredByTest(...))
             ->filter($this->takingTooLong(...))
+            // End of heuristics
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 

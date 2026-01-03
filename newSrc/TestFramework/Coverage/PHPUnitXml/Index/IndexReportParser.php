@@ -33,18 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\TestFramework\Coverage\JUnit;
+
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
+ * TODO: heavily inspired from IndexXmlCoverageParser
+ * @see IndexXmlCoverageParser
  */
-trait CannotBeInstantiated
+final class IndexReportParser
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function parse(string $fileName): PHPUnitXmlReport
     {
+        // TODO: the implementation need to be lazy and streamed.
     }
 }

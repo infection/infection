@@ -33,18 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\MutationAnalyzer;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+enum MutantExecutionStatus: int
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    case COVERED = 0;
+    case NOT_COVERED = 1;
+    case SUSPICIOUS = 2;
 }
