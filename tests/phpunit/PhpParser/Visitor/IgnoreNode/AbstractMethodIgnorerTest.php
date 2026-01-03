@@ -53,6 +53,8 @@ final class AbstractMethodIgnorerTest extends VisitorTestCase
     ): void {
         $nodes = $this->createParser()->parse($code);
 
+        $this->assertNotNull($nodes);
+
         $traverser = new NodeTraverser(
             new NonMutableNodesIgnorerVisitor([new AbstractMethodIgnorer()]),
             new MarkTraversedNodesAsVisitedVisitor(),

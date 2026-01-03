@@ -57,6 +57,8 @@ final class ChangingIgnorerTest extends VisitorTestCase
     ): void {
         $nodes = $this->createParser()->parse($code);
 
+        $this->assertNotNull($nodes);
+
         $changingIgnorer = new ChangingIgnorer();
 
         $this->addIdsToNodes($nodes);

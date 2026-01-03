@@ -54,6 +54,8 @@ final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCas
     ): void {
         $nodes = $this->createParser()->parse($code);
 
+        $this->assertNotNull($nodes);
+
         $changingIgnorer = new ChangingIgnorer();
 
         $traverser = new NodeTraverser(

@@ -224,6 +224,7 @@ parameters:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
+        - ../tests/phpunit/PhpParser/Visitor/VisitorCollectorIntegration/Fixtures/TwoAdditions.php
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
         - ../tests/benchmark/MutationGenerator/sources (?)

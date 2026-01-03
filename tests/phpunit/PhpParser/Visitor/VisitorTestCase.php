@@ -35,19 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use function array_map;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
-use function is_array;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
-use function sprintf;
 
 abstract class VisitorTestCase extends TestCase
 {
@@ -87,30 +83,6 @@ abstract class VisitorTestCase extends TestCase
     /**
      * @param Node[]|Node $nodeOrNodes
      */
-    final protected function removeUndesiredAttributes(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $nodes = (array) $nodeOrNodes;
-
-        $this->assertNotContains(
-            MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
-            $attributes,
-            sprintf(
-                'The attribute "%s" is never printed hence should not be removed. To display all nodes adjust NodeDumper `::dump()` method call instead.',
-                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
-            ),
-        );
-
-        $nodeTraverser = new NodeTraverser(
-            new RemoveUndesiredAttributesVisitor(...$attributes),
-        );
-        $nodeTraverser->traverse($nodes);
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
     final protected function keepOnlyDesiredAttributes(
         array|Node $nodeOrNodes,
         string ...$attributes,
@@ -124,37 +96,5 @@ abstract class VisitorTestCase extends TestCase
             ),
         );
         $nodeTraverser->traverse($nodes);
-    }
-
-    /**
-     * @param array<string, list<mixed>> $records
-     * @return array<string, list<string|list<string>>>
-     */
-    final protected function dumpRecordNodes(array $records): array
-    {
-        return array_map(
-            fn (array $record) => [
-                $record[0],
-                $this->dumpRecursively($record[1]),
-            ],
-            $records,
-        );
-    }
-
-    /**
-     * @return array<string, list<string|list<string>>>
-     */
-    private function dumpRecursively(mixed $potentialNodes): array|string
-    {
-        if (is_array($potentialNodes)) {
-            return array_map(
-                $this->dumpRecursively(...),
-                $potentialNodes,
-            );
-        }
-
-        $this->assertInstanceOf(Node::class, $potentialNodes);
-
-        return $this->dumper->dump($potentialNodes);
     }
 }

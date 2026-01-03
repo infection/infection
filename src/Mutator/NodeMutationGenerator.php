@@ -108,6 +108,11 @@ class NodeMutationGenerator
             return;
         }
 
+        /** @psalm-suppress InvalidArgument */
+        if (!$this->sourceLineMatcher->touches($this->filePath, $node->getStartLine(), $node->getEndLine())) {
+            return;
+        }
+
         foreach ($this->mutators as $mutator) {
             yield from $this->generateForMutator($node, $mutator);
         }
