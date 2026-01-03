@@ -42,18 +42,20 @@ use PhpParser\NodeVisitor\NameResolver;
  * @internal
  * @implements Builder<NameResolver>
  */
-final class NameResolverFactory implements Builder
+final class NameResolverBuilder implements Builder
 {
+    private const OPTIONS = [
+        'preserveOriginalNames' => true,
+        // must be `false` for pretty-printing to work properly
+        // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
+        'replaceNodes' => false,
+    ];
+
     public function build(): NameResolver
     {
         return new NameResolver(
             errorHandler: null, // Ensure we throw.
-            options: [
-                'preserveOriginalNames' => true,
-                // must be `false` for pretty-printing to work properly
-                // @see https://github.com/nikic/PHP-Parser/blob/master/doc/component/Pretty_printing.markdown#formatting-preserving-pretty-printing
-                'replaceNodes' => false,
-            ],
+            options: self::OPTIONS,
         );
     }
 }

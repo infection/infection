@@ -104,7 +104,7 @@ use Infection\Mutator\MutatorFactory;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
-use Infection\PhpParser\Visitor\NameResolverFactory;
+use Infection\PhpParser\Visitor\NameResolverBuilder;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Factory\MutantProcessContainerFactory;
@@ -437,7 +437,7 @@ final class Container extends DIContainer
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
             ),
-            NameResolver::class => NameResolverFactory::class,
+            NameResolver::class => NameResolverBuilder::class,
             FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
                 $container->getFileParser(),
                 $container->getNodeTraverserFactory(),
