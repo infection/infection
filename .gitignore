@@ -13,6 +13,7 @@
 /.tools/
 /build/
 /devTools/Docker*.json
+/dist/
 /infection-cache
 /infection.log
 /per-mutator.md
