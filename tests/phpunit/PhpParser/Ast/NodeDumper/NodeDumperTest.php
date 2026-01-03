@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Ast\NodeDumper;
 
 use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use function is_string;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
@@ -51,7 +52,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
-use function is_string;
 
 #[CoversClass(NodeDumper::class)]
 final class NodeDumperTest extends TestCase

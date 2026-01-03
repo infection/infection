@@ -35,19 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\AstCollector;
 
+use function file_exists;
 use Infection\Ast\AstCollector;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\PhpParser\Ast\VisitorTestCase;
 use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\MarkTraversedNodesVisitor;
+use Infection\Tests\PhpParser\Ast\VisitorTestCase;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Finder\SplFileInfo;
-use function file_exists;
 use function Safe\file_get_contents;
+use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
 #[CoversClass(AstCollector::class)]

@@ -37,7 +37,6 @@ namespace Infection\Tests\PhpParser\Ast\Visitor\NextConnectingVisitor;
 
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\Sequence;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -58,7 +57,7 @@ final class ReplaceNextByNextIdVisitor extends NodeVisitorAbstract
     {
         $next = $node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE);
 
-        if (null === $next) {
+        if ($next === null) {
             return;
         }
 

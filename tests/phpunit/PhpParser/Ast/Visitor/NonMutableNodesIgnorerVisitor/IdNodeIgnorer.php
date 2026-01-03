@@ -33,37 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\Ast\Visitor\NonMutableNodesIgnorerVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
+use function in_array;
 use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use PHPUnit\Framework\Attributes\CoversClass;
+use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use PhpParser\Node;
 
-#[CoversClass(AbstractMethodIgnorer::class)]
-final class AbstractMethodIgnorerTest extends BaseNodeIgnorerTestCase
+final class IdNodeIgnorer implements NodeIgnorer
 {
-    public function test_it_ignores_abstract_methods(): void
-    {
-        $this->parseAndTraverse(<<<'PHP'
-            <?php
-
-            abstract class Foo
-            {
-                public function bar(string $counted)
-                {
-                }
-                abstract public function shouldBeIgnored($ignored);
-            }
-
-            PHP,
-            $spy = $this->createSpy(),
-        );
-
-        $this->assertSame(1, $spy->nodeCounter);
+    /**
+     * @param array<positive-int|0> $ignoredNodeIds
+     */
+    public function __construct(
+        private readonly array $ignoredNodeIds,
+    ) {
     }
 
-    protected function getIgnore(): NodeIgnorer
+    public function ignores(Node $node): bool
     {
-        return new AbstractMethodIgnorer();
+        $id = AddIdToTraversedNodesVisitor::getNodeId($node);
+
+        return in_array($id, $this->ignoredNodeIds, true);
     }
 }

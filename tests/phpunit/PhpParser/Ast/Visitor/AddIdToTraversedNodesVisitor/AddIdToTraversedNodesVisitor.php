@@ -46,17 +46,17 @@ final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 {
     public const NODE_ID_ATTRIBUTE = 'nodeId';
 
+    public function __construct(
+        private readonly Sequence $sequence = new Sequence(),
+    ) {
+    }
+
     /**
      * @return positive-int|null
      */
     public static function getNodeId(Node $node): ?int
     {
         return $node->getAttribute(self::NODE_ID_ATTRIBUTE);
-    }
-
-    public function __construct(
-        private readonly Sequence $sequence = new Sequence(),
-    ) {
     }
 
     public function enterNode(Node $node): void

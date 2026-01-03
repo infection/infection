@@ -59,14 +59,28 @@ class NodeTraverserFactory
 {
     /**
      * @param NodeIgnorer[] $nodeIgnorers
+     *
+     * @return NodeIgnorer[]
+     */
+    public static function createNodeIgnorers(
+        ChangingIgnorer $changingIgnorer,
+        array $nodeIgnorers = [],
+    ): array {
+        $nodeIgnorers[] = $changingIgnorer;
+        $nodeIgnorers[] = new InterfaceIgnorer();
+        $nodeIgnorers[] = new AbstractMethodIgnorer();
+
+        return $nodeIgnorers;
+    }
+
+    /**
+     * @param NodeIgnorer[] $nodeIgnorers
      */
     public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
     {
         $changingIgnorer = new ChangingIgnorer();
-        $nodeIgnorers[] = $changingIgnorer;
 
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
+        self::createNodeIgnorers($changingIgnorer, $nodeIgnorers);
 
         $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
 

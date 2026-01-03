@@ -36,12 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor;
 
 use Infection\Tests\PhpParser\Ast\VisitorTestCase;
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function serialize;
-use function unserialize;
 
 #[CoversClass(AddIdToTraversedNodesVisitor::class)]
 final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
@@ -50,8 +47,7 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
     public function test_it_adds_an_idea_to_each_node(
         string $code,
         string $expected,
-    ): void
-    {
+    ): void {
         $nodes = $this->parser->parse($code);
 
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
@@ -78,68 +74,68 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
 
                 PHP,
             <<<'AST'
-            array(
-                0: Stmt_Namespace(
-                    name: Name(
-                        nodeId: 1
-                    )
-                    stmts: array(
-                        0: Stmt_Expression(
-                            expr: Expr_Assign(
-                                var: Expr_Variable(
-                                    nodeId: 4
-                                )
-                                expr: Expr_New(
-                                    class: Name(
-                                        nodeId: 6
-                                    )
-                                    args: array(
-                                        0: Arg(
-                                            value: Expr_ArrowFunction(
-                                                expr: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'first'
-                                                    nodeId: 9
-                                                )
-                                                nodeId: 8
-                                            )
-                                            nodeId: 7
-                                        )
-                                        1: Arg(
-                                            value: Expr_ArrowFunction(
-                                                expr: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'second'
-                                                    nodeId: 12
-                                                )
-                                                nodeId: 11
-                                            )
-                                            nodeId: 10
-                                        )
-                                        2: Arg(
-                                            value: Expr_ArrowFunction(
-                                                expr: Scalar_String(
-                                                    kind: KIND_SINGLE_QUOTED (1)
-                                                    rawValue: 'third'
-                                                    nodeId: 15
-                                                )
-                                                nodeId: 14
-                                            )
-                                            nodeId: 13
-                                        )
-                                    )
-                                    nodeId: 5
-                                )
-                                nodeId: 3
-                            )
-                            nodeId: 2
+                array(
+                    0: Stmt_Namespace(
+                        name: Name(
+                            nodeId: 1
                         )
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 4
+                                    )
+                                    expr: Expr_New(
+                                        class: Name(
+                                            nodeId: 6
+                                        )
+                                        args: array(
+                                            0: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'first'
+                                                        nodeId: 9
+                                                    )
+                                                    nodeId: 8
+                                                )
+                                                nodeId: 7
+                                            )
+                                            1: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'second'
+                                                        nodeId: 12
+                                                    )
+                                                    nodeId: 11
+                                                )
+                                                nodeId: 10
+                                            )
+                                            2: Arg(
+                                                value: Expr_ArrowFunction(
+                                                    expr: Scalar_String(
+                                                        kind: KIND_SINGLE_QUOTED (1)
+                                                        rawValue: 'third'
+                                                        nodeId: 15
+                                                    )
+                                                    nodeId: 14
+                                                )
+                                                nodeId: 13
+                                            )
+                                        )
+                                        nodeId: 5
+                                    )
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                            )
+                        )
+                        kind: 1
+                        nodeId: 0
                     )
-                    kind: 1
-                    nodeId: 0
                 )
-            )
-            AST,
+                AST,
         ];
     }
 }

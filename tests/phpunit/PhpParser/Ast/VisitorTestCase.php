@@ -35,14 +35,13 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast;
 
+use function array_map;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Ast\NodeDumper\NodeDumper;
+use function is_array;
 use PhpParser\Node;
 use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
-use function array_map;
-use function is_array;
 
 abstract class VisitorTestCase extends TestCase
 {

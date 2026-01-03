@@ -35,9 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\NodeDumper;
 
-use Infection\PhpParser\Visitor\ReflectionVisitor;
+use function get_debug_type;
+use function implode;
 use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
+use function is_array;
+use function is_float;
+use function is_int;
+use function is_object;
+use function is_string;
 use Later\Interfaces\Deferred;
 use PhpParser\Comment;
 use PhpParser\Modifiers;
@@ -52,19 +58,12 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\Node\UseItem;
 use RuntimeException;
-use Webmozart\Assert\Assert;
-use function get_debug_type;
-use function implode;
-use function is_array;
-use function is_float;
-use function is_int;
-use function is_object;
-use function is_string;
 use function sprintf;
 use function str_replace;
 use function strlen;
 use function strrpos;
 use function substr;
+use Webmozart\Assert\Assert;
 
 /**
  * This NodeDumper is taken after the PhpParser one. It has been copied and adapted to our needs. But unless

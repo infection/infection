@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\Visitor\NextConnectingVisitor;
 
-use Infection\Differ\ChangedLinesRange;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Ast\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -47,9 +45,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(NextConnectingVisitor::class)]
 final class NextConnectingVisitorTest extends VisitorTestCase
 {
-    /**
-     * @param ChangedLinesRange $changedLinesByPaths
-     */
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_next_nodes(
         string $code,
@@ -74,12 +69,12 @@ final class NextConnectingVisitorTest extends VisitorTestCase
     {
         yield 'it connects sequential statements' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            $a = 1;
-            $b = 2;
-            $c = 3;
-            PHP,
+                $a = 1;
+                $b = 2;
+                $c = 3;
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -132,29 +127,29 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
         yield 'it handles functions and closures as boundaries' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            $a = 1;
+                $a = 1;
 
-            function test() {
-                $b = 2;
-                $c = 3;
-            }
+                function test() {
+                    $b = 2;
+                    $c = 3;
+                }
 
-            $d = 4;
+                $d = 4;
 
-            $closure1 = function () {
-                $e = 5;
-                $f = 6;
-            };
+                $closure1 = function () {
+                    $e = 5;
+                    $f = 6;
+                };
 
-            $g = 7;
+                $g = 7;
 
-            $closure2 = fn () => $h = 8;
+                $closure2 = fn () => $h = 8;
 
-            $e = 9;
+                $e = 9;
 
-            PHP,
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -326,14 +321,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
         yield 'it skips nop statements' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            $a = 1;
-            $b = 2;
-            // Comment
-            /** Another comment */
-            $c = 3;
-            PHP,
+                $a = 1;
+                $b = 2;
+                // Comment
+                /** Another comment */
+                $c = 3;
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -386,20 +381,20 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
         yield 'it handle class methods as functions and boundaries' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            class Test {
-                public function foo() {
-                    $a = 1;
-                    $b = 2;
-                }
+                class Test {
+                    public function foo() {
+                        $a = 1;
+                        $b = 2;
+                    }
 
-                public function bar() {
-                    $c = 3;
-                    $d = 4;
+                    public function bar() {
+                        $c = 3;
+                        $d = 4;
+                    }
                 }
-            }
-            PHP,
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Class(
@@ -490,15 +485,15 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
         yield 'it handles empty functions as boundaries' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            $a = 1;
+                $a = 1;
 
-            function empty_function() {
-            }
+                function empty_function() {
+                }
 
-            $b = 2;
-            PHP,
+                $b = 2;
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -541,19 +536,19 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
         yield 'it connects return statements to next statements' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            function hasMultipleReturns($condition) {
-                if ($condition) {
-                    return 'early';
-                    $unreachable = true;
+                function hasMultipleReturns($condition) {
+                    if ($condition) {
+                        return 'early';
+                        $unreachable = true;
+                    }
+
+                    $a = 1;
+                    return 'normal';
+                    $afterReturn = 2;
                 }
-
-                $a = 1;
-                return 'normal';
-                $afterReturn = 2;
-            }
-            PHP,
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Function(
@@ -650,13 +645,13 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
         yield 'it does not connect the last return statement' => [
             <<<'PHP'
-            <?php
+                <?php
 
-            function lastReturn() {
-                $a = 1;
-                return $a;
-            }
-            PHP,
+                function lastReturn() {
+                    $a = 1;
+                    return $a;
+                }
+                PHP,
             <<<'AST'
                 array(
                     0: Stmt_Function(

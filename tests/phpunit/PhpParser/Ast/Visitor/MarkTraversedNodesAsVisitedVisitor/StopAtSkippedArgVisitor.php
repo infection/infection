@@ -54,10 +54,12 @@ final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
         return $node->hasAttribute(self::SKIP_ATTRIBUTE);
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): null
     {
         if (self::isNodeMarkedAsSkipped($node)) {
             return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
+
+        return null;
     }
 }
