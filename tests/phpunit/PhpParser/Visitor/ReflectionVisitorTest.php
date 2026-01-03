@@ -71,12 +71,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
         ))->traverse($nodes);
 
         if ($desiredAttributes !== null) {
-            (new NodeTraverser(
-                new KeepOnlyDesiredAttributesVisitor(
-                    MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
-                    ...$desiredAttributes,
-                ),
-            ))->traverse($nodes);
+            $this->keepOnlyDesiredAttributes(...$desiredAttributes);
         }
 
         $actual = $this->dumper->dump($nodes);

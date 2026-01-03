@@ -33,10 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\NextConnectingVisitor;
+namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

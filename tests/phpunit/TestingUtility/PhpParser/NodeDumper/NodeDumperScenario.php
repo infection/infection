@@ -116,6 +116,9 @@ final class NodeDumperScenario
         return $clone;
     }
 
+    /**
+     * @return array{NodeDumperScenario}
+     */
     public function build(): array
     {
         return [$this];

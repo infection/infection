@@ -135,14 +135,12 @@ final class NodeDumper
     /**
      * Dumps a node or array.
      *
-     * @param array|Node $node Node or array to dump
+     * @param Node[]|Node $node Node or array to dump
      * @param string|null $code Code corresponding to dumped AST. This only needs to be passed if
-     *                          the dumpPositions option is enabled and the dumping of node offsets
+     *                          the dumpPositions option is enabled, and the dumping of node offsets
      *                          is desired.
      *
      * @throws PotentialCircularDependencyDetected
-     *
-     * @return string Dumped value
      */
     public function dump(
         array|Node $node,

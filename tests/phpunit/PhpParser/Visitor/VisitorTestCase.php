@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use function array_map;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
@@ -46,6 +47,7 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 abstract class VisitorTestCase extends TestCase
 {
@@ -91,6 +93,15 @@ abstract class VisitorTestCase extends TestCase
     ): void {
         $nodes = (array) $nodeOrNodes;
 
+        $this->assertNotContains(
+            MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+            $attributes,
+            sprintf(
+                'The attribute "%s" is never printed hence should not be removed. To display all nodes adjust NodeDumper `::dump()` method call instead.',
+                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+            ),
+        );
+
         $nodeTraverser = new NodeTraverser(
             new RemoveUndesiredAttributesVisitor(...$attributes),
         );
@@ -107,7 +118,10 @@ abstract class VisitorTestCase extends TestCase
         $nodes = (array) $nodeOrNodes;
 
         $nodeTraverser = new NodeTraverser(
-            new KeepOnlyDesiredAttributesVisitor(...$attributes),
+            new KeepOnlyDesiredAttributesVisitor(
+                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+                ...$attributes,
+            ),
         );
         $nodeTraverser->traverse($nodes);
     }

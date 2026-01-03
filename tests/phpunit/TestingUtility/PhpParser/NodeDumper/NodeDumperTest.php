@@ -73,6 +73,8 @@ final class NodeDumperTest extends TestCase
             $node = $parser->parse($node);
         }
 
+        $this->assertNotNull($node);
+
         $dumper = new NodeDumper(
             $scenario->dumpProperties,
             $scenario->dumpComments,
@@ -251,9 +253,7 @@ final class NodeDumperTest extends TestCase
         yield 'variable other attributes' => NodeDumperScenario::forNode(
             [
                 new Assign(
-                    new Variable(
-                        new Name('x'),
-                    ),
+                    new Variable('x'),
                     new String_(
                         'Hello World!',
                         ['unspecifiedAttribute' => 'Hi'],
@@ -270,9 +270,7 @@ final class NodeDumperTest extends TestCase
                     array(
                         0: Expr_Assign(
                             var: Expr_Variable(
-                                name: Name(
-                                    name: x
-                                )
+                                name: x
                             )
                             expr: Scalar_String(
                                 value: Hello World!
@@ -296,6 +294,7 @@ final class NodeDumperTest extends TestCase
             ->build();
 
         yield 'array with values' => NodeDumperScenario::forNode(
+            // @phpstan-ignore argument.type
             ['Foo', 'Bar', 'Key' => 'FooBar'],
         )
             ->withShowAllNodes()

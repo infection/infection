@@ -204,6 +204,13 @@ parameters:
             identifier: argument.type
             path: ../src/Mutator/NodeMutationGenerator.php
 
+        # This class is copy/pasted from PhpParser so we don't want to change it too much
+        -
+            identifier: if.condNotBoolean
+            path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
+        -
+            identifier: booleanAnd.rightNotBoolean
+            path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
     level: 8
     paths:
         - ../src

@@ -44,6 +44,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(KeepOnlyDesiredAttributesVisitor::class)]
 final class KeepOnlyDesiredAttributesVisitorTest extends VisitorTestCase
 {
+    /**
+     * @param array<string, mixed> $initialAttributes
+     * @param list<string> $desiredAttributes
+     * @param array<string, mixed> $expectedAttributes
+     */
     #[DataProvider('attributeProvider')]
     public function test_it_keeps_the_desired_attributes(
         array $initialAttributes,

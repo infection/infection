@@ -53,7 +53,7 @@ final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @template T extends Node
+     * @template T of Node
      *
      * @param T $node
      * @return T

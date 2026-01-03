@@ -50,6 +50,8 @@ final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
     ): void {
         $nodes = $this->parser->parse($code);
 
+        $this->assertNotNull($nodes);
+
         (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
 
         $this->assertSame(

@@ -44,6 +44,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversClass(RemoveUndesiredAttributesVisitor::class)]
 final class RemoveUndesiredAttributesVisitorTest extends VisitorTestCase
 {
+    /**
+     * @param array<string, mixed> $initialAttributes
+     * @param list<string> $undesiredAttributes
+     * @param array<string, mixed> $expectedAttributes
+     */
     #[DataProvider('attributeProvider')]
     public function test_it_removes_the_undesired_attributes(
         array $initialAttributes,

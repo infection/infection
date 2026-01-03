@@ -62,8 +62,8 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
                 PHP,
         );
 
-        /** @var Node\Stmt\Namespace_ $namespace */
-        $namespace = $nodes[0];
+        $namespace = $nodes[0] ?? null;
+        $this->assertInstanceOf(Node\Stmt\Namespace_::class, $namespace);
 
         /** @var Node\Stmt\Expression $assignmentExpression */
         $assignmentExpression = $namespace->stmts[0];
@@ -184,10 +184,10 @@ final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
     }
 
     /**
-     * @param list<Node> $nodes
-     * @return list<Node>
+     * @param Node[]|null $nodes
+     * @return Node[]
      */
-    private static function cloneNodes(array $nodes): array
+    private static function cloneNodes(?array $nodes): array
     {
         return unserialize(serialize($nodes));
     }
