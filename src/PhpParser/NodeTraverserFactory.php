@@ -56,8 +56,9 @@ use SplObjectStorage;
  */
 class NodeTraverserFactory
 {
-    public function __construct(private readonly NameResolver $nameResolver)
-    {
+    public function __construct(
+        private readonly NameResolver $nameResolver,
+    ) {
     }
 
     /**
