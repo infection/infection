@@ -40,6 +40,7 @@ use function file_get_contents;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\KeepDesiredAttributesVisitor\KeepDesiredAttributesVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\PhpParser\Ast\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
 use Infection\Tests\PhpParser\Ast\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -76,6 +77,18 @@ final class ReflectionVisitorTest extends VisitorTestCase
                 new KeepDesiredAttributesVisitor(
                     MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
                     ...$desiredAttributes,
+                ),
+            ))->traverse($nodes);
+        } else {
+            (new NodeTraverser(
+                new RemoveUndesiredAttributesVisitor(
+                    'nodeId',
+                    'parent',
+                    'namespacedName',
+                    'resolvedName',
+                    'rawValue',
+                    'kind',
+                    'functionScope',
                 ),
             ))->traverse($nodes);
         }
