@@ -33,13 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\AstCollector;
+namespace Infection\Tests\PhpParser\Visitor\VisitorCollectorIntegration;
 
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -63,9 +61,9 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
 
         $nodes = $this->parser->parse($code);
 
-        (new NodeTraverser(
-            new AddIdToTraversedNodesVisitor(),
-        ))->traverse($nodes);
+        $this->assertNotNull($nodes);
+
+        $this->addIdsToNodes($nodes);
         $traverserFactory->createPreTraverser()->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->create(

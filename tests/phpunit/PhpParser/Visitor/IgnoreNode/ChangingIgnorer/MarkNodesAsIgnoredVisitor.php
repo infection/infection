@@ -44,6 +44,9 @@ use SplObjectStorage;
 
 final class MarkNodesAsIgnoredVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var SplObjectStorage<Node, null>
+     */
     private readonly SplObjectStorage $ignoredNodes;
 
     /**

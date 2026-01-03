@@ -33,41 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility\PhpParser\Visitor\RemoveUndesiredAttributesVisitor;
+namespace Infection\Tests\PhpParser\Visitor\VisitorCollectorIntegration\Fixtures;
 
-use function array_diff_key;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-use function Safe\array_flip;
-
-/**
- * Utility visitor which allows removing the specified attributes.
- */
-final class RemoveUndesiredAttributesVisitor extends NodeVisitorAbstract
+final readonly class TwoAdditions
 {
-    /**
-     * @var array<string, mixed>
-     */
-    private readonly array $undesiredAttributesAsKeys;
-
-    public function __construct(
-        string ...$attributes,
-    ) {
-        $this->undesiredAttributesAsKeys = array_flip($attributes);
+    public function first(): int
+    {
+        return 1 + 2;
     }
 
-    public function enterNode(Node $node): void
+    public function second(): int
     {
-        $this->removeUndesiredAttributes($node);
-    }
-
-    private function removeUndesiredAttributes(Node $node): void
-    {
-        $desiredAttributes = array_diff_key(
-            $node->getAttributes(),
-            $this->undesiredAttributesAsKeys,
-        );
-
-        $node->setAttributes($desiredAttributes);
+        return 1 - 2;
     }
 }

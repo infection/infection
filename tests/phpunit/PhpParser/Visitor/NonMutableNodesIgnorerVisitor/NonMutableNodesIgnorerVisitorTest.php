@@ -56,6 +56,8 @@ final class NonMutableNodesIgnorerVisitorTest extends VisitorTestCase
     ): void {
         $nodes = $this->createParser()->parse($code);
 
+        $this->assertNotNull($nodes);
+
         $this->addIdsToNodes($nodes);
         (new NodeTraverser(
             new NonMutableNodesIgnorerVisitor([

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\AstCollector;
+namespace Infection\Tests\PhpParser\Visitor\VisitorCollectorIntegration;
 
 use PhpParser\NodeVisitorAbstract;
 
