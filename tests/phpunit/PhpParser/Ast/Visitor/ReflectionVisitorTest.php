@@ -106,7 +106,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                         name: Identifier(
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            reflectionClass: Infection\Reflection\NullReflection
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: foo
                                         )
                                         params: array(
@@ -115,20 +115,20 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: foo
                                                 )
                                                 var: Expr_Variable(
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: foo
                                                 )
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
-                                                reflectionClass: Infection\Reflection\NullReflection
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: foo
                                             )
                                             1: Param(
@@ -136,27 +136,27 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: foo
                                                 )
                                                 default: Scalar_Float(
                                                     isInsideFunction: true
                                                     isOnFunctionSignature: true
                                                     isStrictTypes: false
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: foo
                                                 )
                                                 isInsideFunction: true
                                                 isOnFunctionSignature: true
                                                 isStrictTypes: false
-                                                reflectionClass: Infection\Reflection\NullReflection
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: foo
                                             )
                                         )
                                         returnType: Identifier(
                                             isInsideFunction: true
                                             isStrictTypes: false
-                                            reflectionClass: Infection\Reflection\NullReflection
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: foo
                                         )
                                         stmts: array(
@@ -166,7 +166,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                         name: Name(
                                                             isInsideFunction: true
                                                             isStrictTypes: false
-                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
                                                             functionName: foo
                                                         )
                                                         args: array(
@@ -174,40 +174,40 @@ final class ReflectionVisitorTest extends VisitorTestCase
                                                                 value: Expr_Array(
                                                                     isInsideFunction: true
                                                                     isStrictTypes: false
-                                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                                     functionName: foo
                                                                 )
                                                                 isInsideFunction: true
                                                                 isStrictTypes: false
-                                                                reflectionClass: Infection\Reflection\NullReflection
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                                 functionName: foo
                                                             )
                                                         )
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: foo
                                                     )
                                                     right: Scalar_Int(
                                                         isInsideFunction: true
                                                         isStrictTypes: false
-                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: foo
                                                     )
                                                     isInsideFunction: true
                                                     isStrictTypes: false
-                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: foo
                                                 )
                                                 isInsideFunction: true
                                                 isStrictTypes: false
-                                                reflectionClass: Infection\Reflection\NullReflection
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: foo
                                             )
                                         )
                                         isOnFunctionSignature: true
                                         isStrictTypes: false
-                                        reflectionClass: Infection\Reflection\NullReflection
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: foo
                                     )
                                 )
@@ -224,6 +224,172 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: foo
+                                        )
+                                        params: array(
+                                            0: Param(
+                                                type: Identifier(
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: foo
+                                                )
+                                                var: Expr_Variable(
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: foo
+                                                )
+                                                isInsideFunction: true
+                                                isOnFunctionSignature: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: foo
+                                            )
+                                            1: Param(
+                                                attrGroups: array(
+                                                    0: AttributeGroup(
+                                                        attrs: array(
+                                                            0: Attribute(
+                                                                name: Name(
+                                                                    isInsideFunction: true
+                                                                    isOnFunctionSignature: true
+                                                                    isStrictTypes: false
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    functionName: foo
+                                                                )
+                                                                args: array(
+                                                                    0: Arg(
+                                                                        value: Expr_ConstFetch(
+                                                                            name: Name(
+                                                                                isInsideFunction: true
+                                                                                isOnFunctionSignature: true
+                                                                                isStrictTypes: false
+                                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                                functionName: foo
+                                                                            )
+                                                                            isInsideFunction: true
+                                                                            isOnFunctionSignature: true
+                                                                            isStrictTypes: false
+                                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                            functionName: foo
+                                                                        )
+                                                                        isInsideFunction: true
+                                                                        isOnFunctionSignature: true
+                                                                        isStrictTypes: false
+                                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                        functionName: foo
+                                                                    )
+                                                                )
+                                                                isInsideFunction: true
+                                                                isOnFunctionSignature: true
+                                                                isStrictTypes: false
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                functionName: foo
+                                                            )
+                                                        )
+                                                        isInsideFunction: true
+                                                        isOnFunctionSignature: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        functionName: foo
+                                                    )
+                                                )
+                                                var: Expr_Variable(
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: foo
+                                                )
+                                                default: Scalar_Float(
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: foo
+                                                )
+                                                isInsideFunction: true
+                                                isOnFunctionSignature: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: foo
+                                            )
+                                        )
+                                        returnType: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: foo
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_BinaryOp_Identical(
+                                                    left: Expr_FuncCall(
+                                                        name: Name(
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            functionName: foo
+                                                        )
+                                                        args: array(
+                                                            0: Arg(
+                                                                value: Expr_Array(
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: false
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    functionName: foo
+                                                                )
+                                                                isInsideFunction: true
+                                                                isStrictTypes: false
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                functionName: foo
+                                                            )
+                                                        )
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        functionName: foo
+                                                    )
+                                                    right: Scalar_Int(
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        functionName: foo
+                                                    )
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: foo
+                                                )
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: foo
+                                            )
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: false
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: foo
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -234,6 +400,42 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: test
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Scalar_Int(
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: test
+                                                )
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: test
+                                            )
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: false
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: test
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -244,6 +446,31 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Function(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_Return(
+                                        expr: Expr_Closure(
+                                            params: array(
+                                                0: Param(
+                                                    var: Expr_Variable
+                                                )
+                                            )
+                                            stmts: array(
+                                                0: Stmt_Return(
+                                                    expr: Scalar_Int
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                                isStrictTypes: false
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -254,6 +481,76 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: foo
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Function(
+                                                name: Identifier(
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: foo
+                                                )
+                                                stmts: array(
+                                                    0: Stmt_Expression(
+                                                        expr: Expr_FuncCall(
+                                                            name: Name(
+                                                                isInsideFunction: true
+                                                                isStrictTypes: false
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                functionName: foo
+                                                            )
+                                                            args: array(
+                                                                0: Arg(
+                                                                    value: Expr_Array(
+                                                                        isInsideFunction: true
+                                                                        isStrictTypes: false
+                                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                        functionName: foo
+                                                                    )
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: false
+                                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                    functionName: foo
+                                                                )
+                                                            )
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            functionName: foo
+                                                        )
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                                        functionName: foo
+                                                    )
+                                                )
+                                                isStrictTypes: false
+                                                isInsideFunction: true
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: foo
+                                            )
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: false
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: foo
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -264,6 +561,42 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable
+                                    expr: Expr_Closure(
+                                        params: array(
+                                            0: Param(
+                                                type: Identifier
+                                                var: Expr_Variable
+                                            )
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Function(
+                                                name: Identifier
+                                                stmts: array(
+                                                    0: Stmt_Expression(
+                                                        expr: Expr_FuncCall(
+                                                            name: Name
+                                                            args: array(
+                                                                0: Arg(
+                                                                    value: Expr_Array
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                                isStrictTypes: false
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -274,6 +607,57 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: bar
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Return(
+                                                expr: Expr_Closure(
+                                                    stmts: array(
+                                                        0: Stmt_Return(
+                                                            expr: Scalar_Int(
+                                                                isInsideFunction: true
+                                                                isStrictTypes: false
+                                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                                functionName: bar
+                                                            )
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                                            functionName: bar
+                                                        )
+                                                    )
+                                                    isInsideFunction: true
+                                                    isOnFunctionSignature: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: bar
+                                                )
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: bar
+                                            )
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: false
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: bar
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -284,6 +668,29 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Use(
+                                uses: array(
+                                    0: UseItem(
+                                        name: Name
+                                    )
+                                )
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_New(
+                                    class: Name
+                                )
+                            )
+                            2: Stmt_Return(
+                                expr: Expr_BinaryOp_Minus(
+                                    left: Scalar_Int
+                                    right: Scalar_Int
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -294,6 +701,45 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Return(
+                                expr: Expr_New(
+                                    class: Stmt_Class(
+                                        stmts: array(
+                                            0: Stmt_ClassMethod(
+                                                name: Identifier(
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                    functionName: test
+                                                )
+                                                stmts: array(
+                                                    0: Stmt_Return(
+                                                        expr: Scalar_Int(
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            reflectionClass: Infection\Reflection\NullReflection
+                                                            functionName: test
+                                                        )
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        functionName: test
+                                                    )
+                                                )
+                                                isOnFunctionSignature: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\NullReflection
+                                                functionName: test
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -304,6 +750,63 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: createAnonymousClass
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Expression(
+                                                expr: Expr_New(
+                                                    class: Stmt_Class(
+                                                        stmts: array(
+                                                            0: Stmt_ClassMethod(
+                                                                name: Identifier(
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: false
+                                                                    reflectionClass: Infection\Reflection\NullReflection
+                                                                    functionName: foo
+                                                                )
+                                                                isInsideFunction: true
+                                                                isOnFunctionSignature: true
+                                                                isStrictTypes: false
+                                                                reflectionClass: Infection\Reflection\NullReflection
+                                                                functionName: foo
+                                                            )
+                                                        )
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\NullReflection
+                                                        functionName: createAnonymousClass
+                                                    )
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: createAnonymousClass
+                                                )
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: createAnonymousClass
+                                            )
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: false
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: createAnonymousClass
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
@@ -314,6 +817,72 @@ final class ReflectionVisitorTest extends VisitorTestCase
             ),
             <<<'AST'
                 array(
+                    0: Stmt_Namespace(
+                        name: Name
+                        stmts: array(
+                            0: Stmt_Class(
+                                name: Identifier
+                            )
+                            1: Stmt_Class(
+                                name: Identifier
+                                stmts: array(
+                                    0: Stmt_ClassMethod(
+                                        name: Identifier(
+                                            isInsideFunction: true
+                                            isStrictTypes: false
+                                            reflectionClass: Infection\Reflection\CoreClassReflection
+                                            functionName: createAnonymousClass
+                                        )
+                                        stmts: array(
+                                            0: Stmt_Expression(
+                                                expr: Expr_New(
+                                                    class: Stmt_Class(
+                                                        extends: Name(
+                                                            isInsideFunction: true
+                                                            isStrictTypes: false
+                                                            reflectionClass: Infection\Reflection\AnonymousClassReflection
+                                                            functionName: createAnonymousClass
+                                                        )
+                                                        stmts: array(
+                                                            0: Stmt_ClassMethod(
+                                                                name: Identifier(
+                                                                    isInsideFunction: true
+                                                                    isStrictTypes: false
+                                                                    reflectionClass: Infection\Reflection\AnonymousClassReflection
+                                                                    functionName: foo
+                                                                )
+                                                                isInsideFunction: true
+                                                                isOnFunctionSignature: true
+                                                                isStrictTypes: false
+                                                                reflectionClass: Infection\Reflection\AnonymousClassReflection
+                                                                functionName: foo
+                                                            )
+                                                        )
+                                                        isInsideFunction: true
+                                                        isStrictTypes: false
+                                                        reflectionClass: Infection\Reflection\AnonymousClassReflection
+                                                        functionName: createAnonymousClass
+                                                    )
+                                                    isInsideFunction: true
+                                                    isStrictTypes: false
+                                                    reflectionClass: Infection\Reflection\CoreClassReflection
+                                                    functionName: createAnonymousClass
+                                                )
+                                                isInsideFunction: true
+                                                isStrictTypes: false
+                                                reflectionClass: Infection\Reflection\CoreClassReflection
+                                                functionName: createAnonymousClass
+                                            )
+                                        )
+                                        isOnFunctionSignature: true
+                                        isStrictTypes: false
+                                        reflectionClass: Infection\Reflection\CoreClassReflection
+                                        functionName: createAnonymousClass
+                                    )
+                                )
+                            )
+                        )
+                    )
                 )
                 AST,
         ];
