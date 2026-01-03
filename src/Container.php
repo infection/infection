@@ -142,6 +142,7 @@ use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParserBuilder;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
@@ -240,9 +241,7 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                isSourceFiltered: $container->getConfiguration()->sourceFilter !== null,
-            ),
+            IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
             ),
