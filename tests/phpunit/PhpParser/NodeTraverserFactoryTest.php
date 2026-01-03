@@ -148,12 +148,6 @@ final class NodeTraverserFactoryTest extends TestCase
 
     private static function getVisitorReflection(): ReflectionProperty
     {
-        if (self::$visitorsReflection !== null) {
-            return self::$visitorsReflection;
-        }
-
-        self::$visitorsReflection = (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
-
-        return self::$visitorsReflection;
+        return self::$visitorsReflection ??= (new ReflectionClass(NodeTraverser::class))->getProperty('visitors');
     }
 }
