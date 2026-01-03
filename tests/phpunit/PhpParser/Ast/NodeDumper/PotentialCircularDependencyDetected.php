@@ -33,33 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor;
+namespace Infection\Tests\PhpParser\Ast\NodeDumper;
 
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use function spl_object_id;
+use function sprintf;
+use UnexpectedValueException;
 
-final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
+final class PotentialCircularDependencyDetected extends UnexpectedValueException
 {
-    public const SKIP_ATTRIBUTE = 'skip';
-
-    public static function markNodeAsSkipped(Node $node): Node
-    {
-        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
-
-        return $node;
-    }
-
-    public static function isNodeMarkedAsSkipped(Node $node): bool
-    {
-        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
-    }
-
-    public function enterNode(Node $node): ?int
-    {
-        if (self::isNodeMarkedAsSkipped($node)) {
-            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
-
-        return null;
+    public static function forAttribute(
+        string $key,
+        Node $value,
+    ): self {
+        return new self(
+            sprintf(
+                'The attribute "%s" found a node instance "%s" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID the node.',
+                $key,
+                $value::class,
+                spl_object_id($value),
+            ),
+        );
     }
 }

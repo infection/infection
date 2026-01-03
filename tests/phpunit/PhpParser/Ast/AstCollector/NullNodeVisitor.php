@@ -33,38 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Ast\Visitor\NextConnectingVisitor;
+namespace Infection\Tests\PhpParser\Ast\AstCollector;
 
-use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-/**
- * The goal of this visitor is to make it easier to text 'next' as the latter cannot
- * be reliably printed.
- */
-final class ReplaceNextByNextIdVisitor extends NodeVisitorAbstract
+final class NullNodeVisitor extends NodeVisitorAbstract
 {
-    public const NEXT_NODE_ID_ATTRIBUTE = 'nextNodeId';
-
-    public function enterNode(Node $node): void
-    {
-        $this->replaceNextByNodeId($node);
-    }
-
-    private function replaceNextByNodeId(Node $node): void
-    {
-        $next = $node->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE);
-
-        if ($next === null) {
-            return;
-        }
-
-        $nodeAttributes = $node->getAttributes();
-        unset($nodeAttributes[NextConnectingVisitor::NEXT_ATTRIBUTE]);
-        $nodeAttributes[self::NEXT_NODE_ID_ATTRIBUTE] = AddIdToTraversedNodesVisitor::getNodeId($next);
-
-        $node->setAttributes($nodeAttributes);
-    }
 }

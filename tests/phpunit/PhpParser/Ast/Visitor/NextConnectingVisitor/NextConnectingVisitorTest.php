@@ -56,9 +56,6 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             new AddIdToTraversedNodesVisitor(),
             new NextConnectingVisitor(),
         ))->traverse($nodes);
-        // The replacement needs to occur in a second pass to allow all the nodes
-        // to be correctly connected first.
-        (new NodeTraverser(new ReplaceNextByNextIdVisitor()))->traverse($nodes);
 
         $actual = $this->dumper->dump($nodes, onlyVisitedNodes: false);
 
@@ -90,7 +87,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 1
                         )
                         nodeId: 0
-                        nextNodeId: 4
+                        next: nodeId(4)
                     )
                     1: Stmt_Expression(
                         expr: Expr_Assign(
@@ -105,7 +102,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 5
                         )
                         nodeId: 4
-                        nextNodeId: 8
+                        next: nodeId(8)
                     )
                     2: Stmt_Expression(
                         expr: Expr_Assign(
@@ -184,7 +181,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     nodeId: 7
                                 )
                                 nodeId: 6
-                                nextNodeId: 10
+                                next: nodeId(10)
                             )
                             1: Stmt_Expression(
                                 expr: Expr_Assign(
@@ -199,7 +196,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     nodeId: 11
                                 )
                                 nodeId: 10
-                                nextNodeId: 14
+                                next: nodeId(14)
                             )
                         )
                         nodeId: 4
@@ -217,7 +214,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 15
                         )
                         nodeId: 14
-                        nextNodeId: 18
+                        next: nodeId(18)
                     )
                     3: Stmt_Expression(
                         expr: Expr_Assign(
@@ -239,7 +236,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 23
                                         )
                                         nodeId: 22
-                                        nextNodeId: 26
+                                        next: nodeId(26)
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -254,7 +251,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 27
                                         )
                                         nodeId: 26
-                                        nextNodeId: 30
+                                        next: nodeId(30)
                                     )
                                 )
                                 nodeId: 21
@@ -276,7 +273,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 31
                         )
                         nodeId: 30
-                        nextNodeId: 34
+                        next: nodeId(34)
                     )
                     5: Stmt_Expression(
                         expr: Expr_Assign(
@@ -344,7 +341,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 1
                         )
                         nodeId: 0
-                        nextNodeId: 4
+                        next: nodeId(4)
                     )
                     1: Stmt_Expression(
                         expr: Expr_Assign(
@@ -359,7 +356,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 5
                         )
                         nodeId: 4
-                        nextNodeId: 8
+                        next: nodeId(8)
                     )
                     2: Stmt_Expression(
                         expr: Expr_Assign(
@@ -420,7 +417,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 5
                                         )
                                         nodeId: 4
-                                        nextNodeId: 8
+                                        next: nodeId(8)
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -457,7 +454,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 15
                                         )
                                         nodeId: 14
-                                        nextNodeId: 18
+                                        next: nodeId(18)
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -576,7 +573,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 7
                                         )
                                         nodeId: 6
-                                        nextNodeId: 8
+                                        next: nodeId(8)
                                     )
                                     1: Stmt_Expression(
                                         expr: Expr_Assign(
@@ -592,11 +589,11 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 9
                                         )
                                         nodeId: 8
-                                        nextNodeId: 13
+                                        next: nodeId(13)
                                     )
                                 )
                                 nodeId: 4
-                                nextNodeId: 6
+                                next: nodeId(6)
                             )
                             1: Stmt_Expression(
                                 expr: Expr_Assign(
@@ -611,7 +608,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     nodeId: 14
                                 )
                                 nodeId: 13
-                                nextNodeId: 17
+                                next: nodeId(17)
                             )
                             2: Stmt_Return(
                                 expr: Scalar_String(
@@ -620,7 +617,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     nodeId: 18
                                 )
                                 nodeId: 17
-                                nextNodeId: 19
+                                next: nodeId(19)
                             )
                             3: Stmt_Expression(
                                 expr: Expr_Assign(
@@ -672,7 +669,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     nodeId: 3
                                 )
                                 nodeId: 2
-                                nextNodeId: 6
+                                next: nodeId(6)
                             )
                             1: Stmt_Return(
                                 expr: Expr_Variable(

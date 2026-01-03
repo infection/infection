@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\NodeDumper;
 
+use Exception;
+use Infection\PhpParser\Visitor\NextConnectingVisitor;
+use Infection\PhpParser\Visitor\ParentConnector;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use function is_string;
 use PhpParser\Node;
@@ -51,15 +56,16 @@ use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Path;
 
 #[CoversClass(NodeDumper::class)]
 final class NodeDumperTest extends TestCase
 {
-    #[DataProvider('provideCodeWithDefaultConfiguration')]
+    #[DataProvider('codeWithDefaultConfigurationProvider')]
+    #[DataProvider('nodesWithAttributesWhichMayCauseCircularDependenciesProvider')]
     public function test_dump_nodes(NodeDumperScenario $scenario): void
     {
         $node = $scenario->node;
+        $expected = $scenario->expected;
 
         if (is_string($node)) {
             $parser = (new ParserFactory())->createForHostVersion();
@@ -75,15 +81,18 @@ final class NodeDumperTest extends TestCase
             $scenario->onlyVisitedNodes,
         );
 
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
         $actual = $dumper->dump($node);
 
-        $this->assertSame(
-            Path::canonicalize($scenario->expected),
-            Path::canonicalize($actual),
-        );
+        if (!($expected instanceof Exception)) {
+            $this->assertSame($expected, $actual);
+        }
     }
 
-    public static function provideCodeWithDefaultConfiguration(): iterable
+    public static function codeWithDefaultConfigurationProvider(): iterable
     {
         $variableAssignment = NodeDumperScenario::forCode(
             <<<'PHP'
@@ -95,11 +104,11 @@ final class NodeDumperTest extends TestCase
                 PHP,
         )
             ->withShowAllNodes()
-        ->withDumpProperties();
+            ->withDumpProperties();
 
         yield 'variable' => $variableAssignment
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                         0: Stmt_Expression(
                             expr: Expr_Assign(
@@ -120,14 +129,14 @@ final class NodeDumperTest extends TestCase
                         )
                         2: Stmt_Nop
                     )
-                    OUT,
+                    AST,
             )
             ->build();
 
         yield 'variable with comments' => $variableAssignment
             ->withDumpComments()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                         0: Stmt_Expression(
                             expr: Expr_Assign(
@@ -151,18 +160,18 @@ final class NodeDumperTest extends TestCase
                         )
                         2: Stmt_Nop(
                             comments: array(
-                                0: / Salutation
+                                0: // Salutation
                             )
                         )
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'variable with positions' => $variableAssignment
             ->withDumpPositions()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                         0: Stmt_Expression[4 - 4](
                             expr: Expr_Assign[4 - 4](
@@ -183,9 +192,9 @@ final class NodeDumperTest extends TestCase
                         )
                         2: Stmt_Nop[5 - 5]
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'tree with only some nodes marked as visited' => NodeDumperScenario::forNode(
             [
@@ -218,7 +227,7 @@ final class NodeDumperTest extends TestCase
             ],
         )
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                         0: Expr_FuncCall(
                             name: Name
@@ -235,9 +244,9 @@ final class NodeDumperTest extends TestCase
                             )
                         )
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'variable other attributes' => NodeDumperScenario::forNode(
             [
@@ -257,7 +266,7 @@ final class NodeDumperTest extends TestCase
             ->withDumpOtherAttributes()
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                         0: Expr_Assign(
                             var: Expr_Variable(
@@ -272,32 +281,32 @@ final class NodeDumperTest extends TestCase
                             anotherUnspecifiedAttribute: ...
                         )
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'empty array' => NodeDumperScenario::forNode([])
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'array with values' => NodeDumperScenario::forNode(
             ['Foo', 'Bar', 'Key' => 'FooBar'],
         )
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     array(
                         0: Foo
                         1: Bar
                         Key: FooBar
                     )
-                    OUT,
+                    AST,
             )
             ->build();
 
@@ -306,11 +315,11 @@ final class NodeDumperTest extends TestCase
         )
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     Name
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'name with extra properties' => NodeDumperScenario::forNode(
             new Name(['Hallo', 'World']),
@@ -318,13 +327,13 @@ final class NodeDumperTest extends TestCase
             ->withDumpProperties()
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     Name(
                         name: Hallo\World
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'array expression' => NodeDumperScenario::forNode(
             new Array_([
@@ -333,7 +342,7 @@ final class NodeDumperTest extends TestCase
         )
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     Expr_Array(
                         items: array(
                             0: ArrayItem(
@@ -341,9 +350,9 @@ final class NodeDumperTest extends TestCase
                             )
                         )
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'array expression with extra properties' => NodeDumperScenario::forNode(
             new Array_([
@@ -354,7 +363,7 @@ final class NodeDumperTest extends TestCase
             ->withShowAllNodes()
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     Expr_Array(
                         items: array(
                             0: ArrayItem(
@@ -367,9 +376,9 @@ final class NodeDumperTest extends TestCase
                             )
                         )
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
 
         yield 'empty method' => NodeDumperScenario::forNode(
             new Node\Stmt\ClassMethod(
@@ -378,12 +387,260 @@ final class NodeDumperTest extends TestCase
         )
             ->withShowAllNodes()
             ->withExpected(
-                <<<'OUT'
+                <<<'AST'
                     Stmt_ClassMethod(
                         name: Identifier
                     )
-                    OUT,
+                    AST,
             )
-        ->build();
+            ->build();
+    }
+
+    public static function nodesWithAttributesWhichMayCauseCircularDependenciesProvider(): iterable
+    {
+        yield 'next attribute' => (static function () {
+            $node1 = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+            $node2 = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+
+            $node1->setAttribute(
+                NextConnectingVisitor::NEXT_ATTRIBUTE,
+                $node2,
+            );
+
+            return NodeDumperScenario::forNode([
+                $node1,
+                $node2,
+            ])
+                ->withShowAllNodes()
+                ->withDumpProperties()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    PotentialCircularDependencyDetected::forAttribute(
+                        NextConnectingVisitor::NEXT_ATTRIBUTE,
+                        $node2,
+                    ),
+                )
+                ->build();
+        })();
+
+        yield 'next attribute with ID' => (static function () {
+            $node1 = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+            $node2 = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+
+            $node1->setAttribute(
+                NextConnectingVisitor::NEXT_ATTRIBUTE,
+                $node2,
+            );
+            $node2->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+
+            return NodeDumperScenario::forNode([
+                $node1,
+                $node2,
+            ])
+                ->withShowAllNodes()
+                ->withDumpProperties()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        name: x1
+                                    )
+                                    expr: Scalar_String(
+                                        value: value1
+                                    )
+                                )
+                                next: nodeId(10)
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        name: x1
+                                    )
+                                    expr: Scalar_String(
+                                        value: value1
+                                    )
+                                )
+                                nodeId: 10
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'parent attribute' => (static function () {
+            $parent = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+            $child = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+
+            ParentConnector::setParent($child, $parent);
+
+            return NodeDumperScenario::forNode([
+                $parent,
+                $child,
+            ])
+                ->withShowAllNodes()
+                ->withDumpProperties()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    PotentialCircularDependencyDetected::forAttribute('parent', $parent),
+                )
+                ->build();
+        })();
+
+        yield 'parent attribute with ID' => (static function () {
+            $parent = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+            $child = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+
+            $parent->setAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE, 10);
+            ParentConnector::setParent($child, $parent);
+
+            return NodeDumperScenario::forNode([
+                $parent,
+                $child,
+            ])
+                ->withShowAllNodes()
+                ->withDumpProperties()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        name: x1
+                                    )
+                                    expr: Scalar_String(
+                                        value: value1
+                                    )
+                                )
+                                nodeId: 10
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        name: x1
+                                    )
+                                    expr: Scalar_String(
+                                        value: value1
+                                    )
+                                )
+                                parent: nodeId(10)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
+
+        yield 'functionScope' => (static function () {
+            $node = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+
+            $node->setAttribute(
+                ReflectionVisitor::FUNCTION_SCOPE_KEY,
+                $node,
+            );
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpProperties()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    PotentialCircularDependencyDetected::forAttribute(
+                        ReflectionVisitor::FUNCTION_SCOPE_KEY,
+                        $node,
+                    ),
+                )
+                ->build();
+        })();
+
+        yield 'functionScope with ID' => (static function () {
+            $node = new Node\Stmt\Expression(
+                new Assign(
+                    new Variable('x1'),
+                    new String_('value1'),
+                ),
+            );
+
+            $node->setAttribute(
+                AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE,
+                10,
+            );
+            $node->setAttribute(
+                ReflectionVisitor::FUNCTION_SCOPE_KEY,
+                $node,
+            );
+
+            return NodeDumperScenario::forNode([$node])
+                ->withShowAllNodes()
+                ->withDumpProperties()
+                ->withDumpOtherAttributes()
+                ->withExpected(
+                    <<<'AST'
+                        array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        name: x1
+                                    )
+                                    expr: Scalar_String(
+                                        value: value1
+                                    )
+                                )
+                                nodeId: 10
+                                functionScope: nodeId(10)
+                            )
+                        )
+                        AST,
+                )
+                ->build();
+        })();
     }
 }

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Ast\Visitor\RemoveUndesiredAttributesVisitor;
+namespace Infection\Tests\PhpParser\Ast\Visitor\KeepDesiredAttributesVisitor;
 
 use Infection\Tests\PhpParser\Ast\VisitorTestCase;
 use PhpParser\Node;
@@ -41,13 +41,13 @@ use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(RemoveUndesiredAttributesVisitor::class)]
-final class RemoveUndesiredAttributesVisitorTest extends VisitorTestCase
+#[CoversClass(KeepDesiredAttributesVisitor::class)]
+final class KeepDesiredAttributesVisitorTest extends VisitorTestCase
 {
     #[DataProvider('attributeProvider')]
-    public function test_it_removes_the_undesired_attributes(
+    public function test_it_keeps_the_desired_attributes(
         array $initialAttributes,
-        array $undesiredAttributes,
+        array $desiredAttributes,
         array $expectedAttributes,
     ): void {
         $node = new Node\Stmt\Expression(
@@ -58,7 +58,7 @@ final class RemoveUndesiredAttributesVisitorTest extends VisitorTestCase
             $initialAttributes,
         );
 
-        $visitor = new RemoveUndesiredAttributesVisitor(...$undesiredAttributes);
+        $visitor = new KeepDesiredAttributesVisitor(...$desiredAttributes);
 
         (new NodeTraverser($visitor))->traverse([$node]);
 
@@ -71,32 +71,20 @@ final class RemoveUndesiredAttributesVisitorTest extends VisitorTestCase
     {
         yield 'no attributes' => [
             'initialAttributes' => [],
-            'undesiredAttributes' => [],
+            'desiredAttributes' => [],
             'expectedAttributes' => [],
         ];
 
-        yield 'remove one attribute' => [
+        yield 'keep some attributes' => [
             'initialAttributes' => [
                 'custom_key_1' => 'value1',
                 'custom_key_2' => 'value2',
                 'custom_key_3' => 'value3',
             ],
-            'undesiredAttributes' => ['custom_key_2'],
+            'desiredAttributes' => ['custom_key_1', 'custom_key_3'],
             'expectedAttributes' => [
                 'custom_key_1' => 'value1',
                 'custom_key_3' => 'value3',
-            ],
-        ];
-
-        yield 'remove multiple attributes' => [
-            'initialAttributes' => [
-                'custom_key_1' => 'value1',
-                'custom_key_2' => 'value2',
-                'custom_key_3' => 'value3',
-            ],
-            'undesiredAttributes' => ['custom_key_2', 'custom_key_3'],
-            'expectedAttributes' => [
-                'custom_key_1' => 'value1',
             ],
         ];
     }

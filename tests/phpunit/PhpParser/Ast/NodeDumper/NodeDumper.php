@@ -37,6 +37,7 @@ namespace Infection\Tests\PhpParser\Ast\NodeDumper;
 
 use function get_debug_type;
 use function implode;
+use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use InvalidArgumentException;
 use function is_array;
@@ -112,8 +113,7 @@ final class NodeDumper
         'endTokenPos' => true,
         // The following attributes are Infection specific
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
-        'parent' => true,
-        'next' => true,
+        // 'parent' => true,
     ];
 
     // Removed instance properties for stateless refactor
@@ -140,6 +140,8 @@ final class NodeDumper
      * @param string|null $code Code corresponding to dumped AST. This only needs to be passed if
      *                          the dumpPositions option is enabled and the dumping of node offsets
      *                          is desired.
+     *
+     * @throws PotentialCircularDependencyDetected
      *
      * @return string Dumped value
      */
@@ -261,6 +263,9 @@ final class NodeDumper
         return "[$start - $end]";
     }
 
+    /**
+     * @throws PotentialCircularDependencyDetected
+     */
     private function dumpRecursive(
         mixed $node,
         ?string $code,
@@ -370,7 +375,20 @@ final class NodeDumper
                         }
                     }
 
-                    $this->dumpRecursive($value, $code, $nodeDetails, $newLine);
+                    // This was added: add native support for Node ids. This removes
+                    // the need to employ various tricks for circular dependencies.
+                    if ($value instanceof Node) {
+                        if ($value->hasAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE)) {
+                            $nodeDetails .= sprintf(
+                                'nodeId(%s)',
+                                $value->getAttribute(AddIdToTraversedNodesVisitor::NODE_ID_ATTRIBUTE),
+                            );
+                        } else {
+                            throw PotentialCircularDependencyDetected::forAttribute($key, $value);
+                        }
+                    } else {
+                        $this->dumpRecursive($value, $code, $nodeDetails, $newLine);
+                    }
                 }
             }
 

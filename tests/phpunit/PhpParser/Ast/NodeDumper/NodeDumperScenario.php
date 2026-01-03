@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\NodeDumper;
 
+use Exception;
 use PhpParser\Node;
 
 final class NodeDumperScenario
@@ -44,7 +45,7 @@ final class NodeDumperScenario
      */
     public function __construct(
         public array|Node|string $node,
-        public string $expected = '',
+        public string|Exception $expected = '',
         // It should have the same defaults as NodeDumper
         public bool $dumpProperties = false,
         public bool $dumpComments = false,
@@ -107,7 +108,7 @@ final class NodeDumperScenario
         return $clone;
     }
 
-    public function withExpected(string $expected): self
+    public function withExpected(string|Exception $expected): self
     {
         $clone = clone $this;
         $clone->expected = $expected;

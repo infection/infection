@@ -35,28 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\Visitor\RemoveUndesiredAttributesVisitor;
 
-use function array_intersect_key;
-use function array_map;
-use Infection\Ast\Metadata\Annotation;
+use function array_diff_key;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use function Safe\array_flip;
 
 /**
- * Some tests may leverage existing visitors for the tests which may add various annotations
- * which are uninteresting for the test.
+ * Utility visitor which allows removing the specified attributes.
  */
 final class RemoveUndesiredAttributesVisitor extends NodeVisitorAbstract
 {
     /**
      * @var array<string, mixed>
      */
-    private readonly array $desiredAttributeKeys;
+    private readonly array $undesiredAttributesAsKeys;
 
     public function __construct(
-        Annotation|string ...$desired,
+        string ...$attributes,
     ) {
-        $this->desiredAttributeKeys = self::getDesiredAttributeKeys($desired);
+        $this->undesiredAttributesAsKeys = array_flip($attributes);
     }
 
     public function enterNode(Node $node): void
@@ -64,28 +61,11 @@ final class RemoveUndesiredAttributesVisitor extends NodeVisitorAbstract
         $this->removeUndesiredAttributes($node);
     }
 
-    /**
-     * @param array<Annotation|string> $desired
-     *
-     * @return array<string, mixed>
-     */
-    private static function getDesiredAttributeKeys(array $desired): array
-    {
-        return array_flip(
-            array_map(
-                static fn (Annotation|string $attribute) => $attribute instanceof Annotation
-                    ? $attribute->name
-                    : $attribute,
-                $desired,
-            ),
-        );
-    }
-
     private function removeUndesiredAttributes(Node $node): void
     {
-        $desiredAttributes = array_intersect_key(
+        $desiredAttributes = array_diff_key(
             $node->getAttributes(),
-            $this->desiredAttributeKeys,
+            $this->undesiredAttributesAsKeys,
         );
 
         $node->setAttributes($desiredAttributes);

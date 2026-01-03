@@ -35,53 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\Visitor;
 
-use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
+use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use function file_get_contents;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Tests\PhpParser\Ast\Visitor\KeepDesiredAttributesVisitor\KeepDesiredAttributesVisitor;
 use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use Infection\Tests\PhpParser\Ast\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
 use Infection\Tests\PhpParser\Ast\VisitorTestCase;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use SplObjectStorage;
-use function file_get_contents;
 
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends VisitorTestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../../../autoloaded/mutator-fixtures';
 
+    /**
+     * @param list<string>|null $desiredAttributes
+     */
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
         string $code,
+        ?array $desiredAttributes,
         string $expected,
     ): void {
         $nodes = $this->createParser()->parse($code);
 
         (new NodeTraverser(
+            new AddIdToTraversedNodesVisitor(),
             new ParentConnectingVisitor(),
             self::createNameResolver(),
             new ReflectionVisitor(),
             new MarkTraversedNodesAsVisitedVisitor(),
         ))->traverse($nodes);
 
-        (new NodeTraverser(
-            new RemoveUndesiredAttributesVisitor(
-                ReflectionVisitor::STRICT_TYPES_KEY,
-                ReflectionVisitor::REFLECTION_CLASS_KEY,
-                ReflectionVisitor::IS_INSIDE_FUNCTION_KEY,
-                ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE,
-                // Cannot include this one because currently there is no way to
-                // provide a string representation of a function...
-                // ReflectionVisitor::FUNCTION_SCOPE_KEY,
-                ReflectionVisitor::FUNCTION_NAME,
-                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
-            )
-        ))->traverse($nodes);
+        if (null !== $desiredAttributes) {
+            (new NodeTraverser(
+                new KeepDesiredAttributesVisitor(
+                    MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+                    ...$desiredAttributes,
+                ),
+            ))->traverse($nodes);
+        }
 
         $actual = $this->dumper->dump($nodes);
 
@@ -92,8 +89,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
     {
         yield 'it marks nodes which are part of the function signature' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-part-of-signature-flag.php',
+                self::FIXTURES_DIR . '/Reflection/rv-part-of-signature-flag.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -220,8 +218,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'it marks nodes which are part of the function signature with attributes' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-part-of-signature-flag-with-attributes.php',
+                self::FIXTURES_DIR . '/Reflection/rv-part-of-signature-flag-with-attributes.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -396,8 +395,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'it detects if it is traversing inside a class method' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-inside-class-method.php',
+                self::FIXTURES_DIR . '/Reflection/rv-inside-class-method.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -440,10 +440,11 @@ final class ReflectionVisitorTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'it does not traverse a regular global or namespaced function' => [
+        yield 'it does not annotate nodes of a regular global or namespaced function' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-inside-function.php',
+                self::FIXTURES_DIR . '/Reflection/rv-inside-function.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -477,8 +478,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'it traverses a plain function inside a class' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-inside-plain-function-in-class.php',
+                self::FIXTURES_DIR . '/Reflection/rv-inside-plain-function-in-class.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -557,8 +559,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'it traverses a plain function inside a closure' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-inside-plain-function-in-closure.php',
+                self::FIXTURES_DIR . '/Reflection/rv-inside-plain-function-in-closure.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -603,8 +606,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'it detects it is traversing inside a closure' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-inside-closure.php',
+                self::FIXTURES_DIR . '/Reflection/rv-inside-closure.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -664,8 +668,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'it does not add the inside function flag if not necessary' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-without-function.php',
+                self::FIXTURES_DIR . '/Reflection/rv-without-function.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -697,8 +702,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'test it can mark nodes as inside function for an anonymous class' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-anonymous-class.php',
+                self::FIXTURES_DIR . '/Reflection/rv-anonymous-class.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -746,8 +752,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'test it sets reflection class to nodes in anonymous class' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-anonymous-class-inside-class.php',
+                self::FIXTURES_DIR . '/Reflection/rv-anonymous-class-inside-class.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(
@@ -813,8 +820,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         yield 'test it sets reflection class to nodes in anonymous class that extends' => [
             file_get_contents(
-                self::FIXTURES_DIR.'/Reflection/rv-anonymous-class-inside-class-that-extends.php',
+                self::FIXTURES_DIR . '/Reflection/rv-anonymous-class-inside-class-that-extends.php',
             ),
+            null,
             <<<'AST'
                 array(
                     0: Stmt_Namespace(

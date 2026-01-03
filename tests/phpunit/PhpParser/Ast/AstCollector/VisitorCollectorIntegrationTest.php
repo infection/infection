@@ -35,291 +35,50 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Ast\AstCollector;
 
-use function file_exists;
-use Infection\Ast\AstCollector;
-use Infection\PhpParser\NodeTraverserFactory;
-use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\Testing\SingletonContainer;
-use Infection\Tests\PhpParser\Ast\Visitor\AddIdToTraversedNodesVisitor\MarkTraversedNodesVisitor;
+use Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Ast\VisitorTestCase;
-use Infection\Tests\TestFramework\Tracing\DummyTracer;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\file_get_contents;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
-#[CoversClass(AstCollector::class)]
+#[CoversNothing]
 final class VisitorCollectorIntegrationTest extends VisitorTestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
-    public function test_it_creates_a_rich_ast(): void
-    {
-        $fileInfoMock = $this->createSplFileInfoMock(self::FIXTURES_DIR . '/TwoAdditions.php');
+    #[DataProvider('nodeProvider')]
+    public function test_it_creates_a_rich_ast(
+        string $code,
+        string $expected,
+    ): void {
+        $traverserFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
-        $astCollector = new AstCollector(
-            SingletonContainer::getContainer()->getFileParser(),
-            $this->createNodeTraverserFactory($fileInfoMock),
-            new DummyTracer(),
-            onlyCovered: false,
-        );
+        $nodes = $this->parser->parse($code);
 
-        $ast = $astCollector->generate($fileInfoMock);
-
-        $expected = <<<'AST'
-            array(
-                0: Stmt_Declare(
-                    declares: array(
-                        0: DeclareItem(
-                            key: Identifier(
-                                NOT_SUPPORTED: 5
-                                TESTS: Deferred(array(
-                                ))
-                                NOT_COVERED_BY_TESTS: 0
-                                ELIGIBLE: -1
-                            )
-                            value: Scalar_Int(
-                                rawValue: 1
-                                kind: KIND_DEC (10)
-                                NOT_SUPPORTED: 5
-                                TESTS: Deferred(array(
-                                ))
-                                NOT_COVERED_BY_TESTS: 0
-                                ELIGIBLE: -1
-                            )
-                            NOT_SUPPORTED: 5
-                            TESTS: Deferred(array(
-                            ))
-                            NOT_COVERED_BY_TESTS: 0
-                            ELIGIBLE: -1
-                        )
-                    )
-                    NOT_SUPPORTED: 5
-                    TESTS: Deferred(array(
-                    ))
-                    NOT_COVERED_BY_TESTS: 0
-                    ELIGIBLE: -1
-                )
-                1: Stmt_Namespace(
-                    name: Name(
-                        NOT_SUPPORTED: 5
-                        TESTS: Deferred(array(
-                        ))
-                        NOT_COVERED_BY_TESTS: 0
-                        ELIGIBLE: -1
-                    )
-                    stmts: array(
-                        0: Stmt_Class(
-                            name: Identifier(
-                                NOT_SUPPORTED: 5
-                                TESTS: Deferred(array(
-                                ))
-                                NOT_COVERED_BY_TESTS: 0
-                                ELIGIBLE: -1
-                            )
-                            stmts: array(
-                                0: Stmt_ClassMethod(
-                                    name: Identifier(
-                                        isInsideFunction: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: first
-                                        TESTS: Deferred(array(
-                                        ))
-                                        NOT_COVERED_BY_TESTS: 0
-                                        ELIGIBLE: -1
-                                    )
-                                    returnType: Identifier(
-                                        isInsideFunction: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: first
-                                        TESTS: Deferred(array(
-                                        ))
-                                        NOT_COVERED_BY_TESTS: 0
-                                        ELIGIBLE: -1
-                                    )
-                                    stmts: array(
-                                        0: Stmt_Return(
-                                            expr: Expr_BinaryOp_Plus(
-                                                left: Scalar_Int(
-                                                    rawValue: 1
-                                                    kind: KIND_DEC (10)
-                                                    isInsideFunction: true
-                                                    isStrictTypes: true
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: first
-                                                    TESTS: Deferred(array(
-                                                    ))
-                                                    NOT_COVERED_BY_TESTS: 0
-                                                    ELIGIBLE: -1
-                                                )
-                                                right: Scalar_Int(
-                                                    rawValue: 2
-                                                    kind: KIND_DEC (10)
-                                                    isInsideFunction: true
-                                                    isStrictTypes: true
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: first
-                                                    TESTS: Deferred(array(
-                                                    ))
-                                                    NOT_COVERED_BY_TESTS: 0
-                                                    ELIGIBLE: -1
-                                                )
-                                                isInsideFunction: true
-                                                isStrictTypes: true
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: first
-                                                TESTS: Deferred(array(
-                                                ))
-                                                NOT_COVERED_BY_TESTS: 0
-                                                ELIGIBLE: -1
-                                            )
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: first
-                                            TESTS: Deferred(array(
-                                            ))
-                                            NOT_COVERED_BY_TESTS: 0
-                                            ELIGIBLE: -1
-                                        )
-                                    )
-                                    isOnFunctionSignature: true
-                                    isStrictTypes: true
-                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                    functionName: first
-                                    TESTS: Deferred(array(
-                                    ))
-                                    NOT_COVERED_BY_TESTS: 0
-                                    ELIGIBLE: -1
-                                )
-                                1: Stmt_ClassMethod(
-                                    name: Identifier(
-                                        isInsideFunction: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: second
-                                        TESTS: Deferred(array(
-                                        ))
-                                        NOT_COVERED_BY_TESTS: 0
-                                        ELIGIBLE: -1
-                                    )
-                                    returnType: Identifier(
-                                        isInsideFunction: true
-                                        isStrictTypes: true
-                                        reflectionClass: Infection\Reflection\CoreClassReflection
-                                        functionName: second
-                                        TESTS: Deferred(array(
-                                        ))
-                                        NOT_COVERED_BY_TESTS: 0
-                                        ELIGIBLE: -1
-                                    )
-                                    stmts: array(
-                                        0: Stmt_Return(
-                                            expr: Expr_BinaryOp_Minus(
-                                                left: Scalar_Int(
-                                                    rawValue: 1
-                                                    kind: KIND_DEC (10)
-                                                    isInsideFunction: true
-                                                    isStrictTypes: true
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: second
-                                                    TESTS: Deferred(array(
-                                                    ))
-                                                    NOT_COVERED_BY_TESTS: 0
-                                                    ELIGIBLE: -1
-                                                )
-                                                right: Scalar_Int(
-                                                    rawValue: 2
-                                                    kind: KIND_DEC (10)
-                                                    isInsideFunction: true
-                                                    isStrictTypes: true
-                                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                                    functionName: second
-                                                    TESTS: Deferred(array(
-                                                    ))
-                                                    NOT_COVERED_BY_TESTS: 0
-                                                    ELIGIBLE: -1
-                                                )
-                                                isInsideFunction: true
-                                                isStrictTypes: true
-                                                reflectionClass: Infection\Reflection\CoreClassReflection
-                                                functionName: second
-                                                TESTS: Deferred(array(
-                                                ))
-                                                NOT_COVERED_BY_TESTS: 0
-                                                ELIGIBLE: -1
-                                            )
-                                            isInsideFunction: true
-                                            isStrictTypes: true
-                                            reflectionClass: Infection\Reflection\CoreClassReflection
-                                            functionName: second
-                                            TESTS: Deferred(array(
-                                            ))
-                                            NOT_COVERED_BY_TESTS: 0
-                                            ELIGIBLE: -1
-                                        )
-                                    )
-                                    isOnFunctionSignature: true
-                                    isStrictTypes: true
-                                    reflectionClass: Infection\Reflection\CoreClassReflection
-                                    functionName: second
-                                    TESTS: Deferred(array(
-                                    ))
-                                    NOT_COVERED_BY_TESTS: 0
-                                    ELIGIBLE: -1
-                                )
-                            )
-                            NOT_SUPPORTED: 5
-                            TESTS: Deferred(array(
-                            ))
-                            NOT_COVERED_BY_TESTS: 0
-                            ELIGIBLE: -1
-                        )
-                    )
-                    kind: 1
-                    NOT_SUPPORTED: 5
-                    TESTS: Deferred(array(
-                    ))
-                    NOT_COVERED_BY_TESTS: 0
-                    ELIGIBLE: -1
-                )
+        $traverserFactory->createPreTraverser()->traverse($nodes);
+        $traversedNodes = $traverserFactory
+            ->create(
+                new MarkTraversedNodesAsVisitedVisitor(),
+                [],
             )
-            AST;
+        ->traverse($nodes);
 
-        $actual = $this->dumper->dump($ast->nodes);
+        $actual = $this->dumper->dump($traversedNodes);
 
         $this->assertSame($expected, $actual);
     }
 
-    private function createSplFileInfoMock(string $file): SplFileInfo&MockObject
+    public static function nodeProvider(): iterable
     {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock->method('getRealPath')->willReturn($file);
-        $splFileInfoMock->method('getContents')->willReturn(
-            file_exists($file) ? file_get_contents($file) : 'content',
-        );
-
-        return $splFileInfoMock;
-    }
-
-    private function createNodeTraverserFactory(SplFileInfo $sourceFile): NodeTraverserFactory
-    {
-        $originalFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
-
-        $traverser = $originalFactory->createFirstTraverser(
-            new EmptyTrace($sourceFile),
-        );
-        $traverser->addVisitor(new MarkTraversedNodesVisitor());
-
-        $factoryMock = $this->createMock(NodeTraverserFactory::class);
-        $factoryMock
-            ->method('createFirstTraverser')
-            ->willReturn($traverser);
-
-        return $factoryMock;
+        yield [
+            file_get_contents(self::FIXTURES_DIR . '/TwoAdditions.php'),
+            <<<'AST'
+                array(
+                )
+                AST,
+        ];
     }
 }

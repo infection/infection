@@ -33,33 +33,41 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Ast\Visitor\MarkTraversedNodesAsVisitedVisitor;
+namespace Infection\Tests\PhpParser\Ast\Visitor\KeepDesiredAttributesVisitor;
 
+use function array_intersect_key;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use function Safe\array_flip;
 
-final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
+/**
+ * Utility visitor which allows keeping only the specified attributes.
+ */
+final class KeepDesiredAttributesVisitor extends NodeVisitorAbstract
 {
-    public const SKIP_ATTRIBUTE = 'skip';
+    /**
+     * @var array<string, mixed>
+     */
+    private readonly array $desiredAttributeKeys;
 
-    public static function markNodeAsSkipped(Node $node): Node
-    {
-        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
-
-        return $node;
+    public function __construct(
+        string ...$attributes,
+    ) {
+        $this->desiredAttributeKeys = array_flip($attributes);
     }
 
-    public static function isNodeMarkedAsSkipped(Node $node): bool
+    public function enterNode(Node $node): void
     {
-        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+        $this->removeUndesiredAttributes($node);
     }
 
-    public function enterNode(Node $node): ?int
+    private function removeUndesiredAttributes(Node $node): void
     {
-        if (self::isNodeMarkedAsSkipped($node)) {
-            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
-        }
+        $desiredAttributes = array_intersect_key(
+            $node->getAttributes(),
+            $this->desiredAttributeKeys,
+        );
 
-        return null;
+        $node->setAttributes($desiredAttributes);
     }
 }
