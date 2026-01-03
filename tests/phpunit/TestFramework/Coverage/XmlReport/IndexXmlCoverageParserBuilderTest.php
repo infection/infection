@@ -35,21 +35,41 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParserBuilder;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 #[CoversClass(IndexXmlCoverageParserBuilder::class)]
 final class IndexXmlCoverageParserBuilderTest extends TestCase
 {
-    public function test_it_builds_an_index_xml_coverage_parser(): void
+    public function test_it_builds_with_source_filtered_false_when_no_filter(): void
     {
-        $configuration = ConfigurationBuilder::withMinimalTestData()->build();
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceFilter(null)
+            ->build();
 
-        $builder = new IndexXmlCoverageParserBuilder($configuration);
+        $parser = (new IndexXmlCoverageParserBuilder($configuration))->build();
 
-        $this->assertInstanceOf(IndexXmlCoverageParser::class, $builder->build());
+        $this->assertFalse($this->getIsSourceFiltered($parser));
+    }
+
+    public function test_it_builds_with_source_filtered_true_when_filter_present(): void
+    {
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceFilter(new PlainFilter(['src/']))
+            ->build();
+
+        $parser = (new IndexXmlCoverageParserBuilder($configuration))->build();
+
+        $this->assertTrue($this->getIsSourceFiltered($parser));
+    }
+
+    private function getIsSourceFiltered(IndexXmlCoverageParser $parser): bool
+    {
+        return (new ReflectionProperty($parser, 'isSourceFiltered'))->getValue($parser);
     }
 }
