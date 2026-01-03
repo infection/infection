@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParserBuilder;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
