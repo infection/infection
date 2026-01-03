@@ -33,41 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\PhpParser\AstCollector;
 
-use function is_string;
-use PhpParser\Node;
-use PhpParser\Node\Expr\Variable;
 use PhpParser\NodeVisitorAbstract;
 
-final class IgnoreSpyVisitor extends NodeVisitorAbstract
+final class NullNodeVisitor extends NodeVisitorAbstract
 {
-    public int $nodeCounter = 0;
-
-    private $failureCallBack;
-
-    public function __construct(callable $failureCallBack)
-    {
-        $this->failureCallBack = $failureCallBack;
-    }
-
-    public function enterNode(Node $node): void
-    {
-        if (!$node instanceof Variable) {
-            return;
-        }
-        $name = $node->name;
-
-        if (!is_string($name)) {
-            return;
-        }
-
-        if ($name === 'ignored') {
-            ($this->failureCallBack)();
-        }
-
-        if ($name === 'counted') {
-            ++$this->nodeCounter;
-        }
-    }
 }

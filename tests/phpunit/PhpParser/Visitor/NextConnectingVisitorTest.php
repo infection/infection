@@ -36,309 +36,650 @@ declare(strict_types=1);
 namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
-use PhpParser\Node;
-use PhpParser\Node\Stmt\Nop;
+use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[Group('integration')]
 #[CoversClass(NextConnectingVisitor::class)]
-final class NextConnectingVisitorTest extends BaseVisitorTestCase
+final class NextConnectingVisitorTest extends VisitorTestCase
 {
-    public function test_it_connects_sequential_statements_with_next_attribute(): void
-    {
-        $code = <<<'PHP'
-            <?php
+    #[DataProvider('nodeProvider')]
+    public function test_it_annotates_the_next_nodes(
+        string $code,
+        string $expected,
+    ): void {
+        $nodes = $this->createParser()->parse($code);
 
-            $a = 1;
-            $b = 2;
-            $c = 3;
-            PHP;
+        $this->addIdsToNodes($nodes);
+        (new NodeTraverser(
+            new NextConnectingVisitor(),
+        ))->traverse($nodes);
 
-        [$nodes] = self::parseCode($code);
+        $actual = $this->dumper->dump($nodes, onlyVisitedNodes: false);
 
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
-
-        $this->assertTrue($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[1], $nodes[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        $this->assertTrue($nodes[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[2], $nodes[1]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        $this->assertFalse($nodes[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+        $this->assertSame($expected, $actual);
     }
 
-    public function test_it_resets_previous_node_when_entering_function(): void
+    public static function nodeProvider(): iterable
     {
-        $code = <<<'PHP'
-            <?php
+        yield 'it connects sequential statements' => [
+            <<<'PHP'
+                <?php
 
-            $a = 1;
-
-            function test() {
-                $b = 2;
-                $c = 3;
-            }
-
-            $d = 4;
-            PHP;
-
-        [$nodes] = self::parseCode($code);
-
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
-
-        $this->assertInstanceOf(Node\Stmt\Function_::class, $nodes[1]);
-
-        // $a = 1 has no next because function resets the previous tracking
-        $this->assertFalse($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Function declaration does NOT have next attribute (FunctionLike nodes are not processed)
-        $this->assertFalse($nodes[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // $d = 4 has no next
-        $this->assertFalse($nodes[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Inside function: $b = 2 connects to $c = 3
-        $functionStmts = $nodes[1]->stmts;
-        $this->assertTrue($functionStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($functionStmts[1], $functionStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // $c = 3 connects to $d = 4 (because traverser visits in depth-first order)
-        $this->assertTrue($functionStmts[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[2], $functionStmts[1]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
-
-    public function test_it_skips_nop_statements(): void
-    {
-        $code = <<<'PHP'
-            <?php
-
-            $a = 1;
-            $b = 2;
-            // Comment that becomes a Nop
-            PHP;
-
-        [$nodes] = self::parseCode($code);
-
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
-
-        // There should be 3 nodes: $a = 1, $b = 2, Nop (comment)
-        $this->assertCount(3, $nodes);
-        $this->assertInstanceOf(Nop::class, $nodes[2]);
-
-        // $a = 1 connects to $b = 2
-        $this->assertTrue($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[1], $nodes[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // $b = 2 has no next (Nop is skipped)
-        $this->assertFalse($nodes[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Nop should not have next attribute
-        $this->assertFalse($nodes[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
-
-    public function test_it_only_processes_statement_nodes(): void
-    {
-        $code = <<<'PHP'
-            <?php
-
-            if (true) {
                 $a = 1;
                 $b = 2;
-            }
+                $c = 3;
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 1
+                                kind: KIND_DEC (10)
+                                nodeId: 3
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                        next: nodeId(4)
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 6
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 2
+                                kind: KIND_DEC (10)
+                                nodeId: 7
+                            )
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                        next: nodeId(8)
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 10
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 3
+                                kind: KIND_DEC (10)
+                                nodeId: 11
+                            )
+                            nodeId: 9
+                        )
+                        nodeId: 8
+                    )
+                )
+                AST,
+        ];
 
-            $c = 3;
-            PHP;
+        yield 'it handles functions and closures as boundaries' => [
+            <<<'PHP'
+                <?php
 
-        [$nodes] = self::parseCode($code);
+                $a = 1;
 
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
-
-        $this->assertObjectHasProperty('stmts', $nodes[0]);
-
-        // If statement connects to first statement inside the block (due to depth-first traversal)
-        $this->assertTrue($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[0]->stmts[0], $nodes[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Inside if block: $a = 1 connects to $b = 2
-        $ifStmts = $nodes[0]->stmts;
-        $this->assertTrue($ifStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($ifStmts[1], $ifStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // $b = 2 connects to $c = 3 (due to depth-first traversal)
-        $this->assertTrue($ifStmts[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[1], $ifStmts[1]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // The condition expression node should not have next attribute
-        $this->assertObjectHasProperty('cond', $nodes[0]);
-        $this->assertFalse($nodes[0]->cond->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
-
-    public function test_it_handles_class_methods_as_function_boundaries(): void
-    {
-        $code = <<<'PHP'
-            <?php
-
-            class Test {
-                public function foo() {
-                    $a = 1;
+                function test() {
                     $b = 2;
-                }
-
-                public function bar() {
                     $c = 3;
-                    $d = 4;
                 }
-            }
-            PHP;
 
-        [$nodes] = self::parseCode($code);
+                $d = 4;
 
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
+                $closure1 = function () {
+                    $e = 5;
+                    $f = 6;
+                };
 
-        $this->assertObjectHasProperty('stmts', $nodes[0]);
-        $classMethods = $nodes[0]->stmts;
+                $g = 7;
 
-        // Methods are FunctionLike nodes, so they don't have next attributes
-        $this->assertFalse($classMethods[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertFalse($classMethods[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+                $closure2 = fn () => $h = 8;
 
-        // Inside first method
-        $fooStmts = $classMethods[0]->stmts;
-        $this->assertTrue($fooStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($fooStmts[1], $fooStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+                $e = 9;
 
-        // Inside second method
-        $barStmts = $classMethods[1]->stmts;
-        $this->assertTrue($barStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($barStmts[1], $barStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 1
+                                kind: KIND_DEC (10)
+                                nodeId: 3
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Function(
+                        name: Identifier(
+                            nodeId: 5
+                        )
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 8
+                                    )
+                                    expr: Scalar_Int(
+                                        rawValue: 2
+                                        kind: KIND_DEC (10)
+                                        nodeId: 9
+                                    )
+                                    nodeId: 7
+                                )
+                                nodeId: 6
+                                next: nodeId(10)
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 12
+                                    )
+                                    expr: Scalar_Int(
+                                        rawValue: 3
+                                        kind: KIND_DEC (10)
+                                        nodeId: 13
+                                    )
+                                    nodeId: 11
+                                )
+                                nodeId: 10
+                                next: nodeId(14)
+                            )
+                        )
+                        nodeId: 4
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 16
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 4
+                                kind: KIND_DEC (10)
+                                nodeId: 17
+                            )
+                            nodeId: 15
+                        )
+                        nodeId: 14
+                        next: nodeId(18)
+                    )
+                    3: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 20
+                            )
+                            expr: Expr_Closure(
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 24
+                                            )
+                                            expr: Scalar_Int(
+                                                rawValue: 5
+                                                kind: KIND_DEC (10)
+                                                nodeId: 25
+                                            )
+                                            nodeId: 23
+                                        )
+                                        nodeId: 22
+                                        next: nodeId(26)
+                                    )
+                                    1: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 28
+                                            )
+                                            expr: Scalar_Int(
+                                                rawValue: 6
+                                                kind: KIND_DEC (10)
+                                                nodeId: 29
+                                            )
+                                            nodeId: 27
+                                        )
+                                        nodeId: 26
+                                        next: nodeId(30)
+                                    )
+                                )
+                                nodeId: 21
+                            )
+                            nodeId: 19
+                        )
+                        nodeId: 18
+                    )
+                    4: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 32
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 7
+                                kind: KIND_DEC (10)
+                                nodeId: 33
+                            )
+                            nodeId: 31
+                        )
+                        nodeId: 30
+                        next: nodeId(34)
+                    )
+                    5: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 36
+                            )
+                            expr: Expr_ArrowFunction(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 39
+                                    )
+                                    expr: Scalar_Int(
+                                        rawValue: 8
+                                        kind: KIND_DEC (10)
+                                        nodeId: 40
+                                    )
+                                    nodeId: 38
+                                )
+                                nodeId: 37
+                            )
+                            nodeId: 35
+                        )
+                        nodeId: 34
+                    )
+                    6: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 43
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 9
+                                kind: KIND_DEC (10)
+                                nodeId: 44
+                            )
+                            nodeId: 42
+                        )
+                        nodeId: 41
+                    )
+                )
+                AST,
+        ];
 
-    public function test_it_handles_closures_as_function_boundaries(): void
-    {
-        $code = <<<'PHP'
-            <?php
+        yield 'it skips nop statements' => [
+            <<<'PHP'
+                <?php
 
-            $a = 1;
-
-            $closure = function() {
+                $a = 1;
                 $b = 2;
+                // Comment
+                /** Another comment */
                 $c = 3;
-            };
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 1
+                                kind: KIND_DEC (10)
+                                nodeId: 3
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                        next: nodeId(4)
+                    )
+                    1: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 6
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 2
+                                kind: KIND_DEC (10)
+                                nodeId: 7
+                            )
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                        next: nodeId(8)
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 10
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 3
+                                kind: KIND_DEC (10)
+                                nodeId: 11
+                            )
+                            nodeId: 9
+                        )
+                        nodeId: 8
+                    )
+                )
+                AST,
+        ];
 
-            $d = 4;
-            PHP;
+        yield 'it handle class methods as functions and boundaries' => [
+            <<<'PHP'
+                <?php
 
-        [$nodes] = self::parseCode($code);
+                class Test {
+                    public function foo() {
+                        $a = 1;
+                        $b = 2;
+                    }
 
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
+                    public function bar() {
+                        $c = 3;
+                        $d = 4;
+                    }
+                }
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Class(
+                        name: Identifier(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_ClassMethod(
+                                name: Identifier(
+                                    nodeId: 3
+                                )
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 6
+                                            )
+                                            expr: Scalar_Int(
+                                                rawValue: 1
+                                                kind: KIND_DEC (10)
+                                                nodeId: 7
+                                            )
+                                            nodeId: 5
+                                        )
+                                        nodeId: 4
+                                        next: nodeId(8)
+                                    )
+                                    1: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 10
+                                            )
+                                            expr: Scalar_Int(
+                                                rawValue: 2
+                                                kind: KIND_DEC (10)
+                                                nodeId: 11
+                                            )
+                                            nodeId: 9
+                                        )
+                                        nodeId: 8
+                                    )
+                                )
+                                nodeId: 2
+                            )
+                            1: Stmt_ClassMethod(
+                                name: Identifier(
+                                    nodeId: 13
+                                )
+                                stmts: array(
+                                    0: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 16
+                                            )
+                                            expr: Scalar_Int(
+                                                rawValue: 3
+                                                kind: KIND_DEC (10)
+                                                nodeId: 17
+                                            )
+                                            nodeId: 15
+                                        )
+                                        nodeId: 14
+                                        next: nodeId(18)
+                                    )
+                                    1: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 20
+                                            )
+                                            expr: Scalar_Int(
+                                                rawValue: 4
+                                                kind: KIND_DEC (10)
+                                                nodeId: 21
+                                            )
+                                            nodeId: 19
+                                        )
+                                        nodeId: 18
+                                    )
+                                )
+                                nodeId: 12
+                            )
+                        )
+                        nodeId: 0
+                    )
+                )
+                AST,
+        ];
 
-        // $a = 1 connects to $closure assignment
-        $this->assertTrue($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[1], $nodes[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+        yield 'it handles empty functions as boundaries' => [
+            <<<'PHP'
+                <?php
 
-        // $closure assignment does NOT connect to $d = 4 because the closure resets previous
-        $this->assertFalse($nodes[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+                $a = 1;
 
-        // $d = 4 has no next
-        $this->assertFalse($nodes[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Inside closure
-        $this->assertObjectHasProperty('expr', $nodes[1]);
-        $closureExpr = $nodes[1]->expr->expr; // Get the closure from the assignment
-        $closureStmts = $closureExpr->stmts;
-        $this->assertTrue($closureStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($closureStmts[1], $closureStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Last statement in closure connects to $d = 4 (because traverser visits in depth-first order)
-        $this->assertTrue($closureStmts[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($nodes[2], $closureStmts[1]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
-
-    public function test_it_handles_empty_function_body(): void
-    {
-        $code = <<<'PHP'
-            <?php
-
-            $a = 1;
-
-            function empty_function() {
-            }
-
-            $b = 2;
-            PHP;
-
-        [$nodes] = self::parseCode($code);
-
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
-
-        // $a = 1 has no next because function resets the previous tracking
-        $this->assertFalse($nodes[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Function declaration does NOT have next attribute (FunctionLike nodes are not processed)
-        $this->assertFalse($nodes[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // $b = 2 has no next
-        $this->assertFalse($nodes[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
-
-    public function test_it_connects_return_statements_to_next_statements(): void
-    {
-        $code = <<<'PHP'
-            <?php
-
-            function hasMultipleReturns($condition) {
-                if ($condition) {
-                    return 'early';
-                    $unreachable = true;
+                function empty_function() {
                 }
 
-                $a = 1;
-                return 'normal';
-                $afterReturn = 2;
-            }
-            PHP;
+                $b = 2;
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 2
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 1
+                                kind: KIND_DEC (10)
+                                nodeId: 3
+                            )
+                            nodeId: 1
+                        )
+                        nodeId: 0
+                    )
+                    1: Stmt_Function(
+                        name: Identifier(
+                            nodeId: 5
+                        )
+                        nodeId: 4
+                    )
+                    2: Stmt_Expression(
+                        expr: Expr_Assign(
+                            var: Expr_Variable(
+                                nodeId: 8
+                            )
+                            expr: Scalar_Int(
+                                rawValue: 2
+                                kind: KIND_DEC (10)
+                                nodeId: 9
+                            )
+                            nodeId: 7
+                        )
+                        nodeId: 6
+                    )
+                )
+                AST,
+        ];
 
-        [$nodes] = self::parseCode($code);
+        yield 'it connects return statements to next statements' => [
+            <<<'PHP'
+                <?php
 
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
+                function hasMultipleReturns($condition) {
+                    if ($condition) {
+                        return 'early';
+                        $unreachable = true;
+                    }
 
-        $this->assertObjectHasProperty('stmts', $nodes[0]);
-        $functionStmts = $nodes[0]->stmts;
-        $ifStmts = $functionStmts[0]->stmts;
+                    $a = 1;
+                    return 'normal';
+                    $afterReturn = 2;
+                }
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Function(
+                        name: Identifier(
+                            nodeId: 1
+                        )
+                        params: array(
+                            0: Param(
+                                var: Expr_Variable(
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                            )
+                        )
+                        stmts: array(
+                            0: Stmt_If(
+                                cond: Expr_Variable(
+                                    nodeId: 5
+                                )
+                                stmts: array(
+                                    0: Stmt_Return(
+                                        expr: Scalar_String(
+                                            kind: KIND_SINGLE_QUOTED (1)
+                                            rawValue: 'early'
+                                            nodeId: 7
+                                        )
+                                        nodeId: 6
+                                        next: nodeId(8)
+                                    )
+                                    1: Stmt_Expression(
+                                        expr: Expr_Assign(
+                                            var: Expr_Variable(
+                                                nodeId: 10
+                                            )
+                                            expr: Expr_ConstFetch(
+                                                name: Name(
+                                                    nodeId: 12
+                                                )
+                                                nodeId: 11
+                                            )
+                                            nodeId: 9
+                                        )
+                                        nodeId: 8
+                                        next: nodeId(13)
+                                    )
+                                )
+                                nodeId: 4
+                                next: nodeId(6)
+                            )
+                            1: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 15
+                                    )
+                                    expr: Scalar_Int(
+                                        rawValue: 1
+                                        kind: KIND_DEC (10)
+                                        nodeId: 16
+                                    )
+                                    nodeId: 14
+                                )
+                                nodeId: 13
+                                next: nodeId(17)
+                            )
+                            2: Stmt_Return(
+                                expr: Scalar_String(
+                                    kind: KIND_SINGLE_QUOTED (1)
+                                    rawValue: 'normal'
+                                    nodeId: 18
+                                )
+                                nodeId: 17
+                                next: nodeId(19)
+                            )
+                            3: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 21
+                                    )
+                                    expr: Scalar_Int(
+                                        rawValue: 2
+                                        kind: KIND_DEC (10)
+                                        nodeId: 22
+                                    )
+                                    nodeId: 20
+                                )
+                                nodeId: 19
+                            )
+                        )
+                        nodeId: 0
+                    )
+                )
+                AST,
+        ];
 
-        // Early return connects to unreachable statement
-        $this->assertTrue($ifStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($ifStmts[1], $ifStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+        yield 'it does not connect the last return statement' => [
+            <<<'PHP'
+                <?php
 
-        // Normal return connects to statement after it
-        $this->assertTrue($functionStmts[2]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($functionStmts[3], $functionStmts[2]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-    }
-
-    public function test_it_does_not_connect_last_return_statement(): void
-    {
-        $code = <<<'PHP'
-            <?php
-
-            function lastReturn() {
-                $a = 1;
-                return $a;
-            }
-            PHP;
-
-        [$nodes] = self::parseCode($code);
-
-        $this->traverse($nodes, [new NextConnectingVisitor()]);
-
-        $this->assertObjectHasProperty('stmts', $nodes[0]);
-        $functionStmts = $nodes[0]->stmts;
-
-        // $a = 1 connects to return
-        $this->assertTrue($functionStmts[0]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-        $this->assertSame($functionStmts[1], $functionStmts[0]->getAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
-
-        // Last return has no next
-        $this->assertFalse($functionStmts[1]->hasAttribute(NextConnectingVisitor::NEXT_ATTRIBUTE));
+                function lastReturn() {
+                    $a = 1;
+                    return $a;
+                }
+                PHP,
+            <<<'AST'
+                array(
+                    0: Stmt_Function(
+                        name: Identifier(
+                            nodeId: 1
+                        )
+                        stmts: array(
+                            0: Stmt_Expression(
+                                expr: Expr_Assign(
+                                    var: Expr_Variable(
+                                        nodeId: 4
+                                    )
+                                    expr: Scalar_Int(
+                                        rawValue: 1
+                                        kind: KIND_DEC (10)
+                                        nodeId: 5
+                                    )
+                                    nodeId: 3
+                                )
+                                nodeId: 2
+                                next: nodeId(6)
+                            )
+                            1: Stmt_Return(
+                                expr: Expr_Variable(
+                                    nodeId: 7
+                                )
+                                nodeId: 6
+                            )
+                        )
+                        nodeId: 0
+                    )
+                )
+                AST,
+        ];
     }
 }

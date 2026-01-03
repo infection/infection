@@ -33,74 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
-use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use PhpParser\Node\Expr\Variable;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\TestCase;
+use function spl_object_id;
+use function sprintf;
 
-#[CoversClass(ChangingIgnorer::class)]
-final class ChangingIgnorerTest extends BaseNodeIgnorerTestCase
+#[CoversClass(PotentialCircularDependencyDetected::class)]
+final class PotentialCircularDependencyDetectedTest extends TestCase
 {
-    private const CODE_WITH_ONE_IGNORED_NODE = <<<'PHP'
-        <?php
-
-        class Foo
-        {
-            public function bar()
-            {
-                $ignored + 1;
-            }
-        }
-
-        PHP;
-
-    private const CODE_WITH_ONE_COUNTED_NODE = <<<'PHP'
-        <?php
-
-        class Foo
-        {
-            public function bar()
-            {
-                $counted + 1;
-            }
-        }
-
-        PHP;
-
-    public function test_it_ignores_when_enabled(): ChangingIgnorer
+    public function test_it_can_create_an_instance_for_an_attribute(): void
     {
-        $ignorer = new ChangingIgnorer();
-        $ignorer->startIgnoring();
+        $node = new Variable('x');
 
-        $this->parseAndTraverse(
-            self::CODE_WITH_ONE_IGNORED_NODE,
-            $spy = $this->createSpy(),
-            $ignorer,
+        $exception = PotentialCircularDependencyDetected::forAttribute(
+            'next',
+            $node,
         );
 
-        $this->assertSame(0, $spy->nodeCounter);
-
-        return $ignorer;
-    }
-
-    #[Depends('test_it_ignores_when_enabled')]
-    public function test_it_does_not_ignore_when_disabled(ChangingIgnorer $ignorer): void
-    {
-        $ignorer->stopIgnoring();
-
-        $this->parseAndTraverse(
-            self::CODE_WITH_ONE_COUNTED_NODE,
-            $spy = $this->createSpy(),
-            $ignorer,
+        $this->assertSame(
+            sprintf(
+                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID the node.',
+                spl_object_id($node),
+            ),
+            $exception->getMessage(),
         );
-
-        $this->assertSame(1, $spy->nodeCounter);
-    }
-
-    protected function getIgnore(): NodeIgnorer
-    {
-        return new ChangingIgnorer();
     }
 }
