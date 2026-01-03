@@ -80,7 +80,6 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
-use Infection\PhpParser\Visitor\NameResolverBuilder;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\Source\Collector\FakeSourceCollector;
@@ -159,7 +158,6 @@ final class ProjectCodeProvider
         MutantExecutionResult::class,
         MutationGeneratingConsoleLoggerSubscriber::class,
         MutatorName::class,
-        NameResolverBuilder::class,
         NodeMutationGenerator::class,
         NoReportFound::class,
         NonExecutableFinder::class,
