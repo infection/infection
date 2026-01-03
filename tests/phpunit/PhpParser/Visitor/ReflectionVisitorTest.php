@@ -42,8 +42,10 @@ use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_get_contents;
 
+#[Group('integration')]
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends VisitorTestCase
 {
