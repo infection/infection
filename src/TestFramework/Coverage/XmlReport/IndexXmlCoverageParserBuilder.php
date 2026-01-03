@@ -42,10 +42,10 @@ use Infection\Configuration\Configuration;
  * @internal
  * @implements Builder<IndexXmlCoverageParser>
  */
-final class IndexXmlCoverageParserBuilder implements Builder
+final readonly class IndexXmlCoverageParserBuilder implements Builder
 {
     public function __construct(
-        private readonly Configuration $configuration,
+        private Configuration $configuration,
     ) {
     }
 
