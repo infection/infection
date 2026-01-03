@@ -40,13 +40,13 @@ use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
 
-final class IdNodeIgnorer implements NodeIgnorer
+final readonly class IdNodeIgnorer implements NodeIgnorer
 {
     /**
      * @param array<positive-int|0> $ignoredNodeIds
      */
     public function __construct(
-        private readonly array $ignoredNodeIds,
+        private array $ignoredNodeIds,
     ) {
     }
 
