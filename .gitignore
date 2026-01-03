@@ -1,6 +1,5 @@
 !/.tools/.gitkeep
-!/build/.gitkeep
-!/build/cache/.gitkeep
+!/dist/.gitkeep
 !/var/cache/.gitkeep
 .phpunit.*
 /*.phar

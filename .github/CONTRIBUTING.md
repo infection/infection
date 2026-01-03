@@ -50,7 +50,7 @@ Some end-to-end tests are called "non-standard" as in they have their own script
 ```shell
 ./tests/e2e_tests <infection-executable> [<e2e-test-name>]
 
-# <infection-executable>: defaults to bin/infection, or use build/infection.phar
+# <infection-executable>: defaults to bin/infection, or use dist/infection.phar
 # [<e2e-test>]: optional grep pattern to filter tests, e.g. Adapter_Installer. The
 #  list of tests available can be found in tests/e2e.
 ```
@@ -64,7 +64,7 @@ By default, it is structured as follows:
 - `README.md`: a more detailed description of the scenario or of why
   this scenario exists.
 - `expected-output.txt`: the expected output from the test process.
-- `var/infection.log` or `infection.log` (not committed): the actual output from
+- `dist/infection.log` or `infection.log` (not committed): the actual output from
   the test process. The former is the recommendation, but not all tests were updated.
 - `run_test.bash` (optional): the script to use to execute the test. If none
   is provided, then the default `tests/e2e/standard_script.bash` one is used.

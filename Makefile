@@ -32,7 +32,7 @@ PARATEST=vendor/bin/paratest
 
 PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 
-INFECTION=./var/infection.phar
+INFECTION=./dist/infection.phar
 
 DOCKER_RUN=docker compose run --rm
 DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile

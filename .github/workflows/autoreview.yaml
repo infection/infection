@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: ./var/cache/php-cs-fixer
-          key: "php-cs-fixer-${{ github.run_id }}"
+          key: "${{ matrix.php-version }}-php-cs-fixer-${{ github.run_id }}"
           restore-keys: "${{ matrix.php-version }}-php-cs-fixer"
 
       - name: Configure Rector GitHub Actions cache
