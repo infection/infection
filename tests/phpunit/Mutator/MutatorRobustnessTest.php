@@ -38,7 +38,6 @@ namespace Infection\Tests\Mutator;
 use function array_values;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
-use Infection\PhpParser\NodeTraverserFactory;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\NullMutationVisitor;
@@ -133,7 +132,7 @@ final class MutatorRobustnessTest extends TestCase
     {
         $initialStatements = SingletonContainer::getContainer()->getParser()->parse($code);
 
-        (new NodeTraverserFactory())
+        SingletonContainer::getContainer()->getNodeTraverserFactory()
             ->create(new NullMutationVisitor($mutator), [])
             ->traverse($initialStatements)
         ;

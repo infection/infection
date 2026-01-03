@@ -44,6 +44,7 @@ use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
+use Infection\Testing\SingletonContainer;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
@@ -62,7 +63,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
+        $traverser = SingletonContainer::getContainer()->getNodeTraverserFactory()->create(new FakeVisitor(), []);
 
         $visitors = array_map(
             get_class(...),
@@ -85,7 +86,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser_with_node_ignorers(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(
+        $traverser = SingletonContainer::getContainer()->getNodeTraverserFactory()->create(
             new FakeVisitor(),
             [
                 new FakeIgnorer(),
@@ -131,7 +132,7 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_pre_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->createPreTraverser();
+        $traverser = SingletonContainer::getContainer()->getNodeTraverserFactory()->createPreTraverser();
 
         $visitors = array_map(
             get_class(...),

@@ -35,17 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
-use Infection\CannotBeInstantiated;
+use DIContainer\Builder;
 use PhpParser\NodeVisitor\NameResolver;
 
 /**
  * @internal
+ * @implements Builder<NameResolver>
  */
-final class NameResolverFactory
+final class NameResolverFactory implements Builder
 {
-    use CannotBeInstantiated;
-
-    public static function create(): NameResolver
+    public function build(): NameResolver
     {
         return new NameResolver(
             errorHandler: null, // Ensure we throw.
