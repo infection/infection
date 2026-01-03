@@ -79,18 +79,12 @@ final class InfectionContainerRule implements Rule {
      */
     private function getContainerFiles(): array
     {
-        if (self::$containerFiles !== null) {
-            return self::$containerFiles;
-        }
-
-        self::$containerFiles = array_map(
+        return self::$containerFiles ??= array_map(
             static fn (string $path): string => Path::canonicalize($path),
             [
                 __DIR__ . '/../../../tests/phpunit/ContainerTest.php',
                 __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
             ],
         );
-
-        return self::$containerFiles;
     }
 }
