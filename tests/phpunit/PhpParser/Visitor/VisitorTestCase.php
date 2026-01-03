@@ -37,7 +37,11 @@ namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\PhpParser\NodeDumper\NodeDumper;
+use Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
+use Infection\Tests\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
+use Infection\Tests\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
 use function array_map;
@@ -63,6 +67,51 @@ abstract class VisitorTestCase extends TestCase
     protected function createDumper(): NodeDumper
     {
         return new NodeDumper();
+    }
+
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     */
+    final protected function addIdsToNodes(array|Node $nodeOrNodes): void
+    {
+        $nodes = (array) $nodeOrNodes;
+
+        $nodeTraverser = new NodeTraverser(
+            new AddIdToTraversedNodesVisitor(),
+        );
+        $nodeTraverser->traverse($nodes);
+    }
+
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     */
+    final protected function removeUndesiredAttributes(
+        array|Node $nodeOrNodes,
+        string ...$attributes,
+    ): void
+    {
+        $nodes = (array) $nodeOrNodes;
+
+        $nodeTraverser = new NodeTraverser(
+            new RemoveUndesiredAttributesVisitor(...$attributes),
+        );
+        $nodeTraverser->traverse($nodes);
+    }
+
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     */
+    final protected function keepOnlyDesiredAttributes(
+        array|Node $nodeOrNodes,
+        string ...$attributes,
+    ): void
+    {
+        $nodes = (array) $nodeOrNodes;
+
+        $nodeTraverser = new NodeTraverser(
+            new KeepOnlyDesiredAttributesVisitor(...$attributes),
+        );
+        $nodeTraverser->traverse($nodes);
     }
 
     /**

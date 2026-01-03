@@ -60,7 +60,7 @@ final class ChangingIgnorerTest extends VisitorTestCase
 
         $changingIgnorer = new ChangingIgnorer();
 
-        (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
+        $this->addIdsToNodes($nodes);
         (new NodeTraverser(
             new MarkNodesAsIgnoredVisitor(
                 $ignoredNodeIds,

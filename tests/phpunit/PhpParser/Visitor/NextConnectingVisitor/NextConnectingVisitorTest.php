@@ -52,8 +52,8 @@ final class NextConnectingVisitorTest extends VisitorTestCase
     ): void {
         $nodes = $this->createParser()->parse($code);
 
+        $this->addIdsToNodes($nodes);
         (new NodeTraverser(
-            new AddIdToTraversedNodesVisitor(),
             new NextConnectingVisitor(),
         ))->traverse($nodes);
 

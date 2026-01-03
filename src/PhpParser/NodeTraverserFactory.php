@@ -79,7 +79,7 @@ class NodeTraverserFactory
     {
         $changingIgnorer = new ChangingIgnorer();
 
-        self::createNodeIgnorers($changingIgnorer, $nodeIgnorers);
+        $nodeIgnorers = self::createNodeIgnorers($changingIgnorer, $nodeIgnorers);
 
         $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
 

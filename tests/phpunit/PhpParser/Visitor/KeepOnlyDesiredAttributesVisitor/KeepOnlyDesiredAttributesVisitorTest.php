@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\KeepDesiredAttributesVisitor;
+namespace Infection\Tests\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
 
 use Infection\Tests\PhpParser\Visitor\VisitorTestCase;
 use PhpParser\Node;
@@ -41,8 +41,8 @@ use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[CoversClass(KeepDesiredAttributesVisitor::class)]
-final class KeepDesiredAttributesVisitorTest extends VisitorTestCase
+#[CoversClass(KeepOnlyDesiredAttributesVisitor::class)]
+final class KeepOnlyDesiredAttributesVisitorTest extends VisitorTestCase
 {
     #[DataProvider('attributeProvider')]
     public function test_it_keeps_the_desired_attributes(
@@ -58,7 +58,7 @@ final class KeepDesiredAttributesVisitorTest extends VisitorTestCase
             $initialAttributes,
         );
 
-        $visitor = new KeepDesiredAttributesVisitor(...$desiredAttributes);
+        $visitor = new KeepOnlyDesiredAttributesVisitor(...$desiredAttributes);
 
         (new NodeTraverser($visitor))->traverse([$node]);
 

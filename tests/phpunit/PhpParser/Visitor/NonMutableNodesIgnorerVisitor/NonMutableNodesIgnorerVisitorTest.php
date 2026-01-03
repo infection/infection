@@ -57,8 +57,7 @@ final class NonMutableNodesIgnorerVisitorTest extends VisitorTestCase
     ): void {
         $nodes = $this->createParser()->parse($code);
 
-        // First, ensure all nodes have an ID
-        (new NodeTraverser(new AddIdToTraversedNodesVisitor()))->traverse($nodes);
+        $this->addIdsToNodes($nodes);
         (new NodeTraverser(
             new NonMutableNodesIgnorerVisitor([
                 new IdNodeIgnorer($ignoredNodeIds),

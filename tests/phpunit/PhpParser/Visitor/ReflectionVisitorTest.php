@@ -37,7 +37,7 @@ namespace Infection\Tests\PhpParser\Visitor;
 
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\PhpParser\Visitor\KeepDesiredAttributesVisitor\KeepDesiredAttributesVisitor;
+use Infection\Tests\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
 use Infection\Tests\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
 use PhpParser\NodeTraverser;
@@ -50,7 +50,7 @@ use function file_get_contents;
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends VisitorTestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../../../../autoloaded/mutator-fixtures';
+    private const FIXTURES_DIR = __DIR__ . '/../../../autoloaded/mutator-fixtures';
 
     /**
      * @param list<string>|null $desiredAttributes
@@ -63,8 +63,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
     ): void {
         $nodes = $this->createParser()->parse($code);
 
+        $this->addIdsToNodes($nodes);
+
         (new NodeTraverser(
-            new AddIdToTraversedNodesVisitor(),
             new ParentConnectingVisitor(),
             self::createNameResolver(),
             new ReflectionVisitor(),
@@ -73,21 +74,9 @@ final class ReflectionVisitorTest extends VisitorTestCase
 
         if (null !== $desiredAttributes) {
             (new NodeTraverser(
-                new KeepDesiredAttributesVisitor(
+                new KeepOnlyDesiredAttributesVisitor(
                     MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
                     ...$desiredAttributes,
-                ),
-            ))->traverse($nodes);
-        } else {
-            (new NodeTraverser(
-                new RemoveUndesiredAttributesVisitor(
-                    'nodeId',
-                    'parent',
-                    'namespacedName',
-                    'resolvedName',
-                    'rawValue',
-                    'kind',
-                    'functionScope',
                 ),
             ))->traverse($nodes);
         }

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\KeepDesiredAttributesVisitor;
+namespace Infection\Tests\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -43,7 +43,7 @@ use function Safe\array_flip;
 /**
  * Utility visitor which allows keeping only the specified attributes.
  */
-final class KeepDesiredAttributesVisitor extends NodeVisitorAbstract
+final class KeepOnlyDesiredAttributesVisitor extends NodeVisitorAbstract
 {
     /**
      * @var array<string, mixed>
