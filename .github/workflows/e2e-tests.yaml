@@ -30,8 +30,8 @@ jobs:
         include:
           - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'dist/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'dist/infection.phar' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
@@ -127,14 +127,14 @@ jobs:
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
 
       - name: Run the whole set of E2E tests with prefixed PHAR
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'build/infection.phar' && matrix.php-version == '8.2'
+        if: runner.os != 'Windows' && matrix.e2e-runner == 'dist/infection.phar' && matrix.php-version == '8.2'
         env:
           TERM: xterm-256color
         run: |
           make compile
           # test PHAR works from subfolder
-          cd build && ./infection.phar -V && cd ..
-          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=build/infection.phar BENCHMARK_SOURCES=
+          cd dist && ./infection.phar -V && cd ..
+          make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
