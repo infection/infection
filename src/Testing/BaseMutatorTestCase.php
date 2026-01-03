@@ -40,7 +40,6 @@ use function array_key_exists;
 use function array_shift;
 use function count;
 use function implode;
-use Infection\Container;
 use Infection\Framework\ClassName;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -60,12 +59,9 @@ abstract class BaseMutatorTestCase extends TestCase
 {
     protected Mutator $mutator;
 
-    protected readonly Container $container;
-
     protected function setUp(): void
     {
         $this->mutator = $this->createMutator();
-        $this->container = Container::create();
     }
 
     /**
@@ -204,7 +200,8 @@ abstract class BaseMutatorTestCase extends TestCase
         $traverser->addVisitor(new NextConnectingVisitor());
         $traverser->traverse($nodes);
 
-        SingletonContainer::getContainer()->getNodeTraverserFactory()
+        SingletonContainer::getContainer()
+            ->getNodeTraverserFactory()
             ->create($mutationsCollectorVisitor, [])
             ->traverse($nodes)
         ;
