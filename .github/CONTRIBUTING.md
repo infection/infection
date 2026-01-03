@@ -64,7 +64,7 @@ By default, it is structured as follows:
 - `README.md`: a more detailed description of the scenario or of why
   this scenario exists.
 - `expected-output.txt`: the expected output from the test process.
-- `dist/infection.log` or `infection.log` (not committed): the actual output from
+- `var/infection.log` or `infection.log` (not committed): the actual output from
   the test process. The former is the recommendation, but not all tests were updated.
 - `run_test.bash` (optional): the script to use to execute the test. If none
   is provided, then the default `tests/e2e/standard_script.bash` one is used.
