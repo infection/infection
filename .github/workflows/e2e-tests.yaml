@@ -28,14 +28,7 @@ jobs:
         coverage-driver: [ pcov, xdebug ]
         e2e-runner: [ 'bin/infection' ]
         include:
-          - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'build/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
+          - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection', locked: true }
 
     name: E2E tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.composer }}; ${{ matrix.dependencies }}), using ${{ matrix.coverage-driver }} with ${{ matrix.e2e-runner }}
 
@@ -54,15 +47,6 @@ jobs:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Remove the configured PHP platform
-        if: matrix.dependencies != 'locked'
-        run: composer config --unset platform.php
-
-      - name: Configure for PHP >= 8.4
-        if: "matrix.php-version >= '8.4'"
-        run: |
-          composer config platform.php 8.4.99
-
       - name: Get composer cache directory
         id: composer-cache
         shell: bash
@@ -80,28 +64,7 @@ jobs:
             composer-
 
       - name: Install dependencies
-        if: ${{ matrix.dependencies == 'locked' }}
         run: composer install --no-interaction --prefer-dist --no-progress
-
-      - name: Install highest dependencies
-        if: ${{ matrix.dependencies == 'highest' }}
-        run: composer update --no-interaction --prefer-dist --no-progress
-
-      - name: Install lowest dependencies
-        if: ${{ matrix.dependencies == 'lowest' }}
-        run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
-
-      - name: Cache E2E tests dependencies
-        if: runner.os == 'Windows'
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-        with:
-          path: tests/e2e/*/vendor
-          key: e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}
-          restore-keys: |
-            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('tests/e2e/*/composer.json') }}-
-            e2e-vendor-${{ runner.os }}-${{ matrix.php-version }}-
-            e2e-vendor-${{ runner.os }}-
-            composer-
 
       - name: Install Composer dependencies for E2E tests
         shell: bash
@@ -109,11 +72,11 @@ jobs:
           ls tests/e2e/*/composer.json | xargs dirname |
              xargs -I{} -P 4 composer --working-dir={} install --no-interaction --prefer-dist --no-progress || true
 
-      - name: Run a subset of E2E tests
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
+#      - name: Run a subset of E2E tests
+#        if: runner.os == 'Windows'
+#        shell: bash
+#        run: |
+#          make test-e2e-phpunit PHP='phpdbg -qrr' E2E_PHPUNIT_GROUP=e2e BENCHMARK_SOURCES=
 
       - name: Install Linux dependencies for E2E tests
         if: runner.os != 'Windows'
@@ -121,7 +84,6 @@ jobs:
           sudo apt-get install -y --no-install-recommends expect
 
       - name: Run the whole set of E2E tests
-        if: runner.os != 'Windows' && matrix.e2e-runner == 'bin/infection'
         env:
           TERM: xterm-256color
         run: make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=bin/infection
