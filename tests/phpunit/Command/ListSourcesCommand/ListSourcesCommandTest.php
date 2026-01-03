@@ -37,7 +37,7 @@ namespace Infection\Tests\Command\ListSourcesCommand;
 
 use Infection\Command\ListSourcesCommand;
 use Infection\Console\Application;
-use Infection\Container;
+use Infection\Container\Container;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;

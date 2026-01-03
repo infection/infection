@@ -33,10 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\XmlReport;
+namespace Infection\Container\Builder;
 
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 /**
  * @internal
