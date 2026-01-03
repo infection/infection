@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 
+use function in_array;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use SplObjectStorage;
-use function in_array;
 
 final class MarkNodesAsIgnoredVisitor extends NodeVisitorAbstract
 {

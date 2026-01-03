@@ -58,22 +58,6 @@ class NodeTraverserFactory
 {
     /**
      * @param NodeIgnorer[] $nodeIgnorers
-     *
-     * @return NodeIgnorer[]
-     */
-    private static function createNodeIgnorers(
-        ChangingIgnorer $changingIgnorer,
-        array $nodeIgnorers = [],
-    ): array {
-        $nodeIgnorers[] = $changingIgnorer;
-        $nodeIgnorers[] = new InterfaceIgnorer();
-        $nodeIgnorers[] = new AbstractMethodIgnorer();
-
-        return $nodeIgnorers;
-    }
-
-    /**
-     * @param NodeIgnorer[] $nodeIgnorers
      */
     public function create(NodeVisitor $mutationVisitor, array $nodeIgnorers): NodeTraverserInterface
     {
@@ -107,5 +91,21 @@ class NodeTraverserFactory
         $traverser->addVisitor(new NextConnectingVisitor());
 
         return $traverser;
+    }
+
+    /**
+     * @param NodeIgnorer[] $nodeIgnorers
+     *
+     * @return NodeIgnorer[]
+     */
+    private static function createNodeIgnorers(
+        ChangingIgnorer $changingIgnorer,
+        array $nodeIgnorers = [],
+    ): array {
+        $nodeIgnorers[] = $changingIgnorer;
+        $nodeIgnorers[] = new InterfaceIgnorer();
+        $nodeIgnorers[] = new AbstractMethodIgnorer();
+
+        return $nodeIgnorers;
     }
 }

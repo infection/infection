@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
 use PhpParser\Node;
-use UnexpectedValueException;
 use function spl_object_id;
 use function sprintf;
+use UnexpectedValueException;
 
 final class PotentialCircularDependencyDetected extends UnexpectedValueException
 {

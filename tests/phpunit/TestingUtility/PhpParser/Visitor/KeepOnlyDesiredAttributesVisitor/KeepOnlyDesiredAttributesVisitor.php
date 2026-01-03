@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
 
+use function array_intersect_key;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function array_intersect_key;
 use function Safe\array_flip;
 
 /**

@@ -41,6 +41,7 @@ use Infection\PhpParser\Visitor\ParentConnector;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use function is_string;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
@@ -55,7 +56,6 @@ use PhpParser\ParserFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function is_string;
 
 #[CoversClass(NodeDumper::class)]
 final class NodeDumperTest extends TestCase

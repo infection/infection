@@ -35,17 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function array_map;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
+use function is_array;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
-use function array_map;
-use function is_array;
 
 abstract class VisitorTestCase extends TestCase
 {
@@ -88,8 +88,7 @@ abstract class VisitorTestCase extends TestCase
     final protected function removeUndesiredAttributes(
         array|Node $nodeOrNodes,
         string ...$attributes,
-    ): void
-    {
+    ): void {
         $nodes = (array) $nodeOrNodes;
 
         $nodeTraverser = new NodeTraverser(
@@ -104,8 +103,7 @@ abstract class VisitorTestCase extends TestCase
     final protected function keepOnlyDesiredAttributes(
         array|Node $nodeOrNodes,
         string ...$attributes,
-    ): void
-    {
+    ): void {
         $nodes = (array) $nodeOrNodes;
 
         $nodeTraverser = new NodeTraverser(

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PhpParser\Visitor\RemoveUndesiredAttributesVisitor;
 
+use function array_diff_key;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use function array_diff_key;
 use function Safe\array_flip;
 
 /**

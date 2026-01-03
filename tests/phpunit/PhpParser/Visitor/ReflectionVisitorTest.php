@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function file_get_contents;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
@@ -43,7 +44,6 @@ use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use function file_get_contents;
 
 #[CoversClass(ReflectionVisitor::class)]
 final class ReflectionVisitorTest extends VisitorTestCase
@@ -70,7 +70,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
             new MarkTraversedNodesAsVisitedVisitor(),
         ))->traverse($nodes);
 
-        if (null !== $desiredAttributes) {
+        if ($desiredAttributes !== null) {
             (new NodeTraverser(
                 new KeepOnlyDesiredAttributesVisitor(
                     MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
