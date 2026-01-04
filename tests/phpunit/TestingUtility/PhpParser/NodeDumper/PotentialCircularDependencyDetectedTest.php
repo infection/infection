@@ -55,7 +55,7 @@ final class PotentialCircularDependencyDetectedTest extends TestCase
 
         $this->assertSame(
             sprintf(
-                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID the node.',
+                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
                 spl_object_id($node),
             ),
             $exception->getMessage(),

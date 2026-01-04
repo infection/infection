@@ -48,7 +48,7 @@ final class PotentialCircularDependencyDetected extends UnexpectedValueException
     ): self {
         return new self(
             sprintf(
-                'The attribute "%s" found a node instance "%s" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID the node.',
+                'The attribute "%s" found a node instance "%s" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
                 $key,
                 $value::class,
                 spl_object_id($value),
