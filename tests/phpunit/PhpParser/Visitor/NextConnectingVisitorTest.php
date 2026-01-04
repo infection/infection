@@ -66,9 +66,9 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1;
-                $b = 2;
-                $c = 3;
+                $a = 1; // next = $b
+                $b = 2; // next = $c
+                $c = 3; // no next
                 PHP,
             <<<'AST'
                 array(
@@ -124,25 +124,25 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1;
+                $a = 1; // no next
 
                 function test() {
-                    $b = 2;
-                    $c = 3;
+                    $b = 2; // next = $c
+                    $c = 3; // no next ;TODO: current has next=$d!
                 }
 
-                $d = 4;
+                $d = 4; // next = $closure1
 
-                $closure1 = function () {
-                    $e = 5;
-                    $f = 6;
+                $closure1 = function () {   // next = $g ;TODO: currently has no next!
+                    $e = 5; // next = $e
+                    $f = 6; // no next ;TODO: currently has next=$g!
                 };
 
-                $g = 7;
+                $g = 7; // next = $closure2
 
-                $closure2 = fn () => $h = 8;
-
-                $e = 9;
+                $closure2 = fn () => $h = 8;    // next of $closure2 is $e ;TODO: currently has no next!
+                                                // $h has no next
+                $e = 9; // no next
 
                 PHP,
             <<<'AST'
@@ -380,13 +380,13 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
                 class Test {
                     public function foo() {
-                        $a = 1;
-                        $b = 2;
+                        $a = 1; // next = $a
+                        $b = 2; // no next
                     }
 
                     public function bar() {
-                        $c = 3;
-                        $d = 4;
+                        $c = 3; // next = $d
+                        $d = 4; // no next
                     }
                 }
                 PHP,
@@ -482,12 +482,12 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1;
+                $a = 1; // no next
 
                 function empty_function() {
                 }
 
-                $b = 2;
+                $b = 2; // no next
                 PHP,
             <<<'AST'
                 array(
@@ -534,14 +534,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 <?php
 
                 function hasMultipleReturns($condition) {
-                    if ($condition) {
-                        return 'early';
-                        $unreachable = true;
+                    if ($condition) {   // $condition has next = return stmt
+                        return 'early'; // next = $unreachable
+                        $unreachable = true;    // next = $a
                     }
 
-                    $a = 1;
-                    return 'normal';
-                    $afterReturn = 2;
+                    $a = 1; // next = return stmt
+                    return 'normal';    // next = $afterReturn
+                    $afterReturn = 2;   // no next
                 }
                 PHP,
             <<<'AST'
@@ -643,8 +643,8 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 <?php
 
                 function lastReturn() {
-                    $a = 1;
-                    return $a;
+                    $a = 1; // next = return stmt
+                    return $a;  // no next
                 }
                 PHP,
             <<<'AST'
