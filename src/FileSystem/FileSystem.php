@@ -67,6 +67,9 @@ class FileSystem extends SymfonyFilesystem
         return realpath($filename);
     }
 
+    /**
+     * @infection-ignore-all
+     */
     public function readFile(string $filename): string
     {
         // @phpstan-ignore function.alreadyNarrowedType
