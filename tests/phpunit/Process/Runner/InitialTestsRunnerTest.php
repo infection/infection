@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Process\Runner;
 
+use function array_filter;
 use function array_map;
 use function array_unique;
 use function array_values;
+use function count;
+use function end;
 use function extension_loaded;
 use Infection\Event\InitialTestCaseWasCompleted;
 use Infection\Event\InitialTestSuiteWasFinished;
@@ -154,7 +157,7 @@ final class InitialTestsRunnerTest extends TestCase
         // Maximum 4: the test script has 4 writes, $stopped flag prevents infinite events
         $completedCount = count(array_filter(
             $events,
-            static fn($e) => $e instanceof InitialTestCaseWasCompleted,
+            static fn ($e) => $e instanceof InitialTestCaseWasCompleted,
         ));
         $this->assertGreaterThanOrEqual(1, $completedCount, 'Should process at least one output');
         $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');
