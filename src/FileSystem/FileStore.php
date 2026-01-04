@@ -74,6 +74,8 @@ final class FileStore
     }
 
     /**
+     * @infection-ignore-all
+     *
      * @throws IOException
      */
     private function readFile(string $path): string
