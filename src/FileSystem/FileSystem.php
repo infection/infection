@@ -69,12 +69,14 @@ class FileSystem extends SymfonyFilesystem
 
     public function readFile(string $filename): string
     {
+        // @phpstan-ignore function.alreadyNarrowedType
         if (method_exists(parent::class, 'readFile')) {
             return parent::readFile($filename);
         }
 
         // To delete once we drop support for Symfony 6.4.
         // Copied from Symfony\Finder\SplFileInfo::getContents() with the exception adjusted
+        /** @psalm-suppress InvalidArgument */
         // @phpstan-ignore argument.type
         set_error_handler(static function ($type, $msg) use (&$error): void { $error = $msg; });
 
