@@ -239,6 +239,8 @@
                 "ArrayAny": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayFind": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayFindKey": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayFirst": { "$ref": "#/definitions/default-mutator-config" },
+                "ArrayLast": { "$ref": "#/definitions/default-mutator-config" },
                 "ArrayItem": { "$ref": "#/definitions/default-mutator-config" },
                 "EqualIdentical": { "$ref": "#/definitions/default-mutator-config" },
                 "FalseValue": { "$ref": "#/definitions/default-mutator-config" },

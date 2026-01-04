@@ -53,7 +53,7 @@ use function sprintf;
 final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
     /**
-     * @param list<SplFileInfo> $filteredSourceFilesToMutate
+     * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
     public function __construct(
         private bool $executeOnlyCoveringTestCases,

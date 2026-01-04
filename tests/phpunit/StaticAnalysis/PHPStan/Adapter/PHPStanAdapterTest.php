@@ -37,7 +37,6 @@ namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
 use Fidry\FileSystem\FakeFileSystem;
 use Fidry\FileSystem\FileSystem;
-use Generator;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -269,7 +268,7 @@ final class PHPStanAdapterTest extends TestCase
         $adapter->assertMinimumVersionSatisfied();
     }
 
-    public static function provideValidVersions(): Generator
+    public static function provideValidVersions(): iterable
     {
         yield 'major version 3' => ['3.0.0'];
 

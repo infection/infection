@@ -35,90 +35,96 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\JUnit;
 
-use function array_map;
-use function count;
-use function current;
-use function file_exists;
+use const DIRECTORY_SEPARATOR;
 use function implode;
-use Infection\FileSystem\Locator\FileNotFound;
-use function iterator_to_array;
+use Infection\FileSystem\FileSystem;
+use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * @internal
- * @final
  */
-class JUnitReportLocator
+final class JUnitReportLocator extends BaseReportLocator implements ReportLocator
 {
-    private readonly string $defaultJUnitPath;
+    public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
-    private ?string $jUnitPath = null;
+    private const DEFAULT_JUNIT_FILENAME = 'junit.xml';
 
-    public function __construct(
-        private readonly string $coveragePath,
-        string $defaultJUnitPath,
-    ) {
-        $this->defaultJUnitPath = Path::canonicalize($defaultJUnitPath);
+    public static function create(
+        FileSystem $filesystem,
+        string $coverageDirectory,
+        ?string $defaultJUnitPathname = null,
+    ): self {
+        // TODO: ensure the default path is in the coverage dir or make the path absolute?
+        return new self(
+            $filesystem,
+            $coverageDirectory,
+            $defaultJUnitPathname === null
+                ? self::createPHPUnitDefaultJUnitPathname($coverageDirectory)
+                : Path::canonicalize($defaultJUnitPathname),
+        );
     }
 
-    /**
-     * @throws FileNotFound
-     */
-    public function locate(): string
+    protected function createInvalidReportSource(string $coverageDirectory): InvalidReportSource
     {
-        if ($this->jUnitPath !== null) {
-            return $this->jUnitPath;
-        }
-
-        // This is the JUnit path enforced before. It is also the one recommended by the
-        // CoverageChecker hence it makes sense to try this one first before attempting any more
-        // expensive lookup
-        if (file_exists($this->defaultJUnitPath)) {
-            return $this->jUnitPath = $this->defaultJUnitPath;
-        }
-
-        if (!file_exists($this->coveragePath)) {
-            throw new FileNotFound(sprintf(
-                'Could not find any file with the pattern "*.junit.xml" in "%s"',
-                $this->coveragePath,
-            ));
-        }
-
-        $files = iterator_to_array(
-            Finder::create()
-                ->files()
-                ->in($this->coveragePath)
-                ->name('/^(.+\.)?junit\.xml$/i')
-                ->sortByName(),
-            false,
+        return new InvalidReportSource(
+            sprintf(
+                'Could not find the JUnit report in "%s": the pathname is not a valid or readable directory.',
+                $coverageDirectory,
+            ),
         );
+    }
 
-        if (count($files) > 1) {
-            throw new FileNotFound(sprintf(
-                'Could not locate the JUnit file: more than one file has been found with the'
-                . ' pattern "*.junit.xml": "%s"',
+    protected function createTooManyReportsFound(
+        string $coverageDirectory,
+        array $reportPathnames,
+    ): TooManyReportsFound {
+        return new TooManyReportsFound(
+            sprintf(
+                'Could not find the JUnit report in "%s": more than one file with the pattern "%s" was found. Found: "%s".',
+                $coverageDirectory,
+                self::JUNIT_FILENAME_REGEX,
                 implode(
                     '", "',
-                    array_map(
-                        static fn (SplFileInfo $fileInfo): string => Path::canonicalize($fileInfo->getPathname()),
-                        $files,
-                    ),
+                    $reportPathnames,
                 ),
-            ));
-        }
+            ),
+            reportPathnames: $reportPathnames,
+        );
+    }
 
-        $junitFileInfo = current($files);
+    protected function createNoReportFound(string $coverageDirectory): NoReportFound
+    {
+        return new NoReportFound(
+            sprintf(
+                'Could not find the JUnit report in "%s": no file with the pattern "%s" was found.',
+                $coverageDirectory,
+                self::JUNIT_FILENAME_REGEX,
+            ),
+        );
+    }
 
-        if ($junitFileInfo !== false) {
-            return $this->jUnitPath = Path::canonicalize($junitFileInfo->getPathname());
-        }
+    protected function configureFinder(Finder $finder): void
+    {
+        // TODO: should the file depth be limited too?
+        $finder
+            ->name(self::JUNIT_FILENAME_REGEX)
+            // We sort by name for deterministic results. It has no impact on
+            // the happy path as we expect to find only one file.
+            // In the other scenario, this gives a more consistent result to the
+            // user for a failing scenario.
+            // This also makes testing easier.
+            ->sortByName();
+    }
 
-        throw new FileNotFound(sprintf(
-            'Could not find any file with the pattern "*.junit.xml" in "%s"',
-            $this->coveragePath,
-        ));
+    private static function createPHPUnitDefaultJUnitPathname(string $coverageDirectory): string
+    {
+        return Path::canonicalize($coverageDirectory . DIRECTORY_SEPARATOR . self::DEFAULT_JUNIT_FILENAME);
     }
 }

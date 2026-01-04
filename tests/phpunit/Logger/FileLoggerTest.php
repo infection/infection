@@ -54,10 +54,7 @@ final class FileLoggerTest extends FileSystemTestCase
 
     private MockObject&FileSystem $fileSystemMock;
 
-    /**
-     * @var DummyLogger
-     */
-    private $logger;
+    private DummyLogger $logger;
 
     protected function setUp(): void
     {

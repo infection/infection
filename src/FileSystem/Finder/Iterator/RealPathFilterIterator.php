@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\FileSystem\Finder\Iterator;
 
 use function preg_quote;
-use ReturnTypeWillChange;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 
@@ -50,13 +49,7 @@ use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
  */
 final class RealPathFilterIterator extends MultiplePcreFilterIterator
 {
-    /**
-     * Filters the iterator values.
-     *
-     * @return bool true if the value should be kept, false otherwise
-     */
-    #[ReturnTypeWillChange]
-    public function accept()
+    public function accept(): bool
     {
         $filename = Path::canonicalize($this->current()->getRealPath());
 
@@ -77,8 +70,10 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
      *
      * @return string regexp corresponding to a given string or regexp
      */
-    protected function toRegex($str): string
+    protected function toRegex(string $str): string
     {
-        return $this->isRegex($str) ? $str : '/' . preg_quote($str, '/') . '/';
+        return $this->isRegex($str)
+            ? $str
+            : '/' . preg_quote($str, '/') . '/';
     }
 }

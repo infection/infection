@@ -35,10 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
-use Fidry\FileSystem\FileSystem;
 use function array_merge;
 use function explode;
-use function file_exists;
+use Fidry\FileSystem\FileSystem;
 use function getenv;
 use const PATH_SEPARATOR;
 use function sprintf;

@@ -79,7 +79,7 @@ final class LogicalOrNegation implements Mutator
         // Clone the node to remove the origNode from the wrapped expression
         // see bug https://github.com/nikic/PHP-Parser/issues/1119
         $wrappedNode = clone $node;
-        $wrappedAttrs = $wrappedNode->getAttributes();
+        $wrappedNode->getAttributes();
         $wrappedNode->setAttributes(NodeAttributes::getAllExceptOriginalNode($wrappedNode));
 
         yield new Node\Expr\BooleanNot(
@@ -100,10 +100,6 @@ final class LogicalOrNegation implements Mutator
             return false;
         }
 
-        if ($parent instanceof Node\Expr\BooleanNot) {
-            return false;
-        }
-
-        return true;
+        return !$parent instanceof Node\Expr\BooleanNot;
     }
 }

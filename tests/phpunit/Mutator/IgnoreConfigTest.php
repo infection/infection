@@ -55,6 +55,9 @@ final class IgnoreConfigTest extends TestCase
         $this->assertFalse($config->isIgnored('Foo', 'bar', 100));
     }
 
+    /**
+     * @param string[] $ignored
+     */
     #[DataProvider('ignoredValuesProvider')]
     public function test_it_can_check_that_the_given_elements_are_ignored(
         array $ignored,
@@ -67,6 +70,9 @@ final class IgnoreConfigTest extends TestCase
         $this->assertTrue($config->isIgnored($class, $method, $lineNumber));
     }
 
+    /**
+     * @param string[] $ignored
+     */
     #[DataProvider('nonIgnoredValuesProvider')]
     public function test_it_can_check_that_the_given_elements_are_not_ignored(
         array $ignored,

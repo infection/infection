@@ -42,36 +42,21 @@ use function implode;
 use Infection\Framework\OperatingSystem;
 use const PHP_EOL;
 
-final class MockVendor
+final readonly class MockVendor
 {
     public const VENDOR = 'phptester';
 
     public const PACKAGE = 'awesome-php-tester';
 
-    /**
-     * @var string
-     */
-    private $packageScript;
+    private string $packageScript;
 
-    /**
-     * @var string
-     */
-    private $scriptPath;
+    private string $scriptPath;
 
-    /**
-     * @var string
-     */
-    private $vendorBinDir;
+    private string $vendorBinDir;
 
-    /**
-     * @var string
-     */
-    private $vendorBinLink;
+    private string $vendorBinLink;
 
-    /**
-     * @var string
-     */
-    private $vendorBinBat;
+    private string $vendorBinBat;
 
     public function __construct(
         private readonly string $tmpDir,
@@ -154,13 +139,13 @@ final class MockVendor
     {
         $files = array_filter(
             [$this->vendorBinLink, $this->vendorBinBat],
-            'file_exists',
+            file_exists(...),
         );
 
         $this->fileSystem->remove($files);
     }
 
-    private function getComposerBatProxy($binaryPath)
+    private function getComposerBatProxy(string $binaryPath): string
     {
         // As per Composer proxy code (BinaryInstaller::generateWindowsProxyCode)
         $code = [
@@ -173,7 +158,7 @@ final class MockVendor
         return implode(PHP_EOL, $code) . PHP_EOL;
     }
 
-    private function getProjectBatProxy($binaryPath)
+    private function getProjectBatProxy(string $binaryPath): string
     {
         // Basic proxy
         $code = [

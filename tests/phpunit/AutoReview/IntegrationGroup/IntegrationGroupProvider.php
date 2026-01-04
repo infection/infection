@@ -35,9 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\IntegrationGroup;
 
-use function class_exists;
 use Infection\CannotBeInstantiated;
-use Infection\Testing\SourceTestClassNameScheme;
+use Infection\Framework\ClassName;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\Console\E2ETest;
 use function Pipeline\take;
@@ -61,7 +60,7 @@ final class IntegrationGroupProvider
     /**
      * @var string[][]|null
      */
-    private static $ioTestCaseClassesTuple;
+    private static ?array $ioTestCaseClassesTuple = null;
 
     /**
      * Note that the current implementation is far from being bullet-proof. For example as of now
@@ -109,9 +108,9 @@ final class IntegrationGroupProvider
      */
     private static function ioTestCaseTuple(string $className): ?array
     {
-        $testCaseClass = SourceTestClassNameScheme::getTestClassName($className);
+        $testCaseClass = ClassName::getCanonicalTestClassName($className);
 
-        if (!class_exists($testCaseClass)) {
+        if ($testCaseClass === null) {
             // No test case could be found for this source file
             return null;
         }

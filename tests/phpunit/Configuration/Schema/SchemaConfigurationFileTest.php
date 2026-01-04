@@ -54,18 +54,18 @@ final class SchemaConfigurationFileTest extends TestCase
 
     public function test_it_can_be_instantiated(): void
     {
-        $path = '/nowhere';
+        $pathname = '/nowhere';
 
-        $config = new SchemaConfigurationFile($path);
+        $config = new SchemaConfigurationFile($pathname);
 
-        $this->assertSame($path, $config->getPath());
+        $this->assertSame($pathname, $config->getPathname());
     }
 
     public function test_its_contents_is_retrieved_lazily(): void
     {
-        $invalidPath = '/nowhere';
+        $invalidPathname = '/nowhere';
 
-        $config = new SchemaConfigurationFile($invalidPath);
+        $config = new SchemaConfigurationFile($invalidPathname);
 
         try {
             $config->getDecodedContents();
@@ -75,10 +75,10 @@ final class SchemaConfigurationFileTest extends TestCase
             $this->addToAssertionCount(1);
         }
 
-        $validPath = self::FIXTURES_DIR . '/file.json';
+        $validPathname = self::FIXTURES_DIR . '/file.json';
         $expectedArrayContents = ['foo' => 'bar'];
 
-        $config = new SchemaConfigurationFile($validPath);
+        $config = new SchemaConfigurationFile($validPathname);
         $actualContents = $config->getDecodedContents();
 
         $this->assertSame($expectedArrayContents, (array) $actualContents);
@@ -99,12 +99,15 @@ final class SchemaConfigurationFileTest extends TestCase
         $this->assertSame($expectedValue, $config->getDecodedContents());
     }
 
+    /**
+     * @param non-empty-string $pathname
+     */
     #[DataProvider('invalidConfigContentsProvider')]
     public function test_it_cannot_retrieve_or_decode_invalid_contents(
-        string $path,
+        string $pathname,
         Exception $expectedException,
     ): void {
-        $config = new SchemaConfigurationFile($path);
+        $config = new SchemaConfigurationFile($pathname);
 
         try {
             $config->getDecodedContents();

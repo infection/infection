@@ -71,15 +71,9 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 
     private const MUTATED_FILE_PATH = '/mutated/file/path';
 
-    /**
-     * @var string
-     */
-    private $projectPath;
+    private string $projectPath;
 
-    /**
-     * @var MutationConfigBuilder
-     */
-    private $builder;
+    private MutationConfigBuilder $builder;
 
     protected function setUp(): void
     {
@@ -774,7 +768,8 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
         ];
     }
 
-    private function queryXpath(string $xml, string $query)
+    // TODO: at this point it is better to use the SafeDOMXPath...
+    private function queryXpath(string $xml, string $query): DOMNodeList
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml);

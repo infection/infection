@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use Fidry\FileSystem\NativeFileSystem;
 use function explode;
 use Fidry\FileSystem\FS;
+use Fidry\FileSystem\NativeFileSystem;
 use Fidry\FileSystem\Test\FileSystemTestCase;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
@@ -66,10 +66,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 {
     use BacksUpEnvironmentVariables;
 
-    /**
-     * @var string
-     */
-    private static $pathName;
+    private static string $pathName;
 
     private ComposerExecutableFinder $composerFinder;
 
@@ -206,11 +203,10 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         );
     }
 
-    public static function providesMockSetup(): array
+    public static function providesMockSetup(): iterable
     {
-        return [
-            'composer-bat' => ['setUpComposerBatchTest'],
-            'project-bat' => ['setUpProjectBatchTest'],
-        ];
+        yield 'composer-bat' => ['setUpComposerBatchTest'];
+
+        yield 'project-bat' => ['setUpProjectBatchTest'];
     }
 }

@@ -59,10 +59,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(XmlConfigurationManipulator::class)]
 final class XmlConfigurationManipulatorTest extends TestCase
 {
-    /**
-     * @var XmlConfigurationManipulator
-     */
-    private $configManipulator;
+    private XmlConfigurationManipulator $configManipulator;
 
     protected function setUp(): void
     {

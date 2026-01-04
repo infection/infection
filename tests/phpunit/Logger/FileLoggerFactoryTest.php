@@ -68,15 +68,9 @@ use ReflectionClass;
 #[CoversClass(FileLoggerFactory::class)]
 final class FileLoggerFactoryTest extends TestCase
 {
-    /**
-     * @var MetricsCalculator
-     */
-    private $metricsCalculator;
+    private MetricsCalculator $metricsCalculator;
 
-    /**
-     * @var ResultsCollector
-     */
-    private $resultsCollector;
+    private ResultsCollector $resultsCollector;
 
     protected function setUp(): void
     {

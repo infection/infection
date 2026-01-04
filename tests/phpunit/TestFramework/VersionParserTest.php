@@ -45,10 +45,7 @@ use function sprintf;
 #[CoversClass(VersionParser::class)]
 final class VersionParserTest extends TestCase
 {
-    /**
-     * @var VersionParser
-     */
-    private $versionParser;
+    private VersionParser $versionParser;
 
     protected function setUp(): void
     {

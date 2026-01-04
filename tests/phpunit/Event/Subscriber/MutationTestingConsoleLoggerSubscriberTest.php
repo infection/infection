@@ -68,30 +68,15 @@ use Symfony\Component\Console\Output\StreamOutput;
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
 final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
-    /**
-     * @var OutputInterface|MockObject
-     */
-    private $output;
+    private MockObject&OutputInterface $output;
 
-    /**
-     * @var OutputFormatter|MockObject
-     */
-    private $outputFormatter;
+    private MockObject&OutputFormatter $outputFormatter;
 
-    /**
-     * @var MetricsCalculator|MockObject
-     */
-    private $metricsCalculator;
+    private MockObject&MetricsCalculator $metricsCalculator;
 
-    /**
-     * @var ResultsCollector|MockObject
-     */
-    private $resultsCollector;
+    private MockObject&ResultsCollector $resultsCollector;
 
-    /**
-     * @var DiffColorizer|MockObject
-     */
-    private $diffColorizer;
+    private MockObject&DiffColorizer $diffColorizer;
 
     protected function setUp(): void
     {
@@ -251,32 +236,32 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByTestsCount')
             ->willReturn(0);
         // less important metrics, only rendered when > 0
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getIgnoredCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getNotTestedCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getEscapedCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getErrorCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSyntaxErrorCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getTimedOutCount')
             ->willReturn(0);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSkippedCount')
             ->willReturn(0);
 
@@ -353,32 +338,32 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
             ->willReturn([]);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByTestsCount')
             ->willReturn(2);
         // less important metrics, only rendered when > 0
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getKilledByStaticAnalysisCount')
             ->willReturn(3);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getIgnoredCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getNotTestedCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getEscapedCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getErrorCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSyntaxErrorCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getTimedOutCount')
             ->willReturn(1);
-        $this->metricsCalculator->expects($this->any())
+        $this->metricsCalculator
             ->method('getSkippedCount')
             ->willReturn(1);
 

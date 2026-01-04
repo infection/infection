@@ -1,6 +1,6 @@
 !/.tools/.gitkeep
-!/build/.gitkeep
-!/build/cache/.gitkeep
+!/dist/.gitkeep
+!/var/cache/.gitkeep
 .phpunit.*
 /*.phar
 /.box_dump/
@@ -13,12 +13,14 @@
 /.tools/
 /build/
 /devTools/Docker*.json
+/dist/
 /infection-cache
 /infection.log
 /per-mutator.md
 /phpunit.xml
 /tests/benchmark/*/coverage/
 /tests/benchmark/*/sources/
+/tests/benchmark/GitParseDiff/diff
 /tests/e2e/*/coverage/
 /tests/e2e/*/infection/
 /tests/e2e/Configure/infection.json.dist
@@ -31,4 +33,5 @@
 /tests/e2e/SymfonyFlex/tests/.gitignore
 /tests/error.log
 /tests/phpunit/**/*/generated_index.xml
+/var/
 /vendor/

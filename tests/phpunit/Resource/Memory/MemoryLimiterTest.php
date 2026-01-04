@@ -55,15 +55,9 @@ final class MemoryLimiterTest extends FileSystemTestCase
 {
     private MockObject&FileSystem $fileSystemMock;
 
-    /**
-     * @var AbstractTestFrameworkAdapter|MockObject
-     */
-    private $adapterMock;
+    private MockObject&AbstractTestFrameworkAdapter $adapterMock;
 
-    /**
-     * @var MemoryLimiterEnvironment|MockObject
-     */
-    private $environmentMock;
+    private MockObject&MemoryLimiterEnvironment $environmentMock;
 
     protected function setUp(): void
     {

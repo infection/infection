@@ -37,7 +37,6 @@ namespace Infection\FileSystem\Locator;
 
 use const DIRECTORY_SEPARATOR;
 use Fidry\FileSystem\FileSystem;
-use function Safe\realpath;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
@@ -91,7 +90,9 @@ final readonly class RootsFileOrDirectoryLocator implements Locator
     }
 
     /**
-     * @param string[] $fileNames
+     * @param non-empty-string[] $fileNames
+     *
+     * @return non-empty-string|null
      */
     private function innerLocateOneOf(array $fileNames): ?string
     {

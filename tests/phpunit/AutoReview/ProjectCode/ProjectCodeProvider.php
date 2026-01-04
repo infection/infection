@@ -40,6 +40,11 @@ use const DIRECTORY_SEPARATOR;
 use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Git\LoggerFactory;
+use Infection\Command\Git\Option\BaseOption;
+use Infection\Command\Git\Option\FilterOption;
+use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\SourceFilterOptions;
 use Infection\Config\ConsoleHelper;
 use Infection\Config\Guesser\SourceDirGuesser;
 use Infection\Configuration\Entry\Logs;
@@ -48,6 +53,9 @@ use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Configuration\Schema\SchemaConfigurationFactory;
 use Infection\Configuration\Schema\SchemaConfigurationFileLoader;
 use Infection\Configuration\Schema\SchemaValidator;
+use Infection\Configuration\SourceFilter\FakeSourceFilter;
+use Infection\Configuration\SourceFilter\GitDiffFilter;
+use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
@@ -60,8 +68,6 @@ use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\NonExecutableFinder;
 use Infection\FileSystem\Finder\TestFrameworkFinder;
-use Infection\FileSystem\SourceFileCollector;
-use Infection\Framework\Enum\EnumBucket;
 use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
@@ -71,26 +77,32 @@ use Infection\Mutator\Definition;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\MutatorCategory;
 use Infection\Mutator\NodeMutationGenerator;
+use Infection\PhpParser\Visitor\NameResolverFactory;
 use Infection\Process\Runner\IndexedMutantProcessContainer;
-use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Processor\CpuCoresCountProvider;
+use Infection\Source\Collector\FakeSourceCollector;
+use Infection\Source\Collector\FixedSourceCollector;
+use Infection\Source\Collector\GitDiffSourceCollector;
+use Infection\Source\Matcher\NullSourceLineMatcher;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
-use Infection\TestFramework\Coverage\NodeLineRangeData;
-use Infection\TestFramework\Coverage\SourceMethodLineRange;
-use Infection\TestFramework\Coverage\TestLocations;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\TestFramework\Coverage\Locator\FakeLocator;
+use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
+use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
+use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use Infection\TestFramework\PhpUnit\CommandLine\FilterBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder as PhpUnitInitalConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder as PhpUnitMutationConfigBuilder;
-use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
 use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\SourceTestClassNameScheme;
 use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
@@ -114,35 +126,54 @@ final class ProjectCodeProvider
      * reasons. This list should never be added to, only removed from.
      */
     public const NON_TESTED_CONCRETE_CLASSES = [
-        ConfigureCommand::class,
-        Application::class,
-        ProgressFormatter::class,
-        ConcreteComposerExecutableFinder::class,
-        StrykerCurlClient::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
-        NodeMutationGenerator::class,
-        NonExecutableFinder::class,
         AdapterInstaller::class,
-        XdebugHandler::class,
-        NullSubscriber::class,
-        FormatterName::class,
-        ShellCommandLineExecutor::class,
+        Application::class,
+        BaseMutatorTestCase::class,
+        BaseOption::class,
+        ConcreteComposerExecutableFinder::class,
+        ConfigureCommand::class,
+        ConfigurationOption::class,
         CpuCoresCountProvider::class,
         DispatchPcntlSignalSubscriber::class,
-        StopInfectionOnSigintSignalSubscriber::class,
+        DummyFileSystem::class,
+        EmptyTrace::class,
+        FakeFileSystem::class,
+        FakeLocator::class,
+        FakeSourceCollector::class,
+        FakeSourceFilter::class,
+        FileSystem::class,
+        FilterOption::class,
+        FixedSourceCollector::class,
+        SourceFilterOptions::class,
+        FormatterName::class,
+        GitDiffFilter::class,
+        GitDiffSourceCollector::class,
+        IncompleteGitDiffFilter::class,
+        InvalidReportSource::class,
+        LoggerFactory::class,
         Logs::class,
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutantExecutionResult::class,
+        MutationGeneratingConsoleLoggerSubscriber::class,
         MutatorName::class,
-        BaseMutatorTestCase::class,
+        NameResolverFactory::class,
+        NodeMutationGenerator::class,
+        NoReportFound::class,
+        NonExecutableFinder::class,
+        NullSourceLineMatcher::class,
+        NullSubscriber::class,
         OperatingSystem::class,
+        ProgressFormatter::class,
         SchemaConfiguration::class,
         SimpleMutation::class,
-        StringNormalizer::class,
-        Source::class,
-        SourceTestClassNameScheme::class,
         SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
+        Source::class,
+        StopInfectionOnSigintSignalSubscriber::class,
+        StringNormalizer::class,
+        StrykerCurlClient::class,
+        TooManyReportsFound::class,
+        XdebugHandler::class,
     ];
 
     /**
@@ -151,11 +182,7 @@ final class ProjectCodeProvider
      * For example, test cases that are in a child directory.
      */
     public const CONCRETE_CLASSES_WITH_TESTS_IN_DIFFERENT_LOCATION = [
-        IndexXmlCoverageParser::class,
         FilterBuilder::class,
-        SafeDOMXPath::class,
-        SourceFileCollector::class,
-        EnumBucket::class,
     ];
 
     /**
@@ -164,42 +191,43 @@ final class ProjectCodeProvider
      */
     public const NON_FINAL_EXTENSION_CLASSES = [
         ConsoleHelper::class,
-        SourceDirGuesser::class,
-        TestFrameworkFinder::class,
-        StrykerDashboardClient::class,
+        FileSystem::class,
         MetricsCalculator::class,
         PhpUnitInitalConfigBuilder::class,
         PhpUnitMutationConfigBuilder::class,
+        SourceDirGuesser::class,
+        StrykerDashboardClient::class,
+        TestFrameworkFinder::class,
     ];
 
     /**
      * This array contains all classes that can be extended by our users.
      */
     public const EXTENSION_POINTS = [
+        BaseMutatorTestCase::class,
+        Definition::class,
+        Mutator::class,
+        MutatorCategory::class,
         OutputFormatter::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,
-        Mutator::class,
-        Definition::class,
-        MutatorCategory::class,
-        BaseMutatorTestCase::class,
     ];
 
     /**
      * @var string[]|null
      */
-    private static $sourceClasses;
+    private static ?array $sourceClasses = null;
 
     /**
      * @var string[]|null
      */
-    private static $sourceClassesToCheckForPublicProperties;
+    private static ?array $sourceClassesToCheckForPublicProperties = null;
 
     /**
      * @var string[]|null
      */
-    private static $testClasses;
+    private static ?array $testClasses = null;
 
     public static function provideSourceClasses(): iterable
     {
@@ -243,6 +271,9 @@ final class ProjectCodeProvider
         ));
     }
 
+    /**
+     * @return iterable<string, array{class-string}>
+     */
     public static function concreteSourceClassesProvider(): iterable
     {
         yield from DataProviderFactory::fromIterable(

@@ -51,12 +51,11 @@ use function str_replace;
 #[CoversClass(ExcludeDirsProvider::class)]
 final class ExcludeDirsProviderTest extends BaseProviderTestCase
 {
-    private string $tmp;
+    private string $workspace;
 
-    /**
-     * @var ExcludeDirsProvider
-     */
-    private $provider;
+    private FileSystem $fileSystem;
+
+    private ExcludeDirsProvider $provider;
 
     protected function setUp(): void
     {
@@ -76,6 +75,9 @@ final class ExcludeDirsProviderTest extends BaseProviderTestCase
         FS::remove($this->tmp);
     }
 
+    /**
+     * @param string[] $dirsInCurrentFolder
+     */
     #[DataProvider('excludeDirsProvider')]
     public function test_it_contains_vendors_when_sources_contains_current_dir(string $excludedRootDir, array $dirsInCurrentFolder): void
     {

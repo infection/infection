@@ -36,8 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Fidry\FileSystem\Test\FileSystemTestCase;
-use Infection\TestFramework\Coverage\Trace;
-use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
@@ -57,12 +56,6 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
         $indexContents = 'index contents';
 
         file_put_contents($indexPath, $indexContents);
-
-        $indexLocatorMock = $this->createMock(IndexXmlCoverageLocator::class);
-        $indexLocatorMock
-            ->method('locate')
-            ->willReturn($indexPath)
-        ;
 
         $sourceFileInfoProviderMock = $this->createMock(SourceFileInfoProvider::class);
 
@@ -87,7 +80,7 @@ final class PhpUnitXmlCoverageTraceProviderTest extends FileSystemTestCase
         ;
 
         $provider = new PhpUnitXmlCoverageTraceProvider(
-            $indexLocatorMock,
+            new FixedLocator($indexPath),
             $indexXmlParserMock,
             $coverageXmlParserMock,
         );

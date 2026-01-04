@@ -35,14 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Finder;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use function explode;
 use Fidry\FileSystem\FakeFileSystem;
 use Fidry\FileSystem\FileSystem;
-use Fidry\FileSystem\FS;
-use Fidry\FileSystem\NativeFileSystem;
 use Fidry\FileSystem\Test\FileSystemTestCase;
-use Generator;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
@@ -54,6 +50,8 @@ use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
@@ -233,7 +231,7 @@ final class StaticAnalysisToolExecutableFinderTest extends FileSystemTestCase
         );
     }
 
-    public static function providesMockSetup(): Generator
+    public static function providesMockSetup(): iterable
     {
         yield 'composer-bat' => ['setUpComposerBatchTest'];
 

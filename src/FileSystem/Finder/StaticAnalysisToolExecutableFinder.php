@@ -38,7 +38,6 @@ namespace Infection\FileSystem\Finder;
 use function array_key_exists;
 use function dirname;
 use Fidry\FileSystem\FileSystem;
-use function file_exists;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function ltrim;

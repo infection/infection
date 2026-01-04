@@ -32,7 +32,7 @@ PARATEST=vendor/bin/paratest
 
 PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
 
-INFECTION=./build/infection.phar
+INFECTION=./dist/infection.phar
 
 DOCKER_RUN=docker compose run --rm
 DOCKER_RUN_82=$(DOCKER_RUN) php82 $(FLOCK) Makefile
@@ -42,6 +42,7 @@ FLOCK=./devTools/flock
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 
 BENCHMARK_MUTATION_GENERATOR_SOURCES=tests/benchmark/MutationGenerator/sources
+BENCHMARK_PARSE_GIT_DIFF_SOURCE=tests/benchmark/ParseGitDiff/diff
 BENCHMARK_TRACING_COVERAGE_DIR=tests/benchmark/Tracing/coverage
 BENCHMARK_TRACING_SUBMODULE=tests/benchmark/Tracing/benchmark-source
 BENCHMARK_TRACING_COVERAGE_SOURCE_DIR=$(BENCHMARK_TRACING_SUBMODULE)/dist/coverage
@@ -92,7 +93,7 @@ phpstan-baseline: vendor $(PHPSTAN)
 
 .PHONY: psalm-baseline
 psalm-baseline: vendor
-	$(PSALM) --threads=max --set-baseline=psalm-baseline.xml
+	$(PSALM) --threads=max --set-baseline=devTools/psalm-baseline.xml
 
 .PHONY: detect-collisions
 detect-collisions: vendor $(PHPSTAN)
@@ -100,7 +101,7 @@ detect-collisions: vendor $(PHPSTAN)
 
 .PHONY: psalm
 psalm: vendor $(PSALM)
-	$(PSALM) --threads=max
+	$(PSALM) --threads=max --use-baseline=devTools/psalm-baseline.xml
 
 .PHONY: rector
 rector: vendor $(RECTOR)
@@ -118,11 +119,13 @@ validate:
 profile: 	 	## Runs Blackfire
 profile:
 	$(MAKE) profile_mutation_generator
+	$(MAKE) profile_parse_git_diff
 	$(MAKE) profile_tracing
 
 .PHONY: benchmark
 benchmark: vendor \
 		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
+		$(BENCHMARK_PARSE_GIT_DIFF_SOURCE) \
 		$(BENCHMARK_TRACING_SUBMODULE) \
 		$(BENCHMARK_TRACING_COVERAGE_DIR)
 	composer dump --classmap-authoritative --quiet
@@ -142,6 +145,21 @@ profile_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 benchmark_mutation_generator: vendor $(BENCHMARK_MUTATION_GENERATOR_SOURCES)
 	composer dump --classmap-authoritative --quiet
 	vendor/bin/phpbench run tests/benchmark/MutationGenerator $(PHPBENCH_REPORTS)
+	composer dump
+
+.PHONY: profile_parse_git_diff
+profile_parse_git_diff: vendor $(BENCHMARK_PARSE_GIT_DIFF_SOURCE)
+	composer dump --classmap-authoritative --quiet
+	blackfire run \
+		--title="ParseGitDiff" \
+		--metadata="commit=$(COMMIT_HASH)" \
+		php tests/benchmark/ParseGitDiff/profile.php
+	composer dump
+
+.PHONY: benchmark_parse_git_diff
+benchmark_parse_git_diff: vendor $(BENCHMARK_PARSE_GIT_DIFF_SOURCE)
+	composer dump --classmap-authoritative --quiet
+	vendor/bin/phpbench run tests/benchmark/ParseGitDiff $(PHPBENCH_REPORTS)
 	composer dump
 
 .PHONY: profile_tracing
@@ -296,6 +314,10 @@ $(DOCKER_FILE_IMAGE): devTools/Dockerfile
 
 $(BENCHMARK_MUTATION_GENERATOR_SOURCES): tests/benchmark/MutationGenerator/sources.tar.gz
 	cd tests/benchmark/MutationGenerator; tar -xzf sources.tar.gz
+	touch -c $@
+
+$(BENCHMARK_PARSE_GIT_DIFF_SOURCE):
+	php tests/benchmark/ParseGitDiff/generate-diff.php
 	touch -c $@
 
 $(BENCHMARK_TRACING_COVERAGE_DIR): $(BENCHMARK_TRACING_COVERAGE_SOURCE_DIR)

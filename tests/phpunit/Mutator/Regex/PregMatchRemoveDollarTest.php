@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator\Regex;
 
-use Generator;
 use Infection\Mutator\Regex\PregMatchRemoveDollar;
 use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,12 +47,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class PregMatchRemoveDollarTest extends BaseMutatorTestCase
 {
     #[DataProvider('provideMutationCases')]
-    public function test_mutator($input, $expected = null): void
+    public function test_mutator(string $input, ?string $expected = null): void
     {
         $this->assertMutatesInput($input, $expected);
     }
 
-    public static function provideMutationCases(): Generator
+    public static function provideMutationCases(): iterable
     {
         yield 'It mutates correctly removing dollar when provided with a string and flags' => [
             <<<'PHP'

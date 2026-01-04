@@ -17,4 +17,4 @@ else
     php $INFECTION
 fi
 
-diff -w expected-output.txt infection.log
+diff --ignore-all-space expected-output.txt infection.log

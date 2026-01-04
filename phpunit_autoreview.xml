@@ -8,10 +8,12 @@
          failOnWarning="true"
          failOnRisky="true"
          requireCoverageMetadata="true"
+         displayDetailsOnIncompleteTests="true"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnSkippedTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
-         cacheDirectory="./build/cache/phpunit-autoreview"
+         cacheDirectory="./var/cache/phpunit-autoreview"
 >
 
     <extensions>

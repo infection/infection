@@ -1,23 +1,49 @@
 <?php
+/**
+ * This code is licensed under the BSD 3-Clause License.
+ *
+ * Copyright (c) 2017, Maks Rafalko
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 declare(strict_types=1);
 
 namespace Infection\Composer;
 
-use Composer\Semver\Semver;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FileSystem;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use Infection\Composer\Throwable\IncompatibleComposerVersion;
-use Infection\Composer\Throwable\UndetectableComposerVersion;
 use KevinGH\Box\NotInstantiable;
+use const PHP_EOL;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use function sprintf;
 use function trim;
-use const PHP_EOL;
 
 /**
  * This file is taken from the `box-project/box` project.
@@ -52,6 +78,13 @@ final class ComposerOrchestrator
 
     private string $detectedVersion;
 
+    public function __construct(
+        private readonly ComposerProcessFactory $processFactory,
+        private readonly LoggerInterface $logger,
+        private readonly FileSystem $fileSystem,
+    ) {
+    }
+
     public static function create(): self
     {
         return new self(
@@ -59,13 +92,6 @@ final class ComposerOrchestrator
             new NullLogger(),
             new FileSystem(),
         );
-    }
-
-    public function __construct(
-        private readonly ComposerProcessFactory $processFactory,
-        private readonly LoggerInterface $logger,
-        private readonly FileSystem $fileSystem,
-    ) {
     }
 
     /**
@@ -79,7 +105,7 @@ final class ComposerOrchestrator
 
         $vendorDirProcess->run();
 
-        if (false === $vendorDirProcess->isSuccessful()) {
+        if ($vendorDirProcess->isSuccessful() === false) {
             throw new RuntimeException(
                 'Could not retrieve the vendor dir.',
                 0,
@@ -98,7 +124,7 @@ final class ComposerOrchestrator
 
         $dumpAutoloadProcess->run();
 
-        if (false === $dumpAutoloadProcess->isSuccessful()) {
+        if ($dumpAutoloadProcess->isSuccessful() === false) {
             throw new RuntimeException(
                 'Could not dump the autoloader.',
                 0,
@@ -109,16 +135,16 @@ final class ComposerOrchestrator
         $output = $dumpAutoloadProcess->getOutput();
         $errorOutput = $dumpAutoloadProcess->getErrorOutput();
 
-        if ('' !== $output) {
+        if ($output !== '') {
             $this->logger->info(
-                'STDOUT output:'.PHP_EOL.$output,
+                'STDOUT output:' . PHP_EOL . $output,
                 ['stdout' => $output],
             );
         }
 
-        if ('' !== $errorOutput) {
+        if ($errorOutput !== '') {
             $this->logger->info(
-                'STDERR output:'.PHP_EOL.$errorOutput,
+                'STDERR output:' . PHP_EOL . $errorOutput,
                 ['stderr' => $errorOutput],
             );
         }

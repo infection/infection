@@ -61,15 +61,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 {
     private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
 
-    /**
-     * @var string
-     */
-    private $projectPath;
+    private string $projectPath;
 
-    /**
-     * @var InitialConfigBuilder
-     */
-    private $builder;
+    private InitialConfigBuilder $builder;
 
     protected function setUp(): void
     {
@@ -558,7 +552,8 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         ];
     }
 
-    private function queryXpath(string $xml, string $query)
+    // TODO: at this point it is better to use the SafeDOMXPath...
+    private function queryXpath(string $xml, string $query): DOMNodeList
     {
         $dom = new DOMDocument();
         $dom->loadXML($xml);
@@ -571,6 +566,9 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
         return $this->createConfigBuilder(self::FIXTURES . '/phpunit_93.xml');
     }
 
+    /**
+     * @param list<string> $filteredSourceFilesToMutate
+     */
     private function createConfigBuilder(
         ?string $originalPhpUnitXmlConfigPath = null,
         array $filteredSourceFilesToMutate = [],

@@ -35,22 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\TestFramework\Coverage\XmlReport;
 
-use Fidry\FileSystem\FileSystem;
-use Fidry\FileSystem\FS;
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FileSystem;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
 use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
-use function Safe\realpath;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\SplFileInfo;
 use function trim;
-use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -99,9 +96,7 @@ class SourceFileInfoProvider
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
     {
-        $fileNode = $xPath->query('/p:phpunit/p:file')[0];
-
-        Assert::notNull($fileNode);
+        $fileNode = $xPath->getElement('/p:phpunit/p:file');
 
         $fileName = $fileNode->getAttribute('name');
         $relativeFilePath = $fileNode->getAttribute('path');

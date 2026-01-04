@@ -5,10 +5,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    errorBaseline="psalm-baseline.xml"
+    errorBaseline="devTools/psalm-baseline.xml"
     findUnusedBaselineEntry="true"
     findUnusedCode="false"
-    cacheDirectory="./build/cache/psalm"
+    cacheDirectory="./var/cache/psalm"
 >
     <projectFiles>
         <directory name="src" />
@@ -32,6 +32,13 @@
                 <directory name="src/Mutator/Regex"/>
             </errorLevel>
         </ImpureFunctionCall>
+
+        <ParamNameMismatch>
+            <errorLevel type="suppress">
+                <file name="src/TestFramework/Coverage/JUnit/JUnitReportLocator.php" />
+                <file name="src/TestFramework/Coverage/XmlReport/IndexXmlCoverageLocator.php" />
+            </errorLevel>
+        </ParamNameMismatch>
 
         <UnusedConstructor>
             <errorLevel type="suppress">

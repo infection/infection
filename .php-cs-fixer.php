@@ -63,6 +63,7 @@ $finder = Finder::create()
         'tests/benchmark/Tracing/benchmark-source',
         'tests/e2e',
         'tests/phpunit/Fixtures',
+        'var',
     ])
     ->ignoreDotFiles(false)
     ->name('*php')
@@ -151,6 +152,8 @@ return (new Config())
         'phpdoc_align' => [
             'align' => 'left',
         ],
+        // This rule is buggy and does not only apply to phpdoc annotation...
+        'phpdoc_annotation_without_dot' => false,
         // Allow inline Psalm suppress statements
         'phpdoc_to_comment' => false,
         'php_unit_dedicate_assert' => true,
@@ -190,5 +193,5 @@ return (new Config())
         'blank_line_after_opening_tag' => false,
     ])
     ->setFinder($finder)
-    ->setCacheFile(__DIR__ . '/build/.php_cs.cache')
+    ->setCacheFile(__DIR__ . '/var/cache/php-cs-fixer')
 ;

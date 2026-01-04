@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder;
 
-use Fidry\FileSystem\FileSystem;
 use function array_key_exists;
 use function dirname;
+use Fidry\FileSystem\FileSystem;
 use function file_exists;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;

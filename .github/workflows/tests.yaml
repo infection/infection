@@ -26,7 +26,7 @@ jobs:
         php-version: [ '8.2', '8.3', '8.4', '8.5' ]
         dependencies: [ locked, lowest, highest ]
         coverage-driver: [ pcov, xdebug ]
-        symfony-version: [ '6.4.*', '7.*.*' ]
+        symfony-version: [ '6.4.*', '7.*.*', '8.0.*' ]
         include:
           - operating-system: windows-latest
             php-version: '8.2'
@@ -36,15 +36,19 @@ jobs:
         exclude:
           - dependencies: 'locked'
             symfony-version: '7.*.*'
+          - php-version: '8.2'
+            symfony-version: '8.0.*'
+          - php-version: '8.3'
+            symfony-version: '8.0.*'
 
     name: Tests on ${{ matrix.operating-system }} with PHP ${{ matrix.php-version }} (${{ matrix.dependencies }}; Symfony ${{ matrix.symfony-version }}), using ${{ matrix.coverage-driver }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           php-version: ${{ matrix.php-version }}
           coverage: ${{ matrix.coverage-driver }}
@@ -77,7 +81,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependencies }} }}

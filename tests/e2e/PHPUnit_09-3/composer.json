@@ -1,0 +1,19 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^9.3.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnit_09_3\\": "src/"
+        },
+        "files": [
+            "src/Covered/functions.php",
+            "src/Uncovered/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Infection\\E2ETests\\PHPUnit_09_3\\Tests\\": "tests/"
+        }
+    }
+}

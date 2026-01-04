@@ -10,22 +10,22 @@ use PhpParser\NodeVisitor;
 
 final class FakeVisitor implements NodeVisitor
 {
-    public function beforeTraverse(array $nodes)
+    public function beforeTraverse(array $nodes): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function afterTraverse(array $nodes)
+    public function afterTraverse(array $nodes): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
