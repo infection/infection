@@ -38,6 +38,7 @@ namespace Infection\Command;
 use function extension_loaded;
 use function implode;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\MapSourceClassToTestOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -75,8 +76,6 @@ final class RunCommand extends BaseCommand
 {
     /** @var string */
     public const OPTION_THREADS = 'threads';
-
-    public const OPTION_MAP_SOURCE_CLASS_TO_TEST = 'map-source-class-to-test';
 
     /** @var string */
     public const OPTION_LOGGER_GITHUB = 'logger-github';
@@ -270,14 +269,9 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Run only one Mutant by its ID. Can be used multiple times. If source code is changed, can be invalidated. Pass all previous options with this one.',
                 Container::DEFAULT_MUTANT_ID,
-            )
-            ->addOption(
-                self::OPTION_MAP_SOURCE_CLASS_TO_TEST,
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Enables test files filtering during "Initial Tests Run" stage when `--filter`/`--git-diff-filter`/`--git-diff-lines` are used. With this option, only those test files are executed to provide coverage, that cover changed/added source files.',
-                false,
-            )
+            );
+
+        MapSourceClassToTestOption::addOption($this)
             ->addOption(
                 self::OPTION_LOGGER_GITLAB,
                 null,
@@ -518,7 +512,7 @@ final class RunCommand extends BaseCommand
             textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
-            mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
+            mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
             loggerProjectRootDirectory: $loggerProjectRootDirectory,
             staticAnalysisTool: $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
