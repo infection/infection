@@ -33,47 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
+use PhpParser\NodeVisitorAbstract;
 
-abstract class BaseVisitorTestCase extends TestCase
+final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @return array{0: Node[], 1: Token[]}
-     */
-    final protected static function parseCode(string $code): array
+    public const SKIP_ATTRIBUTE = 'skip';
+
+    public static function markNodeAsSkipped(Node $node): Node
     {
-        $parser = SingletonContainer::getContainer()->getParser();
+        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
 
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
+        return $node;
     }
 
-    /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
-     */
-    final protected function traverse(array $nodes, array $visitors): array
+    public static function isNodeMarkedAsSkipped(Node $node): bool
     {
-        $traverser = new NodeTraverser();
+        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+    }
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
+    public function enterNode(Node $node): ?int
+    {
+        if (self::isNodeMarkedAsSkipped($node)) {
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
         }
 
-        return $traverser->traverse($nodes);
+        return null;
     }
 }

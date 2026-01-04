@@ -33,47 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use Infection\Testing\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
-
-abstract class BaseVisitorTestCase extends TestCase
+final class Sequence
 {
     /**
-     * @return array{0: Node[], 1: Token[]}
+     * @var positive-int|0
      */
-    final protected static function parseCode(string $code): array
-    {
-        $parser = SingletonContainer::getContainer()->getParser();
-
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
-    }
+    private int $value = 0;
 
     /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
+     * @return positive-int|0
      */
-    final protected function traverse(array $nodes, array $visitors): array
+    public function next(): int
     {
-        $traverser = new NodeTraverser();
+        $value = $this->value;
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
-        }
+        ++$this->value;
 
-        return $traverser->traverse($nodes);
+        return $value;
     }
 }

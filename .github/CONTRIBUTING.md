@@ -18,6 +18,11 @@ Contributions are always welcome. Here are a few guidelines to be aware of:
 To run the tests locally, you can run `make test`. It, however, requires [Docker][docker]. For more
 granular tests, you can run `make` to see the available commands.
 
+### PhpParser visitor tests
+
+To test `PhpParser` visitors check out [its dedicated documentation][visitor-documentation].
+
+
 ### End-to-end tests
 
 Infection contains a few end-to-end tests that can be executed. Some of those are self-contained, in which
@@ -102,3 +107,4 @@ Read the [Benchmark documentation].
 [Benchmark documentation]: ../doc/benchmarking.md
 [docker]: https://www.docker.com/get-docker
 [readme]: /README.md
+[visitor-documentation]: ../tests/phpunit/PhpParser/Visitor/README.md

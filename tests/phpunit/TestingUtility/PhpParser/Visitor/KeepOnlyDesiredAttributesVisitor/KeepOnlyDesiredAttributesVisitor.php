@@ -33,47 +33,42 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor;
 
-use Infection\Testing\SingletonContainer;
+use function array_intersect_key;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
+use PhpParser\NodeVisitorAbstract;
+use function Safe\array_flip;
 
-abstract class BaseVisitorTestCase extends TestCase
+/**
+ * Utility visitor which allows keeping only the specified attributes. This can, for example, help
+ * to reduce noise in the test by removing uninteresting attributes.
+ */
+final class KeepOnlyDesiredAttributesVisitor extends NodeVisitorAbstract
 {
     /**
-     * @return array{0: Node[], 1: Token[]}
+     * @var array<string, mixed>
      */
-    final protected static function parseCode(string $code): array
-    {
-        $parser = SingletonContainer::getContainer()->getParser();
+    private readonly array $desiredAttributeKeys;
 
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
+    public function __construct(
+        string ...$attributes,
+    ) {
+        $this->desiredAttributeKeys = array_flip($attributes);
     }
 
-    /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
-     */
-    final protected function traverse(array $nodes, array $visitors): array
+    public function enterNode(Node $node): void
     {
-        $traverser = new NodeTraverser();
+        $this->removeUndesiredAttributes($node);
+    }
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
-        }
+    private function removeUndesiredAttributes(Node $node): void
+    {
+        $desiredAttributes = array_intersect_key(
+            $node->getAttributes(),
+            $this->desiredAttributeKeys,
+        );
 
-        return $traverser->traverse($nodes);
+        $node->setAttributes($desiredAttributes);
     }
 }

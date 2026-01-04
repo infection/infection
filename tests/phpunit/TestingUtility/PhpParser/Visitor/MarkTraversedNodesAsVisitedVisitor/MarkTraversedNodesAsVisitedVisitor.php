@@ -33,47 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
+use PhpParser\NodeVisitorAbstract;
 
-abstract class BaseVisitorTestCase extends TestCase
+/**
+ * Utility that adds an attribute to each node it visits. Unless configured to show all nodes,
+ * the node dumper will render nodes that do not have this attribute as `<skipped>`, allowing
+ * to easily identify that some nodes have not been visited.
+ */
+final class MarkTraversedNodesAsVisitedVisitor extends NodeVisitorAbstract
 {
-    /**
-     * @return array{0: Node[], 1: Token[]}
-     */
-    final protected static function parseCode(string $code): array
+    public const VISITED_ATTRIBUTE = 'visited';
+
+    public static function wasVisited(Node $node): bool
     {
-        $parser = SingletonContainer::getContainer()->getParser();
-
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
+        return $node->hasAttribute(self::VISITED_ATTRIBUTE);
     }
 
     /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
+     * @template T of Node
      *
-     * @return Node[]
+     * @param T $node
+     * @return T
      */
-    final protected function traverse(array $nodes, array $visitors): array
+    public static function markAsVisited(Node $node): Node
     {
-        $traverser = new NodeTraverser();
+        $node->setAttribute(self::VISITED_ATTRIBUTE, true);
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
-        }
+        return $node;
+    }
 
-        return $traverser->traverse($nodes);
+    public function enterNode(Node $node): void
+    {
+        self::markAsVisited($node);
     }
 }

@@ -33,47 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 
-use Infection\Testing\SingletonContainer;
+use function in_array;
+use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
 
-abstract class BaseVisitorTestCase extends TestCase
+final readonly class IdNodeIgnorer implements NodeIgnorer
 {
     /**
-     * @return array{0: Node[], 1: Token[]}
+     * @param array<positive-int|0> $ignoredNodeIds
      */
-    final protected static function parseCode(string $code): array
-    {
-        $parser = SingletonContainer::getContainer()->getParser();
-
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
+    public function __construct(
+        private array $ignoredNodeIds,
+    ) {
     }
 
-    /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
-     */
-    final protected function traverse(array $nodes, array $visitors): array
+    public function ignores(Node $node): bool
     {
-        $traverser = new NodeTraverser();
+        $id = AddIdToTraversedNodesVisitor::getNodeId($node);
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
-        }
-
-        return $traverser->traverse($nodes);
+        return in_array($id, $this->ignoredNodeIds, true);
     }
 }

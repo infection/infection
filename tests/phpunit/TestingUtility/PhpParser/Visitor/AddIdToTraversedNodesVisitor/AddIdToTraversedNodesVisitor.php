@@ -33,37 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
-use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
-use Infection\Testing\SingletonContainer;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
-abstract class BaseNodeIgnorerTestCase extends TestCase
+/**
+ * Utility visitor which adds an ID to each node as a sequence. This allows easily identifying a
+ * node and more predictably than with `spl_object_id()`.
+ *
+ * The node dumper will also leverage this property to render nodes that are found in attributes
+ * to both reduce noise and avoid circular dependencies.
+ */
+final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
 {
-    abstract protected function getIgnore(): NodeIgnorer;
+    public const NODE_ID_ATTRIBUTE = 'nodeId';
 
-    final protected function parseAndTraverse(string $code, NodeVisitor $spy, ?NodeIgnorer $ignorer = null): void
-    {
-        $nodes = SingletonContainer::getContainer()->getParser()->parse($code);
-
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NonMutableNodesIgnorerVisitor([
-            $ignorer ?? $this->getIgnore(),
-        ]));
-        $traverser->addVisitor($spy);
-        $traverser->traverse($nodes);
-
-        $this->addToAssertionCount(1);
+    public function __construct(
+        private readonly Sequence $sequence = new Sequence(),
+    ) {
     }
 
-    protected function createSpy(): IgnoreSpyVisitor
+    /**
+     * @return positive-int|0|null
+     */
+    public static function getNodeId(Node $node): ?int
     {
-        return new IgnoreSpyVisitor(static function (): void {
-            self::fail('A variable that should have been ignored was still parsed by the next visitor.');
-        });
+        return $node->getAttribute(self::NODE_ID_ATTRIBUTE);
+    }
+
+    public function enterNode(Node $node): void
+    {
+        $this->addId($node);
+    }
+
+    private function addId(Node $node): void
+    {
+        $node->setAttribute(
+            self::NODE_ID_ATTRIBUTE,
+            $this->sequence->next(),
+        );
     }
 }
