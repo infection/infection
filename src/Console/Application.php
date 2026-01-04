@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Command\Test\TestInitialTestRunCommand;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
@@ -119,6 +120,7 @@ final class Application extends BaseApplication
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
+                new TestInitialTestRunCommand(),
             ],
         );
     }
