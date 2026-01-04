@@ -59,8 +59,7 @@ The typical pattern for testing a visitor follows these steps:
 ### 1. Parse the Code
 
 ```php
-$nodes = $this->parser->parse($code);
-$this->assertNotNull($nodes);
+$nodes = $this->parse($code);
 ```
 
 

@@ -59,9 +59,7 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
     ): void {
         $traverserFactory = SingletonContainer::getContainer()->getNodeTraverserFactory();
 
-        $nodes = $this->parser->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
         $traverserFactory->createPreTraverser()->traverse($nodes);

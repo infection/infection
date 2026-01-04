@@ -40,6 +40,7 @@ use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use PhpParser\ErrorHandler;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
@@ -60,6 +61,18 @@ abstract class VisitorTestCase extends TestCase
     protected function createParser(): Parser
     {
         return SingletonContainer::getContainer()->getParser();
+    }
+
+    /**
+     * @return Node\Stmt[]
+     */
+    final protected function parse(string $code): array
+    {
+        $nodes = $this->parser->parse($code);
+
+        $this->assertNotNull($nodes);
+
+        return $nodes;
     }
 
     protected function createDumper(): NodeDumper

@@ -47,13 +47,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class InterfaceIgnorerTest extends VisitorTestCase
 {
     #[DataProvider('nodeProvider')]
-    public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
+    public function test_it_ignores_interfaces(
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $traverser = new NodeTraverser(
             new NonMutableNodesIgnorerVisitor([new InterfaceIgnorer()]),
@@ -68,7 +66,7 @@ final class InterfaceIgnorerTest extends VisitorTestCase
 
     public static function nodeProvider(): iterable
     {
-        yield 'interfaces are ignored' => [
+        yield 'only an interface (ignored)' => [
             <<<'PHP'
                 <?php
 
@@ -85,7 +83,7 @@ final class InterfaceIgnorerTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'classes are not ignored' => [
+        yield 'a regular class (not ignored)' => [
             <<<'PHP'
                 <?php
 
@@ -128,7 +126,7 @@ final class InterfaceIgnorerTest extends VisitorTestCase
                 AST,
         ];
 
-        yield 'it ignores only interfaces' => [
+        yield 'interface + regular class: only the interface is ignored' => [
             <<<'PHP'
                 <?php
 

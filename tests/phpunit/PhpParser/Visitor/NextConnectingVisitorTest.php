@@ -48,9 +48,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
         (new NodeTraverser(
