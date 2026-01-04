@@ -45,7 +45,7 @@ use function unserialize;
 #[CoversClass(MarkTraversedNodesAsVisitedVisitor::class)]
 final class MarkTraversedNodesAsVisitedVisitorTest extends VisitorTestCase
 {
-    public function test_it_records_the_traversed_nodes(): void
+    public function test_it_annotates_the_viewed_nodes_as_visited(): void
     {
         $nodes = $this->parser->parse(
             <<<'PHP'
