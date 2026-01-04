@@ -56,6 +56,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(FileMutationGenerator::class)]
@@ -78,11 +79,17 @@ final class FileMutationGeneratorTest extends TestCase
         $fileSystemStub = $this->createStub(FileSystem::class);
         $fileSystemStub
             ->method('readFile')
-            ->willReturn('');
+            ->willReturnCallback(
+                static fn (string $path) => sprintf(
+                    'contents(%s)',
+                    $path,
+                ),
+            );
 
         $this->mutationGenerator = new FileMutationGenerator(
             new FileParser(
                 $this->phpParserMock,
+                new FileStore($fileSystemStub),
             ),
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
@@ -119,7 +126,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->phpParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with('contents')
+            ->with('contents(/path/to/file)')
             ->willReturn($initialStatements);
         $this->phpParserMock
             ->expects($this->once())
