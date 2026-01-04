@@ -213,8 +213,8 @@ You can customize dumping with additional parameters:
 ```php
 $output = $this->dumper->dump(
     $nodes,
-    $code,                  // Original code (needed for position dumping)
-    dumpPositions: true,    // Include line/column information
+    $code,                   // Original code (needed for position dumping)
+    dumpPositions: true,     // Include line/column information
     onlyVisitedNodes: false, // Show all nodes, not just visited ones
 );
 ```
