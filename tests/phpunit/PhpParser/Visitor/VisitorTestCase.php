@@ -40,7 +40,6 @@ use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use PhpParser\ErrorHandler;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
