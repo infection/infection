@@ -70,16 +70,8 @@ class InitialTestsRunner
 
         $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
 
-        $stopped = false;
-
-        $process->run(function (string $type) use ($process, &$stopped): void {
-            if ($stopped) {
-                return;
-            }
-
+        $process->run(function (string $type) use ($process): void {
             if ($type === Process::ERR) {
-                // Stop on the first error encountered
-                $stopped = true;
                 $process->stop();
             }
 
