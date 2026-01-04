@@ -33,38 +33,36 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Test;
+namespace Infection\Command\InitialTest;
 
-use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
+use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Test\Option\InitialTestsPhpOptionsOption;
-use Infection\Command\Test\Option\MapSourceClassToTestOption;
-use Infection\Command\Test\Option\TestFrameworkOption;
-use Infection\Command\Test\Option\TestFrameworkOptionsOption;
+use Infection\Command\Option\TestFrameworkOption;
+use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
-use Infection\Console\LogVerbosity;
 use Infection\Logger\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
+use function explode;
 
 /**
  * @internal
  */
-final class TestInitialTestRunCommand extends BaseCommand
+final class InitialTestConfigCommand extends BaseCommand
 {
     public function __construct()
     {
-        parent::__construct('test:initial-test-run');
+        parent::__construct('initial-test:config');
     }
 
     protected function configure(): void
     {
         $this->setDescription(
-            'Executes the initial test run as orchestrated by Infection.',
+            'Outputs the configuration used for the initial test run.',
         );
 
         ConfigurationOption::addOption($this);
@@ -73,7 +71,6 @@ final class TestInitialTestRunCommand extends BaseCommand
         InitialTestsPhpOptionsOption::addOption($this);
         TestFrameworkOption::addOption($this);
         TestFrameworkOptionsOption::addOption($this);
-        MapSourceClassToTestOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool
@@ -88,6 +85,9 @@ final class TestInitialTestRunCommand extends BaseCommand
             logger: $logger,
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
+            initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
+            testFramework: TestFrameworkOption::get($io),
+            testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );
 

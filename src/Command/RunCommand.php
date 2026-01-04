@@ -35,14 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function extension_loaded;
-use function implode;
+use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Option\MapSourceClassToTestOption;
 use Infection\Command\Option\SourceFilterOptions;
-use Infection\Command\Test\Option\InitialTestsPhpOptionsOption;
-use Infection\Command\Test\Option\MapSourceClassToTestOption;
-use Infection\Command\Test\Option\TestFrameworkOption;
-use Infection\Command\Test\Option\TestFrameworkOptionsOption;
+use Infection\Command\Option\TestFrameworkOption;
+use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -63,13 +61,15 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
-use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use function extension_loaded;
+use function implode;
+use function sprintf;
 use function trim;
+use const PHP_SAPI;
 
 /**
  * @internal
@@ -406,11 +406,8 @@ final class RunCommand extends BaseCommand
         $input = $io->getInput();
 
         $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
-        $testFramework = TestFrameworkOption::get($io);
-        $testFrameworkExtraOptions = TestFrameworkOptionsOption::get($io);
         $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
         $staticAnalysisToolOptions = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS));
-        $initialTestsPhpOptions = InitialTestsPhpOptionsOption::get($io);
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
         $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
@@ -455,7 +452,7 @@ final class RunCommand extends BaseCommand
             existingCoveragePath: $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
-            initialTestsPhpOptions: $initialTestsPhpOptions,
+            initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
@@ -463,8 +460,8 @@ final class RunCommand extends BaseCommand
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
             msiPrecision: $msiPrecision,
-            testFramework: $testFramework,
-            testFrameworkExtraOptions: $testFrameworkExtraOptions,
+            testFramework: TestFrameworkOption::get($io),
+            testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
             staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,

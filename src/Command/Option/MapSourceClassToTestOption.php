@@ -33,23 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Test\Option;
+namespace Infection\Command\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use Infection\Container;
+use Infection\TestFramework\MapSourceClassToTestStrategy;
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use function trim;
+use function in_array;
+use function sprintf;
 
 /**
  * @internal
  */
-final class TestFrameworkOptionsOption
+final class MapSourceClassToTestOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'test-framework-options';
+    public const NAME = 'map-source-class-to-test';
 
     /**
      * @template T of Command
@@ -59,9 +61,9 @@ final class TestFrameworkOptionsOption
         return $command->addOption(
             self::NAME,
             null,
-            InputOption::VALUE_REQUIRED,
-            'Options to be passed to the test framework',
-            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
+            InputOption::VALUE_OPTIONAL,
+            'Enables test files filtering during "Initial Tests Run" stage when `--filter`/`--git-diff-filter`/`--git-diff-lines` are used. With this option, only those test files are executed to provide coverage, that cover changed/added source files.',
+            false,
         );
     }
 
@@ -70,8 +72,30 @@ final class TestFrameworkOptionsOption
      */
     public static function get(IO $io): ?string
     {
-        $value = trim((string) $io->getInput()->getOption(self::NAME));
+        $inputValue = $io->getInput()->getOption(self::NAME);
 
-        return $value === '' ? null : $value;
+        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
+        // `null` means the option was provided without any argument -> user wants to enable it
+        // any string: the argument provided, but only `'simple'` is allowed for now
+        if ($inputValue === false) {
+            return null;
+        }
+
+        if ($inputValue === null) {
+            return MapSourceClassToTestStrategy::SIMPLE;
+        }
+
+        if (!in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
+                    $inputValue,
+                    self::NAME,
+                    MapSourceClassToTestStrategy::SIMPLE,
+                ),
+            );
+        }
+
+        return $inputValue;
     }
 }

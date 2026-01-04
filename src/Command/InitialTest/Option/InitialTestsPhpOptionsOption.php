@@ -33,14 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Test\Option;
+namespace Infection\Command\InitialTest\Option;
 
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\Container;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
+use function sprintf;
 use function trim;
 
 /**

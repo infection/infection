@@ -33,14 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Command\Test\Option;
+namespace Infection\Command\Option;
 
-use function implode;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\Container;
-use Infection\TestFramework\TestFrameworkTypes;
-use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
@@ -48,11 +45,11 @@ use function trim;
 /**
  * @internal
  */
-final class TestFrameworkOption
+final class TestFrameworkOptionsOption
 {
     use CannotBeInstantiated;
 
-    public const NAME = 'test-framework';
+    public const NAME = 'test-framework-options';
 
     /**
      * @template T of Command
@@ -63,11 +60,8 @@ final class TestFrameworkOption
             self::NAME,
             null,
             InputOption::VALUE_REQUIRED,
-            sprintf(
-                'Name of the Test framework to use ("%s")',
-                implode('", "', TestFrameworkTypes::getTypes()),
-            ),
-            Container::DEFAULT_TEST_FRAMEWORK,
+            'Options to be passed to the test framework',
+            Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
         );
     }
 
@@ -78,6 +72,6 @@ final class TestFrameworkOption
     {
         $value = trim((string) $io->getInput()->getOption(self::NAME));
 
-        return $value === '' ? Container::DEFAULT_TEST_FRAMEWORK : $value;
+        return $value === '' ? null : $value;
     }
 }
