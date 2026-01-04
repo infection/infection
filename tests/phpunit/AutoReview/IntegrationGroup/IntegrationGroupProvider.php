@@ -39,8 +39,6 @@ use Infection\CannotBeInstantiated;
 use Infection\Framework\ClassName;
 use Infection\Tests\AutoReview\ProjectCode\ProjectCodeProvider;
 use Infection\Tests\Console\E2ETest;
-use Infection\Tests\FileSystem\FileSystemTestCase;
-use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use ReflectionClass;
 use function Safe\file_get_contents;

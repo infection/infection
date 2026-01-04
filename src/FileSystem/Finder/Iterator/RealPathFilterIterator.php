@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem\Finder\Iterator;
 
-use Infection\Framework\OperatingSystem;
 use function preg_quote;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
@@ -52,11 +51,7 @@ final class RealPathFilterIterator extends MultiplePcreFilterIterator
 {
     public function accept(): bool
     {
-        $filename = $this->current()->getRealPath();
-
-        if (OperatingSystem::isWindows()) {
-            $filename = Path::normalize((string) $filename);
-        }
+        $filename = Path::canonicalize($this->current()->getRealPath());
 
         return $this->isAccepted($filename);
     }

@@ -37,6 +37,9 @@ namespace Infection;
 
 use function array_filter;
 use DIContainer\Container as DIContainer;
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\NativeFileSystem;
+use Fidry\FileSystem\ReadOnlyFileSystem;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
 use Infection\CI\NullCiDetector;
@@ -71,8 +74,6 @@ use Infection\Event\Subscriber\PerformanceLoggerSubscriberFactory;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
-use Infection\FileSystem\DummyFileSystem;
-use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
 use Infection\FileSystem\Finder\MemoizedComposerExecutableFinder;
@@ -539,7 +540,7 @@ final class Container extends DIContainer
                     $container->getProcessRunner(),
                     $container->getEventDispatcher(),
                     $configuration->isDryRun
-                        ? new DummyFileSystem()
+                        ? new ReadOnlyFileSystem(failOnWrite: false)
                         : $container->getFileSystem(),
                     $container->getDiffSourceCodeMatcher(),
                     $configuration->noProgress,
@@ -548,7 +549,10 @@ final class Container extends DIContainer
                     $configuration->mutantId,
                 );
             },
-            MemoizedComposerExecutableFinder::class => static fn (): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(new ConcreteComposerExecutableFinder()),
+            MemoizedComposerExecutableFinder::class => static fn (self $container): ComposerExecutableFinder => new MemoizedComposerExecutableFinder(
+                new ConcreteComposerExecutableFinder($container->getFileSystem()),
+            ),
+            FileSystem::class => static fn (): FileSystem => new NativeFileSystem(),
             Git::class => static fn (self $container): Git => new CommandLineGit(
                 new ShellCommandLineExecutor(),
                 $container->getLogger(),

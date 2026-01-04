@@ -37,12 +37,12 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FileSystem;
 use function file_exists;
 use function implode;
 use Infection\TestFramework\SafeDOMXPath;
 use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
-use function Safe\realpath;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
@@ -62,6 +62,7 @@ class SourceFileInfoProvider
         private readonly string $coverageDir,
         private readonly string $relativeCoverageFilePath,
         private readonly string $projectSource,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -120,7 +121,7 @@ class SourceFileInfoProvider
         );
 
         try {
-            $realPath = realpath($path);
+            $realPath = $this->fileSystem->normalizedRealPath($path);
         } catch (FilesystemException) {
             $coverageFilePath = Path::canonicalize(
                 $this->coverageDir . DIRECTORY_SEPARATOR . $this->relativeCoverageFilePath,

@@ -37,7 +37,7 @@ namespace Infection\FileSystem\Finder;
 
 use function array_merge;
 use function explode;
-use function file_exists;
+use Fidry\FileSystem\FileSystem;
 use function getenv;
 use const PATH_SEPARATOR;
 use function sprintf;
@@ -45,8 +45,13 @@ use function sprintf;
 /**
  * @internal
  */
-final class NonExecutableFinder
+final readonly class NonExecutableFinder
 {
+    public function __construct(
+        private FileSystem $fileSystem,
+    ) {
+    }
+
     /**
      * @param string[] $probableNames
      * @param string[] $extraDirectories
@@ -68,8 +73,8 @@ final class NonExecutableFinder
             foreach ($probableNames as $name) {
                 $fileName = sprintf('%s/%s', $dir, $name);
 
-                if (file_exists($fileName)) {
-                    return $fileName;
+                if ($this->fileSystem->isReadableFile($fileName)) {
+                    return $this->fileSystem->normalizedRealPath($fileName);
                 }
             }
         }

@@ -35,36 +35,32 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Fidry\FileSystem\FakeFileSystem;
+use Fidry\FileSystem\FileSystem;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriberFactory;
 use Infection\Event\Subscriber\NullSubscriber;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(CleanUpAfterMutationTestingFinishedSubscriberFactory::class)]
 final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends TestCase
 {
-    private MockObject&Filesystem $fileSystemMock;
+    private FileSystem $fileSystem;
 
     protected function setUp(): void
     {
-        $this->fileSystemMock = $this->createMock(Filesystem::class);
-        $this->fileSystemMock
-            ->expects($this->never())
-            ->method($this->anything())
-        ;
+        $this->fileSystem = new FakeFileSystem();
     }
 
     public function test_it_creates_a_cleanup_subscriber_if_debug_is_disabled(): void
     {
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             false,
-            $this->fileSystemMock,
+            $this->fileSystem,
             '/path/to/tmp',
         );
 
@@ -77,7 +73,7 @@ final class CleanUpAfterMutationTestingFinishedSubscriberFactoryTest extends Tes
     {
         $factory = new CleanUpAfterMutationTestingFinishedSubscriberFactory(
             true,
-            $this->fileSystemMock,
+            $this->fileSystem,
             '/path/to/tmp',
         );
 

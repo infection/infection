@@ -36,13 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
 use const DIRECTORY_SEPARATOR;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\FileSystem\FileSystem;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
-use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
-use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
-use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -229,6 +227,9 @@ final class JUnitReportLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void
     {
+        FS::dumpFile($jUnitRelativePaths, '');
+
+        $expected = Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . $jUnitRelativePaths);
         $this->fileSystem->touch('phpunit.junit.xml');
         $this->fileSystem->touch('phpspec.junit.xml');
 

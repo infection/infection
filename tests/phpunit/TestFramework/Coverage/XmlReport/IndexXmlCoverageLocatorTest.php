@@ -38,13 +38,13 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 use function basename;
 use const DIRECTORY_SEPARATOR;
 use function dirname;
-use Infection\FileSystem\FileSystem;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\Coverage\Locator\Throwable\InvalidReportSource;
 use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -52,6 +52,7 @@ use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
 use function strtoupper;
 use Symfony\Component\Filesystem\Path;
+use function touch;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageLocator::class)]
@@ -168,7 +169,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public static function reportPathnameProvider(): iterable
     {
-        yield 'exact match with the default location' => [self::TEST_DEFAULT_RELATIVE_PATHNAME];
+        FS::dumpFile('coverage-xml/index.xml', '');
 
         yield 'in sub-directory' => ['sub-dir/index.xml'];
 
@@ -181,7 +182,7 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
             $this->markTestSkipped('Requires a case-insensitive system.');
         }
 
-        $relativePathname = dirname(self::TEST_DEFAULT_RELATIVE_PATHNAME) . DIRECTORY_SEPARATOR . strtoupper(basename(self::TEST_DEFAULT_RELATIVE_PATHNAME));
+        FS::dumpFile('coverage-xml/INDEX.XML', '');
 
         $this->fileSystem->dumpFile($relativePathname, '');
 
@@ -225,12 +226,19 @@ final class IndexXmlCoverageLocatorTest extends FileSystemTestCase
 
     public function test_it_cannot_find_the_report_if_there_is_more_than_one_valid_report(): void
     {
-        if (OperatingSystem::isMacOs()) {
-            $this->markTestSkipped('Requires a case-sensitive system.');
-        }
+        FS::dumpFile($indexRelativePath, '');
 
-        $this->fileSystem->touch('index.xml');
-        $this->fileSystem->dumpFile('sub-dir/index.xml', '');
+        $expected = Path::canonicalize($this->tmp . DIRECTORY_SEPARATOR . $indexRelativePath);
+
+        $this->assertSame($expected, $this->locator->locate());
+        // Call second time to check the cached result
+        $this->assertSame($expected, $this->locator->locate());
+    }
+
+    public function test_it_cannot_locate_the_index_file_if_the_result_is_ambiguous(): void
+    {
+        touch('index.xml');
+        FS::dumpFile('sub-dir/index.xml', '');
 
         $expectedReportsPathnames = [
             Path::normalize($this->tmp . '/index.xml'),

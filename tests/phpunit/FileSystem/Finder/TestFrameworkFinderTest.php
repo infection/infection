@@ -36,6 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\FileSystem\Finder;
 
 use function explode;
+use Fidry\FileSystem\FS;
+use Fidry\FileSystem\NativeFileSystem;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use function getenv;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\Exception\FinderException;
@@ -43,18 +46,14 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\TestFramework\TestFrameworkTypes;
 use Infection\Tests\EnvVariableManipulation\BacksUpEnvironmentVariables;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use const PATH_SEPARATOR;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
-use function Safe\chdir;
 use function Safe\putenv;
 use function Safe\realpath;
 use function sprintf;
 use function strlen;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -69,9 +68,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     private static string $pathName;
 
-    private Filesystem $fileSystem;
-
-    private MockObject $composerFinder;
+    private ComposerExecutableFinder $composerFinder;
 
     /**
      * Saves the current environment
@@ -87,11 +84,11 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
         parent::setUp();
 
-        // This test relies on the current working directory to be the project
-        // root.
-        chdir(__DIR__ . '/../../../../');
+        // For this test we expect to remain in the current working dir.
+        // Not ideal, but it is what it is for now.
+        self::safeChdir($this->cwd);
 
-        $this->fileSystem = new Filesystem();
+        $this->fileSystem = new NativeFileSystem();
 
         $this->composerFinder = $this->createMock(ComposerExecutableFinder::class);
         $this->composerFinder->method('find')
@@ -107,7 +104,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_it_can_load_a_custom_path(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
+        $filename = FS::tmpFile('test', targetDirectory: $this->tmp);
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
@@ -116,9 +113,9 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_invalid_custom_path_throws_exception(): void
     {
-        $filename = $this->fileSystem->tempnam($this->tmp, 'test');
+        $filename = FS::tmpFile('test', targetDirectory: $this->tmp);
         // Remove it so that the file doesn't exist
-        $this->fileSystem->remove($filename);
+        FS::remove($filename);
 
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
@@ -164,7 +161,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
 
     public function test_it_finds_framework_executable(): void
     {
-        $mock = new MockVendor($this->tmp, $this->fileSystem);
+        $mock = new MockVendor($this->tmp);
         $mock->setUpPlatformTest();
 
         // Set the path to a single directory (vendor/bin)
@@ -174,7 +171,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
         $frameworkFinder = new TestFrameworkFinder($this->composerFinder);
 
         if (OperatingSystem::isWindows()) {
-            // This .bat has no code, so main script will not be found
+            // This .bat has no code, so the main script will not be found
             $expected = $mock->getVendorBinBat();
         } else {
             $expected = $mock->getVendorBinLink();
@@ -190,7 +187,7 @@ final class TestFrameworkFinderTest extends FileSystemTestCase
     #[DataProvider('providesMockSetup')]
     public function test_it_finds_framework_script_from_bat(string $methodName): void
     {
-        $mock = new MockVendor($this->tmp, $this->fileSystem);
+        $mock = new MockVendor($this->tmp);
         $mock->{$methodName}();
 
         // Set the path to a single directory (vendor/bin)

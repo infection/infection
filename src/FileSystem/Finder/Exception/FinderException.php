@@ -78,10 +78,11 @@ final class FinderException extends RuntimeException
         );
     }
 
-    public static function testCustomPathDoesNotExist(string $testFrameworkName, string $customPath): self
+    public static function invalidCustomPath(string $testFrameworkName, string $customPath): self
     {
         return new self(
-            sprintf('The custom path to %s was set as "%s" but this file did not exist.',
+            sprintf(
+                'The custom path to "%s" was set to "%s", but this file did not exist or is not a readable file.',
                 $testFrameworkName,
                 $customPath,
             ),

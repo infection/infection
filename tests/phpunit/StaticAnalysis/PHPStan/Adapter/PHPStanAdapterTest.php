@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\StaticAnalysis\PHPStan\Adapter;
 
+use Fidry\FileSystem\FakeFileSystem;
+use Fidry\FileSystem\FileSystem;
 use Infection\StaticAnalysis\PHPStan\Adapter\PHPStanAdapter;
 use Infection\StaticAnalysis\PHPStan\Mutant\PHPStanMutantExecutionResultFactory;
 use Infection\StaticAnalysis\PHPStan\Process\PHPStanMutantProcessFactory;
@@ -47,7 +49,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('integration')]
 #[CoversClass(PHPStanAdapter::class)]
@@ -59,13 +60,13 @@ final class PHPStanAdapterTest extends TestCase
 
     private PHPStanMutantExecutionResultFactory&MockObject $mutantExecutionResultFactory;
 
-    private Filesystem&MockObject $fileSystem;
+    private FileSystem $fileSystem;
 
     protected function setUp(): void
     {
         $this->commandLineBuilder = $this->createMock(CommandLineBuilder::class);
         $this->mutantExecutionResultFactory = $this->createMock(PHPStanMutantExecutionResultFactory::class);
-        $this->fileSystem = $this->createMock(Filesystem::class);
+        $this->fileSystem = new FakeFileSystem();
 
         $this->adapter = new PHPStanAdapter(
             $this->fileSystem,

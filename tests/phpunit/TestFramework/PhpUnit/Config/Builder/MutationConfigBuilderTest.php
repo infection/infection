@@ -41,13 +41,14 @@ use DOMNode;
 use DOMNodeList;
 use DOMXPath;
 use function escapeshellarg;
+use Fidry\FileSystem\NativeFileSystem;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\StreamWrapper\IncludeInterceptor;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestCaseSorter;
 use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -56,7 +57,6 @@ use function Safe\exec;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -782,7 +782,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
     ): MutationConfigBuilder {
         $phpunitXmlPath = $originalPhpUnitXmlConfigPath ?: self::FIXTURES . '/phpunit.xml';
 
-        $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
+        $replacer = new PathReplacer(new NativeFileSystem(), $this->projectPath);
 
         return new MutationConfigBuilder(
             $this->tmp,

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\FileSystem\Locator;
 
+use Fidry\FileSystem\FileSystem;
+use Fidry\FileSystem\NativeFileSystem;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\Framework\OperatingSystem;
@@ -45,7 +47,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -54,11 +55,11 @@ final class RootsFileOrDirectoryLocatorTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../../Fixtures/Locator';
 
-    private Filesystem $filesystem;
+    private FileSystem $filesystem;
 
     protected function setUp(): void
     {
-        $this->filesystem = new Filesystem();
+        $this->filesystem = new NativeFileSystem();
     }
 
     /**

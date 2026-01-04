@@ -37,19 +37,18 @@ namespace Infection\FileSystem\Finder;
 
 use function array_key_exists;
 use function dirname;
-use function file_exists;
+use Fidry\FileSystem\FileSystem;
 use function getenv;
 use Infection\FileSystem\Finder\Exception\FinderException;
 use function ltrim;
 use const PATH_SEPARATOR;
 use function rtrim;
 use RuntimeException;
-use function Safe\file_get_contents;
 use function Safe\getcwd;
 use function Safe\preg_match;
 use function Safe\putenv;
-use function Safe\realpath;
 use function substr;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use function trim;
@@ -70,6 +69,7 @@ class StaticAnalysisToolExecutableFinder
 
     public function __construct(
         private readonly ComposerExecutableFinder $executableFinder,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -80,7 +80,7 @@ class StaticAnalysisToolExecutableFinder
                 $this->addVendorBinToPath();
             }
 
-            $this->cachedPath[$staticAnalysisTool] = realpath($this->findStaticAnalysisExecutable($staticAnalysisTool, $customPath));
+            $this->cachedPath[$staticAnalysisTool] = $this->findStaticAnalysisExecutable($staticAnalysisTool, $customPath);
 
             Assert::string($this->cachedPath[$staticAnalysisTool]);
 
@@ -98,11 +98,11 @@ class StaticAnalysisToolExecutableFinder
             return false;
         }
 
-        if (file_exists($customPath)) {
+        if ($this->fileSystem->isReadableFile($customPath)) {
             return true;
         }
 
-        throw FinderException::testCustomPathDoesNotExist($staticAnalysisTool, $customPath);
+        throw FinderException::invalidCustomPath($staticAnalysisTool, $customPath);
     }
 
     private function addVendorBinToPath(): void
@@ -118,10 +118,10 @@ class StaticAnalysisToolExecutableFinder
 
             $process->mustRun();
             $vendorPath = trim($process->getOutput());
-        } catch (RuntimeException) {
+        } catch (RuntimeException $e) {
             $candidate = getcwd() . '/vendor/bin';
 
-            if (file_exists($candidate)) {
+            if ($this->fileSystem->isReadableFile($candidate)) {
                 $vendorPath = $candidate;
             }
         }
@@ -140,13 +140,13 @@ class StaticAnalysisToolExecutableFinder
     private function findStaticAnalysisExecutable(string $staticAnalysisTool, string $customPath): string
     {
         if ($this->shouldUseCustomPath($staticAnalysisTool, $customPath)) {
-            return $customPath;
+            return $this->fileSystem->normalizedRealPath($customPath);
         }
 
         /*
          * There's a glitch where ExecutableFinder would find a non-executable
          * file on Windows, even if there's a proper executable .bat by its side.
-         * Therefore we have to explicitly look for a .bat first.
+         * Therefore, we have to explicitly look for a .bat first.
          */
         $candidates = [
             $staticAnalysisTool . '.bat',
@@ -167,7 +167,7 @@ class StaticAnalysisToolExecutableFinder
             }
         }
 
-        $nonExecutableFinder = new NonExecutableFinder();
+        $nonExecutableFinder = new NonExecutableFinder($this->fileSystem);
         $path = $nonExecutableFinder->searchNonExecutables($candidates, $extraDirs);
 
         if ($path !== null) {
@@ -179,6 +179,8 @@ class StaticAnalysisToolExecutableFinder
 
     private function findFromBatchFile(string $path): string
     {
+        $contents = $this->fileSystem->readFile($path);
+
         /* Check the proxy code (%~dp0 is the script path with a backslash),
          * then trim it and remove any leading directory slash and any trailing
          * components. This will extract the relative path from lines like:
@@ -186,11 +188,11 @@ class StaticAnalysisToolExecutableFinder
          *   SET BIN_TARGET=%~dp0/../path
          *   php %~dp0/path %*
          */
-        if (preg_match('/%~dp0(.+$)/mi', file_get_contents($path), $match) === 1) {
+        if (preg_match('/%~dp0(.+$)/mi', $contents, $match) === 1) {
             $target = ltrim(rtrim(trim($match[1]), '" %*'), '\\/');
-            $script = realpath(dirname($path) . '/' . $target);
+            $script = Path::canonicalize(dirname($path) . '/' . $target);
 
-            if (file_exists($script)) {
+            if ($this->fileSystem->isReadableFile($script)) {
                 $path = $script;
             }
         }

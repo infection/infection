@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\PhpUnit\Config\Path;
 
 use DOMDocument;
+use Fidry\FileSystem\NativeFileSystem;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -53,7 +53,7 @@ final class PathReplacerTest extends TestCase
         string $originalPath,
         string $expectedPath,
     ): void {
-        $pathReplacer = new PathReplacer(new Filesystem());
+        $pathReplacer = new PathReplacer(new NativeFileSystem());
 
         $dom = new DOMDocument();
         $node = $dom->createElement('phpunit', $originalPath);

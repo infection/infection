@@ -70,7 +70,7 @@ final class ContainerTest extends TestCase
     {
         $container = new Container([]);
 
-        $container->getFileSystem();
+        $container->getCiDetector();
 
         $this->addToAssertionCount(1);
     }

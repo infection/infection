@@ -38,12 +38,13 @@ namespace Infection\Tests\TestFramework\PhpUnit\Config\Builder;
 use DOMDocument;
 use DOMNodeList;
 use DOMXPath;
+use Fidry\FileSystem\NativeFileSystem;
+use Fidry\FileSystem\Test\FileSystemTestCase;
 use Infection\TestFramework\PhpUnit\Config\Builder\InitialConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\InvalidPhpUnitConfiguration;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
-use Infection\Tests\FileSystem\FileSystemTestCase;
 use InvalidArgumentException;
 use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -52,7 +53,6 @@ use PHPUnit\Framework\Attributes\Group;
 use function Safe\file_get_contents;
 use function Safe\simplexml_load_string;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -577,7 +577,7 @@ final class InitialConfigBuilderTest extends FileSystemTestCase
 
         $srcDirs = ['src', 'app'];
 
-        $replacer = new PathReplacer(new Filesystem(), $this->projectPath);
+        $replacer = new PathReplacer(new NativeFileSystem(), $this->projectPath);
 
         return new InitialConfigBuilder(
             $this->tmp,
