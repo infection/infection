@@ -37,7 +37,7 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\RunCommand;
 use Infection\Command\RunCommandHelper;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

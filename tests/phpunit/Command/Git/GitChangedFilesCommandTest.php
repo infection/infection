@@ -39,7 +39,7 @@ use Infection\Command\Git\GitChangedFilesCommand;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\Schema\SchemaConfiguration;
 use Infection\Console\Application;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Git\Git;
 use Infection\Tests\Configuration\Schema\SchemaConfigurationBuilder;
 use InvalidArgumentException;

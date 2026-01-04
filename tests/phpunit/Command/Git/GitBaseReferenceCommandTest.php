@@ -37,7 +37,7 @@ namespace Infection\Tests\Command\Git;
 
 use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Console\Application;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;

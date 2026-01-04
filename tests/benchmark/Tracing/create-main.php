@@ -40,7 +40,7 @@ use function array_splice;
 use Closure;
 use function count;
 use function function_exists;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProvider;

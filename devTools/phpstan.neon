@@ -186,7 +186,7 @@ parameters:
         -
             message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoSourceFound) in PHPDoc \@throws tag but it.+s not thrown\.$#'
             identifier: throws.unusedType
-            path: ../src/Container.php
+            path: ../src/Container/Container.php
 
         # PHPStan cannot really properly infer the types here
         -

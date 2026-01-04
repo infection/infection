@@ -39,7 +39,7 @@ use Infection\CannotBeInstantiated;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\IO;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use function sprintf;

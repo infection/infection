@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Testing;
 
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Mutant\MutantCodePrinter;
 use Infection\Tests\AutoReview\PhpDoc\PHPDocParser;
 use PhpParser\NodeDumper;

@@ -37,7 +37,7 @@ namespace Infection\Tests\Command;
 
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Console\Application;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Tests\MockedContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

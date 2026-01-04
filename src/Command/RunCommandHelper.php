@@ -37,7 +37,7 @@ namespace Infection\Command;
 
 use function getenv;
 use function in_array;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use InvalidArgumentException;

@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * This code is licensed under the BSD 3-Clause License.
@@ -34,61 +33,27 @@
 
 declare(strict_types=1);
 
-// Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
+namespace Infection\Container\Builder;
 
-use Infection\Console\Application;
-use Infection\Container\Container;
-use function Safe\getcwd;
+use DIContainer\Builder;
+use Infection\Configuration\Configuration;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
-if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
-    echo \PHP_EOL . 'Infection may only be invoked from a command line, got "' . \PHP_SAPI . '"' . \PHP_EOL;
+/**
+ * @internal
+ * @implements Builder<IndexXmlCoverageParser>
+ */
+final readonly class IndexXmlCoverageParserBuilder implements Builder
+{
+    public function __construct(
+        private Configuration $configuration,
+    ) {
+    }
 
-    exit(1);
+    public function build(): IndexXmlCoverageParser
+    {
+        return new IndexXmlCoverageParser(
+            isSourceFiltered: $this->configuration->sourceFilter !== null,
+        );
+    }
 }
-
-// Infection autoloading
-(static function (): void {
-    $autoload = $GLOBALS['_composer_autoload_path'] ?? '';
-
-    if ($autoload && \file_exists($autoload)) {
-        // Is installed via Composer
-        include_once $autoload;
-
-        return;
-    }
-
-    if (\file_exists($autoload = __DIR__ . '/../../../autoload.php')) {
-        // Is installed via Composer
-        include_once $autoload;
-
-        return;
-    }
-
-    if (\file_exists($autoload = __DIR__ . '/../vendor/autoload.php')) {
-        // Is installed locally
-        include_once $autoload;
-
-        return;
-    }
-
-    \fwrite(
-        \STDERR,
-        <<<'ERROR'
-            You need to set up the project dependencies using Composer:
-                $ composer install
-            You can learn all about Composer on https://getcomposer.org/.
-
-            ERROR,
-    );
-
-    throw new RuntimeException('Unable to find the Composer autoloader.');
-})();
-
-// Project (third-party) autoloading
-(static function (): void {
-    if (\file_exists($autoload = getcwd() . '/vendor/autoload.php')) {
-        include_once $autoload;
-    }
-})();
-
-(new Application(Container::create()))->run();

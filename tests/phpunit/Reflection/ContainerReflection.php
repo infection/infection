@@ -37,7 +37,7 @@ namespace Infection\Tests\Reflection;
 
 use Closure;
 use Error;
-use Infection\Container;
+use Infection\Container\Container;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
