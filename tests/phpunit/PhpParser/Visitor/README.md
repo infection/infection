@@ -130,8 +130,7 @@ public function test_it_annotates_nodes(
     string $expected,
 ): void {
     // 1. Parse the code
-    $nodes = $this->parser->parse($code);
-    $this->assertNotNull($nodes);
+    $nodes = $this->parse($code);
 
     // 2. Add IDs for easier debugging
     $this->addIdsToNodes($nodes);
@@ -175,10 +174,13 @@ array(
                 name: Identifier(
                     nodeId: 3
                     parent: nodeId(2)
-                    customAttribute: someValue
                 )
+                nodeId: 2
+                parent: nodeId(0)
+                customAttribute: someValue
             )
         )
+        kind: 1
         nodeId: 0
     )
 )
