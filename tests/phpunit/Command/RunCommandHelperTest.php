@@ -38,7 +38,6 @@ namespace Infection\Tests\Command;
 use Infection\Command\RunCommand;
 use Infection\Command\RunCommandHelper;
 use Infection\Container;
-use Infection\TestFramework\MapSourceClassToTestStrategy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -95,27 +94,6 @@ final class RunCommandHelperTest extends TestCase
         yield [null, null];
 
         yield [5, '5'];
-    }
-
-    #[DataProvider('providesMapSourceClassToTest')]
-    public function test_it_maps_source_class_to_test(?string $expected, mixed $optionValue): void
-    {
-        $this->inputMock->expects($this->once())
-            ->method('getOption')
-            ->with(RunCommand::OPTION_MAP_SOURCE_CLASS_TO_TEST)
-            ->willReturn($optionValue);
-
-        $commandHelper = new RunCommandHelper($this->inputMock);
-        $this->assertSame($expected, $commandHelper->getMapSourceClassToTest());
-    }
-
-    public static function providesMapSourceClassToTest(): iterable
-    {
-        yield [null, false];
-
-        yield [MapSourceClassToTestStrategy::SIMPLE, null];
-
-        yield [MapSourceClassToTestStrategy::SIMPLE, MapSourceClassToTestStrategy::SIMPLE];
     }
 
     #[DataProvider('providesNumberOfShownMutations')]

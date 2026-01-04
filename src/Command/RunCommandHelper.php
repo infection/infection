@@ -36,10 +36,8 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use function getenv;
-use function in_array;
 use Infection\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
-use Infection\TestFramework\MapSourceClassToTestStrategy;
 use InvalidArgumentException;
 use function is_numeric;
 use function max;
@@ -111,33 +109,6 @@ final readonly class RunCommandHelper
 
         // we subtract 1 here to not use all the available cores by Infection
         return max(1, CpuCoresCountProvider::provide() - 1);
-    }
-
-    public function getMapSourceClassToTest(): ?string
-    {
-        $inputValue = $this->input->getOption(RunCommand::OPTION_MAP_SOURCE_CLASS_TO_TEST);
-
-        // `false` means the option was not provided at all -> user does not care and it will be auto-detected
-        // `null` means the option was provided without any argument -> user wants to enable it
-        // any string: the argument provided, but only `'simple'` is allowed for now
-        if ($inputValue === false) {
-            return null;
-        }
-
-        if ($inputValue === null) {
-            return MapSourceClassToTestStrategy::SIMPLE;
-        }
-
-        if (!in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
-                $inputValue,
-                RunCommand::OPTION_MAP_SOURCE_CLASS_TO_TEST,
-                MapSourceClassToTestStrategy::SIMPLE,
-            ));
-        }
-
-        return $inputValue;
     }
 
     public function getNumberOfShownMutations(): ?int

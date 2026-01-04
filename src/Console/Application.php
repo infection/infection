@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Command\InitialTest\InitialTestConfigCommand;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
@@ -47,6 +48,7 @@ use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
+use Infection\Command\InitialTest\InitialTestRunCommand;
 use Infection\Container;
 use OutOfBoundsException;
 use function preg_quote;
@@ -119,6 +121,8 @@ final class Application extends BaseApplication
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),
+                new InitialTestConfigCommand(),
+                new InitialTestRunCommand(),
             ],
         );
     }
