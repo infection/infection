@@ -53,8 +53,6 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 final readonly class BasicSourceCollector implements SourceCollector
 {
-    private bool $filtered;
-
     /**
      * @param non-empty-string[] $sourceDirectories
      * @param non-empty-string[] $excludedFilesOrDirectories
@@ -64,12 +62,6 @@ final readonly class BasicSourceCollector implements SourceCollector
         private array $excludedFilesOrDirectories,
         private ?PlainFilter $filter,
     ) {
-        $this->filtered = $this->filter !== null;
-    }
-
-    public function isFiltered(): bool
-    {
-        return $this->filtered;
     }
 
     public function collect(): array

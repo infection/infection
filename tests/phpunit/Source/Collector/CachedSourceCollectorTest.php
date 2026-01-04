@@ -58,25 +58,6 @@ final class CachedSourceCollectorTest extends TestCase
         );
     }
 
-    public function test_it_caches_the_is_filtered_call(): void
-    {
-        $expected = true;
-
-        $this->decoratedCollectorMock
-            ->expects($this->once())
-            ->method('isFiltered')
-            ->willReturn($expected);
-        $this->decoratedCollectorMock
-            ->expects($this->never())
-            ->method('collect');
-
-        $actual1 = $this->collector->isFiltered();
-        $actual2 = $this->collector->isFiltered();
-
-        $this->assertSame($expected, $actual1);
-        $this->assertSame($actual1, $actual2);
-    }
-
     public function test_it_caches_the_collected_files(): void
     {
         $expected = [
@@ -84,9 +65,6 @@ final class CachedSourceCollectorTest extends TestCase
             new MockSplFileInfo('src/File2.php'),
         ];
 
-        $this->decoratedCollectorMock
-            ->expects($this->never())
-            ->method('isFiltered');
         $this->decoratedCollectorMock
             ->expects($this->once())
             ->method('collect')

@@ -83,10 +83,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             null,
         );
 
-        // This must be checked _before_ we configure any expected exception:
-        // this call should not throw.
-        $this->assertFalse($collector->isFiltered());
-
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);
         }
@@ -249,10 +245,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             excludedFilesOrDirectories: [],
             filter: $filter,
         );
-
-        // This must be checked _before_ we configure any expected exception:
-        // this call should not throw.
-        $this->assertSame($expectedIsSourceFiltered, $collector->isFiltered());
 
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);

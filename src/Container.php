@@ -241,7 +241,7 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                $container->getSourceCollector()->isFiltered(),
+                isSourceFiltered: $container->getConfiguration()->sourceFilter !== null,
             ),
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),

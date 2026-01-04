@@ -46,14 +46,8 @@ final readonly class FixedSourceCollector implements SourceCollector
      * @param SplFileInfo[] $files
      */
     public function __construct(
-        public bool $filtered,
         public array $files,
     ) {
-    }
-
-    public function isFiltered(): bool
-    {
-        return $this->filtered;
     }
 
     public function collect(): array

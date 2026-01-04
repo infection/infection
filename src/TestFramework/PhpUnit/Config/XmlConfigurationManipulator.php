@@ -162,7 +162,7 @@ final readonly class XmlConfigurationManipulator
 
     /**
      * @param string[] $srcDirs
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param string[] $filteredSourceFilesToMutate
      */
     public function addOrUpdateLegacyCoverageWhitelistNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
@@ -171,7 +171,7 @@ final readonly class XmlConfigurationManipulator
 
     /**
      * @param string[] $srcDirs
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param string[] $filteredSourceFilesToMutate
      */
     public function addOrUpdateCoverageIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
@@ -180,7 +180,7 @@ final readonly class XmlConfigurationManipulator
 
     /**
      * @param string[] $srcDirs
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param string[] $filteredSourceFilesToMutate
      */
     public function addOrUpdateSourceIncludeNodes(SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
@@ -235,7 +235,7 @@ final readonly class XmlConfigurationManipulator
 
     /**
      * @param string[] $srcDirs
-     * @param list<string> $filteredSourceFilesToMutate
+     * @param string[] $filteredSourceFilesToMutate
      */
     private function addOrUpdateCoverageNodes(string $parentName, string $listName, SafeDOMXPath $xPath, array $srcDirs, array $filteredSourceFilesToMutate): void
     {
