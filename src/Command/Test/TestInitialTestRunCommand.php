@@ -35,8 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Command\Test;
 
+use Infection\Command\Test\Option\InitialTestsPhpOptionsOption;
+use Infection\Command\Test\Option\MapSourceClassToTestOption;
+use Infection\Command\Test\Option\TestFrameworkOption;
+use Infection\Command\Test\Option\TestFrameworkOptionsOption;
+use function explode;
 use Infection\Command\BaseCommand;
-use Infection\Command\Git\LoggerFactory;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
@@ -46,7 +50,6 @@ use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
 use Infection\Logger\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
-use function explode;
 
 /**
  * @internal
@@ -67,6 +70,10 @@ final class TestInitialTestRunCommand extends BaseCommand
         ConfigurationOption::addOption($this);
         BaseOption::addOption($this);
         FilterOption::addOption($this);
+        InitialTestsPhpOptionsOption::addOption($this);
+        TestFrameworkOption::addOption($this);
+        TestFrameworkOptionsOption::addOption($this);
+        MapSourceClassToTestOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool
@@ -84,7 +91,7 @@ final class TestInitialTestRunCommand extends BaseCommand
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
         );
 
-        //LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
+        // LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
         $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
 
         $configuration = $container->getConfiguration();

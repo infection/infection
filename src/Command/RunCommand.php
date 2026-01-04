@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function extension_loaded;
-use function implode;
 use Infection\Command\Option\ConfigurationOption;
-use Infection\Command\Option\MapSourceClassToTestOption;
 use Infection\Command\Option\SourceFilterOptions;
-use Infection\Configuration\Configuration;
+use Infection\Command\Test\Option\InitialTestsPhpOptionsOption;
+use Infection\Command\Test\Option\MapSourceClassToTestOption;
+use Infection\Command\Test\Option\TestFrameworkOption;
+use Infection\Command\Test\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
@@ -61,13 +61,15 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
-use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use function extension_loaded;
+use function implode;
+use function sprintf;
 use function trim;
+use const PHP_SAPI;
 
 /**
  * @internal
@@ -92,13 +94,7 @@ final class RunCommand extends BaseCommand
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
-    /** @var string */
-    private const OPTION_TEST_FRAMEWORK = 'test-framework';
-
     private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
-
-    /** @var string */
-    private const OPTION_TEST_FRAMEWORK_OPTIONS = 'test-framework-options';
 
     /** @var string */
     private const OPTION_STATIC_ANALYSIS_TOOL_OPTIONS = 'static-analysis-tool-options';
@@ -144,9 +140,6 @@ final class RunCommand extends BaseCommand
     private const OPTION_LOG_VERBOSITY = 'log-verbosity';
 
     /** @var string */
-    private const OPTION_INITIAL_TESTS_PHP_OPTIONS = 'initial-tests-php-options';
-
-    /** @var string */
     private const OPTION_SKIP_INITIAL_TESTS = 'skip-initial-tests';
 
     /** @var string */
@@ -161,17 +154,9 @@ final class RunCommand extends BaseCommand
     {
         $this
             ->setName('run')
-            ->setDescription('Runs the mutation testing.')
-            ->addOption(
-                self::OPTION_TEST_FRAMEWORK,
-                null,
-                InputOption::VALUE_REQUIRED,
-                sprintf(
-                    'Name of the Test framework to use ("%s")',
-                    implode('", "', TestFrameworkTypes::getTypes()),
-                ),
-                Container::DEFAULT_TEST_FRAMEWORK,
-            )
+            ->setDescription('Runs the mutation testing.');
+
+        TestFrameworkOption::addOption($this)
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL,
                 null,
@@ -181,14 +166,9 @@ final class RunCommand extends BaseCommand
                     implode('", "', StaticAnalysisToolTypes::getTypes()),
                 ),
                 Container::DEFAULT_STATIC_ANALYSIS_TOOL,
-            )
-            ->addOption(
-                self::OPTION_TEST_FRAMEWORK_OPTIONS,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Options to be passed to the test framework',
-                Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
-            )
+            );
+
+        TestFrameworkOptionsOption::addOption($this)
             ->addOption(
                 self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS,
                 null,
@@ -328,17 +308,9 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 '"all" - full logs format, "default" - short logs format, "none" - no logs',
                 Container::DEFAULT_LOG_VERBOSITY,
-            )
-            ->addOption(
-                self::OPTION_INITIAL_TESTS_PHP_OPTIONS,
-                null,
-                InputOption::VALUE_REQUIRED,
-                sprintf(
-                    'PHP options passed to the PHP executable when executing the initial tests. Will be ignored if <comment>"--%s"</comment> option presented',
-                    self::OPTION_COVERAGE,
-                ),
-                Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS,
-            )
+            );
+
+        InitialTestsPhpOptionsOption::addOption($this)
             ->addOption(
                 self::OPTION_SKIP_INITIAL_TESTS,
                 null,
@@ -434,11 +406,11 @@ final class RunCommand extends BaseCommand
         $input = $io->getInput();
 
         $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
-        $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
-        $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
+        $testFramework = TestFrameworkOption::get($io);
+        $testFrameworkExtraOptions = TestFrameworkOptionsOption::get($io);
         $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
         $staticAnalysisToolOptions = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS));
-        $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
+        $initialTestsPhpOptions = InitialTestsPhpOptionsOption::get($io);
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
         $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
@@ -483,9 +455,7 @@ final class RunCommand extends BaseCommand
             existingCoveragePath: $coverage === ''
                 ? Container::DEFAULT_EXISTING_COVERAGE_PATH
                 : $coverage,
-            initialTestsPhpOptions: $initialTestsPhpOptions === ''
-                ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
-                : $initialTestsPhpOptions,
+            initialTestsPhpOptions: $initialTestsPhpOptions,
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
@@ -493,12 +463,8 @@ final class RunCommand extends BaseCommand
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
             msiPrecision: $msiPrecision,
-            testFramework: $testFramework === ''
-                ? Container::DEFAULT_TEST_FRAMEWORK
-                : $testFramework,
-            testFrameworkExtraOptions: $testFrameworkExtraOptions === ''
-                ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
-                : $testFrameworkExtraOptions,
+            testFramework: $testFramework,
+            testFrameworkExtraOptions: $testFrameworkExtraOptions,
             staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
                 ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
                 : $staticAnalysisToolOptions,
@@ -522,10 +488,8 @@ final class RunCommand extends BaseCommand
     private function installTestFrameworkIfNeeded(Container $container, IO $io): void
     {
         $installationDecider = $container->getAdapterInstallationDecider();
-        $configuration = $container->getConfiguration();
-        $configTestFramework = $configuration->testFramework;
 
-        $adapterName = trim((string) $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK)) ?: $configTestFramework;
+        $adapterName = TestFrameworkOption::get($io);
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
@@ -604,7 +568,7 @@ final class RunCommand extends BaseCommand
             $configureCommand = $this->getApplication()->find('configure');
 
             $args = [
-                sprintf('--%s', self::OPTION_TEST_FRAMEWORK) => $io->getInput()->getOption(self::OPTION_TEST_FRAMEWORK) ?: TestFrameworkTypes::PHPUNIT,
+                sprintf('--%s', TestFrameworkOption::NAME) => $io->getInput()->getOption(TestFrameworkOption::NAME) ?: TestFrameworkTypes::PHPUNIT,
             ];
 
             $newInput = new ArrayInput($args);
