@@ -47,6 +47,7 @@ use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
+use Infection\Tests\TestFramework\Tracing\Trace\FakeTrace;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -185,7 +186,8 @@ final class FileMutationGeneratorTest extends TestCase
      */
     #[DataProvider('scenarioProvider')]
     public function test_it_traverses_the_source_statements(
-        Scenario $scenario,
+        bool $onlyCovered,
+        bool $hasTrace,
     ): void {
         $fileInfoMock = $this->createSplFileInfoMock('/path/to/file');
 
@@ -210,35 +212,19 @@ final class FileMutationGeneratorTest extends TestCase
             ->method('traverse')
             ->willReturn([]);
 
-        if ($scenario->expected) {
-            $this->fileParserMock
-                ->expects($this->once())
-                ->method('parse')
-                ->willReturn([$initialStatements, $originalFileTokens]);
+        $this->fileParserMock
+            ->expects($this->once())
+            ->method('parse')
+            ->willReturn([$initialStatements, $originalFileTokens]);
 
-            $this->traverserFactoryMock
-                ->method('createPreTraverser')
-                ->willReturn($traverserStub);
-        } else {
-            $this->fileParserMock
-                ->expects($this->never())
-                ->method('parse');
+        $this->traverserFactoryMock
+            ->method('createPreTraverser')
+            ->willReturn($traverserStub);
 
-            $this->traverserFactoryMock
-                ->expects($this->never())
-                ->method('createPreTraverser')
-                ->willReturn($traverserStub);
-        }
-
-        $traceMock = $this->createMock(Trace::class);
-        $traceMock
-            ->method('hasTests')
-            ->willReturn($scenario->traceHasTests);
-
-        if ($scenario->hasTrace) {
+        if ($hasTrace) {
             $this->tracerMock
                 ->method('trace')
-                ->willReturn($traceMock);
+                ->willReturn(new FakeTrace());
         } else {
             $this->tracerMock
                 ->method('trace')
@@ -247,7 +233,7 @@ final class FileMutationGeneratorTest extends TestCase
 
         $mutations = $this->mutationGenerator->generate(
             $fileInfoMock,
-            $scenario->onlyCovered,
+            $onlyCovered,
             $mutators,
             $nodeIgnorers,
         );
@@ -260,44 +246,24 @@ final class FileMutationGeneratorTest extends TestCase
 
     public static function scenarioProvider(): iterable
     {
-        $nominalScenario = new Scenario(
-            onlyCovered: true,
-            hasTrace: true,
-            traceHasTests: true,
-            expected: true,
-        );
-
-        yield 'nominal' => [$nominalScenario];
-
-        yield 'onlyCovered=true: skip generation if no tests' => [
-            $nominalScenario
-                ->withTraceHasTests(false)
-                ->withExpected(false),
+        yield [
+            'onlyCovered' => true,
+            'hasTrace' => true,
         ];
 
-        yield 'onlyCovered=true: skip generation if no trace' => [
-            $nominalScenario
-                ->withHasTrace(false)
-                ->withExpected(false),
+        yield [
+            'onlyCovered' => false,
+            'hasTrace' => true,
         ];
 
-        yield 'onlyCovered=false: do not skip generation if no tests' => [
-            $nominalScenario
-                ->withOnlyCovered(false)
-                ->withTraceHasTests(false),
+        yield [
+            'onlyCovered' => true,
+            'hasTrace' => false,
         ];
 
-        yield 'onlyCovered=false: do not skip generation if no trace' => [
-            $nominalScenario
-                ->withOnlyCovered(false)
-                ->withHasTrace(false),
-        ];
-
-        yield 'onlyCovered=false: do not skip generation if no trace and no tests' => [
-            $nominalScenario
-                ->withOnlyCovered(false)
-                ->withHasTrace(false)
-                ->withTraceHasTests(false),
+        yield [
+            'onlyCovered' => false,
+            'hasTrace' => false,
         ];
     }
 

@@ -72,6 +72,11 @@ final class ListSourcesCommand extends BaseCommand
             logger: new ConsoleLogger($io),
             output: $io->getOutput(),
             configFile: ConfigurationOption::get($io),
+            // Without this, we would try to filter out the sources which
+            // do not have tests which require coverage data.
+            // Whilst it is an interesting piece of information, it is not
+            // the scope of this command.
+            withUncovered: true,
             sourceFilter: SourceFilterOptions::get($io),
         );
 
