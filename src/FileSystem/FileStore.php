@@ -35,11 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
-use function file_get_contents;
 use function is_string;
-use function method_exists;
-use function restore_error_handler;
-use function set_error_handler;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Webmozart\Assert\Assert;
@@ -70,37 +66,6 @@ final class FileStore
 
         Assert::notFalse($path);
 
-        return $this->contents[$path] ??= $this->readFile($path);
-    }
-
-    /**
-     * @infection-ignore-all
-     *
-     * @throws IOException
-     */
-    private function readFile(string $path): string
-    {
-        // @phpstan-ignore function.alreadyNarrowedType
-        if (method_exists($this->fileSystem, 'readFile')) {
-            return $this->fileSystem->readFile($path);
-        }
-
-        // To delete once we drop support for Symfony 6.4.
-        // Copied from Symfony\Finder\SplFileInfo::getContents() with the exception adjusted
-        // @phpstan-ignore argument.type
-        set_error_handler(static function ($type, $msg) use (&$error): void { $error = $msg; });
-
-        try {
-            // @phpstan-ignore theCodingMachineSafe.function
-            $content = file_get_contents($path);
-        } finally {
-            restore_error_handler();
-        }
-
-        if ($content === false) {
-            throw new IOException($error ?? '');
-        }
-
-        return $content;
+        return $this->contents[$path] ??= $this->fileSystem->readFile($path);
     }
 }
