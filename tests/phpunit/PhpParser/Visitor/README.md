@@ -132,7 +132,10 @@ public function test_it_annotates_nodes(
     // 1. Parse the code
     $nodes = $this->parse($code);
 
-    // 2. Add IDs for easier debugging
+    // 2. Add IDs for easier debugging; This is totally optional.
+    //    If there are attributes with circular dependencies, the IDs
+    //    allow handling them out the box. Otherwise, those attributes
+    //    will have to be explicitly removed.
     $this->addIdsToNodes($nodes);
 
     // 3. Apply visitors

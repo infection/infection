@@ -69,6 +69,8 @@ abstract class VisitorTestCase extends TestCase
     {
         $nodes = $this->parser->parse($code);
 
+        // Currently, this should not be possible because we configure
+        // PhpParser to throw on failure rather than returning `null`.
         $this->assertNotNull($nodes);
 
         return $nodes;
