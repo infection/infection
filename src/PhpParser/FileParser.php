@@ -44,13 +44,12 @@ use Throwable;
 
 /**
  * @internal
- * @final
  */
-class FileParser
+final readonly class FileParser
 {
     public function __construct(
-        private readonly Parser $parser,
-        private readonly FileStore $fileStore,
+        private Parser $parser,
+        private FileStore $fileStore,
     ) {
     }
 

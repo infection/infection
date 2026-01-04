@@ -51,6 +51,7 @@ use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
 use function iterator_to_array;
 use PhpParser\NodeTraverserInterface;
+use PhpParser\Parser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -60,7 +61,7 @@ use Symfony\Component\Finder\SplFileInfo;
 #[CoversClass(FileMutationGenerator::class)]
 final class FileMutationGeneratorTest extends TestCase
 {
-    private MockObject&FileParser $fileParserMock;
+    private MockObject&Parser $phpParserMock;
 
     private MockObject&NodeTraverserFactory $traverserFactoryMock;
 
@@ -70,7 +71,7 @@ final class FileMutationGeneratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fileParserMock = $this->createMock(FileParser::class);
+        $this->phpParserMock = $this->createMock(Parser::class);
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
 
@@ -80,7 +81,9 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn('');
 
         $this->mutationGenerator = new FileMutationGenerator(
-            $this->fileParserMock,
+            new FileParser(
+                $this->phpParserMock,
+            ),
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
             $this->createMock(SourceLineMatcher::class),
@@ -91,7 +94,10 @@ final class FileMutationGeneratorTest extends TestCase
 
     public function test_it_parses_the_source_file_and_yields_the_generated_mutations(): void
     {
-        $fileInfoMock = $this->createSplFileInfoMock('/path/to/file');
+        $fileInfoMock = $this->createSplFileInfoMock(
+            '/path/to/file',
+            'contents',
+        );
 
         $mutators = [
             new FakeMutator(),
@@ -110,15 +116,15 @@ final class FileMutationGeneratorTest extends TestCase
             FakeToken::create(),
         ];
 
-        $this->fileParserMock
+        $this->phpParserMock
             ->expects($this->once())
             ->method('parse')
-            ->willReturnCallback(function (SplFileInfo $fileInfo) use ($initialStatements, $originalFileTokens): array {
-                $this->assertSame('/path/to/file', $fileInfo->getRealPath());
-
-                return [$initialStatements, $originalFileTokens];
-            })
-        ;
+            ->with('contents')
+            ->willReturn($initialStatements);
+        $this->phpParserMock
+            ->expects($this->once())
+            ->method('getTokens')
+            ->willReturn($originalFileTokens);
 
         $preTraverserCalled = false;
 
@@ -219,16 +225,20 @@ final class FileMutationGeneratorTest extends TestCase
             ->willReturn([]);
 
         if ($scenario->expected) {
-            $this->fileParserMock
+            $this->phpParserMock
                 ->expects($this->once())
                 ->method('parse')
-                ->willReturn([$initialStatements, $originalFileTokens]);
+                ->willReturn($initialStatements);
+            $this->phpParserMock
+                ->expects($this->once())
+                ->method('getTokens')
+                ->willReturn($originalFileTokens);
 
             $this->traverserFactoryMock
                 ->method('createPreTraverser')
                 ->willReturn($traverserStub);
         } else {
-            $this->fileParserMock
+            $this->phpParserMock
                 ->expects($this->never())
                 ->method('parse');
 
@@ -309,10 +319,13 @@ final class FileMutationGeneratorTest extends TestCase
         ];
     }
 
-    private function createSplFileInfoMock(string $file): SplFileInfo&MockObject
-    {
+    private function createSplFileInfoMock(
+        string $path,
+        string $contents = '',
+    ): SplFileInfo&MockObject {
         $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock->method('getRealPath')->willReturn($file);
+        $splFileInfoMock->method('getRealPath')->willReturn($path);
+        $splFileInfoMock->method('getContents')->willReturn($contents);
 
         return $splFileInfoMock;
     }
