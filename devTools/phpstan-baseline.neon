@@ -13,10 +13,10 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: '#^Parameter \#2 \$value of method DIContainer\\Container\:\:set\(\) expects \(callable\(DIContainer\\Container\)\: object\)\|class\-string\<DIContainer\\Builder\<object\>\>, callable\(Infection\\Container\)\: object given\.$#'
+			message: '#^Parameter \#2 \$value of method DIContainer\\Container\:\:set\(\) expects \(callable\(DIContainer\\Container\)\: object\)\|class\-string\<DIContainer\\Builder\<object\>\>, callable\(Infection\\Container\\Container\)\: object given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../src/Container.php
+			path: ../src/Container/Container.php
 
 		-
 			message: '#^Variable \$end might not be defined\.$#'

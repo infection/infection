@@ -82,7 +82,7 @@ final class InfectionContainerRule implements Rule {
         return self::$containerFiles ??= array_map(
             static fn (string $path): string => Path::canonicalize($path),
             [
-                __DIR__ . '/../../../tests/phpunit/ContainerTest.php',
+                __DIR__ . '/../../../tests/phpunit/Container/ContainerTest.php',
                 __DIR__ . '/../../../tests/phpunit/MockedContainer.php',
             ],
         );
