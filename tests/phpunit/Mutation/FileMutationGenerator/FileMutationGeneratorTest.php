@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
+use Infection\FileSystem\FileStore;
+use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -72,12 +74,18 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
 
+        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub
+            ->method('readFile')
+            ->willReturn('');
+
         $this->mutationGenerator = new FileMutationGenerator(
             $this->fileParserMock,
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
             $this->createMock(SourceLineMatcher::class),
             $this->tracerMock,
+            new FileStore($fileSystemStub),
         );
     }
 

@@ -102,6 +102,7 @@ return static function (int $maxCount): Closure {
         $container->getLineRangeCalculator(),
         $container->getSourceLineMatcher(),
         new EmptyTraceTracer(),
+        $container->getFileStore(),
     );
 
     return static function () use ($sources, $fileMutationGenerator, $mutators, $maxCount): int {
