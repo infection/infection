@@ -154,7 +154,7 @@ final class InitialTestsRunnerTest extends TestCase
 
         // Count completed events - OS buffering makes exact count non-deterministic
         // Minimum 1: at least one output chunk was processed
-        // Maximum 4: the test script has 4 writes, $stopped flag prevents infinite events
+        // Maximum 4: the test script has 4 writes total
         $completedCount = count(array_filter(
             $events,
             static fn ($e) => $e instanceof InitialTestCaseWasCompleted,

@@ -72,6 +72,7 @@ class InitialTestsRunner
 
         $process->run(function (string $type) use ($process): void {
             if ($type === Process::ERR) {
+                // Stop on the first error encountered
                 $process->stop();
             }
 
