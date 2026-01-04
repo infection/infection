@@ -38,9 +38,9 @@ namespace Infection\Command\Test\Option;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\Container;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use function sprintf;
 use function trim;
 
 /**
@@ -54,9 +54,6 @@ final class InitialTestsPhpOptionsOption
 
     /**
      * @template T of Command
-     * @param Command $command
-     *
-     * @return Command
      */
     public static function addOption(Command $command): Command
     {

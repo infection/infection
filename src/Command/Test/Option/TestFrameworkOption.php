@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Command\Test\Option;
 
+use function implode;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\Container;
 use Infection\TestFramework\TestFrameworkTypes;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use function implode;
-use function sprintf;
 use function trim;
 
 /**
@@ -56,9 +56,6 @@ final class TestFrameworkOption
 
     /**
      * @template T of Command
-     * @param Command $command
-     *
-     * @return Command
      */
     public static function addOption(Command $command): Command
     {

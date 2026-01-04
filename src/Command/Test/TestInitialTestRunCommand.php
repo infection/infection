@@ -35,15 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Command\Test;
 
-use Infection\Command\Test\Option\InitialTestsPhpOptionsOption;
-use Infection\Command\Test\Option\MapSourceClassToTestOption;
-use Infection\Command\Test\Option\TestFrameworkOption;
-use Infection\Command\Test\Option\TestFrameworkOptionsOption;
 use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
+use Infection\Command\Test\Option\InitialTestsPhpOptionsOption;
+use Infection\Command\Test\Option\MapSourceClassToTestOption;
+use Infection\Command\Test\Option\TestFrameworkOption;
+use Infection\Command\Test\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;

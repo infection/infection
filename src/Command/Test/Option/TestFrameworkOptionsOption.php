@@ -53,9 +53,6 @@ final class TestFrameworkOptionsOption
 
     /**
      * @template T of Command
-     * @param Command $command
-     *
-     * @return Command
      */
     public static function addOption(Command $command): Command
     {

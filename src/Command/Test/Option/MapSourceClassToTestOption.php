@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Command\Test\Option;
 
+use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use InvalidArgumentException;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use function in_array;
-use function sprintf;
 
 /**
  * @internal
@@ -55,9 +55,6 @@ final class MapSourceClassToTestOption
 
     /**
      * @template T of Command
-     * @param Command $command
-     *
-     * @return Command
      */
     public static function addOption(Command $command): Command
     {
@@ -91,11 +88,11 @@ final class MapSourceClassToTestOption
         if (!in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
             throw new InvalidArgumentException(
                 sprintf(
-                'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
-                $inputValue,
-                self::NAME,
-                MapSourceClassToTestStrategy::SIMPLE,
-            ),
+                    'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
+                    $inputValue,
+                    self::NAME,
+                    MapSourceClassToTestStrategy::SIMPLE,
+                ),
             );
         }
 
