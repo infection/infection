@@ -33,74 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Command\ListSourcesCommand;
+namespace Infection\Tests\Container\Builder;
 
-use Infection\Command\ListSourcesCommand;
-use Infection\Console\Application;
-use Infection\Container\Container;
+use Infection\Configuration\SourceFilter\PlainFilter;
+use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
+use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function Safe\chdir;
-use function Safe\getcwd;
-use Symfony\Component\Console\Tester\CommandTester;
+use ReflectionProperty;
 
-#[Group('integration')]
-#[CoversClass(ListSourcesCommand::class)]
-final class ListSourcesCommandTest extends TestCase
+#[CoversClass(IndexXmlCoverageParserBuilder::class)]
+final class IndexXmlCoverageParserBuilderTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
-
-    private string $cwd;
-
-    protected function setUp(): void
+    public function test_it_builds_with_source_filtered_false_when_no_filter(): void
     {
-        $this->cwd = getcwd();
-        chdir(self::FIXTURES_DIR);
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceFilter(null)
+            ->build();
+
+        $parser = (new IndexXmlCoverageParserBuilder($configuration))->build();
+
+        $this->assertFalse($this->getIsSourceFiltered($parser));
     }
 
-    protected function tearDown(): void
+    public function test_it_builds_with_source_filtered_true_when_filter_present(): void
     {
-        chdir($this->cwd);
+        $configuration = ConfigurationBuilder::withMinimalTestData()
+            ->withSourceFilter(new PlainFilter(['src/']))
+            ->build();
+
+        $parser = (new IndexXmlCoverageParserBuilder($configuration))->build();
+
+        $this->assertTrue($this->getIsSourceFiltered($parser));
     }
 
-    /**
-     * @param array<string, string> $input
-     */
-    #[DataProvider('inputProvider')]
-    public function test_it_lists_source_files(
-        array $input,
-        string $expected,
-    ): void {
-        $application = new Application(Container::create());
-        $tester = new CommandTester($application->find('config:list-sources'));
-
-        $tester->execute($input);
-
-        $actual = $tester->getDisplay();
-
-        $this->assertSame($expected, $actual);
-        $tester->assertCommandIsSuccessful();
-    }
-
-    public static function inputProvider(): iterable
+    private function getIsSourceFiltered(IndexXmlCoverageParser $parser): bool
     {
-        yield 'no filter' => [
-            [],
-            <<<'STDOUT'
-                File1.php
-                File2.php
-
-                STDOUT,
-        ];
-
-        yield 'with plain filter' => [
-            ['--filter' => 'File1'],
-            <<<'STDOUT'
-                File1.php
-
-                STDOUT,
-        ];
+        return (new ReflectionProperty($parser, 'isSourceFiltered'))->getValue($parser);
     }
 }

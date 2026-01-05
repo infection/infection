@@ -47,7 +47,7 @@ use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Command\ListSourcesCommand;
 use Infection\Command\MakeCustomMutatorCommand;
 use Infection\Command\RunCommand;
-use Infection\Container;
+use Infection\Container\Container;
 use OutOfBoundsException;
 use function preg_quote;
 use function Safe\preg_match;
