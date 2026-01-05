@@ -108,7 +108,8 @@ final class TraceProviderAdapterTracer implements Tracer
 
     private function tryToTrace(SplFileInfo $fileInfo): ?Trace
     {
-        $sourcePathname = $fileInfo->getPathname();
+        $sourcePathname = $fileInfo->getRealPath();
+        Assert::notFalse($sourcePathname);
 
         return array_key_exists($sourcePathname, $this->indexedTraces)
             ? $this->indexedTraces[$sourcePathname]
@@ -136,7 +137,9 @@ final class TraceProviderAdapterTracer implements Tracer
 
             $this->isEmpty = false;
 
-            $traceSourcePathname = $trace->getSourceFileInfo()->getPathname();
+            $traceSourcePathname = $trace->getSourceFileInfo()->getRealPath();
+            Assert::notFalse($traceSourcePathname);
+
             $this->indexedTraces[$traceSourcePathname] = $trace;
 
             if ($traceSourcePathname === $sourcePathname) {
