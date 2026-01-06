@@ -994,11 +994,6 @@ final class Container extends DIContainer
         return $this->get(MinMsiChecker::class);
     }
 
-    private function getMutatedCodePrinter(): MutantCodePrinter
-    {
-        return $this->get(MutantCodePrinter::class);
-    }
-
     private function getStopwatch(): Stopwatch
     {
         return $this->get(Stopwatch::class);
@@ -1034,19 +1029,9 @@ final class Container extends DIContainer
         return $this->get(ConfigurationFactory::class);
     }
 
-    private function getPrinter(): PrettyPrinterAbstract
-    {
-        return $this->get(PrettyPrinterAbstract::class);
-    }
-
     private function getTestFrameworkConfigLocator(): TestFrameworkConfigLocator
     {
         return $this->get(TestFrameworkConfigLocator::class);
-    }
-
-    private function getStaticAnalysisConfigLocator(): StaticAnalysisConfigLocator
-    {
-        return $this->get(StaticAnalysisConfigLocator::class);
     }
 
     private function getProcessRunner(): ProcessRunner
