@@ -33,47 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-use Infection\Testing\SingletonContainer;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
 
-abstract class BaseVisitorTestCase extends TestCase
+#[CoversClass(Sequence::class)]
+final class SequenceTest extends TestCase
 {
-    /**
-     * @return array{0: Node[], 1: Token[]}
-     */
-    final protected static function parseCode(string $code): array
+    public function test_it_gives_a_sequence(): void
     {
-        $parser = SingletonContainer::getContainer()->getParser();
+        $sequence = new Sequence();
 
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
+        for ($i = 0; $i < 10; ++$i) {
+            $value = $sequence->next();
 
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
-    }
-
-    /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
-     */
-    final protected function traverse(array $nodes, array $visitors): array
-    {
-        $traverser = new NodeTraverser();
-
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
+            $this->assertSame($i, $value);
         }
-
-        return $traverser->traverse($nodes);
     }
 }

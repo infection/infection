@@ -33,47 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
-use Infection\Testing\SingletonContainer;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
+use function spl_object_id;
+use function sprintf;
+use UnexpectedValueException;
 
-abstract class BaseVisitorTestCase extends TestCase
+final class PotentialCircularDependencyDetected extends UnexpectedValueException
 {
-    /**
-     * @return array{0: Node[], 1: Token[]}
-     */
-    final protected static function parseCode(string $code): array
-    {
-        $parser = SingletonContainer::getContainer()->getParser();
-
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
-    }
-
-    /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
-     */
-    final protected function traverse(array $nodes, array $visitors): array
-    {
-        $traverser = new NodeTraverser();
-
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
-        }
-
-        return $traverser->traverse($nodes);
+    public static function forAttribute(
+        string $key,
+        Node $value,
+    ): self {
+        return new self(
+            sprintf(
+                'The attribute "%s" found a node instance "%s" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
+                $key,
+                $value::class,
+                spl_object_id($value),
+            ),
+        );
     }
 }
