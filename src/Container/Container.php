@@ -240,9 +240,7 @@ final class Container extends DIContainer
 
     public static function create(): self
     {
-        $removeDep = getenv('REMOVE_DEP');
-
-        $parts = [
+        $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
@@ -540,17 +538,7 @@ final class Container extends DIContainer
                     );
                 },
             ),
-        ];
-
-        if ($removeDep !== false) {
-            $parts = array_filter(
-                $parts,
-                static fn (string $key): bool => !str_ends_with($key, $removeDep),
-                ARRAY_FILTER_USE_KEY,
-            );
-        }
-
-        $container = new self($parts);
+        ]);
 
         return $container->withValues(
             new NullLogger(),
