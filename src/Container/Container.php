@@ -240,7 +240,9 @@ final class Container extends DIContainer
 
     public static function create(): self
     {
-        $container = new self([
+        $removeDep = getenv('REMOVE_DEP');
+
+        $parts = [
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
@@ -276,25 +278,10 @@ final class Container extends DIContainer
                     GeneratedExtensionsConfig::EXTENSIONS,
                 );
             },
-            StaticAnalysisToolFactory::class => static function (self $container): StaticAnalysisToolFactory {
-                $config = $container->getConfiguration();
-
-                return new StaticAnalysisToolFactory(
-                    $config,
-                    $container->getStaticAnalysisToolExecutableFinder(),
-                    $container->getStaticAnalysisConfigLocator(),
-                );
-            },
             MutantFactory::class => static fn (self $container): MutantFactory => new MutantFactory(
                 $container->getConfiguration()->tmpDir,
                 $container->getDiffer(),
                 $container->getMutantCodeFactory(),
-            ),
-            MutantCodeFactory::class => static fn (self $container): MutantCodeFactory => new MutantCodeFactory(
-                $container->getMutatedCodePrinter(),
-            ),
-            MutantCodePrinter::class => static fn (self $container): MutantCodePrinter => new MutantCodePrinter(
-                $container->getPrinter(),
             ),
             Differ::class => static fn (): Differ => new Differ(new BaseDiffer(new UnifiedDiffOutputBuilder(''))),
             SyncEventDispatcher::class => static fn (): SyncEventDispatcher => new SyncEventDispatcher(),
@@ -303,9 +290,6 @@ final class Container extends DIContainer
             ),
             TestFrameworkConfigLocator::class => static fn (self $container): TestFrameworkConfigLocator => new TestFrameworkConfigLocator(
                 (string) $container->getConfiguration()->phpUnit->configDir,
-            ),
-            StaticAnalysisConfigLocator::class => static fn (self $container): StaticAnalysisConfigLocator => new StaticAnalysisConfigLocator(
-                (string) $container->getConfiguration()->phpStan->configDir,
             ),
             MemoizedTestFileDataProvider::class => static fn (self $container): TestFileDataProvider => new MemoizedTestFileDataProvider(
                 new JUnitTestFileDataProvider($container->getJUnitReportLocator()),
@@ -393,15 +377,6 @@ final class Container extends DIContainer
                     $config->isDebugEnabled,
                 );
             },
-            InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
-                $config = $container->getConfiguration();
-
-                return new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
-                    $config->noProgress,
-                    $config->isDebugEnabled,
-                    $container->getStaticAnalysisToolAdapter(),
-                );
-            },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
                 $container->getConfiguration()->noProgress,
             ),
@@ -433,13 +408,6 @@ final class Container extends DIContainer
                 $container->getTimeFormatter(),
                 $container->getMemoryFormatter(),
                 $container->getConfiguration()->threadCount,
-            ),
-            FileMutationGenerator::class => static fn (self $container): FileMutationGenerator => new FileMutationGenerator(
-                $container->getFileParser(),
-                $container->getNodeTraverserFactory(),
-                $container->getLineRangeCalculator(),
-                $container->getSourceLineMatcher(),
-                $container->getTracer(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -493,13 +461,6 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
-            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
-                $container->getStaticAnalysisToolAdapter(),
-            ),
-            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
-                $container->getInitialStaticAnalysisProcessFactory(),
-                $container->getEventDispatcher(),
-            ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
@@ -566,9 +527,6 @@ final class Container extends DIContainer
                     )
                     : new NullSourceLineMatcher();
             },
-            SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
-                $container->getGit(),
-            ),
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {
                     $configuration = $container->getConfiguration();
@@ -582,7 +540,17 @@ final class Container extends DIContainer
                     );
                 },
             ),
-        ]);
+        ];
+
+        if ($removeDep !== false) {
+            $parts = array_filter(
+                $parts,
+                static fn (string $key): bool => !str_ends_with($key, $removeDep),
+                ARRAY_FILTER_USE_KEY,
+            );
+        }
+
+        $container = new self($parts);
 
         return $container->withValues(
             new NullLogger(),
