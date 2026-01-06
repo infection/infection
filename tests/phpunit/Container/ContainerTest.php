@@ -39,6 +39,11 @@ use function array_keys;
 use Error;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
+use Infection\Mutant\MutantCodeFactory;
+use Infection\Mutant\MutantCodePrinter;
+use Infection\Mutation\FileMutationGenerator;
+use Infection\Source\Collector\SourceCollectorFactory;
+use Infection\StaticAnalysis\StaticAnalysisToolFactory;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\Reflection\ContainerReflection;
@@ -225,5 +230,37 @@ final class ContainerTest extends TestCase
         );
 
         $this->assertSame($service, $reflection->getService($id));
+    }
+
+    /**
+     * These classes were removed from the Container factory list because they can be auto-wired.
+     * This test ensures they remain auto-wireable.
+     *
+     * @see https://github.com/infection/infection/pull/2147
+     */
+    public static function provideAutoWireableServices(): iterable
+    {
+        yield 'StaticAnalysisToolFactory' => [StaticAnalysisToolFactory::class];
+
+        yield 'MutantCodeFactory' => [MutantCodeFactory::class];
+
+        yield 'MutantCodePrinter' => [MutantCodePrinter::class];
+
+        yield 'FileMutationGenerator' => [FileMutationGenerator::class];
+
+        yield 'SourceCollectorFactory' => [SourceCollectorFactory::class];
+    }
+
+    /**
+     * @param class-string $id
+     */
+    #[DataProvider('provideAutoWireableServices')]
+    public function test_service_can_be_auto_wired(string $id): void
+    {
+        $container = Container::create();
+
+        $service = $container->get($id);
+
+        $this->assertInstanceOf($id, $service);
     }
 }
