@@ -96,7 +96,6 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
 use Infection\Metrics\TargetDetectionStatusesProvider;
 use Infection\Mutant\MutantCodeFactory;
-use Infection\Mutant\MutantCodePrinter;
 use Infection\Mutant\MutantFactory;
 use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
