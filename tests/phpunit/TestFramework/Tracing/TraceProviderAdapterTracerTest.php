@@ -145,6 +145,36 @@ final class TraceProviderAdapterTracerTest extends TestCase
         $this->assertSame($trace3, $this->tracer->trace($fileInfo3));
     }
 
+    // Note that despite being Windows-specific, the same problem could
+    // maybe surface with symlinks (this was not checked).
+    public function test_it_finds_traces_on_windows(): void
+    {
+        // Comes from the Symfony Finder.
+        // See https://github.com/infection/infection/pull/2789#issuecomment-3710366303
+        $sourceFileInfo = new MockSplFileInfo([
+            'name' => 'C:/path/to/project/src\Admin\Admin.php',
+            'realPath' => 'C:\path\to\project\src\Admin\Admin.php',
+        ]);
+
+        // Comes from SourceFileInfoProvider
+        $coverageFileInfo = new MockSplFileInfo([
+            'name' => 'C:\path\to\project\src\Admin\Admin.php',
+            'realPath' => 'C:\path\to\project\src\Admin\Admin.php',
+        ]);
+
+        $tracesIterator = new ArrayIterator([
+            $trace = $this->createTraceMock($coverageFileInfo),
+            $this->createTraceMock($coverageFileInfo),
+        ]);
+
+        $this->traceProviderMock
+            ->expects($this->once())
+            ->method('provideTraces')
+            ->willReturn($tracesIterator);
+
+        $this->assertSame($trace, $this->tracer->trace($sourceFileInfo));
+    }
+
     public function test_it_handles_empty_trace_provider(): void
     {
         $fileInfo = self::createDummySplFileInfo('src/Service.php');
@@ -167,7 +197,10 @@ final class TraceProviderAdapterTracerTest extends TestCase
      */
     private static function createDummySplFileInfo(string $name): MockSplFileInfo
     {
-        return new MockSplFileInfo(['name' => $name]);
+        return new MockSplFileInfo([
+            'name' => $name,
+            'realPath' => $name,
+        ]);
     }
 
     /**
