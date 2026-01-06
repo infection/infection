@@ -178,8 +178,19 @@ final class ContainerTest extends TestCase
             sprintf('Service should be an instance of "%s"', $id),
         );
 
-        // Here we can check that all other services can be created without a factory for this service
-        // Iterate over $reflection->iterateExpectedConcreteServices(), calling getService() for each service
+        // Verify all other services can still be created without this factory
+        foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $serviceId) {
+            try {
+                $dependentService = $reflection->getService($serviceId);
+            } catch (InvalidArgumentException $e) {
+                $this->fail(sprintf(
+                    'Factory for "%s" is essential: removing it breaks "%s" (%s)',
+                    $id,
+                    $serviceId,
+                    $e->getMessage(),
+                ));
+            }
+        }
     }
 
     public static function provideExpectedConcreteServicesWithReflection(): iterable

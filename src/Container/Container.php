@@ -461,6 +461,13 @@ final class Container extends DIContainer
                     $config->processTimeout,
                 );
             },
+            InitialStaticAnalysisProcessFactory::class => static fn (self $container): InitialStaticAnalysisProcessFactory => new InitialStaticAnalysisProcessFactory(
+                $container->getStaticAnalysisToolAdapter(),
+            ),
+            InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
+                $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getEventDispatcher(),
+            ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
                 $config = $container->getConfiguration();
 
