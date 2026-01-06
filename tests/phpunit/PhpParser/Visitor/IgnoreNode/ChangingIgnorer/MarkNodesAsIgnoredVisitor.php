@@ -33,47 +33,56 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor;
+namespace Infection\Tests\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 
-use Infection\Testing\SingletonContainer;
+use function in_array;
+use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor;
-use PhpParser\Token;
-use PHPUnit\Framework\TestCase;
-use Webmozart\Assert\Assert;
+use PhpParser\NodeVisitorAbstract;
+use SplObjectStorage;
 
-abstract class BaseVisitorTestCase extends TestCase
+final class MarkNodesAsIgnoredVisitor extends NodeVisitorAbstract
 {
     /**
-     * @return array{0: Node[], 1: Token[]}
+     * @var SplObjectStorage<Node, null>
      */
-    final protected static function parseCode(string $code): array
-    {
-        $parser = SingletonContainer::getContainer()->getParser();
-
-        $statements = $parser->parse($code);
-        $originalFileTokens = $parser->getTokens();
-
-        Assert::notNull($statements);
-
-        return [$statements, $originalFileTokens];
-    }
+    private readonly SplObjectStorage $ignoredNodes;
 
     /**
-     * @param Node[] $nodes
-     * @param NodeVisitor[] $visitors
-     *
-     * @return Node[]
+     * @param array<positive-int|0> $ignoredNodeIds
      */
-    final protected function traverse(array $nodes, array $visitors): array
-    {
-        $traverser = new NodeTraverser();
+    public function __construct(
+        private readonly array $ignoredNodeIds,
+        private readonly ChangingIgnorer $changingIgnorer,
+    ) {
+        $this->ignoredNodes = new SplObjectStorage();
+    }
 
-        foreach ($visitors as $visitor) {
-            $traverser->addVisitor($visitor);
+    public function enterNode(Node $node): null
+    {
+        if ($this->ignores($node)) {
+            $this->changingIgnorer->startIgnoring();
+            $this->ignoredNodes->offsetSet($node);
         }
 
-        return $traverser->traverse($nodes);
+        return null;
+    }
+
+    public function leaveNode(Node $node): null
+    {
+        if ($this->ignoredNodes->offsetExists($node)) {
+            $this->changingIgnorer->stopIgnoring();
+            $this->ignoredNodes->offsetUnset($node);
+        }
+
+        return null;
+    }
+
+    private function ignores(Node $node): bool
+    {
+        $id = AddIdToTraversedNodesVisitor::getNodeId($node);
+
+        return in_array($id, $this->ignoredNodeIds, true);
     }
 }
