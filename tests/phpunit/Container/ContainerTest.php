@@ -179,7 +179,7 @@ final class ContainerTest extends TestCase
         );
 
         // Verify all other services can still be created without this factory
-        foreach ($reflection->iterateExpectedConcreteServices() as $methodName => $serviceId) {
+        foreach ($reflection->iterateExpectedConcreteServices() as $serviceId) {
             try {
                 $dependentService = $reflection->getService($serviceId);
             } catch (InvalidArgumentException $e) {

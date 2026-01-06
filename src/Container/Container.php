@@ -377,6 +377,15 @@ final class Container extends DIContainer
                     $config->isDebugEnabled,
                 );
             },
+            InitialStaticAnalysisRunConsoleLoggerSubscriberFactory::class => static function (self $container): InitialStaticAnalysisRunConsoleLoggerSubscriberFactory {
+                $config = $container->getConfiguration();
+
+                return new InitialStaticAnalysisRunConsoleLoggerSubscriberFactory(
+                    $config->noProgress,
+                    $config->isDebugEnabled,
+                    $container->getStaticAnalysisToolAdapter(),
+                );
+            },
             MutationGeneratingConsoleLoggerSubscriberFactory::class => static fn (self $container): MutationGeneratingConsoleLoggerSubscriberFactory => new MutationGeneratingConsoleLoggerSubscriberFactory(
                 $container->getConfiguration()->noProgress,
             ),
