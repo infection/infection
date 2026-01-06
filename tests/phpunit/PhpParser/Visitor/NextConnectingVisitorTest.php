@@ -136,25 +136,25 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1; // no next
+                $a = 1; // no next (function declaration breaks chain)
 
                 function test() {
                     $b = 2; // next = $c
-                    $c = 3; // no next ;TODO: current has next=$d!
+                    $c = 3; // no next (function body isolated)
                 }
 
                 $d = 4; // next = $closure1
 
-                $closure1 = function () {   // next = $g ;TODO: currently has no next!
-                    $e = 5; // next = $e
-                    $f = 6; // no next ;TODO: currently has next=$g!
+                $closure1 = function () {   // next = $g (closure statement connects to next)
+                    $e = 5; // next = $f
+                    $f = 6; // no next (closure body isolated)
                 };
 
                 $g = 7; // next = $closure2
 
-                $closure2 = fn () => $h = 8;    // next of $closure2 is $e ;TODO: currently has no next! ; // $h has no next
+                $closure2 = fn () => $h = 8;    // next = $i (arrow function statement connects to next) ; $h has no next
 
-                $e = 9; // no next
+                $i = 9; // no next
 
                 PHP,
             true,
@@ -207,7 +207,6 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                     nodeId: 11
                                 )
                                 nodeId: 10
-                                next: nodeId(14)
                             )
                         )
                         nodeId: 4
@@ -262,7 +261,6 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                                             nodeId: 27
                                         )
                                         nodeId: 26
-                                        next: nodeId(30)
                                     )
                                 )
                                 nodeId: 21
@@ -270,6 +268,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 19
                         )
                         nodeId: 18
+                        next: nodeId(30)
                     )
                     4: Stmt_Expression(
                         expr: Expr_Assign(
@@ -308,6 +307,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                             nodeId: 35
                         )
                         nodeId: 34
+                        next: nodeId(41)
                     )
                     6: Stmt_Expression(
                         expr: Expr_Assign(
