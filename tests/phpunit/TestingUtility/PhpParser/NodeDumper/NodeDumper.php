@@ -111,7 +111,7 @@ final class NodeDumper
         'endFilePos' => true,
         'startTokenPos' => true,
         'endTokenPos' => true,
-        // The following attribute(s) is/are Infection specific
+        // Infection specific attribute(s)
         MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE => true,
     ];
 

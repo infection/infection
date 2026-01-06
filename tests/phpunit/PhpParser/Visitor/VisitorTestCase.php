@@ -62,6 +62,20 @@ abstract class VisitorTestCase extends TestCase
         return SingletonContainer::getContainer()->getParser();
     }
 
+    /**
+     * @return Node\Stmt[]
+     */
+    final protected function parse(string $code): array
+    {
+        $nodes = $this->parser->parse($code);
+
+        // Currently, this should not be possible because we configure
+        // PhpParser to throw on failure rather than returning `null`.
+        $this->assertNotNull($nodes);
+
+        return $nodes;
+    }
+
     protected function createDumper(): NodeDumper
     {
         return new NodeDumper();

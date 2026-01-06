@@ -47,13 +47,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class AbstractMethodIgnorerTest extends VisitorTestCase
 {
     #[DataProvider('nodeProvider')]
-    public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
+    public function test_it_ignores_abstract_methods(
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $traverser = new NodeTraverser(
             new NonMutableNodesIgnorerVisitor([new AbstractMethodIgnorer()]),

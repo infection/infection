@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Container;
 
 use function array_filter;
 use DIContainer\Container as DIContainer;
@@ -53,6 +53,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterFactory;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\OutputFormatter\OutputFormatter;
+use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
 use Infection\Differ\DiffSourceCodeMatcher;
@@ -240,9 +241,7 @@ final class Container extends DIContainer
     public static function create(): self
     {
         $container = new self([
-            IndexXmlCoverageParser::class => static fn (self $container): IndexXmlCoverageParser => new IndexXmlCoverageParser(
-                isSourceFiltered: $container->getConfiguration()->sourceFilter !== null,
-            ),
+            IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
                 $container->getTraceProvider(),
             ),

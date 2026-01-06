@@ -60,9 +60,7 @@ final class ReflectionVisitorTest extends VisitorTestCase
         ?array $desiredAttributes,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
 

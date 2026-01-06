@@ -54,9 +54,7 @@ final class NonMutableNodesIgnorerVisitorTest extends VisitorTestCase
         array $ignoredNodeIds,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
         (new NodeTraverser(
@@ -98,6 +96,7 @@ final class NonMutableNodesIgnorerVisitorTest extends VisitorTestCase
             }
             PHP;
 
+        // Sanity check
         yield 'no code ignored' => [
             $codeSample,
             [],

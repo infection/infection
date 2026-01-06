@@ -50,14 +50,12 @@ final class ChangingIgnorerTest extends VisitorTestCase
      * @param array<positive-int|0> $ignoredNodeIds
      */
     #[DataProvider('nodeProvider')]
-    public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
+    public function test_it_annotates_ignored_nodes(
         string $code,
         array $ignoredNodeIds,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $changingIgnorer = new ChangingIgnorer();
 

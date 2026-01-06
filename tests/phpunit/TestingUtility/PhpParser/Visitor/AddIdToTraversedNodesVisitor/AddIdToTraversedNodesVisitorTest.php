@@ -44,7 +44,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 final class AddIdToTraversedNodesVisitorTest extends VisitorTestCase
 {
     #[DataProvider('nodeProvider')]
-    public function test_it_adds_an_idea_to_each_node(
+    public function test_it_adds_an_id_to_each_node(
         string $code,
         string $expected,
     ): void {

@@ -48,13 +48,11 @@ use SplObjectStorage;
 final class IgnoreAllMutationsAnnotationReaderVisitorTest extends VisitorTestCase
 {
     #[DataProvider('nodeProvider')]
-    public function test_it_annotates_excluded_nodes_and_stops_the_traversal(
+    public function test_it_marks_nodes_with_the_ignore_all_comment_as_ignored(
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse($code);
 
         $changingIgnorer = new ChangingIgnorer();
 

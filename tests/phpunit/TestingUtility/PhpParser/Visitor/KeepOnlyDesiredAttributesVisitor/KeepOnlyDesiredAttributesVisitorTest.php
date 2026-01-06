@@ -50,7 +50,7 @@ final class KeepOnlyDesiredAttributesVisitorTest extends VisitorTestCase
      * @param array<string, mixed> $expectedAttributes
      */
     #[DataProvider('attributeProvider')]
-    public function test_it_keeps_the_desired_attributes(
+    public function test_it_keeps_only_the_desired_attributes(
         array $initialAttributes,
         array $desiredAttributes,
         array $expectedAttributes,

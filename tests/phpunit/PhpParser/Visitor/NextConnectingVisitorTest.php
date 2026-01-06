@@ -35,10 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\PhpParser\Visitor;
 
+use function array_map;
+use function explode;
+use function implode;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use function rtrim;
+use function strpos;
+use function substr;
 
 #[CoversClass(NextConnectingVisitor::class)]
 final class NextConnectingVisitorTest extends VisitorTestCase
@@ -46,11 +52,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
     #[DataProvider('nodeProvider')]
     public function test_it_annotates_the_next_nodes(
         string $code,
+        bool $ignorePhpComments,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
-
-        $this->assertNotNull($nodes);
+        $nodes = $this->parse(
+            $ignorePhpComments
+                ? self::removePhpComments($code)
+                : $code,
+        );
 
         $this->addIdsToNodes($nodes);
         (new NodeTraverser(
@@ -68,10 +77,11 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1;
-                $b = 2;
-                $c = 3;
+                $a = 1; // next = $b
+                $b = 2; // next = $c
+                $c = 3; // no next
                 PHP,
+            true,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -126,27 +136,28 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1;
+                $a = 1; // no next
 
                 function test() {
-                    $b = 2;
-                    $c = 3;
+                    $b = 2; // next = $c
+                    $c = 3; // no next ;TODO: current has next=$d!
                 }
 
-                $d = 4;
+                $d = 4; // next = $closure1
 
-                $closure1 = function () {
-                    $e = 5;
-                    $f = 6;
+                $closure1 = function () {   // next = $g ;TODO: currently has no next!
+                    $e = 5; // next = $e
+                    $f = 6; // no next ;TODO: currently has next=$g!
                 };
 
-                $g = 7;
+                $g = 7; // next = $closure2
 
-                $closure2 = fn () => $h = 8;
+                $closure2 = fn () => $h = 8;    // next of $closure2 is $e ;TODO: currently has no next! ; // $h has no next
 
-                $e = 9;
+                $e = 9; // no next
 
                 PHP,
+            true,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -326,6 +337,7 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 /** Another comment */
                 $c = 3;
                 PHP,
+            false,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -382,16 +394,17 @@ final class NextConnectingVisitorTest extends VisitorTestCase
 
                 class Test {
                     public function foo() {
-                        $a = 1;
-                        $b = 2;
+                        $a = 1; // next = $a
+                        $b = 2; // no next
                     }
 
                     public function bar() {
-                        $c = 3;
-                        $d = 4;
+                        $c = 3; // next = $d
+                        $d = 4; // no next
                     }
                 }
                 PHP,
+            true,
             <<<'AST'
                 array(
                     0: Stmt_Class(
@@ -484,13 +497,14 @@ final class NextConnectingVisitorTest extends VisitorTestCase
             <<<'PHP'
                 <?php
 
-                $a = 1;
+                $a = 1; // no next
 
                 function empty_function() {
                 }
 
-                $b = 2;
+                $b = 2; // no next
                 PHP,
+            true,
             <<<'AST'
                 array(
                     0: Stmt_Expression(
@@ -536,16 +550,17 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 <?php
 
                 function hasMultipleReturns($condition) {
-                    if ($condition) {
-                        return 'early';
-                        $unreachable = true;
+                    if ($condition) {   // $condition has next = return stmt
+                        return 'early'; // next = $unreachable
+                        $unreachable = true;    // next = $a
                     }
 
-                    $a = 1;
-                    return 'normal';
-                    $afterReturn = 2;
+                    $a = 1; // next = return stmt
+                    return 'normal';    // next = $afterReturn
+                    $afterReturn = 2;   // no next
                 }
                 PHP,
+            true,
             <<<'AST'
                 array(
                     0: Stmt_Function(
@@ -645,10 +660,11 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 <?php
 
                 function lastReturn() {
-                    $a = 1;
-                    return $a;
+                    $a = 1;     // next = return stmt
+                    return $a;  // no next
                 }
                 PHP,
+            true,
             <<<'AST'
                 array(
                     0: Stmt_Function(
@@ -683,5 +699,25 @@ final class NextConnectingVisitorTest extends VisitorTestCase
                 )
                 AST,
         ];
+    }
+
+    private function removePhpComments(string $code): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                self::removePhpComment(...),
+                explode("\n", $code),
+            ),
+        );
+    }
+
+    private function removePhpComment(string $line): string
+    {
+        $position = strpos($line, '// ');
+
+        return $position === false
+            ? $line
+            : rtrim(substr($line, 0, $position));
     }
 }
