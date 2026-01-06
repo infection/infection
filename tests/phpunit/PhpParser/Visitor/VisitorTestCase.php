@@ -40,10 +40,12 @@ use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
 use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
+use Infection\Tests\TestingUtility\PhpParser\Visitor\RemoveUndesiredAttributesVisitor\RemoveUndesiredAttributesVisitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 abstract class VisitorTestCase extends TestCase
 {
@@ -90,6 +92,30 @@ abstract class VisitorTestCase extends TestCase
 
         $nodeTraverser = new NodeTraverser(
             new AddIdToTraversedNodesVisitor(),
+        );
+        $nodeTraverser->traverse($nodes);
+    }
+
+    /**
+     * @param Node[]|Node $nodeOrNodes
+     */
+    final protected function removeUndesiredAttributes(
+        array|Node $nodeOrNodes,
+        string ...$attributes,
+    ): void {
+        $nodes = (array) $nodeOrNodes;
+
+        $this->assertNotContains(
+            MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+            $attributes,
+            sprintf(
+                'The attribute "%s" is never printed hence should not be removed. To display all nodes adjust NodeDumper `::dump()` method call instead.',
+                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
+            ),
+        );
+
+        $nodeTraverser = new NodeTraverser(
+            new RemoveUndesiredAttributesVisitor(...$attributes),
         );
         $nodeTraverser->traverse($nodes);
     }

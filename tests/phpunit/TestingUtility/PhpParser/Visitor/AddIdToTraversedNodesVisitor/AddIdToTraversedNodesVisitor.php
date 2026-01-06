@@ -35,67 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor;
 
-<<<<<<<< HEAD:tests/phpunit/PhpParser/Visitor/VisitorTestCase.php
-use Infection\Testing\SingletonContainer;
-use Infection\Tests\TestingUtility\PhpParser\NodeDumper\NodeDumper;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\AddIdToTraversedNodesVisitor\AddIdToTraversedNodesVisitor;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\KeepOnlyDesiredAttributesVisitor\KeepOnlyDesiredAttributesVisitor;
-use Infection\Tests\TestingUtility\PhpParser\Visitor\MarkTraversedNodesAsVisitedVisitor\MarkTraversedNodesAsVisitedVisitor;
-use PhpParser\Node;
-use PhpParser\NodeTraverser;
-use PhpParser\Parser;
-use PHPUnit\Framework\TestCase;
-
-abstract class VisitorTestCase extends TestCase
-{
-    protected Parser $parser;
-
-    protected NodeDumper $dumper;
-
-    protected function setUp(): void
-    {
-        $this->parser = $this->createParser();
-        $this->dumper = $this->createDumper();
-    }
-
-    protected function createParser(): Parser
-    {
-        return SingletonContainer::getContainer()->getParser();
-    }
-
-    protected function createDumper(): NodeDumper
-    {
-        return new NodeDumper();
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    final protected function addIdsToNodes(array|Node $nodeOrNodes): void
-    {
-        $nodes = (array) $nodeOrNodes;
-
-        $nodeTraverser = new NodeTraverser(
-            new AddIdToTraversedNodesVisitor(),
-        );
-        $nodeTraverser->traverse($nodes);
-    }
-
-    /**
-     * @param Node[]|Node $nodeOrNodes
-     */
-    final protected function keepOnlyDesiredAttributes(
-        array|Node $nodeOrNodes,
-        string ...$attributes,
-    ): void {
-        $nodes = (array) $nodeOrNodes;
-
-        $nodeTraverser = new NodeTraverser(
-            new KeepOnlyDesiredAttributesVisitor(
-                MarkTraversedNodesAsVisitedVisitor::VISITED_ATTRIBUTE,
-                ...$attributes,
-            ),
-========
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -133,8 +72,6 @@ final class AddIdToTraversedNodesVisitor extends NodeVisitorAbstract
         $node->setAttribute(
             self::NODE_ID_ATTRIBUTE,
             $this->sequence->next(),
->>>>>>>> upstream/master:tests/phpunit/TestingUtility/PhpParser/Visitor/AddIdToTraversedNodesVisitor/AddIdToTraversedNodesVisitor.php
         );
-        $nodeTraverser->traverse($nodes);
     }
 }
