@@ -27,7 +27,9 @@ COLLISION_DETECTOR=./vendor/bin/detect-collisions
 PSALM=./.tools/psalm
 PSALM_URL="https://github.com/vimeo/psalm/releases/download/5.11.0/psalm.phar"
 
-PHPUNIT=vendor/phpunit/phpunit/phpunit
+PHPUNIT_BIN=vendor/phpunit/phpunit/phpunit
+CI ?=
+PHPUNIT=$(PHPUNIT_BIN)$(if $(CI), --no-progress,)
 PARATEST=vendor/bin/paratest
 
 PHPBENCH_REPORTS=--report=aggregate --report=bar_chart_iteration
@@ -191,12 +193,12 @@ test-docker:		## Runs all the tests on the different Docker platforms
 test-docker: autoreview test-unit-docker test-e2e-docker test-infection-docker
 
 .PHONY: test-autoreview
-test-autoreview: $(PHPUNIT) vendor
+test-autoreview: $(PHPUNIT_BIN) vendor
 	$(PHPUNIT) --configuration=phpunit_autoreview.xml
 
 .PHONY: test-unit
 test-unit:	 	## Runs the unit tests
-test-unit: $(PHPUNIT) vendor
+test-unit: $(PHPUNIT_BIN) vendor
 	$(PHPUNIT) --group $(PHPUNIT_GROUP) --exclude-group e2e
 
 .PHONY: test-unit-parallel
@@ -208,12 +210,12 @@ test-unit-parallel: $(PARATEST) vendor
 test-unit-docker:	## Runs the unit tests on the different Docker platforms
 test-unit-docker: test-unit-82-docker
 
-test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT)
+test-unit-82-docker: $(DOCKER_FILE_IMAGE) $(PHPUNIT_BIN)
 	$(DOCKER_RUN_82) $(PHPUNIT) --group $(PHPUNIT_GROUP)
 
 .PHONY: test-benchmark
 test-benchmark:	 	## Runs the benchmark tests
-test-benchmark: $(PHPUNIT) \
+test-benchmark: $(PHPUNIT_BIN) \
 		vendor \
 		$(BENCHMARK_MUTATION_GENERATOR_SOURCES) \
 		$(BENCHMARK_TRACING_SUBMODULE) \
@@ -227,7 +229,7 @@ test-e2e: test-e2e-phpunit
 
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
-test-e2e-phpunit: $(PHPUNIT) vendor
+test-e2e-phpunit: $(PHPUNIT_BIN) vendor
 	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
 
 .PHONY: test-e2e-docker
@@ -299,7 +301,7 @@ composer.lock: composer.json
 	composer install --prefer-dist
 	touch -c $@
 
-$(PHPUNIT): vendor phpunit.xml.dist
+$(PHPUNIT_BIN): vendor phpunit.xml.dist
 	touch -c $@
 
 phpunit.xml.dist:
