@@ -83,6 +83,7 @@ use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\RootsFileLocator;
 use Infection\FileSystem\Locator\RootsFileOrDirectoryLocator;
 use Infection\FileSystem\ProjectDirProvider;
+use Infection\FileSystem\TmpDirProvider;
 use Infection\Git\CommandLineGit;
 use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
@@ -101,6 +102,7 @@ use Infection\Mutant\TestFrameworkMutantExecutionResultFactory;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\MutatorFactory;
+use Infection\Mutator\MutatorParser;
 use Infection\Mutator\MutatorResolver;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -308,6 +310,14 @@ final class Container extends DIContainer
                 $container->getRootsFileLocator(),
                 $container->getSchemaConfigurationFileLoader(),
             ),
+            ConfigurationFactory::class => static fn (self $container): ConfigurationFactory => new ConfigurationFactory(
+                $container->get(TmpDirProvider::class),
+                $container->get(MutatorResolver::class),
+                $container->get(MutatorFactory::class),
+                $container->get(MutatorParser::class),
+                $container->getCiDetector(),
+                $container->getGit(),
+            ),
             RootsFileLocator::class => static fn (self $container): RootsFileLocator => new RootsFileLocator(
                 [$container->getProjectDir()],
                 $container->getFileSystem(),
@@ -359,6 +369,10 @@ final class Container extends DIContainer
 
                 return new ChainSubscriberFactory(...$subscriberFactories);
             },
+            SubscriberRegisterer::class => static fn (self $container): SubscriberRegisterer => new SubscriberRegisterer(
+                $container->getEventDispatcher(),
+                $container->get(ChainSubscriberFactory::class),
+            ),
             CleanUpAfterMutationTestingFinishedSubscriberFactory::class => static function (self $container): CleanUpAfterMutationTestingFinishedSubscriberFactory {
                 $config = $container->getConfiguration();
 
@@ -475,6 +489,10 @@ final class Container extends DIContainer
             ),
             InitialStaticAnalysisRunner::class => static fn (self $container): InitialStaticAnalysisRunner => new InitialStaticAnalysisRunner(
                 $container->getInitialStaticAnalysisProcessFactory(),
+                $container->getEventDispatcher(),
+            ),
+            InitialTestsRunner::class => static fn (self $container): InitialTestsRunner => new InitialTestsRunner(
+                $container->get(InitialTestsRunProcessFactory::class),
                 $container->getEventDispatcher(),
             ),
             MutantProcessContainerFactory::class => static function (self $container): MutantProcessContainerFactory {
