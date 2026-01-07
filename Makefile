@@ -230,7 +230,11 @@ test-e2e: test-e2e-phpunit
 .PHONY: test-e2e-phpunit
 test-e2e-phpunit:	## Runs PHPUnit-enabled subset of end-to-end tests
 test-e2e-phpunit: $(PHPUNIT_BIN) vendor
-	$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP)
+	@if [ -x $(PARATEST) ]; then \
+		$(PARATEST) --group $(E2E_PHPUNIT_GROUP); \
+	else \
+		$(PHPUNIT) --group $(E2E_PHPUNIT_GROUP); \
+	fi
 
 .PHONY: test-e2e-docker
 test-e2e-docker: 	## Runs the end-to-end tests on the different Docker platforms
