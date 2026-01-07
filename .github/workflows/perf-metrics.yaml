@@ -67,6 +67,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          # When ref input is provided, checkout from upstream (where tags exist)
+          repository: ${{ github.event.inputs.ref && 'infection/infection' || github.repository }}
           ref: ${{ github.event.inputs.ref || github.ref }}
 
       - name: Setup PHP
