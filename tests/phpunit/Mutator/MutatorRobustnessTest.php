@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutator;
 
+use PHPUnit\Framework\AssertionFailedError;
 use function array_values;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
@@ -72,12 +73,17 @@ final class MutatorRobustnessTest extends TestCase
 
             $this->addToAssertionCount(1);
         } catch (Throwable $throwable) {
-            $this->fail(sprintf(
-                'The mutator "%s" could not parse the file "%s": %s.',
-                $mutator->getName(),
-                $fileName,
-                $throwable->getMessage(),
-            ));
+            $this->expectNotToPerformAssertions();
+
+            throw new AssertionFailedError(
+                sprintf(
+                    'The mutator "%s" could not parse the file "%s": %s.',
+                    $mutator->getName(),
+                    $fileName,
+                    $throwable->getMessage(),
+                ),
+                previous: $throwable,
+            );
         }
     }
 
@@ -134,7 +140,7 @@ final class MutatorRobustnessTest extends TestCase
         $initialStatements = SingletonContainer::getContainer()->getParser()->parse($code);
 
         (new NodeTraverserFactory())
-            ->create(new NullMutationVisitor($mutator), [])
+            ->create(new NullMutationVisitor($mutator))
             ->traverse($initialStatements)
         ;
     }

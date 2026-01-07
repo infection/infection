@@ -49,7 +49,7 @@ final class LabelNodeAsEligibleVisitorTest extends VisitorTestCase
         string $code,
         string $expected,
     ): void {
-        $nodes = $this->createParser()->parse($code);
+        $nodes = $this->parse($code);
 
         $traverser = new NodeTraverser(
             new LabelNodesAsEligibleVisitor(),
