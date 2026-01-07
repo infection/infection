@@ -84,22 +84,18 @@ jobs:
             php bin/infection \
               --skip-initial-tests \
               --coverage=var/logs \
-              --logger-summary-json=summary.json \
               --no-progress \
               --threads=max \
               --no-interaction \
             || true
           cat timing.json
-          cat summary.json
 
       - name: Prepare metrics entry
         id: prepare
         run: |
-          # Merge timing and summary JSON
-          jq -s '.[0] * {infection: .[1].stats}' timing.json summary.json > combined.json
-
-          # Add metadata and runner specs
           CPU_CORES=${{ steps.runner-specs.outputs.cpu_cores }}
+
+          # Add metadata and runner specs to timing data
           jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
              --arg sha "${{ github.sha }}" \
              --arg ref "${{ github.ref }}" \
@@ -131,22 +127,19 @@ jobs:
                  cpu_arch: $cpu_arch,
                  total_memory_kb: $total_mem
                }
-             }' combined.json > with_meta.json
+             }' timing.json > with_meta.json
 
           # Compute derived metrics
           WALL_CLOCK=$(jq '.wall_clock_sec' with_meta.json)
           USER_TIME=$(jq '.user_time_sec' with_meta.json)
           SYS_TIME=$(jq '.system_time_sec' with_meta.json)
-          TOTAL_MUTANTS=$(jq '.infection.totalMutantsCount // 0' with_meta.json)
 
           jq --argjson wall_per_core "$(echo "scale=2; $WALL_CLOCK / $CPU_CORES" | bc)" \
              --argjson cpu_total "$(echo "scale=2; $USER_TIME + $SYS_TIME" | bc)" \
-             --argjson sec_per_mut "$(echo "scale=4; $WALL_CLOCK / ($TOTAL_MUTANTS + 1)" | bc)" \
              '. + {
                derived: {
                  wall_clock_per_core: $wall_per_core,
-                 cpu_time_total: $cpu_total,
-                 sec_per_mutation: $sec_per_mut
+                 cpu_time_total: $cpu_total
                }
              }' with_meta.json > entry.json
 
