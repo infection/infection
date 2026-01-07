@@ -91,6 +91,9 @@ jobs:
         if: ${{ matrix.dependencies == 'lowest' }}
         run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
+      - name: Try to install paratest for parallel test execution
+        run: composer require --dev brianium/paratest:^7.8.4 --no-interaction --no-progress || true
+
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
