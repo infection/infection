@@ -146,6 +146,10 @@ final class E2ETest extends TestCase
             ]));
         }
 
+        if (extension_loaded('xdebug')) {
+            $this->markTestSkipped('Skipping slow test under xdebug');
+        }
+
         $output = $this->runInfection(self::EXPECT_SUCCESS, [
             '--test-framework-options=--exclude-group=' . self::EXCLUDED_GROUP,
         ]);
