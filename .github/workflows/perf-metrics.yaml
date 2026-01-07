@@ -16,7 +16,13 @@ on:
   pull_request:
     paths:
       - '.github/workflows/perf-metrics.yaml'
-  workflow_dispatch:  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (tag, commit, or branch) to test'
+        required: false
+        default: ''
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -60,6 +66,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -118,9 +126,11 @@ jobs:
         id: prepare
         run: |
           CPU_CORES=${{ steps.runner-specs.outputs.cpu_cores }}
+          COMMIT_DATE=$(git log -1 --format='%cI')
 
           # Add metadata and runner specs to timing data
           jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             --arg commit_date "$COMMIT_DATE" \
              --arg sha "${{ github.sha }}" \
              --arg ref "${{ github.ref }}" \
              --arg trigger "${{ github.event_name }}" \
@@ -135,6 +145,7 @@ jobs:
              --argjson total_mem "${{ steps.runner-specs.outputs.total_memory_kb }}" \
              '. + {
                timestamp: $ts,
+               commit_date: $commit_date,
                git_sha: $sha,
                git_ref: $ref,
                trigger: $trigger,
