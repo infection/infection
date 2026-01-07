@@ -8,7 +8,6 @@ on:
     branches:
       - main
       - master
-      - feat/metrics-gh-pages-branch-poc  # PoC branch for testing
     paths:
       - '.github/workflows/perf-metrics.yaml'
       - 'src/**'
