@@ -92,7 +92,7 @@ jobs:
         run: composer update --no-interaction --prefer-dist --no-progress --prefer-lowest
 
       - name: Try to install paratest for parallel test execution
-        run: composer require --dev brianium/paratest:^7.8.4 -W --no-interaction --no-progress || true
+        run: composer require --dev brianium/paratest:^7.8.4 --no-interaction --no-progress || true
 
       - name: Cache E2E tests dependencies
         if: runner.os == 'Windows'
