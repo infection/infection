@@ -22,12 +22,36 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  METRICS_COMMIT_PREFIX: "perf: Add metrics for"
+
 jobs:
+  check:
+    name: Check if should run
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref }}
+          fetch-depth: 2
+
+      - name: Check commit message
+        id: check
+        run: |
+          COMMIT_MSG="$(git log -1 --format='%s')"
+          if [[ "$COMMIT_MSG" == "$METRICS_COMMIT_PREFIX"* ]]; then
+            echo "Skipping - triggered by metrics commit: $COMMIT_MSG"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+
   collect:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # Skip runs triggered by the bot's own commits
-    if: github.actor != 'github-actions[bot]'
 
     name: Collect performance metrics
 
@@ -157,12 +181,13 @@ jobs:
           path: entry.json
 
   commit:
-    needs: collect
+    needs: [check, collect]
     runs-on: ubuntu-latest
-    # Only commit metrics on push/dispatch, and only if collect succeeded (not skipped)
+    # Only commit if not skipped and collect succeeded
     if: |
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      needs.collect.result == 'success'
+      needs.check.outputs.skip != 'true' &&
+      needs.collect.result == 'success' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
 
     steps:
       - name: Checkout metrics branch
@@ -194,5 +219,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add metrics.jsonl
           git diff --staged --quiet && echo "No changes to commit" && exit 0
-          git commit -m "perf: Add metrics for ${{ github.sha }}"
+          git commit -m "$METRICS_COMMIT_PREFIX ${{ github.sha }}"
           git push
