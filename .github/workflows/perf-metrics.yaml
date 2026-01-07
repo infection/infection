@@ -1,0 +1,202 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Performance Metrics
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - feat/metrics-gh-pages-branch-poc  # PoC branch for testing
+    paths:
+      - '.github/workflows/perf-metrics.yaml'
+      - 'src/**'
+      - 'bin/**'
+      - 'composer.*'
+  pull_request:
+    paths:
+      - '.github/workflows/perf-metrics.yaml'
+  workflow_dispatch:  # Manual trigger for testing
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    name: Collect performance metrics
+
+    outputs:
+      entry_json: ${{ steps.prepare.outputs.entry_json }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: pcov
+          tools: composer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-8.2-${{ hashFiles('composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-8.2-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Collect coverage report
+        run: |
+          php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            --coverage-xml=var/logs/coverage-xml \
+            --log-junit=var/logs/junit.xml
+
+      - name: Collect runner specs
+        id: runner-specs
+        run: |
+          echo "cpu_model=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs)" >> $GITHUB_OUTPUT
+          echo "cpu_cores=$(nproc)" >> $GITHUB_OUTPUT
+          echo "cpu_arch=$(uname -m)" >> $GITHUB_OUTPUT
+          echo "total_memory_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Run Infection with timing
+        run: |
+          /usr/bin/time -f '{"user_time_sec":%U,"system_time_sec":%S,"wall_clock_sec":%e,"max_rss_kb":%M,"cpu_percent":"%P","voluntary_ctx_switches":%w,"involuntary_ctx_switches":%c,"exit_status":%x}' \
+            -o timing.json \
+            php bin/infection \
+              --skip-initial-tests \
+              --coverage=var/logs \
+              --logger-summary-json=summary.json \
+              --no-progress \
+              --threads=max \
+              --no-interaction \
+            || true
+          cat timing.json
+          cat summary.json
+
+      - name: Prepare metrics entry
+        id: prepare
+        run: |
+          # Merge timing and summary JSON
+          jq -s '.[0] * {infection: .[1].stats}' timing.json summary.json > combined.json
+
+          # Add metadata and runner specs
+          CPU_CORES=${{ steps.runner-specs.outputs.cpu_cores }}
+          jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             --arg sha "${{ github.sha }}" \
+             --arg ref "${{ github.ref }}" \
+             --arg trigger "${{ github.event_name }}" \
+             --arg php_version "$(php -r 'echo PHP_VERSION;')" \
+             --arg config_name "baseline" \
+             --arg config_args "--no-progress --threads=max" \
+             --arg os "ubuntu-latest" \
+             --arg image "${ImageVersion:-unknown}" \
+             --arg cpu_model "${{ steps.runner-specs.outputs.cpu_model }}" \
+             --argjson cpu_cores "$CPU_CORES" \
+             --arg cpu_arch "${{ steps.runner-specs.outputs.cpu_arch }}" \
+             --argjson total_mem "${{ steps.runner-specs.outputs.total_memory_kb }}" \
+             '. + {
+               timestamp: $ts,
+               git_sha: $sha,
+               git_ref: $ref,
+               trigger: $trigger,
+               php_version: $php_version,
+               config: {
+                 name: $config_name,
+                 args: $config_args
+               },
+               runner: {
+                 os: $os,
+                 image_version: $image,
+                 cpu_model: $cpu_model,
+                 cpu_cores: $cpu_cores,
+                 cpu_arch: $cpu_arch,
+                 total_memory_kb: $total_mem
+               }
+             }' combined.json > with_meta.json
+
+          # Compute derived metrics
+          WALL_CLOCK=$(jq '.wall_clock_sec' with_meta.json)
+          USER_TIME=$(jq '.user_time_sec' with_meta.json)
+          SYS_TIME=$(jq '.system_time_sec' with_meta.json)
+          TOTAL_MUTANTS=$(jq '.infection.totalMutantsCount // 0' with_meta.json)
+
+          jq --argjson wall_per_core "$(echo "scale=2; $WALL_CLOCK / $CPU_CORES" | bc)" \
+             --argjson cpu_total "$(echo "scale=2; $USER_TIME + $SYS_TIME" | bc)" \
+             --argjson sec_per_mut "$(echo "scale=4; $WALL_CLOCK / ($TOTAL_MUTANTS + 1)" | bc)" \
+             '. + {
+               derived: {
+                 wall_clock_per_core: $wall_per_core,
+                 cpu_time_total: $cpu_total,
+                 sec_per_mutation: $sec_per_mut
+               }
+             }' with_meta.json > entry.json
+
+          echo "Final metrics entry:"
+          cat entry.json | jq .
+
+          # Compact to single line for JSONL
+          echo "entry_json=$(jq -c . entry.json)" >> $GITHUB_OUTPUT
+
+      - name: Upload metrics artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics-entry
+          path: entry.json
+
+  commit:
+    needs: collect
+    runs-on: ubuntu-latest
+    # Only commit metrics on push to main/master or PoC branch (not on PRs)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout metrics branch
+        uses: actions/checkout@v4
+        with:
+          # For PoC: use current branch; later change to gh-pages
+          ref: ${{ github.ref }}
+
+      - name: Download metrics artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: metrics-entry
+          path: artifacts
+
+      - name: Append metrics to JSONL
+        run: |
+          # Create metrics.jsonl if it doesn't exist
+          touch metrics.jsonl
+
+          # Append new entry as single line
+          jq -c . artifacts/entry.json >> metrics.jsonl
+
+          echo "Updated metrics.jsonl:"
+          tail -5 metrics.jsonl
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add metrics.jsonl
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "perf: Add metrics for ${{ github.sha }}"
+          git push
