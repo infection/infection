@@ -26,6 +26,8 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # Skip runs triggered by the bot's own commits
+    if: github.actor != 'github-actions[bot]'
 
     name: Collect performance metrics
 
@@ -157,8 +159,10 @@ jobs:
   commit:
     needs: collect
     runs-on: ubuntu-latest
-    # Only commit metrics on push to main/master or PoC branch (not on PRs)
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    # Only commit metrics on push/dispatch, and only if collect succeeded (not skipped)
+    if: |
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      needs.collect.result == 'success'
 
     steps:
       - name: Checkout metrics branch
