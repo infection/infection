@@ -20,7 +20,8 @@ jobs:
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           php-version: 8.2
-          ini-values: memory_limit=512M, xdebug.mode=off
+          coverage: none
+          ini-values: memory_limit=512M, opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
           tools: 'composer'
         env:
           # This is necessary when installing a tool with a specific version

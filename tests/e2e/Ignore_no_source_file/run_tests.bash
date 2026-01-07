@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 readonly INFECTION="../../../bin/infection --filter=nonExistentFile.php"
 rm -f var/infection-execution.log || true
 
