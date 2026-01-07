@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 set -e
 
 # PRs from forked repositories are ignored cause we can't use such branches from another remote in composer.json below
@@ -41,4 +43,8 @@ composer install
 
 docker run -t -v "$PWD":/opt -w /opt php:8.4-alpine vendor/bin/infection --coverage=infection-coverage
 
-diff --ignore-all-space expected-output.txt infection.log
+if [ -n "$GOLDEN" ]; then
+    cp -v infection.log expected-output.txt
+fi
+
+diff -u --ignore-all-space expected-output.txt infection.log
