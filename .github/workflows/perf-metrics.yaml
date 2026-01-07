@@ -189,11 +189,17 @@ jobs:
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
 
     steps:
-      - name: Checkout metrics branch
-        uses: actions/checkout@v4
+      - name: Setup SSH key for metrics repo
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          # For PoC: use current branch; later change to gh-pages
-          ref: ${{ github.ref }}
+          ssh-private-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
+
+      - name: Clone metrics repository
+        run: |
+          git clone git@github.com:infection/infection-metrics.git metrics-repo
+          cd metrics-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Download metrics artifact
         uses: actions/download-artifact@v4
@@ -203,19 +209,17 @@ jobs:
 
       - name: Append metrics to JSONL
         run: |
-          # Create metrics.jsonl if it doesn't exist
-          touch metrics.jsonl
+          cd metrics-repo
 
           # Append new entry as single line
-          jq -c . artifacts/entry.json >> metrics.jsonl
+          jq -c . ../artifacts/entry.json >> metrics.jsonl
 
           echo "Updated metrics.jsonl:"
           tail -5 metrics.jsonl
 
       - name: Commit and push
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cd metrics-repo
           git add metrics.jsonl
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "$METRICS_COMMIT_PREFIX ${{ github.sha }}"
