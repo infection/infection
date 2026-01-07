@@ -239,5 +239,16 @@ jobs:
           cd metrics-repo
           git add metrics.jsonl
           git diff --staged --quiet && echo "No changes to commit" && exit 0
-          git commit -m "$METRICS_COMMIT_PREFIX ${{ github.sha }}"
+
+          # Build commit message with tag (if provided) and short SHA
+          SHORT_SHA="${{ github.sha }}"
+          SHORT_SHA="${SHORT_SHA:0:7}"
+          REF_INPUT="${{ github.event.inputs.ref }}"
+          if [[ -n "$REF_INPUT" ]]; then
+            COMMIT_MSG="$METRICS_COMMIT_PREFIX $REF_INPUT ($SHORT_SHA)"
+          else
+            COMMIT_MSG="$METRICS_COMMIT_PREFIX $SHORT_SHA"
+          fi
+
+          git commit -m "$COMMIT_MSG"
           git push
