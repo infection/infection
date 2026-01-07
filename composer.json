@@ -78,7 +78,6 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
-        "brianium/paratest": "^7.4",
         "fidry/makefile": "^1.0",
         "fig/log-test": "^1.2",
         "phpbench/phpbench": "^1.4",
