@@ -111,8 +111,22 @@ jobs:
           echo "cpu_arch=$(uname -m)" >> $GITHUB_OUTPUT
           echo "total_memory_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')" >> $GITHUB_OUTPUT
 
+      - name: Check for summary logger support
+        id: feature-check
+        run: |
+          if git grep -q 'logger-summary-json' -- src/; then
+            echo "has_summary_logger=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_summary_logger=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run Infection with timing
         run: |
+          SUMMARY_OPT=""
+          if [[ "${{ steps.feature-check.outputs.has_summary_logger }}" == "true" ]]; then
+            SUMMARY_OPT="--logger-summary-json=infection-summary.json"
+          fi
+
           /usr/bin/time -f '{"user_time_sec":%U,"system_time_sec":%S,"wall_clock_sec":%e,"max_rss_kb":%M,"cpu_percent":"%P","voluntary_ctx_switches":%w,"involuntary_ctx_switches":%c,"exit_status":%x}' \
             -o timing.json \
             php bin/infection \
@@ -121,7 +135,7 @@ jobs:
               --no-progress \
               --threads=max \
               --no-interaction \
-              --logger-summary-json=infection-summary.json \
+              $SUMMARY_OPT \
             || true
           cat timing.json
 
