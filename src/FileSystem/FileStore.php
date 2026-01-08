@@ -45,10 +45,8 @@ use Webmozart\Assert\Assert;
  */
 final class FileStore
 {
-    /**
-     * @var array<string, string>
-     */
-    private array $contents = [];
+    private ?string $lastFile = null;
+    private ?string $contents = null;
 
     public function __construct(
         private readonly FileSystem $fileSystem,
@@ -66,6 +64,13 @@ final class FileStore
 
         Assert::notFalse($path);
 
-        return $this->contents[$path] ??= $this->fileSystem->readFile($path);
+        if ($this->lastFile === $path) {
+            return $this->contents;
+        }
+
+        $this->lastFile = $path;
+        $this->contents = $this->fileSystem->readFile($path);
+
+        return $this->contents;
     }
 }

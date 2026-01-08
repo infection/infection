@@ -55,44 +55,71 @@ final class FileStoreTest extends TestCase
         $this->fileStore = new FileStore($this->fileSystemMock);
     }
 
-    public function test_it_reads_file_contents_from_a_path_and_caches_it(): void
+    public function test_it_reads_file_contents_from_a_path_and_caches_it_until_a_new_file_is_requested(): void
     {
-        $filePath = '/path/to/file.php';
-        $expected = '<?php echo "Hello World";';
+        $filePath1 = '/path/to/file1.php';
+        $fileContent1 = '<?php echo "Uno";';
+
+        $filePath2 = '/path/to/file2.php';
+        $fileContent2 = '<?php echo "Secundo";';
 
         $this->fileSystemMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('readFile')
-            ->with($filePath)
-            ->willReturn($expected);
+            ->willReturnOnConsecutiveCalls(
+                $fileContent1,
+                $fileContent2,
+            );
 
-        $actual1 = $this->fileStore->getContents($filePath);
-        $actual2 = $this->fileStore->getContents($filePath);
+        $actual1 = $this->fileStore->getContents($filePath1);
+        $actual2 = $this->fileStore->getContents($filePath1);
 
-        $this->assertSame($expected, $actual1);
-        $this->assertSame($expected, $actual2);
+        $this->assertSame($fileContent1, $actual1);
+        $this->assertSame($fileContent1, $actual2);
+
+        $actual3 = $this->fileStore->getContents($filePath2);
+        $actual4 = $this->fileStore->getContents($filePath2);
+
+        $this->assertSame($fileContent2, $actual3);
+        $this->assertSame($fileContent2, $actual4);
     }
 
-    public function test_it_reads_file_contents_from_spl_file_info(): void
+    public function test_it_reads_file_contents_from_spl_file_info_and_caches_it_until_a_new_file_is_requested(): void
     {
-        $filePath = '/path/to/file.php';
-        $expected = '<?php echo "Hello World";';
+        $filePath1 = '/path/to/file.php';
+        $fileContent1 = '<?php echo "Hello World";';
 
-        $fileInfoStub = $this->createStub(SplFileInfo::class);
-        $fileInfoStub
+        $fileInfoStub1 = $this->createStub(SplFileInfo::class);
+        $fileInfoStub1
             ->method('getRealPath')
-            ->willReturn($filePath);
+            ->willReturn($filePath1);
+
+        $filePath2 = '/path/to/file2.php';
+        $fileContent2 = '<?php echo "Secundo";';
+
+        $fileInfoStub2 = $this->createStub(SplFileInfo::class);
+        $fileInfoStub2
+            ->method('getRealPath')
+            ->willReturn($filePath2);
 
         $this->fileSystemMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('readFile')
-            ->with($filePath)
-            ->willReturn($expected);
+            ->willReturnOnConsecutiveCalls(
+                $fileContent1,
+                $fileContent2,
+            );
 
-        $actual1 = $this->fileStore->getContents($fileInfoStub);
-        $actual2 = $this->fileStore->getContents($fileInfoStub);
+        $actual1 = $this->fileStore->getContents($fileInfoStub1);
+        $actual2 = $this->fileStore->getContents($fileInfoStub1);
 
-        $this->assertSame($expected, $actual1);
-        $this->assertSame($expected, $actual2);
+        $this->assertSame($fileContent1, $actual1);
+        $this->assertSame($fileContent1, $actual2);
+
+        $actual3 = $this->fileStore->getContents($fileInfoStub2);
+        $actual4 = $this->fileStore->getContents($fileInfoStub2);
+
+        $this->assertSame($fileContent2, $actual3);
+        $this->assertSame($fileContent2, $actual4);
     }
 }
