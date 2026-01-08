@@ -53,7 +53,6 @@ use PHPUnit\Framework\Exception as PhpUnitFrameworkException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
-use SplFileInfo;
 use function sprintf;
 
 #[Group('integration')]
@@ -318,7 +317,7 @@ final class FileParserTest extends TestCase
         ];
     }
 
-    private function createFileInfo(string $path, string $contents): SplFileInfo
+    private function createFileInfo(string $path, string $contents): MockSplFileInfo
     {
         $fileInfo = new MockSplFileInfo(realPath: $path);
 
