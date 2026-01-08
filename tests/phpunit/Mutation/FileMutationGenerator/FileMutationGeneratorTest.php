@@ -80,7 +80,7 @@ final class FileMutationGeneratorTest extends TestCase
         $fileSystemStub
             ->method('readFile')
             ->willReturnCallback(
-                static fn (string $path) => sprintf(
+                static fn (string $path): string => sprintf(
                     'contents(%s)',
                     $path,
                 ),
