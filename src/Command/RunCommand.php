@@ -130,6 +130,8 @@ final class RunCommand extends BaseCommand
 
     private const OPTION_LOGGER_TEXT = 'logger-text';
 
+    private const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
 
     private const OPTION_EXECUTE_ONLY_COVERING_TEST_CASES = 'only-covering-test-cases';
@@ -302,6 +304,12 @@ final class RunCommand extends BaseCommand
                 'Path to text report file.',
             )
             ->addOption(
+                self::OPTION_LOGGER_SUMMARY_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to summary JSON report file (statistics only, no mutation details).',
+            )
+            ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
@@ -447,6 +455,7 @@ final class RunCommand extends BaseCommand
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
         $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
+        $summaryJsonLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_SUMMARY_JSON));
         $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
 
         /** @var string|null $minMsi */
@@ -515,6 +524,7 @@ final class RunCommand extends BaseCommand
             gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            summaryJsonLogFilePath: $summaryJsonLogFilePath === '' ? Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH : $summaryJsonLogFilePath,
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
