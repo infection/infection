@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\PhpParser\Visitor;
 
+use function array_pop;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -51,12 +52,16 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 
     private ?Node $previous = null;
 
+    /** @var list<Node|null> */
+    private array $previousStack = [];
+
     /**
      * {@inheritDoc}
      */
     public function beforeTraverse(array $nodes)
     {
         $this->previous = null;
+        $this->previousStack = [];
 
         return null;
     }
@@ -67,6 +72,7 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\FunctionLike) {
+            $this->previousStack[] = $this->previous;
             $this->previous = null;
 
             return null;
@@ -84,6 +90,24 @@ final class NextConnectingVisitor extends NodeVisitorAbstract
 
         $this->previous?->setAttribute(self::NEXT_ATTRIBUTE, $node);
         $this->previous = $node;
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function leaveNode(Node $node)
+    {
+        if (!$node instanceof Node\FunctionLike) {
+            return null;
+        }
+
+        $saved = array_pop($this->previousStack);
+
+        // Statement-level functions (Stmt_Function) break the chain completely
+        // Expression-level functions (closures) restore the chain so the containing statement connects to next
+        $this->previous = $node instanceof Node\Stmt ? null : $saved;
 
         return null;
     }

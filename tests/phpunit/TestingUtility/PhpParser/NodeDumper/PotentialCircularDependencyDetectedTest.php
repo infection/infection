@@ -33,41 +33,32 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\PhpParser\Visitor\IgnoreNode;
+namespace Infection\Tests\TestingUtility\PhpParser\NodeDumper;
 
-use function is_string;
-use PhpParser\Node;
 use PhpParser\Node\Expr\Variable;
-use PhpParser\NodeVisitorAbstract;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function spl_object_id;
+use function sprintf;
 
-final class IgnoreSpyVisitor extends NodeVisitorAbstract
+#[CoversClass(PotentialCircularDependencyDetected::class)]
+final class PotentialCircularDependencyDetectedTest extends TestCase
 {
-    public int $nodeCounter = 0;
-
-    private $failureCallBack;
-
-    public function __construct(callable $failureCallBack)
+    public function test_it_can_create_an_instance_for_an_attribute(): void
     {
-        $this->failureCallBack = $failureCallBack;
-    }
+        $node = new Variable('x');
 
-    public function enterNode(Node $node): void
-    {
-        if (!$node instanceof Variable) {
-            return;
-        }
-        $name = $node->name;
+        $exception = PotentialCircularDependencyDetected::forAttribute(
+            'next',
+            $node,
+        );
 
-        if (!is_string($name)) {
-            return;
-        }
-
-        if ($name === 'ignored') {
-            ($this->failureCallBack)();
-        }
-
-        if ($name === 'counted') {
-            ++$this->nodeCounter;
-        }
+        $this->assertSame(
+            sprintf(
+                'The attribute "next" found a node instance "PhpParser\Node\Expr\Variable" (#%s). The NodeDumper cannot support those as they may trigger circular dependencies. Either remove the attribute before dumping, do not dump extra attributes or add an ID to the node.',
+                spl_object_id($node),
+            ),
+            $exception->getMessage(),
+        );
     }
 }

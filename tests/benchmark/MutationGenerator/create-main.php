@@ -38,7 +38,7 @@ namespace Infection\Benchmark\MutationGenerator;
 use function class_exists;
 use Closure;
 use function function_exists;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;

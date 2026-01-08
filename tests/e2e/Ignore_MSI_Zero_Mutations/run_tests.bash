@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname "$0")"
+
 set -e pipefail
 
 readonly INFECTION="../../../bin/infection --ignore-msi-with-no-mutations --min-msi=100"
@@ -11,4 +13,8 @@ else
     php $INFECTION
 fi
 
-diff --ignore-all-space expected-output.txt var/infection.log
+if [ -n "$GOLDEN" ]; then
+    cp -v var/infection.log expected-output.txt
+fi
+
+diff -u --ignore-all-space expected-output.txt var/infection.log

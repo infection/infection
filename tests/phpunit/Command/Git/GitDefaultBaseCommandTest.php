@@ -37,7 +37,7 @@ namespace Infection\Tests\Command\Git;
 
 use Infection\Command\Git\GitDefaultBaseCommand;
 use Infection\Console\Application;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Git\Git;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;

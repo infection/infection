@@ -37,7 +37,7 @@ declare(strict_types=1);
 // Disable strict types for now: https://github.com/infection/infection/pull/720#issuecomment-506546284
 
 use Infection\Console\Application;
-use Infection\Container;
+use Infection\Container\Container;
 use function Safe\getcwd;
 
 if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) === false) {
