@@ -181,6 +181,42 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
+			message: '#^Method Infection\\Tests\\Mutator\\MutatorTestCase\:\:createMutator\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorTestCase.php
+
+		-
+			message: '#^Method Infection\\Tests\\Mutator\\MutatorTestCase\:\:createMutator\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorTestCase.php
+
+		-
+			message: '#^Method Infection\\Tests\\Mutator\\MutatorTestCase\:\:getMutationsFromCode\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorTestCase.php
+
+		-
+			message: '#^Method Infection\\Tests\\Mutator\\MutatorTestCase\:\:mutate\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorTestCase.php
+
+		-
+			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<string, array\{settings\: array\}\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorTestCase.php
+
+		-
+			message: '#^Property Infection\\Tests\\Mutator\\MutatorTestCase\:\:\$mutator with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
+			identifier: missingType.generics
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorTestCase.php
+
+		-
 			message: '#^Class Infection\\Testing\\SimpleMutation extends @final class Infection\\Mutation\\Mutation\.$#'
 			identifier: class.extendsFinalByPhpDoc
 			count: 1

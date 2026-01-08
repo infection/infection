@@ -57,15 +57,15 @@ final class MutatorFixturesProvider
     private static array $testCaseFixtureDirMapping = [];
 
     /**
-     * @param class-string<MutatorTestCase> $testCaseClassName
+     * @param class-string $class
      */
-    public static function getFixtureFileContent(string $testCaseClassName, string $file): string
+    public static function getFixtureFileContent(string $class, string $file): string
     {
-        Assert::isAOf($testCaseClassName, MutatorTestCase::class);
+        Assert::isAOf($class, MutatorTestCase::class);
 
         return file_get_contents(sprintf(
             '%s/%s',
-            self::getTestCaseFixtureDir($testCaseClassName),
+            self::getTestCaseFixtureDir($class),
             $file,
         ));
     }
