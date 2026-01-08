@@ -95,7 +95,7 @@ jobs:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none
           tools: composer
-          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
+          ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
