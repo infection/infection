@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Later\Interfaces\Deferred;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
@@ -72,11 +72,6 @@ class ProxyTrace implements Trace
         Assert::string($realPath);
 
         return $realPath;
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFile->getRelativePathname();
     }
 
     public function hasTests(): bool

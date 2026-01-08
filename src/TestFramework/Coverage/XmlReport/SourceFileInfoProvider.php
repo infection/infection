@@ -43,10 +43,10 @@ use Infection\TestFramework\SafeDOMXPath;
 use Safe\Exceptions\FilesystemException;
 use function Safe\file_get_contents;
 use function Safe\realpath;
+use SplFileInfo;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
 use function trim;
 
 /**
@@ -134,6 +134,6 @@ class SourceFileInfoProvider
             ));
         }
 
-        return new SplFileInfo($realPath, $relativeFilePath, $path);
+        return new SplFileInfo($realPath);
     }
 }

@@ -41,6 +41,7 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Testing\SingletonContainer;
 use Infection\Testing\StringNormalizer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\NodeDumper;
@@ -52,8 +53,8 @@ use PHPUnit\Framework\Exception as PhpUnitFrameworkException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
+use SplFileInfo;
 use function sprintf;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
 #[CoversClass(FileParser::class)]
@@ -319,18 +320,7 @@ final class FileParserTest extends TestCase
 
     private function createFileInfo(string $path, string $contents): SplFileInfo
     {
-        $fileInfo = new class($path) extends SplFileInfo {
-            public function __construct(
-                private readonly string $path,
-            ) {
-                parent::__construct($path, $path, $path);
-            }
-
-            public function getRealPath(): string
-            {
-                return $this->path;
-            }
-        };
+        $fileInfo = new MockSplFileInfo(realPath: $path);
 
         $this->fileSystemMock
             ->method('readFile')
