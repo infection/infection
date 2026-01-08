@@ -131,9 +131,15 @@ jobs:
           # Create the metrics preparation script inline (so it works for old tags too)
           cat > prepare-metrics.php << 'SCRIPT_EOF'
           <?php
-          $timing = json_decode(file_get_contents($argv[1]), true);
+          $content = file_get_contents($argv[1]);
+          // When command exits non-zero, time prepends "Command exited with non-zero status N\n"
+          if (str_starts_with($content, 'Command exited')) {
+              $content = substr($content, strpos($content, "\n") + 1);
+          }
+          $timing = json_decode($content, true);
           if ($timing === null) {
-              fwrite(STDERR, "Failed to parse timing.json\n");
+              fwrite(STDERR, "Failed to parse timing.json: " . json_last_error_msg() . "\n");
+              fwrite(STDERR, "Content: $content\n");
               exit(1);
           }
 

@@ -52,6 +52,10 @@ if (!file_exists($timingFile)) {
 
 // Read timing data
 $timingJson = file_get_contents($timingFile);
+// When command exits non-zero, time prepends "Command exited with non-zero status N\n"
+if (str_starts_with($timingJson, 'Command exited')) {
+    $timingJson = substr($timingJson, strpos($timingJson, "\n") + 1);
+}
 $timing = json_decode($timingJson, true);
 
 if ($timing === null) {
