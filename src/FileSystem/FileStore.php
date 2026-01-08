@@ -46,7 +46,8 @@ use Webmozart\Assert\Assert;
 final class FileStore
 {
     private ?string $lastFile = null;
-    private ?string $contents = null;
+
+    private string $contents = '';
 
     public function __construct(
         private readonly FileSystem $fileSystem,
