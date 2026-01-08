@@ -56,11 +56,6 @@ final readonly class EmptyTrace implements Trace
         return $this->sourceFileInfo->getRealPath();
     }
 
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFileInfo->getRelativePathname();
-    }
-
     public function hasTests(): bool
     {
         return false;
