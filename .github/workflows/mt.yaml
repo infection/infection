@@ -42,10 +42,12 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
+          # Any supported PHP version is fine
           php-version: ${{ env.PHP_VERSION }}
           coverage: pcov
           tools: composer
         env:
+          # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get composer cache directory
@@ -63,6 +65,8 @@ jobs:
             composer-
 
       - name: Install dependencies
+        # Run the locked dependencies: we are not interested in testing different
+        # variations here so having a stable set is better.
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Collect coverage report
