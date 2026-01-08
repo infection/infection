@@ -128,110 +128,92 @@ jobs:
       - name: Prepare metrics entry
         id: prepare
         run: |
-          CPU_CORES=${{ steps.runner-specs.outputs.cpu_cores }}
-          COMMIT_DATE=$(git log -1 --format='%cI')
+          # Create the metrics preparation script inline (so it works for old tags too)
+          cat > prepare-metrics.php << 'SCRIPT_EOF'
+          <?php
+          $timing = json_decode(file_get_contents($argv[1]), true);
+          if ($timing === null) {
+              fwrite(STDERR, "Failed to parse timing.json\n");
+              exit(1);
+          }
 
-          # Add metadata and runner specs to timing data
-          # Use actual checked-out commit info (not workflow context) when ref input is provided
-          ACTUAL_SHA=$(git rev-parse HEAD)
-          ACTUAL_REF="${{ github.event.inputs.ref || github.ref }}"
+          $mutations = null;
+          if (file_exists('infection-summary.json')) {
+              $summary = json_decode(file_get_contents('infection-summary.json'), true);
+              if ($summary !== null && isset($summary['stats'])) {
+                  $mutations = [
+                      'total' => $summary['stats']['totalMutantsCount'] ?? 0,
+                      'killed' => $summary['stats']['killedCount'] ?? 0,
+                      'msi' => $summary['stats']['msi'] ?? 0,
+                  ];
+              }
+          }
 
-          jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-             --arg commit_date "$COMMIT_DATE" \
-             --arg sha "$ACTUAL_SHA" \
-             --arg ref "$ACTUAL_REF" \
-             --arg trigger "${{ github.event_name }}" \
-             --arg php_version "$(php -r 'echo PHP_VERSION;')" \
-             --arg config_name "baseline" \
-             --arg config_args "--no-progress --threads=max" \
-             --arg os "ubuntu-latest" \
-             --arg image "${ImageVersion:-unknown}" \
-             --arg cpu_model "${{ steps.runner-specs.outputs.cpu_model }}" \
-             --argjson cpu_cores "$CPU_CORES" \
-             --arg cpu_arch "${{ steps.runner-specs.outputs.cpu_arch }}" \
-             --argjson total_mem "${{ steps.runner-specs.outputs.total_memory_kb }}" \
-             '. + {
-               timestamp: $ts,
-               commit_date: $commit_date,
-               git_sha: $sha,
-               git_ref: $ref,
-               trigger: $trigger,
-               php_version: $php_version,
-               config: {
-                 name: $config_name,
-                 args: $config_args
-               },
-               runner: {
-                 os: $os,
-                 image_version: $image,
-                 cpu_model: $cpu_model,
-                 cpu_cores: $cpu_cores,
-                 cpu_arch: $cpu_arch,
-                 total_memory_kb: $total_mem
-               }
-             }' timing.json > with_meta.json
+          $cpuCores = (int) getenv('CPU_CORES') ?: 1;
+          $wallClock = (float) ($timing['wall_clock_sec'] ?? 0);
+          $userTime = (float) ($timing['user_time_sec'] ?? 0);
+          $sysTime = (float) ($timing['system_time_sec'] ?? 0);
+          $maxRss = (int) ($timing['max_rss_kb'] ?? 0);
 
-          # Extract mutation statistics from summary JSON
-          if [[ -f infection-summary.json ]]; then
-            MUTATIONS=$(jq '.stats.totalMutantsCount // 0' infection-summary.json)
-            KILLED=$(jq '.stats.killedCount // 0' infection-summary.json)
-            MSI=$(jq '.stats.msi // 0' infection-summary.json)
-          else
-            MUTATIONS=0
-            KILLED=0
-            MSI=0
-          fi
+          $wallPerCore = $cpuCores > 0 ? round($wallClock / $cpuCores, 2) : 0;
+          $cpuTotal = round($userTime + $sysTime, 2);
+          $wallPerMut = $userPerMut = $memPerMut = 0;
 
-          # Add mutations object to metrics
-          jq --argjson mutations "$MUTATIONS" \
-             --argjson killed "$KILLED" \
-             --argjson msi "$MSI" \
-             '. + {
-               mutations: {
-                 total: $mutations,
-                 killed: $killed,
-                 msi: $msi
-               }
-             }' with_meta.json > with_mutations.json
+          if ($mutations !== null && $mutations['total'] > 0) {
+              $wallPerMut = round($wallClock / $mutations['total'], 4);
+              $userPerMut = round($userTime / $mutations['total'], 4);
+              $memPerMut = round($maxRss / $mutations['total'], 2);
+          }
 
-          # Compute derived metrics
-          WALL_CLOCK=$(jq '.wall_clock_sec' with_mutations.json)
-          USER_TIME=$(jq '.user_time_sec' with_mutations.json)
-          SYS_TIME=$(jq '.system_time_sec' with_mutations.json)
-          MAX_RSS=$(jq '.max_rss_kb' with_mutations.json)
+          $entry = array_merge($timing, [
+              'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+              'commit_date' => getenv('COMMIT_DATE'),
+              'git_sha' => getenv('GIT_SHA'),
+              'git_ref' => getenv('GIT_REF'),
+              'trigger' => getenv('TRIGGER'),
+              'php_version' => PHP_VERSION,
+              'config' => ['name' => 'baseline', 'args' => '--no-progress --threads=max'],
+              'runner' => [
+                  'os' => 'ubuntu-latest',
+                  'image_version' => getenv('IMAGE_VERSION') ?: 'unknown',
+                  'cpu_model' => getenv('CPU_MODEL'),
+                  'cpu_cores' => $cpuCores,
+                  'cpu_arch' => getenv('CPU_ARCH'),
+                  'total_memory_kb' => (int) getenv('TOTAL_MEM'),
+              ],
+          ]);
 
-          # Calculate normalized (per-mutation) metrics
-          # Use awk instead of bc for proper JSON number formatting (bc outputs .123 instead of 0.123)
-          if [[ "$MUTATIONS" -gt 0 ]]; then
-            WALL_PER_MUTATION=$(awk "BEGIN {printf \"%.4f\", $WALL_CLOCK / $MUTATIONS}")
-            USER_PER_MUTATION=$(awk "BEGIN {printf \"%.4f\", $USER_TIME / $MUTATIONS}")
-            MEM_PER_MUTATION=$(awk "BEGIN {printf \"%.2f\", $MAX_RSS / $MUTATIONS}")
-          else
-            WALL_PER_MUTATION=0
-            USER_PER_MUTATION=0
-            MEM_PER_MUTATION=0
-          fi
+          if ($mutations !== null) {
+              $entry['mutations'] = $mutations;
+          }
 
-          WALL_PER_CORE=$(awk "BEGIN {printf \"%.2f\", $WALL_CLOCK / $CPU_CORES}")
-          CPU_TOTAL=$(awk "BEGIN {printf \"%.2f\", $USER_TIME + $SYS_TIME}")
+          $entry['derived'] = [
+              'wall_clock_per_core' => $wallPerCore,
+              'cpu_time_total' => $cpuTotal,
+              'wall_clock_per_mutation' => $wallPerMut,
+              'user_time_per_mutation' => $userPerMut,
+              'memory_per_mutation_kb' => $memPerMut,
+          ];
 
-          jq --argjson wall_per_core "$WALL_PER_CORE" \
-             --argjson cpu_total "$CPU_TOTAL" \
-             --argjson wall_per_mut "$WALL_PER_MUTATION" \
-             --argjson user_per_mut "$USER_PER_MUTATION" \
-             --argjson mem_per_mut "$MEM_PER_MUTATION" \
-             '. + {
-               derived: {
-                 wall_clock_per_core: $wall_per_core,
-                 cpu_time_total: $cpu_total,
-                 wall_clock_per_mutation: $wall_per_mut,
-                 user_time_per_mutation: $user_per_mut,
-                 memory_per_mutation_kb: $mem_per_mut
-               }
-             }' with_mutations.json > entry.json
+          echo json_encode($entry, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+          SCRIPT_EOF
+
+          # Set environment variables for the PHP script
+          export CPU_CORES=${{ steps.runner-specs.outputs.cpu_cores }}
+          export COMMIT_DATE=$(git log -1 --format='%cI')
+          export GIT_SHA=$(git rev-parse HEAD)
+          export GIT_REF="${{ github.event.inputs.ref || github.ref }}"
+          export TRIGGER="${{ github.event_name }}"
+          export CPU_MODEL="${{ steps.runner-specs.outputs.cpu_model }}"
+          export CPU_ARCH="${{ steps.runner-specs.outputs.cpu_arch }}"
+          export TOTAL_MEM=${{ steps.runner-specs.outputs.total_memory_kb }}
+          export IMAGE_VERSION="${ImageVersion:-unknown}"
+
+          # Run the script
+          php prepare-metrics.php timing.json > entry.json
 
           echo "Final metrics entry:"
-          cat entry.json | jq .
+          cat entry.json
 
           # Compact to single line for JSONL
           echo "entry_json=$(jq -c . entry.json)" >> $GITHUB_OUTPUT
