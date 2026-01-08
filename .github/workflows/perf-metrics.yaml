@@ -121,6 +121,7 @@ jobs:
               --no-progress \
               --threads=max \
               --no-interaction \
+              --logger-summary-json=infection-summary.json \
             || true
           cat timing.json
 
@@ -170,19 +171,64 @@ jobs:
                }
              }' timing.json > with_meta.json
 
-          # Compute derived metrics
-          WALL_CLOCK=$(jq '.wall_clock_sec' with_meta.json)
-          USER_TIME=$(jq '.user_time_sec' with_meta.json)
-          SYS_TIME=$(jq '.system_time_sec' with_meta.json)
+          # Extract mutation statistics from summary JSON
+          if [[ -f infection-summary.json ]]; then
+            MUTATIONS=$(jq '.stats.totalMutantsCount // 0' infection-summary.json)
+            KILLED=$(jq '.stats.killedCount // 0' infection-summary.json)
+            MSI=$(jq '.stats.msi // 0' infection-summary.json)
+          else
+            MUTATIONS=0
+            KILLED=0
+            MSI=0
+          fi
 
-          jq --argjson wall_per_core "$(echo "scale=2; $WALL_CLOCK / $CPU_CORES" | bc)" \
-             --argjson cpu_total "$(echo "scale=2; $USER_TIME + $SYS_TIME" | bc)" \
+          # Add mutations object to metrics
+          jq --argjson mutations "$MUTATIONS" \
+             --argjson killed "$KILLED" \
+             --argjson msi "$MSI" \
+             '. + {
+               mutations: {
+                 total: $mutations,
+                 killed: $killed,
+                 msi: $msi
+               }
+             }' with_meta.json > with_mutations.json
+
+          # Compute derived metrics
+          WALL_CLOCK=$(jq '.wall_clock_sec' with_mutations.json)
+          USER_TIME=$(jq '.user_time_sec' with_mutations.json)
+          SYS_TIME=$(jq '.system_time_sec' with_mutations.json)
+          MAX_RSS=$(jq '.max_rss_kb' with_mutations.json)
+
+          # Calculate normalized (per-mutation) metrics
+          # Use awk instead of bc for proper JSON number formatting (bc outputs .123 instead of 0.123)
+          if [[ "$MUTATIONS" -gt 0 ]]; then
+            WALL_PER_MUTATION=$(awk "BEGIN {printf \"%.4f\", $WALL_CLOCK / $MUTATIONS}")
+            USER_PER_MUTATION=$(awk "BEGIN {printf \"%.4f\", $USER_TIME / $MUTATIONS}")
+            MEM_PER_MUTATION=$(awk "BEGIN {printf \"%.2f\", $MAX_RSS / $MUTATIONS}")
+          else
+            WALL_PER_MUTATION=0
+            USER_PER_MUTATION=0
+            MEM_PER_MUTATION=0
+          fi
+
+          WALL_PER_CORE=$(awk "BEGIN {printf \"%.2f\", $WALL_CLOCK / $CPU_CORES}")
+          CPU_TOTAL=$(awk "BEGIN {printf \"%.2f\", $USER_TIME + $SYS_TIME}")
+
+          jq --argjson wall_per_core "$WALL_PER_CORE" \
+             --argjson cpu_total "$CPU_TOTAL" \
+             --argjson wall_per_mut "$WALL_PER_MUTATION" \
+             --argjson user_per_mut "$USER_PER_MUTATION" \
+             --argjson mem_per_mut "$MEM_PER_MUTATION" \
              '. + {
                derived: {
                  wall_clock_per_core: $wall_per_core,
-                 cpu_time_total: $cpu_total
+                 cpu_time_total: $cpu_total,
+                 wall_clock_per_mutation: $wall_per_mut,
+                 user_time_per_mutation: $user_per_mut,
+                 memory_per_mutation_kb: $mem_per_mut
                }
-             }' with_meta.json > entry.json
+             }' with_mutations.json > entry.json
 
           echo "Final metrics entry:"
           cat entry.json | jq .
