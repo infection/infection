@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Operator\IfNegation;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(IfNegation::class)]
-final class IfNegationTest extends BaseMutatorTestCase
+final class IfNegationTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\ModEqual;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ModEqual::class)]
-final class ModEqualTest extends BaseMutatorTestCase
+final class ModEqualTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

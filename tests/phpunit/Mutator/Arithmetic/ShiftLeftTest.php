@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\ShiftLeft;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ShiftLeft::class)]
-final class ShiftLeftTest extends BaseMutatorTestCase
+final class ShiftLeftTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

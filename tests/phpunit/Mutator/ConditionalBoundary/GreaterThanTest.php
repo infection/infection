@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ConditionalBoundary;
 
 use Infection\Mutator\ConditionalBoundary\GreaterThan;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(GreaterThan::class)]
-final class GreaterThanTest extends BaseMutatorTestCase
+final class GreaterThanTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

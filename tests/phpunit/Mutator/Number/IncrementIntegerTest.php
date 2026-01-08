@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Number;
 
 use Infection\Mutator\Number\IncrementInteger;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use const PHP_INT_MAX;
 use const PHP_INT_MIN;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(IncrementInteger::class)]
-final class IncrementIntegerTest extends BaseMutatorTestCase
+final class IncrementIntegerTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

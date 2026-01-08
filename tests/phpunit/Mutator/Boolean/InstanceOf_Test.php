@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\InstanceOf_;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(InstanceOf_::class)]
-final class InstanceOf_Test extends BaseMutatorTestCase
+final class InstanceOf_Test extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

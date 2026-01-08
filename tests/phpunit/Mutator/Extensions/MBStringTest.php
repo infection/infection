@@ -37,13 +37,13 @@ namespace Infection\Tests\Mutator\Extensions;
 
 use function defined;
 use Infection\Mutator\Extensions\MBString;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use function Safe\define;
 
 #[CoversClass(MBString::class)]
-final class MBStringTest extends BaseMutatorTestCase
+final class MBStringTest extends MutatorTestCase
 {
     public static function setUpBeforeClass(): void
     {

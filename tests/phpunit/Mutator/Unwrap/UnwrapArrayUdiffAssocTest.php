@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Mutator\Unwrap\UnwrapArrayUdiffAssoc;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(UnwrapArrayUdiffAssoc::class)]
-final class UnwrapArrayUdiffAssocTest extends BaseMutatorTestCase
+final class UnwrapArrayUdiffAssocTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

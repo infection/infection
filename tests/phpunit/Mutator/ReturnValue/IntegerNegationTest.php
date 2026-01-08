@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\ReturnValue\IntegerNegation;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Return_;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(IntegerNegation::class)]
-final class IntegerNegationTest extends BaseMutatorTestCase
+final class IntegerNegationTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

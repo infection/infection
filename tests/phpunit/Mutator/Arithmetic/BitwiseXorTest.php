@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\BitwiseXor;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(BitwiseXor::class)]
-final class BitwiseXorTest extends BaseMutatorTestCase
+final class BitwiseXorTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

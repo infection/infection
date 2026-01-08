@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Exponentiation;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(Exponentiation::class)]
-final class ExponentiationTest extends BaseMutatorTestCase
+final class ExponentiationTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\ArrayAll;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ArrayAll::class)]
-final class ArrayAllTest extends BaseMutatorTestCase
+final class ArrayAllTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

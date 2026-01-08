@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Mutator\Removal\FunctionCallRemoval;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(FunctionCallRemoval::class)]
-final class FunctionCallRemovalTest extends BaseMutatorTestCase
+final class FunctionCallRemovalTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Mutator\Removal\CatchBlockRemoval;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(CatchBlockRemoval::class)]
-final class CatchBlockRemovalTest extends BaseMutatorTestCase
+final class CatchBlockRemovalTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

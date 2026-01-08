@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalAndAllSubExprNegation;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(LogicalAndAllSubExprNegation::class)]
-final class LogicalAndAllSubExprNegationTest extends BaseMutatorTestCase
+final class LogicalAndAllSubExprNegationTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

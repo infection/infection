@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\FalseValue;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(FalseValue::class)]
-final class FalseValueTest extends BaseMutatorTestCase
+final class FalseValueTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

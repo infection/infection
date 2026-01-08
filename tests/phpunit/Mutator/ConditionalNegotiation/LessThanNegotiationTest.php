@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ConditionalNegotiation;
 
 use Infection\Mutator\ConditionalNegotiation\LessThanNegotiation;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(LessThanNegotiation::class)]
-final class LessThanNegotiationTest extends BaseMutatorTestCase
+final class LessThanNegotiationTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected
