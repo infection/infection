@@ -10,84 +10,31 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
     cancel-in-progress: true
 
-env:
-    PHP_VERSION: '8.2'
-
 jobs:
-    coverage:
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-
-        name: Collect coverage
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
-            - name: Setup PHP
-              uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
-              with:
-                  php-version: ${{ env.PHP_VERSION }}
-                  tools: composer
-                  coverage: pcov
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Get composer cache directory
-              id: composer-cache
-              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-            - name: Cache dependencies
-              uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-              with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
-                  restore-keys: |
-                      composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
-                      composer-${{ runner.os }}-
-                      composer-
-
-            - name: Install dependencies
-              run: composer install --no-interaction --prefer-dist --no-progress
-
-            - name: Collect coverage report
-              run: |
-                  php vendor/phpunit/phpunit/phpunit --stop-on-failure \
-                    --coverage-xml=var/logs/coverage-xml \
-                    --log-junit=var/logs/junit.xml
-
-            - name: Upload coverage
-              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-              with:
-                  name: coverage
-                  path: var/logs/
-                  retention-days: 1
-
-    annotations:
+    tests:
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        needs: coverage
 
-        name: Mutation Testing Code Review Annotations
+        strategy:
+            matrix:
+                php-version: ['8.2']
+
+        name: Mutation Testing Code Review Annotations ${{ matrix.php-version }}
 
         steps:
             - name: Checkout code
               uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   fetch-depth: 0
-
             - name: Setup PHP
               uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
               with:
-                  php-version: ${{ env.PHP_VERSION }}
-                  tools: composer
-                  coverage: none
-                  ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
+                  php-version: ${{ matrix.php-version }}
+                  tools: composer:v2.1
+                  coverage: pcov
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Create opcache directory
-              run: mkdir -p /tmp/opcache
+                # This is necessary when installing a tool with a specific version
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Get composer cache directory
               id: composer-cache
@@ -97,27 +44,20 @@ jobs:
               uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
-                  key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
+                  key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
                   restore-keys: |
-                      composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+                      composer-${{ runner.os }}-${{ matrix.php-version }}-
                       composer-${{ runner.os }}-
                       composer-
 
             - name: Install dependencies
-              run: composer install --no-interaction --prefer-dist --no-progress
-
-            - name: Download coverage
-              uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-              with:
-                  name: coverage
-                  path: var/logs/
+              run: |
+                  composer install --no-interaction --prefer-dist --no-progress
 
             - name: Run Infection for changed lines only
               run: |
                   git fetch origin $GITHUB_BASE_REF
                   php bin/infection \
-                    --skip-initial-tests \
-                    --coverage=var/logs \
                     --git-diff-lines \
                     --git-diff-base=origin/$GITHUB_BASE_REF \
                     --ignore-msi-with-no-mutations \
@@ -130,7 +70,7 @@ jobs:
         name: Annotations Status
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        needs: annotations
+        needs: tests
         if: always()
         steps:
             - name: Successful run
