@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
@@ -65,6 +66,7 @@ class FileMutationGenerator
         private readonly LineRangeCalculator $lineRangeCalculator,
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
+        private readonly FileStore $fileStore,
     ) {
     }
 
@@ -108,7 +110,7 @@ class FileMutationGenerator
                 lineRangeCalculator: $this->lineRangeCalculator,
                 sourceLineMatcher: $this->sourceLineMatcher,
                 originalFileTokens: $originalFileTokens,
-                originalFileContent: $sourceFile->getContents(),
+                originalFileContent: $this->fileStore->getContents($sourceFile),
             ),
         );
 

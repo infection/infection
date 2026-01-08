@@ -33,47 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser;
+namespace Infection\FileSystem;
 
-use Infection\FileSystem\FileStore;
-use PhpParser\Node\Stmt;
-use PhpParser\Parser;
-use PhpParser\Token;
-use Symfony\Component\Finder\SplFileInfo;
-use Throwable;
+use function is_string;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final readonly class FileParser
+final class FileStore
 {
+    private ?string $lastFile = null;
+
+    private string $contents = '';
+
     public function __construct(
-        private Parser $parser,
-        private FileStore $fileStore,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
     /**
-     * @throws UnparsableFile
-     *
-     * @return array{Stmt[], Token[]}
+     * @throws IOException
      */
-    public function parse(SplFileInfo $fileInfo): array
+    public function getContents(SplFileInfo|string $file): string
     {
-        try {
-            return [
-                $this->parser->parse(
-                    $this->fileStore->getContents($fileInfo),
-                ) ?? [],
-                $this->parser->getTokens(),
-            ];
-        } catch (Throwable $throwable) {
-            $filePath = $fileInfo->getRealPath() === false
-                ? $fileInfo->getPathname()
-                : $fileInfo->getRealPath()
-            ;
+        $path = is_string($file)
+            ? $file
+            : $file->getRealPath();
 
-            throw UnparsableFile::fromInvalidFile($filePath, $throwable);
+        Assert::notFalse($path);
+
+        if ($this->lastFile === $path) {
+            return $this->contents;
         }
+
+        $this->lastFile = $path;
+        $this->contents = $this->fileSystem->readFile($path);
+
+        return $this->contents;
     }
 }

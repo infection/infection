@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
+use Infection\FileSystem\FileStore;
+use Infection\FileSystem\FileSystem;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -54,6 +56,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 use Symfony\Component\Finder\SplFileInfo;
 
 #[CoversClass(FileMutationGenerator::class)]
@@ -73,14 +76,26 @@ final class FileMutationGeneratorTest extends TestCase
         $this->traverserFactoryMock = $this->createMock(NodeTraverserFactory::class);
         $this->tracerMock = $this->createMock(Tracer::class);
 
+        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub
+            ->method('readFile')
+            ->willReturnCallback(
+                static fn (string $path): string => sprintf(
+                    'contents(%s)',
+                    $path,
+                ),
+            );
+
         $this->mutationGenerator = new FileMutationGenerator(
             new FileParser(
                 $this->phpParserMock,
+                new FileStore($fileSystemStub),
             ),
             $this->traverserFactoryMock,
             new LineRangeCalculator(),
             $this->createMock(SourceLineMatcher::class),
             $this->tracerMock,
+            new FileStore($fileSystemStub),
         );
     }
 
@@ -111,7 +126,7 @@ final class FileMutationGeneratorTest extends TestCase
         $this->phpParserMock
             ->expects($this->once())
             ->method('parse')
-            ->with('contents')
+            ->with('contents(/path/to/file)')
             ->willReturn($initialStatements);
         $this->phpParserMock
             ->expects($this->once())
