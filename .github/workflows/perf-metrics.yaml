@@ -206,14 +206,15 @@ jobs:
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
 
     steps:
-      - name: Setup SSH key for metrics repo
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Checkout metrics repository
+        uses: actions/checkout@v4
         with:
-          ssh-private-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
+          repository: infection/infection-metrics
+          ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
+          path: metrics-repo
 
-      - name: Clone metrics repository
+      - name: Configure git
         run: |
-          git clone git@github.com:infection/infection-metrics.git metrics-repo
           cd metrics-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
