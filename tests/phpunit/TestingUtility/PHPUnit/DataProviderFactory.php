@@ -55,4 +55,19 @@ final class DataProviderFactory
             yield $key => [$value];
         }
     }
+
+    /**
+     * @template Key
+     * @template Value
+     *
+     * @param iterable<Key, Value> $dataProvider
+     *
+     * @return iterable<string, array{Value}>
+     */
+    public static function prefix(string $prefix, iterable $dataProvider): iterable
+    {
+        foreach ($dataProvider as $title => $scenario) {
+            yield $prefix.$title => $scenario;
+        }
+    }
 }

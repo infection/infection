@@ -1,7 +1,16 @@
 This file describes the process used to get real JUnit coverage reports.
 
-The JUnit coverage reports sometimes contain absolute paths. The path to the
-project has been replaced by `/path/to`.
+> [!CAUTION]
+> Note that generating coverage data is not deterministic as it contains runtime
+information which will change from an execution to another or a machine to another.
+
+As part of the normalisation process, any paths that are absolute have their
+path to the project replaced by `/path/to`. This can be done by executing:
+
+```
+cd <directory containing this file>
+make
+```
 
 
 ## Codeception (`codeception-junit.xml`)
@@ -18,7 +27,7 @@ ls -l tests/_output/
 
 
 ## PhpSpec
-
+``
 PhpSpec does not support JUnit coverage reports!
 
 
