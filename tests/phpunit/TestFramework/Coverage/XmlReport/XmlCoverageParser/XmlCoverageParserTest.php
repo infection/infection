@@ -222,10 +222,94 @@ final class XmlCoverageParserTest extends TestCase
                             null,
                             null,
                         ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #1',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #2',
+                            null,
+                            null,
+                        ),
+                    ],
+                    14 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #0',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #1',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #2',
+                            null,
+                            null,
+                        ),
+                    ],
+                    19 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_multiply',
+                            null,
+                            null,
+                        ),
+                    ],
+                    24 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
+                            null,
+                            null,
+                        ),
+                    ],
+                    25 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
+                            null,
+                            null,
+                        ),
+                    ],
+                    28 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
+                            null,
+                            null,
+                        ),
+                    ],
+                    33 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_is_positive',
+                            null,
+                            null,
+                        ),
+                    ],
+                    38 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute_zero',
+                            null,
+                            null,
+                        ),
                     ],
                 ],
                 byMethod: [
-                    'add' => new SourceMethodLineRange(7,10),
+                    'add' => new SourceMethodLineRange(7, 10),
+                    'subtract' => new SourceMethodLineRange(12, 15),
+                    'multiply' => new SourceMethodLineRange(17, 20),
+                    'divide' => new SourceMethodLineRange(22, 29),
+                    'isPositive' => new SourceMethodLineRange(31, 34),
+                    'absolute' => new SourceMethodLineRange(36, 39),
                 ],
             ),
         ];
