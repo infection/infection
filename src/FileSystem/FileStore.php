@@ -33,43 +33,45 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Tracing\Trace;
+namespace Infection\FileSystem;
 
-use Symfony\Component\Finder\SplFileInfo;
+use function is_string;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
  */
-final readonly class EmptyTrace implements Trace
+final class FileStore
 {
-    public function __construct(private SplFileInfo $sourceFileInfo)
-    {
+    private ?string $lastFile = null;
+
+    private string $contents = '';
+
+    public function __construct(
+        private readonly FileSystem $fileSystem,
+    ) {
     }
 
-    public function getSourceFileInfo(): SplFileInfo
+    /**
+     * @throws IOException
+     */
+    public function getContents(SplFileInfo|string $file): string
     {
-        return $this->sourceFileInfo;
-    }
+        $path = is_string($file)
+            ? $file
+            : $file->getRealPath();
 
-    public function getRealPath(): string
-    {
-        return $this->sourceFileInfo->getRealPath();
-    }
+        Assert::notFalse($path);
 
-    public function hasTests(): bool
-    {
-        return false;
-    }
+        if ($this->lastFile === $path) {
+            return $this->contents;
+        }
 
-    public function getTests(): TestLocations
-    {
-        return new TestLocations();
-    }
+        $this->lastFile = $path;
+        $this->contents = $this->fileSystem->readFile($path);
 
-    public function getAllTestsForMutation(
-        NodeLineRangeData $lineRange,
-        bool $isOnFunctionSignature,
-    ): iterable {
-        return [];
+        return $this->contents;
     }
 }

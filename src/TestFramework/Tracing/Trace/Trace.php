@@ -62,11 +62,6 @@ interface Trace
      */
     public function getRealPath(): string;
 
-    /**
-     * This is used by PathFilterIterator to filter out excluded files for mutation testing
-     */
-    public function getRelativePathname(): string;
-
     public function hasTests(): bool;
 
     public function getTests(): TestLocations;

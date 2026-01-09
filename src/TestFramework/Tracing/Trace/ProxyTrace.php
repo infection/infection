@@ -74,11 +74,6 @@ class ProxyTrace implements Trace
         return $realPath;
     }
 
-    public function getRelativePathname(): string
-    {
-        return $this->sourceFile->getRelativePathname();
-    }
-
     public function hasTests(): bool
     {
         if ($this->lazyTestLocations === null) {
