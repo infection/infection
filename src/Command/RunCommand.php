@@ -130,7 +130,7 @@ final class RunCommand extends BaseCommand
 
     private const OPTION_LOGGER_TEXT = 'logger-text';
 
-    private const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+    public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
 
     private const OPTION_USE_NOOP_MUTATORS = 'noop';
 
@@ -523,7 +523,7 @@ final class RunCommand extends BaseCommand
             gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
-            summaryJsonLogFilePath: trim((string) $input->getOption(self::OPTION_LOGGER_SUMMARY_JSON)) ?: null,
+            summaryJsonLogFilePath: $commandHelper->getSummaryJsonLogFilePath(),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
