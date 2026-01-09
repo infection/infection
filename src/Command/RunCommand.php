@@ -455,7 +455,6 @@ final class RunCommand extends BaseCommand
         $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
         $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
         $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
-        $summaryJsonLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_SUMMARY_JSON));
         $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
 
         /** @var string|null $minMsi */
@@ -524,7 +523,7 @@ final class RunCommand extends BaseCommand
             gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
-            summaryJsonLogFilePath: $summaryJsonLogFilePath === '' ? Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH : $summaryJsonLogFilePath,
+            summaryJsonLogFilePath: trim((string) $input->getOption(self::OPTION_LOGGER_SUMMARY_JSON)) ?: null,
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
