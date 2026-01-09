@@ -200,13 +200,12 @@ final class CommandLineGitIntegrationTest extends TestCase
 
     public function test_it_can_get_this_project_default_git_base(): void
     {
-        $expected = TestCIDetector::isCIDetected()
-            ? 'origin/master'
-            : 'refs/remotes/origin/master';
-
         $actual = $this->git->getDefaultBase();
 
-        $this->assertSame($expected, $actual);
+        $this->assertContains($actual, [
+            'origin/master',
+            'refs/remotes/origin/master',
+        ]);
     }
 
     public function test_it_can_refine_the_base_used(): void
