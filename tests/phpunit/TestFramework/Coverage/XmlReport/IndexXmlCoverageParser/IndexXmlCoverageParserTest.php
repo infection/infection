@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
+use Exception;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use function array_diff;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
@@ -47,6 +49,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function sprintf;
@@ -58,6 +61,10 @@ use Traversable;
 #[CoversClass(IndexXmlCoverageParser::class)]
 final class IndexXmlCoverageParserTest extends TestCase
 {
+    use ExpectsThrowables;
+
+    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+
     private static ?string $fixturesXmlFileName = null;
 
     private static ?string $fixturesOldXmlFileName = null;
@@ -97,6 +104,59 @@ final class IndexXmlCoverageParserTest extends TestCase
             XmlCoverageFixtures::provideFixtures(),
             $sourceFilesData,
         );
+    }
+
+    /**
+     * @param list<SourceFileInfoProvider>|Exception $expected
+     */
+    #[DataProvider('indexProvider')]
+    public function test_it_provides_file_information(
+        string $pathname,
+        array|Exception $expected,
+    ): void {
+
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
+        $actual = $this->parser->parse(
+            $pathname,
+            self::FIXTURES_DIR,
+        );
+
+        $actual = take($actual)->toAssoc();
+
+        if (!($expected instanceof Exception)) {
+            $this->assertEquals($expected, $actual);
+        }
+    }
+
+    public static function indexProvider(): iterable
+    {
+        $phpunit9 = Path::canonicalize(self::FIXTURES_DIR.'/phpunit-09-index.xml');
+
+        $createPhpUnit9SourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpunit9,
+            coverageDir: self::FIXTURES_DIR,
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/infection/tests/e2e/PHPUnit_09-3/src',
+        );
+
+        yield 'PHPUnit 9' => [
+            $phpunit9,
+            [
+                $createPhpUnit9SourceFileInfo('Covered/Calculator.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/LoggerTrait.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/UserService.php.xml'),
+                $createPhpUnit9SourceFileInfo('Covered/functions.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/Calculator.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/LoggerTrait.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/UserService.php.xml'),
+                $createPhpUnit9SourceFileInfo('Uncovered/functions.php.xml'),
+            ],
+        ];
     }
 
     public function test_it_correctly_parses_xml_when_directory_has_absolute_path_for_old_phpunit_versions(): void

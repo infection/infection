@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Fri Jan 9 9:45:28 UTC 2026" phpunit="10.5.60" coverage="10.1.16">
+    <runtime name="PHP" version="8.3.19" url="https://www.php.net/"/>
+    <driver name="xdebug" version="3.4.2"/>
+  </build>
+  <project source="/path/to/infection/tests/e2e/PHPUnit_10-1/src">
+    <tests>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#0" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#1" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#with a key" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_add#with a key with ('&quot;#::&amp;) special characters" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#0" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#1" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#with a key" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_subtract#with a key with ('&quot;#::&amp;) special characters" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_multiply" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_divide" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_is_positive" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_absolute" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\CalculatorTest::test_absolute_zero" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\FunctionsTest::test_format_name_with_both_names" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\FunctionsTest::test_format_name_with_no_names" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_add_user_successfully" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_remove_user_successfully" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_get_user_returns_user_data" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_get_user_returns_null_for_non_existent_user" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_user_exists" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_logger_trait_methods" size="unknown" status="success"/>
+      <test name="Infection\E2ETests\PHPUnit_10_1\Tests\Covered\UserServiceTest::test_log_method_is_public" size="unknown" status="success"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="315" comments="0" code="315" executable="83" executed="37" percent="44.58"/>
+        <methods count="30" tested="15" percent="50.00"/>
+        <functions count="4" tested="1" percent="25.00"/>
+        <classes count="4" tested="3" percent="75.00"/>
+        <traits count="2" tested="0" percent="0.00"/>
+      </totals>
+      <directory name="Covered">
+        <totals>
+          <lines total="146" comments="0" code="146" executable="37" executed="37" percent="100.00"/>
+          <methods count="15" tested="15" percent="100.00"/>
+          <functions count="1" tested="1" percent="100.00"/>
+          <classes count="2" tested="3" percent="150.00"/>
+          <traits count="1" tested="0" percent="0.00"/>
+        </totals>
+        <file name="Calculator.php" href="Covered/Calculator.php.xml">
+          <totals>
+            <lines total="41" comments="0" code="41" executable="8" executed="8" percent="100.00"/>
+            <methods count="6" tested="6" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LoggerTrait.php" href="Covered/LoggerTrait.php.xml">
+          <totals>
+            <lines total="29" comments="0" code="29" executable="4" executed="4" percent="100.00"/>
+            <methods count="4" tested="4" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="1" percent="0"/>
+            <traits count="1" tested="0" percent="0.00"/>
+          </totals>
+        </file>
+        <file name="UserService.php" href="Covered/UserService.php.xml">
+          <totals>
+            <lines total="55" comments="0" code="55" executable="18" executed="18" percent="100.00"/>
+            <methods count="5" tested="5" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="functions.php" href="Covered/functions.php.xml">
+          <totals>
+            <lines total="21" comments="0" code="21" executable="7" executed="7" percent="100.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="1" percent="100.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="Uncovered">
+        <totals>
+          <lines total="169" comments="0" code="169" executable="46" executed="0" percent="0.00"/>
+          <methods count="15" tested="0" percent="0.00"/>
+          <functions count="3" tested="0" percent="0.00"/>
+          <classes count="2" tested="0" percent="0.00"/>
+          <traits count="1" tested="0" percent="0.00"/>
+        </totals>
+        <file name="Calculator.php" href="Uncovered/Calculator.php.xml">
+          <totals>
+            <lines total="41" comments="0" code="41" executable="8" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LoggerTrait.php" href="Uncovered/LoggerTrait.php.xml">
+          <totals>
+            <lines total="29" comments="0" code="29" executable="4" executed="0" percent="0.00"/>
+            <methods count="4" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="1" tested="0" percent="0.00"/>
+          </totals>
+        </file>
+        <file name="UserService.php" href="Uncovered/UserService.php.xml">
+          <totals>
+            <lines total="55" comments="0" code="55" executable="18" executed="0" percent="0.00"/>
+            <methods count="5" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="functions.php" href="Uncovered/functions.php.xml">
+          <totals>
+            <lines total="44" comments="0" code="44" executable="16" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="3" tested="0" percent="0.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+    </directory>
+  </project>
+</phpunit>

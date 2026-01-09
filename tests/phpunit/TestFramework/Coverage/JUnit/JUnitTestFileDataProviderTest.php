@@ -49,6 +49,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Path;
 use Throwable;
 use function file_get_contents;
 use function is_string;
@@ -63,14 +64,6 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
     use ExpectsThrowables;
 
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
-
-    private const JUNIT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit.xml';
-
-    private const JUNIT_DIFF_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit2.xml';
-
-    private const JUNIT_FEATURE_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_feature.xml';
-
-    private const JUNIT_CODECEPTION_CEST_FORMAT = __DIR__ . '/../../../Fixtures/Files/phpunit/junit_codeception_cest.xml';
 
     private function createProvider(string $file): JUnitTestFileDataProvider
     {
@@ -583,9 +576,6 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
             InvalidArgumentException::class,
         ];
 
-        // TODO: investigate this; this should be working based on
-        //  tests/phpunit/Fixtures/Files/phpunit/junit_feature.xml
-        //  'FeatureA:Scenario A1'
         yield 'test ID of a simple test (ID found in a JUnit report)' => [
             $junitXml,
             'Calculator: Dividing two numbers',
@@ -753,36 +743,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
         $provider->getTestFileInfo('Foo\BarTest');
     }
 
-    public function test_it_works_with_different_junit_format(): void
-    {
-        $provider = $this->createProvider(self::JUNIT_DIFF_FORMAT);
-
-        $testFileInfo = $provider->getTestFileInfo('App\Tests\unit\SourceClassTest');
-
-        $this->assertSame('/codeception/tests/unit/SourceClassTest.php', $testFileInfo->path);
-    }
-
-    public function test_it_works_with_feature_junit_format(): void
-    {
-        $provider = $this->createProvider(self::JUNIT_FEATURE_FORMAT);
-
-        $testFileInfo = $provider->getTestFileInfo('FeatureA:Scenario A1');
-
-        $this->assertSame('/codeception/tests/bdd/FeatureA.feature', $testFileInfo->path);
-    }
-
-    public function test_it_works_with_codeception_cest_format(): void
-    {
-        $provider = $this->createProvider(self::JUNIT_CODECEPTION_CEST_FORMAT);
-
-        $testFileInfo = $provider->getTestFileInfo('app\controllers\ExampleCest:FeatureA');
-
-        $this->assertSame('/app/controllers/ExampleCest.php', $testFileInfo->path);
-    }
-
     private function createJUnit(string $contents): string
     {
-        $pathname = $this->tmp.'/junit.xml';
+        $pathname = Path::canonicalize($this->tmp.'/junit.xml');
         file_put_contents($pathname, $contents);
 
         return $pathname;
