@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Fri Jan 9 12:54:12 UTC 2026" phpunit="12.5.4" coverage="12.5.2">
+    <runtime name="PHP" version="8.3.19" url="https://www.php.net/"/>
+    <driver name="xdebug" version="3.4.2"/>
+  </build>
+  <project source="/Users/tfidry/Project/Humbug/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src">
+    <tests>
+      <test name="calculator:Adding two numbers" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Subtracting two numbers" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Multiplying two numbers" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Dividing two numbers" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Division by zero throws error" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Checking if numbers are positive | 5, true" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Checking if numbers are positive | 0, true" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Checking if numbers are positive | -5, false" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | 42, 5, 5" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | positive number, 10, 10" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | negative number, -7, 7" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | zero, 0, 0" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | with special chars ('&quot;#::&amp;), -15, 15" size="unknown" status="success" time="0.000000"/>
+      <test name="calculator:Computing absolute value with label &quot;&lt;label&gt;&quot; | another &quot;quoted&quot; value, -1, 1" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testAddition" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testSubtraction" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testMultiplication" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testDivision" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testDivisionByZeroThrowsException" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testIsPositive" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\CalculatorCest:testAbsolute" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testAddUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testAddUserWithEmptyNameFails" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testAddUserWithEmptyEmailFails" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testAddDuplicateUserFails" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testRemoveUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testRemoveNonExistentUserFails" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testGetUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testGetNonExistentUserReturnsNull" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testUserExists" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\functional\UserServiceCest:testClearLogs" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\DatabaseTest:testGetStuffWithoutLimit" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\DatabaseTest:testGetStuffWithLimit" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testAddition" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testSubtraction" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testMultiplication" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testDivision" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testDivisionByZero" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testIsPositive" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\CalculatorTest:testAbsolute" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\FormatNameFunctionTest:testFormatFullName" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\FormatNameFunctionTest:testFormatFirstNameOnly" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\FormatNameFunctionTest:testFormatLastNameOnly" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\FormatNameFunctionTest:testFormatEmptyNames" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\FormatNameFunctionTest:testFormatWithSpaces" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testAddUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testAddUserWithEmptyName" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testAddUserWithEmptyEmail" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testAddDuplicateUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testRemoveUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testRemoveNonExistentUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testGetUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testGetNonExistentUser" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testUserExists" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testGetLogs" size="unknown" status="success" time="0.000000"/>
+      <test name="Codeception_With_Suite_Overridings\Tests\unit\Covered\UserServiceTest:testClearLogs" size="unknown" status="success" time="0.000000"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="174" comments="3" code="171" executable="42" executed="42" percent="100.00"/>
+        <methods count="17" tested="17" percent="100.00"/>
+        <functions count="1" tested="1" percent="100.00"/>
+        <classes count="3" tested="4" percent="133.33"/>
+        <traits count="1" tested="0" percent="0.00"/>
+      </totals>
+      <directory name="Covered">
+        <totals>
+          <lines total="146" comments="0" code="146" executable="37" executed="37" percent="100.00"/>
+          <methods count="15" tested="15" percent="100.00"/>
+          <functions count="1" tested="1" percent="100.00"/>
+          <classes count="2" tested="3" percent="150.00"/>
+          <traits count="1" tested="0" percent="0.00"/>
+        </totals>
+        <file name="Calculator.php" href="Covered/Calculator.php.xml" hash="09af5bd9dd8a4a4d04350e0dc39dc774cad96c9f">
+          <totals>
+            <lines total="41" comments="0" code="41" executable="8" executed="8" percent="100.00"/>
+            <methods count="6" tested="6" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="LoggerTrait.php" href="Covered/LoggerTrait.php.xml" hash="c9c1681165af585eb2e0477e0f9e063e1abb0a9c">
+          <totals>
+            <lines total="29" comments="0" code="29" executable="4" executed="4" percent="100.00"/>
+            <methods count="4" tested="4" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="1" percent="0"/>
+            <traits count="1" tested="0" percent="0.00"/>
+          </totals>
+        </file>
+        <file name="UserService.php" href="Covered/UserService.php.xml" hash="e67dd01fca096df99f227db893ccf791e04d8223">
+          <totals>
+            <lines total="55" comments="0" code="55" executable="18" executed="18" percent="100.00"/>
+            <methods count="5" tested="5" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="functions.php" href="Covered/functions.php.xml" hash="9098e79cc04b0f93238f45e071385fb149b0e809">
+          <totals>
+            <lines total="21" comments="0" code="21" executable="7" executed="7" percent="100.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="1" tested="1" percent="100.00"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <file name="Database.php" href="Database.php.xml" hash="dbbd32675ed29ccc59c54a2ec29069bc2af6f7b0">
+        <totals>
+          <lines total="28" comments="3" code="25" executable="5" executed="5" percent="100.00"/>
+          <methods count="2" tested="2" percent="100.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="1" percent="100.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

@@ -67,7 +67,7 @@ final class DataProviderFactory
     public static function prefix(string $prefix, iterable $dataProvider): iterable
     {
         foreach ($dataProvider as $title => $scenario) {
-            yield $prefix.$title => $scenario;
+            yield $prefix . $title => $scenario;
         }
     }
 }

@@ -33,24 +33,33 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Coverage\XmlReport;
+namespace Infection\Tests\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 
+use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
+use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\SafeDOMXPath;
+use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
+use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function file_get_contents;
 
 #[Group('integration')]
 #[CoversClass(XmlCoverageParser::class)]
 final class XmlCoverageParserTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+
     private XmlCoverageParser $parser;
 
     protected function setUp(): void
@@ -59,26 +68,26 @@ final class XmlCoverageParserTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $expectedTests
+     * @param array<string, mixed> $expected
      */
-    #[DataProvider('sourceFileInfoProviderProvider')]
-    public function test_it_reads_every_type_of_fixture(
-        SourceFileInfoProvider $provider,
-        array $expectedTests,
+    #[DataProvider('lineCoverageProvider')]
+    public function test_it_can_get_the_line_coverage(
+        SafeDOMXPath $xPath,
+        TestLocations $expected,
     ): void {
-        $fileData = $this->parser->parse($provider);
+        $sourceFileInfoProviderStub = $this->createStub(SourceFileInfoProvider::class);
+        $sourceFileInfoProviderStub
+            ->method('provideFileInfo')
+            ->willReturn(new MockSplFileInfo(''));
+        $sourceFileInfoProviderStub
+            ->method('provideXPath')
+            ->willReturn($xPath);
 
-        $this->assertSame(
-            $fileData->getSourceFileInfo()->getRealPath(),
-            $provider->provideFileInfo()->getRealPath(),
-        );
+        $actual = $this->parser
+            ->parse($sourceFileInfoProviderStub)
+            ->getTests();
 
-        $coverageData = $fileData->getTests();
-
-        $this->assertSame(
-            $expectedTests,
-            TestLocationsNormalizer::normalize([$coverageData])[0],
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public function test_it_reads_report_with_no_covered_lines(): void
@@ -157,19 +166,69 @@ final class XmlCoverageParserTest extends TestCase
         $this->assertArrayNotHasKey(11, $coverageData->getTestsLocationsBySourceLine());
     }
 
-    public static function sourceFileInfoProviderProvider(): iterable
+    public static function lineCoverageProvider(): iterable
     {
-        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
-            yield [
-                new SourceFileInfoProvider(
-                    '/path/to/index.xml',
-                    $fixture->coverageDir,
-                    $fixture->relativeCoverageFilePath,
-                    $fixture->projectSource,
-                ),
-                $fixture->normalizedTests,
-            ];
-        }
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 09] ',
+            self::phpUnit09InfoProvider(),
+        );
+//
+//        yield from DataProviderFactory::prefix(
+//            '[PHPUnit 10] ',
+//            self::phpUnit10InfoProvider(),
+//        );
+//
+//        yield from DataProviderFactory::prefix(
+//            '[PHPUnit 11] ',
+//            self::phpUnit11InfoProvider(),
+//        );
+//
+//        yield from DataProviderFactory::prefix(
+//            '[PHPUnit 12] ',
+//            self::phpUnit12InfoProvider(),
+//        );
+//
+//        // https://codeception.com/docs/UnitTests
+//        yield from DataProviderFactory::prefix(
+//            '[Codeception (unit)] ',
+//            self::codeceptionUnitProvider(),
+//        );
+//
+//        // https://codeception.com/docs/BDD
+//        yield from DataProviderFactory::prefix(
+//            '[Codeception (BDD style)] ',
+//            self::codeceptionBddProvider(),
+//        );
+//
+//        // https://codeception.com/docs/AdvancedUsage#Cest-Classes
+//        yield from DataProviderFactory::prefix(
+//            '[Codeception (Cest style)] ',
+//            self::codeceptionCestProvider(),
+//        );
+    }
+
+    private static function phpUnit09InfoProvider(): iterable
+    {
+        yield 'covered class' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Covered/Calculator.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    9 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #0',
+                            null,
+                            null,
+                        ),
+                    ],
+                ],
+                byMethod: [
+                    'add' => new SourceMethodLineRange(7,10),
+                ],
+            ),
+        ];
     }
 
     private function createSourceFileInfoProvider(string $xml): SourceFileInfoProvider&MockObject

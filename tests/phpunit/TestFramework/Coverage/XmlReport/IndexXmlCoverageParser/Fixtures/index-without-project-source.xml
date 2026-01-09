@@ -4,14 +4,14 @@
         <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
         <driver name="xdebug" version="2.5.1"/>
     </build>
-    <project source="/path/to/src">
+    <project>
         <tests>
             <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
             <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
         </tests>
-        <directory name="/absolute/path">
+        <directory name="/">
             <totals>
-                <lines total="913" comments="130" code="783" executable="348" executed="7" percent="0"/>
+                <lines total="913" comments="130" code="783" executable="348" executed="24" percent="6.90"/>
             </totals>
         </directory>
     </project>
