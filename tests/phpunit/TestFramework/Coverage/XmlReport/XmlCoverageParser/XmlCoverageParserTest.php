@@ -313,6 +313,643 @@ final class XmlCoverageParserTest extends TestCase
                 ],
             ),
         ];
+
+        yield 'covered trait' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Covered/LoggerTrait.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    11 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_log_method_is_public',
+                            null,
+                            null,
+                        ),
+                    ],
+                    16 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_log_method_is_public',
+                            null,
+                            null,
+                        ),
+                    ],
+                    21 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    26 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                ],
+                byMethod: [
+                    'log' => new SourceMethodLineRange(9, 12),
+                    'getLogs' => new SourceMethodLineRange(14, 17),
+                    'clearLogs' => new SourceMethodLineRange(19, 22),
+                    'hasLogs' => new SourceMethodLineRange(24, 27),
+                ],
+            ),
+        ];
+
+        yield 'covered class with trait' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Covered/UserService.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    13 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    14 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    15 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    18 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    19 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    20 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    23 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    24 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    25 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    30 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    31 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    32 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            null,
+                            null,
+                        ),
+                    ],
+                    35 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                    ],
+                    36 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                    ],
+                    37 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                    ],
+                    42 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_null_for_non_existent_user',
+                            null,
+                            null,
+                        ),
+                    ],
+                    47 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            null,
+                            null,
+                        ),
+                    ],
+                    52 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            null,
+                            null,
+                        ),
+                    ],
+                ],
+                byMethod: [
+                    'addUser' => new SourceMethodLineRange(11, 26),
+                    'removeUser' => new SourceMethodLineRange(28, 38),
+                    'getUser' => new SourceMethodLineRange(40, 43),
+                    'userExists' => new SourceMethodLineRange(45, 48),
+                    'getUserCount' => new SourceMethodLineRange(50, 53),
+                ],
+            ),
+        ];
+
+        yield 'covered function' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Covered/functions.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    7 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_no_names',
+                            null,
+                            null,
+                        ),
+                    ],
+                    8 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_no_names',
+                            null,
+                            null,
+                        ),
+                    ],
+                    11 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
+                            null,
+                            null,
+                        ),
+                    ],
+                    12 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
+                            null,
+                            null,
+                        ),
+                    ],
+                    15 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            null,
+                            null,
+                        ),
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            null,
+                            null,
+                        ),
+                    ],
+                    16 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            null,
+                            null,
+                        ),
+                    ],
+                    19 => [
+                        new TestLocation(
+                            'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            null,
+                            null,
+                        ),
+                    ],
+                ],
+                byMethod: [],
+            ),
+        ];
+
+        yield 'uncovered class' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Uncovered/Calculator.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [
+                    'add' => new SourceMethodLineRange(7, 10),
+                    'subtract' => new SourceMethodLineRange(12, 15),
+                    'multiply' => new SourceMethodLineRange(17, 20),
+                    'divide' => new SourceMethodLineRange(22, 29),
+                    'isPositive' => new SourceMethodLineRange(31, 34),
+                    'absolute' => new SourceMethodLineRange(36, 39),
+                ],
+            ),
+        ];
+
+        yield 'uncovered trait' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Uncovered/LoggerTrait.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [
+                    'log' => new SourceMethodLineRange(9, 12),
+                    'getLogs' => new SourceMethodLineRange(14, 17),
+                    'clearLogs' => new SourceMethodLineRange(19, 22),
+                    'hasLogs' => new SourceMethodLineRange(24, 27),
+                ],
+            ),
+        ];
+
+        yield 'uncovered class with trait' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Uncovered/UserService.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [
+                    'addUser' => new SourceMethodLineRange(11, 26),
+                    'removeUser' => new SourceMethodLineRange(28, 38),
+                    'getUser' => new SourceMethodLineRange(40, 43),
+                    'userExists' => new SourceMethodLineRange(45, 48),
+                    'getUserCount' => new SourceMethodLineRange(50, 53),
+                ],
+            ),
+        ];
+
+        yield 'uncovered functions' => [
+            SafeDOMXPath::fromFile(
+                self::FIXTURES_DIR . '/phpunit-09-xml/Uncovered/functions.php.xml',
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [],
+            ),
+        ];
     }
 
     private function createSourceFileInfoProvider(string $xml): SourceFileInfoProvider&MockObject
