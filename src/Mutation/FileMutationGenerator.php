@@ -97,8 +97,9 @@ class FileMutationGenerator
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
-        $preTraverser = $this->traverserFactory->createPreTraverser();
-        $preTraverser->traverse($initialStatements);
+        $this->traverserFactory
+            ->createPreTraverser($nodeIgnorers)
+            ->traverse($initialStatements);
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
@@ -114,8 +115,9 @@ class FileMutationGenerator
             ),
         );
 
-        $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);
-        $traverser->traverse($initialStatements);
+        $this->traverserFactory
+            ->create($mutationCollectorVisitor)
+            ->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();
     }
