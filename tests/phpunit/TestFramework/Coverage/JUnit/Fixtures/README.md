@@ -1,5 +1,9 @@
 This file describes the process used to get real JUnit coverage reports.
 
+The JUnit coverage reports sometimes contain absolute paths. The path to the
+project has been replaced by `/path/to`.
+
+
 ## Codeception (`codeception-junit.xml`)
 
 ```shell
@@ -18,9 +22,9 @@ ls -l tests/_output/
 PhpSpec does not support JUnit coverage reports!
 
 
-## PHPUnit
+## PHPUnit `phpunit-XX-junit.xml`)
 
-Within Infection e2e tests there is several PHPUnit scenarios. They should all
+Within Infection e2e tests there are several PHPUnit scenarios. They should all
 have a Makefile with:
 
 ```
