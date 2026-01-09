@@ -232,7 +232,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
     public function test_it_filters_the_collected_files(
         ?PlainFilter $filter,
         array $filePaths,
-        bool $expectedIsSourceFiltered,
         array|Exception $expected,
     ): void {
         foreach ($filePaths as $filePath) {
@@ -266,7 +265,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             [
                 'src/Example/Test.php',
             ],
-            true,
             [
                 'src/Example/Test.php',
             ],
@@ -277,7 +275,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             [
                 'src/Example/Test.php',
             ],
-            true,
             new NoSourceFound(
                 isSourceFiltered: true,
                 message: 'No source file found for the filter applied to the configured sources. The filter used was: "src/Foo".',
@@ -291,7 +288,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
                 'src/Bar/Baz.php',
                 'src/Example/Test.php',
             ],
-            false,
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',
@@ -309,7 +305,6 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
                 'src/Bar/Baz.php',
                 'src/Example/Test.php',
             ],
-            true,
             [
                 'src/Foo/Test.php',
                 'src/Bar/Baz.php',

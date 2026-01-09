@@ -73,6 +73,7 @@ use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
 use Infection\Event\Subscriber\SubscriberRegisterer;
 use Infection\ExtensionInstaller\GeneratedExtensionsConfig;
 use Infection\FileSystem\DummyFileSystem;
+use Infection\FileSystem\FileStore;
 use Infection\FileSystem\FileSystem;
 use Infection\FileSystem\Finder\ComposerExecutableFinder;
 use Infection\FileSystem\Finder\ConcreteComposerExecutableFinder;
@@ -442,6 +443,7 @@ final class Container extends DIContainer
                 $container->getLineRangeCalculator(),
                 $container->getSourceLineMatcher(),
                 $container->getTracer(),
+                $container->getFileStore(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -1037,6 +1039,11 @@ final class Container extends DIContainer
     public function getMinMsiChecker(): MinMsiChecker
     {
         return $this->get(MinMsiChecker::class);
+    }
+
+    public function getFileStore(): FileStore
+    {
+        return $this->get(FileStore::class);
     }
 
     private function getMutatedCodePrinter(): MutantCodePrinter

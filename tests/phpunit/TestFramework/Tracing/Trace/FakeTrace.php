@@ -56,11 +56,6 @@ final readonly class FakeTrace implements Trace
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function getRelativePathname(): string
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
-
     public function hasTests(): bool
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);

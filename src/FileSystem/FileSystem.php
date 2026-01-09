@@ -35,10 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\FileSystem;
 
+use function file_get_contents;
 use function is_dir;
 use function is_file;
 use function is_readable;
+use function method_exists;
+use function restore_error_handler;
 use function Safe\realpath;
+use function set_error_handler;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -60,6 +65,36 @@ class FileSystem extends SymfonyFilesystem
     public function realPath(string $filename): string
     {
         return realpath($filename);
+    }
+
+    /**
+     * @infection-ignore-all
+     */
+    public function readFile(string $filename): string
+    {
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(parent::class, 'readFile')) {
+            return parent::readFile($filename);
+        }
+
+        // To delete once we drop support for Symfony 6.4.
+        // Copied from Symfony\Finder\SplFileInfo::getContents() with the exception adjusted
+        /** @psalm-suppress InvalidArgument */
+        // @phpstan-ignore argument.type
+        set_error_handler(static function ($type, $msg) use (&$error): void { $error = $msg; });
+
+        try {
+            // @phpstan-ignore theCodingMachineSafe.function
+            $content = file_get_contents($filename);
+        } finally {
+            restore_error_handler();
+        }
+
+        if ($content === false) {
+            throw new IOException($error ?? '');
+        }
+
+        return $content;
     }
 
     public function createFinder(): Finder

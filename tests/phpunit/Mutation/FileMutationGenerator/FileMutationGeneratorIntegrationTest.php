@@ -69,6 +69,7 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
             SingletonContainer::getContainer()->getLineRangeCalculator(),
             SingletonContainer::getContainer()->getSourceLineMatcher(),
             new DummyTracer(),
+            SingletonContainer::getContainer()->getFileStore(),
         );
 
         $mutations = $mutationGenerator->generate(
