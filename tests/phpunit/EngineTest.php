@@ -40,6 +40,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Mutation\MutationGenerator;
@@ -143,6 +144,9 @@ final class EngineTest extends TestCase
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
 
+        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+        $maxTimeoutsChecker->expects($this->never())->method($this->anything());
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -153,6 +157,7 @@ final class EngineTest extends TestCase
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
+            $maxTimeoutsChecker,
             $consoleOutput,
             $metricsCalculator,
             $testFrameworkExtraOptionsFilter,
@@ -262,6 +267,8 @@ final class EngineTest extends TestCase
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
 
+        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -272,6 +279,7 @@ final class EngineTest extends TestCase
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
+            $maxTimeoutsChecker,
             $consoleOutput,
             $metricsCalculator,
             $testFrameworkExtraOptionsFilter,
@@ -401,6 +409,8 @@ final class EngineTest extends TestCase
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
 
+        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -411,6 +421,7 @@ final class EngineTest extends TestCase
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
+            $maxTimeoutsChecker,
             $consoleOutput,
             $metricsCalculator,
             $testFrameworkExtraOptionsFilter,
@@ -497,6 +508,8 @@ final class EngineTest extends TestCase
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
 
+        $maxTimeoutsChecker = $this->createMock(MaxTimeoutsChecker::class);
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -507,6 +520,7 @@ final class EngineTest extends TestCase
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
+            $maxTimeoutsChecker,
             $consoleOutput,
             $metricsCalculator,
             $testFrameworkExtraOptionsFilter,

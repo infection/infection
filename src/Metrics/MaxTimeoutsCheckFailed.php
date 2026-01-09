@@ -33,51 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Metrics;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use function sprintf;
+use UnexpectedValueException;
 
 /**
  * @internal
  */
-final readonly class SchemaConfiguration
+final class MaxTimeoutsCheckFailed extends UnexpectedValueException
 {
-    /**
-     * @param non-empty-string $pathname
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
-     */
-    public function __construct(
-        public string $pathname,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public ?bool $timeoutsAsEscaped,
-        public ?int $maxTimeouts,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
-    ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    public static function create(int $maxTimeouts, int $timedOutCount): self
+    {
+        return new self(sprintf(
+            'The maximum allowed timeouts is %d, but %d timed out. '
+            . 'Reduce timeouts or increase the limit!',
+            $maxTimeouts,
+            $timedOutCount,
+        ));
     }
 }

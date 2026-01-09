@@ -53,6 +53,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Metrics\MaxTimeoutsCheckFailed;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
@@ -139,6 +140,12 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
+
+    /** @var string */
+    private const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+
+    /** @var string */
+    private const OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
     /** @var string */
     private const OPTION_LOG_VERBOSITY = 'log-verbosity';
@@ -328,6 +335,19 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_MIN_COVERED_MSI,
             )
             ->addOption(
+                self::OPTION_WITH_TIMEOUTS,
+                null,
+                InputOption::VALUE_NONE,
+                'Treat timed out mutants as escaped (affects MSI calculation)',
+            )
+            ->addOption(
+                self::OPTION_MAX_TIMEOUTS,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Maximum allowed timeouts. Build fails if exceeded',
+                Container::DEFAULT_MAX_TIMEOUTS,
+            )
+            ->addOption(
                 self::OPTION_LOG_VERBOSITY,
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -400,6 +420,7 @@ final class RunCommand extends BaseCommand
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
+                $container->getMaxTimeoutsChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
@@ -419,7 +440,7 @@ final class RunCommand extends BaseCommand
             }
 
             throw $noSourceFoundException;
-        } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutsCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
@@ -453,6 +474,11 @@ final class RunCommand extends BaseCommand
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
         /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption(self::OPTION_MIN_COVERED_MSI);
+
+        $timeoutsAsEscaped = (bool) $input->getOption(self::OPTION_WITH_TIMEOUTS);
+        /** @var string|null $maxTimeoutsInput */
+        $maxTimeoutsInput = $input->getOption(self::OPTION_MAX_TIMEOUTS);
+        $maxTimeouts = $maxTimeoutsInput !== null ? (int) $maxTimeoutsInput : null;
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
@@ -497,6 +523,8 @@ final class RunCommand extends BaseCommand
             ignoreMsiWithNoMutations: $commandHelper->getIgnoreMsiWithNoMutations(),
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
+            timeoutsAsEscaped: $timeoutsAsEscaped,
+            maxTimeouts: $maxTimeouts,
             msiPrecision: $msiPrecision,
             testFramework: $testFramework === ''
                 ? Container::DEFAULT_TEST_FRAMEWORK
