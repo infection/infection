@@ -712,6 +712,92 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         $this->assertStringContainsString('Covered Code MSI: <high>90%</high>', $displayOutput);
     }
 
+    public function test_it_does_not_show_timed_out_mutants_by_default(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([]);
+
+        // getTimedOutExecutionResults should NOT be called when withTimeouts defaults to false
+        $this->resultsCollector->expects($this->never())
+            ->method('getTimedOutExecutionResults');
+
+        $dispatcher = new SyncEventDispatcher();
+        // withTimeouts parameter is NOT passed, so it uses the default value of false
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            20,
+            false, // withUncovered
+            // withTimeouts defaults to false - NOT passed
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $displayOutput = $this->getDisplay($output);
+
+        $this->assertStringNotContainsString('Timed out mutants:', $displayOutput);
+    }
+
+    public function test_it_shows_timed_out_mutants_when_with_timeouts_is_true(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $timedOutExecutionResult = $this->createMock(MutantExecutionResult::class);
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/timedout/filePath');
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getOriginalStartingLine')
+            ->willReturn(42);
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getMutatorName')
+            ->willReturn('Minus');
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getMutantHash')
+            ->willReturn('t1m30ut');
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([]);
+
+        $this->resultsCollector->expects($this->once())
+            ->method('getTimedOutExecutionResults')
+            ->willReturn([$timedOutExecutionResult]);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
+            $output,
+            $this->outputFormatter,
+            $this->metricsCalculator,
+            $this->resultsCollector,
+            $this->diffColorizer,
+            new FederatedLogger(),
+            20,
+            false, // withUncovered
+            true,  // withTimeouts = true
+        ));
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $displayOutput = $this->getDisplay($output);
+
+        $this->assertStringContainsString(
+            "\nTimed out mutants:\n==================\n",
+            $displayOutput,
+        );
+        $this->assertStringContainsString(
+            '1) /original/timedout/filePath:42    [M] Minus [ID] t1m30ut',
+            $displayOutput,
+        );
+    }
+
     private function getDisplay(StreamOutput $output): string
     {
         rewind($output->getStream());

@@ -142,10 +142,10 @@ final class RunCommand extends BaseCommand
     private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
 
     /** @var string */
-    private const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
 
     /** @var string */
-    private const OPTION_MAX_TIMEOUTS = 'max-timeouts';
+    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
     /** @var string */
     private const OPTION_LOG_VERBOSITY = 'log-verbosity';
@@ -458,6 +458,7 @@ final class RunCommand extends BaseCommand
         LoggerInterface $logger,
     ): Container {
         $input = $io->getInput();
+        $commandHelper = new RunCommandHelper($input);
 
         $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
         $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
@@ -475,10 +476,8 @@ final class RunCommand extends BaseCommand
         /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption(self::OPTION_MIN_COVERED_MSI);
 
-        $timeoutsAsEscaped = (bool) $input->getOption(self::OPTION_WITH_TIMEOUTS);
-        /** @var string|null $maxTimeoutsInput */
-        $maxTimeoutsInput = $input->getOption(self::OPTION_MAX_TIMEOUTS);
-        $maxTimeouts = $maxTimeoutsInput !== null ? (int) $maxTimeoutsInput : null;
+        $timeoutsAsEscaped = $commandHelper->getTimeoutsAsEscaped();
+        $maxTimeouts = $commandHelper->getMaxTimeouts();
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
@@ -493,8 +492,6 @@ final class RunCommand extends BaseCommand
                     self::OPTION_FORCE_PROGRESS),
             );
         }
-
-        $commandHelper = new RunCommandHelper($input);
 
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,

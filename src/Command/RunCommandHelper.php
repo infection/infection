@@ -171,4 +171,17 @@ final readonly class RunCommandHelper
             default => true,
         };
     }
+
+    public function getTimeoutsAsEscaped(): bool
+    {
+        return (bool) $this->input->getOption(RunCommand::OPTION_WITH_TIMEOUTS);
+    }
+
+    public function getMaxTimeouts(): ?int
+    {
+        /** @var string|null $maxTimeoutsInput */
+        $maxTimeoutsInput = $this->input->getOption(RunCommand::OPTION_MAX_TIMEOUTS);
+
+        return $maxTimeoutsInput !== null ? (int) $maxTimeoutsInput : null;
+    }
 }
