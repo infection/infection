@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 use function array_diff;
+use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
@@ -50,7 +51,6 @@ use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Traversable;
 
@@ -62,14 +62,17 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     private static ?string $fixturesOldXmlFileName = null;
 
-    private Filesystem $filesystem;
+    private FileSystem $fileSystem;
 
     private IndexXmlCoverageParser $parser;
 
     protected function setUp(): void
     {
-        $this->filesystem = new Filesystem();
-        $this->parser = new IndexXmlCoverageParser(false);
+        $this->fileSystem = new FileSystem();
+        $this->parser = new IndexXmlCoverageParser(
+            false,
+            $this->fileSystem,
+        );
     }
 
     #[DataProvider('coverageProvider')]
@@ -126,7 +129,7 @@ final class IndexXmlCoverageParserTest extends TestCase
     public function test_it_errors_when_no_lines_were_executed(string $xml): void
     {
         $filename = __DIR__ . '/generated_index.xml';
-        $this->filesystem->dumpFile($filename, $xml);
+        $this->fileSystem->dumpFile($filename, $xml);
 
         $this->expectException(NoSourceFound::class);
 
@@ -140,11 +143,14 @@ final class IndexXmlCoverageParserTest extends TestCase
     public function test_it_errors_for_git_diff_lines_mode_when_no_lines_were_executed(string $xml): void
     {
         $filename = __DIR__ . '/generated_index.xml';
-        $this->filesystem->dumpFile($filename, $xml);
+        $this->fileSystem->dumpFile($filename, $xml);
 
         $this->expectException(NoSourceFound::class);
 
-        (new IndexXmlCoverageParser(true))->parse(
+        (new IndexXmlCoverageParser(
+            true,
+            $this->fileSystem,
+        ))->parse(
             $filename,
             __DIR__,
         );
@@ -236,7 +242,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             XML;
 
         $filename = __DIR__ . '/generated_index.xml';
-        $this->filesystem->dumpFile($filename, $xml);
+        $this->fileSystem->dumpFile($filename, $xml);
 
         // Note that the result is lazy, hence the exception is not thrown (yet).
         $sources = $this->parser->parse(
@@ -280,7 +286,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 
         self::$fixturesXmlFileName = Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/generated_index.xml');
 
-        (new Filesystem())->dumpFile(self::$fixturesXmlFileName, $correctedXml);
+        (new FileSystem())->dumpFile(self::$fixturesXmlFileName, $correctedXml);
 
         return self::$fixturesXmlFileName;
     }
@@ -307,7 +313,7 @@ final class IndexXmlCoverageParserTest extends TestCase
 
         self::$fixturesOldXmlFileName = Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/generated_index.xml');
 
-        (new Filesystem())->dumpFile(self::$fixturesOldXmlFileName, $correctedXml);
+        (new FileSystem())->dumpFile(self::$fixturesOldXmlFileName, $correctedXml);
 
         return self::$fixturesOldXmlFileName;
     }
