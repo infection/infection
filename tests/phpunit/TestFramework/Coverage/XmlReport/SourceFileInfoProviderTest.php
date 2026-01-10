@@ -35,25 +35,25 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use Infection\FileSystem\FakeFileSystem;
+use function dirname;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use function dirname;
-use function sprintf;
+use function Safe\file_get_contents;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
+use ValueError;
 
 #[Group('integration')]
 #[CoversClass(SourceFileInfoProvider::class)]
 final class SourceFileInfoProviderTest extends TestCase
 {
-    private const GENERAL_FIXTURES_DIR = __DIR__ . '/../Fixtures';
+    private const FIXTURES_DIR = __DIR__ . '/../Fixtures';
 
     #[DataProvider('fileFixturesProvider')]
     public function test_it_provides_file_info_and_xpath(
@@ -64,6 +64,16 @@ final class SourceFileInfoProviderTest extends TestCase
         string $expectedSourceFilePath,
     ): void {
         $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableFile')
+            ->willReturn(true);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->willReturnCallback(
+                static fn (string $path) => file_get_contents($path),
+            );
         $fileSystemMock
             ->expects($this->once())
             ->method('realPath')
@@ -93,59 +103,97 @@ final class SourceFileInfoProviderTest extends TestCase
 
     public function test_it_errors_when_the_xml_file_could_not_be_found(): void
     {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableFile')
+            ->willReturn(false);
+
         $provider = new SourceFileInfoProvider(
             '/path/to/index.xml',
             '/path/to/coverage-dir',
             'zeroLevel.php.xml',
             'projectSource',
-            new FileSystem(),
+            $fileSystemMock,
         );
 
-        try {
-            $provider->provideFileInfo();
+        $this->expectExceptionObject(
+            new InvalidCoverage(
+                'Could not find the XML coverage file "/path/to/coverage-dir/zeroLevel.php.xml" listed in "/path/to/index.xml". Make sure the coverage used is up to date',
+            ),
+        );
 
-            $this->fail();
-        } catch (InvalidCoverage $exception) {
-            $this->assertSame(
-                'Could not find the XML coverage file '
-                . '"/path/to/coverage-dir/zeroLevel.php.xml" listed in "/path/to/index.xml". Make '
-                . 'sure the coverage used is up to date',
-                $exception->getMessage(),
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
-        }
+        $provider->provideFileInfo();
+    }
+
+    public function test_it_errors_when_the_xml_file_contains_invalid_xml(): void
+    {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableFile')
+            ->willReturn(true);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->willReturn('');
+
+        $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
+            '/path/to/coverage-dir',
+            'zeroLevel.php.xml',
+            'projectSource',
+            $fileSystemMock,
+        );
+
+        // TODO: this is not ideal...
+        $this->expectException(ValueError::class);
+
+        $provider->provideFileInfo();
     }
 
     public function test_it_errors_when_the_source_file_could_not_be_found(): void
     {
-        $incorrectCoverageSrcDir = Path::canonicalize(XmlCoverageFixtures::FIXTURES_INCORRECT_COVERAGE_DIR . '/src');
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableFile')
+            ->with('/path/to/project/var/coverage-xml/src/zeroLevel.php.xml')
+            ->willReturn(true);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->with('/path/to/project/var/coverage-xml/src/zeroLevel.php.xml')
+            ->willReturn(
+                <<<'XML'
+                    <?xml version="1.0"?>
+                    <phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+                      <file name="Calculator.php" path="/Covered/Zero" hash="5166fd6f45f4b26afab9eaa7968e0c023bc35461">
+                      </file>
+                    </phpunit>
+                    XML,
+            );
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('realPath')
+            ->with('/path/to/project/src/Covered/Zero/Calculator.php')
+            ->willThrowException(new IOException(''));
 
         $provider = new SourceFileInfoProvider(
-            '/path/to/index.xml',
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
-            'zeroLevel.php.xml',
-            $incorrectCoverageSrcDir,
-            new FileSystem(),
+            '/path/to/project/var/coverage-xml/index.xml',
+            '/path/to/project/var/coverage-xml',
+            'src/zeroLevel.php.xml',
+            '/path/to/project/src',
+            $fileSystemMock,
         );
 
-        try {
-            $provider->provideFileInfo();
+        $this->expectExceptionObject(
+            new InvalidCoverage(
+                'Could not find the source file "/path/to/project/src/Covered/Zero/Calculator.php" referred by "/path/to/project/var/coverage-xml/src/zeroLevel.php.xml". Make sure the coverage used is up to date',
+            ),
+        );
 
-            $this->fail();
-        } catch (InvalidCoverage $exception) {
-            $this->assertSame(
-                sprintf(
-                    'Could not find the source file "%s/zeroLevel.php" referred by '
-                    . '"%s/zeroLevel.php.xml". Make sure the coverage used is up to date',
-                    $incorrectCoverageSrcDir,
-                    Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR),
-                ),
-                $exception->getMessage(),
-            );
-            $this->assertSame(0, $exception->getCode());
-            $this->assertNull($exception->getPrevious());
-        }
+        $provider->provideFileInfo();
     }
 
     public static function fileFixturesProvider(): iterable
@@ -154,11 +202,41 @@ final class SourceFileInfoProviderTest extends TestCase
             '[PHPUnit 09] ',
             self::phpUnit09InfoProvider(),
         );
+
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 10] ',
+            self::phpUnit10InfoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 11] ',
+            self::phpUnit11InfoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 12.0] ',
+            self::phpUnit120InfoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 12.5] ',
+            self::phpUnit125InfoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[Codeception] ',
+            self::codeceptionInfoProvider(),
+        );
+
+        yield from DataProviderFactory::prefix(
+            '[phpspec] ',
+            self::phpSpecInfoProvider(),
+        );
     }
 
     private static function phpUnit09InfoProvider(): iterable
     {
-        $phpunit9IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-09/coverage-xml/index.xml');
+        $phpunit9IndexPath = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/index.xml');
 
         $createPhpUnit9Scenario = static fn (
             string $relativeCoverageFilePath,
@@ -209,6 +287,332 @@ final class SourceFileInfoProviderTest extends TestCase
         yield 'uncovered function' => $createPhpUnit9Scenario(
             'Uncovered/functions.php.xml',
             '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Uncovered/functions.php',
+        );
+    }
+
+    private static function phpUnit10InfoProvider(): iterable
+    {
+        $phpunit10IndexPath = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-10/coverage-xml/index.xml');
+
+        $createPhpUnit10Scenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $phpunit10IndexPath,
+            dirname($phpunit10IndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createPhpUnit10Scenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Covered/Calculator.php',
+        );
+
+        yield 'covered trait' => $createPhpUnit10Scenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createPhpUnit10Scenario(
+            'Covered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createPhpUnit10Scenario(
+            'Covered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Covered/functions.php',
+        );
+
+        yield 'uncovered class' => $createPhpUnit10Scenario(
+            'Uncovered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Uncovered/Calculator.php',
+        );
+
+        yield 'uncovered trait' => $createPhpUnit10Scenario(
+            'Uncovered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Uncovered/LoggerTrait.php',
+        );
+
+        yield 'uncovered class with trait' => $createPhpUnit10Scenario(
+            'Uncovered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Uncovered/UserService.php',
+        );
+
+        yield 'uncovered function' => $createPhpUnit10Scenario(
+            'Uncovered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_10-1/src/Uncovered/functions.php',
+        );
+    }
+
+    private static function phpUnit11InfoProvider(): iterable
+    {
+        $phpunit11IndexPath = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-11/coverage-xml/index.xml');
+
+        $createPhpUnit11Scenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $phpunit11IndexPath,
+            dirname($phpunit11IndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/infection/tests/e2e/PHPUnit_11/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createPhpUnit11Scenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Covered/Calculator.php',
+        );
+
+        yield 'covered trait' => $createPhpUnit11Scenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createPhpUnit11Scenario(
+            'Covered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createPhpUnit11Scenario(
+            'Covered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Covered/functions.php',
+        );
+
+        yield 'uncovered class' => $createPhpUnit11Scenario(
+            'Uncovered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Uncovered/Calculator.php',
+        );
+
+        yield 'uncovered trait' => $createPhpUnit11Scenario(
+            'Uncovered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Uncovered/LoggerTrait.php',
+        );
+
+        yield 'uncovered class with trait' => $createPhpUnit11Scenario(
+            'Uncovered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Uncovered/UserService.php',
+        );
+
+        yield 'uncovered function' => $createPhpUnit11Scenario(
+            'Uncovered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_11/src/Uncovered/functions.php',
+        );
+    }
+
+    private static function phpUnit120InfoProvider(): iterable
+    {
+        $phpunit120IndexPath = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-12-0/coverage-xml/index.xml');
+
+        $createPhpUnit120Scenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $phpunit120IndexPath,
+            dirname($phpunit120IndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createPhpUnit120Scenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Covered/Calculator.php',
+        );
+
+        yield 'covered trait' => $createPhpUnit120Scenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createPhpUnit120Scenario(
+            'Covered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createPhpUnit120Scenario(
+            'Covered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Covered/functions.php',
+        );
+
+        yield 'uncovered class' => $createPhpUnit120Scenario(
+            'Uncovered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Uncovered/Calculator.php',
+        );
+
+        yield 'uncovered trait' => $createPhpUnit120Scenario(
+            'Uncovered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Uncovered/LoggerTrait.php',
+        );
+
+        yield 'uncovered class with trait' => $createPhpUnit120Scenario(
+            'Uncovered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Uncovered/UserService.php',
+        );
+
+        yield 'uncovered function' => $createPhpUnit120Scenario(
+            'Uncovered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-0/src/Uncovered/functions.php',
+        );
+    }
+
+    private static function phpUnit125InfoProvider(): iterable
+    {
+        $phpunit125IndexPath = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-12-5/index.xml');
+
+        $createPhpUnit125Scenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $phpunit125IndexPath,
+            dirname($phpunit125IndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createPhpUnit125Scenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/Calculator.php',
+        );
+
+        yield 'covered trait' => $createPhpUnit125Scenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createPhpUnit125Scenario(
+            'Covered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createPhpUnit125Scenario(
+            'Covered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Covered/functions.php',
+        );
+
+        yield 'uncovered class' => $createPhpUnit125Scenario(
+            'Uncovered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Uncovered/Calculator.php',
+        );
+
+        yield 'uncovered trait' => $createPhpUnit125Scenario(
+            'Uncovered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Uncovered/LoggerTrait.php',
+        );
+
+        yield 'uncovered class with trait' => $createPhpUnit125Scenario(
+            'Uncovered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Uncovered/UserService.php',
+        );
+
+        yield 'uncovered function' => $createPhpUnit125Scenario(
+            'Uncovered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_12-5/src/Uncovered/functions.php',
+        );
+    }
+
+    private static function codeceptionInfoProvider(): iterable
+    {
+        $codeceptionIndexPath = Path::canonicalize(self::FIXTURES_DIR . '/codeception/coverage-xml/index.xml');
+
+        $createCodeceptionScenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $codeceptionIndexPath,
+            dirname($codeceptionIndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createCodeceptionScenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src/Covered/Calculator.php',
+        );
+
+        yield 'covered trait' => $createCodeceptionScenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createCodeceptionScenario(
+            'Covered/UserService.php.xml',
+            '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createCodeceptionScenario(
+            'Covered/functions.php.xml',
+            '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src/Covered/functions.php',
+        );
+
+        yield 'database class' => $createCodeceptionScenario(
+            'Database.php.xml',
+            '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src/Database.php',
+        );
+    }
+
+    private static function phpSpecInfoProvider(): iterable
+    {
+        $phpSpecIndexPath = Path::canonicalize(self::FIXTURES_DIR . '/phpspec/index.xml');
+
+        $createPhpSpecScenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $phpSpecIndexPath,
+            dirname($phpSpecIndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createPhpSpecScenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/Calculator.php',
+        );
+
+        yield 'covered base class' => $createPhpSpecScenario(
+            'Covered/BaseCalculator.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/BaseCalculator.php',
+        );
+
+        yield 'covered trait' => $createPhpSpecScenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createPhpSpecScenario(
+            'Covered/UserService.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createPhpSpecScenario(
+            'Covered/functions.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Covered/functions.php',
+        );
+
+        yield 'uncovered class' => $createPhpSpecScenario(
+            'Uncovered/Calculator.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Uncovered/Calculator.php',
+        );
+
+        yield 'uncovered trait' => $createPhpSpecScenario(
+            'Uncovered/LoggerTrait.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Uncovered/LoggerTrait.php',
+        );
+
+        yield 'uncovered class with trait' => $createPhpSpecScenario(
+            'Uncovered/UserService.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Uncovered/UserService.php',
+        );
+
+        yield 'uncovered function' => $createPhpSpecScenario(
+            'Uncovered/functions.php.xml',
+            '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src/Uncovered/functions.php',
         );
     }
 }
