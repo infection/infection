@@ -40,6 +40,7 @@ use function file_exists;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\CoveredTraceProvider;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
@@ -85,7 +86,10 @@ final class PHPUnitCoverageTracerTest extends TestCase
         $this->provider = new CoveredTraceProvider(
             new PhpUnitXmlCoverageTraceProvider(
                 indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                indexParser: new IndexXmlCoverageParser(isSourceFiltered: false),
+                indexParser: new IndexXmlCoverageParser(
+                    isSourceFiltered: false,
+                    fileSystem: new FileSystem(),
+                ),
                 parser: new XmlCoverageParser(),
             ),
             new JUnitTestExecutionInfoAdder(
