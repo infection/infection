@@ -35,14 +35,17 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function dirname;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
@@ -50,25 +53,39 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(SourceFileInfoProvider::class)]
 final class SourceFileInfoProviderTest extends TestCase
 {
+    private const GENERAL_FIXTURES_DIR = __DIR__ . '/../Fixtures';
+
     #[DataProvider('fileFixturesProvider')]
     public function test_it_provides_file_info_and_xpath(
+        string $coverageIndexPath,
         string $coverageDir,
         string $relativeCoverageFilePath,
         string $projectSource,
         string $expectedSourceFilePath,
     ): void {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('realPath')
+            ->with($expectedSourceFilePath)
+            ->willReturn($expectedSourceFilePath);
+
         $provider = new SourceFileInfoProvider(
-            '/path/to/index.xml',
+            $coverageIndexPath,
             $coverageDir,
             $relativeCoverageFilePath,
             $projectSource,
-            new FileSystem(),
+            $fileSystemMock,
         );
 
-        $this->assertSame($expectedSourceFilePath, $provider->provideFileInfo()->getRealPath());
+        // Note that in practice we care about the real path, not the pathname.
+        // However, since we are creating a real SplFileInfo instance and the
+        // path is a fake one, `getRealPath()` would return `false`.
+        $this->assertSame($expectedSourceFilePath, $provider->provideFileInfo()->getPathname());
 
+        // We cannot check that the XPath is correct... Only that we produced
+        // a cached XPath.
         $xPath = $provider->provideXPath();
-
         $xPathAgain = $provider->provideXPath();
 
         $this->assertSame($xPath, $xPathAgain);
@@ -133,13 +150,65 @@ final class SourceFileInfoProviderTest extends TestCase
 
     public static function fileFixturesProvider(): iterable
     {
-        foreach (XmlCoverageFixtures::provideAllFixtures() as $fixture) {
-            yield [
-                $fixture->coverageDir,
-                $fixture->relativeCoverageFilePath,
-                $fixture->projectSource,
-                $fixture->sourceFilePath,
-            ];
-        }
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 09] ',
+            self::phpUnit09InfoProvider(),
+        );
+    }
+
+    private static function phpUnit09InfoProvider(): iterable
+    {
+        $phpunit9IndexPath = Path::canonicalize(self::GENERAL_FIXTURES_DIR . '/phpunit-09/coverage-xml/index.xml');
+
+        $createPhpUnit9Scenario = static fn (
+            string $relativeCoverageFilePath,
+            string $expected,
+        ) => [
+            $phpunit9IndexPath,
+            dirname($phpunit9IndexPath),
+            $relativeCoverageFilePath,
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src',
+            $expected,
+        ];
+
+        yield 'covered class' => $createPhpUnit9Scenario(
+            'Covered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/Calculator.php',
+        );
+
+        yield 'covered trait' => $createPhpUnit9Scenario(
+            'Covered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/LoggerTrait.php',
+        );
+
+        yield 'covered class with trait' => $createPhpUnit9Scenario(
+            'Covered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/UserService.php',
+        );
+
+        yield 'covered function' => $createPhpUnit9Scenario(
+            'Covered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/functions.php',
+        );
+
+        yield 'uncovered class' => $createPhpUnit9Scenario(
+            'Uncovered/Calculator.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Uncovered/Calculator.php',
+        );
+
+        yield 'uncovered trait' => $createPhpUnit9Scenario(
+            'Uncovered/LoggerTrait.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Uncovered/LoggerTrait.php',
+        );
+
+        yield 'uncovered class with trait' => $createPhpUnit9Scenario(
+            'Uncovered/UserService.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Uncovered/UserService.php',
+        );
+
+        yield 'uncovered function' => $createPhpUnit9Scenario(
+            'Uncovered/functions.php.xml',
+            '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Uncovered/functions.php',
+        );
     }
 }
