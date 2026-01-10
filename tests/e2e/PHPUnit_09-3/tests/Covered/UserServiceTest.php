@@ -6,6 +6,7 @@ use Infection\E2ETests\PHPUnit_09_3\Covered\LoggerTrait;
 use Infection\E2ETests\PHPUnit_09_3\Covered\UserService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversTrait(LoggerTrait::class)]
