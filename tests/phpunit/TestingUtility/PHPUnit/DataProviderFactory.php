@@ -62,7 +62,7 @@ final class DataProviderFactory
      *
      * @param iterable<Key, Value> $dataProvider
      *
-     * @return iterable<string, array{Value}>
+     * @return iterable<string, Value>
      */
     public static function prefix(string $prefix, iterable $dataProvider): iterable
     {

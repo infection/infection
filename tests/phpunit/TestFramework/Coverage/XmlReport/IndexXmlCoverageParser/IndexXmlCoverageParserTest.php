@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
+use Infection\FileSystem\FakeFileSystem;
 use function dirname;
 use Exception;
 use Infection\Source\Exception\NoSourceFound;
@@ -78,7 +79,10 @@ final class IndexXmlCoverageParserTest extends TestCase
         string $coverageBasePath,
         array|Exception $expected,
     ): void {
-        $parser = new IndexXmlCoverageParser(isSourceFiltered: false);
+        $parser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
+        );
 
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);
@@ -107,6 +111,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($phpunit9IndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/infection/tests/e2e/PHPUnit_09-3/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'PHPUnit 9' => [
@@ -133,6 +138,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($phpunit10IndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/infection/tests/e2e/PHPUnit_10-1/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'PHPUnit 10' => [
@@ -159,6 +165,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($phpunit11IndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/infection/tests/e2e/PHPUnit_11/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'PHPUnit 11' => [
@@ -185,6 +192,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($phpunit12_0IndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/infection/tests/e2e/PHPUnit_12-0/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'PHPUnit 12.0' => [
@@ -211,6 +219,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($phpunit12_5IndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/infection/tests/e2e/PHPUnit_12-5/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'PHPUnit 12.5' => [
@@ -237,6 +246,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($phpspecIndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/phpspec-adapter/tests/e2e/PhpSpec/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'PhpSpec' => [
@@ -264,6 +274,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             coverageDir: dirname($codeceptionIndexPath),
             relativeCoverageFilePath: $relativeCoverageFilePath,
             projectSource: '/path/to/codeception-adapter/tests/e2e/Codeception_With_Suite_Overridings/src',
+            fileSystem: new FakeFileSystem(),
         );
 
         yield 'Codeception' => [
@@ -313,7 +324,10 @@ final class IndexXmlCoverageParserTest extends TestCase
         $filename = self::FIXTURES_DIR . '/generated_index.xml';
         $this->filesystem->dumpFile($filename, $xml);
 
-        $unfilteredParser = new IndexXmlCoverageParser(isSourceFiltered: false);
+        $unfilteredParser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
+        );
 
         $unfilteredNoSourceFound = $this->expectToThrow(
             static fn () => $unfilteredParser->parse($filename, __DIR__),
@@ -322,7 +336,10 @@ final class IndexXmlCoverageParserTest extends TestCase
         $this->assertInstanceOf(NoSourceFound::class, $unfilteredNoSourceFound);
         $this->assertFalse($unfilteredNoSourceFound->isSourceFiltered);
 
-        $filteredParser = new IndexXmlCoverageParser(isSourceFiltered: true);
+        $filteredParser = new IndexXmlCoverageParser(
+            isSourceFiltered: true,
+            fileSystem: new FakeFileSystem(),
+        );
 
         $filteredNoSourceFound = $this->expectToThrow(
             static fn () => $filteredParser->parse($filename, __DIR__),

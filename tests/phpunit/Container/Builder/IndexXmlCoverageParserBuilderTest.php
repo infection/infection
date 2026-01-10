@@ -37,6 +37,7 @@ namespace Infection\Tests\Container\Builder;
 
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\Tests\Configuration\ConfigurationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -52,7 +53,10 @@ final class IndexXmlCoverageParserBuilderTest extends TestCase
             ->withSourceFilter(null)
             ->build();
 
-        $parser = (new IndexXmlCoverageParserBuilder($configuration))->build();
+        $parser = (new IndexXmlCoverageParserBuilder(
+            $configuration,
+            new FakeFileSystem(),
+        ))->build();
 
         $this->assertFalse($this->getIsSourceFiltered($parser));
     }
@@ -63,7 +67,10 @@ final class IndexXmlCoverageParserBuilderTest extends TestCase
             ->withSourceFilter(new PlainFilter(['src/']))
             ->build();
 
-        $parser = (new IndexXmlCoverageParserBuilder($configuration))->build();
+        $parser = (new IndexXmlCoverageParserBuilder(
+            $configuration,
+            new FakeFileSystem(),
+        ))->build();
 
         $this->assertTrue($this->getIsSourceFiltered($parser));
     }

@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
-use function file_get_contents;
+use function Safe\file_get_contents;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;

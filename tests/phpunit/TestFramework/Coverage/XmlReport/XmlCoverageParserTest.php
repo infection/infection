@@ -63,9 +63,6 @@ final class XmlCoverageParserTest extends TestCase
         $this->parser = new XmlCoverageParser();
     }
 
-    /**
-     * @param array<string, mixed> $expected
-     */
     #[DataProvider('lineCoverageProvider')]
     public function test_it_can_get_the_line_coverage(
         SafeDOMXPath $xPath,
@@ -5035,26 +5032,5 @@ final class XmlCoverageParserTest extends TestCase
                 ],
             ),
         ];
-    }
-
-    private function createSourceFileInfoProvider(string $xml): SourceFileInfoProvider&MockObject
-    {
-        $xPath = SafeDOMXPath::fromString($xml, 'p');
-
-        $providerMock = $this->createMock(SourceFileInfoProvider::class);
-
-        $providerMock
-            ->expects($this->once())
-            ->method('provideFileInfo')
-            ->willReturn(new MockSplFileInfo(['file' => 'test.txt']))
-        ;
-
-        $providerMock
-            ->expects($this->once())
-            ->method('provideXPath')
-            ->willReturn($xPath)
-        ;
-
-        return $providerMock;
     }
 }

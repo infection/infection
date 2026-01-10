@@ -41,8 +41,10 @@ use function is_file;
 use function is_readable;
 use function method_exists;
 use function restore_error_handler;
+use Safe\Exceptions\FilesystemException;
 use function Safe\realpath;
 use function set_error_handler;
+use function sprintf;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
@@ -62,9 +64,22 @@ class FileSystem extends SymfonyFilesystem
         return is_dir($filename) && is_readable($filename);
     }
 
+    /**
+     * @throws IOException
+     */
     public function realPath(string $filename): string
     {
-        return realpath($filename);
+        try {
+            return realpath($filename);
+        } catch (FilesystemException $exception) {
+            throw new IOException(
+                sprintf(
+                    'Could not resolve the path "%s".',
+                    $filename,
+                ),
+                previous: $exception,
+            );
+        }
     }
 
     /**
