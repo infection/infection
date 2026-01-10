@@ -46,19 +46,21 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function Safe\fopen;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
 use function str_replace;
-use const PHP_EOL;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 #[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
+#[Group('integration')]
 final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     private MockObject&MetricsCalculator $metricsCalculatorMock;

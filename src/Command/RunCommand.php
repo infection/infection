@@ -94,6 +94,12 @@ final class RunCommand extends BaseCommand
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
     /** @var string */
+    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+
+    /** @var string */
+    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
+
+    /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
     private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
@@ -140,12 +146,6 @@ final class RunCommand extends BaseCommand
 
     /** @var string */
     private const OPTION_MIN_COVERED_MSI = 'min-covered-msi';
-
-    /** @var string */
-    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
-
-    /** @var string */
-    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
     /** @var string */
     private const OPTION_LOG_VERBOSITY = 'log-verbosity';
