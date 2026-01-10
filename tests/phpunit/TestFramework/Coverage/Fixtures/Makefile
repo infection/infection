@@ -6,7 +6,8 @@ MAKEFLAGS += --no-builtin-rules
 
 .PHONY: replace_absolute_paths
 replace_absolute_paths:
-	for file in *.xml; do \
+	find . -name '*.xml' -type f | while read -r file; do \
 		sed -i '' -E 's|"/[^"]*/infection/|"/path/to/infection/|g' "$$file"; \
 		sed -i '' -E 's|"/[^"]*/codeception-adapter/|"/path/to/codeception-adapter/|g' "$$file"; \
+		sed -i '' -E 's|"/[^"]*/phpspec-adapter/|"/path/to/phpspec-adapter/|g' "$$file"; \
 	done

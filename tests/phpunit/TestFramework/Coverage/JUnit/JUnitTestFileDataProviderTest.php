@@ -48,7 +48,6 @@ use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
 use function Safe\file_put_contents;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
@@ -59,10 +58,10 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 {
     use ExpectsThrowables;
 
-    private const FIXTURES_DIR = __DIR__ . '/Fixtures';
+    private const FIXTURES_DIR = __DIR__ . '/../Fixtures';
 
     /**
-     * @param non-empty-array<class-string, TestFileTimeData|class-string<Throwable>> $expected
+     * @param TestFileTimeData|class-string<Throwable> $expected
      */
     #[DataProvider('infoProvider')]
     public function test_it_can_get_the_test_info_for_a_given_test_id(
@@ -75,11 +74,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
         );
 
         if (is_string($expected)) {
-            $actualException = $this->expectToThrow(
-                static fn () => $provider->getTestFileInfo($testId),
-            );
+            $this->expectException($expected);
 
-            $this->assertInstanceOf($expected, $actualException);
+            $provider->getTestFileInfo($testId);
         } else {
             $actual = $provider->getTestFileInfo($testId);
 
@@ -126,10 +123,16 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
             '[Codeception (Cest style)] ',
             self::codeceptionCestProvider(),
         );
+
+        yield 'invalid XML' => [
+            '',
+            'Acme\Service',
+            InvalidArgumentException::class,
+        ];
     }
 
     /**
-     * @param non-empty-array<class-string, TestFileTimeData|class-string<Throwable>> $expected
+     * @param TestFileTimeData|class-string<Throwable> $expected
      */
     #[DataProvider('infoProvider')]
     public function test_it_is_idempotent(
@@ -158,18 +161,6 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
         }
     }
 
-    public function test_it_throws_an_exception_if_the_junit_file_is_invalid_xml(): void
-    {
-        $provider = $this->createProvider(
-            $this->createJUnit(''),
-        );
-
-        // TODO: this is not ideal...
-        $this->expectException(InvalidArgumentException::class);
-
-        $provider->getTestFileInfo('Foo\BarTest');
-    }
-
     private function createProvider(string $file): JUnitTestFileDataProvider
     {
         return new JUnitTestFileDataProvider(
@@ -179,7 +170,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function phpUnit09InfoProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/phpunit-09-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/junit.xml'),
+        );
 
         yield 'TestCase classname' => [
             $junitXml,
@@ -271,7 +264,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function phpUnit10InfoProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/phpunit-10-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-10/junit.xml'),
+        );
 
         yield 'TestCase classname' => [
             $junitXml,
@@ -363,7 +358,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function phpUnit11InfoProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/phpunit-11-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-11/junit.xml'),
+        );
 
         yield 'TestCase classname' => [
             $junitXml,
@@ -455,7 +452,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function phpUnit12InfoProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/phpunit-12-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-12-0/junit.xml'),
+        );
 
         yield 'TestCase classname' => [
             $junitXml,
@@ -547,7 +546,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function codeceptionUnitProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/codeception-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/codeception/junit.xml'),
+        );
 
         yield 'TestSuite' => [
             $junitXml,
@@ -596,7 +597,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function codeceptionBddProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/codeception-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/codeception/junit.xml'),
+        );
 
         yield 'TestSuite' => [
             $junitXml,
@@ -692,7 +695,9 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private static function codeceptionCestProvider(): iterable
     {
-        $junitXml = file_get_contents(self::FIXTURES_DIR . '/codeception-junit.xml');
+        $junitXml = file_get_contents(
+            Path::canonicalize(self::FIXTURES_DIR . '/codeception/junit.xml'),
+        );
 
         yield 'TestSuite' => [
             $junitXml,
