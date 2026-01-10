@@ -18,8 +18,6 @@ on:
       - main
       - master
   pull_request:
-    paths:
-      - '.github/workflows/mt.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -31,17 +29,17 @@ env:
   MIN_COVERED_MSI: 86.00
 
 jobs:
-  tests:
+  coverage:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
-    name: Infection complete run on Infection
+    name: Collect coverage
 
     steps:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      - name: Setup PHP for coverage
+      - name: Setup PHP
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           # Any supported PHP version is fine
@@ -77,17 +75,59 @@ jobs:
             --coverage-xml=var/logs/coverage-xml \
             --log-junit=var/logs/junit.xml
 
-      - name: Setup PHP for mutation testing
+      - name: Upload coverage
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: coverage
+          path: var/logs/
+          retention-days: 1
+
+  mutation-testing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: coverage
+
+    name: Infection complete run on Infection
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Setup PHP
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           php-version: ${{ env.PHP_VERSION }}
           coverage: none
+          tools: composer
           ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create opcache directory
         run: mkdir -p /tmp/opcache
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Download coverage
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: coverage
+          path: var/logs/
 
       - name: Run Infection on the full codebase
         env:
