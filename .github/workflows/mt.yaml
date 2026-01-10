@@ -18,8 +18,8 @@ on:
       - main
       - master
   pull_request:
-#    paths:
-#      - '.github/workflows/mt.yaml'
+    paths:
+      - '.github/workflows/mt.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
