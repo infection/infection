@@ -35,18 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use const DIRECTORY_SEPARATOR;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Path;
+use function Pipeline\take;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -179,19 +182,6 @@ final class XmlCoverageParserTest extends TestCase
             '[Codeception] ',
             self::codeceptionInfoProvider(),
         );
-    }
-
-    private function createSourceFileInfoProviderStub(SafeDOMXPath $xPath): SourceFileInfoProvider
-    {
-        $sourceFileInfoProviderStub = $this->createStub(SourceFileInfoProvider::class);
-        $sourceFileInfoProviderStub
-            ->method('provideFileInfo')
-            ->willReturn(new MockSplFileInfo(''));
-        $sourceFileInfoProviderStub
-            ->method('provideXPath')
-            ->willReturn($xPath);
-
-        return $sourceFileInfoProviderStub;
     }
 
     private static function phpUnit09InfoProvider(): iterable
@@ -5031,5 +5021,18 @@ final class XmlCoverageParserTest extends TestCase
                 ],
             ),
         ];
+    }
+
+    private function createSourceFileInfoProviderStub(SafeDOMXPath $xPath): SourceFileInfoProvider
+    {
+        $sourceFileInfoProviderStub = $this->createStub(SourceFileInfoProvider::class);
+        $sourceFileInfoProviderStub
+            ->method('provideFileInfo')
+            ->willReturn(new MockSplFileInfo(''));
+        $sourceFileInfoProviderStub
+            ->method('provideXPath')
+            ->willReturn($xPath);
+
+        return $sourceFileInfoProviderStub;
     }
 }

@@ -40,11 +40,11 @@ use const DIRECTORY_SEPARATOR;
 use function implode;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\SafeDOMXPath;
+use SplFileInfo;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
 use function trim;
 
 /**
@@ -91,7 +91,7 @@ class SourceFileInfoProvider
 
         return $this->xPath = SafeDOMXPath::fromString(
             $this->fileSystem->readFile($coverageFile),
-            'p',
+            namespace: 'p',
         );
     }
 
@@ -136,6 +136,6 @@ class SourceFileInfoProvider
             ));
         }
 
-        return new SplFileInfo($realPath, $relativeFilePath, $path);
+        return new SplFileInfo($realPath);
     }
 }

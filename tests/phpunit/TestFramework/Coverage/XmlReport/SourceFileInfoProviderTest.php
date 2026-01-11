@@ -35,15 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
-use function dirname;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
+use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function dirname;
 use function Safe\file_get_contents;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
@@ -53,8 +54,6 @@ use ValueError;
 #[CoversClass(SourceFileInfoProvider::class)]
 final class SourceFileInfoProviderTest extends TestCase
 {
-    private const FIXTURES_DIR = __DIR__ . '/../Fixtures';
-
     #[DataProvider('fileFixturesProvider')]
     public function test_it_provides_file_info_and_xpath(
         string $coverageIndexPath,
@@ -63,6 +62,8 @@ final class SourceFileInfoProviderTest extends TestCase
         string $projectSource,
         string $expectedSourceFilePath,
     ): void {
+        // We configure the FileSystem so that the computed XML file needs to point to a real file
+        // but the source file does not need to exist.
         $fileSystemMock = $this->createMock(FileSystem::class);
         $fileSystemMock
             ->expects($this->once())
@@ -71,9 +72,7 @@ final class SourceFileInfoProviderTest extends TestCase
         $fileSystemMock
             ->expects($this->once())
             ->method('readFile')
-            ->willReturnCallback(
-                static fn (string $path) => file_get_contents($path),
-            );
+            ->willReturnCallback(file_get_contents(...));
         $fileSystemMock
             ->expects($this->once())
             ->method('realPath')
@@ -91,7 +90,9 @@ final class SourceFileInfoProviderTest extends TestCase
         // Note that in practice we care about the real path, not the pathname.
         // However, since we are creating a real SplFileInfo instance and the
         // path is a fake one, `getRealPath()` would return `false`.
-        $this->assertSame($expectedSourceFilePath, $provider->provideFileInfo()->getPathname());
+        $actualSourceFilePath = $provider->provideFileInfo()->getPathname();
+
+        $this->assertSame($expectedSourceFilePath, $actualSourceFilePath);
 
         // We cannot check that the XPath is correct... Only that we produced
         // a cached XPath.
@@ -122,32 +123,6 @@ final class SourceFileInfoProviderTest extends TestCase
                 'Could not find the XML coverage file "/path/to/coverage-dir/zeroLevel.php.xml" listed in "/path/to/index.xml". Make sure the coverage used is up to date',
             ),
         );
-
-        $provider->provideFileInfo();
-    }
-
-    public function test_it_errors_when_the_xml_file_contains_invalid_xml(): void
-    {
-        $fileSystemMock = $this->createMock(FileSystem::class);
-        $fileSystemMock
-            ->expects($this->once())
-            ->method('isReadableFile')
-            ->willReturn(true);
-        $fileSystemMock
-            ->expects($this->once())
-            ->method('readFile')
-            ->willReturn('');
-
-        $provider = new SourceFileInfoProvider(
-            '/path/to/index.xml',
-            '/path/to/coverage-dir',
-            'zeroLevel.php.xml',
-            'projectSource',
-            $fileSystemMock,
-        );
-
-        // TODO: this is not ideal...
-        $this->expectException(ValueError::class);
 
         $provider->provideFileInfo();
     }
@@ -192,6 +167,32 @@ final class SourceFileInfoProviderTest extends TestCase
                 'Could not find the source file "/path/to/project/src/Covered/Zero/Calculator.php" referred by "/path/to/project/var/coverage-xml/src/zeroLevel.php.xml". Make sure the coverage used is up to date',
             ),
         );
+
+        $provider->provideFileInfo();
+    }
+
+    public function test_it_errors_when_the_xml_file_contains_invalid_xml(): void
+    {
+        $fileSystemMock = $this->createMock(FileSystem::class);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('isReadableFile')
+            ->willReturn(true);
+        $fileSystemMock
+            ->expects($this->once())
+            ->method('readFile')
+            ->willReturn('');
+
+        $provider = new SourceFileInfoProvider(
+            '/path/to/index.xml',
+            '/path/to/coverage-dir',
+            'zeroLevel.php.xml',
+            'projectSource',
+            $fileSystemMock,
+        );
+
+        // TODO: this is not ideal...
+        $this->expectException(ValueError::class);
 
         $provider->provideFileInfo();
     }

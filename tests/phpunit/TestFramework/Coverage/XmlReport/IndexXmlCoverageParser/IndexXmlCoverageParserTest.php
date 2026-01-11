@@ -35,20 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
+use Infection\Tests\TestingUtility\FS;
 use function dirname;
 use Exception;
 use Infection\FileSystem\FakeFileSystem;
+use function dirname;
+use Exception;
+use Infection\FileSystem\FakeFileSystem;
+use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
+use function Safe\file_get_contents;
+use function Safe\file_put_contents;
+use function Safe\preg_replace;
+use function Safe\unlink;
 use function sprintf;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -63,11 +74,16 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     private const FIXTURES_DIR = __DIR__ . '/Fixtures';
 
-    private Filesystem $filesystem;
+    private string $generatedIndexXmlPath;
 
     protected function setUp(): void
     {
-        $this->filesystem = new Filesystem();
+        $this->generatedIndexXmlPath = FS::tmpFile('IndexXmlCoverageParserTest');
+    }
+
+    protected function tearDown(): void
+    {
+        unlink($this->generatedIndexXmlPath);
     }
 
     /**
@@ -98,6 +114,43 @@ final class IndexXmlCoverageParserTest extends TestCase
         if (!($expected instanceof Exception)) {
             $this->assertEquals($expected, $actual);
         }
+    }
+
+    #[DataProvider('noCoveredLineReportProviders')]
+    public function test_it_errors_when_no_lines_were_executed(
+        string $xml,
+    ): void {
+        file_put_contents($this->generatedIndexXmlPath, $xml);
+
+        $unfilteredParser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
+        );
+
+        $unfilteredNoSourceFound = $this->expectToThrow(
+            fn () => $unfilteredParser->parse(
+                $this->generatedIndexXmlPath,
+                __DIR__,
+            ),
+        );
+
+        $this->assertInstanceOf(NoSourceFound::class, $unfilteredNoSourceFound);
+        $this->assertFalse($unfilteredNoSourceFound->isSourceFiltered);
+
+        $filteredParser = new IndexXmlCoverageParser(
+            isSourceFiltered: true,
+            fileSystem: new FakeFileSystem(),
+        );
+
+        $filteredNoSourceFound = $this->expectToThrow(
+            fn () => $filteredParser->parse(
+                $this->generatedIndexXmlPath,
+                __DIR__,
+            ),
+        );
+
+        $this->assertInstanceOf(NoSourceFound::class, $filteredNoSourceFound);
+        $this->assertTrue($filteredNoSourceFound->isSourceFiltered);
     }
 
     public static function indexProvider(): iterable
@@ -317,38 +370,6 @@ final class IndexXmlCoverageParserTest extends TestCase
         ];
     }
 
-    #[DataProvider('noCoveredLineReportProviders')]
-    public function test_it_errors_when_no_lines_were_executed(
-        string $xml,
-    ): void {
-        $filename = self::FIXTURES_DIR . '/generated_index.xml';
-        $this->filesystem->dumpFile($filename, $xml);
-
-        $unfilteredParser = new IndexXmlCoverageParser(
-            isSourceFiltered: false,
-            fileSystem: new FakeFileSystem(),
-        );
-
-        $unfilteredNoSourceFound = $this->expectToThrow(
-            static fn () => $unfilteredParser->parse($filename, __DIR__),
-        );
-
-        $this->assertInstanceOf(NoSourceFound::class, $unfilteredNoSourceFound);
-        $this->assertFalse($unfilteredNoSourceFound->isSourceFiltered);
-
-        $filteredParser = new IndexXmlCoverageParser(
-            isSourceFiltered: true,
-            fileSystem: new FakeFileSystem(),
-        );
-
-        $filteredNoSourceFound = $this->expectToThrow(
-            static fn () => $filteredParser->parse($filename, __DIR__),
-        );
-
-        $this->assertInstanceOf(NoSourceFound::class, $filteredNoSourceFound);
-        $this->assertTrue($filteredNoSourceFound->isSourceFiltered);
-    }
-
     public static function noCoveredLineReportProviders(): iterable
     {
         yield 'zero lines executed' => [
@@ -397,5 +418,58 @@ final class IndexXmlCoverageParserTest extends TestCase
                 </phpunit>
                 XML,
         ];
+    }
+
+
+
+    public function test_it_errors_when_no_phpunit_project_source_could_be_found(): void
+    {
+        $xml = <<<'XML'
+            <?xml version="1.0"?>
+                <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+                  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                    <driver name="xdebug" version="2.5.1"/>
+                  </build>
+                  <project>
+                    <tests>
+                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                    </tests>
+                    <directory name="/">
+                      <totals>
+                        <lines total="913" comments="130" code="783" executable="348" executed="24" percent="6.90"/>
+                      </totals>
+                    </directory>
+                  </project>
+                  <!-- The rest of the file has been removed for this test-->
+                </phpunit>
+            XML;
+
+        file_put_contents($this->generatedIndexXmlPath, $xml);
+
+        $parser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
+        );
+
+        // Note that the result is lazy, hence the exception is not thrown (yet).
+        $sources = $parser->parse(
+            $this->generatedIndexXmlPath,
+            __DIR__,
+        );
+
+        $this->expectExceptionObject(
+            new InvalidCoverage(
+                sprintf(
+                    'Could not find the source attribute for the project in the file "%s".',
+                    $this->generatedIndexXmlPath,
+                ),
+            ),
+        );
+
+        foreach ($sources as $source) {
+            return;
+        }
     }
 }

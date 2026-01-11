@@ -123,6 +123,7 @@ class ConfigurationFactory
         ?string $gitlabLogFilePath,
         ?string $htmlLogFilePath,
         ?string $textLogFilePath,
+        ?string $summaryJsonLogFilePath,
         bool $useNoopMutators,
         bool $executeOnlyCoveringTestCases,
         ?string $mapSourceClassToTestStrategy,
@@ -158,7 +159,7 @@ class ConfigurationFactory
             processTimeout: $schema->timeout ?? self::DEFAULT_TIMEOUT,
             source: $schema->source,
             sourceFilter: $sourceFilter,
-            logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath),
+            logs: $this->retrieveLogs($schema->logs, $configDir, $useGitHubLogger, $gitlabLogFilePath, $htmlLogFilePath, $textLogFilePath, $summaryJsonLogFilePath),
             logVerbosity: $logVerbosity,
             tmpDir: $namespacedTmpDir,
             phpUnit: $this->retrievePhpUnit($schema, $configDir),
@@ -348,7 +349,7 @@ class ConfigurationFactory
         return $sourceFilter;
     }
 
-    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath): Logs
+    private function retrieveLogs(Logs $logs, string $configDir, ?bool $useGitHubLogger, ?string $gitlabLogFilePath, ?string $htmlLogFilePath, ?string $textLogFilePath, ?string $summaryJsonLogFilePath): Logs
     {
         if ($useGitHubLogger === null) {
             $useGitHubLogger = $this->detectCiGithubActions();
@@ -368,6 +369,10 @@ class ConfigurationFactory
 
         if ($textLogFilePath !== null) {
             $logs->setTextLogFilePath($textLogFilePath);
+        }
+
+        if ($summaryJsonLogFilePath !== null) {
+            $logs->setSummaryJsonLogFilePath($summaryJsonLogFilePath);
         }
 
         return new Logs(

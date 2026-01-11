@@ -33,26 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestingUtility;
+namespace Infection\Tests\TestingUtility\FileSystem;
 
-use Infection\CannotBeInstantiated;
-use OndraM\CiDetector\CiDetector;
+use SplFileInfo;
 
-/**
- * @internal
- */
-final class TestCIDetector
+final class MockSplFileInfo extends SplFileInfo
 {
-    use CannotBeInstantiated;
+    public function __construct(
+        string $pathname = 'file.txt',
+        private readonly string|false $realPath = false,
+    ) {
+        parent::__construct($pathname);
+    }
 
-    private static ?bool $ciDetected = null;
-
-    public static function isCIDetected(): bool
+    public function getRealPath(): false|string
     {
-        if (self::$ciDetected === null) {
-            self::$ciDetected = (new CiDetector())->isCiDetected();
-        }
-
-        return self::$ciDetected;
+        return $this->realPath;
     }
 }
