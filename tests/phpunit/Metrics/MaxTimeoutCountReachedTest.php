@@ -33,51 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Configuration\Schema;
+namespace Infection\Tests\Metrics;
 
-use Infection\Configuration\Entry\Logs;
-use Infection\Configuration\Entry\PhpStan;
-use Infection\Configuration\Entry\PhpUnit;
-use Infection\Configuration\Entry\Source;
-use Infection\StaticAnalysis\StaticAnalysisToolTypes;
-use Infection\TestFramework\TestFrameworkTypes;
-use Webmozart\Assert\Assert;
+use Infection\Metrics\MaxTimeoutCountReached;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
-/**
- * @internal
- */
-final readonly class SchemaConfiguration
+#[CoversClass(MaxTimeoutCountReached::class)]
+final class MaxTimeoutCountReachedTest extends TestCase
 {
-    /**
-     * @param non-empty-string $pathname
-     * @param array<string, mixed> $mutators
-     * @param TestFrameworkTypes::*|null $testFramework
-     * @param StaticAnalysisToolTypes::*|null $staticAnalysisTool
-     */
-    public function __construct(
-        public string $pathname,
-        public ?float $timeout,
-        public Source $source,
-        public Logs $logs,
-        public ?string $tmpDir,
-        public PhpUnit $phpUnit,
-        public PhpStan $phpStan,
-        public ?bool $ignoreMsiWithNoMutations,
-        public ?float $minMsi,
-        public ?float $minCoveredMsi,
-        public ?bool $timeoutsAsEscaped,
-        public ?int $maxTimeouts,
-        public array $mutators,
-        public ?string $testFramework,
-        public ?string $bootstrap,
-        public ?string $initialTestsPhpOptions,
-        public ?string $testFrameworkExtraOptions,
-        public ?string $staticAnalysisToolOptions,
-        public string|int|null $threads,
-        public ?string $staticAnalysisTool,
-    ) {
-        Assert::nullOrGreaterThanEq($timeout, 0);
-        Assert::nullOrOneOf($testFramework, TestFrameworkTypes::getTypes());
-        Assert::nullOrOneOf($staticAnalysisTool, StaticAnalysisToolTypes::getTypes());
+    public function test_it_extends_unexpected_value_exception(): void
+    {
+        $exception = MaxTimeoutCountReached::create(5, 10);
+
+        $this->assertInstanceOf(UnexpectedValueException::class, $exception);
+    }
+
+    public function test_it_creates_exception_with_correct_message(): void
+    {
+        $exception = MaxTimeoutCountReached::create(5, 10);
+
+        $this->assertSame(
+            'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
+            $exception->getMessage(),
+        );
+    }
+
+    public function test_it_creates_exception_with_zero_limit(): void
+    {
+        $exception = MaxTimeoutCountReached::create(0, 1);
+
+        $this->assertSame(
+            'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
+            $exception->getMessage(),
+        );
     }
 }

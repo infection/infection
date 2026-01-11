@@ -82,6 +82,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly FederatedLogger $mutationTestingResultsLogger,
         private readonly ?int $numberOfShownMutations,
         private readonly bool $withUncovered,
+        private readonly bool $withTimeouts = false,
     ) {
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
@@ -109,6 +110,10 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
             if ($this->withUncovered) {
                 $this->showMutations($this->resultsCollector->getNotCoveredExecutionResults(), 'Not covered');
+            }
+
+            if ($this->withTimeouts) {
+                $this->showMutations($this->resultsCollector->getTimedOutExecutionResults(), 'Timed out');
             }
         }
 

@@ -53,6 +53,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
@@ -92,6 +93,12 @@ final class RunCommand extends BaseCommand
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
     public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+
+    /** @var string */
+    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+
+    /** @var string */
+    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
@@ -335,6 +342,19 @@ final class RunCommand extends BaseCommand
                 Container::DEFAULT_MIN_COVERED_MSI,
             )
             ->addOption(
+                self::OPTION_WITH_TIMEOUTS,
+                null,
+                InputOption::VALUE_NONE,
+                'Treat timed out mutants as escaped (affects MSI calculation)',
+            )
+            ->addOption(
+                self::OPTION_MAX_TIMEOUTS,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Maximum allowed timeouts. Build fails if exceeded',
+                Container::DEFAULT_MAX_TIMEOUTS,
+            )
+            ->addOption(
                 self::OPTION_LOG_VERBOSITY,
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -407,6 +427,7 @@ final class RunCommand extends BaseCommand
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
+                $container->getMaxTimeoutsChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
@@ -426,7 +447,7 @@ final class RunCommand extends BaseCommand
             }
 
             throw $noSourceFoundException;
-        } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
@@ -488,6 +509,8 @@ final class RunCommand extends BaseCommand
             ignoreMsiWithNoMutations: $commandHelper->getIgnoreMsiWithNoMutations(),
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
+            timeoutsAsEscaped: $commandHelper->getTimeoutsAsEscaped(),
+            maxTimeouts: $commandHelper->getMaxTimeouts(),
             msiPrecision: $msiPrecision,
             testFramework: $commandHelper->getStringOption(self::OPTION_TEST_FRAMEWORK, Container::DEFAULT_TEST_FRAMEWORK),
             testFrameworkExtraOptions: $commandHelper->getStringOption(self::OPTION_TEST_FRAMEWORK_OPTIONS, Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS),

@@ -122,6 +122,8 @@ final class ConfigurationFactoryTest extends TestCase
             ignoreMsiWithNoMutations: null,
             minMsi: null,
             minCoveredMsi: null,
+            timeoutsAsEscaped: null,
+            maxTimeouts: null,
             mutators: [],
             testFramework: TestFrameworkTypes::PHPUNIT,
             bootstrap: null,
@@ -152,6 +154,8 @@ final class ConfigurationFactoryTest extends TestCase
                 minMsi: null,
                 numberOfShownMutations: 0,
                 minCoveredMsi: null,
+                timeoutsAsEscaped: false,
+                maxTimeouts: null,
                 msiPrecision: 2,
                 mutatorsInput: '',
                 testFramework: TestFrameworkTypes::PHPUNIT,
@@ -192,6 +196,8 @@ final class ConfigurationFactoryTest extends TestCase
             ignoreMsiWithNoMutations: null,
             minMsi: null,
             minCoveredMsi: null,
+            timeoutsAsEscaped: null,
+            maxTimeouts: null,
             mutators: [],
             testFramework: null,
             bootstrap: null,
@@ -215,6 +221,8 @@ final class ConfigurationFactoryTest extends TestCase
             minMsi: null,
             numberOfShownMutations: 0,
             minCoveredMsi: null,
+            timeoutsAsEscaped: false,
+            maxTimeouts: null,
             msiPrecision: 2,
             mutatorsInput: '',
             testFramework: null,
@@ -261,6 +269,8 @@ final class ConfigurationFactoryTest extends TestCase
             minMsi: null,
             numberOfShownMutations: 0,
             minCoveredMsi: null,
+            timeoutsAsEscaped: false,
+            maxTimeouts: null,
             msiPrecision: 2,
             threadCount: 1,
             isDryRun: false,
@@ -713,6 +723,86 @@ final class ConfigurationFactoryTest extends TestCase
             ),
         ];
 
+        yield 'timeoutsAsEscaped not specified in schema and false in input' => [
+            $defaultScenario->forValueForTimeoutsAsEscaped(
+                null,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'timeoutsAsEscaped not specified in schema and true in input' => [
+            $defaultScenario->forValueForTimeoutsAsEscaped(
+                null,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'timeoutsAsEscaped false in schema and false in input' => [
+            $defaultScenario->forValueForTimeoutsAsEscaped(
+                false,
+                false,
+                false,
+            ),
+        ];
+
+        yield 'timeoutsAsEscaped true in schema and false in input' => [
+            $defaultScenario->forValueForTimeoutsAsEscaped(
+                true,
+                false,
+                true,
+            ),
+        ];
+
+        yield 'timeoutsAsEscaped false in schema and true in input' => [
+            $defaultScenario->forValueForTimeoutsAsEscaped(
+                false,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'timeoutsAsEscaped true in schema and true in input' => [
+            $defaultScenario->forValueForTimeoutsAsEscaped(
+                true,
+                true,
+                true,
+            ),
+        ];
+
+        yield 'maxTimeouts not specified in schema and not specified in input' => [
+            $defaultScenario->forValueForMaxTimeouts(
+                null,
+                null,
+                null,
+            ),
+        ];
+
+        yield 'maxTimeouts specified in schema and not specified in input' => [
+            $defaultScenario->forValueForMaxTimeouts(
+                10,
+                null,
+                10,
+            ),
+        ];
+
+        yield 'maxTimeouts not specified in schema and specified in input' => [
+            $defaultScenario->forValueForMaxTimeouts(
+                null,
+                5,
+                5,
+            ),
+        ];
+
+        yield 'maxTimeouts specified in schema and specified in input' => [
+            $defaultScenario->forValueForMaxTimeouts(
+                10,
+                5,
+                5,
+            ),
+        ];
+
         yield 'no static analysis tool' => [
             $defaultScenario->forValueForStaticAnalysisTool(
                 null,
@@ -1104,6 +1194,8 @@ final class ConfigurationFactoryTest extends TestCase
                     minMsi: 72.3,
                     numberOfShownMutations: 20,
                     minCoveredMsi: 81.5,
+                    timeoutsAsEscaped: false,
+                    maxTimeouts: null,
                     msiPrecision: 2,
                     mutatorsInput: 'TrueValue',
                     testFramework: 'phpspec',
