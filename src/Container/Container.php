@@ -487,6 +487,7 @@ final class Container extends DIContainer
                     $config->logVerbosity,
                     $config->mutateOnlyCoveredCode(),
                     $config->numberOfShownMutations,
+                    $config->timeoutsAsEscaped,
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
