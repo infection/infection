@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\SafeDOMXPath;
@@ -166,6 +167,7 @@ final class XmlCoverageParserTest extends TestCase
                     $fixture->coverageDir,
                     $fixture->relativeCoverageFilePath,
                     $fixture->projectSource,
+                    new FileSystem(),
                 ),
                 $fixture->normalizedTests,
             ];
