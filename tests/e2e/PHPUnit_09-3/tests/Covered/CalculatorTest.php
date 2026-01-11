@@ -16,18 +16,27 @@ class CalculatorTest extends TestCase
         $this->calculator = new Calculator();
     }
 
-    public function test_add(): void
+    /**
+     * @dataProvider \Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorProvider::provideAdditions
+     */
+    public function test_add(int $a, int $b, int $expected): void
     {
-        $this->assertSame(5, $this->calculator->add(2, 3));
-        $this->assertSame(0, $this->calculator->add(-5, 5));
-        $this->assertSame(-10, $this->calculator->add(-5, -5));
+        $this->assertSame($expected, $this->calculator->add($a, $b));
     }
 
-    public function test_subtract(): void
+    /**
+     * @dataProvider provideSubstractions
+     */
+    public function test_subtract(int $a, int $b, int $expected): void
     {
-        $this->assertSame(2, $this->calculator->subtract(5, 3));
-        $this->assertSame(-10, $this->calculator->subtract(-5, 5));
-        $this->assertSame(0, $this->calculator->subtract(5, 5));
+        $this->assertSame($expected, $this->calculator->subtract($a, $b));
+    }
+
+    public static function provideSubstractions(): iterable
+    {
+        yield [5, 3, 2];
+        yield [5, -5, 10];
+        yield [5, 5, 0];
     }
 
     public function test_multiply(): void
