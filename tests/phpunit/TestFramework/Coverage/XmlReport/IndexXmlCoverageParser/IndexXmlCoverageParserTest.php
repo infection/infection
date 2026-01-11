@@ -345,7 +345,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             ),
         ];
 
-        $invalidXmlIndexPath = Path::canonicalize(self::FIXTURES_DIR . '/invalid-xml.xml');
+        $invalidXmlIndexPath = Path::canonicalize(self::FIXTURES_DIR . '/invalid-index.xml');
 
         yield [
             $invalidXmlIndexPath,
@@ -362,51 +362,49 @@ final class IndexXmlCoverageParserTest extends TestCase
 
     public static function noCoveredLineReportProviders(): iterable
     {
-        yield 'zero lines executed' => [
-            <<<'XML'
-                <?xml version="1.0"?>
-                <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-                  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-                    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-                    <driver name="xdebug" version="2.5.1"/>
-                  </build>
-                  <project source="/path/to/src">
-                    <tests>
-                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-                    </tests>
-                    <directory name="/">
-                      <totals>
-                        <lines total="913" comments="130" code="783" executable="348" executed="0" percent="0"/>
-                      </totals>
-                    </directory>
-                  </project>
-                  <!-- The rest of the file has been removed for this test-->
-                </phpunit>
-                XML,
+        yield 'zero lines executed' => [<<<'XML'
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                <driver name="xdebug" version="2.5.1"/>
+              </build>
+              <project source="/path/to/src">
+                <tests>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                </tests>
+                <directory name="/">
+                  <totals>
+                    <lines total="913" comments="130" code="783" executable="348" executed="0" percent="0"/>
+                  </totals>
+                </directory>
+              </project>
+              <!-- The rest of the file has been removed for this test-->
+            </phpunit>
+            XML
         ];
 
-        yield 'lines is not present' => [
-            <<<'XML'
-                <?xml version="1.0"?>
-                <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
-                  <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
-                    <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
-                    <driver name="xdebug" version="2.5.1"/>
-                  </build>
-                  <project source="/path/to/src">
-                    <tests>
-                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
-                      <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
-                    </tests>
-                    <directory name="/">
-                      <totals>
-                      </totals>
-                    </directory>
-                  </project>
-                  <!-- The rest of the file has been removed for this test-->
-                </phpunit>
-                XML,
+        yield 'lines is not present' => [<<<'XML'
+            <?xml version="1.0"?>
+            <phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+              <build time="Mon Apr 10 20:06:19 GMT+0000 2017" phpunit="6.1.0" coverage="5.1.0">
+                <runtime name="PHP" version="7.1.0" url="https://secure.php.net/"/>
+                <driver name="xdebug" version="2.5.1"/>
+              </build>
+              <project source="/path/to/src">
+                <tests>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::test_gets_mutation_reverses_integer_sign_when_positive" size="unknown" result="0" status="PASSED"/>
+                  <test name="Infection\Tests\Mutator\ReturnValue\IntegerNegotiationTest::testGetsMutationReversesIntegerSignWhenNegative" size="unknown" result="0" status="PASSED"/>
+                </tests>
+                <directory name="/">
+                  <totals>
+                  </totals>
+                </directory>
+              </project>
+              <!-- The rest of the file has been removed for this test-->
+            </phpunit>
+            XML
         ];
     }
 
