@@ -53,7 +53,6 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
-use Infection\Metrics\MaxTimeoutsCheckFailed;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
@@ -427,7 +426,6 @@ final class RunCommand extends BaseCommand
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
-                $container->getMaxTimeoutsChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
@@ -447,7 +445,7 @@ final class RunCommand extends BaseCommand
             }
 
             throw $noSourceFoundException;
-        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutsCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
@@ -467,24 +465,10 @@ final class RunCommand extends BaseCommand
         $input = $io->getInput();
         $commandHelper = new RunCommandHelper($input);
 
-        $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
-        $testFramework = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK));
-        $testFrameworkExtraOptions = trim((string) $input->getOption(self::OPTION_TEST_FRAMEWORK_OPTIONS));
-        $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
-        $staticAnalysisToolOptions = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS));
-        $initialTestsPhpOptions = trim((string) $input->getOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS));
-        $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
-        $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
-        $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
-        $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
-
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
         /** @var string|null $minCoveredMsi */
         $minCoveredMsi = $input->getOption(self::OPTION_MIN_COVERED_MSI);
-
-        $timeoutsAsEscaped = $commandHelper->getTimeoutsAsEscaped();
-        $maxTimeouts = $commandHelper->getMaxTimeouts();
 
         $msiPrecision = MsiParser::detectPrecision($minMsi, $minCoveredMsi);
 
@@ -523,8 +507,8 @@ final class RunCommand extends BaseCommand
             ignoreMsiWithNoMutations: $commandHelper->getIgnoreMsiWithNoMutations(),
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
-            timeoutsAsEscaped: $timeoutsAsEscaped,
-            maxTimeouts: $maxTimeouts,
+            timeoutsAsEscaped: $commandHelper->getTimeoutsAsEscaped(),
+            maxTimeouts: $commandHelper->getMaxTimeouts(),
             msiPrecision: $msiPrecision,
             testFramework: $commandHelper->getStringOption(self::OPTION_TEST_FRAMEWORK, Container::DEFAULT_TEST_FRAMEWORK),
             testFrameworkExtraOptions: $commandHelper->getStringOption(self::OPTION_TEST_FRAMEWORK_OPTIONS, Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS),
