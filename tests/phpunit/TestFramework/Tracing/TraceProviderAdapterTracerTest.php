@@ -209,11 +209,14 @@ final class TraceProviderAdapterTracerTest extends TestCase
             ? $fileInfoOrName
             : self::createDummySplFileInfo($fileInfoOrName);
 
-        $trace = $this->createMock(Trace::class);
-        $trace
+        $traceStub = $this->createStub(Trace::class);
+        $traceStub
             ->method('getSourceFileInfo')
             ->willReturn($fileInfo);
+        $traceStub
+            ->method('getRealPath')
+            ->willReturn($fileInfo->getRealPath());
 
-        return $trace;
+        return $traceStub;
     }
 }

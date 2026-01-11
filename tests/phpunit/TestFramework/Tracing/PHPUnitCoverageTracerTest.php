@@ -90,7 +90,9 @@ final class PHPUnitCoverageTracerTest extends TestCase
                     isSourceFiltered: false,
                     fileSystem: new FileSystem(),
                 ),
-                parser: new XmlCoverageParser(),
+                parser: new XmlCoverageParser(
+                    new FileSystem(),
+                ),
             ),
             new JUnitTestExecutionInfoAdder(
                 $testFrameworkAdapterStub,

@@ -121,11 +121,13 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $proxyTrace = new ProxyTrace(
             $sourceFile,
+            '',
             now($tests),
         );
 
         $expected = new ProxyTrace(
             $sourceFile,
+            '',
             now(
                 new TestLocations(
                     [
@@ -164,6 +166,7 @@ final class JUnitTestExecutionInfoAdderTest extends TestCase
 
         $proxyTrace = new ProxyTrace(
             $sourceFile,
+            '',
             // @phpstan-ignore argument.templateType,argument.type,callable.void
             lazy((static function () {
                 throw new Exception();

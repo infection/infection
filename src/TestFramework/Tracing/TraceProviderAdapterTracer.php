@@ -137,7 +137,7 @@ final class TraceProviderAdapterTracer implements Tracer
 
             $this->isEmpty = false;
 
-            $traceSourcePathname = $trace->getSourceFileInfo()->getRealPath();
+            $traceSourcePathname = $trace->getRealPath();
             Assert::notFalse($traceSourcePathname);
 
             $this->indexedTraces[$traceSourcePathname] = $trace;
