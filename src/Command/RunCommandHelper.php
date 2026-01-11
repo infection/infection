@@ -45,6 +45,7 @@ use function is_numeric;
 use function max;
 use function sprintf;
 use Symfony\Component\Console\Input\InputInterface;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -55,6 +56,15 @@ final readonly class RunCommandHelper
     public function __construct(
         private InputInterface $input,
     ) {
+    }
+
+    public function getStringOption(string $name, ?string $default = null): ?string
+    {
+        $optionValue = trim((string) $this->input->getOption($name));
+
+        return $optionValue === ''
+            ? $default
+            : $optionValue;
     }
 
     public function getUseGitHubLogger(): ?bool
