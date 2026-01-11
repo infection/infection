@@ -85,7 +85,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             fileSystem: new FakeFileSystem(),
         );
 
-        $this->generatedIndexXmlPath = FS::tmpFile('JUnitTestFileDataProviderTest');
+        $this->generatedIndexXmlPath = FS::tmpFile('IndexXmlCoverageParserTest');
     }
 
     protected function tearDown(): void
