@@ -39,7 +39,7 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\Tests\FileSystem\FileSystemTestCase;
+use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
@@ -47,18 +47,32 @@ use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 use function Safe\file_get_contents;
 use function Safe\file_put_contents;
+use function Safe\unlink;
 use Symfony\Component\Filesystem\Path;
 use Throwable;
 
 #[Group('integration')]
 #[CoversClass(JUnitTestFileDataProvider::class)]
-final class JUnitTestFileDataProviderTest extends FileSystemTestCase
+final class JUnitTestFileDataProviderTest extends TestCase
 {
     use ExpectsThrowables;
 
     private const FIXTURES_DIR = __DIR__ . '/../Fixtures';
+
+    private string $generatedJunitPath;
+
+    protected function setUp(): void
+    {
+        $this->generatedJunitPath = FS::tmpFile('JUnitTestFileDataProviderTest');
+    }
+
+    protected function tearDown(): void
+    {
+        unlink($this->generatedJunitPath);
+    }
 
     /**
      * @param TestFileTimeData|class-string<Throwable> $expected
@@ -81,6 +95,36 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
             $actual = $provider->getTestFileInfo($testId);
 
             $this->assertEquals($expected, $actual);
+        }
+    }
+
+    /**
+     * @param TestFileTimeData|class-string<Throwable> $expected
+     */
+    #[DataProvider('infoProvider')]
+    public function test_it_is_idempotent(
+        string $xml,
+        string $testId,
+        TestFileTimeData|string $expected,
+    ): void {
+        $provider = $this->createProvider(
+            $this->createJUnit($xml),
+        );
+
+        if (is_string($expected)) {
+            $resultOfTheFirstCall = $this->expectToThrow(
+                static fn () => $provider->getTestFileInfo($testId),
+            );
+            $resultOfTheSecondCall = $this->expectToThrow(
+                static fn () => $provider->getTestFileInfo($testId),
+            );
+
+            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
+        } else {
+            $resultOfTheFirstCall = $provider->getTestFileInfo($testId);
+            $resultOfTheSecondCall = $provider->getTestFileInfo($testId);
+
+            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
         }
     }
 
@@ -129,36 +173,6 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
             'Acme\Service',
             InvalidArgumentException::class,
         ];
-    }
-
-    /**
-     * @param TestFileTimeData|class-string<Throwable> $expected
-     */
-    #[DataProvider('infoProvider')]
-    public function test_it_is_idempotent(
-        string $xml,
-        string $testId,
-        TestFileTimeData|string $expected,
-    ): void {
-        $provider = $this->createProvider(
-            $this->createJUnit($xml),
-        );
-
-        if (is_string($expected)) {
-            $resultOfTheFirstCall = $this->expectToThrow(
-                static fn () => $provider->getTestFileInfo($testId),
-            );
-            $resultOfTheSecondCall = $this->expectToThrow(
-                static fn () => $provider->getTestFileInfo($testId),
-            );
-
-            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
-        } else {
-            $resultOfTheFirstCall = $provider->getTestFileInfo($testId);
-            $resultOfTheSecondCall = $provider->getTestFileInfo($testId);
-
-            $this->assertEquals($resultOfTheFirstCall, $resultOfTheSecondCall);
-        }
     }
 
     private function createProvider(string $file): JUnitTestFileDataProvider
@@ -746,7 +760,7 @@ final class JUnitTestFileDataProviderTest extends FileSystemTestCase
 
     private function createJUnit(string $contents): string
     {
-        $pathname = Path::canonicalize($this->tmp . '/junit.xml');
+        $pathname = Path::canonicalize($this->generatedJunitPath);
         file_put_contents($pathname, $contents);
 
         return $pathname;

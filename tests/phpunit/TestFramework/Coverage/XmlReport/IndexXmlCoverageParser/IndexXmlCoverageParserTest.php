@@ -36,18 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 use function dirname;
-use function dirname;
 use Exception;
-use Exception;
-use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FakeFileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\TestingUtility\FS;
-use Infection\Tests\TestingUtility\FS;
-use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -113,9 +108,8 @@ final class IndexXmlCoverageParserTest extends TestCase
     }
 
     #[DataProvider('noCoveredLineReportProviders')]
-    public function test_it_errors_when_no_lines_were_executed(
-        string $xml,
-    ): void {
+    public function test_it_errors_when_no_lines_were_executed(string $xml): void
+    {
         file_put_contents($this->generatedIndexXmlPath, $xml);
 
         $unfilteredParser = new IndexXmlCoverageParser(

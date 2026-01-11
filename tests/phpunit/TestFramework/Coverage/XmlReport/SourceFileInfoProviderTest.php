@@ -53,6 +53,8 @@ use ValueError;
 #[CoversClass(SourceFileInfoProvider::class)]
 final class SourceFileInfoProviderTest extends TestCase
 {
+    private const FIXTURES_DIR = __DIR__ . '/../Fixtures';
+
     #[DataProvider('fileFixturesProvider')]
     public function test_it_provides_file_info_and_xpath(
         string $coverageIndexPath,

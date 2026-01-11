@@ -48,7 +48,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
 #[CoversClass(XmlCoverageParser::class)]
