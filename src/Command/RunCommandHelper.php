@@ -58,6 +58,15 @@ final readonly class RunCommandHelper
     ) {
     }
 
+    public function getStringOption(string $name, ?string $default = null): ?string
+    {
+        $optionValue = trim((string) $this->input->getOption($name));
+
+        return $optionValue === ''
+            ? $default
+            : $optionValue;
+    }
+
     public function getUseGitHubLogger(): ?bool
     {
         // on e2e environment, we don't need github logger
@@ -175,16 +184,6 @@ final readonly class RunCommandHelper
 
     public function getSummaryJsonLogFilePath(): ?string
     {
-        return self::trimmedStringOrNull($this->input->getOption(RunCommand::OPTION_LOGGER_SUMMARY_JSON));
-    }
-
-    /**
-     * Converts an input option to a trimmed string, or null if empty.
-     */
-    public static function trimmedStringOrNull(string|bool|int|float|null $value): ?string
-    {
-        $trimmed = trim((string) $value);
-
-        return $trimmed === '' ? null : $trimmed;
+        return $this->getStringOption(RunCommand::OPTION_LOGGER_SUMMARY_JSON);
     }
 }
