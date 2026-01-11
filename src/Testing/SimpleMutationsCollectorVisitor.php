@@ -37,6 +37,7 @@ namespace Infection\Testing;
 
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Token;
@@ -46,6 +47,12 @@ use PhpParser\Token;
  */
 final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 {
+    private Node $currentNode;
+
+    private ?bool $isOnFunctionSignatureMemoized = null;
+
+    private ?bool $isInsideFunctionMemoized = null;
+
     /**
      * @var SimpleMutation[]
      */
@@ -70,6 +77,16 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
+        $this->currentNode = $node;
+        $this->isOnFunctionSignatureMemoized = null;
+        $this->isInsideFunctionMemoized = null;
+
+        if (!$this->isOnFunctionSignature()
+            && !$this->isInsideFunction()
+        ) {
+            return;
+        }
+
         if (!$this->mutator->canMutate($node)) {
             return null;
         }
@@ -97,5 +114,15 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
     public function getMutations(): array
     {
         return $this->mutations;
+    }
+
+    private function isOnFunctionSignature(): bool
+    {
+        return $this->isOnFunctionSignatureMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false);
+    }
+
+    private function isInsideFunction(): bool
+    {
+        return $this->isInsideFunctionMemoized ??= $this->currentNode->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false);
     }
 }
