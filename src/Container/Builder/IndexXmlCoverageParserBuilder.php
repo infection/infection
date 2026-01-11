@@ -37,6 +37,7 @@ namespace Infection\Container\Builder;
 
 use DIContainer\Builder;
 use Infection\Configuration\Configuration;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
 /**
@@ -47,6 +48,7 @@ final readonly class IndexXmlCoverageParserBuilder implements Builder
 {
     public function __construct(
         private Configuration $configuration,
+        private FileSystem $fileSystem,
     ) {
     }
 
@@ -54,6 +56,7 @@ final readonly class IndexXmlCoverageParserBuilder implements Builder
     {
         return new IndexXmlCoverageParser(
             isSourceFiltered: $this->configuration->sourceFilter !== null,
+            fileSystem: $this->fileSystem,
         );
     }
 }
