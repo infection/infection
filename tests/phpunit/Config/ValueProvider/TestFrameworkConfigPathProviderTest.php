@@ -101,7 +101,8 @@ final class TestFrameworkConfigPathProviderTest extends BaseProviderTestCase
                 '',
             );
 
-        $inputPhpUnitPath = realpath(__DIR__ . '/../../Fixtures/Files/phpunit');
+        // TODO: it would be better to inject the FS to be able to mock rather than relying on such a value
+        $inputPhpUnitPath = __DIR__;
 
         $path = $this->provider->get(
             new IO(

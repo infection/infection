@@ -52,6 +52,8 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(PhpUnitCustomExecutablePathProvider::class)]
 final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
+    private const VALID_PHPUNIT_EXECUTABLE = __DIR__.'/../../../../vendor/bin/phpunit';
+
     private MockObject&TestFrameworkFinder $finderMock;
 
     private PhpUnitCustomExecutablePathProvider $provider;
@@ -90,7 +92,7 @@ final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
             ->with(TestFrameworkTypes::PHPUNIT)
             ->willThrowException(new FinderException());
 
-        $customExecutable = Path::canonicalize(__DIR__ . '/../../Fixtures/Files/phpunit/phpunit.phar');
+        $customExecutable = Path::canonicalize(self::VALID_PHPUNIT_EXECUTABLE);
 
         $path = $this->provider->get(new IO(
             $this->createStreamableInput($this->getInputStream("{$customExecutable}\n")),
