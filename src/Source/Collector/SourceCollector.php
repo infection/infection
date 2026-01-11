@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Source\Collector;
 
 use Infection\Source\Exception\NoSourceFound;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * The SourceCollector is the service responsible for collecting all the source

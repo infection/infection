@@ -33,41 +33,21 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\TestingUtility\FileSystem;
 
-use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\Tests\UnsupportedMethod;
 use SplFileInfo;
 
-/**
- * @internal
- */
-final readonly class FakeTrace implements Trace
+final class MockSplFileInfo extends SplFileInfo
 {
-    public function getSourceFileInfo(): SplFileInfo
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    public function __construct(
+        string $pathname = 'file.txt',
+        private readonly string|false $realPath = false,
+    ) {
+        parent::__construct($pathname);
     }
 
-    public function getRealPath(): string
+    public function getRealPath(): false|string
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
-
-    public function hasTests(): bool
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
-
-    public function getTests(): TestLocations
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
-
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        return $this->realPath;
     }
 }

@@ -38,7 +38,7 @@ namespace Infection\Tests\TestFramework\Tracing;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 final class DummyTracer implements Tracer
 {

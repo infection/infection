@@ -37,7 +37,7 @@ namespace Infection\Tests\Source\Collector;
 
 use Infection\Source\Collector\CachedSourceCollector;
 use Infection\Source\Collector\SourceCollector;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
