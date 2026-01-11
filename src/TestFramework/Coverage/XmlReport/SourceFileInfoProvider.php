@@ -37,11 +37,9 @@ namespace Infection\TestFramework\Coverage\XmlReport;
 
 use function array_filter;
 use const DIRECTORY_SEPARATOR;
-use function file_exists;
 use function implode;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\SafeDOMXPath;
-use function Safe\file_get_contents;
 use function sprintf;
 use function str_replace;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -82,7 +80,7 @@ class SourceFileInfoProvider
 
         $coverageFile = $this->coverageDir . '/' . $this->relativeCoverageFilePath;
 
-        if (!file_exists($coverageFile)) {
+        if (!$this->fileSystem->isReadableFile($coverageFile)) {
             throw new InvalidCoverage(sprintf(
                 'Could not find the XML coverage file "%s" listed in "%s". Make sure the '
                 . 'coverage used is up to date',
@@ -91,7 +89,10 @@ class SourceFileInfoProvider
             ));
         }
 
-        return $this->xPath = SafeDOMXPath::fromString(file_get_contents($coverageFile), 'p');
+        return $this->xPath = SafeDOMXPath::fromString(
+            $this->fileSystem->readFile($coverageFile),
+            namespace: 'p',
+        );
     }
 
     private function retrieveSourceFileInfo(SafeDOMXPath $xPath): SplFileInfo
