@@ -33,18 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use newSrc\AST\NodeLabeler;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+// Add types based on either stubs or PHPStan or other.
+final class AddTypesVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public function __construct(
+        private NodeLabeler $nodeStateTracker,
+    ) {
+    }
+
+    public function enterNode(Node $node): ?Node
     {
+        if ($this->nodeStateTracker->isEligible($node)) {
+            // I would add those types in a way that it is lazily evaluated, i.e. we do not try to get the types for the node unless necessary.
+        }
+
+        return null;
     }
 }

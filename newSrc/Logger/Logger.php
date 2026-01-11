@@ -33,18 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\Logger;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+interface Logger
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function logSkippingInitialTests(string $frameworkName): void;
 }

@@ -33,18 +33,50 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
+
+use newSrc\AST\AridCodeDetector\AridCodeDetector;
+use newSrc\AST\Metadata\Annotation;
+use newSrc\AST\Metadata\NodeAnnotator;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
+ * Once a node is detected as arid, it labels it and all its children as arid code.
  *
- * @internal
+ * TODO: we may want to be able to have some children marked as not arid despite the parent being arid.
  */
-trait CannotBeInstantiated
+final class DetectAridCodeVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    private bool $isArid = false;
+    private ?Node $startNode = null;
+
+    public function __construct(
+        private readonly AridCodeDetector $aridCodeDetector,
+    ) {
+    }
+
+    public function enterNode(Node $node): ?Node
     {
+        if ($this->isArid) {
+            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
+        } elseif ($this->aridCodeDetector->isArid($node)) {
+            $this->isArid = true;
+            $this->startNode = $node;
+
+            NodeAnnotator::annotate($node, Annotation::ARID_CODE);
+        }
+
+        return null;
+    }
+
+    public function leaveNode(Node $node): ?Node
+    {
+        if ($node === $this->startNode) {
+            $this->isArid = false;
+            $this->startNode = null;
+        }
+
+        return null;
     }
 }

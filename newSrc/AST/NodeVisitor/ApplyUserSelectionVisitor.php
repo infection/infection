@@ -33,18 +33,37 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc\AST\NodeVisitor;
+
+use newSrc\AST\Metadata\SymbolAnnotator;
+use newSrc\TestFramework\Trace\Symbol\Symbol;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
+ * A user can select a piece of source code to mutation. For example "*Str::trim*()". When
+ * such a selection is provided, this visitor will exclude any node that do not belong to
+ * this selection.
  *
- * @internal
+ * Note that this strategy is incompatible with LabelNodesAsEligibleVisitor.
+ *
+ * @see LabelNodesAsEligibleVisitor
  */
-trait CannotBeInstantiated
+final class ApplyUserSelectionVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    // TODO
+    // Will make use of the SymbolAnnotator.
+    // A few examples of how it should work:
+    //
+    // Case: "Acme\Str::trimLineReturns()" -> MethodReference Symbol
+    //      - we enter a namespace Foo -> stop the the traversal of the current node & children
+    //      - we enter the namespace "Acme": continue
+    //      - we enter a class A -> stop the the traversal of the current node & children
+    //      - we enter a class Str: continue
+    //      - we enter a method "::bar()": stop the the traversal of the current node & children
+    //      - we enter a method "::trimLineReturns()": start to mark nodes as eligible
+    //      - we leave the method "::trimLineReturns()": stop the the traversal of the current node & children?
+    //
+    // Case: to specify how it works with patterns
+    // Note that maybe we should allow multiple selections in which case there is a bit more to figure out/specify.
 }

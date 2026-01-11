@@ -33,55 +33,49 @@
 
 declare(strict_types=1);
 
-namespace Infection\PhpParser\Visitor;
+namespace newSrc\MutationAnalyzer\MutantExecutor;
 
-use Infection\Mutation\Mutation;
-use Infection\Mutator\NodeMutationGenerator;
-use Infection\Source\Exception\NoSourceFound;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+use newSrc\MutationAnalyzer\Mutant;
+use newSrc\MutationAnalyzer\MutantExecutionResult;
+use newSrc\MutationAnalyzer\MutantExecutionStatus;
+use newSrc\TestFramework\TestFramework;
 
-/**
- * @internal
- */
-final class MutationCollectorVisitor extends NodeVisitorAbstract
+final class SynchronousMutantExecutor implements MutantExecutor
 {
     /**
-     * @var array<iterable<Mutation>>
+     * @param TestFramework[] $testFrameworks
      */
-    private array $mutationChunks = [];
-
     public function __construct(
-        private readonly NodeMutationGenerator $mutationGenerator,
+        private array $testFrameworks,
     ) {
     }
 
-    public function beforeTraverse(array $nodes): ?array
+    public function execute(Mutant $mutant): MutantExecutionResult
     {
-        $this->mutationChunks = [];
+        $results = [];
 
-        return null;
-    }
+        foreach ($this->testFrameworks as $testFramework) {
+            $result = $testFramework->test($mutant);
+            $resultStatus = $result->getStatus();
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NoSourceFound
-     */
-    public function leaveNode(Node $node): ?Node
-    {
-        $this->mutationChunks[] = $this->mutationGenerator->generate($node);
+            $results[] = $result;
 
-        return null;
-    }
+            if ($resultStatus === MutantExecutionStatus::COVERED) {
+                return $result;
+            }
 
-    /**
-     * @return iterable<Mutation>
-     */
-    public function getMutations(): iterable
-    {
-        foreach ($this->mutationChunks as $mutations) {
-            yield from $mutations;
+            if ($resultStatus === MutantExecutionStatus::SUSPICIOUS) {
+                // TODO: discuss the strategy
+                // an idea: retry this test framework with a noop test
+                // if noop test passes, continue with test frameworks
+                // other test framework may cover or not
+            }
         }
+
+        // Here there two possible statuses for each result: NOT_COVERED and SUSPICIOUS
+        //
+        // If all NOT_COVERED => aggregate = NOT COVERED
+        // Otherwise (at least one suspicious) => SUSPICIOUS
+        return MutantExecutionResult::aggregate($results);
     }
 }
