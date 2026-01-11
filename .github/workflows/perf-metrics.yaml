@@ -159,101 +159,23 @@ jobs:
 
       - name: Prepare and commit metrics
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          CPU_CORES: ${{ steps.runner-specs.outputs.cpu_cores }}
+          GIT_REF: ${{ github.event.inputs.ref || github.ref }}
+          TRIGGER: ${{ github.event_name }}
+          CPU_MODEL: ${{ steps.runner-specs.outputs.cpu_model }}
+          CPU_ARCH: ${{ steps.runner-specs.outputs.cpu_arch }}
+          TOTAL_MEM: ${{ steps.runner-specs.outputs.total_memory_kb }}
         run: |
-          # Create the metrics preparation script inline (so it works for old tags too)
-          cat > prepare-metrics.php << 'SCRIPT_EOF'
-          <?php
-          $content = file_get_contents($argv[1]);
-          // When command exits non-zero, time prepends "Command exited with non-zero status N\n"
-          if (str_starts_with($content, 'Command exited')) {
-              $content = substr($content, strpos($content, "\n") + 1);
-          }
-          $timing = json_decode($content, true);
-          if ($timing === null) {
-              fwrite(STDERR, "Failed to parse timing.json: " . json_last_error_msg() . "\n");
-              fwrite(STDERR, "Content: $content\n");
-              exit(1);
-          }
-
-          $mutations = null;
-          if (file_exists('infection-summary.json')) {
-              $summary = json_decode(file_get_contents('infection-summary.json'), true);
-              if ($summary !== null && isset($summary['stats'])) {
-                  $mutations = [
-                      'total' => $summary['stats']['totalMutantsCount'] ?? 0,
-                      'killed' => $summary['stats']['killedCount'] ?? 0,
-                      'msi' => $summary['stats']['msi'] ?? 0,
-                  ];
-              }
-          }
-
-          $cpuCores = (int) getenv('CPU_CORES') ?: 1;
-          $wallClock = (float) ($timing['wall_clock_sec'] ?? 0);
-          $userTime = (float) ($timing['user_time_sec'] ?? 0);
-          $sysTime = (float) ($timing['system_time_sec'] ?? 0);
-          $maxRss = (int) ($timing['max_rss_kb'] ?? 0);
-
-          $wallPerCore = $cpuCores > 0 ? round($wallClock / $cpuCores, 2) : 0;
-          $cpuTotal = round($userTime + $sysTime, 2);
-          $wallPerMut = $userPerMut = $memPerMut = 0;
-
-          if ($mutations !== null && $mutations['total'] > 0) {
-              $wallPerMut = round($wallClock / $mutations['total'], 4);
-              $userPerMut = round($userTime / $mutations['total'], 4);
-              $memPerMut = round($maxRss / $mutations['total'], 2);
-          }
-
-          $entry = array_merge($timing, [
-              'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
-              'commit_date' => getenv('COMMIT_DATE'),
-              'git_sha' => getenv('GIT_SHA'),
-              'git_ref' => getenv('GIT_REF'),
-              'trigger' => getenv('TRIGGER'),
-              'php_version' => PHP_VERSION,
-              'config' => ['name' => 'baseline', 'args' => '--no-progress --threads=max'],
-              'runner' => [
-                  'os' => 'ubuntu-latest',
-                  'image_version' => getenv('IMAGE_VERSION') ?: 'unknown',
-                  'cpu_model' => getenv('CPU_MODEL'),
-                  'cpu_cores' => $cpuCores,
-                  'cpu_arch' => getenv('CPU_ARCH'),
-                  'total_memory_kb' => (int) getenv('TOTAL_MEM'),
-              ],
-          ]);
-
-          if ($mutations !== null) {
-              $entry['mutations'] = $mutations;
-          }
-
-          $entry['derived'] = [
-              'wall_clock_per_core' => $wallPerCore,
-              'cpu_time_total' => $cpuTotal,
-              'wall_clock_per_mutation' => $wallPerMut,
-              'user_time_per_mutation' => $userPerMut,
-              'memory_per_mutation_kb' => $memPerMut,
-          ];
-
-          echo json_encode($entry, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
-          SCRIPT_EOF
-
-          # Set environment variables for the PHP script
-          export CPU_CORES=${{ steps.runner-specs.outputs.cpu_cores }}
           export COMMIT_DATE=$(git log -1 --format='%cI')
           export GIT_SHA=$(git rev-parse HEAD)
-          export GIT_REF="${{ github.event.inputs.ref || github.ref }}"
-          export TRIGGER="${{ github.event_name }}"
-          export CPU_MODEL="${{ steps.runner-specs.outputs.cpu_model }}"
-          export CPU_ARCH="${{ steps.runner-specs.outputs.cpu_arch }}"
-          export TOTAL_MEM=${{ steps.runner-specs.outputs.total_memory_kb }}
           export IMAGE_VERSION="${ImageVersion:-unknown}"
 
-          # Run the script
-          php prepare-metrics.php timing.json > entry.json
+          php metrics-repo/scripts/prepare-metrics.php timing.json entry.json
 
           echo "Final metrics entry:"
           cat entry.json
 
-          # Configure git and commit
           cd metrics-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
