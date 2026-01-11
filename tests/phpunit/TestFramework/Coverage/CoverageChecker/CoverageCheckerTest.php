@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\CoverageChecker;
 
+use function extension_loaded;
 use Infection\TestFramework\Coverage\CoverageChecker;
 use Infection\TestFramework\Coverage\CoverageNotFound;
 use Infection\TestFramework\Coverage\Locator\FakeLocator;
@@ -42,16 +43,15 @@ use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\Tests\TestFramework\Coverage\Locator\Throwable\UnknownReportLocatorException;
+use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Path;
-use function extension_loaded;
 use function sprintf;
-use const PHP_SAPI;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * All these tests should be run in separate processes, as otherwise they may rely
@@ -65,9 +65,9 @@ use const PHP_SAPI;
 #[CoversClass(CoverageChecker::class)]
 final class CoverageCheckerTest extends TestCase
 {
-    private const COVERAGE_DIR_PATH = __DIR__.'/Fixtures';
-    
-    private const JUNIT_PATH = __DIR__.'/Fixtures/junit.xml';
+    private const COVERAGE_DIR_PATH = __DIR__ . '/Fixtures';
+
+    private const JUNIT_PATH = __DIR__ . '/Fixtures/junit.xml';
 
     public function test_it_needs_coverage_to_be_provided_if_initial_tests_are_skipped_without_junit_report(): void
     {

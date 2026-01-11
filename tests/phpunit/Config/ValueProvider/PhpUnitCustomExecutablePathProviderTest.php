@@ -52,7 +52,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(PhpUnitCustomExecutablePathProvider::class)]
 final class PhpUnitCustomExecutablePathProviderTest extends BaseProviderTestCase
 {
-    private const VALID_PHPUNIT_EXECUTABLE = __DIR__.'/../../../../vendor/bin/phpunit';
+    private const VALID_PHPUNIT_EXECUTABLE = __DIR__ . '/../../../../vendor/bin/phpunit';
 
     private MockObject&TestFrameworkFinder $finderMock;
 
