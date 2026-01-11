@@ -39,6 +39,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\DetectionStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 #[CoversClass(MetricsCalculator::class)]
 final class MetricsCalculatorTest extends TestCase
@@ -124,5 +125,29 @@ final class MetricsCalculatorTest extends TestCase
         $this->assertSame(100.0, $calculator->getMutationScoreIndicator());
         $this->assertSame(100.0, $calculator->getCoverageRate());
         $this->assertSame(100.0, $calculator->getCoveredCodeMutationScoreIndicator());
+    }
+
+    public function test_calculator_is_memoized(): void
+    {
+        $metricsCalculator = new MetricsCalculator(2);
+
+        $this->addMutantExecutionResult(
+            $metricsCalculator,
+            DetectionStatus::KILLED_BY_TESTS,
+            1,
+        );
+
+        // First call creates and caches Calculator
+        $metricsCalculator->getMutationScoreIndicator();
+
+        $calculatorProperty = new ReflectionProperty($metricsCalculator, 'calculator');
+        $firstCalculator = $calculatorProperty->getValue($metricsCalculator);
+
+        // Second call should reuse cached Calculator
+        $metricsCalculator->getCoveredCodeMutationScoreIndicator();
+
+        $secondCalculator = $calculatorProperty->getValue($metricsCalculator);
+
+        $this->assertSame($firstCalculator, $secondCalculator, 'Calculator should be memoized between calls');
     }
 }
