@@ -161,4 +161,23 @@ final class RunCommandHelperTest extends TestCase
 
         yield 'provided with value true' => [true, 'true'];
     }
+
+    #[DataProvider('providesTrimmedStringOrNull')]
+    public function test_it_returns_trimmed_string_or_null(?string $expected, mixed $value): void
+    {
+        $this->assertSame($expected, RunCommandHelper::trimmedStringOrNull($value));
+    }
+
+    public static function providesTrimmedStringOrNull(): iterable
+    {
+        yield 'null returns null' => [null, null];
+
+        yield 'empty string returns null' => [null, ''];
+
+        yield 'whitespace-only returns null' => [null, '   '];
+
+        yield 'non-empty string returns trimmed' => ['path/to/file.json', 'path/to/file.json'];
+
+        yield 'string with leading/trailing whitespace returns trimmed' => ['path/to/file.json', '  path/to/file.json  '];
+    }
 }

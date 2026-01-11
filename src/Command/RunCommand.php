@@ -92,6 +92,8 @@ final class RunCommand extends BaseCommand
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
 
+    public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+
     /** @var string */
     private const OPTION_TEST_FRAMEWORK = 'test-framework';
 
@@ -300,6 +302,12 @@ final class RunCommand extends BaseCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Path to text report file.',
+            )
+            ->addOption(
+                self::OPTION_LOGGER_SUMMARY_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to summary JSON report file (statistics only, no mutation details).',
             )
             ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
@@ -515,6 +523,7 @@ final class RunCommand extends BaseCommand
             gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
             htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
             textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            summaryJsonLogFilePath: $commandHelper->getSummaryJsonLogFilePath(),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),

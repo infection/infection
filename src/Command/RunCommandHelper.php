@@ -45,6 +45,7 @@ use function is_numeric;
 use function max;
 use function sprintf;
 use Symfony\Component\Console\Input\InputInterface;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -170,5 +171,20 @@ final readonly class RunCommandHelper
             RunCommand::OPTION_VALUE_NOT_PROVIDED => null,
             default => true,
         };
+    }
+
+    public function getSummaryJsonLogFilePath(): ?string
+    {
+        return self::trimmedStringOrNull($this->input->getOption(RunCommand::OPTION_LOGGER_SUMMARY_JSON));
+    }
+
+    /**
+     * Converts an input option to a trimmed string, or null if empty.
+     */
+    public static function trimmedStringOrNull(string|bool|int|float|null $value): ?string
+    {
+        $trimmed = trim((string) $value);
+
+        return $trimmed === '' ? null : $trimmed;
     }
 }
