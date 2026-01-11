@@ -37,7 +37,6 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParse
 
 use function dirname;
 use Exception;
-use function file_put_contents;
 use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
@@ -53,10 +52,11 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
 use function Safe\file_get_contents;
+use function Safe\file_put_contents;
 use function Safe\preg_replace;
+use function Safe\unlink;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use function unlink;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageParser::class)]
@@ -64,24 +64,12 @@ final class IndexXmlCoverageParserTest extends TestCase
 {
     use ExpectsThrowables;
 
-    private static ?string $fixturesXmlFileName = null;
-
     private static ?string $fixturesOldXmlFileName = null;
-
-    private FileSystem $fileSystem;
-
-    private IndexXmlCoverageParser $parser;
 
     private string $generatedIndexXmlPath;
 
     protected function setUp(): void
     {
-        $this->fileSystem = new FileSystem();
-        $this->parser = new IndexXmlCoverageParser(
-            isSourceFiltered: false,
-            fileSystem: new FakeFileSystem(),
-        );
-
         $this->generatedIndexXmlPath = FS::tmpFile('IndexXmlCoverageParserTest');
     }
 
