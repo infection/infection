@@ -44,9 +44,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
-use ValueError;
-use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use ValueError;
 
 #[Group('integration')]
 #[CoversClass(SourceFileInfoProvider::class)]
@@ -209,7 +208,7 @@ final class SourceFileInfoProviderTest extends TestCase
 
         yield [
             '/path/to/index.xml',
-            Path::canonicalize(__DIR__.'/../../../Fixtures/Files/phpunit/coverage/coverage-xml'),
+            Path::canonicalize(__DIR__ . '/../../../Fixtures/Files/phpunit/coverage/coverage-xml'),
             'FirstLevel/firstLevelNotInIndex.php.xml',
             '/path/to/src',
             '/path/to/src/FirstLevel/firstLevelNotIndexed.php',

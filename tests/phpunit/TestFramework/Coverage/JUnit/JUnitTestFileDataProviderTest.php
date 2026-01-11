@@ -35,24 +35,22 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\JUnit;
 
+use function file_get_contents;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileTimeData;
 use Infection\TestFramework\Coverage\Locator\FixedLocator;
-use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use InvalidArgumentException;
+use function is_string;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Path;
-use Throwable;
-use function file_get_contents;
-use function is_string;
 use function Safe\file_put_contents;
 use function Safe\unlink;
+use Symfony\Component\Filesystem\Path;
+use Throwable;
 
 #[Group('integration')]
 #[CoversClass(JUnitTestFileDataProvider::class)]

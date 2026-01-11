@@ -35,21 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
+use function dirname;
 use Exception;
+use function file_put_contents;
 use Infection\FileSystem\FakeFileSystem;
-use Infection\Tests\TestingUtility\FS;
-use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
-use function array_diff;
 use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use function dirname;
-use function file_put_contents;
-use function iterator_to_array;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -59,7 +56,7 @@ use function Safe\file_get_contents;
 use function Safe\preg_replace;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Traversable;
+use function unlink;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageParser::class)]
