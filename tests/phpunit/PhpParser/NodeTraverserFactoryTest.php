@@ -41,12 +41,14 @@ use Infection\PhpParser\Visitor\IgnoreAllMutationsAnnotationReaderVisitor;
 use Infection\PhpParser\Visitor\IgnoreNode\AbstractMethodIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\ChangingIgnorer;
 use Infection\PhpParser\Visitor\IgnoreNode\InterfaceIgnorer;
+use Infection\PhpParser\Visitor\LabelNodesAsEligibleVisitor;
 use Infection\PhpParser\Visitor\NextConnectingVisitor;
 use Infection\PhpParser\Visitor\NonMutableNodesIgnorerVisitor;
 use Infection\PhpParser\Visitor\ReflectionVisitor;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeVisitor;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeTraverserInterface;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
@@ -62,31 +64,38 @@ final class NodeTraverserFactoryTest extends TestCase
 
     public function test_it_can_create_a_traverser(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor(), []);
-
-        $visitors = array_map(
-            get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
+        $traverser = (new NodeTraverserFactory())->create(new FakeVisitor());
 
         $this->assertSame(
             [
                 CloningVisitor::class,
+                FakeVisitor::class,
+            ],
+            self::getVisitorClassNames($traverser),
+        );
+    }
+
+    public function test_it_can_create_a_pre_traverser(): void
+    {
+        $traverser = (new NodeTraverserFactory())->createPreTraverser([]);
+
+        $this->assertSame(
+            [
+                NextConnectingVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
-                FakeVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
             ],
-            $visitors,
+            self::getVisitorClassNames($traverser),
         );
     }
 
     public function test_it_can_create_a_traverser_with_node_ignorers(): void
     {
-        $traverser = (new NodeTraverserFactory())->create(
-            new FakeVisitor(),
+        $traverser = (new NodeTraverserFactory())->createPreTraverser(
             [
                 new FakeIgnorer(),
                 new FakeIgnorer(),
@@ -95,19 +104,20 @@ final class NodeTraverserFactoryTest extends TestCase
 
         $visitors = self::getVisitorReflection()->getValue($traverser);
 
-        $visitorClasses = array_map(get_class(...), $visitors);
-
         $this->assertSame(
             [
-                CloningVisitor::class,
+                NextConnectingVisitor::class,
                 IgnoreAllMutationsAnnotationReaderVisitor::class,
                 NonMutableNodesIgnorerVisitor::class,
                 NameResolver::class,
                 ParentConnectingVisitor::class,
                 ReflectionVisitor::class,
-                FakeVisitor::class,
+                LabelNodesAsEligibleVisitor::class,
             ],
-            $visitorClasses,
+            array_map(
+                get_class(...),
+                $visitors,
+            ),
         );
 
         $nodeIgnorersReflection = (new ReflectionClass(NonMutableNodesIgnorerVisitor::class))->getProperty('nodeIgnorers');
@@ -129,19 +139,16 @@ final class NodeTraverserFactoryTest extends TestCase
         );
     }
 
-    public function test_it_can_create_a_pre_traverser(): void
+    /**
+     * @return class-string[]
+     */
+    private static function getVisitorClassNames(NodeTraverserInterface $traverser): array
     {
-        $traverser = (new NodeTraverserFactory())->createPreTraverser();
+        $visitors = self::getVisitorReflection()->getValue($traverser);
 
-        $visitors = array_map(
+        // @phpstan-ignore return.type
+        return array_map(
             get_class(...),
-            self::getVisitorReflection()->getValue($traverser),
-        );
-
-        $this->assertSame(
-            [
-                NextConnectingVisitor::class,
-            ],
             $visitors,
         );
     }

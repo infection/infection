@@ -36,7 +36,9 @@ declare(strict_types=1);
 namespace Infection\Testing;
 
 use Infection\Mutator\Mutator;
+use Infection\PhpParser\Metadata\NodeAnnotator;
 use Infection\PhpParser\MutatedNode;
+use Infection\PhpParser\Visitor\ReflectionVisitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Token;
@@ -70,6 +72,16 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
+        if (!NodeAnnotator::isEligible($node)) {
+            return;
+        }
+
+        if (!$node->getAttribute(ReflectionVisitor::IS_ON_FUNCTION_SIGNATURE, false)
+            && !$node->getAttribute(ReflectionVisitor::IS_INSIDE_FUNCTION_KEY, false)
+        ) {
+            return;
+        }
+
         if (!$this->mutator->canMutate($node)) {
             return null;
         }

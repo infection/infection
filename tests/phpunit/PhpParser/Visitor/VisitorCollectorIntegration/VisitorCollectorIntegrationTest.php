@@ -62,11 +62,10 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
         $nodes = $this->parse($code);
 
         $this->addIdsToNodes($nodes);
-        $traverserFactory->createPreTraverser()->traverse($nodes);
+        $traverserFactory->createPreTraverser([])->traverse($nodes);
         $traversedNodes = $traverserFactory
             ->create(
                 new MarkTraversedNodesAsVisitedVisitor(),
-                [],
             )
         ->traverse($nodes);
 
@@ -86,59 +85,67 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                             0: DeclareItem(
                                 key: Identifier(
                                     nodeId: 2
-                                    origNode: nodeId(2)
                                     parent: nodeId(1)
+                                    ELIGIBLE: -1
+                                    origNode: nodeId(2)
                                 )
                                 value: Scalar_Int(
                                     rawValue: 1
                                     kind: KIND_DEC (10)
                                     nodeId: 3
-                                    origNode: nodeId(3)
                                     parent: nodeId(1)
+                                    ELIGIBLE: -1
+                                    origNode: nodeId(3)
                                 )
                                 nodeId: 1
-                                origNode: nodeId(1)
                                 parent: nodeId(0)
+                                ELIGIBLE: -1
+                                origNode: nodeId(1)
                             )
                         )
                         nodeId: 0
+                        ELIGIBLE: -1
                         next: nodeId(4)
                         origNode: nodeId(0)
                     )
                     1: Stmt_Namespace(
                         name: Name(
                             nodeId: 5
-                            origNode: nodeId(5)
                             parent: nodeId(4)
+                            ELIGIBLE: -1
+                            origNode: nodeId(5)
                         )
                         stmts: array(
                             0: Stmt_Class(
                                 name: Identifier(
                                     nodeId: 7
-                                    origNode: nodeId(7)
                                     parent: nodeId(6)
+                                    ELIGIBLE: -1
+                                    origNode: nodeId(7)
                                 )
                                 stmts: array(
                                     0: Stmt_ClassMethod(
                                         name: Identifier(
                                             nodeId: 9
-                                            origNode: nodeId(9)
                                             parent: nodeId(8)
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(8)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: first
+                                            ELIGIBLE: -1
+                                            origNode: nodeId(9)
                                         )
                                         returnType: Identifier(
                                             nodeId: 10
-                                            origNode: nodeId(10)
                                             parent: nodeId(8)
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(8)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: first
+                                            ELIGIBLE: -1
+                                            origNode: nodeId(10)
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -147,73 +154,80 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                         rawValue: 1
                                                         kind: KIND_DEC (10)
                                                         nodeId: 13
-                                                        origNode: nodeId(13)
                                                         parent: nodeId(12)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         functionScope: nodeId(8)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: first
+                                                        ELIGIBLE: -1
+                                                        origNode: nodeId(13)
                                                     )
                                                     right: Scalar_Int(
                                                         rawValue: 2
                                                         kind: KIND_DEC (10)
                                                         nodeId: 14
-                                                        origNode: nodeId(14)
                                                         parent: nodeId(12)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         functionScope: nodeId(8)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: first
+                                                        ELIGIBLE: -1
+                                                        origNode: nodeId(14)
                                                     )
                                                     nodeId: 12
-                                                    origNode: nodeId(12)
                                                     parent: nodeId(11)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(8)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: first
+                                                    ELIGIBLE: -1
+                                                    origNode: nodeId(12)
                                                 )
                                                 nodeId: 11
-                                                origNode: nodeId(11)
                                                 parent: nodeId(8)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
                                                 functionScope: nodeId(8)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: first
+                                                ELIGIBLE: -1
+                                                origNode: nodeId(11)
                                             )
                                         )
                                         nodeId: 8
-                                        origNode: nodeId(8)
                                         parent: nodeId(6)
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: first
+                                        ELIGIBLE: -1
+                                        origNode: nodeId(8)
                                     )
                                     1: Stmt_ClassMethod(
                                         name: Identifier(
                                             nodeId: 16
-                                            origNode: nodeId(16)
                                             parent: nodeId(15)
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(15)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: second
+                                            ELIGIBLE: -1
+                                            origNode: nodeId(16)
                                         )
                                         returnType: Identifier(
                                             nodeId: 17
-                                            origNode: nodeId(17)
                                             parent: nodeId(15)
                                             isInsideFunction: true
                                             isStrictTypes: true
                                             functionScope: nodeId(15)
                                             reflectionClass: Infection\Reflection\CoreClassReflection
                                             functionName: second
+                                            ELIGIBLE: -1
+                                            origNode: nodeId(17)
                                         )
                                         stmts: array(
                                             0: Stmt_Return(
@@ -222,61 +236,68 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
                                                         rawValue: 1
                                                         kind: KIND_DEC (10)
                                                         nodeId: 20
-                                                        origNode: nodeId(20)
                                                         parent: nodeId(19)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         functionScope: nodeId(15)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: second
+                                                        ELIGIBLE: -1
+                                                        origNode: nodeId(20)
                                                     )
                                                     right: Scalar_Int(
                                                         rawValue: 2
                                                         kind: KIND_DEC (10)
                                                         nodeId: 21
-                                                        origNode: nodeId(21)
                                                         parent: nodeId(19)
                                                         isInsideFunction: true
                                                         isStrictTypes: true
                                                         functionScope: nodeId(15)
                                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                                         functionName: second
+                                                        ELIGIBLE: -1
+                                                        origNode: nodeId(21)
                                                     )
                                                     nodeId: 19
-                                                    origNode: nodeId(19)
                                                     parent: nodeId(18)
                                                     isInsideFunction: true
                                                     isStrictTypes: true
                                                     functionScope: nodeId(15)
                                                     reflectionClass: Infection\Reflection\CoreClassReflection
                                                     functionName: second
+                                                    ELIGIBLE: -1
+                                                    origNode: nodeId(19)
                                                 )
                                                 nodeId: 18
-                                                origNode: nodeId(18)
                                                 parent: nodeId(15)
                                                 isInsideFunction: true
                                                 isStrictTypes: true
                                                 functionScope: nodeId(15)
                                                 reflectionClass: Infection\Reflection\CoreClassReflection
                                                 functionName: second
+                                                ELIGIBLE: -1
+                                                origNode: nodeId(18)
                                             )
                                         )
                                         nodeId: 15
-                                        origNode: nodeId(15)
                                         parent: nodeId(6)
                                         isOnFunctionSignature: true
                                         isStrictTypes: true
                                         reflectionClass: Infection\Reflection\CoreClassReflection
                                         functionName: second
+                                        ELIGIBLE: -1
+                                        origNode: nodeId(15)
                                     )
                                 )
                                 nodeId: 6
-                                origNode: nodeId(6)
                                 parent: nodeId(4)
+                                ELIGIBLE: -1
+                                origNode: nodeId(6)
                             )
                         )
                         kind: 1
                         nodeId: 4
+                        ELIGIBLE: -1
                         next: nodeId(6)
                         origNode: nodeId(4)
                     )
