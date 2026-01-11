@@ -64,7 +64,6 @@ use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use function trim;
 
@@ -92,6 +91,8 @@ final class RunCommand extends BaseCommand
      * without value"
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
+
+    public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
 
     /** @var string */
     public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
@@ -309,6 +310,12 @@ final class RunCommand extends BaseCommand
                 'Path to text report file.',
             )
             ->addOption(
+                self::OPTION_LOGGER_SUMMARY_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to summary JSON report file (statistics only, no mutation details).',
+            )
+            ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
@@ -497,23 +504,19 @@ final class RunCommand extends BaseCommand
             logger: $logger,
             output: $io->getOutput(),
             configFile: $configFile,
-            mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
+            mutatorsInput: $commandHelper->getStringOption(self::OPTION_MUTATORS, Container::DEFAULT_MUTATORS_INPUT),
             numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
-            logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
+            logVerbosity: $commandHelper->getStringOption(self::OPTION_LOG_VERBOSITY, Container::DEFAULT_LOG_VERBOSITY),
             // To keep in sync with Container::DEFAULT_DEBUG
             debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            formatterName: self::getFormatterName($input),
+            formatterName: self::getFormatterName($commandHelper),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             noProgress: $noProgress,
             forceProgress: $forceProgress,
-            existingCoveragePath: $coverage === ''
-                ? Container::DEFAULT_EXISTING_COVERAGE_PATH
-                : $coverage,
-            initialTestsPhpOptions: $initialTestsPhpOptions === ''
-                ? Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS
-                : $initialTestsPhpOptions,
+            existingCoveragePath: $commandHelper->getStringOption(self::OPTION_COVERAGE, Container::DEFAULT_EXISTING_COVERAGE_PATH),
+            initialTestsPhpOptions: $commandHelper->getStringOption(self::OPTION_INITIAL_TESTS_PHP_OPTIONS, Container::DEFAULT_INITIAL_TESTS_PHP_OPTIONS),
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
             // To keep in sync with Container::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS
@@ -523,28 +526,23 @@ final class RunCommand extends BaseCommand
             timeoutsAsEscaped: $timeoutsAsEscaped,
             maxTimeouts: $maxTimeouts,
             msiPrecision: $msiPrecision,
-            testFramework: $testFramework === ''
-                ? Container::DEFAULT_TEST_FRAMEWORK
-                : $testFramework,
-            testFrameworkExtraOptions: $testFrameworkExtraOptions === ''
-                ? Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS
-                : $testFrameworkExtraOptions,
-            staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
-                ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
-                : $staticAnalysisToolOptions,
+            testFramework: $commandHelper->getStringOption(self::OPTION_TEST_FRAMEWORK, Container::DEFAULT_TEST_FRAMEWORK),
+            testFrameworkExtraOptions: $commandHelper->getStringOption(self::OPTION_TEST_FRAMEWORK_OPTIONS, Container::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS),
+            staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io),
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),
-            gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
-            htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
-            textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            gitlabLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_GITLAB, Container::DEFAULT_GITLAB_LOGGER_PATH),
+            htmlLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_HTML, Container::DEFAULT_HTML_LOGGER_PATH),
+            textLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_TEXT, Container::DEFAULT_TEXT_LOGGER_PATH),
+            summaryJsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_SUMMARY_JSON, Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),
-            loggerProjectRootDirectory: $loggerProjectRootDirectory,
-            staticAnalysisTool: $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
+            loggerProjectRootDirectory: $commandHelper->getStringOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY),
+            staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
     }
@@ -654,10 +652,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(InputInterface $input): FormatterName
+    private static function getFormatterName(RunCommandHelper $commandHelper): FormatterName
     {
-        $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
-
-        return FormatterName::from($value);
+        return FormatterName::from(
+            $commandHelper->getStringOption(self::OPTION_FORMATTER, Container::DEFAULT_FORMATTER_NAME->value),
+        );
     }
 }

@@ -59,7 +59,7 @@ use Symfony\Component\Filesystem\Path;
 #[CoversClass(InitialConfigBuilder::class)]
 final class InitialConfigBuilderTest extends FileSystemTestCase
 {
-    private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
+    private const FIXTURES = __DIR__ . '/Fixtures';
 
     private string $projectPath;
 

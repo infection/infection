@@ -67,6 +67,7 @@ final class ConfigurationFactoryInputBuilder
         private ?string $gitlabLogFilePath,
         private ?string $htmlLogFilePath,
         private ?string $textLogFilePath,
+        private ?string $summaryJsonLogFilePath,
         private bool $useNoopMutators,
         private bool $executeOnlyCoveringTestCases,
         private ?string $mapSourceClassToTestStrategy,
@@ -276,6 +277,14 @@ final class ConfigurationFactoryInputBuilder
         return $clone;
     }
 
+    public function withSummaryJsonLogFilePath(?string $summaryJsonLogFilePath): self
+    {
+        $clone = clone $this;
+        $clone->summaryJsonLogFilePath = $summaryJsonLogFilePath;
+
+        return $clone;
+    }
+
     public function withUseNoopMutators(bool $useNoopMutators): self
     {
         $clone = clone $this;
@@ -389,6 +398,7 @@ final class ConfigurationFactoryInputBuilder
             $this->gitlabLogFilePath,
             $this->htmlLogFilePath,
             $this->textLogFilePath,
+            $this->summaryJsonLogFilePath,
             $this->useNoopMutators,
             $this->executeOnlyCoveringTestCases,
             $this->mapSourceClassToTestStrategy,
