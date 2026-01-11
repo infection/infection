@@ -55,6 +55,8 @@ class MetricsCalculator implements Collector
 
     private int $totalMutantsCount = 0;
 
+    private ?Calculator $calculator = null;
+
     private readonly RunningVariance $testRuntimesVariance;
 
     private readonly RunningVariance $staticAnalysisRuntimesVariance;
@@ -73,6 +75,11 @@ class MetricsCalculator implements Collector
 
     public function collect(MutantExecutionResult ...$executionResults): void
     {
+        if ($this->calculator !== null && $executionResults !== []) {
+            // Reset the calculator if any result is added
+            $this->calculator = null;
+        }
+
         foreach ($executionResults as $executionResult) {
             $detectionStatus = $executionResult->getDetectionStatus();
 
@@ -212,7 +219,7 @@ class MetricsCalculator implements Collector
 
     private function getCalculator(): Calculator
     {
-        return Calculator::fromMetrics($this, $this->timeoutsAsEscaped);
+        return $this->calculator ??= Calculator::fromMetrics($this, $this->timeoutsAsEscaped);
     }
 
     private static function foldToZero(float $value): float

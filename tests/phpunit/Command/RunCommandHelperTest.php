@@ -203,4 +203,35 @@ final class RunCommandHelperTest extends TestCase
 
         yield 'provided as string 100' => [100, '100'];
     }
+
+    #[DataProvider('providesGetStringOption')]
+    public function test_it_returns_string_option(?string $expected, mixed $optionValue, ?string $default = null): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with('test-option')
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getStringOption('test-option', $default));
+    }
+
+    public static function providesGetStringOption(): iterable
+    {
+        yield 'null returns null' => [null, null];
+
+        yield 'empty string returns null' => [null, ''];
+
+        yield 'whitespace-only returns null' => [null, '   '];
+
+        yield 'non-empty string returns trimmed' => ['path/to/file.json', 'path/to/file.json'];
+
+        yield 'string with leading/trailing whitespace returns trimmed' => ['path/to/file.json', '  path/to/file.json  '];
+
+        yield 'empty with default returns default' => ['default.json', '', 'default.json'];
+
+        yield 'null with default returns default' => ['default.json', null, 'default.json'];
+
+        yield 'value with default returns value' => ['custom.json', 'custom.json', 'default.json'];
+    }
 }
