@@ -39,7 +39,7 @@ use Infection\FileSystem\FileStore;
 use PhpParser\Node\Stmt;
 use PhpParser\Parser;
 use PhpParser\Token;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Throwable;
 
 /**

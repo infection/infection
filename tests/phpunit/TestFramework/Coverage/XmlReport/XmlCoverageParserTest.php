@@ -39,9 +39,9 @@ use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\SafeDOMXPath;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestFramework\Tracing\Trace\TestLocationsNormalizer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -183,7 +183,7 @@ final class XmlCoverageParserTest extends TestCase
         $providerMock
             ->expects($this->once())
             ->method('provideFileInfo')
-            ->willReturn(new MockSplFileInfo(['file' => 'test.txt']))
+            ->willReturn(new MockSplFileInfo('test.txt'))
         ;
 
         $providerMock
