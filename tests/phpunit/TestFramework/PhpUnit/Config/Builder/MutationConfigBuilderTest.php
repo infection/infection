@@ -65,7 +65,7 @@ final class MutationConfigBuilderTest extends FileSystemTestCase
 {
     public const HASH = 'a1b2c3';
 
-    private const FIXTURES = __DIR__ . '/../../../../Fixtures/Files/phpunit';
+    private const FIXTURES = __DIR__ . '/Fixtures';
 
     private const ORIGINAL_FILE_PATH = '/original/file/path';
 
