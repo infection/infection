@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Metrics;
 
 use Infection\Metrics\MaxTimeoutsChecker;
-use Infection\Metrics\MaxTimeoutsCheckFailed;
+use Infection\Metrics\MaxTimeoutCountReached;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -77,8 +77,8 @@ final class MaxTimeoutsCheckerTest extends TestCase
         try {
             $checker->checkTimeouts(10);
 
-            $this->fail('Expected MaxTimeoutsCheckFailed to be thrown');
-        } catch (MaxTimeoutsCheckFailed $exception) {
+            $this->fail('Expected MaxTimeoutCountReached to be thrown');
+        } catch (MaxTimeoutCountReached $exception) {
             $this->assertSame(
                 'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
                 $exception->getMessage(),
@@ -93,8 +93,8 @@ final class MaxTimeoutsCheckerTest extends TestCase
         try {
             $checker->checkTimeouts(1);
 
-            $this->fail('Expected MaxTimeoutsCheckFailed to be thrown');
-        } catch (MaxTimeoutsCheckFailed $exception) {
+            $this->fail('Expected MaxTimeoutCountReached to be thrown');
+        } catch (MaxTimeoutCountReached $exception) {
             $this->assertSame(
                 'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
                 $exception->getMessage(),

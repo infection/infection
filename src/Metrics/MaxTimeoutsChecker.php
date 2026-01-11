@@ -39,15 +39,15 @@ namespace Infection\Metrics;
  * @internal
  * @final
  */
-class MaxTimeoutsChecker
+readonly class MaxTimeoutsChecker
 {
     public function __construct(
-        private readonly ?int $maxTimeouts,
+        private ?int $maxTimeouts,
     ) {
     }
 
     /**
-     * @throws MaxTimeoutsCheckFailed
+     * @throws MaxTimeoutCountReached
      */
     public function checkTimeouts(int $timedOutCount): void
     {
@@ -56,7 +56,7 @@ class MaxTimeoutsChecker
         }
 
         if ($timedOutCount > $this->maxTimeouts) {
-            throw MaxTimeoutsCheckFailed::create($this->maxTimeouts, $timedOutCount);
+            throw MaxTimeoutCountReached::create($this->maxTimeouts, $timedOutCount);
         }
     }
 }

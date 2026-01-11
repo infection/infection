@@ -33,40 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Metrics;
+namespace Infection\Metrics;
 
-use Infection\Metrics\MaxTimeoutsCheckFailed;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use function sprintf;
 use UnexpectedValueException;
 
-#[CoversClass(MaxTimeoutsCheckFailed::class)]
-final class MaxTimeoutsCheckFailedTest extends TestCase
+/**
+ * @internal
+ */
+final class MaxTimeoutCountReached extends UnexpectedValueException
 {
-    public function test_it_extends_unexpected_value_exception(): void
+    public static function create(int $maxTimeouts, int $timedOutCount): self
     {
-        $exception = MaxTimeoutsCheckFailed::create(5, 10);
-
-        $this->assertInstanceOf(UnexpectedValueException::class, $exception);
-    }
-
-    public function test_it_creates_exception_with_correct_message(): void
-    {
-        $exception = MaxTimeoutsCheckFailed::create(5, 10);
-
-        $this->assertSame(
-            'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
-            $exception->getMessage(),
-        );
-    }
-
-    public function test_it_creates_exception_with_zero_limit(): void
-    {
-        $exception = MaxTimeoutsCheckFailed::create(0, 1);
-
-        $this->assertSame(
-            'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
-            $exception->getMessage(),
-        );
+        return new self(sprintf(
+            'The maximum allowed timeouts is %d, but %d timed out. '
+            . 'Reduce timeouts or increase the limit!',
+            $maxTimeouts,
+            $timedOutCount,
+        ));
     }
 }

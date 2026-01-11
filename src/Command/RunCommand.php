@@ -53,7 +53,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
-use Infection\Metrics\MaxTimeoutsCheckFailed;
+use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
@@ -447,7 +447,7 @@ final class RunCommand extends BaseCommand
             }
 
             throw $noSourceFoundException;
-        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutsCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());

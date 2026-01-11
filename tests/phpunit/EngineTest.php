@@ -41,7 +41,7 @@ use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MaxTimeoutsChecker;
-use Infection\Metrics\MaxTimeoutsCheckFailed;
+use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -700,7 +700,7 @@ final class EngineTest extends TestCase
             ->expects($this->once())
             ->method('checkTimeouts')
             ->with(100)
-            ->willThrowException(MaxTimeoutsCheckFailed::create(10, 100))
+            ->willThrowException(MaxTimeoutCountReached::create(10, 100))
         ;
 
         $engine = new Engine(
@@ -719,7 +719,7 @@ final class EngineTest extends TestCase
             $testFrameworkExtraOptionsFilter,
         );
 
-        $this->expectException(MaxTimeoutsCheckFailed::class);
+        $this->expectException(MaxTimeoutCountReached::class);
 
         $engine->execute();
     }

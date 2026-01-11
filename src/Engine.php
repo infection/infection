@@ -42,7 +42,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Metrics\MaxTimeoutsChecker;
-use Infection\Metrics\MaxTimeoutsCheckFailed;
+use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -96,7 +96,7 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
-     * @throws MaxTimeoutsCheckFailed
+     * @throws MaxTimeoutCountReached
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
