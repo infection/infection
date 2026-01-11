@@ -145,6 +145,15 @@ final class JUnitTestFileDataProviderTest extends TestCase
             ),
         ];
 
+        yield 'Codeception unit tests' => [
+            file_get_contents(self::JUNIT_DIFF_FORMAT),
+            'App\Tests\unit\SourceClassTest',
+            new TestFileTimeData(
+                '/codeception/tests/unit/SourceClassTest.php',
+                0.006096,
+            ),
+        ];
+
         yield 'Codeception BDD' => [
             file_get_contents(self::JUNIT_FEATURE_FORMAT),
             'FeatureA:Scenario A1',
