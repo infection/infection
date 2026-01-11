@@ -180,6 +180,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Pull latest to minimize conflicts with concurrent runs
+          git pull --rebase
+
           # Append new entry as single line
           jq -c . ../entry.json >> metrics.jsonl
 
@@ -200,4 +203,10 @@ jobs:
           fi
 
           git commit -m "$COMMIT_MSG"
-          git push
+
+          # Retry with rebase if concurrent run committed first
+          for i in 1 2 3; do
+            git push && break
+            echo "Push failed, rebasing and retrying ($i/3)..."
+            git pull --rebase
+          done
