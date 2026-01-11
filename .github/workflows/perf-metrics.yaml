@@ -29,6 +29,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  PHP_VERSION: '8.2'
   METRICS_COMMIT_PREFIX: "perf: Add metrics for"
 
 jobs:
@@ -58,10 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
-    name: Collect performance metrics
-
-    outputs:
-      entry_json: ${{ steps.prepare.outputs.entry_json }}
+    name: Collect and commit metrics
 
     steps:
       - name: Checkout code
@@ -71,10 +69,10 @@ jobs:
           repository: ${{ github.event.inputs.ref && 'infection/infection' || github.repository }}
           ref: ${{ github.event.inputs.ref || github.ref }}
 
-      - name: Setup PHP
+      - name: Setup PHP for coverage
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: ${{ env.PHP_VERSION }}
           coverage: pcov
           tools: composer
         env:
@@ -88,9 +86,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-8.2-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-8.2-
+            composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
             composer-${{ runner.os }}-
             composer-
 
@@ -102,6 +100,18 @@ jobs:
           php vendor/phpunit/phpunit/phpunit --stop-on-failure \
             --coverage-xml=var/logs/coverage-xml \
             --log-junit=var/logs/junit.xml
+
+      - name: Setup PHP for mutation testing
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create opcache directory
+        run: mkdir -p /tmp/opcache
 
       - name: Collect runner specs
         id: runner-specs
@@ -139,8 +149,16 @@ jobs:
             || true
           cat timing.json
 
-      - name: Prepare metrics entry
-        id: prepare
+      - name: Checkout metrics repository
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+        with:
+          repository: infection/infection-metrics
+          ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
+          path: metrics-repo
+
+      - name: Prepare and commit metrics
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
           # Create the metrics preparation script inline (so it works for old tags too)
           cat > prepare-metrics.php << 'SCRIPT_EOF'
@@ -235,57 +253,17 @@ jobs:
           echo "Final metrics entry:"
           cat entry.json
 
-          # Compact to single line for JSONL
-          echo "entry_json=$(jq -c . entry.json)" >> $GITHUB_OUTPUT
-
-      - name: Upload metrics artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: metrics-entry
-          path: entry.json
-
-  commit:
-    needs: [check, collect]
-    runs-on: ubuntu-latest
-    # Only commit if not skipped and collect succeeded
-    if: |
-      needs.check.outputs.skip != 'true' &&
-      needs.collect.result == 'success' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-
-    steps:
-      - name: Checkout metrics repository
-        uses: actions/checkout@v4
-        with:
-          repository: infection/infection-metrics
-          ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
-          path: metrics-repo
-
-      - name: Configure git
-        run: |
+          # Configure git and commit
           cd metrics-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Download metrics artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: metrics-entry
-          path: artifacts
-
-      - name: Append metrics to JSONL
-        run: |
-          cd metrics-repo
-
           # Append new entry as single line
-          jq -c . ../artifacts/entry.json >> metrics.jsonl
+          jq -c . ../entry.json >> metrics.jsonl
 
           echo "Updated metrics.jsonl:"
           tail -5 metrics.jsonl
 
-      - name: Commit and push
-        run: |
-          cd metrics-repo
           git add metrics.jsonl
           git diff --staged --quiet && echo "No changes to commit" && exit 0
 
