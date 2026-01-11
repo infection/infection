@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\RoundingFamily;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(RoundingFamily::class)]
-final class RoundingFamilyTest extends BaseMutatorTestCase
+final class RoundingFamilyTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

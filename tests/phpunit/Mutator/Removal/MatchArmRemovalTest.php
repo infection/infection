@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Mutator\Removal\MatchArmRemoval;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(MatchArmRemoval::class)]
-final class MatchArmRemovalTest extends BaseMutatorTestCase
+final class MatchArmRemovalTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

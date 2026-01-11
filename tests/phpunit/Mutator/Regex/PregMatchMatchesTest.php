@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Mutator\Regex\PregMatchMatches;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(PregMatchMatches::class)]
-final class PregMatchMatchesTest extends BaseMutatorTestCase
+final class PregMatchMatchesTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

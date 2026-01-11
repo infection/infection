@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Nullify;
 
 use Infection\Mutator\Nullify\ArrayFind;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ArrayFind::class)]
-final class ArrayFindTest extends BaseMutatorTestCase
+final class ArrayFindTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

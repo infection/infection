@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\ReturnValue\This;
-use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
 #[CoversClass(This::class)]
-final class ThisTest extends BaseMutatorTestCase
+final class ThisTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

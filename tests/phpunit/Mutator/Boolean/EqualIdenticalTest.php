@@ -36,14 +36,14 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\EqualIdentical;
-use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Mutator\MutatorTestCase;
 use const PHP_VERSION_ID;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(EqualIdentical::class)]
-final class EqualIdenticalTest extends BaseMutatorTestCase
+final class EqualIdenticalTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

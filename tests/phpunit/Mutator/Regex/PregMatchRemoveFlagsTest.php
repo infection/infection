@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Mutator\Regex\PregMatchRemoveFlags;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -44,7 +44,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * @internal
  */
 #[CoversClass(PregMatchRemoveFlags::class)]
-final class PregMatchRemoveFlagsTest extends BaseMutatorTestCase
+final class PregMatchRemoveFlagsTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

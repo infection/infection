@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\FunctionSignature;
 
 use Infection\Mutator\FunctionSignature\PublicVisibility;
-use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
 #[CoversClass(PublicVisibility::class)]
-final class PublicVisibilityTest extends BaseMutatorTestCase
+final class PublicVisibilityTest extends MutatorTestCase
 {
     #[DataProvider('blacklistedProvider')]
     public function test_it_does_not_modify_blacklisted_functions(string $functionName): void

@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Mutator\Regex\PregQuote;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(PregQuote::class)]
-final class PregQuoteTest extends BaseMutatorTestCase
+final class PregQuoteTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

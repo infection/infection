@@ -36,13 +36,13 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Cast;
 
 use Infection\Mutator\Cast\CastBool;
-use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(CastBool::class)]
-final class CastBoolTest extends BaseMutatorTestCase
+final class CastBoolTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

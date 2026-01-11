@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Nullify;
 
 use Infection\Mutator\Nullify\ArrayFirst;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ArrayFirst::class)]
-final class ArrayFirstTest extends BaseMutatorTestCase
+final class ArrayFirstTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

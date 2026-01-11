@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Mutator\Unwrap\UnwrapArrayReplaceRecursive;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(UnwrapArrayReplaceRecursive::class)]
-final class UnwrapArrayReplaceRecursiveTest extends BaseMutatorTestCase
+final class UnwrapArrayReplaceRecursiveTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

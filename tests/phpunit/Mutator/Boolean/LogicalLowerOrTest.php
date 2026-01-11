@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Boolean;
 
 use Infection\Mutator\Boolean\LogicalLowerOr;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(LogicalLowerOr::class)]
-final class LogicalLowerOrTest extends BaseMutatorTestCase
+final class LogicalLowerOrTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Loop;
 
 use Infection\Mutator\Loop\For_;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(For_::class)]
-final class For_Test extends BaseMutatorTestCase
+final class For_Test extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

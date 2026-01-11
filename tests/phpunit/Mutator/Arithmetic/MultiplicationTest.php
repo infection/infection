@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Arithmetic;
 
 use Infection\Mutator\Arithmetic\Multiplication;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(Multiplication::class)]
-final class MultiplicationTest extends BaseMutatorTestCase
+final class MultiplicationTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

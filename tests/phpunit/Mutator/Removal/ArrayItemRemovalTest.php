@@ -36,15 +36,15 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Removal;
 
 use Infection\Mutator\Removal\ArrayItemRemoval;
-use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('integration')]
 #[CoversClass(ArrayItemRemoval::class)]
-final class ArrayItemRemovalTest extends BaseMutatorTestCase
+final class ArrayItemRemovalTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

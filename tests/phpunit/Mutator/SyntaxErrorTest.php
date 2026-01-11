@@ -36,12 +36,11 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator;
 
 use Infection\Mutator\SyntaxError;
-use Infection\Testing\BaseMutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(SyntaxError::class)]
-final class SyntaxErrorTest extends BaseMutatorTestCase
+final class SyntaxErrorTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

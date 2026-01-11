@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Operator\Continue_;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(Continue_::class)]
-final class Continue_Test extends BaseMutatorTestCase
+final class Continue_Test extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

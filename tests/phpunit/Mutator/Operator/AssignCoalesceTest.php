@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Operator;
 
 use Infection\Mutator\Operator\AssignCoalesce;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AssignCoalesce::class)]
-final class AssignCoalesceTest extends BaseMutatorTestCase
+final class AssignCoalesceTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

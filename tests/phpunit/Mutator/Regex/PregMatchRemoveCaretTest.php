@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Regex;
 
 use Infection\Mutator\Regex\PregMatchRemoveCaret;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -44,7 +44,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
  * @internal
  */
 #[CoversClass(PregMatchRemoveCaret::class)]
-final class PregMatchRemoveCaretTest extends BaseMutatorTestCase
+final class PregMatchRemoveCaretTest extends MutatorTestCase
 {
     #[DataProvider('provideMutationCases')]
     public function test_mutator(string $input, ?string $expected = null): void

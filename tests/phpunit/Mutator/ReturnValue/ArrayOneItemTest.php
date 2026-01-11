@@ -37,8 +37,8 @@ namespace Infection\Tests\Mutator\ReturnValue;
 
 use Composer\InstalledVersions;
 use Infection\Mutator\ReturnValue\ArrayOneItem;
-use Infection\Testing\BaseMutatorTestCase;
 use Infection\Tests\Mutator\MutatorFixturesProvider;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -46,7 +46,7 @@ use function version_compare;
 
 #[Group('integration')]
 #[CoversClass(ArrayOneItem::class)]
-final class ArrayOneItemTest extends BaseMutatorTestCase
+final class ArrayOneItemTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

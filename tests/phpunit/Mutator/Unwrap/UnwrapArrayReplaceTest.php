@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Unwrap;
 
 use Infection\Mutator\Unwrap\UnwrapArrayReplace;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(UnwrapArrayReplace::class)]
-final class UnwrapArrayReplaceTest extends BaseMutatorTestCase
+final class UnwrapArrayReplaceTest extends MutatorTestCase
 {
     /**
      * @param string|string[] $expected

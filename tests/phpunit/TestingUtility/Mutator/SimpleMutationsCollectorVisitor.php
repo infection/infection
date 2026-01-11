@@ -33,74 +33,70 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Mutator\Loop;
+namespace Infection\Tests\TestingUtility\Mutator;
 
-use Infection\Mutator\Loop\While_;
-use Infection\Tests\Mutator\MutatorTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Infection\Mutator\Mutator;
+use Infection\PhpParser\MutatedNode;
+use Infection\Testing\SimpleMutation;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+use PhpParser\Token;
 
-#[CoversClass(While_::class)]
-final class While_Test extends MutatorTestCase
+/**
+ * @internal
+ */
+final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
 {
     /**
-     * @param string|string[]|null $expected
+     * @var SimpleMutation[]
      */
-    #[DataProvider('mutationsProvider')]
-    public function test_it_can_mutate(string $input, string|array|null $expected = []): void
-    {
-        $this->assertMutatesInput($input, $expected);
+    private array $mutations = [];
+
+    /**
+     * @param Mutator<Node> $mutator
+     */
+    public function __construct(
+        private readonly Mutator $mutator,
+        /**
+         * @var Node[]
+         */
+        private readonly array $fileAst,
+        /**
+         * @var Token[]
+         */
+        private readonly array $originalFileTokens,
+        private readonly string $originalFileContent,
+    ) {
     }
 
-    public static function mutationsProvider(): iterable
+    public function leaveNode(Node $node)
     {
-        yield 'It mutates expression part from variable to false' => [
-            <<<'PHP'
-                <?php
+        if (!$this->mutator->canMutate($node)) {
+            return null;
+        }
 
-                $condition = true;
+        // It is important to not rely on the keys here. It might otherwise result in some elements
+        // being overridden, see https://3v4l.org/JLN73
+        foreach ($this->mutator->mutate($node) as $mutatedNode) {
+            $this->mutations[] = new SimpleMutation(
+                $this->fileAst,
+                $this->originalFileTokens,
+                $this->originalFileContent,
+                $this->mutator,
+                MutatedNode::wrap($mutatedNode),
+                $node->getAttributes(),
+                $node::class,
+            );
+        }
 
-                while ($condition) {
-                }
+        return null;
+    }
 
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $condition = true;
-
-                while (false) {
-                }
-
-                PHP,
-        ];
-
-        yield 'It mutates expression part from boolean true to false' => [
-            <<<'PHP'
-                <?php
-
-                while (true) {
-                }
-
-                PHP,
-            <<<'PHP'
-                <?php
-
-                while (false) {
-                }
-
-                PHP,
-        ];
-
-        yield 'It does not mutate expression part in do-while loop to false' => [
-            <<<'PHP'
-                <?php
-
-                do {
-
-                } while (true);
-
-                PHP,
-        ];
+    /**
+     * @return SimpleMutation[]
+     */
+    public function getMutations(): array
+    {
+        return $this->mutations;
     }
 }

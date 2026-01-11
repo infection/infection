@@ -39,7 +39,6 @@ use function array_key_exists;
 use function end;
 use function explode;
 use Infection\CannotBeInstantiated;
-use Infection\Testing\BaseMutatorTestCase;
 use function Safe\file_get_contents;
 use function sprintf;
 use function substr;
@@ -62,7 +61,7 @@ final class MutatorFixturesProvider
      */
     public static function getFixtureFileContent(string $class, string $file): string
     {
-        Assert::isAOf($class, BaseMutatorTestCase::class);
+        Assert::isAOf($class, MutatorTestCase::class);
 
         return file_get_contents(sprintf(
             '%s/%s',

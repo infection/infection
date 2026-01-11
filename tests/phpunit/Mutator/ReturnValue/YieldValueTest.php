@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\ReturnValue;
 
 use Infection\Mutator\ReturnValue\YieldValue;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(YieldValue::class)]
-final class YieldValueTest extends BaseMutatorTestCase
+final class YieldValueTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected

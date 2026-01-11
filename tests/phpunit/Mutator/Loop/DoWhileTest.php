@@ -36,12 +36,12 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutator\Loop;
 
 use Infection\Mutator\Loop\DoWhile;
-use Infection\Testing\BaseMutatorTestCase;
+use Infection\Tests\Mutator\MutatorTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(DoWhile::class)]
-final class DoWhileTest extends BaseMutatorTestCase
+final class DoWhileTest extends MutatorTestCase
 {
     /**
      * @param string|string[]|null $expected
