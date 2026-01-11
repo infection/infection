@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Metrics;
 
-use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MaxTimeoutCountReached;
+use Infection\Metrics\MaxTimeoutsChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
