@@ -58,6 +58,11 @@ final readonly class RunCommandHelper
     ) {
     }
 
+    /**
+     * @template T of string|null
+     * @param T $default
+     * @return (T is null ? string|null : string)
+     */
     public function getStringOption(string $name, ?string $default = null): ?string
     {
         $optionValue = trim((string) $this->input->getOption($name));
