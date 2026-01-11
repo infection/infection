@@ -162,13 +162,19 @@ final class RunCommandHelperTest extends TestCase
         yield 'provided with value true' => [true, 'true'];
     }
 
-    #[DataProvider('providesTrimmedStringOrNull')]
-    public function test_it_returns_trimmed_string_or_null(?string $expected, mixed $value): void
+    #[DataProvider('providesGetStringOption')]
+    public function test_it_returns_string_option(?string $expected, mixed $optionValue, ?string $default = null): void
     {
-        $this->assertSame($expected, RunCommandHelper::trimmedStringOrNull($value));
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with('test-option')
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getStringOption('test-option', $default));
     }
 
-    public static function providesTrimmedStringOrNull(): iterable
+    public static function providesGetStringOption(): iterable
     {
         yield 'null returns null' => [null, null];
 
@@ -179,5 +185,11 @@ final class RunCommandHelperTest extends TestCase
         yield 'non-empty string returns trimmed' => ['path/to/file.json', 'path/to/file.json'];
 
         yield 'string with leading/trailing whitespace returns trimmed' => ['path/to/file.json', '  path/to/file.json  '];
+
+        yield 'empty with default returns default' => ['default.json', '', 'default.json'];
+
+        yield 'null with default returns default' => ['default.json', null, 'default.json'];
+
+        yield 'value with default returns value' => ['custom.json', 'custom.json', 'default.json'];
     }
 }
