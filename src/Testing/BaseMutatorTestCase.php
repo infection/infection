@@ -196,15 +196,14 @@ abstract class BaseMutatorTestCase extends TestCase
             $code,
         );
 
-        // Pre-traverse the nodes to connect them
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NextConnectingVisitor());
-        $traverser->traverse($nodes);
+        $factory = new NodeTraverserFactory();
 
-        (new NodeTraverserFactory())
-            ->create($mutationsCollectorVisitor, [])
-            ->traverse($nodes)
-        ;
+        $factory
+            ->createPreTraverser()
+            ->traverse($nodes);
+        $factory
+            ->create($mutationsCollectorVisitor, nodeIgnorers: [])
+            ->traverse($nodes);
 
         return $mutationsCollectorVisitor->getMutations();
     }
