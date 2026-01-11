@@ -35,33 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
-use Infection\Tests\TestingUtility\FS;
+use function dirname;
 use function dirname;
 use Exception;
-use Infection\FileSystem\FakeFileSystem;
-use function dirname;
 use Exception;
 use Infection\FileSystem\FakeFileSystem;
-use Infection\FileSystem\FileSystem;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
-use InvalidArgumentException;
+use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use function Safe\file_get_contents;
 use function Safe\file_put_contents;
-use function Safe\preg_replace;
 use function Safe\unlink;
 use function sprintf;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -419,8 +415,6 @@ final class IndexXmlCoverageParserTest extends TestCase
                 XML,
         ];
     }
-
-
 
     public function test_it_errors_when_no_phpunit_project_source_could_be_found(): void
     {
