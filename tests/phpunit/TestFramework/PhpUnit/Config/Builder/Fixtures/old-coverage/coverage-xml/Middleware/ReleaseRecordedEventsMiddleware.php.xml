@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+    <file name="ReleaseRecordedEventsMiddleware.php">
+        <totals>
+            <lines total="60" comments="22" code="38" executable="11" executed="11" percent="100.00%"/>
+            <methods count="2" tested="2" percent="100.00%"/>
+            <functions count="0" tested="0" percent=""/>
+            <classes count="1" tested="1" percent="100.00%"/>
+            <traits count="0" tested="0" percent=""/>
+        </totals>
+        <class name="ReleaseRecordedEventsMiddleware" start="9" executable="11" executed="11" crap="4">
+            <package full="" name="" sub="" category=""/>
+            <namespace name="BornFree\TacticianDomainEvent\Middleware"/>
+            <method name="__construct" signature="__construct(ContainsRecordedEvents $eventRecorder, EventDispatcherInterface $eventDispatcher)" start="27" end="31" crap="1" executable="3" executed="3" coverage="100"/>
+            <method name="execute" signature="execute($command, callable $next)" start="43" end="60" crap="3" executable="8" executed="8" coverage="100"/>
+        </class>
+        <coverage>
+            <line nr="29">
+                <covered by="BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events"/>
+                <covered by="BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised"/>
+            </line>
+            <line nr="30">
+                <covered by="BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events"/>
+                <covered by="BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised"/>
+            </line>
+        </coverage>
+    </file>
+</phpunit>

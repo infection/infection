@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © 2017 Maks Rafalko
+  ~
+  ~ License: https://opensource.org/licenses/BSD-3-Clause New BSD License
+  -->
+
+<phpunit xmlns="http://schema.phpunit.de/coverage/1.0">
+    <file name="secondLevel.php" path="/FirstLevel/SecondLevel">
+        <totals>
+            <lines total="36" comments="6" code="30" executable="6" executed="4" percent="13.44"/>
+            <methods count="2" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <class name="Plus" start="11" executable="6" executed="4" crap="5.93">
+            <package full="" name="" sub="" category=""/>
+            <namespace name="Infection\Mutator\Arithmetic"/>
+            <method name="mutate" signature="mutate(Node $node)" start="19" end="22" crap="2" executable="1" executed="0" coverage="0"/>
+            <method name="shouldMutate" signature="shouldMutate(Node $node) : bool" start="24" end="35" crap="4.13" executable="5" executed="4" coverage="80"/>
+        </class>
+        <coverage>
+            <line nr="11">
+                <covered by="Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_mutate_plus_expression"/>
+                <covered by="Infection\Tests\Mutator\Arithmetic\PlusTest::test_it_should_not_mutate_plus_with_arrays"/>
+            </line>
+        </coverage>
+    </file>
+</phpunit>
