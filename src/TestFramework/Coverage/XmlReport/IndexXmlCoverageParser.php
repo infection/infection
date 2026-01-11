@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\Coverage\XmlReport;
 
 use DOMElement;
+use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\SafeDOMXPath;
 use function sprintf;
@@ -49,6 +50,7 @@ class IndexXmlCoverageParser
 {
     public function __construct(
         private readonly bool $isSourceFiltered,
+        private readonly FileSystem $fileSystem,
     ) {
     }
 
@@ -95,6 +97,7 @@ class IndexXmlCoverageParser
                 $coverageBasePath,
                 $relativeCoverageFilePath,
                 $projectSource,
+                $this->fileSystem,
             );
         }
     }

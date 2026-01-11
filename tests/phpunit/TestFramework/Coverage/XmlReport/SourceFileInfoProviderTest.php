@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
@@ -61,6 +62,7 @@ final class SourceFileInfoProviderTest extends TestCase
             $coverageDir,
             $relativeCoverageFilePath,
             $projectSource,
+            new FileSystem(),
         );
 
         $this->assertSame($expectedSourceFilePath, $provider->provideFileInfo()->getRealPath());
@@ -79,6 +81,7 @@ final class SourceFileInfoProviderTest extends TestCase
             '/path/to/coverage-dir',
             'zeroLevel.php.xml',
             'projectSource',
+            new FileSystem(),
         );
 
         try {
@@ -106,6 +109,7 @@ final class SourceFileInfoProviderTest extends TestCase
             XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
             'zeroLevel.php.xml',
             $incorrectCoverageSrcDir,
+            new FileSystem(),
         );
 
         try {
