@@ -500,6 +500,7 @@ final class RunCommand extends BaseCommand
             gitlabLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_GITLAB, Container::DEFAULT_GITLAB_LOGGER_PATH),
             htmlLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_HTML, Container::DEFAULT_HTML_LOGGER_PATH),
             textLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_TEXT, Container::DEFAULT_TEXT_LOGGER_PATH),
+            summaryJsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_SUMMARY_JSON, Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: $commandHelper->getMapSourceClassToTest(),

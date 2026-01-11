@@ -186,9 +186,4 @@ final readonly class RunCommandHelper
             default => true,
         };
     }
-
-    public function getSummaryJsonLogFilePath(): ?string
-    {
-        return $this->getStringOption(RunCommand::OPTION_LOGGER_SUMMARY_JSON);
-    }
 }
