@@ -171,12 +171,12 @@
         "timeoutsAsEscaped": {
             "type": "boolean",
             "default": false,
-            "description": "Treat timed out mutants as escaped (affects MSI calculation)."
+            "description": "Treat timed-out mutants as escaped (affects MSI calculation)."
         },
         "maxTimeouts": {
             "type": "integer",
             "minimum": 0,
-            "description": "Maximum allowed timeouts. Build fails if exceeded."
+            "description": "Maximum allowed number of timed-out mutants. Build fails if exceeded."
         },
         "mutators": {
             "type": "object",
