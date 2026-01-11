@@ -36,8 +36,6 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing;
 
 use function count;
-use function file_exists;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
@@ -49,13 +47,17 @@ use Infection\TestFramework\Coverage\Locator\FixedLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
+use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\TraceProvider;
+use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
+use Infection\TestFramework\Tracing\Tracer;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
+use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -63,422 +65,1172 @@ use function Safe\realpath;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Process;
 
 #[CoversNothing]
 final class PHPUnitCoverageTracerTest extends TestCase
 {
-    private const FIXTURE_DIR = __DIR__ . '/Fixtures';
-
-    private const COVERAGE_REPORT_DIR = self::FIXTURE_DIR . '/phpunit-coverage';
-
-    private TraceProvider $provider;
-
-    protected function setUp(): void
-    {
-        $coveragePath = Path::canonicalize(self::COVERAGE_REPORT_DIR);
-
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapterStub
-            ->method('hasJUnitReport')
-            ->willReturn(true);
-
-        $this->provider = new CoveredTraceProvider(
-            new PhpUnitXmlCoverageTraceProvider(
-                indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                indexParser: new IndexXmlCoverageParser(
-                    isSourceFiltered: false,
-                    fileSystem: new FileSystem(),
-                ),
-                parser: new XmlCoverageParser(),
-            ),
-            new JUnitTestExecutionInfoAdder(
-                $testFrameworkAdapterStub,
-                new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider(
-                        new FixedLocator($coveragePath . '/junit.xml'),
-                    ),
-                ),
-            ),
-        );
-
-        $this->copyReportFromTemplateIfMissing($coveragePath);
-    }
+    private const FIXTURES_DIR = __DIR__ . '/../Coverage/Fixtures';
 
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
+        string $indexXmlPath,
+        string $fileXmlPath,
+        string $junitXmlPath,
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
-        $canonicalPathname = Path::canonicalize($fileInfo->getPathname());
-        $actual = null;
+        $tracer = $this->createTracer(
+            $indexXmlPath,
+            $fileXmlPath,
+            $junitXmlPath,
+            $fileInfo->getRealPath(),
+        );
 
-        $visitedPathnames = [];
+        $actual = $tracer->trace($fileInfo);
 
-        foreach ($this->provider->provideTraces() as $trace) {
-            $pathname = Path::canonicalize($trace->getSourceFileInfo()->getPathname());
-            $visitedPathnames[] = $pathname;
-
-            if ($pathname === $canonicalPathname) {
-                $actual = $trace;
-
-                break;
-            }
-        }
-
-        self::assertFoundMatchingTrace($visitedPathnames, $expected, $actual);
         TraceAssertion::assertEquals($expected, $actual);
     }
 
     public static function traceProvider(): iterable
     {
-        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
+        //        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
+        //
+        //        $splFileInfo = new SplFileInfo(
+        //            self::FIXTURE_DIR . '/src/DemoCounterService.php',
+        //        );
+        //
+        //        $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');
+        //
+        //        $testLocations = [
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_set_step_changes_increment_amount',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_custom_step_with_multiple_counts',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_count_increments_by_step_and_returns_new_value',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_negative_step_decreases_counter',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_multiple_counts_increment_correctly',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_set_step_with_default_resets_to_one',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_complex_scenario',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_start_count_with_default_sets_to_zero',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_zero_step_keeps_counter_unchanged',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //            new TestLocation(
+        //                sprintf(
+        //                    '%s::test_start_count_affects_subsequent_counts',
+        //                    DemoCounterServiceTest::class,
+        //                ),
+        //                $testFilePath,
+        //                0.022199,
+        //            ),
+        //        ];
+        //
+        //        yield [
+        //            $splFileInfo,
+        //            new SyntheticTrace(
+        //                sourceFileInfo: $splFileInfo,
+        //                realPath: realpath($canonicalDemoCounterServicePathname),
+        //                relativePathname: $canonicalDemoCounterServicePathname,
+        //                hasTest: true,
+        //                tests: new TestLocations(
+        //                    [
+        //                        46 => $testLocations,
+        //                        47 => $testLocations,
+        //                        49 => $testLocations,
+        //                        54 => [
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_start_count_sets_initial_value',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_negative_step_decreases_counter',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_complex_scenario',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_start_count_with_default_sets_to_zero',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_zero_step_keeps_counter_unchanged',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_start_count_affects_subsequent_counts',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                        ],
+        //                        59 => [
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_set_step_changes_increment_amount',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_custom_step_with_multiple_counts',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_negative_step_decreases_counter',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_set_step_with_default_resets_to_one',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_complex_scenario',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_zero_step_keeps_counter_unchanged',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                        ],
+        //                        64 => [
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_set_step_changes_increment_amount',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_custom_step_with_multiple_counts',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_start_count_sets_initial_value',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_count_increments_by_step_and_returns_new_value',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_initial_counter_is_zero',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_negative_step_decreases_counter',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_multiple_counts_increment_correctly',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_complex_scenario',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_start_count_with_default_sets_to_zero',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_zero_step_keeps_counter_unchanged',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                            new TestLocation(
+        //                                sprintf(
+        //                                    '%s::test_start_count_affects_subsequent_counts',
+        //                                    DemoCounterServiceTest::class,
+        //                                ),
+        //                                $testFilePath,
+        //                                0.022199,
+        //                            ),
+        //                        ],
+        //                    ],
+        //                    [
+        //                        'count' => new SourceMethodLineRange(44, 50),
+        //                        'startCount' => new SourceMethodLineRange(52, 55),
+        //                        'setStep' => new SourceMethodLineRange(57, 60),
+        //                        'get' => new SourceMethodLineRange(62, 65),
+        //                    ],
+        //                ),
+        //            ),
+        //        ];
 
-        $splFileInfo = new SplFileInfo(
-            self::FIXTURE_DIR . '/src/DemoCounterService.php',
+        yield from DataProviderFactory::prefix(
+            '[PHPUnit 09] ',
+            self::phpUnit09InfoProvider(),
         );
 
-        $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');
+        //        yield from DataProviderFactory::prefix(
+        //            '[PHPUnit 10] ',
+        //            self::phpUnit10InfoProvider(),
+        //        );
+        //
+        //        yield from DataProviderFactory::prefix(
+        //            '[PHPUnit 11] ',
+        //            self::phpUnit11InfoProvider(),
+        //        );
+        //
+        //        yield from DataProviderFactory::prefix(
+        //            '[PHPUnit 12.0] ',
+        //            self::phpUnit120InfoProvider(),
+        //        );
+        //
+        //        yield from DataProviderFactory::prefix(
+        //            '[PHPUnit 12.5] ',
+        //            self::phpUnit125InfoProvider(),
+        //        );
+        //
+        //        yield from DataProviderFactory::prefix(
+        //            '[Codeception] ',
+        //            self::codeceptionInfoProvider(),
+        //        );
+    }
 
-        $testLocations = [
-            new TestLocation(
-                sprintf(
-                    '%s::test_set_step_changes_increment_amount',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_custom_step_with_multiple_counts',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_count_increments_by_step_and_returns_new_value',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_negative_step_decreases_counter',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_multiple_counts_increment_correctly',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_set_step_with_default_resets_to_one',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_complex_scenario',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_start_count_with_default_sets_to_zero',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_zero_step_keeps_counter_unchanged',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-            new TestLocation(
-                sprintf(
-                    '%s::test_start_count_affects_subsequent_counts',
-                    DemoCounterServiceTest::class,
-                ),
-                $testFilePath,
-                0.022199,
-            ),
-        ];
+    private function createTracer(
+        string $indexXmlPath,
+        string $fileXmlPath,
+        string $junitXmlPath,
+        string $sourceRealPath,
+    ): Tracer {
+        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapterStub
+            ->method('hasJUnitReport')
+            ->willReturn(true);
 
-        yield [
-            $splFileInfo,
+        $fileSystemStub = $this->createFileSystemStub();
+
+        return new TraceProviderAdapterTracer(
+            new CoveredTraceProvider(
+                new PhpUnitXmlCoverageTraceProvider(
+                    indexLocator: new FixedLocator($indexXmlPath),
+                    indexParser: new IndexXmlCoverageParser(
+                        isSourceFiltered: false,
+                        fileSystem: $fileSystemStub,
+                    ),
+                    parser: new XmlCoverageParser(
+                        $fileSystemStub,
+                    ),
+                ),
+                new JUnitTestExecutionInfoAdder(
+                    $testFrameworkAdapterStub,
+                    new MemoizedTestFileDataProvider(
+                        new JUnitTestFileDataProvider(
+                            new FixedLocator($junitXmlPath),
+                        ),
+                    ),
+                ),
+            ),
+        );
+    }
+
+    private function createFileSystemStub(): FileSystem
+    {
+        $fileSystem = new FileSystem();
+
+        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub
+            ->method('isReadableFile')
+            ->willReturnCallback($fileSystem->isReadableFile(...));
+        $fileSystemStub
+            ->method('readFile')
+            ->willReturnCallback($fileSystem->readFile(...));
+
+        // We are only interested in mocking the realPath check!
+        // In this test, we do not ~~need~~ want to check that the source file exists as this
+        // makes the tests too inflexible.
+        // In a real run, this is what provides the guarantee that the constructed path makes
+        // sense; in this test it is done by checking that the path we get at the end for the
+        // source file is the one we expect.
+        $fileSystemStub
+            ->method('realPath')
+            ->willReturnCallback(static fn (string $path) => $path);
+
+        return $fileSystemStub;
+    }
+
+    private static function phpUnit09InfoProvider(): iterable
+    {
+        $coverageDirectory = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/');
+
+        $indexXmlPath = Path::canonicalize($coverageDirectory . '/coverage-xml/index.xml');
+        $junitXmlPath = Path::canonicalize($coverageDirectory . '/junit.xml');
+
+        $coveredClassSplFileInfo = new MockSplFileInfo(
+            realPath: '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/Calculator.php',
+        );
+
+        yield 'covered class' => [
+            $indexXmlPath,
+            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Covered/Calculator.php.xml'),
+            $junitXmlPath,
+            $coveredClassSplFileInfo,
             new SyntheticTrace(
-                sourceFileInfo: $splFileInfo,
-                realPath: realpath($canonicalDemoCounterServicePathname),
-                relativePathname: $canonicalDemoCounterServicePathname,
+                sourceFileInfo: $coveredClassSplFileInfo,
+                realPath: '',
+                relativePathname: '',
                 hasTest: true,
                 tests: new TestLocations(
-                    [
-                        46 => $testLocations,
-                        47 => $testLocations,
-                        49 => $testLocations,
-                        54 => [
+                    byLine: [
+                        9 => [
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_sets_initial_value',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #0',
+                                filePath: null,
+                                executionTime: null,
                             ),
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #1',
+                                filePath: null,
+                                executionTime: null,
                             ),
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_with_default_sets_to_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_affects_subsequent_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #2',
+                                filePath: null,
+                                executionTime: null,
                             ),
                         ],
-                        59 => [
+                        14 => [
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_changes_increment_amount',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #0',
+                                filePath: null,
+                                executionTime: null,
                             ),
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_custom_step_with_multiple_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #1',
+                                filePath: null,
+                                executionTime: null,
                             ),
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_with_default_resets_to_one',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #2',
+                                filePath: null,
+                                executionTime: null,
                             ),
                         ],
-                        64 => [
+                        19 => [
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_set_step_changes_increment_amount',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_multiply',
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        24 => [
+                            new TestLocation(
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
+                                filePath: null,
+                                executionTime: null,
                             ),
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_custom_step_with_multiple_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        25 => [
+                            new TestLocation(
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        28 => [
+                            new TestLocation(
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        33 => [
+                            new TestLocation(
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_is_positive',
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        38 => [
+                            new TestLocation(
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute',
+                                filePath: null,
+                                executionTime: null,
                             ),
                             new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_sets_initial_value',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_count_increments_by_step_and_returns_new_value',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_initial_counter_is_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_negative_step_decreases_counter',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_multiple_counts_increment_correctly',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_complex_scenario',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_with_default_sets_to_zero',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_zero_step_keeps_counter_unchanged',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
-                            ),
-                            new TestLocation(
-                                sprintf(
-                                    '%s::test_start_count_affects_subsequent_counts',
-                                    DemoCounterServiceTest::class,
-                                ),
-                                $testFilePath,
-                                0.022199,
+                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute_zero',
+                                filePath: null,
+                                executionTime: null,
                             ),
                         ],
                     ],
-                    [
-                        'count' => new SourceMethodLineRange(44, 50),
-                        'startCount' => new SourceMethodLineRange(52, 55),
-                        'setStep' => new SourceMethodLineRange(57, 60),
-                        'get' => new SourceMethodLineRange(62, 65),
+                    byMethod: [
+                        'add' => new SourceMethodLineRange(7, 10),
+                        'subtract' => new SourceMethodLineRange(12, 15),
+                        'multiply' => new SourceMethodLineRange(17, 20),
+                        'divide' => new SourceMethodLineRange(22, 29),
+                        'isPositive' => new SourceMethodLineRange(31, 34),
+                        'absolute' => new SourceMethodLineRange(36, 39),
                     ],
                 ),
             ),
         ];
-    }
 
-    /**
-     * @phpstan-assert Trace $actual
-     *
-     * @param string[] $visitedPathnames
-     */
-    private function assertFoundMatchingTrace(
-        array $visitedPathnames,
-        Trace $expected,
-        ?Trace $actual,
-    ): void {
-        if ($actual !== null) {
-            return;
-        }
+        return;
 
-        $this->fail(
-            sprintf(
-                'Expected to find a trace for the source file with the pathname "%s" but none found. %s',
-                $expected->getSourceFileInfo()->getPathname(),
-                count($visitedPathnames) > 0
-                    ? sprintf(
-                        'Found: "%s".',
-                        implode('", "', $visitedPathnames),
-                    )
-                    : 'No trace found.',
+        yield 'covered trait' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Covered/LoggerTrait.php.xml'),
+                namespace: 'p',
             ),
-        );
-    }
+            new TestLocations(
+                byLine: [
+                    11 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_log_method_is_public',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    16 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_log_method_is_public',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    21 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    26 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                ],
+                byMethod: [
+                    'log' => new SourceMethodLineRange(9, 12),
+                    'getLogs' => new SourceMethodLineRange(14, 17),
+                    'clearLogs' => new SourceMethodLineRange(19, 22),
+                    'hasLogs' => new SourceMethodLineRange(24, 27),
+                ],
+            ),
+        ];
 
-    private function copyReportFromTemplateIfMissing(string $coveragePath): void
-    {
-        if (file_exists($coveragePath)) {
-            return;
-        }
+        yield 'covered class with trait' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Covered/UserService.php.xml'),
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    13 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    14 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    15 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    18 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    19 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    20 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    23 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    24 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    25 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    30 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    31 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    32 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    35 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    36 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    37 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    42 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_null_for_non_existent_user',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    47 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_non_existent_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_get_user_returns_user_data',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_user_exists',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_logger_trait_methods',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    52 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_name_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_user_with_empty_email_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_add_duplicate_user_fails',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\UserServiceTest::test_remove_user_successfully',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                ],
+                byMethod: [
+                    'addUser' => new SourceMethodLineRange(11, 26),
+                    'removeUser' => new SourceMethodLineRange(28, 38),
+                    'getUser' => new SourceMethodLineRange(40, 43),
+                    'userExists' => new SourceMethodLineRange(45, 48),
+                    'getUserCount' => new SourceMethodLineRange(50, 53),
+                ],
+            ),
+        ];
 
-        $process = new Process(
-            command: [
-                'make',
-                'phpunit-coverage',
-            ],
-            cwd: self::FIXTURE_DIR,
-            timeout: 5,
-        );
-        $process->mustRun();
+        yield 'covered function' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Covered/functions.php.xml'),
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [
+                    7 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_no_names',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    8 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_no_names',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    11 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    12 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_last_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    15 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    16 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_first_name_only',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                    19 => [
+                        new TestLocation(
+                            method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\FunctionsTest::test_format_name_with_both_names',
+                            filePath: null,
+                            executionTime: null,
+                        ),
+                    ],
+                ],
+                byMethod: [],
+            ),
+        ];
+
+        yield 'uncovered class' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Uncovered/Calculator.php.xml'),
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [],
+            ),
+        ];
+
+        yield 'uncovered trait' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Uncovered/LoggerTrait.php.xml'),
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [],
+            ),
+        ];
+
+        yield 'uncovered class with trait' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Uncovered/UserService.php.xml'),
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [],
+            ),
+        ];
+
+        yield 'uncovered functions' => [
+            SafeDOMXPath::fromFile(
+                Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Uncovered/functions.php.xml'),
+                namespace: 'p',
+            ),
+            new TestLocations(
+                byLine: [],
+                byMethod: [],
+            ),
+        ];
     }
 }

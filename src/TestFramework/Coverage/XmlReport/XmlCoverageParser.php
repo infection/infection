@@ -40,6 +40,7 @@ use DOMNameSpaceNode;
 use DOMNode;
 use DOMNodeList;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\Tracing\Trace\ProxyTrace;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
@@ -54,10 +55,18 @@ use Webmozart\Assert\Assert;
  */
 class XmlCoverageParser
 {
+    public function __construct(
+        private readonly FileSystem $fileSystem,
+    ) {
+    }
+
     public function parse(SourceFileInfoProvider $provider): Trace
     {
+        $sourceFile = $provider->provideFileInfo();
+
         return new ProxyTrace(
-            $provider->provideFileInfo(),
+            $sourceFile,
+            $this->fileSystem->realPath($sourceFile->getPathname()),
             lazy(self::createTestLocationsGenerator($provider->provideXPath())),
         );
     }
