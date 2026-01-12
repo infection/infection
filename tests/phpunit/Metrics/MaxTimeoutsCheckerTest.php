@@ -38,67 +38,57 @@ namespace Infection\Tests\Metrics;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MaxTimeoutsChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MaxTimeoutsChecker::class)]
 final class MaxTimeoutsCheckerTest extends TestCase
 {
-    public function test_it_does_nothing_when_max_timeouts_is_null(): void
+    #[DataProvider('noExceptionProvider')]
+    public function test_it_does_not_throw(?int $maxTimeouts, int $timedOutCount): void
     {
-        $checker = new MaxTimeoutsChecker(null);
+        $checker = new MaxTimeoutsChecker($maxTimeouts);
 
-        $checker->checkTimeouts(100);
+        $checker->checkTimeouts($timedOutCount);
 
         $this->addToAssertionCount(1);
     }
 
-    public function test_it_does_nothing_when_timed_out_count_is_below_limit(): void
+    public static function noExceptionProvider(): iterable
     {
-        $checker = new MaxTimeoutsChecker(10);
+        yield 'null limit allows any count' => [null, 100];
 
-        $checker->checkTimeouts(5);
+        yield 'below limit' => [10, 5];
 
-        $this->addToAssertionCount(1);
+        yield 'at limit' => [10, 10];
     }
 
-    public function test_it_does_nothing_when_timed_out_count_equals_limit(): void
+    #[DataProvider('exceptionProvider')]
+    public function test_it_throws_when_timed_out_count_exceeds_limit(int $maxTimeouts, int $timedOutCount, string $expectedMessage): void
     {
-        $checker = new MaxTimeoutsChecker(10);
-
-        $checker->checkTimeouts(10);
-
-        $this->addToAssertionCount(1);
-    }
-
-    public function test_it_throws_when_timed_out_count_exceeds_limit(): void
-    {
-        $checker = new MaxTimeoutsChecker(5);
+        $checker = new MaxTimeoutsChecker($maxTimeouts);
 
         try {
-            $checker->checkTimeouts(10);
+            $checker->checkTimeouts($timedOutCount);
 
             $this->fail('Expected MaxTimeoutCountReached to be thrown');
         } catch (MaxTimeoutCountReached $exception) {
-            $this->assertSame(
-                'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
-                $exception->getMessage(),
-            );
+            $this->assertSame($expectedMessage, $exception->getMessage());
         }
     }
 
-    public function test_it_throws_when_timed_out_count_exceeds_zero_limit(): void
+    public static function exceptionProvider(): iterable
     {
-        $checker = new MaxTimeoutsChecker(0);
+        yield 'exceeds limit' => [
+            5,
+            10,
+            'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
+        ];
 
-        try {
-            $checker->checkTimeouts(1);
-
-            $this->fail('Expected MaxTimeoutCountReached to be thrown');
-        } catch (MaxTimeoutCountReached $exception) {
-            $this->assertSame(
-                'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
-                $exception->getMessage(),
-            );
-        }
+        yield 'exceeds zero limit' => [
+            0,
+            1,
+            'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
+        ];
     }
 }
