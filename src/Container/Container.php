@@ -245,7 +245,6 @@ final class Container extends DIContainer
 
     public static function create(): self
     {
-        // @phpstan-ignore argument.type
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
