@@ -60,9 +60,9 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
+use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Process;
 
 #[CoversNothing]
@@ -135,9 +135,7 @@ final class PHPUnitCoverageTracerTest extends TestCase
         $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
 
         $splFileInfo = new SplFileInfo(
-            file: self::FIXTURE_DIR . '/src/DemoCounterService.php',
-            relativePath: '/',
-            relativePathname: $canonicalDemoCounterServicePathname,
+            self::FIXTURE_DIR . '/src/DemoCounterService.php',
         );
 
         $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');

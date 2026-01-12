@@ -33,41 +33,53 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\TestFramework\Tracing\Trace;
+namespace Infection\Tests\TestingUtility\FileSystem;
 
-use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
-use Infection\TestFramework\Tracing\Trace\TestLocations;
-use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\Tests\UnsupportedMethod;
-use SplFileInfo;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class FakeTrace implements Trace
+#[CoversClass(MockSplFileInfo::class)]
+final class MockSplFileInfoTest extends TestCase
 {
-    public function getSourceFileInfo(): SplFileInfo
+    public function test_it_can_be_created_for_a_real_file_from_a_path(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $fileInfo = new MockSplFileInfo(__FILE__);
+
+        $this->assertSame(__FILE__, $fileInfo->getPathname());
+        $this->assertFalse($fileInfo->getRealPath());
     }
 
-    public function getRealPath(): string
+    public function test_it_can_be_created_for_a_fake_file_from_a_path(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $fileInfo = new MockSplFileInfo('/path/to/file');
+
+        $this->assertSame('/path/to/file', $fileInfo->getPathname());
+        $this->assertFalse($fileInfo->getRealPath());
+
+        $anotherFileInfo = new MockSplFileInfo('file');
+
+        $this->assertSame('file', $anotherFileInfo->getPathname());
+        $this->assertFalse($anotherFileInfo->getRealPath());
     }
 
-    public function hasTests(): bool
+    public function test_it_can_be_created_for_a_real_file_for_a_realpath(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $fileInfo = new MockSplFileInfo(realPath: __FILE__);
+
+        $this->assertSame('file.txt', $fileInfo->getPathname());
+        $this->assertSame(__FILE__, $fileInfo->getRealPath());
     }
 
-    public function getTests(): TestLocations
+    public function test_it_can_be_created_for_a_fake_file_for_a_realpath(): void
     {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
-    }
+        $fileInfo = new MockSplFileInfo(realPath: '/path/to/file');
 
-    public function getAllTestsForMutation(NodeLineRangeData $lineRange, bool $isOnFunctionSignature): iterable
-    {
-        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+        $this->assertSame('file.txt', $fileInfo->getPathname());
+        $this->assertSame('/path/to/file', $fileInfo->getRealPath());
+
+        $anotherFileInfo = new MockSplFileInfo(realPath: 'file');
+
+        $this->assertSame('file.txt', $anotherFileInfo->getPathname());
+        $this->assertSame('file', $anotherFileInfo->getRealPath());
     }
 }

@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Tracing\Trace;
 
 use Infection\TestFramework\Coverage\XmlReport\TestLocator;
 use Later\Interfaces\Deferred;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**
