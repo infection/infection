@@ -30,32 +30,9 @@ concurrency:
 
 env:
   PHP_VERSION: '8.2'
-  METRICS_COMMIT_PREFIX: "perf: Add metrics for"
 
 jobs:
-  check:
-    name: Check if should run
-    runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.check.outputs.skip }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 2
-
-      - name: Check commit message
-        id: check
-        run: |
-          COMMIT_MSG="$(git log -1 --format='%s')"
-          if [[ "$COMMIT_MSG" == "$METRICS_COMMIT_PREFIX"* ]]; then
-            echo "Skipping - triggered by metrics commit: $COMMIT_MSG"
-            echo "skip=true" >> $GITHUB_OUTPUT
-          fi
-
   collect:
-    needs: check
-    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -197,9 +174,9 @@ jobs:
           SHORT_SHA="${SHORT_SHA:0:7}"
           REF_INPUT="${{ github.event.inputs.ref }}"
           if [[ -n "$REF_INPUT" ]]; then
-            COMMIT_MSG="$METRICS_COMMIT_PREFIX $REF_INPUT ($SHORT_SHA)"
+            COMMIT_MSG="perf: Add metrics for $REF_INPUT ($SHORT_SHA)"
           else
-            COMMIT_MSG="$METRICS_COMMIT_PREFIX $SHORT_SHA"
+            COMMIT_MSG="perf: Add metrics for $SHORT_SHA"
           fi
 
           git commit -m "$COMMIT_MSG"
