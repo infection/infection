@@ -58,6 +58,7 @@ use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use SplFileInfo;
@@ -65,6 +66,7 @@ use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
 
+#[Group('integration')]
 #[CoversNothing]
 final class PHPUnitCoverageTracerTest extends TestCase
 {
