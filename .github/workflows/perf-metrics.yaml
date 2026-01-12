@@ -78,7 +78,7 @@ jobs:
             --coverage-xml=var/coverage/coverage-xml \
             --log-junit=var/coverage/junit.xml
 
-      - name: Setup PHP for mutation testing
+      - name: Re-configure PHP for mutation testing without pcov and with opcache
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # master
         with:
           php-version: ${{ env.PHP_VERSION }}
