@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use Infection\TestFramework\Coverage\JUnit\JUnitReportLocator;
+use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
+use Infection\Testing\SingletonContainer;
+use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\NullOutput;
 use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
@@ -84,26 +89,48 @@ final class TracerIntegrationTest extends TestCase
             ->method('hasJUnitReport')
             ->willReturn(true);
 
-        $this->tracer = new TraceProviderAdapterTracer(
-            new CoveredTraceProvider(
-                new PhpUnitXmlCoverageTraceProvider(
-                    indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                    indexParser: new IndexXmlCoverageParser(
-                        isSourceFiltered: false,
-                        fileSystem: new FileSystem(),
-                    ),
-                    parser: new XmlCoverageParser(),
-                ),
-                new JUnitTestExecutionInfoAdder(
-                    $testFrameworkAdapterStub,
-                    new MemoizedTestFileDataProvider(
-                        new JUnitTestFileDataProvider(
-                            new FixedLocator($coveragePath . '/junit.xml'),
-                        ),
-                    ),
-                ),
-            ),
-        );
+        $this->tracer = SingletonContainer::getContainer()
+            ->withValues(
+                logger: new NullLogger(),
+                output: new NullOutput(),
+                skipInitialTests: true,
+                existingCoveragePath: $coveragePath,
+                sourceFilter: null,
+            )
+            ->withService(
+                IndexXmlCoverageLocator::class,
+                static fn () => new FixedLocator($coveragePath . '/xml/index.xml'),
+            )
+            ->withService(
+                JUnitReportLocator::class,
+                static fn () => new FixedLocator($coveragePath . '/junit.xml'),
+            )
+            ->withService(
+                TestFrameworkAdapter::class,
+                static fn () => $testFrameworkAdapterStub,
+            )
+            ->getTracer();
+
+//        $this->tracer = new TraceProviderAdapterTracer(
+//            new CoveredTraceProvider(
+//                new PhpUnitXmlCoverageTraceProvider(
+//                    indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
+//                    indexParser: new IndexXmlCoverageParser(
+//                        isSourceFiltered: false,
+//                        fileSystem: new FileSystem(),
+//                    ),
+//                    parser: new XmlCoverageParser(),
+//                ),
+//                new JUnitTestExecutionInfoAdder(
+//                    $testFrameworkAdapterStub,
+//                    new MemoizedTestFileDataProvider(
+//                        new JUnitTestFileDataProvider(
+//                            new FixedLocator($coveragePath . '/junit.xml'),
+//                        ),
+//                    ),
+//                ),
+//            ),
+//        );
 
         $this->copyReportFromTemplateIfMissing($coveragePath);
     }
