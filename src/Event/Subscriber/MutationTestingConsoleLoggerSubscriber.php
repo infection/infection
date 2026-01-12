@@ -82,7 +82,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         private readonly FederatedLogger $mutationTestingResultsLogger,
         private readonly ?int $numberOfShownMutations,
         private readonly bool $withUncovered,
-        private readonly bool $withTimeouts = false,
+        private readonly bool $withTimeouts,
     ) {
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }

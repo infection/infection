@@ -55,7 +55,7 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
         private ?int $numberOfShownMutations,
         private OutputFormatter $formatter,
         private bool $withUncovered,
-        private bool $withTimeouts = false,
+        private bool $withTimeouts,
     ) {
     }
 

@@ -47,11 +47,10 @@ final class MaxTimeoutsCheckerTest extends TestCase
     #[DataProvider('noExceptionProvider')]
     public function test_it_does_not_throw(?int $maxTimeouts, int $timedOutCount): void
     {
+        $this->expectNotToPerformAssertions();
+
         $checker = new MaxTimeoutsChecker($maxTimeouts);
-
         $checker->checkTimeouts($timedOutCount);
-
-        $this->addToAssertionCount(1);
     }
 
     public static function noExceptionProvider(): iterable
@@ -64,31 +63,18 @@ final class MaxTimeoutsCheckerTest extends TestCase
     }
 
     #[DataProvider('exceptionProvider')]
-    public function test_it_throws_when_timed_out_count_exceeds_limit(int $maxTimeouts, int $timedOutCount, string $expectedMessage): void
+    public function test_it_throws_when_timed_out_count_exceeds_limit(int $maxTimeouts, int $timedOutCount): void
     {
+        $this->expectExceptionObject(MaxTimeoutCountReached::create($maxTimeouts, $timedOutCount));
+
         $checker = new MaxTimeoutsChecker($maxTimeouts);
-
-        try {
-            $checker->checkTimeouts($timedOutCount);
-
-            $this->fail('Expected MaxTimeoutCountReached to be thrown');
-        } catch (MaxTimeoutCountReached $exception) {
-            $this->assertSame($expectedMessage, $exception->getMessage());
-        }
+        $checker->checkTimeouts($timedOutCount);
     }
 
     public static function exceptionProvider(): iterable
     {
-        yield 'exceeds limit' => [
-            5,
-            10,
-            'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
-        ];
+        yield 'exceeds limit' => [5, 10];
 
-        yield 'exceeds zero limit' => [
-            0,
-            1,
-            'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
-        ];
+        yield 'exceeds zero limit' => [0, 1];
     }
 }

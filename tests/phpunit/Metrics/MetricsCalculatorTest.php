@@ -137,13 +137,13 @@ final class MetricsCalculatorTest extends TestCase
             1,
         );
 
-        // First call creates and caches Calculator
+        // First call creates and memoizes Calculator
         $metricsCalculator->getMutationScoreIndicator();
 
         $calculatorProperty = new ReflectionProperty($metricsCalculator, 'calculator');
         $firstCalculator = $calculatorProperty->getValue($metricsCalculator);
 
-        // Second call should reuse cached Calculator
+        // Second call should reuse memoized Calculator
         $metricsCalculator->getCoveredCodeMutationScoreIndicator();
 
         $secondCalculator = $calculatorProperty->getValue($metricsCalculator);

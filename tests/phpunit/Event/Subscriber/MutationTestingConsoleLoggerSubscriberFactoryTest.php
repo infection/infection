@@ -54,6 +54,7 @@ use PHPUnit\Framework\TestCase;
 use function Safe\fopen;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
+use function str_replace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
@@ -98,7 +99,8 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             new FederatedLogger(),
             $numberOfShownMutations,
             new FakeOutputFormatter(),
-            true, // showMutationScoreIndicator
+            withUncovered: true,
+            withTimeouts: false,
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
@@ -136,7 +138,6 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $resultsCollector->expects($this->never())
             ->method('getTimedOutExecutionResults');
 
-        // When withTimeouts is not passed, the factory uses the default value of false
         $factory = new MutationTestingConsoleLoggerSubscriberFactory(
             $metricsCalculator,
             $resultsCollector,
@@ -144,8 +145,8 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             new FederatedLogger(),
             20,
             $outputFormatter,
-            false, // withUncovered
-            // withTimeouts defaults to false - NOT passed
+            withUncovered: false,
+            withTimeouts: false,
         );
 
         $subscriber = $factory->create($output);
@@ -198,8 +199,8 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             new FederatedLogger(),
             20,
             $outputFormatter,
-            false, // withUncovered
-            true,  // withTimeouts = true
+            withUncovered: false,
+            withTimeouts: true,
         );
 
         $subscriber = $factory->create($output);
