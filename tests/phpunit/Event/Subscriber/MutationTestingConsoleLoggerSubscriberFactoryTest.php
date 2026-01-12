@@ -229,6 +229,6 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 
         $display = stream_get_contents($output->getStream());
 
-        return str_replace(PHP_EOL, "\n", $display);
+        return Str::toUnixLineEndings($display);
     }
 }
