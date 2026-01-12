@@ -245,6 +245,7 @@ final class Container extends DIContainer
 
     public static function create(): self
     {
+        // @phpstan-ignore argument.type
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
             Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
@@ -1149,6 +1150,7 @@ final class Container extends DIContainer
 
     private function getIndexXmlCoverageLocator(): ReportLocator
     {
+        // @phpstan-ignore argument.type,return.type
         return $this->get('infection.test_framework.coverage.index_xml_coverage_locator');
     }
 
@@ -1159,6 +1161,7 @@ final class Container extends DIContainer
 
     private function getJUnitReportLocator(): ReportLocator
     {
+        // @phpstan-ignore argument.type,return.type
         return $this->get('infection.test_framework.coverage.junit_xml_coverage_locator');
     }
 
