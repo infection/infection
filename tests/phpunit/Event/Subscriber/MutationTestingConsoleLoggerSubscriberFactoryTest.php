@@ -46,6 +46,7 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -226,8 +227,6 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
     {
         rewind($output->getStream());
 
-        $display = stream_get_contents($output->getStream());
-
-        return Str::toUnixLineEndings($display);
+        return str_replace(PHP_EOL, "\n", stream_get_contents($output->getStream()));
     }
 }

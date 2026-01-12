@@ -676,7 +676,8 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->diffColorizer,
             new FederatedLogger(),
             20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
-            true, // showMutationScoreIndicator = true
+            withUncovered: true,
+            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
@@ -716,8 +717,9 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             $this->resultsCollector,
             $this->diffColorizer,
             new FederatedLogger(),
-            20, // Use 20 like other tests to ensure getEscapedExecutionResults is called
-            false, // showMutationScoreIndicator = false
+            20, // Use 20 to ensure getEscapedExecutionResults is called
+            withUncovered: false,
+            withTimeouts: false,
         ));
 
         $dispatcher->dispatch(new MutationTestingWasFinished());
