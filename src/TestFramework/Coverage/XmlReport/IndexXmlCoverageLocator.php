@@ -50,7 +50,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final class IndexXmlCoverageLocator extends BaseReportLocator implements ReportLocator
+final readonly class IndexXmlCoverageLocator extends BaseReportLocator implements ReportLocator
 {
     public const INDEX_FILENAME_REGEX = '/^index\.xml$/i';
 

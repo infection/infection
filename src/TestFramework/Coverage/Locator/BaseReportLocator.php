@@ -53,28 +53,20 @@ use Symfony\Component\Finder\Finder;
  *
  * @internal
  */
-abstract class BaseReportLocator implements ReportLocator
+abstract readonly class BaseReportLocator implements ReportLocator
 {
-    private ?string $report = null;
-
     public function __construct(
-        private readonly FileSystem $filesystem,
-        private readonly string $sourceDirectory,
-        private readonly string $defaultPathname,
+        private FileSystem $filesystem,
+        private string $sourceDirectory,
+        private string $defaultPathname,
     ) {
     }
 
     final public function locate(): string
     {
-        if ($this->report !== null) {
-            return $this->report;
-        }
-
-        $this->report = $this->filesystem->isReadableFile($this->defaultPathname)
+        return $this->filesystem->isReadableFile($this->defaultPathname)
             ? $this->defaultPathname
             : $this->lookup();
-
-        return $this->report;
     }
 
     public function getDefaultLocation(): string

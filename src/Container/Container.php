@@ -142,6 +142,8 @@ use Infection\TestFramework\Coverage\JUnit\JUnitTestExecutionInfoAdder;
 use Infection\TestFramework\Coverage\JUnit\JUnitTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\MemoizedTestFileDataProvider;
 use Infection\TestFramework\Coverage\JUnit\TestFileDataProvider;
+use Infection\TestFramework\Coverage\Locator\CachedLocator;
+use Infection\TestFramework\Coverage\Locator\ReportLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageLocator;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
@@ -257,9 +259,11 @@ final class Container extends DIContainer
                 $container->getIndexXmlCoverageParser(),
                 $container->getXmlCoverageParser(),
             ),
-            IndexXmlCoverageLocator::class => static fn (self $container) => IndexXmlCoverageLocator::create(
-                $container->getFileSystem(),
-                $container->getConfiguration()->coveragePath,
+            'infection.test_framework.coverage.index_xml_coverage_locator' => static fn (self $container): ReportLocator => new CachedLocator(
+                IndexXmlCoverageLocator::create(
+                    $container->getFileSystem(),
+                    $container->getConfiguration()->coveragePath,
+                ),
             ),
             RootsFileOrDirectoryLocator::class => static fn (self $container): RootsFileOrDirectoryLocator => new RootsFileOrDirectoryLocator(
                 [$container->getProjectDir()],
@@ -346,9 +350,11 @@ final class Container extends DIContainer
                     $container->getIndexXmlCoverageLocator(),
                 );
             },
-            JUnitReportLocator::class => static fn (self $container) => JUnitReportLocator::create(
-                $container->getFileSystem(),
-                $container->getConfiguration()->coveragePath,
+            'infection.test_framework.coverage.junit_xml_coverage_locator' => static fn (self $container): ReportLocator => new CachedLocator(
+                JUnitReportLocator::create(
+                    $container->getFileSystem(),
+                    $container->getConfiguration()->coveragePath,
+                ),
             ),
             MinMsiChecker::class => static function (self $container): MinMsiChecker {
                 $config = $container->getConfiguration();
@@ -1141,9 +1147,9 @@ final class Container extends DIContainer
         return $this->get(PhpUnitXmlCoverageTraceProvider::class);
     }
 
-    private function getIndexXmlCoverageLocator(): IndexXmlCoverageLocator
+    private function getIndexXmlCoverageLocator(): ReportLocator
     {
-        return $this->get(IndexXmlCoverageLocator::class);
+        return $this->get('infection.test_framework.coverage.index_xml_coverage_locator');
     }
 
     private function getProjectDir(): string
@@ -1151,9 +1157,9 @@ final class Container extends DIContainer
         return $this->get(ProjectDirProvider::class)->getProjectDir();
     }
 
-    private function getJUnitReportLocator(): JUnitReportLocator
+    private function getJUnitReportLocator(): ReportLocator
     {
-        return $this->get(JUnitReportLocator::class);
+        return $this->get('infection.test_framework.coverage.junit_xml_coverage_locator');
     }
 
     private function getIndexXmlCoverageParser(): IndexXmlCoverageParser

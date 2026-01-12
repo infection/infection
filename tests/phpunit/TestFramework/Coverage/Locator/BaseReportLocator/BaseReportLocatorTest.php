@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\Locator\BaseReportLocator;
 
-use const DIRECTORY_SEPARATOR;
 use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\Locator\BaseReportLocator;
 use Infection\TestFramework\Coverage\Locator\ReportLocator;
@@ -47,7 +46,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
 
 #[Group('integration')]
 #[CoversClass(BaseReportLocator::class)]
@@ -93,7 +91,7 @@ final class BaseReportLocatorTest extends FileSystemTestCase
         $this->assertSame($default, $actual);
     }
 
-    public function test_it_caches_the_result_found_if_the_result_is_located_at_the_default_location(): void
+    public function test_it_checks_the_default_location_first(): void
     {
         $default = '/path/to/default-file';
 
@@ -111,52 +109,9 @@ final class BaseReportLocatorTest extends FileSystemTestCase
             $default,
         );
 
-        $actual1 = $locator->locate();
-        $actual2 = $locator->locate();
+        $actual = $locator->locate();
 
-        $this->assertSame($default, $actual1);
-        $this->assertSame($default, $actual2);
-    }
-
-    public function test_it_caches_the_result_found(): void
-    {
-        $default = '/path/to/default-file';
-
-        $fileSystemMock = $this->createMock(FileSystem::class);
-
-        $fileSystemMock
-            ->expects($this->once())
-            ->method('isReadableFile')
-            ->with($default)
-            ->willReturn(false);
-
-        $fileSystemMock
-            ->expects($this->once())
-            ->method('isReadableDirectory')
-            ->with($this->tmp)
-            ->willReturn(true);
-
-        // We do not want to mock the Finder here because it's a PITA, but we still
-        // want to spy on the behaviour of the FileSystem service.
-        $fileSystemMock
-            ->expects($this->once())
-            ->method('createFinder')
-            ->willReturn(Finder::create());
-
-        $this->fileSystem->touch('report.demo');
-        $expected = Path::normalize($this->tmp . DIRECTORY_SEPARATOR . 'report.demo');
-
-        $locator = new DemoReportLocator(
-            $fileSystemMock,
-            $this->tmp,
-            $default,
-        );
-
-        $actual1 = $locator->locate();
-        $actual2 = $locator->locate();
-
-        $this->assertSame($expected, $actual1);
-        $this->assertSame($expected, $actual2);
+        $this->assertSame($default, $actual);
     }
 
     public function test_it_cannot_find_the_report_if_the_source_directory_is_invalid(): void

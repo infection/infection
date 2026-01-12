@@ -50,7 +50,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * @internal
  */
-final class JUnitReportLocator extends BaseReportLocator implements ReportLocator
+final readonly class JUnitReportLocator extends BaseReportLocator implements ReportLocator
 {
     public const JUNIT_FILENAME_REGEX = '/^(.+\.)?junit\.xml$/i';
 
