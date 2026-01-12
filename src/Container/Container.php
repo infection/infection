@@ -1150,6 +1150,7 @@ final class Container extends DIContainer
 
     private function getIndexXmlCoverageLocator(): ReportLocator
     {
+        /** @psalm-suppress UndefinedClass */
         // @phpstan-ignore argument.type,return.type
         return $this->get('infection.test_framework.coverage.index_xml_coverage_locator');
     }
@@ -1161,6 +1162,7 @@ final class Container extends DIContainer
 
     private function getJUnitReportLocator(): ReportLocator
     {
+        /** @psalm-suppress UndefinedClass */
         // @phpstan-ignore argument.type,return.type
         return $this->get('infection.test_framework.coverage.junit_xml_coverage_locator');
     }
