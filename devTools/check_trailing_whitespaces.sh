@@ -23,6 +23,9 @@
 
 set -eu
 
+stderr_file=$(mktemp)
+trap 'rm -f "$stderr_file"' EXIT
+
 files_with_trailing_spaces=$(
     git grep -In "\\s$" \
         ':!tests/autoloaded/*' \
@@ -32,8 +35,14 @@ files_with_trailing_spaces=$(
         ':!tests/phpunit/TestFramework/PhpUnit/Config/Builder/Fixtures/format-whitespace/original-phpunit.xml' \
         ':!tests/benchmark/Tracing/benchmark-source' \
         ':!tests/benchmark/MutationGenerator/sources.tar.gz' \
+        2>"$stderr_file" \
     | sort -fh
-)
+) || true
+
+if [[ -s "$stderr_file" ]]; then
+    cat "$stderr_file" >&2
+    exit 1
+fi
 
 if [ "$files_with_trailing_spaces" ]
 then
