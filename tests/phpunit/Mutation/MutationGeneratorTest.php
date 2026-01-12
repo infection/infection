@@ -45,26 +45,22 @@ use Infection\Mutation\MutationGenerator;
 use Infection\Mutator\IgnoreConfig;
 use Infection\Mutator\IgnoreMutator;
 use Infection\Source\Collector\FixedSourceCollector;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
 use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use Infection\Tests\WithConsecutive;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 #[CoversClass(MutationGenerator::class)]
 final class MutationGeneratorTest extends TestCase
 {
     public function test_it_returns_all_the_mutations_generated_for_each_files(): void
     {
-        $fileInfoA = new MockSplFileInfo([
-            'file' => 'testA.txt',
-        ]);
-        $fileInfoB = new MockSplFileInfo([
-            'file' => 'testB.txt',
-        ]);
+        $fileInfoA = new MockSplFileInfo('testA.txt');
+        $fileInfoB = new MockSplFileInfo('testB.txt');
 
         $sourceCollector = new FixedSourceCollector(
             [
@@ -141,16 +137,8 @@ final class MutationGeneratorTest extends TestCase
 
         $sourceCollector = new FixedSourceCollector(
             [
-                new SplFileInfo(
-                    'fileA',
-                    'relativePathToFileA',
-                    'relativePathnameToFileA',
-                ),
-                new SplFileInfo(
-                    'fileB',
-                    'relativePathToFileB',
-                    'relativePathnameToFileB',
-                ),
+                new SplFileInfo('fileA'),
+                new SplFileInfo('fileB'),
             ],
         );
 

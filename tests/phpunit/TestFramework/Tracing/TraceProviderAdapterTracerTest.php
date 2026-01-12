@@ -40,7 +40,7 @@ use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use Infection\Tests\TestingUtility\Iterable\NonRewindableIterator;
 use Infection\Tests\TestingUtility\Iterable\TrackableIterator;
 use Infection\Tests\TestingUtility\Iterable\YieldOnceIterator;
@@ -48,7 +48,7 @@ use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 #[CoversClass(TraceProviderAdapterTracer::class)]
 final class TraceProviderAdapterTracerTest extends TestCase
@@ -151,16 +151,16 @@ final class TraceProviderAdapterTracerTest extends TestCase
     {
         // Comes from the Symfony Finder.
         // See https://github.com/infection/infection/pull/2789#issuecomment-3710366303
-        $sourceFileInfo = new MockSplFileInfo([
-            'name' => 'C:/path/to/project/src\Admin\Admin.php',
-            'realPath' => 'C:\path\to\project\src\Admin\Admin.php',
-        ]);
+        $sourceFileInfo = new MockSplFileInfo(
+            'C:/path/to/project/src\Admin\Admin.php',
+            'C:\path\to\project\src\Admin\Admin.php',
+        );
 
         // Comes from SourceFileInfoProvider
-        $coverageFileInfo = new MockSplFileInfo([
-            'name' => 'C:\path\to\project\src\Admin\Admin.php',
-            'realPath' => 'C:\path\to\project\src\Admin\Admin.php',
-        ]);
+        $coverageFileInfo = new MockSplFileInfo(
+            'C:\path\to\project\src\Admin\Admin.php',
+            'C:\path\to\project\src\Admin\Admin.php',
+        );
 
         $tracesIterator = new ArrayIterator([
             $trace = $this->createTraceMock($coverageFileInfo),
@@ -197,10 +197,7 @@ final class TraceProviderAdapterTracerTest extends TestCase
      */
     private static function createDummySplFileInfo(string $name): MockSplFileInfo
     {
-        return new MockSplFileInfo([
-            'name' => $name,
-            'realPath' => $name,
-        ]);
+        return new MockSplFileInfo($name, $name);
     }
 
     /**

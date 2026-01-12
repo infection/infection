@@ -39,12 +39,12 @@ use Infection\Source\Collector\FakeSourceCollector;
 use Infection\Source\Collector\FixedSourceCollector;
 use Infection\Source\Collector\LazySourceCollector;
 use Infection\Source\Collector\SourceCollector;
-use Infection\Tests\Fixtures\Finder\MockSplFileInfo;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 #[CoversClass(LazySourceCollector::class)]
 final class LazySourceCollectorTest extends TestCase

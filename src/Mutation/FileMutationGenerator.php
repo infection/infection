@@ -51,7 +51,7 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 use Webmozart\Assert\Assert;
 
 /**

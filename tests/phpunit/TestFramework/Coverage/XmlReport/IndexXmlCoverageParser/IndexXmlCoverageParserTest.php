@@ -35,137 +35,189 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 
-use function array_diff;
+use function dirname;
+use Exception;
+use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixture;
 use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
-use function iterator_to_array;
+use Infection\Tests\TestingUtility\FS;
+use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function Safe\file_get_contents;
+use function Safe\file_put_contents;
 use function Safe\preg_replace;
+use function Safe\unlink;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Traversable;
 
 #[Group('integration')]
 #[CoversClass(IndexXmlCoverageParser::class)]
 final class IndexXmlCoverageParserTest extends TestCase
 {
-    private static ?string $fixturesXmlFileName = null;
+    use ExpectsThrowables;
 
     private static ?string $fixturesOldXmlFileName = null;
 
-    private FileSystem $fileSystem;
-
-    private IndexXmlCoverageParser $parser;
+    private string $generatedIndexXmlPath;
 
     protected function setUp(): void
     {
-        $this->fileSystem = new FileSystem();
-        $this->parser = new IndexXmlCoverageParser(
-            false,
-            $this->fileSystem,
-        );
+        $this->generatedIndexXmlPath = FS::tmpFile('IndexXmlCoverageParserTest');
     }
 
-    #[DataProvider('coverageProvider')]
-    public function test_it_collects_data_recursively_for_all_files(
-        string $coverageIndexPath,
+    protected function tearDown(): void
+    {
+        unlink($this->generatedIndexXmlPath);
+    }
+
+    /**
+     * @param list<SourceFileInfoProvider>|Exception $expected
+     */
+    #[DataProvider('indexProvider')]
+    public function test_it_provides_file_information(
+        string $pathname,
         string $coverageBasePath,
+        array|Exception $expected,
     ): void {
-        $sourceFilesData = $this->parser->parse(
-            $coverageIndexPath,
+        $parser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
+        );
+
+        if ($expected instanceof Exception) {
+            $this->expectExceptionObject($expected);
+        }
+
+        $actual = $parser->parse(
+            $pathname,
             $coverageBasePath,
         );
 
-        // zeroLevel + noPercentage + firstLevel + secondLevel
-        $this->assertCount(5, [...$sourceFilesData]);
-    }
+        $actual = take($actual)->toAssoc();
 
-    public function test_it_has_correct_coverage_data_for_each_file(): void
-    {
-        $sourceFilesData = $this->parser->parse(
-            self::getFixturesXmlFileName(),
-            XmlCoverageFixtures::FIXTURES_COVERAGE_DIR,
-        );
-
-        $this->assertCoverageFixtureSame(
-            XmlCoverageFixtures::provideFixtures(),
-            $sourceFilesData,
-        );
-    }
-
-    public function test_it_correctly_parses_xml_when_directory_has_absolute_path_for_old_phpunit_versions(): void
-    {
-        $sourceFilesData = $this->parser->parse(
-            __DIR__ . '/phpunit6_index_with_absolute_path.xml',
-            __DIR__,
-        );
-
-        $this->assertCoverageFixtureSame([], $sourceFilesData);
-    }
-
-    public function test_it_has_correct_coverage_data_for_each_file_for_old_phpunit_versions(): void
-    {
-        $sourceFilesData = $this->parser->parse(
-            self::getOldFixturesXmlFileName(),
-            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
-        );
-
-        $this->assertCoverageFixtureSame(
-            XmlCoverageFixtures::providePhpUnit6Fixtures(),
-            $sourceFilesData,
-        );
+        if (!($expected instanceof Exception)) {
+            $this->assertEquals($expected, $actual);
+        }
     }
 
     #[DataProvider('noCoveredLineReportProviders')]
     public function test_it_errors_when_no_lines_were_executed(string $xml): void
     {
-        $filename = __DIR__ . '/generated_index.xml';
-        $this->fileSystem->dumpFile($filename, $xml);
+        file_put_contents($this->generatedIndexXmlPath, $xml);
 
-        $this->expectException(NoSourceFound::class);
-
-        $this->parser->parse(
-            $filename,
-            __DIR__,
+        $unfilteredParser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
         );
+
+        $unfilteredNoSourceFound = $this->expectToThrow(
+            fn () => $unfilteredParser->parse(
+                $this->generatedIndexXmlPath,
+                __DIR__,
+            ),
+        );
+
+        $this->assertInstanceOf(NoSourceFound::class, $unfilteredNoSourceFound);
+        $this->assertFalse($unfilteredNoSourceFound->isSourceFiltered);
+
+        $filteredParser = new IndexXmlCoverageParser(
+            isSourceFiltered: true,
+            fileSystem: new FakeFileSystem(),
+        );
+
+        $filteredNoSourceFound = $this->expectToThrow(
+            fn () => $filteredParser->parse(
+                $this->generatedIndexXmlPath,
+                __DIR__,
+            ),
+        );
+
+        $this->assertInstanceOf(NoSourceFound::class, $filteredNoSourceFound);
+        $this->assertTrue($filteredNoSourceFound->isSourceFiltered);
     }
 
-    #[DataProvider('noCoveredLineReportProviders')]
-    public function test_it_errors_for_git_diff_lines_mode_when_no_lines_were_executed(string $xml): void
+    public static function indexProvider(): iterable
     {
-        $filename = __DIR__ . '/generated_index.xml';
-        $this->fileSystem->dumpFile($filename, $xml);
+        $nominalPhpUnitIndexPath = Path::canonicalize(__DIR__ . '/index.xml');
 
-        $this->expectException(NoSourceFound::class);
-
-        (new IndexXmlCoverageParser(
-            true,
-            $this->fileSystem,
-        ))->parse(
-            $filename,
-            __DIR__,
+        $createNominalSourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $nominalPhpUnitIndexPath,
+            coverageDir: dirname($nominalPhpUnitIndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/src',
+            fileSystem: new FakeFileSystem(),
         );
-    }
 
-    public static function coverageProvider(): iterable
-    {
         yield 'nominal' => [
-            Path::canonicalize(__DIR__ . '/index.xml'),
-            __DIR__,
+            $nominalPhpUnitIndexPath,
+            dirname($nominalPhpUnitIndexPath),
+            [
+                $createNominalSourceFileInfo('FirstLevel/firstLevel.php.xml'),
+                $createNominalSourceFileInfo('FirstLevel/SecondLevel/secondLevel.php.xml'),
+                $createNominalSourceFileInfo('FirstLevel/SecondLevel/secondLevelTrait.php.xml'),
+                $createNominalSourceFileInfo('zeroLevel.php.xml'),
+                $createNominalSourceFileInfo('noPercentage.php.xml'),
+            ],
         ];
 
+        $phpunit6OrLessIndexPath = Path::canonicalize(__DIR__ . '/index-for_phpunit6_and_less.xml');
+
+        $createPhp6OrLessSourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $phpunit6OrLessIndexPath,
+            coverageDir: dirname($phpunit6OrLessIndexPath),
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: '/path/to/src',
+            fileSystem: new FakeFileSystem(),
+        );
+
         yield 'PHPUnit <6' => [
-            Path::canonicalize(__DIR__ . '/index-for_phpunit6_and_less.xml'),
+            $phpunit6OrLessIndexPath,
+            dirname($phpunit6OrLessIndexPath),
+            [
+                $createPhp6OrLessSourceFileInfo('FirstLevel/firstLevel.php.xml'),
+                $createPhp6OrLessSourceFileInfo('FirstLevel/SecondLevel/secondLevel.php.xml'),
+                $createPhp6OrLessSourceFileInfo('FirstLevel/SecondLevel/secondLevelTrait.php.xml'),
+                $createPhp6OrLessSourceFileInfo('zeroLevel.php.xml'),
+                $createPhp6OrLessSourceFileInfo('noPercentage.php.xml'),
+            ],
+        ];
+
+        $oldFixturesIndexPath = Path::canonicalize(self::getOldFixturesXmlFileName());
+
+        $createOldFixturesSourceFileInfo = static fn (
+            string $relativeCoverageFilePath,
+        ) => new SourceFileInfoProvider(
+            coverageIndexPath: $oldFixturesIndexPath,
+            coverageDir: XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
+            relativeCoverageFilePath: $relativeCoverageFilePath,
+            projectSource: Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
+            fileSystem: new FakeFileSystem(),
+        );
+
+        yield 'old coverage' => [
+            self::getOldFixturesXmlFileName(),
+            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
+            [
+                $createOldFixturesSourceFileInfo('Middleware/ReleaseRecordedEventsMiddleware.php.xml'),
+            ],
+        ];
+
+        yield 'parses the XML when directory has absolute path for old PHPUnit versions' => [
+            __DIR__ . '/phpunit6_index_with_absolute_path.xml',
             __DIR__,
+            [],
         ];
     }
 
@@ -241,12 +293,16 @@ final class IndexXmlCoverageParserTest extends TestCase
                 </phpunit>
             XML;
 
-        $filename = __DIR__ . '/generated_index.xml';
-        $this->fileSystem->dumpFile($filename, $xml);
+        file_put_contents($this->generatedIndexXmlPath, $xml);
+
+        $parser = new IndexXmlCoverageParser(
+            isSourceFiltered: false,
+            fileSystem: new FakeFileSystem(),
+        );
 
         // Note that the result is lazy, hence the exception is not thrown (yet).
-        $sources = $this->parser->parse(
-            $filename,
+        $sources = $parser->parse(
+            $this->generatedIndexXmlPath,
             __DIR__,
         );
 
@@ -254,7 +310,7 @@ final class IndexXmlCoverageParserTest extends TestCase
             new InvalidCoverage(
                 sprintf(
                     'Could not find the source attribute for the project in the file "%s".',
-                    $filename,
+                    $this->generatedIndexXmlPath,
                 ),
             ),
         );
@@ -262,33 +318,6 @@ final class IndexXmlCoverageParserTest extends TestCase
         foreach ($sources as $source) {
             return;
         }
-    }
-
-    private static function getFixturesXmlFileName(): string
-    {
-        if (self::$fixturesXmlFileName !== null) {
-            return self::$fixturesXmlFileName;
-        }
-
-        $sourceXml = Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/index.xml');
-
-        $xml = file_get_contents($sourceXml);
-
-        // Replaces dummy source path with the real path
-        $correctedXml = preg_replace(
-            '/(source=\").*?(\")/',
-            sprintf(
-                '$1%s$2',
-                Path::canonicalize(XmlCoverageFixtures::FIXTURES_SRC_DIR),
-            ),
-            $xml,
-        );
-
-        self::$fixturesXmlFileName = Path::canonicalize(XmlCoverageFixtures::FIXTURES_COVERAGE_DIR . '/generated_index.xml');
-
-        (new FileSystem())->dumpFile(self::$fixturesXmlFileName, $correctedXml);
-
-        return self::$fixturesXmlFileName;
     }
 
     private static function getOldFixturesXmlFileName(): string
@@ -316,44 +345,5 @@ final class IndexXmlCoverageParserTest extends TestCase
         (new FileSystem())->dumpFile(self::$fixturesOldXmlFileName, $correctedXml);
 
         return self::$fixturesOldXmlFileName;
-    }
-
-    /**
-     * @param iterable<XmlCoverageFixture> $coverageFixtures
-     * @param iterable<SourceFileInfoProvider> $sourceFilesData
-     */
-    private function assertCoverageFixtureSame(
-        iterable $coverageFixtures,
-        iterable $sourceFilesData,
-    ): void {
-        $this->assertSame([], array_diff(
-            // Fixtures are not expected to be in any particular order
-            iterator_to_array(self::xmlCoverageFixturesToList($coverageFixtures), false),
-            iterator_to_array(self::sourceFileInfoProvidersToList($sourceFilesData), false),
-        ));
-    }
-
-    /**
-     * @param iterable<SourceFileInfoProvider> $sourceFilesData
-     *
-     * @return Traversable<string>
-     */
-    private static function sourceFileInfoProvidersToList(iterable $sourceFilesData): Traversable
-    {
-        foreach ($sourceFilesData as $provider) {
-            yield $provider->provideFileInfo()->getPathname();
-        }
-    }
-
-    /**
-     * @param iterable<XmlCoverageFixture> $fixtures
-     *
-     * @return Traversable<string>
-     */
-    private static function xmlCoverageFixturesToList(iterable $fixtures): Traversable
-    {
-        foreach ($fixtures as $fixture) {
-            yield $fixture->sourceFilePath;
-        }
     }
 }
