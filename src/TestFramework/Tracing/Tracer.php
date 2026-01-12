@@ -37,7 +37,7 @@ namespace Infection\TestFramework\Tracing;
 
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * The test framework Tracer is the service responsible for creating a Trace for a given file, i.e.

@@ -50,9 +50,9 @@ use function max;
 use function min;
 use Psr\Log\NullLogger;
 use function round;
+use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';

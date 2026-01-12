@@ -249,7 +249,10 @@ final class BasicSourceCollectorTest extends FileSystemTestCase
             $this->expectExceptionObject($expected);
         }
 
-        $actual = take($collector->collect())
+        /** @var FinderSplFileInfo[] $fileInfos */
+        $fileInfos = $collector->collect();
+
+        $actual = take($fileInfos)
             ->map(static fn (FinderSplFileInfo $fileInfo) => $fileInfo->getRelativePathname())
             ->toList();
 
