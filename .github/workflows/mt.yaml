@@ -74,8 +74,8 @@ jobs:
       - name: Collect coverage report
         run: |
           php vendor/phpunit/phpunit/phpunit --stop-on-failure \
-            --coverage-xml=var/logs/coverage-xml \
-            --log-junit=var/logs/junit.xml
+            --coverage-xml=var/coverage/coverage-xml \
+            --log-junit=var/coverage/junit.xml
 
       - name: Setup PHP for mutation testing
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
@@ -97,7 +97,7 @@ jobs:
             --skip-initial-tests \
             --min-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
-            --coverage=var/logs \
+            --coverage=var/coverage \
             --log-verbosity=none \
             --no-interaction \
             --no-progress
