@@ -37,6 +37,7 @@ namespace Infection\Tests\Container;
 
 use function array_keys;
 use Error;
+use function in_array;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Container\Container;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
@@ -137,12 +138,19 @@ final class ContainerTest extends TestCase
 
     public static function provideServicesWithReflection(): iterable
     {
+        $nonClassServiceIds = [
+            'infection.test_framework.coverage.index_xml_coverage_locator',
+            'infection.test_framework.coverage.junit_xml_coverage_locator',
+        ];
+
         $reflection = new ContainerReflection(
             SingletonContainer::getContainer(),
         );
 
         foreach (array_keys($reflection->getFactories()) as $id) {
-            yield $id => [$id];
+            if (!in_array($id, $nonClassServiceIds, true)) {
+                yield $id => [$id];
+            }
         }
     }
 
