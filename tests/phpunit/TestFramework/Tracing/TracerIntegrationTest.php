@@ -35,9 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
-use function count;
 use function file_exists;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
@@ -52,12 +50,14 @@ use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Infection\TestFramework\Tracing\TraceProvider;
+use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
+use Infection\TestFramework\Tracing\Tracer;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use SplFileInfo;
@@ -65,14 +65,15 @@ use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Process\Process;
 
+#[Group('integration')]
 #[CoversNothing]
-final class PHPUnitCoverageTracerTest extends TestCase
+final class TracerIntegrationTest extends TestCase
 {
     private const FIXTURE_DIR = __DIR__ . '/Fixtures';
 
     private const COVERAGE_REPORT_DIR = self::FIXTURE_DIR . '/phpunit-coverage';
 
-    private TraceProvider $provider;
+    private Tracer $tracer;
 
     protected function setUp(): void
     {
@@ -83,20 +84,22 @@ final class PHPUnitCoverageTracerTest extends TestCase
             ->method('hasJUnitReport')
             ->willReturn(true);
 
-        $this->provider = new CoveredTraceProvider(
-            new PhpUnitXmlCoverageTraceProvider(
-                indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                indexParser: new IndexXmlCoverageParser(
-                    isSourceFiltered: false,
-                    fileSystem: new FileSystem(),
+        $this->tracer = new TraceProviderAdapterTracer(
+            new CoveredTraceProvider(
+                new PhpUnitXmlCoverageTraceProvider(
+                    indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
+                    indexParser: new IndexXmlCoverageParser(
+                        isSourceFiltered: false,
+                        fileSystem: new FileSystem(),
+                    ),
+                    parser: new XmlCoverageParser(),
                 ),
-                parser: new XmlCoverageParser(),
-            ),
-            new JUnitTestExecutionInfoAdder(
-                $testFrameworkAdapterStub,
-                new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider(
-                        new FixedLocator($coveragePath . '/junit.xml'),
+                new JUnitTestExecutionInfoAdder(
+                    $testFrameworkAdapterStub,
+                    new MemoizedTestFileDataProvider(
+                        new JUnitTestFileDataProvider(
+                            new FixedLocator($coveragePath . '/junit.xml'),
+                        ),
                     ),
                 ),
             ),
@@ -110,23 +113,8 @@ final class PHPUnitCoverageTracerTest extends TestCase
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
-        $canonicalPathname = Path::canonicalize($fileInfo->getPathname());
-        $actual = null;
+        $actual = $this->tracer->trace($fileInfo);
 
-        $visitedPathnames = [];
-
-        foreach ($this->provider->provideTraces() as $trace) {
-            $pathname = Path::canonicalize($trace->getSourceFileInfo()->getPathname());
-            $visitedPathnames[] = $pathname;
-
-            if ($pathname === $canonicalPathname) {
-                $actual = $trace;
-
-                break;
-            }
-        }
-
-        self::assertFoundMatchingTrace($visitedPathnames, $expected, $actual);
         TraceAssertion::assertEquals($expected, $actual);
     }
 
@@ -435,34 +423,6 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 ),
             ),
         ];
-    }
-
-    /**
-     * @phpstan-assert Trace $actual
-     *
-     * @param string[] $visitedPathnames
-     */
-    private function assertFoundMatchingTrace(
-        array $visitedPathnames,
-        Trace $expected,
-        ?Trace $actual,
-    ): void {
-        if ($actual !== null) {
-            return;
-        }
-
-        $this->fail(
-            sprintf(
-                'Expected to find a trace for the source file with the pathname "%s" but none found. %s',
-                $expected->getSourceFileInfo()->getPathname(),
-                count($visitedPathnames) > 0
-                    ? sprintf(
-                        'Found: "%s".',
-                        implode('", "', $visitedPathnames),
-                    )
-                    : 'No trace found.',
-            ),
-        );
     }
 
     private function copyReportFromTemplateIfMissing(string $coveragePath): void
