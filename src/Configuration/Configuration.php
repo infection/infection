@@ -88,6 +88,7 @@ readonly class Configuration
         private bool $withUncovered,
         public bool $noProgress,
         public bool $ignoreMsiWithNoMutations,
+        public bool $useOpcache,
         public ?float $minMsi,
         public ?int $numberOfShownMutations,
         public ?float $minCoveredMsi,

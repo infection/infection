@@ -119,6 +119,7 @@ use Infection\Process\ShellCommandLineExecutor;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Memory\MemoryLimiter;
 use Infection\Resource\Memory\MemoryLimiterEnvironment;
+use Infection\Resource\Performance\OpcacheConfigurer;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
 use Infection\Source\Collector\CachedSourceCollector;
@@ -322,6 +323,11 @@ final class Container extends DIContainer
                 $container->getFileSystem(),
                 (string) php_ini_loaded_file(),
                 new MemoryLimiterEnvironment(),
+            ),
+            OpcacheConfigurer::class => static fn (self $container): OpcacheConfigurer => new OpcacheConfigurer(
+                $container->getFileSystem(),
+                (string) php_ini_loaded_file(),
+                $container->getConfiguration()->tmpDir . '/opcache',
             ),
             SchemaConfigurationLoader::class => static fn (self $container): SchemaConfigurationLoader => new SchemaConfigurationLoader(
                 $container->getRootsFileLocator(),
@@ -759,6 +765,11 @@ final class Container extends DIContainer
     public function getMemoryLimiter(): MemoryLimiter
     {
         return $this->get(MemoryLimiter::class);
+    }
+
+    public function getOpcacheConfigurer(): OpcacheConfigurer
+    {
+        return $this->get(OpcacheConfigurer::class);
     }
 
     public function getMutatorResolver(): MutatorResolver

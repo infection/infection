@@ -404,6 +404,7 @@ final class RunCommand extends BaseCommand
                 $container->getEventDispatcher(),
                 $container->getInitialTestsRunner(),
                 $container->getMemoryLimiter(),
+                $container->getOpcacheConfigurer(),
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),

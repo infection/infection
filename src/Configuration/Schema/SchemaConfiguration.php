@@ -63,6 +63,7 @@ final readonly class SchemaConfiguration
         public PhpUnit $phpUnit,
         public PhpStan $phpStan,
         public ?bool $ignoreMsiWithNoMutations,
+        public ?bool $useOpcache,
         public ?float $minMsi,
         public ?float $minCoveredMsi,
         public array $mutators,

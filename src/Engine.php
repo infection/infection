@@ -53,6 +53,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Resource\Performance\OpcacheConfigurer;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -78,6 +79,7 @@ final readonly class Engine
         private EventDispatcher $eventDispatcher,
         private InitialTestsRunner $initialTestsRunner,
         private MemoryLimiter $memoryLimiter,
+        private OpcacheConfigurer $opcacheConfigurer,
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
@@ -113,6 +115,10 @@ final readonly class Engine
          */
         if ($initialTestSuiteOutput !== null) {
             $this->memoryLimiter->limitMemory($initialTestSuiteOutput, $this->adapter);
+        }
+
+        if ($this->config->useOpcache) {
+            $this->opcacheConfigurer->configure();
         }
 
         $this->runMutationAnalysis();

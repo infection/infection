@@ -156,6 +156,10 @@
             "type": "boolean",
             "description": "Ignore MSI violations with zero mutations."
         },
+        "useOpcache": {
+            "type": "boolean",
+            "description": "Enable file-based OPcache for mutation testing processes. Improves performance by ~15%. Default: true."
+        },
         "minMsi": {
             "type": "number",
             "minimum": 0,
