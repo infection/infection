@@ -231,4 +231,22 @@ abstract class BaseMutatorTestCase extends TestCase
             );
         }
     }
+
+    protected static function wrapCodeInMethod(
+        string $code,
+        ?string $namespace = null,
+    ): string
+    {
+        $namespaceDeclaration = $namespace !== null ? "namespace {$namespace}; " : '';
+
+        return <<<PHP
+        <?php
+        {$namespaceDeclaration}
+        class WrappingClass {
+            public function wrappedTestedCode() {
+                {$code}
+            }
+        }
+        PHP;
+    }
 }
