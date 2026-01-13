@@ -959,16 +959,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.1.8",
+            "version": "0.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "f7ea6a00692608f785fc0eabb1c54f5349d973e9"
+                "reference": "7a7f82ee7084de134b9f0d5e2e8926693cc977a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/f7ea6a00692608f785fc0eabb1c54f5349d973e9",
-                "reference": "f7ea6a00692608f785fc0eabb1c54f5349d973e9",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/7a7f82ee7084de134b9f0d5e2e8926693cc977a2",
+                "reference": "7a7f82ee7084de134b9f0d5e2e8926693cc977a2",
                 "shasum": ""
             },
             "require": {
@@ -1022,7 +1022,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.1.8"
+                "source": "https://github.com/sanmai/di-container/tree/0.1.10"
             },
             "funding": [
                 {
@@ -1030,7 +1030,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-03T14:10:40+00:00"
+            "time": "2026-01-12T23:28:14+00:00"
         },
         {
             "name": "sanmai/duoclock",
