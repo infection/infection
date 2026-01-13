@@ -93,14 +93,14 @@ final class TracerIntegrationTest extends TestCase
                         fileSystem: new FileSystem(),
                     ),
                     parser: new XmlCoverageParser(
-                    new FileSystem(),
+                        new FileSystem(),
+                    ),
                 ),
-            ),
-            new JUnitTestExecutionInfoAdder(
-                $testFrameworkAdapterStub,
-                new MemoizedTestFileDataProvider(
-                    new JUnitTestFileDataProvider(
-                        new FixedLocator($coveragePath . '/junit.xml'),),
+                new JUnitTestExecutionInfoAdder(
+                    $testFrameworkAdapterStub,
+                    new MemoizedTestFileDataProvider(
+                        new JUnitTestFileDataProvider(
+                            new FixedLocator($coveragePath . '/junit.xml'), ),
                     ),
                 ),
             ),
