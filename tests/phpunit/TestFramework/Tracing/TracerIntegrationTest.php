@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
-use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
@@ -55,6 +54,7 @@ use Infection\TestFramework\Tracing\Tracer;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -63,7 +63,6 @@ use function Safe\realpath;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversNothing]
@@ -73,59 +72,28 @@ final class TracerIntegrationTest extends TestCase
 
     private const COVERAGE_REPORT_DIR = self::FIXTURE_DIR . '/phpunit-coverage';
 
-    private Tracer $tracer;
-
-    protected function setUp(): void
-    {
-        $coveragePath = Path::canonicalize(self::COVERAGE_REPORT_DIR);
-
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapterStub
-            ->method('hasJUnitReport')
-            ->willReturn(true);
-
-        $this->tracer = new TraceProviderAdapterTracer(
-            new CoveredTraceProvider(
-                new PhpUnitXmlCoverageTraceProvider(
-                    indexLocator: new FixedLocator($coveragePath . '/xml/index.xml'),
-                    indexParser: new IndexXmlCoverageParser(
-                        isSourceFiltered: false,
-                        fileSystem: new FileSystem(),
-                    ),
-                    parser: new XmlCoverageParser(
-                        new FileSystem(),
-                    ),
-                ),
-                new JUnitTestExecutionInfoAdder(
-                    $testFrameworkAdapterStub,
-                    new MemoizedTestFileDataProvider(
-                        new JUnitTestFileDataProvider(
-                            new FixedLocator($coveragePath . '/junit.xml'), ),
-                    ),
-                ),
-            ),
-        );
-
-        $this->copyReportFromTemplateIfMissing($coveragePath);
-    }
-
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
+        string $indexXmlPath,
+        string $junitXmlPath,
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
-        $actual = $this->tracer->trace($fileInfo);
+        $tracer = $this->createTracer(
+            $indexXmlPath,
+            $junitXmlPath,
+        );
+
+        $actual = $tracer->trace($fileInfo);
 
         TraceAssertion::assertEquals($expected, $actual);
     }
 
     public static function traceProvider(): iterable
     {
-        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
+        $coveragePath = Path::canonicalize(self::COVERAGE_REPORT_DIR);
 
-        $splFileInfo = new SplFileInfo(
-            self::FIXTURE_DIR . '/src/DemoCounterService.php',
-        );
+        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
 
         $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');
 
@@ -213,9 +181,13 @@ final class TracerIntegrationTest extends TestCase
         ];
 
         yield [
-            $splFileInfo,
+            $coveragePath . '/xml/index.xml',
+            $coveragePath . '/junit.xml',
+            new MockSplFileInfo(realPath: $canonicalDemoCounterServicePathname),
             new SyntheticTrace(
-                sourceFileInfo: $splFileInfo,
+                sourceFileInfo: new SplFileInfo(
+                    self::FIXTURE_DIR . '/src/DemoCounterService.php',
+                ),
                 realPath: realpath($canonicalDemoCounterServicePathname),
                 relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
@@ -426,20 +398,63 @@ final class TracerIntegrationTest extends TestCase
         ];
     }
 
-    private function copyReportFromTemplateIfMissing(string $coveragePath): void
-    {
-        if (file_exists($coveragePath)) {
-            return;
-        }
+    private function createTracer(
+        string $indexXmlPath,
+        string $junitXmlPath,
+    ): Tracer {
+        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapterStub
+            ->method('hasJUnitReport')
+            ->willReturn(true);
 
-        $process = new Process(
-            command: [
-                'make',
-                'phpunit-coverage',
-            ],
-            cwd: self::FIXTURE_DIR,
-            timeout: 5,
+        $fileSystemStub = $this->createFileSystemStub();
+
+        return new TraceProviderAdapterTracer(
+            new CoveredTraceProvider(
+                new PhpUnitXmlCoverageTraceProvider(
+                    indexLocator: new FixedLocator($indexXmlPath),
+                    indexParser: new IndexXmlCoverageParser(
+                        isSourceFiltered: false,
+                        fileSystem: $fileSystemStub,
+                    ),
+                    parser: new XmlCoverageParser(
+                        $fileSystemStub,
+                    ),
+                ),
+                new JUnitTestExecutionInfoAdder(
+                    $testFrameworkAdapterStub,
+                    new MemoizedTestFileDataProvider(
+                        new JUnitTestFileDataProvider(
+                            new FixedLocator($junitXmlPath),
+                        ),
+                    ),
+                ),
+            ),
         );
-        $process->mustRun();
+    }
+
+    private function createFileSystemStub(): FileSystem
+    {
+        $fileSystem = new FileSystem();
+
+        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub
+            ->method('isReadableFile')
+            ->willReturnCallback($fileSystem->isReadableFile(...));
+        $fileSystemStub
+            ->method('readFile')
+            ->willReturnCallback($fileSystem->readFile(...));
+
+        // We are only interested in mocking the realPath check!
+        // In this test, we do not ~~need~~ want to check that the source file exists as this
+        // makes the tests too inflexible.
+        // In a real run, this is what provides the guarantee that the constructed path makes
+        // sense; in this test it is done by checking that the path we get at the end for the
+        // source file is the one we expect.
+        $fileSystemStub
+            ->method('realPath')
+            ->willReturnCallback(static fn (string $path): string => $path);
+
+        return $fileSystemStub;
     }
 }
