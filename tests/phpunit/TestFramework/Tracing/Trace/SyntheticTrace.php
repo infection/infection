@@ -39,6 +39,7 @@ use DomainException;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use SplFileInfo;
 
 /**
@@ -51,10 +52,23 @@ final readonly class SyntheticTrace implements Trace
     public function __construct(
         public SplFileInfo $sourceFileInfo,
         public string $realPath,
-        public string $relativePathname,
         public bool $hasTest,
         public TestLocations $tests,
     ) {
+    }
+
+    public static function forSource(
+        string $realPath,
+        bool $hasTest,
+        TestLocations $tests,
+    ): self
+    {
+        return new self(
+            MockSplFileInfo::create($realPath),
+            $realPath,
+            $hasTest,
+            $tests,
+        );
     }
 
     public function getSourceFileInfo(): SplFileInfo

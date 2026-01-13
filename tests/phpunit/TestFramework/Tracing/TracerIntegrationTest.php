@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
-use function count;
-use function file_exists;
-use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
@@ -55,18 +52,15 @@ use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
-use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
-use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use SplFileInfo;
-use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
 #[Group('integration')]
@@ -79,7 +73,6 @@ final class TracerIntegrationTest extends TestCase
     public function test_it_can_create_a_trace(
         string $indexXmlPath,
         string $junitXmlPath,
-        SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
         $tracer = $this->createTracer(
@@ -87,7 +80,9 @@ final class TracerIntegrationTest extends TestCase
             $junitXmlPath,
         );
 
-        $actual = $tracer->trace($fileInfo);
+        $actual = $tracer->trace(
+            $expected->getSourceFileInfo(),
+        );
 
         TraceAssertion::assertEquals($expected, $actual);
     }
@@ -99,122 +94,117 @@ final class TracerIntegrationTest extends TestCase
         $indexXmlPath = Path::canonicalize($coverageDirectory . '/coverage-xml/index.xml');
         $junitXmlPath = Path::canonicalize($coverageDirectory . '/junit.xml');
 
-        $coveredClassSplFileInfo = new MockSplFileInfo(
-            realPath: '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/Calculator.php',
-        );
+        yield 'covered class' => (static function () use ($indexXmlPath, $junitXmlPath) {
+            $sourcePath = '/path/to/infection/tests/e2e/PHPUnit_09-3/src/Covered/Calculator.php';
+            $testPath = '/path/to/infection/tests/e2e/PHPUnit_09-3/tests/Covered/CalculatorTest.php';
 
-        yield 'covered class' => [
-            $indexXmlPath,
-            Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/coverage-xml/Covered/Calculator.php.xml'),
-            $junitXmlPath,
-            $coveredClassSplFileInfo,
-            new SyntheticTrace(
-                sourceFileInfo: $coveredClassSplFileInfo,
-                realPath: '',
-                relativePathname: '',
-                hasTest: true,
-                tests: new TestLocations(
-                    byLine: [
-                        9 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #0',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #1',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #2',
-                                filePath: null,
-                                executionTime: null,
-                            ),
+            return [
+                $indexXmlPath,
+                $junitXmlPath,
+                SyntheticTrace::forSource(
+                    realPath: $sourcePath,
+                    hasTest: true,
+                    tests: new TestLocations(
+                        byLine: [
+                            9 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #0',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #1',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_add with data set #2',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            14 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #0',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #1',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #2',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            19 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_multiply',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            24 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            25 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            28 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            33 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_is_positive',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
+                            38 => [
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                                new TestLocation(
+                                    method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute_zero',
+                                    filePath: $testPath,
+                                    executionTime: 0.006446
+                                ),
+                            ],
                         ],
-                        14 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #0',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #1',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_subtract with data set #2',
-                                filePath: null,
-                                executionTime: null,
-                            ),
+                        byMethod: [
+                            'add' => new SourceMethodLineRange(7, 10),
+                            'subtract' => new SourceMethodLineRange(12, 15),
+                            'multiply' => new SourceMethodLineRange(17, 20),
+                            'divide' => new SourceMethodLineRange(22, 29),
+                            'isPositive' => new SourceMethodLineRange(31, 34),
+                            'absolute' => new SourceMethodLineRange(36, 39),
                         ],
-                        19 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_multiply',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                        ],
-                        24 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                        ],
-                        25 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide_by_zero_throws_exception',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                        ],
-                        28 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_divide',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                        ],
-                        33 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_is_positive',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                        ],
-                        38 => [
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                            new TestLocation(
-                                method: 'Infection\E2ETests\PHPUnit_09_3\Tests\Covered\CalculatorTest::test_absolute_zero',
-                                filePath: null,
-                                executionTime: null,
-                            ),
-                        ],
-                    ],
-                    byMethod: [
-                        'add' => new SourceMethodLineRange(7, 10),
-                        'subtract' => new SourceMethodLineRange(12, 15),
-                        'multiply' => new SourceMethodLineRange(17, 20),
-                        'divide' => new SourceMethodLineRange(22, 29),
-                        'isPositive' => new SourceMethodLineRange(31, 34),
-                        'absolute' => new SourceMethodLineRange(36, 39),
-                    ],
+                    ),
                 ),
-            ),
-        ];
-
-        return;
+            ];
+        })();
 
         yield 'covered trait' => [
             SafeDOMXPath::fromFile(
