@@ -1194,4 +1194,17 @@ final class Container extends DIContainer
     {
         $this->set($id, $value);
     }
+
+    /**
+     * @param class-string<object> $id
+     * @param callable(static): object $value
+     */
+    public function withService(string $id, callable $value): self
+    {
+        $clone = clone $this;
+
+        $clone->set($id, $value);
+
+        return $clone;
+    }
 }
