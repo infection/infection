@@ -55,86 +55,86 @@ final class CastObjectTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It removes casting to object' => [
-            <<<'PHP'
-                <?php
-
-                (object) ['test' => 1];
-                PHP,
-            <<<'PHP'
-                <?php
-
-                ['test' => 1];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    (object) ['test' => 1];
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    ['test' => 1];
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to object in conditions' => [
-            <<<'PHP'
-                <?php
-
-                if ((object) implode()) {
-                    echo 'Hello';
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                if (implode()) {
-                    echo 'Hello';
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if ((object) implode()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (implode()) {
+                        echo 'Hello';
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to object in global return' => [
-            <<<'PHP'
-                <?php
-
-                return (object) implode();
-                PHP,
-            <<<'PHP'
-                <?php
-
-                return implode();
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return (object) implode();
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    return implode();
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to object in return of untyped-function' => [
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return (object) implode();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                function noReturnType()
-                {
-                    return implode();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return (object) implode();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function noReturnType()
+                    {
+                        return implode();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It removes casting to object in return of object-function when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsObject(): object
-                {
-                    return (object) implode();
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function returnsObject(): object
-                {
-                    return implode();
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsObject(): object
+                    {
+                        return (object) implode();
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function returnsObject(): object
+                    {
+                        return implode();
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to object in return of object-function when strict-types=1' => [
@@ -161,24 +161,24 @@ final class CastObjectTest extends BaseMutatorTestCase
         ];
 
         yield 'It removes casting to object in function parameters when strict-types=0' => [
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    doBar((object) $arr);
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                declare (strict_types=0);
-                function doFoo()
-                {
-                    doBar($arr);
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        doBar((object) $arr);
+                    }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    declare (strict_types=0);
+                    function doFoo()
+                    {
+                        doBar($arr);
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It not removes casting to object in function parameters when strict-types=1' => [

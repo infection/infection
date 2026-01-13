@@ -55,37 +55,23 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates or with two expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() || b();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !(a() || b());
+                    $var = a() || b();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !(a() || b());
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It preserves formatting for non-modified code' => [
-            <<<'PHP'
-                <?php
-
-                class TestFormatPreserving {
-                    public function test(): bool {
-                        return 1
-                          && 2;
-                    }
-                }
-
-                $var = a() || b();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
                     class TestFormatPreserving {
                         public function test(): bool {
                             return 1
@@ -93,32 +79,46 @@ final class LogicalOrNegationTest extends BaseMutatorTestCase
                         }
                     }
 
-                    $var = !(a() || b());
+                    $var = a() || b();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class TestFormatPreserving {
+                            public function test(): bool {
+                                return 1
+                                  && 2;
+                            }
+                        }
+
+                        $var = !(a() || b());
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates or with more expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = a() || b() || c() || d();
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
-                    $var = !(a() || b() || c() || d());
+                    $var = a() || b() || c() || d();
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $var = !(a() || b() || c() || d());
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate already negated expressions' => [
-            <<<'PHP'
-                <?php
-
-                $var = !(a() || !b());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $var = !(a() || !b());
+                    PHP,
+            ),
         ];
     }
 }

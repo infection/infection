@@ -55,13 +55,13 @@ final class Yield_Test extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates a yield with a double arrow to a yield with a greater than comparison' => [
-            <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $a => $b);
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a => $b);
+                    };
+                    PHP,
+            ),
             (static fn () => <<<'PHP'
                 <?php
 
@@ -72,13 +72,13 @@ final class Yield_Test extends BaseMutatorTestCase
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [
-            <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $b);
-                };
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $b);
+                    };
+                    PHP,
+            ),
         ];
     }
 }

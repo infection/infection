@@ -37,8 +37,10 @@ namespace Infection\Testing;
 
 use function array_flip;
 use function array_key_exists;
+use function array_map;
 use function array_shift;
 use function count;
+use function explode;
 use function implode;
 use Infection\Framework\ClassName;
 use Infection\Mutator\Mutator;
@@ -57,11 +59,32 @@ use Webmozart\Assert\Assert;
 
 abstract class BaseMutatorTestCase extends TestCase
 {
+    private const WRAPPED_CODE_METHOD_BODY_INDENT = '        ';
+
     protected Mutator $mutator;
 
     protected function setUp(): void
     {
         $this->mutator = $this->createMutator();
+    }
+
+    public static function wrapCodeInMethod(
+        string $code,
+        ?string $namespace = null,
+    ): string {
+        $namespaceDeclaration = $namespace !== null ? "namespace {$namespace};" : '';
+
+        $indentedCode = self::indentCode($code);
+
+        return <<<PHP
+            <?php
+            {$namespaceDeclaration}
+            class WrappingClass {
+                public function wrappedTestedCode() {
+            {$indentedCode}
+                }
+            }
+            PHP;
     }
 
     /**
@@ -177,6 +200,20 @@ abstract class BaseMutatorTestCase extends TestCase
         return $mutants;
     }
 
+    private static function indentCode(string $code): string
+    {
+        return implode(
+            "\n",
+            array_map(
+                static fn (string $line) => self::WRAPPED_CODE_METHOD_BODY_INDENT . $line,
+                explode(
+                    "\n",
+                    $code,
+                ),
+            ),
+        );
+    }
+
     /**
      * @return SimpleMutation[]
      */
@@ -230,23 +267,5 @@ abstract class BaseMutatorTestCase extends TestCase
                 ),
             );
         }
-    }
-
-    protected static function wrapCodeInMethod(
-        string $code,
-        ?string $namespace = null,
-    ): string
-    {
-        $namespaceDeclaration = $namespace !== null ? "namespace {$namespace}; " : '';
-
-        return <<<PHP
-        <?php
-        {$namespaceDeclaration}
-        class WrappingClass {
-            public function wrappedTestedCode() {
-                {$code}
-            }
-        }
-        PHP;
     }
 }

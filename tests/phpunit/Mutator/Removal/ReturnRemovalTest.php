@@ -68,146 +68,114 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
         yield from self::mutatesWithReturnType('', '"value"');
 
         yield 'It mutates duplicate return statements' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo(): array
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class Bar
                     {
-                        return [1];
-                        return [2];
+                        function foo(): array
+                        {
+                            return [1];
+                            return [2];
+                        }
                     }
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo(): array
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class Bar
                     {
+                        function foo(): array
+                        {
 
-                        return [2];
+                            return [2];
+                        }
                     }
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It leaves the last return statement alone if the method has a return type' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    namespace Foo;
 
-                namespace Foo;
-
-                class ConfigLoader
-                {
-                    private ?object $config = null;
-                    public function getConfig(): object
+                    class ConfigLoader
                     {
-                        if (null !== $this->config) {
+                        private ?object $config = null;
+                        public function getConfig(): object
+                        {
+                            if (null !== $this->config) {
+                                return $this->config;
+                            }
+                            // ... load and cache
+                            $this->config = $config;
                             return $this->config;
+                            // Cool comment
                         }
-                        // ... load and cache
-                        $this->config = $config;
-                        return $this->config;
-                        // Cool comment
-                    }
-                    public function foo(): void
-                    {
-                    }
-                }
-                PHP,
-            <<<'PHP'
-                <?php
-
-                namespace Foo;
-
-                class ConfigLoader
-                {
-                    private ?object $config = null;
-                    public function getConfig(): object
-                    {
-                        if (null !== $this->config) {
-
+                        public function foo(): void
+                        {
                         }
-                        // ... load and cache
-                        $this->config = $config;
-                        return $this->config;
-                        // Cool comment
                     }
-                    public function foo(): void
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    namespace Foo;
+
+                    class ConfigLoader
                     {
+                        private ?object $config = null;
+                        public function getConfig(): object
+                        {
+                            if (null !== $this->config) {
+
+                            }
+                            // ... load and cache
+                            $this->config = $config;
+                            return $this->config;
+                            // Cool comment
+                        }
+                        public function foo(): void
+                        {
+                        }
                     }
-                }
-                PHP,
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate last return null in function without return type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        $a = 1;
-                        return null;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'It does not mutate last empty return in function without return type' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        $a = 1;
-                        return;
-                    }
-                }
-                PHP,
-        ];
-
-        yield 'It mutates return null if not last statement' => [
-            <<<'PHP'
-                <?php
-
-                class Bar
-                {
-                    function foo()
-                    {
-                        if (true) {
-                            return null;
-                            echo "never reached";
-                        }
-                        return "default";
-                    }
-                }
-                PHP,
-            [
+            self::wrapCodeInMethod(
                 <<<'PHP'
-                    <?php
-
                     class Bar
                     {
                         function foo()
                         {
-                            if (true) {
-
-                                echo "never reached";
-                            }
-                            return "default";
+                            $a = 1;
+                            return null;
                         }
                     }
                     PHP,
-                <<<'PHP'
-                    <?php
+            ),
+        ];
 
+        yield 'It does not mutate last empty return in function without return type' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    class Bar
+                    {
+                        function foo()
+                        {
+                            $a = 1;
+                            return;
+                        }
+                    }
+                    PHP,
+            ),
+        ];
+
+        yield 'It mutates return null if not last statement' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
                     class Bar
                     {
                         function foo()
@@ -216,10 +184,42 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
                                 return null;
                                 echo "never reached";
                             }
-
+                            return "default";
                         }
                     }
                     PHP,
+            ),
+            [
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class Bar
+                        {
+                            function foo()
+                            {
+                                if (true) {
+
+                                    echo "never reached";
+                                }
+                                return "default";
+                            }
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        class Bar
+                        {
+                            function foo()
+                            {
+                                if (true) {
+                                    return null;
+                                    echo "never reached";
+                                }
+
+                            }
+                        }
+                        PHP,
+                ),
             ],
         ];
     }
