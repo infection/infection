@@ -959,16 +959,16 @@
         },
         {
             "name": "sanmai/di-container",
-            "version": "0.1.9",
+            "version": "0.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sanmai/di-container.git",
-                "reference": "bde5001bec7942179b4a3816cf09534edf66c0fc"
+                "reference": "4723e235e04589f88c0a114a4e438ff57a7cbb8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sanmai/di-container/zipball/bde5001bec7942179b4a3816cf09534edf66c0fc",
-                "reference": "bde5001bec7942179b4a3816cf09534edf66c0fc",
+                "url": "https://api.github.com/repos/sanmai/di-container/zipball/4723e235e04589f88c0a114a4e438ff57a7cbb8a",
+                "reference": "4723e235e04589f88c0a114a4e438ff57a7cbb8a",
                 "shasum": ""
             },
             "require": {
@@ -979,14 +979,18 @@
             "require-dev": {
                 "ergebnis/composer-normalize": "^2.8",
                 "friendsofphp/php-cs-fixer": "^3.17",
-                "infection/infection": ">=0.29",
+                "infection/infection": ">=0.31",
                 "php-coveralls/php-coveralls": "^2.4.1",
+                "phpbench/phpbench": "^1.4",
                 "phpstan/extension-installer": "^1.4",
                 "phpunit/phpunit": "^11.5.25",
                 "sanmai/phpstan-rules": "^0.3.10"
             },
             "type": "library",
             "extra": {
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev"
+                },
                 "preferred-install": "dist"
             },
             "autoload": {
@@ -1022,7 +1026,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sanmai/di-container/issues",
-                "source": "https://github.com/sanmai/di-container/tree/0.1.9"
+                "source": "https://github.com/sanmai/di-container/tree/0.1.11"
             },
             "funding": [
                 {
@@ -1030,7 +1034,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-12T12:09:00+00:00"
+            "time": "2026-01-13T07:38:17+00:00"
         },
         {
             "name": "sanmai/duoclock",
@@ -2396,16 +2400,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "b01be90dceff69c88c7b36c30ee45c9fd9107f7f"
+                "reference": "ce6a2f100c404b2d32a1dd1270f9b59ad4f57649"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/b01be90dceff69c88c7b36c30ee45c9fd9107f7f",
-                "reference": "b01be90dceff69c88c7b36c30ee45c9fd9107f7f",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/ce6a2f100c404b2d32a1dd1270f9b59ad4f57649",
+                "reference": "ce6a2f100c404b2d32a1dd1270f9b59ad4f57649",
                 "shasum": ""
             },
             "require": {
@@ -2452,9 +2456,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.1.1"
+                "source": "https://github.com/webmozarts/assert/tree/2.1.2"
             },
-            "time": "2026-01-07T17:26:38+00:00"
+            "time": "2026-01-13T14:02:24+00:00"
         }
     ],
     "packages-dev": [
@@ -3954,16 +3958,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f7166355dcf47482f27be59169b0825995f51c7d"
+                "reference": "9afc1bb43571b25629f353c61a9315b5ef31383a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f7166355dcf47482f27be59169b0825995f51c7d",
-                "reference": "f7166355dcf47482f27be59169b0825995f51c7d",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/9afc1bb43571b25629f353c61a9315b5ef31383a",
+                "reference": "9afc1bb43571b25629f353c61a9315b5ef31383a",
                 "shasum": ""
             },
             "require": {
@@ -4002,7 +4006,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.3.0"
+                "source": "https://github.com/rectorphp/rector/tree/2.3.1"
             },
             "funding": [
                 {
@@ -4010,7 +4014,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-25T22:00:18+00:00"
+            "time": "2026-01-13T15:13:58+00:00"
         },
         {
             "name": "sebastian/cli-parser",

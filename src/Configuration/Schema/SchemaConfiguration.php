@@ -65,6 +65,8 @@ final readonly class SchemaConfiguration
         public ?bool $ignoreMsiWithNoMutations,
         public ?float $minMsi,
         public ?float $minCoveredMsi,
+        public ?bool $timeoutsAsEscaped,
+        public ?int $maxTimeouts,
         public array $mutators,
         public ?string $testFramework,
         public ?string $bootstrap,
