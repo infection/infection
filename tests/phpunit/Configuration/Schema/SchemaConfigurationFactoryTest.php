@@ -2659,6 +2659,7 @@ final class SchemaConfigurationFactoryTest extends TestCase
             'phpunit' => new PhpUnit(null, null),
             'phpStan' => new PhpStan(null, null),
             'ignoreMsiWithNoMutations' => null,
+            'useOpcache' => null,
             'minMsi' => null,
             'minCoveredMsi' => null,
             'mutators' => [],

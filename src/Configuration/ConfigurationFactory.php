@@ -177,6 +177,7 @@ class ConfigurationFactory
             withUncovered: $withUncovered,
             noProgress: $this->retrieveNoProgress($noProgress),
             ignoreMsiWithNoMutations: self::retrieveIgnoreMsiWithNoMutations($ignoreMsiWithNoMutations, $schema),
+            useOpcache: $schema->useOpcache ?? true,
             minMsi: self::retrieveMinMsi($minMsi, $schema),
             numberOfShownMutations: $numberOfShownMutations,
             minCoveredMsi: self::retrieveMinCoveredMsi($minCoveredMsi, $schema),

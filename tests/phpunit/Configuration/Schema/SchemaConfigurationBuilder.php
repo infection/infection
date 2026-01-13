@@ -61,6 +61,7 @@ final class SchemaConfigurationBuilder
         private PhpUnit $phpUnit,
         private PhpStan $phpStan,
         private ?bool $ignoreMsiWithNoMutations,
+        private ?bool $useOpcache,
         private ?float $minMsi,
         private ?float $minCoveredMsi,
         private array $mutators,
@@ -85,6 +86,7 @@ final class SchemaConfigurationBuilder
             phpUnit: $schema->phpUnit,
             phpStan: $schema->phpStan,
             ignoreMsiWithNoMutations: $schema->ignoreMsiWithNoMutations,
+            useOpcache: $schema->useOpcache,
             minMsi: $schema->minMsi,
             minCoveredMsi: $schema->minCoveredMsi,
             mutators: $schema->mutators,
@@ -109,6 +111,7 @@ final class SchemaConfigurationBuilder
             phpUnit: new PhpUnit(null, null),
             phpStan: new PhpStan(null, null),
             ignoreMsiWithNoMutations: null,
+            useOpcache: null,
             minMsi: null,
             minCoveredMsi: null,
             mutators: [],
@@ -144,6 +147,7 @@ final class SchemaConfigurationBuilder
             phpUnit: new PhpUnit('/config/phpunit', '/custom/phpunit'),
             phpStan: new PhpStan('/config/phpstan', '/custom/phpstan'),
             ignoreMsiWithNoMutations: true,
+            useOpcache: true,
             minMsi: 80.0,
             minCoveredMsi: 90.0,
             mutators: ['@default' => true],
@@ -220,6 +224,14 @@ final class SchemaConfigurationBuilder
     {
         $clone = clone $this;
         $clone->ignoreMsiWithNoMutations = $ignoreMsiWithNoMutations;
+
+        return $clone;
+    }
+
+    public function withUseOpcache(?bool $useOpcache): self
+    {
+        $clone = clone $this;
+        $clone->useOpcache = $useOpcache;
 
         return $clone;
     }
@@ -324,6 +336,7 @@ final class SchemaConfigurationBuilder
             phpUnit: $this->phpUnit,
             phpStan: $this->phpStan,
             ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
+            useOpcache: $this->useOpcache,
             minMsi: $this->minMsi,
             minCoveredMsi: $this->minCoveredMsi,
             mutators: $this->mutators,

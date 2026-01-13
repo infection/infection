@@ -48,6 +48,7 @@ use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Process\Runner\MutationTestingRunner;
 use Infection\Resource\Memory\MemoryLimiter;
+use Infection\Resource\Performance\OpcacheConfigurer;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\Coverage\CoverageChecker;
@@ -143,6 +144,9 @@ final class EngineTest extends TestCase
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
 
+        $opcacheConfigurer = $this->createMock(OpcacheConfigurer::class);
+        $opcacheConfigurer->expects($this->never())->method($this->anything());
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -150,6 +154,7 @@ final class EngineTest extends TestCase
             $eventDispatcher,
             $initialTestsRunner,
             $memoryLimiter,
+            $opcacheConfigurer,
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
@@ -262,6 +267,9 @@ final class EngineTest extends TestCase
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
         $testFrameworkExtraOptionsFilter->expects($this->never())->method($this->anything());
 
+        $opcacheConfigurer = $this->createMock(OpcacheConfigurer::class);
+        $opcacheConfigurer->expects($this->once())->method('configure');
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -269,6 +277,7 @@ final class EngineTest extends TestCase
             $eventDispatcher,
             $initialTestsRunner,
             $memoryLimiter,
+            $opcacheConfigurer,
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
@@ -401,6 +410,9 @@ final class EngineTest extends TestCase
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
 
+        $opcacheConfigurer = $this->createMock(OpcacheConfigurer::class);
+        $opcacheConfigurer->expects($this->once())->method('configure');
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -408,6 +420,7 @@ final class EngineTest extends TestCase
             $eventDispatcher,
             $initialTestsRunner,
             $memoryLimiter,
+            $opcacheConfigurer,
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,
@@ -497,6 +510,9 @@ final class EngineTest extends TestCase
 
         $testFrameworkExtraOptionsFilter = $this->createMock(TestFrameworkExtraOptionsFilter::class);
 
+        $opcacheConfigurer = $this->createMock(OpcacheConfigurer::class);
+        $opcacheConfigurer->expects($this->once())->method('configure');
+
         $engine = new Engine(
             $config,
             $adapter,
@@ -504,6 +520,7 @@ final class EngineTest extends TestCase
             $eventDispatcher,
             $initialTestsRunner,
             $memoryLimiter,
+            $opcacheConfigurer,
             $mutationGenerator,
             $mutationTestingRunner,
             $minMsiChecker,

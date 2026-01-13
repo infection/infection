@@ -84,6 +84,7 @@ final class ConfigurationBuilder
         private bool $uncovered,
         private bool $noProgress,
         private bool $ignoreMsiWithNoMutations,
+        private bool $useOpcache,
         private ?float $minMsi,
         private ?int $numberOfShownMutations,
         private ?float $minCoveredMsi,
@@ -126,6 +127,7 @@ final class ConfigurationBuilder
             uncovered: !$configuration->mutateOnlyCoveredCode(),
             noProgress: $configuration->noProgress,
             ignoreMsiWithNoMutations: $configuration->ignoreMsiWithNoMutations,
+            useOpcache: $configuration->useOpcache,
             minMsi: $configuration->minMsi,
             numberOfShownMutations: $configuration->numberOfShownMutations,
             minCoveredMsi: $configuration->minCoveredMsi,
@@ -166,6 +168,7 @@ final class ConfigurationBuilder
             uncovered: false,
             noProgress: false,
             ignoreMsiWithNoMutations: false,
+            useOpcache: true,
             minMsi: null,
             numberOfShownMutations: null,
             minCoveredMsi: null,
@@ -228,6 +231,7 @@ final class ConfigurationBuilder
             uncovered: true,
             noProgress: true,
             ignoreMsiWithNoMutations: true,
+            useOpcache: true,
             minMsi: 50.0,
             numberOfShownMutations: 10,
             minCoveredMsi: 60.0,
@@ -445,6 +449,14 @@ final class ConfigurationBuilder
         return $clone;
     }
 
+    public function withUseOpcache(bool $useOpcache): self
+    {
+        $clone = clone $this;
+        $clone->useOpcache = $useOpcache;
+
+        return $clone;
+    }
+
     public function withMinMsi(?float $minMsi): self
     {
         $clone = clone $this;
@@ -579,6 +591,7 @@ final class ConfigurationBuilder
             withUncovered: $this->uncovered,
             noProgress: $this->noProgress,
             ignoreMsiWithNoMutations: $this->ignoreMsiWithNoMutations,
+            useOpcache: $this->useOpcache,
             minMsi: $this->minMsi,
             numberOfShownMutations: $this->numberOfShownMutations,
             minCoveredMsi: $this->minCoveredMsi,
