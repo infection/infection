@@ -92,6 +92,7 @@ use Infection\Logger\Html\StrykerHtmlReportBuilder;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
+use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\ResultsCollector;
@@ -223,6 +224,10 @@ final class Container extends DIContainer
 
     public const DEFAULT_MIN_COVERED_MSI = null;
 
+    public const DEFAULT_TIMEOUTS_AS_ESCAPED = false;
+
+    public const DEFAULT_MAX_TIMEOUTS = null;
+
     public const DEFAULT_MSI_PRECISION = MsiParser::DEFAULT_PRECISION;
 
     public const DEFAULT_TEST_FRAMEWORK = null;
@@ -317,6 +322,7 @@ final class Container extends DIContainer
             PrettyPrinterAbstract::class => static fn (): Standard => new Standard(),
             MetricsCalculator::class => static fn (self $container): MetricsCalculator => new MetricsCalculator(
                 $container->getConfiguration()->msiPrecision,
+                $container->getConfiguration()->timeoutsAsEscaped,
             ),
             MemoryLimiter::class => static fn (self $container): MemoryLimiter => new MemoryLimiter(
                 $container->getFileSystem(),
@@ -359,6 +365,9 @@ final class Container extends DIContainer
                     (float) $config->minCoveredMsi,
                 );
             },
+            MaxTimeoutsChecker::class => static fn (self $container): MaxTimeoutsChecker => new MaxTimeoutsChecker(
+                $container->getConfiguration()->maxTimeouts,
+            ),
             ChainSubscriberFactory::class => static function (self $container): ChainSubscriberFactory {
                 $subscriberFactories = [
                     $container->getInitialTestsConsoleLoggerSubscriberFactory(),
@@ -429,6 +438,7 @@ final class Container extends DIContainer
                     $config->numberOfShownMutations,
                     $container->getOutputFormatter(),
                     !$config->mutateOnlyCoveredCode(),
+                    $config->timeoutsAsEscaped,
                 );
             },
             PerformanceLoggerSubscriberFactory::class => static fn (self $container): PerformanceLoggerSubscriberFactory => new PerformanceLoggerSubscriberFactory(
@@ -477,6 +487,7 @@ final class Container extends DIContainer
                     $config->logVerbosity,
                     $config->mutateOnlyCoveredCode(),
                     $config->numberOfShownMutations,
+                    $config->timeoutsAsEscaped,
                 );
             },
             TestFrameworkAdapter::class => static function (self $container): TestFrameworkAdapter {
@@ -615,6 +626,8 @@ final class Container extends DIContainer
         ?bool $ignoreMsiWithNoMutations = self::DEFAULT_IGNORE_MSI_WITH_NO_MUTATIONS,
         ?float $minMsi = self::DEFAULT_MIN_MSI,
         ?float $minCoveredMsi = self::DEFAULT_MIN_COVERED_MSI,
+        bool $timeoutsAsEscaped = self::DEFAULT_TIMEOUTS_AS_ESCAPED,
+        ?int $maxTimeouts = self::DEFAULT_MAX_TIMEOUTS,
         int $msiPrecision = self::DEFAULT_MSI_PRECISION,
         ?string $testFramework = self::DEFAULT_TEST_FRAMEWORK,
         ?string $testFrameworkExtraOptions = self::DEFAULT_TEST_FRAMEWORK_EXTRA_OPTIONS,
@@ -691,6 +704,8 @@ final class Container extends DIContainer
                 minMsi: $minMsi,
                 numberOfShownMutations: $numberOfShownMutations,
                 minCoveredMsi: $minCoveredMsi,
+                timeoutsAsEscaped: $timeoutsAsEscaped,
+                maxTimeouts: $maxTimeouts,
                 msiPrecision: $msiPrecision,
                 mutatorsInput: $mutatorsInput,
                 testFramework: $testFramework,
@@ -1039,6 +1054,11 @@ final class Container extends DIContainer
     public function getMinMsiChecker(): MinMsiChecker
     {
         return $this->get(MinMsiChecker::class);
+    }
+
+    public function getMaxTimeoutsChecker(): MaxTimeoutsChecker
+    {
+        return $this->get(MaxTimeoutsChecker::class);
     }
 
     public function getFileStore(): FileStore

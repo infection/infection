@@ -33,44 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Metrics;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\FederatedLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+use function sprintf;
+use UnexpectedValueException;
 
 /**
  * @internal
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+final class MaxTimeoutCountReached extends UnexpectedValueException
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private OutputFormatter $formatter,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
-    }
-
-    public function create(OutputInterface $output): EventSubscriber
+    public static function create(int $maxTimeouts, int $timedOutCount): self
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        return new self(sprintf(
+            'The maximum allowed timeouts is %d, but %d timed out. '
+            . 'Reduce timeouts or increase the limit!',
+            $maxTimeouts,
+            $timedOutCount,
+        ));
     }
 }

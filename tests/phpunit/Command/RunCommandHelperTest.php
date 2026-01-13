@@ -162,6 +162,48 @@ final class RunCommandHelperTest extends TestCase
         yield 'provided with value true' => [true, 'true'];
     }
 
+    #[DataProvider('providesTimeoutsAsEscaped')]
+    public function test_it_returns_timeouts_as_escaped(bool $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_WITH_TIMEOUTS)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getTimeoutsAsEscaped());
+    }
+
+    public static function providesTimeoutsAsEscaped(): iterable
+    {
+        yield 'not provided (VALUE_NONE returns false)' => [false, false];
+
+        yield 'provided (VALUE_NONE returns true)' => [true, true];
+    }
+
+    #[DataProvider('providesMaxTimeouts')]
+    public function test_it_returns_max_timeouts(?int $expected, mixed $optionValue): void
+    {
+        $this->inputMock->expects($this->once())
+            ->method('getOption')
+            ->with(RunCommand::OPTION_MAX_TIMEOUTS)
+            ->willReturn($optionValue);
+
+        $commandHelper = new RunCommandHelper($this->inputMock);
+        $this->assertSame($expected, $commandHelper->getMaxTimeouts());
+    }
+
+    public static function providesMaxTimeouts(): iterable
+    {
+        yield 'not provided' => [null, null];
+
+        yield 'provided as string 5' => [5, '5'];
+
+        yield 'provided as string 0' => [0, '0'];
+
+        yield 'provided as string 100' => [100, '100'];
+    }
+
     #[DataProvider('providesGetStringOption')]
     public function test_it_returns_string_option(?string $expected, mixed $optionValue, ?string $default = null): void
     {
