@@ -2400,16 +2400,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "b01be90dceff69c88c7b36c30ee45c9fd9107f7f"
+                "reference": "ce6a2f100c404b2d32a1dd1270f9b59ad4f57649"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/b01be90dceff69c88c7b36c30ee45c9fd9107f7f",
-                "reference": "b01be90dceff69c88c7b36c30ee45c9fd9107f7f",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/ce6a2f100c404b2d32a1dd1270f9b59ad4f57649",
+                "reference": "ce6a2f100c404b2d32a1dd1270f9b59ad4f57649",
                 "shasum": ""
             },
             "require": {
@@ -2456,9 +2456,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.1.1"
+                "source": "https://github.com/webmozarts/assert/tree/2.1.2"
             },
-            "time": "2026-01-07T17:26:38+00:00"
+            "time": "2026-01-13T14:02:24+00:00"
         }
     ],
     "packages-dev": [
