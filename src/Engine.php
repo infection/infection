@@ -41,6 +41,8 @@ use Infection\Configuration\Configuration;
 use Infection\Console\ConsoleOutput;
 use Infection\Event\ApplicationExecutionWasFinished;
 use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Metrics\MaxTimeoutCountReached;
+use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -81,6 +83,7 @@ final readonly class Engine
         private MutationGenerator $mutationGenerator,
         private MutationTestingRunner $mutationTestingRunner,
         private MinMsiChecker $minMsiChecker,
+        private MaxTimeoutsChecker $maxTimeoutsChecker,
         private ConsoleOutput $consoleOutput,
         private MetricsCalculator $metricsCalculator,
         private TestFrameworkExtraOptionsFilter $testFrameworkExtraOptionsFilter,
@@ -93,6 +96,7 @@ final readonly class Engine
      * @throws InitialTestsFailed
      * @throws InitialStaticAnalysisRunFailed
      * @throws MinMsiCheckFailed
+     * @throws MaxTimeoutCountReached
      * @throws UnparsableFile
      * @throws InvalidCoverage
      * @throws NoSourceFound
@@ -118,6 +122,10 @@ final readonly class Engine
         $this->runMutationAnalysis();
 
         try {
+            $this->maxTimeoutsChecker->checkTimeouts(
+                $this->metricsCalculator->getTimedOutCount(),
+            );
+
             $this->minMsiChecker->checkMetrics(
                 $this->metricsCalculator->getTestedMutantsCount(),
                 $this->metricsCalculator->getMutationScoreIndicator(),

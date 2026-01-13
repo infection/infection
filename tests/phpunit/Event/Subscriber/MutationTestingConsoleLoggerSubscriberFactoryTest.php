@@ -35,20 +35,31 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
+use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
+use Infection\Framework\Str;
 use Infection\Logger\FederatedLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
+use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function Safe\fopen;
+use function Safe\rewind;
+use function Safe\stream_get_contents;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 #[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
+#[Group('integration')]
 final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 {
     private MockObject&MetricsCalculator $metricsCalculatorMock;
@@ -88,7 +99,8 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             new FederatedLogger(),
             $numberOfShownMutations,
             new FakeOutputFormatter(),
-            true, // showMutationScoreIndicator
+            withUncovered: true,
+            withTimeouts: false,
         );
 
         $outputMock = $this->createMock(OutputInterface::class);
@@ -107,5 +119,113 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         foreach ([20, 0, null] as $showMutations) {
             yield [$showMutations];
         }
+    }
+
+    public function test_it_creates_a_subscriber_without_timeouts_by_default(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $resultsCollector = $this->createMock(ResultsCollector::class);
+        $diffColorizer = $this->createMock(DiffColorizer::class);
+        $outputFormatter = $this->createMock(OutputFormatter::class);
+
+        $resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([]);
+
+        // getTimedOutExecutionResults should NOT be called when factory uses default withTimeouts=false
+        $resultsCollector->expects($this->never())
+            ->method('getTimedOutExecutionResults');
+
+        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+            $metricsCalculator,
+            $resultsCollector,
+            $diffColorizer,
+            new FederatedLogger(),
+            20,
+            $outputFormatter,
+            withUncovered: false,
+            withTimeouts: false,
+        );
+
+        $subscriber = $factory->create($output);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $displayOutput = $this->getDisplay($output);
+
+        $this->assertStringNotContainsString('Timed out mutants:', $displayOutput);
+    }
+
+    public function test_it_creates_a_subscriber_with_timeouts_when_explicitly_enabled(): void
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w'));
+
+        $metricsCalculator = $this->createMock(MetricsCalculator::class);
+        $resultsCollector = $this->createMock(ResultsCollector::class);
+        $diffColorizer = $this->createMock(DiffColorizer::class);
+        $outputFormatter = $this->createMock(OutputFormatter::class);
+
+        $timedOutExecutionResult = $this->createMock(MutantExecutionResult::class);
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getOriginalFilePath')
+            ->willReturn('/original/timedout/filePath');
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getOriginalStartingLine')
+            ->willReturn(42);
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getMutatorName')
+            ->willReturn('Minus');
+        $timedOutExecutionResult->expects($this->once())
+            ->method('getMutantHash')
+            ->willReturn('t1m30ut');
+
+        $resultsCollector->expects($this->once())
+            ->method('getEscapedExecutionResults')
+            ->willReturn([]);
+
+        $resultsCollector->expects($this->once())
+            ->method('getTimedOutExecutionResults')
+            ->willReturn([$timedOutExecutionResult]);
+
+        $factory = new MutationTestingConsoleLoggerSubscriberFactory(
+            $metricsCalculator,
+            $resultsCollector,
+            $diffColorizer,
+            new FederatedLogger(),
+            20,
+            $outputFormatter,
+            withUncovered: false,
+            withTimeouts: true,
+        );
+
+        $subscriber = $factory->create($output);
+
+        $dispatcher = new SyncEventDispatcher();
+        $dispatcher->addSubscriber($subscriber);
+
+        $dispatcher->dispatch(new MutationTestingWasFinished());
+
+        $displayOutput = $this->getDisplay($output);
+
+        $this->assertStringContainsString(
+            'Timed out mutants:',
+            $displayOutput,
+        );
+        $this->assertStringContainsString(
+            '1) /original/timedout/filePath:42    [M] Minus [ID] t1m30ut',
+            $displayOutput,
+        );
+    }
+
+    private function getDisplay(StreamOutput $output): string
+    {
+        rewind($output->getStream());
+
+        return Str::toUnixLineEndings(stream_get_contents($output->getStream()));
     }
 }

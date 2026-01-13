@@ -33,44 +33,40 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Metrics;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\FederatedLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Metrics\MaxTimeoutCountReached;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+#[CoversClass(MaxTimeoutCountReached::class)]
+final class MaxTimeoutCountReachedTest extends TestCase
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private OutputFormatter $formatter,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
+    public function test_it_extends_unexpected_value_exception(): void
+    {
+        $exception = MaxTimeoutCountReached::create(5, 10);
+
+        $this->assertInstanceOf(UnexpectedValueException::class, $exception);
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function test_it_creates_exception_with_correct_message(): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
+        $exception = MaxTimeoutCountReached::create(5, 10);
+
+        $this->assertSame(
+            'The maximum allowed timeouts is 5, but 10 timed out. Reduce timeouts or increase the limit!',
+            $exception->getMessage(),
+        );
+    }
+
+    public function test_it_creates_exception_with_zero_limit(): void
+    {
+        $exception = MaxTimeoutCountReached::create(0, 1);
+
+        $this->assertSame(
+            'The maximum allowed timeouts is 0, but 1 timed out. Reduce timeouts or increase the limit!',
+            $exception->getMessage(),
         );
     }
 }

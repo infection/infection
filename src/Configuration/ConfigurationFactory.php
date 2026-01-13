@@ -111,6 +111,8 @@ class ConfigurationFactory
         ?float $minMsi,
         ?int $numberOfShownMutations,
         ?float $minCoveredMsi,
+        bool $timeoutsAsEscaped,
+        ?int $maxTimeouts,
         int $msiPrecision,
         string $mutatorsInput,
         ?string $testFramework,
@@ -180,6 +182,8 @@ class ConfigurationFactory
             minMsi: self::retrieveMinMsi($minMsi, $schema),
             numberOfShownMutations: $numberOfShownMutations,
             minCoveredMsi: self::retrieveMinCoveredMsi($minCoveredMsi, $schema),
+            timeoutsAsEscaped: self::retrieveTimeoutsAsEscaped($timeoutsAsEscaped, $schema),
+            maxTimeouts: self::retrieveMaxTimeouts($maxTimeouts, $schema),
             msiPrecision: $msiPrecision,
             threadCount: $this->retrieveThreadCount($threadCount, $schema),
             isDryRun: $dryRun,
@@ -312,6 +316,16 @@ class ConfigurationFactory
     private static function retrieveMinCoveredMsi(?float $minCoveredMsi, SchemaConfiguration $schema): ?float
     {
         return $minCoveredMsi ?? $schema->minCoveredMsi;
+    }
+
+    private static function retrieveTimeoutsAsEscaped(bool $timeoutsAsEscaped, SchemaConfiguration $schema): bool
+    {
+        return $timeoutsAsEscaped || ($schema->timeoutsAsEscaped ?? false);
+    }
+
+    private static function retrieveMaxTimeouts(?int $maxTimeouts, SchemaConfiguration $schema): ?int
+    {
+        return $maxTimeouts ?? $schema->maxTimeouts;
     }
 
     /**
