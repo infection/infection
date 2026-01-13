@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Coverage\XmlReport;
 
 use Infection\AbstractTestFramework\Coverage\TestLocation;
+use Infection\FileSystem\FileSystem;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\SafeDOMXPath;
@@ -59,7 +60,9 @@ final class XmlCoverageParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parser = new XmlCoverageParser();
+        $this->parser = new XmlCoverageParser(
+            new FileSystem(),
+        );
     }
 
     #[DataProvider('lineCoverageProvider')]

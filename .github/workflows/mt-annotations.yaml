@@ -61,6 +61,7 @@ jobs:
                     --git-diff-lines \
                     --git-diff-base=origin/$GITHUB_BASE_REF \
                     --ignore-msi-with-no-mutations \
+                    --max-timeouts=0 \
                     --min-msi=100 \
                     --min-covered-msi=100
 

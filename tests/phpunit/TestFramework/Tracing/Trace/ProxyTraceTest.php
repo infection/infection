@@ -54,20 +54,9 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = new MockSplFileInfo();
 
-        $actual = (new ProxyTrace($fileInfoMock))->getSourceFileInfo();
+        $actual = (new ProxyTrace($fileInfoMock, ''))->getSourceFileInfo();
 
         $this->assertSame($fileInfoMock, $actual);
-    }
-
-    public function test_it_exposes_its_source_file_real_path(): void
-    {
-        $expected = 'Foo.php';
-
-        $fileInfoMock = new MockSplFileInfo(realPath: $expected);
-
-        $actual = (new ProxyTrace($fileInfoMock))->getRealPath();
-
-        $this->assertSame($expected, $actual);
     }
 
     public function test_it_can_retrieve_the_test_locations(): void
@@ -76,7 +65,11 @@ final class ProxyTraceTest extends TestCase
 
         $tests = new TestLocations();
 
-        $trace = new ProxyTrace($fileInfoMock, now($tests));
+        $trace = new ProxyTrace(
+            $fileInfoMock,
+            '',
+            now($tests),
+        );
 
         $actual = $trace->getTests();
 
@@ -99,12 +92,14 @@ final class ProxyTraceTest extends TestCase
         yield [
             new ProxyTrace(
                 new MockSplFileInfo(),
+                '',
             ),
         ];
 
         yield [
             new ProxyTrace(
                 new MockSplFileInfo(),
+                '',
                 now(new TestLocations()),
             ),
         ];
@@ -114,7 +109,7 @@ final class ProxyTraceTest extends TestCase
     {
         $fileInfoMock = new MockSplFileInfo();
 
-        $trace = new ProxyTrace($fileInfoMock);
+        $trace = new ProxyTrace($fileInfoMock, '');
 
         $this->assertCount(0, $trace->getAllTestsForMutation(new NodeLineRangeData(1, 2), false));
     }
@@ -137,7 +132,11 @@ final class ProxyTraceTest extends TestCase
             ],
         );
 
-        $trace = new ProxyTrace($fileInfoMock, now($tests));
+        $trace = new ProxyTrace(
+            $fileInfoMock,
+            '',
+            now($tests),
+        );
 
         $this->assertTrue($trace->hasTests());
 

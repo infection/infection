@@ -62,11 +62,11 @@ class XmlCoverageParser
 
     public function parse(SourceFileInfoProvider $provider): Trace
     {
-        $sourceFile = $provider->provideFileInfo();
+        $fileInfo = $provider->provideFileInfo();
 
         return new ProxyTrace(
-            $sourceFile,
-            $this->fileSystem->realPath($sourceFile->getPathname()),
+            $fileInfo,
+            $this->fileSystem->realPath($fileInfo->getPathname()),
             lazy(self::createTestLocationsGenerator($provider->provideXPath())),
         );
     }

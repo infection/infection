@@ -33,44 +33,30 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
-
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\FederatedLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Metrics;
 
 /**
  * @internal
+ * @final
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+readonly class MaxTimeoutsChecker
 {
     public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private OutputFormatter $formatter,
-        private bool $withUncovered,
-        private bool $withTimeouts,
+        private ?int $maxTimeouts,
     ) {
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    /**
+     * @throws MaxTimeoutCountReached
+     */
+    public function checkTimeouts(int $timedOutCount): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        if ($this->maxTimeouts === null) {
+            return;
+        }
+
+        if ($timedOutCount > $this->maxTimeouts) {
+            throw MaxTimeoutCountReached::create($this->maxTimeouts, $timedOutCount);
+        }
     }
 }

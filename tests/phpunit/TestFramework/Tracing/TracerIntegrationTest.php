@@ -36,6 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\TestFramework\Tracing;
 
 use function count;
+use function file_exists;
+use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
@@ -60,30 +62,29 @@ use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
 use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
 
+#[Group('integration')]
 #[CoversNothing]
-final class PHPUnitCoverageTracerTest extends TestCase
+final class TracerIntegrationTest extends TestCase
 {
     private const FIXTURES_DIR = __DIR__ . '/../Coverage/Fixtures';
 
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
         string $indexXmlPath,
-        string $fileXmlPath,
         string $junitXmlPath,
         SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
         $tracer = $this->createTracer(
             $indexXmlPath,
-            $fileXmlPath,
             $junitXmlPath,
-            $fileInfo->getRealPath(),
         );
 
         $actual = $tracer->trace($fileInfo);
@@ -92,405 +93,6 @@ final class PHPUnitCoverageTracerTest extends TestCase
     }
 
     public static function traceProvider(): iterable
-    {
-        //        $canonicalDemoCounterServicePathname = Path::canonicalize(self::FIXTURE_DIR . '/src/DemoCounterService.php');
-        //
-        //        $splFileInfo = new SplFileInfo(
-        //            self::FIXTURE_DIR . '/src/DemoCounterService.php',
-        //        );
-        //
-        //        $testFilePath = Path::canonicalize(self::FIXTURE_DIR . '/tests/DemoCounterServiceTest.php');
-        //
-        //        $testLocations = [
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_set_step_changes_increment_amount',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_custom_step_with_multiple_counts',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_count_increments_by_step_and_returns_new_value',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_negative_step_decreases_counter',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_multiple_counts_increment_correctly',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_set_step_with_default_resets_to_one',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_complex_scenario',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_start_count_with_default_sets_to_zero',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_zero_step_keeps_counter_unchanged',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //            new TestLocation(
-        //                sprintf(
-        //                    '%s::test_start_count_affects_subsequent_counts',
-        //                    DemoCounterServiceTest::class,
-        //                ),
-        //                $testFilePath,
-        //                0.022199,
-        //            ),
-        //        ];
-        //
-        //        yield [
-        //            $splFileInfo,
-        //            new SyntheticTrace(
-        //                sourceFileInfo: $splFileInfo,
-        //                realPath: realpath($canonicalDemoCounterServicePathname),
-        //                relativePathname: $canonicalDemoCounterServicePathname,
-        //                hasTest: true,
-        //                tests: new TestLocations(
-        //                    [
-        //                        46 => $testLocations,
-        //                        47 => $testLocations,
-        //                        49 => $testLocations,
-        //                        54 => [
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_start_count_sets_initial_value',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_negative_step_decreases_counter',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_complex_scenario',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_start_count_with_default_sets_to_zero',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_zero_step_keeps_counter_unchanged',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_start_count_affects_subsequent_counts',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                        ],
-        //                        59 => [
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_set_step_changes_increment_amount',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_custom_step_with_multiple_counts',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_negative_step_decreases_counter',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_set_step_with_default_resets_to_one',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_complex_scenario',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_zero_step_keeps_counter_unchanged',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                        ],
-        //                        64 => [
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_set_step_changes_increment_amount',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_custom_step_with_multiple_counts',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_start_count_sets_initial_value',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_count_increments_by_step_and_returns_new_value',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_initial_counter_is_zero',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_negative_step_decreases_counter',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_multiple_counts_increment_correctly',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_complex_scenario',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_start_count_with_default_sets_to_zero',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_zero_step_keeps_counter_unchanged',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                            new TestLocation(
-        //                                sprintf(
-        //                                    '%s::test_start_count_affects_subsequent_counts',
-        //                                    DemoCounterServiceTest::class,
-        //                                ),
-        //                                $testFilePath,
-        //                                0.022199,
-        //                            ),
-        //                        ],
-        //                    ],
-        //                    [
-        //                        'count' => new SourceMethodLineRange(44, 50),
-        //                        'startCount' => new SourceMethodLineRange(52, 55),
-        //                        'setStep' => new SourceMethodLineRange(57, 60),
-        //                        'get' => new SourceMethodLineRange(62, 65),
-        //                    ],
-        //                ),
-        //            ),
-        //        ];
-
-        yield from DataProviderFactory::prefix(
-            '[PHPUnit 09] ',
-            self::phpUnit09InfoProvider(),
-        );
-
-        //        yield from DataProviderFactory::prefix(
-        //            '[PHPUnit 10] ',
-        //            self::phpUnit10InfoProvider(),
-        //        );
-        //
-        //        yield from DataProviderFactory::prefix(
-        //            '[PHPUnit 11] ',
-        //            self::phpUnit11InfoProvider(),
-        //        );
-        //
-        //        yield from DataProviderFactory::prefix(
-        //            '[PHPUnit 12.0] ',
-        //            self::phpUnit120InfoProvider(),
-        //        );
-        //
-        //        yield from DataProviderFactory::prefix(
-        //            '[PHPUnit 12.5] ',
-        //            self::phpUnit125InfoProvider(),
-        //        );
-        //
-        //        yield from DataProviderFactory::prefix(
-        //            '[Codeception] ',
-        //            self::codeceptionInfoProvider(),
-        //        );
-    }
-
-    private function createTracer(
-        string $indexXmlPath,
-        string $fileXmlPath,
-        string $junitXmlPath,
-        string $sourceRealPath,
-    ): Tracer {
-        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
-        $testFrameworkAdapterStub
-            ->method('hasJUnitReport')
-            ->willReturn(true);
-
-        $fileSystemStub = $this->createFileSystemStub();
-
-        return new TraceProviderAdapterTracer(
-            new CoveredTraceProvider(
-                new PhpUnitXmlCoverageTraceProvider(
-                    indexLocator: new FixedLocator($indexXmlPath),
-                    indexParser: new IndexXmlCoverageParser(
-                        isSourceFiltered: false,
-                        fileSystem: $fileSystemStub,
-                    ),
-                    parser: new XmlCoverageParser(
-                        $fileSystemStub,
-                    ),
-                ),
-                new JUnitTestExecutionInfoAdder(
-                    $testFrameworkAdapterStub,
-                    new MemoizedTestFileDataProvider(
-                        new JUnitTestFileDataProvider(
-                            new FixedLocator($junitXmlPath),
-                        ),
-                    ),
-                ),
-            ),
-        );
-    }
-
-    private function createFileSystemStub(): FileSystem
-    {
-        $fileSystem = new FileSystem();
-
-        $fileSystemStub = $this->createStub(FileSystem::class);
-        $fileSystemStub
-            ->method('isReadableFile')
-            ->willReturnCallback($fileSystem->isReadableFile(...));
-        $fileSystemStub
-            ->method('readFile')
-            ->willReturnCallback($fileSystem->readFile(...));
-
-        // We are only interested in mocking the realPath check!
-        // In this test, we do not ~~need~~ want to check that the source file exists as this
-        // makes the tests too inflexible.
-        // In a real run, this is what provides the guarantee that the constructed path makes
-        // sense; in this test it is done by checking that the path we get at the end for the
-        // source file is the one we expect.
-        $fileSystemStub
-            ->method('realPath')
-            ->willReturnCallback(static fn (string $path) => $path);
-
-        return $fileSystemStub;
-    }
-
-    private static function phpUnit09InfoProvider(): iterable
     {
         $coverageDirectory = Path::canonicalize(self::FIXTURES_DIR . '/phpunit-09/');
 
@@ -1232,5 +834,65 @@ final class PHPUnitCoverageTracerTest extends TestCase
                 byMethod: [],
             ),
         ];
+    }
+
+    private function createTracer(
+        string $indexXmlPath,
+        string $junitXmlPath,
+    ): Tracer {
+        $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
+        $testFrameworkAdapterStub
+            ->method('hasJUnitReport')
+            ->willReturn(true);
+
+        $fileSystemStub = $this->createFileSystemStub();
+
+        return new TraceProviderAdapterTracer(
+            new CoveredTraceProvider(
+                new PhpUnitXmlCoverageTraceProvider(
+                    indexLocator: new FixedLocator($indexXmlPath),
+                    indexParser: new IndexXmlCoverageParser(
+                        isSourceFiltered: false,
+                        fileSystem: $fileSystemStub,
+                    ),
+                    parser: new XmlCoverageParser(
+                        $fileSystemStub,
+                    ),
+                ),
+                new JUnitTestExecutionInfoAdder(
+                    $testFrameworkAdapterStub,
+                    new MemoizedTestFileDataProvider(
+                        new JUnitTestFileDataProvider(
+                            new FixedLocator($junitXmlPath),
+                        ),
+                    ),
+                ),
+            ),
+        );
+    }
+
+    private function createFileSystemStub(): FileSystem
+    {
+        $fileSystem = new FileSystem();
+
+        $fileSystemStub = $this->createStub(FileSystem::class);
+        $fileSystemStub
+            ->method('isReadableFile')
+            ->willReturnCallback($fileSystem->isReadableFile(...));
+        $fileSystemStub
+            ->method('readFile')
+            ->willReturnCallback($fileSystem->readFile(...));
+
+        // We are only interested in mocking the realPath check!
+        // In this test, we do not ~~need~~ want to check that the source file exists as this
+        // makes the tests too inflexible.
+        // In a real run, this is what provides the guarantee that the constructed path makes
+        // sense; in this test it is done by checking that the path we get at the end for the
+        // source file is the one we expect.
+        $fileSystemStub
+            ->method('realPath')
+            ->willReturnCallback(static fn (string $path): string => $path);
+
+        return $fileSystemStub;
     }
 }

@@ -55,7 +55,7 @@ class ProxyTrace implements Trace
      */
     public function __construct(
         private readonly SplFileInfo $sourceFile,
-        private readonly string $realPath,
+        private readonly string $sourceRealPath,
         private readonly ?Deferred $lazyTestLocations = null,
     ) {
     }
@@ -67,7 +67,7 @@ class ProxyTrace implements Trace
 
     public function getRealPath(): string
     {
-        return $this->realPath;
+        return $this->sourceRealPath;
     }
 
     public function hasTests(): bool

@@ -33,37 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\TestFramework\Coverage\Locator;
+namespace Infection\Metrics;
+
+use function sprintf;
+use UnexpectedValueException;
 
 /**
  * @internal
  */
-final class MemoizedLocator implements ReportLocator
+final class MaxTimeoutCountReached extends UnexpectedValueException
 {
-    private string $location;
-
-    private string $defaultLocation;
-
-    public function __construct(
-        private readonly ReportLocator $decoratedLocator,
-    ) {
-    }
-
-    public function locate(): string
+    public static function create(int $maxTimeouts, int $timedOutCount): self
     {
-        if (!isset($this->location)) {
-            $this->location = $this->decoratedLocator->locate();
-        }
-
-        return $this->location;
-    }
-
-    public function getDefaultLocation(): string
-    {
-        if (!isset($this->defaultLocation)) {
-            $this->defaultLocation = $this->decoratedLocator->getDefaultLocation();
-        }
-
-        return $this->defaultLocation;
+        return new self(sprintf(
+            'The maximum allowed timeouts is %d, but %d timed out. '
+            . 'Reduce timeouts or increase the limit!',
+            $maxTimeouts,
+            $timedOutCount,
+        ));
     }
 }
