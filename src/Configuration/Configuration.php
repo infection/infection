@@ -91,6 +91,8 @@ readonly class Configuration
         public ?float $minMsi,
         public ?int $numberOfShownMutations,
         public ?float $minCoveredMsi,
+        public bool $timeoutsAsEscaped,
+        public ?int $maxTimeouts,
         public int $msiPrecision,
         public int $threadCount,
         public bool $isDryRun,

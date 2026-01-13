@@ -53,6 +53,7 @@ class TargetDetectionStatusesProvider
         private readonly string $logVerbosity,
         private readonly bool $onlyCoveredMode,
         private readonly ?int $numberOfShownMutations,
+        private readonly bool $withTimeouts = false,
     ) {
     }
 
@@ -80,6 +81,10 @@ class TargetDetectionStatusesProvider
     {
         if ($this->numberOfShownMutations !== 0) {
             yield DetectionStatus::ESCAPED->name => DetectionStatus::ESCAPED;
+
+            if ($this->withTimeouts) {
+                yield DetectionStatus::TIMED_OUT->name => DetectionStatus::TIMED_OUT;
+            }
         }
 
         if (!$this->onlyCoveredMode) {
