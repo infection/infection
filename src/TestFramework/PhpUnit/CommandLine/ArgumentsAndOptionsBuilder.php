@@ -42,10 +42,6 @@ use function explode;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\SafeDOMXPath;
-use InvalidArgumentException;
-use Later\Interfaces\Deferred;
-use function Later\lazy;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
@@ -56,7 +52,6 @@ use function str_starts_with;
  */
 final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
