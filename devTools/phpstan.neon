@@ -182,6 +182,17 @@ parameters:
             identifier: throws.unusedType
             path: ../src/Container/Container.php
 
+        # This is legit; To review if that remains to be true once we dealt with
+        # https://github.com/infection/infection/issues/2760.
+        -
+            message: '#getDefaultLocation#'
+            identifier: shipmonk.deadMethod
+            path: ../src/TestFramework/Coverage/Locator/ReportLocator.php
+        -
+            message: '#getDefaultLocation#'
+            identifier: shipmonk.deadMethod
+            path: ../src/TestFramework/Coverage/Locator/FakeLocator.php
+
         # PHPStan cannot really properly infer the types here
         -
             message: '#BasicSourceCollector::makePathsAbsolute\(\)#'

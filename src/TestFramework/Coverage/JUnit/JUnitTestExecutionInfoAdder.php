@@ -88,6 +88,7 @@ class JUnitTestExecutionInfoAdder
         foreach ($traces as $trace) {
             yield new ProxyTrace(
                 $trace->getSourceFileInfo(),
+                $trace->getRealPath(),
                 lazy(self::createCompleteTestLocationsGenerator($trace)),
             );
         }

@@ -33,44 +33,48 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Tests\Metrics;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\FederatedLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Metrics\MaxTimeoutCountReached;
+use Infection\Metrics\MaxTimeoutsChecker;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+#[CoversClass(MaxTimeoutsChecker::class)]
+final class MaxTimeoutsCheckerTest extends TestCase
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private OutputFormatter $formatter,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
+    #[DataProvider('noExceptionProvider')]
+    public function test_it_does_not_throw(?int $maxTimeouts, int $timedOutCount): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $checker = new MaxTimeoutsChecker($maxTimeouts);
+        $checker->checkTimeouts($timedOutCount);
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public static function noExceptionProvider(): iterable
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        yield 'null limit allows any count' => [null, 100];
+
+        yield 'below limit' => [10, 5];
+
+        yield 'at limit' => [10, 10];
+    }
+
+    #[DataProvider('exceptionProvider')]
+    public function test_it_throws_when_timed_out_count_exceeds_limit(int $maxTimeouts, int $timedOutCount): void
+    {
+        $this->expectExceptionObject(MaxTimeoutCountReached::create($maxTimeouts, $timedOutCount));
+
+        $checker = new MaxTimeoutsChecker($maxTimeouts);
+        $checker->checkTimeouts($timedOutCount);
+    }
+
+    public static function exceptionProvider(): iterable
+    {
+        yield 'exceeds limit' => [5, 10];
+
+        yield 'exceeds zero limit' => [0, 1];
     }
 }
