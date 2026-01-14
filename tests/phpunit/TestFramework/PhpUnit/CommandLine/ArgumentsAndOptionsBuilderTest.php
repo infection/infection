@@ -52,9 +52,19 @@ use function sprintf;
 #[CoversClass(FilterBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
+    private const PHPUNIT_CONFIG_WITH_COVERAGE_METADATA = <<<'XML'
+        <?xml version="1.0"?>
+        <phpunit requireCoverageMetadata="true"></phpunit>
+        XML;
+
+    private const PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA = <<<'XML'
+        <?xml version="1.0"?>
+        <phpunit></phpunit>
+        XML;
+
     public function test_it_can_build_the_command_without_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -62,13 +72,13 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--configuration',
                 $configPath,
             ],
-            $builder->buildForInitialTestsRun($configPath, ''),
+            $builder->buildForInitialTestsRun($configPath, '', '10.0'),
         );
     }
 
     public function test_it_can_build_the_command_with_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -78,18 +88,20 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--verbose',
                 '--debug',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
+            $builder->buildForInitialTestsRun($configPath, '--verbose --debug', '10.0'),
         );
     }
 
     public function test_it_can_build_the_command_with_filtered_files_for_initial_tests_run(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false,
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
             [
                 new SplFileInfo('src/Foo.php'),
                 new SplFileInfo('src/bar/Baz.php'),
             ],
             'simple',
+            self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA,
         );
         $configPath = '/config/path';
 
@@ -102,13 +114,13 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 '--filter',
                 'FooTest|BazTest',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--verbose --debug'),
+            $builder->buildForInitialTestsRun($configPath, '--verbose --debug', '10.0'),
         );
     }
 
     public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
         $configPath = '/the config/path';
 
         $this->assertSame(
@@ -117,7 +129,126 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 $configPath,
                 '--path=/a path/with spaces',
             ],
-            $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces'),
+            $builder->buildForInitialTestsRun($configPath, '--path=/a path/with spaces', '10.0'),
+        );
+    }
+
+    public function test_it_adds_covers_option_when_require_coverage_metadata_is_true_and_phpunit_10_or_higher(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+                new SplFileInfo('src/bar/Baz.php'),
+            ],
+            null,
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--covers',
+                'Foo',
+                '--covers',
+                'Baz',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '', '10.0'),
+        );
+    }
+
+    public function test_it_does_not_add_covers_option_when_phpunit_version_is_below_10(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+            ],
+            null,
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+            ],
+            $builder->buildForInitialTestsRun($configPath, '', '9.5'),
+        );
+    }
+
+    public function test_it_does_not_add_covers_option_when_require_coverage_metadata_is_false(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+            ],
+            null,
+            self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+            ],
+            $builder->buildForInitialTestsRun($configPath, '', '10.0'),
+        );
+    }
+
+    public function test_it_adds_both_covers_and_filter_when_both_conditions_are_met(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+                new SplFileInfo('src/Bar.php'),
+            ],
+            'simple',
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--covers',
+                'Foo',
+                '--covers',
+                'Bar',
+                '--filter',
+                'FooTest|BarTest',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '', '10.0'),
+        );
+    }
+
+    public function test_it_does_not_override_user_specified_covers_option(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+            ],
+            null,
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        // Extra options are parsed by splitting on ' --', so '--covers CustomClass' stays as one string
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--covers CustomClass',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '--covers CustomClass', '10.0'),
         );
     }
 
@@ -133,7 +264,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     ): void {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null);
+        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
 
         $expectedArgumentsAndOptions = [
             '--configuration',

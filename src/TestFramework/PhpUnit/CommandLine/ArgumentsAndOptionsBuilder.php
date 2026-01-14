@@ -40,12 +40,12 @@ use function array_merge;
 use function count;
 use function explode;
 use function implode;
+use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
-use function str_starts_with;
 
 /**
  * @internal
@@ -69,12 +69,9 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
-        if ($this->filteredSourceFilesToMutate === []) {
-            return $options;
-        }
-
-        if ($this->mapSourceClassToTestStrategy !== null
-            && !self::hasOption($options, '--filter')
+        if ($this->filteredSourceFilesToMutate !== []
+            && $this->mapSourceClassToTestStrategy !== null
+            && !in_array('--filter', $options, true)
         ) {
             $options[] = '--filter';
 
@@ -139,20 +136,6 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         return $options;
-    }
-
-    /**
-     * @param list<string> $options
-     */
-    private static function hasOption(array $options, string $option): bool
-    {
-        foreach ($options as $opt) {
-            if ($opt === $option || str_starts_with($opt, $option . ' ')) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
