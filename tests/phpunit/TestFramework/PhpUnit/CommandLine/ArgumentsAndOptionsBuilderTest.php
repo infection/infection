@@ -52,9 +52,19 @@ use function sprintf;
 #[CoversClass(FilterBuilder::class)]
 final class ArgumentsAndOptionsBuilderTest extends TestCase
 {
+    private const PHPUNIT_CONFIG_WITH_COVERAGE_METADATA = <<<'XML'
+        <?xml version="1.0"?>
+        <phpunit requireCoverageMetadata="true"></phpunit>
+        XML;
+
+    private const PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA = <<<'XML'
+        <?xml version="1.0"?>
+        <phpunit></phpunit>
+        XML;
+
     public function test_it_can_build_the_command_without_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -68,7 +78,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_extra_options(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
         $configPath = '/config/path';
 
         $this->assertSame(
@@ -84,12 +94,14 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_filtered_files_for_initial_tests_run(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false,
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
             [
                 new SplFileInfo('src/Foo.php'),
                 new SplFileInfo('src/bar/Baz.php'),
             ],
             'simple',
+            self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA,
         );
         $configPath = '/config/path';
 
@@ -108,7 +120,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
 
     public function test_it_can_build_the_command_with_extra_options_that_contains_spaces(): void
     {
-        $builder = new ArgumentsAndOptionsBuilder(false, [], null);
+        $builder = new ArgumentsAndOptionsBuilder(false, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
         $configPath = '/the config/path';
 
         $this->assertSame(
@@ -130,7 +142,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/bar/Baz.php'),
             ],
             null,
-            true, // requireCoverageMetadata
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
         );
         $configPath = '/config/path';
 
@@ -155,7 +167,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/Foo.php'),
             ],
             null,
-            true, // requireCoverageMetadata
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
         );
         $configPath = '/config/path';
 
@@ -176,7 +188,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/Foo.php'),
             ],
             null,
-            false, // requireCoverageMetadata
+            self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA,
         );
         $configPath = '/config/path';
 
@@ -201,7 +213,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
     ): void {
         $configPath = '/the config/path';
 
-        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null);
+        $builder = new ArgumentsAndOptionsBuilder($executeOnlyCoveringTestCases, [], null, self::PHPUNIT_CONFIG_WITHOUT_COVERAGE_METADATA);
 
         $expectedArgumentsAndOptions = [
             '--configuration',

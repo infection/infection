@@ -44,15 +44,19 @@ use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
+use Infection\TestFramework\SafeDOMXPath;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
+use Throwable;
 
 /**
  * @internal
  */
 final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
+    private bool $requireCoverageMetadata;
+
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
      */
@@ -60,8 +64,20 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         private bool $executeOnlyCoveringTestCases,
         private array $filteredSourceFilesToMutate,
         private ?string $mapSourceClassToTestStrategy,
-        private bool $requireCoverageMetadata = false,
+        string $testFrameworkConfigContent,
     ) {
+        $this->requireCoverageMetadata = self::parseRequireCoverageMetadata($testFrameworkConfigContent);
+    }
+
+    private static function parseRequireCoverageMetadata(string $xmlContent): bool
+    {
+        try {
+            $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
+
+            return $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     /**
