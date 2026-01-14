@@ -45,6 +45,8 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\SafeDOMXPath;
+use Later\Interfaces\Deferred;
+use function Later\lazy;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
@@ -55,7 +57,8 @@ use Throwable;
  */
 final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    private bool $requireCoverageMetadata;
+    /** @var Deferred<bool> */
+    private Deferred $requireCoverageMetadata;
 
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
@@ -66,18 +69,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         private ?string $mapSourceClassToTestStrategy,
         string $testFrameworkConfigContent,
     ) {
-        $this->requireCoverageMetadata = self::parseRequireCoverageMetadata($testFrameworkConfigContent);
-    }
-
-    private static function parseRequireCoverageMetadata(string $xmlContent): bool
-    {
-        try {
-            $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
-
-            return $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
-        } catch (Throwable) {
-            return false;
-        }
+        $this->requireCoverageMetadata = lazy(self::parseRequireCoverageMetadata($testFrameworkConfigContent));
     }
 
     /**
@@ -94,9 +86,9 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         // Auto-add --covers for PHPUnit 10+ when requireCoverageMetadata is true
         // This filters tests to only those with matching #[CoversClass] attributes,
         // avoiding PHPUnit 12's "not a valid target for code coverage" warning
-        if ($this->requireCoverageMetadata
+        if (!in_array('--covers', $options, true)
             && PhpUnitAdapter::supportsCoversSelector($testFrameworkVersion)
-            && !in_array('--covers', $options, true)
+            && $this->requireCoverageMetadata->get()
         ) {
             foreach ($this->filteredSourceFilesToMutate as $sourceFile) {
                 $options[] = '--covers';
@@ -142,6 +134,20 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         return $options;
+    }
+
+    /**
+     * @return iterable<bool>
+     */
+    private static function parseRequireCoverageMetadata(string $xmlContent): iterable
+    {
+        try {
+            $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
+
+            yield $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
+        } catch (Throwable) {
+            yield false;
+        }
     }
 
     private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
