@@ -36,6 +36,7 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
+use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
@@ -163,38 +164,17 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
-        $recommendations = parent::getInitialTestsFailRecommendations($commandLine);
+        $recommendations = [parent::getInitialTestsFailRecommendations($commandLine)];
 
-        if (self::supportsExecutionOrderDefectsRandom($this->getVersion())) {
-            $recommendations = sprintf(
-                "%s\n\n%s\n\n%s",
-                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
-                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
-                'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                $recommendations,
-            );
-        } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
-            $recommendations = sprintf(
-                "%s\n\n%s\n\n%s",
-                "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
-                . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
-                'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                $recommendations,
-            );
+        if (version_compare($this->getVersion(), '7.2', '>=')) {
+            $recommendations = [...$this->getRandomOrderRecommendations(), $recommendations];
         }
 
         if (version_compare($this->getVersion(), '12.0', '>=')) {
-            $recommendations = sprintf(
-                "%s\n\n%s",
-                "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors:\n"
-                . "- Add requireCoverageMetadata=\"true\" to phpunit.xml\n"
-                . "- Ensure all tests have #[CoversClass] or #[CoversNothing] attributes\n"
-                . '- Or use --test-framework-options="--covers=ClassName" manually',
-                $recommendations,
-            );
+            $recommendations = [...$this->getPHPUnit12CoversRecommendations(), $recommendations];
         }
 
-        return $recommendations;
+        return implode("\n\n", $recommendations);
     }
 
     /**
@@ -220,5 +200,26 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
     public function getInitialRunOnlyOptions(): array
     {
         return ['--configuration', '--filter', '--testsuite'];
+    }
+
+    private function getRandomOrderRecommendations(): iterable
+    {
+        yield 'Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.';
+
+        yield self::supportsExecutionOrderDefectsRandom($this->getVersion())
+            ? 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...'
+            : 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...';
+
+        yield '';
+
+        yield 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"';
+    }
+
+    private function getPHPUnit12CoversRecommendations(): iterable
+    {
+        yield "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors:\n"
+            . "- Add requireCoverageMetadata=\"true\" to phpunit.xml\n"
+            . "- Ensure all tests have #[CoversClass] or #[CoversNothing] attributes\n"
+            . '- Or use --test-framework-options="--covers=ClassName" manually';
     }
 }
