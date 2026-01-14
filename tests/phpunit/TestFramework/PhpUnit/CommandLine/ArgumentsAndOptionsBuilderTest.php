@@ -201,6 +201,57 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
+    public function test_it_adds_both_covers_and_filter_when_both_conditions_are_met(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+                new SplFileInfo('src/Bar.php'),
+            ],
+            'simple',
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--covers',
+                'Foo',
+                '--covers',
+                'Bar',
+                '--filter',
+                'FooTest|BarTest',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '', '10.0'),
+        );
+    }
+
+    public function test_it_does_not_override_user_specified_covers_option(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+            ],
+            null,
+            self::PHPUNIT_CONFIG_WITH_COVERAGE_METADATA,
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+                '--covers',
+                'CustomClass',
+            ],
+            $builder->buildForInitialTestsRun($configPath, '--covers CustomClass', '10.0'),
+        );
+    }
+
     /**
      * @param string[] $testCases
      */
