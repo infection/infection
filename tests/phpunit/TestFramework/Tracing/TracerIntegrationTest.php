@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\TestFramework\Tracing;
 
+use function file_exists;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\FileSystem\FileSystem;
@@ -60,9 +61,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Safe\realpath;
-use SplFileInfo;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Process\Process;
 
 #[Group('integration')]
 #[CoversNothing]
@@ -76,15 +77,18 @@ final class TracerIntegrationTest extends TestCase
     public function test_it_can_create_a_trace(
         string $indexXmlPath,
         string $junitXmlPath,
-        SplFileInfo $fileInfo,
         Trace $expected,
     ): void {
+        $this->copyReportFromTemplateIfMissing(self::COVERAGE_REPORT_DIR);
+
         $tracer = $this->createTracer(
             $indexXmlPath,
             $junitXmlPath,
         );
 
-        $actual = $tracer->trace($fileInfo);
+        $actual = $tracer->trace(
+            $expected->getSourceFileInfo(),
+        );
 
         TraceAssertion::assertEquals($expected, $actual);
     }
@@ -183,11 +187,8 @@ final class TracerIntegrationTest extends TestCase
         yield [
             $coveragePath . '/xml/index.xml',
             $coveragePath . '/junit.xml',
-            new MockSplFileInfo(realPath: $canonicalDemoCounterServicePathname),
             new SyntheticTrace(
-                sourceFileInfo: new SplFileInfo(
-                    self::FIXTURE_DIR . '/src/DemoCounterService.php',
-                ),
+                sourceFileInfo: MockSplFileInfo::create(self::FIXTURE_DIR . '/src/DemoCounterService.php'),
                 realPath: realpath($canonicalDemoCounterServicePathname),
                 relativePathname: $canonicalDemoCounterServicePathname,
                 hasTest: true,
@@ -456,5 +457,22 @@ final class TracerIntegrationTest extends TestCase
             ->willReturnCallback(static fn (string $path): string => $path);
 
         return $fileSystemStub;
+    }
+
+    private function copyReportFromTemplateIfMissing(string $coveragePath): void
+    {
+        if (file_exists($coveragePath)) {
+            return;
+        }
+
+        $process = new Process(
+            command: [
+                'make',
+                'phpunit-coverage',
+            ],
+            cwd: self::FIXTURE_DIR,
+            timeout: 5,
+        );
+        $process->mustRun();
     }
 }
