@@ -47,6 +47,7 @@ use Infection\TestFramework\PhpUnit\Config\Builder\MutationConfigBuilder;
 use Infection\TestFramework\PhpUnit\Config\Path\PathReplacer;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationManipulator;
 use Infection\TestFramework\PhpUnit\Config\XmlConfigurationVersionProvider;
+use Infection\TestFramework\SafeDOMXPath;
 use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
@@ -78,6 +79,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
         Assert::string($testFrameworkConfigDir, 'Config dir is not allowed to be `null` for the adapter');
 
         $testFrameworkConfigContent = file_get_contents($testFrameworkConfigPath);
+        $requireCoverageMetadata = self::parseRequireCoverageMetadata($testFrameworkConfigContent);
 
         $configManipulator = new XmlConfigurationManipulator(
             new PathReplacer(
@@ -114,6 +116,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
+                $requireCoverageMetadata,
             ),
             new VersionParser(),
             new CommandLineBuilder(),
@@ -128,5 +131,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
     public static function getExecutableName(): string
     {
         return 'phpunit';
+    }
+
+    private static function parseRequireCoverageMetadata(string $xmlContent): bool
+    {
+        $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
+
+        return $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
     }
 }
