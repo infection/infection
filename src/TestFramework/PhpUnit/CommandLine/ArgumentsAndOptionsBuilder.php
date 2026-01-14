@@ -42,7 +42,6 @@ use function explode;
 use function implode;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
-use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\SafeDOMXPath;
 use InvalidArgumentException;
 use Later\Interfaces\Deferred;
