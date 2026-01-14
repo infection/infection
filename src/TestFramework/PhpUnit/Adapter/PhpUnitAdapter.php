@@ -172,7 +172,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         }
 
         if (version_compare($this->getVersion(), '12.0', '>=')) {
-            $recommendations = [...$this->getPHPUnit12CoversRecommendations(), ...$recommendations];
+            $recommendations = [...$this->getPHPUnit12Recommendations(), ...$recommendations];
         }
 
         return implode("\n\n", $recommendations);
@@ -193,14 +193,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
             || version_compare($version, '11.5.27', '>=') && version_compare($version, '12.0', '<')
             || version_compare($version, '12.2.7', '>=')
         ;
-    }
-
-    /**
-     * PHPUnit 10+ supports the `--covers` selector to choose only tests covering specific classes.
-     */
-    public static function supportsCoversSelector(string $version): bool
-    {
-        return version_compare($version, '10.0', '>=');
     }
 
     /**
@@ -229,12 +221,11 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
 
     /**
      * @return iterable<string>
+     * @see https://github.com/infection/infection/issues/2440
      */
-    private function getPHPUnit12CoversRecommendations(): iterable
+    private function getPHPUnit12Recommendations(): iterable
     {
-        yield "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors:\n"
-            . "- Add requireCoverageMetadata=\"true\" to phpunit.xml\n"
-            . "- Ensure all tests have #[CoversClass] or #[CoversNothing] attributes\n"
-            . '- Or specify --test-framework-options="--covers=ClassName" manually';
+        yield "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors,\n"
+            . "narrow tests with --test-framework-options=\"--filter='ClassName'\"";
     }
 }
