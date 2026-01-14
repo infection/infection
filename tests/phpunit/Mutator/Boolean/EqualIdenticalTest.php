@@ -357,28 +357,33 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
 
         yield 'It mutates equal operator into identical operator for comparison of intersection types' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'identical-intersection-type.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace EqualIdenticalIntersectionType;
+            <<<'PHP'
+                <?php
 
-                    interface A
-                    {
-                    }
-                    interface B
-                    {
-                    }
-                    class C implements A, B
-                    {
-                    }
-                    function doFoo(): A&B
-                    {
-                        return new C();
-                    }
-                    doFoo() === doFoo();
-                    doFoo() === doFoo();
+                namespace EqualIdenticalIntersectionType;
 
-                    PHP,
-            ),
+                interface A
+                {
+                }
+                interface B
+                {
+                }
+                class C implements A, B
+                {
+                }
+                function doFoo(): A&B
+                {
+                    return new C();
+                }
+
+                class Demo {
+                    function compareFoos() {
+                        doFoo() === doFoo();
+                        doFoo() === doFoo();
+                    }
+                }
+
+                PHP,
         ];
 
         yield 'It does not mutate equal operator into identical operator for empty array type' => [
@@ -459,41 +464,41 @@ final class EqualIdenticalTest extends BaseMutatorTestCase
 
         if (PHP_VERSION_ID >= 80400) {
             yield 'It does not mutate equal operator into identical operator for known int global constants' => [
-                <<<'PHPCODE'
-                    <?php
-
-                    PHP_MAJOR_VERSION == 5;
-                    PHPCODE,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        PHP_MAJOR_VERSION == 5;
+                        PHP,
+                ),
             ];
         } else {
             yield 'It mutates equal operator into identical operator for global int constants without reflection info (PHP 8.3)' => [
-                <<<'PHPCODE'
-                    <?php
-
-                    PHP_MAJOR_VERSION == 5;
-                    PHPCODE,
-                <<<'PHPCODE'
-                    <?php
-
-                    PHP_MAJOR_VERSION === 5;
-                    PHPCODE,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        PHP_MAJOR_VERSION == 5;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        PHP_MAJOR_VERSION === 5;
+                        PHP,
+                ),
             ];
         }
 
         yield 'It does not mutate equal operator into identical operator for known global constants' => [
-            <<<'PHPCODE'
-                <?php
-
-                PHP_SAPI == 'phpdbg';
-                PHPCODE,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    PHP_SAPI == 'phpdbg';
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate equal operator into identical operator for unknown global constants' => [
-            <<<'PHPCODE'
-                <?php
-
-                NOONE_KNOWS_THIS_CONSTANT == 'phpdbg';
-                PHPCODE,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    NOONE_KNOWS_THIS_CONSTANT == 'phpdbg';
+                    PHP,
+            ),
         ];
 
         yield 'It mutates equal operator into identical operator for comparison against empty literal string' => [

@@ -95,52 +95,52 @@ final class ReturnRemovalTest extends BaseMutatorTestCase
         ];
 
         yield 'It leaves the last return statement alone if the method has a return type' => [
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace Foo;
+            <<<'PHP'
+                <?php
 
-                    class ConfigLoader
+                namespace Foo;
+
+                class ConfigLoader
+                {
+                    private ?object $config = null;
+                    public function getConfig(): object
                     {
-                        private ?object $config = null;
-                        public function getConfig(): object
-                        {
-                            if (null !== $this->config) {
-                                return $this->config;
-                            }
-                            // ... load and cache
-                            $this->config = $config;
+                        if (null !== $this->config) {
                             return $this->config;
-                            // Cool comment
                         }
-                        public function foo(): void
-                        {
-                        }
+                        // ... load and cache
+                        $this->config = $config;
+                        return $this->config;
+                        // Cool comment
                     }
-                    PHP,
-            ),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace Foo;
-
-                    class ConfigLoader
+                    public function foo(): void
                     {
-                        private ?object $config = null;
-                        public function getConfig(): object
-                        {
-                            if (null !== $this->config) {
-
-                            }
-                            // ... load and cache
-                            $this->config = $config;
-                            return $this->config;
-                            // Cool comment
-                        }
-                        public function foo(): void
-                        {
-                        }
                     }
-                    PHP,
-            ),
+                }
+                PHP,
+            <<<'PHP'
+                <?php
+
+                namespace Foo;
+
+                class ConfigLoader
+                {
+                    private ?object $config = null;
+                    public function getConfig(): object
+                    {
+                        if (null !== $this->config) {
+
+                        }
+                        // ... load and cache
+                        $this->config = $config;
+                        return $this->config;
+                        // Cool comment
+                    }
+                    public function foo(): void
+                    {
+                    }
+                }
+                PHP,
         ];
 
         yield 'It does not mutate last return null in function without return type' => [

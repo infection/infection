@@ -62,13 +62,13 @@ final class Yield_Test extends BaseMutatorTestCase
                     };
                     PHP,
             ),
-            (static fn () => <<<'PHP'
-                <?php
-
-                $a = function () {
-                    (yield $a > $b);
-                };
-                PHP)(),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = function () {
+                        (yield $a > $b);
+                    };
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate yields without a double arrow operator' => [

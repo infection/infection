@@ -59,20 +59,20 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
     {
         yield 'It mutates protected to private' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-one-class.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace ProtectedVisibilityOneClass;
+            <<<'PHP'
+                <?php
 
-                    class Test
+                namespace ProtectedVisibilityOneClass;
+
+                class Test
+                {
+                    private function foo(int $param, $test = 1) : bool
                     {
-                        private function foo(int $param, $test = 1) : bool
-                        {
-                            echo 1;
-                            return false;
-                        }
+                        echo 1;
+                        return false;
                     }
-                    PHP,
-            ),
+                }
+                PHP,
         ];
 
         yield 'It does not mutate final method' => [
@@ -93,38 +93,38 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
         yield 'It does mutate not abstract protected to private in an abstract class' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-abstract-class-protected-method.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace ProtectedVisibilityAbstractClassProtectedMethod;
+            <<<'PHP'
+                <?php
 
-                    abstract class Test
+                namespace ProtectedVisibilityAbstractClassProtectedMethod;
+
+                abstract class Test
+                {
+                    private function foo(int $param, $test = 1) : bool
                     {
-                        private function foo(int $param, $test = 1) : bool
-                        {
-                            echo 1;
-                            return false;
-                        }
+                        echo 1;
+                        return false;
                     }
-                    PHP,
-            ),
+                }
+                PHP,
         ];
 
         yield 'It does not mutate static flag' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-static.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace ProtectedVisibilityStatic;
+            <<<'PHP'
+                <?php
 
-                    class Test
+                namespace ProtectedVisibilityStatic;
+
+                class Test
+                {
+                    private static function foo(int $param, $test = 1) : bool
                     {
-                        private static function foo(int $param, $test = 1) : bool
-                        {
-                            echo 1;
-                            return false;
-                        }
+                        echo 1;
+                        return false;
                     }
-                    PHP,
-            ),
+                }
+                PHP,
         ];
 
         yield 'It does not mutate if parent abstract has same protected method' => [
@@ -133,69 +133,69 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
 
         yield 'It does not mutate if parent class has same protected method' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-parent.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace ProtectedSameParent;
+            <<<'PHP'
+                <?php
 
-                    class SameParent
-                    {
-                        private function foo() {}
-                    }
+                namespace ProtectedSameParent;
 
-                    class Child extends SameParent
-                    {
-                        protected function foo() {}
-                    }
-                    PHP,
-            ),
+                class SameParent
+                {
+                    private function foo() {}
+                }
+
+                class Child extends SameParent
+                {
+                    protected function foo() {}
+                }
+                PHP,
         ];
 
         yield 'It does not mutate if grand parent class has same protected method' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-same-method-grandparent.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace ProtectedSameGrandParent;
+            <<<'PHP'
+                <?php
 
-                    class SameGrandParent
-                    {
-                        private function foo() {}
-                    }
+                namespace ProtectedSameGrandParent;
 
-                    class SameParent extends SameGrandParent
-                    {
+                class SameGrandParent
+                {
+                    private function foo() {}
+                }
 
-                    }
+                class SameParent extends SameGrandParent
+                {
 
-                    class Child extends SameParent
-                    {
-                        protected function foo() {}
-                    }
-                    PHP,
-            ),
+                }
+
+                class Child extends SameParent
+                {
+                    protected function foo() {}
+                }
+                PHP,
         ];
 
         yield 'it does mutate non-inherited methods' => [
             MutatorFixturesProvider::getFixtureFileContent(self::class, 'pv-non-same-method-parent.php'),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    namespace ProtectedNonSameAbstract;
+            <<<'PHP'
+                <?php
 
-                    abstract class ProtectedNonSameAbstract
-                    {
-                        protected abstract function foo();
-                    }
-                    class Child extends ProtectedNonSameAbstract
-                    {
-                        protected function foo()
-                        {
-                        }
-                        private function bar()
-                        {
-                        }
-                    }
+                namespace ProtectedNonSameAbstract;
 
-                    PHP,
-            ),
+                abstract class ProtectedNonSameAbstract
+                {
+                    protected abstract function foo();
+                }
+                class Child extends ProtectedNonSameAbstract
+                {
+                    protected function foo()
+                    {
+                    }
+                    private function bar()
+                    {
+                    }
+                }
+
+                PHP,
         ];
 
         yield 'it mutates an anonymous class' => [
