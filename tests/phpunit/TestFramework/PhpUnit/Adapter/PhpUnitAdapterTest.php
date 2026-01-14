@@ -394,6 +394,26 @@ final class PhpUnitAdapterTest extends TestCase
         yield ['13.0', true];
     }
 
+    public function test_initial_tests_fail_recommendations_include_coverage_metadata_hint_for_phpunit_12(): void
+    {
+        $adapter = $this->getPHPUnitAdapter('12.0');
+
+        $recommendations = $adapter->getInitialTestsFailRecommendations('phpunit --configuration /tmp/phpunit.xml');
+
+        $this->assertStringContainsString('requireCoverageMetadata', $recommendations);
+        $this->assertStringContainsString('#[CoversClass]', $recommendations);
+        $this->assertStringContainsString('--covers=ClassName', $recommendations);
+    }
+
+    public function test_initial_tests_fail_recommendations_do_not_include_coverage_metadata_hint_for_phpunit_11(): void
+    {
+        $adapter = $this->getPHPUnitAdapter('11.5');
+
+        $recommendations = $adapter->getInitialTestsFailRecommendations('phpunit --configuration /tmp/phpunit.xml');
+
+        $this->assertStringNotContainsString('requireCoverageMetadata', $recommendations);
+    }
+
     private function getPHPUnitAdapter(string $version = '9.0'): PhpUnitAdapter
     {
         return new PhpUnitAdapter(

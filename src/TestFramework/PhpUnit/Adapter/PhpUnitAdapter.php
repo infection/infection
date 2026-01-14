@@ -171,7 +171,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
                 . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="defects,random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine),
+                $recommendations,
             );
         } elseif (version_compare($this->getVersion(), '7.2', '>=')) {
             $recommendations = sprintf(
@@ -179,7 +179,18 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
                 "Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.\n\n"
                 . 'You can add these attributes to `phpunit.xml` to check it: <phpunit executionOrder="random" resolveDependencies="true" ...',
                 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"',
-                parent::getInitialTestsFailRecommendations($commandLine),
+                $recommendations,
+            );
+        }
+
+        if (version_compare($this->getVersion(), '12.0', '>=')) {
+            $recommendations = sprintf(
+                "%s\n\n%s",
+                "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors:\n"
+                . "- Add requireCoverageMetadata=\"true\" to phpunit.xml\n"
+                . "- Ensure all tests have #[CoversClass] or #[CoversNothing] attributes\n"
+                . '- Or use --test-framework-options="--covers=ClassName" manually',
+                $recommendations,
             );
         }
 
