@@ -52,6 +52,7 @@ use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
+use Infection\Tests\Fixtures\TestFramework\Coverage\JUnit\FakeTestFileDataProvider;
 use Infection\Tests\TestFramework\Tracing\Fixtures\tests\DemoCounterServiceTest;
 use Infection\Tests\TestFramework\Tracing\Trace\SyntheticTrace;
 use Infection\Tests\TestFramework\Tracing\Trace\TraceAssertion;
@@ -76,7 +77,7 @@ final class TracerIntegrationTest extends TestCase
     #[DataProvider('traceProvider')]
     public function test_it_can_create_a_trace(
         string $indexXmlPath,
-        string $junitXmlPath,
+        ?string $junitXmlPath,
         Trace $expected,
     ): void {
         $this->copyReportFromTemplateIfMissing(self::COVERAGE_REPORT_DIR);
@@ -397,16 +398,321 @@ final class TracerIntegrationTest extends TestCase
                 ),
             ),
         ];
+
+        $noJUnitTestLocations = [
+            new TestLocation(
+                sprintf(
+                    '%s::test_set_step_changes_increment_amount',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_custom_step_with_multiple_counts',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_count_increments_by_step_and_returns_new_value',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_negative_step_decreases_counter',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_multiple_counts_increment_correctly',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_set_step_with_default_resets_to_one',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_complex_scenario',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_start_count_with_default_sets_to_zero',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_zero_step_keeps_counter_unchanged',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+            new TestLocation(
+                sprintf(
+                    '%s::test_start_count_affects_subsequent_counts',
+                    DemoCounterServiceTest::class,
+                ),
+                filePath: null,
+                executionTime: null,
+            ),
+        ];
+
+        yield 'no JUnit report available' => [
+            $coveragePath . '/xml/index.xml',
+            null,
+            new SyntheticTrace(
+                sourceFileInfo: MockSplFileInfo::create(self::FIXTURE_DIR . '/src/DemoCounterService.php'),
+                realPath: realpath($canonicalDemoCounterServicePathname),
+                relativePathname: $canonicalDemoCounterServicePathname,
+                hasTest: true,
+                tests: new TestLocations(
+                    [
+                        46 => $noJUnitTestLocations,
+                        47 => $noJUnitTestLocations,
+                        49 => $noJUnitTestLocations,
+                        54 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_sets_initial_value',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_with_default_sets_to_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_affects_subsequent_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        59 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_changes_increment_amount',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_custom_step_with_multiple_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_with_default_resets_to_one',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                        64 => [
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_set_step_changes_increment_amount',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_custom_step_with_multiple_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_sets_initial_value',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_count_increments_by_step_and_returns_new_value',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_initial_counter_is_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_negative_step_decreases_counter',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_multiple_counts_increment_correctly',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_complex_scenario',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_with_default_sets_to_zero',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_zero_step_keeps_counter_unchanged',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                            new TestLocation(
+                                sprintf(
+                                    '%s::test_start_count_affects_subsequent_counts',
+                                    DemoCounterServiceTest::class,
+                                ),
+                                filePath: null,
+                                executionTime: null,
+                            ),
+                        ],
+                    ],
+                    [
+                        'count' => new SourceMethodLineRange(44, 50),
+                        'startCount' => new SourceMethodLineRange(52, 55),
+                        'setStep' => new SourceMethodLineRange(57, 60),
+                        'get' => new SourceMethodLineRange(62, 65),
+                    ],
+                ),
+            ),
+        ];
     }
 
     private function createTracer(
         string $indexXmlPath,
-        string $junitXmlPath,
+        ?string $junitXmlPath,
     ): Tracer {
         $testFrameworkAdapterStub = $this->createStub(TestFrameworkAdapter::class);
         $testFrameworkAdapterStub
             ->method('hasJUnitReport')
-            ->willReturn(true);
+            ->willReturn($junitXmlPath !== null);
+
+        $junitFileDataProvider = $junitXmlPath === null
+            ? new FakeTestFileDataProvider()
+            : new MemoizedTestFileDataProvider(
+                new JUnitTestFileDataProvider(
+                    new FixedLocator($junitXmlPath),
+                ),
+            );
 
         $fileSystemStub = $this->createFileSystemStub();
 
@@ -424,11 +730,7 @@ final class TracerIntegrationTest extends TestCase
                 ),
                 new JUnitTestExecutionInfoAdder(
                     $testFrameworkAdapterStub,
-                    new MemoizedTestFileDataProvider(
-                        new JUnitTestFileDataProvider(
-                            new FixedLocator($junitXmlPath),
-                        ),
-                    ),
+                    $junitFileDataProvider,
                 ),
             ),
         );
