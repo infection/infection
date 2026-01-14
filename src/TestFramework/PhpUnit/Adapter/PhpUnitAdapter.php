@@ -202,6 +202,9 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         return ['--configuration', '--filter', '--testsuite'];
     }
 
+    /**
+     * @return iterable<string>
+     */
     private function getRandomOrderRecommendations(): iterable
     {
         yield 'Infection runs the test suite in a RANDOM order. Make sure your tests do not have hidden dependencies.';
@@ -215,6 +218,9 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         yield 'If you don\'t want to let Infection run tests in a random order, set the `executionOrder` to some value, for example <phpunit executionOrder="default"';
     }
 
+    /**
+     * @return iterable<string>
+     */
     private function getPHPUnit12CoversRecommendations(): iterable
     {
         yield "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors:\n"
