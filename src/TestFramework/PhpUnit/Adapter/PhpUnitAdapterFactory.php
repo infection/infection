@@ -135,8 +135,12 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
 
     private static function parseRequireCoverageMetadata(string $xmlContent): bool
     {
-        $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
+        try {
+            $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
 
-        return $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
+            return $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }
