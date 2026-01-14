@@ -52,6 +52,7 @@ use Infection\TestFramework\VersionParser;
 use function Safe\file_get_contents;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
+use Throwable;
 use Webmozart\Assert\Assert;
 
 /**
@@ -139,7 +140,7 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
             $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
 
             return $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return false;
         }
     }
