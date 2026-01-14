@@ -61,8 +61,7 @@ final readonly class SyntheticTrace implements Trace
         string $realPath,
         bool $hasTest,
         TestLocations $tests,
-    ): self
-    {
+    ): self {
         return new self(
             MockSplFileInfo::create($realPath),
             $realPath,
