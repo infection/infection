@@ -18,6 +18,9 @@ jobs:
   tests:
     runs-on: ${{ matrix.operating-system }}
     timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
 
     strategy:
       matrix:
@@ -31,7 +34,7 @@ jobs:
           - { operating-system: 'windows-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'dist/infection.phar' }
-          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'dist/infection.phar' }
+          - { operating-system: 'ubuntu-latest', php-version: '8.2', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'dist/infection.phar', upload-phar: true }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.3', composer: 'composer', coverage-driver: 'pcov', e2e-runner: 'bin/infection' }
           - { operating-system: 'ubuntu-latest', php-version: '8.4', composer: 'composer', coverage-driver: 'xdebug', e2e-runner: 'bin/infection' }
@@ -138,6 +141,23 @@ jobs:
           # test PHAR works from subfolder
           cd dist && ./infection.phar -V && cd ..
           make test-e2e E2E_PHPUNIT_GROUP=e2e INFECTION=dist/infection.phar BENCHMARK_SOURCES=
+
+      - name: Upload PHAR artifact
+        if: matrix.upload-phar && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: infection.phar
+          path: dist/infection.phar
+
+      - name: Post PHAR download link
+        if: matrix.upload-phar && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: phar-download
+          message: |
+            ## Test this PR
+
+            Download the PHAR: [infection.phar](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
 
   # This is a meta job to avoid to have to constantly change the protection rules
   # whenever we touch the matrix.
