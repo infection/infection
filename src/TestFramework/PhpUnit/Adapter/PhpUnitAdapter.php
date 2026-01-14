@@ -174,6 +174,7 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
             $recommendations = [...$this->getPHPUnit12CoversRecommendations(), $recommendations];
         }
 
+        /** @var array<string> $recommendations */
         return implode("\n\n", $recommendations);
     }
 
@@ -226,6 +227,6 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
         yield "PHPUnit 12+ validates coverage targets strictly. If you see \"not a valid target for code coverage\" errors:\n"
             . "- Add requireCoverageMetadata=\"true\" to phpunit.xml\n"
             . "- Ensure all tests have #[CoversClass] or #[CoversNothing] attributes\n"
-            . '- Or use --test-framework-options="--covers=ClassName" manually';
+            . '- Or specify --test-framework-options="--covers=ClassName" manually';
     }
 }
