@@ -40,7 +40,6 @@ use function array_merge;
 use function count;
 use function explode;
 use function implode;
-use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
@@ -50,6 +49,7 @@ use function Later\lazy;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
+use function str_starts_with;
 use Throwable;
 
 /**
@@ -86,7 +86,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         // Auto-add --covers for PHPUnit 10+ when requireCoverageMetadata is true
         // This filters tests to only those with matching #[CoversClass] attributes,
         // avoiding PHPUnit 12's "not a valid target for code coverage" warning
-        if (!in_array('--covers', $options, true)
+        if (!self::hasOption($options, '--covers')
             && PhpUnitAdapter::supportsCoversSelector($testFrameworkVersion)
             && $this->requireCoverageMetadata->get()
         ) {
@@ -97,7 +97,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         if ($this->mapSourceClassToTestStrategy !== null
-            && !in_array('--filter', $options, true)
+            && !self::hasOption($options, '--filter')
         ) {
             $options[] = '--filter';
 
@@ -176,6 +176,20 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         return $options;
+    }
+
+    /**
+     * @param list<string> $options
+     */
+    private static function hasOption(array $options, string $option): bool
+    {
+        foreach ($options as $opt) {
+            if ($opt === $option || str_starts_with($opt, $option . ' ')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
