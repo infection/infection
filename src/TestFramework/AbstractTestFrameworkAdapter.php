@@ -78,11 +78,7 @@ abstract class AbstractTestFrameworkAdapter implements TestFrameworkAdapter
     ): array {
         return $this->getCommandLine(
             $phpExtraArgs,
-            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun(
-                $this->buildInitialConfigFile(),
-                $extraOptions,
-                $this->getVersion(),
-            ),
+            $this->argumentsAndOptionsBuilder->buildForInitialTestsRun($this->buildInitialConfigFile(), $extraOptions),
         );
     }
 

@@ -45,7 +45,7 @@ interface CommandLineArgumentsAndOptionsBuilder
     /**
      * @return string[]
      */
-    public function buildForInitialTestsRun(string $configPath, string $extraOptions, string $testFrameworkVersion): array;
+    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array;
 
     /**
      * @param TestLocation[] $tests

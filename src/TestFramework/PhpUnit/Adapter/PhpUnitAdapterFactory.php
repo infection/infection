@@ -114,7 +114,6 @@ final class PhpUnitAdapterFactory implements TestFrameworkAdapterFactory
                 $executeOnlyCoveringTestCases,
                 $filteredSourceFilesToMutate,
                 $mapSourceClassToTestStrategy,
-                $testFrameworkConfigContent,
             ),
             new VersionParser(),
             new CommandLineBuilder(),
