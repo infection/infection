@@ -241,7 +241,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
         $configPath = '/config/path';
 
-        // User-specified --covers should not be overridden with auto-generated ones
+        // Extra options are parsed by splitting on ' --', so '--covers CustomClass' stays as one string
         $this->assertSame(
             [
                 '--configuration',
