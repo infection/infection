@@ -60,6 +60,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         private bool $executeOnlyCoveringTestCases,
         private array $filteredSourceFilesToMutate,
         private ?string $mapSourceClassToTestStrategy,
+        private bool $requireCoverageMetadata = false,
     ) {
     }
 
@@ -70,10 +71,11 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
-        // Auto-add --covers for PHPUnit 10+ when filtering source files.
+        // Auto-add --covers for PHPUnit 10+ when requireCoverageMetadata is true
         // This filters tests to only those with matching #[CoversClass] attributes,
-        // avoiding PHPUnit 12's "not a valid target for code coverage" warning.
-        if ($this->filteredSourceFilesToMutate !== []
+        // avoiding PHPUnit 12's "not a valid target for code coverage" warning
+        if ($this->requireCoverageMetadata
+            && $this->filteredSourceFilesToMutate !== []
             && version_compare($testFrameworkVersion, '10.0', '>=')
             && !in_array('--covers', $options, true)
         ) {

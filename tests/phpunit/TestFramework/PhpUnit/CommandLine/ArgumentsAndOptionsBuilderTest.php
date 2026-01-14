@@ -121,7 +121,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
         );
     }
 
-    public function test_it_adds_covers_option_when_phpunit_10_or_higher_and_filtered_files(): void
+    public function test_it_adds_covers_option_when_require_coverage_metadata_is_true_and_phpunit_10_or_higher(): void
     {
         $builder = new ArgumentsAndOptionsBuilder(
             false,
@@ -130,6 +130,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/bar/Baz.php'),
             ],
             null,
+            true, // requireCoverageMetadata
         );
         $configPath = '/config/path';
 
@@ -154,6 +155,7 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 new SplFileInfo('src/Foo.php'),
             ],
             null,
+            true, // requireCoverageMetadata
         );
         $configPath = '/config/path';
 
@@ -163,6 +165,27 @@ final class ArgumentsAndOptionsBuilderTest extends TestCase
                 $configPath,
             ],
             $builder->buildForInitialTestsRun($configPath, '', '9.5'),
+        );
+    }
+
+    public function test_it_does_not_add_covers_option_when_require_coverage_metadata_is_false(): void
+    {
+        $builder = new ArgumentsAndOptionsBuilder(
+            false,
+            [
+                new SplFileInfo('src/Foo.php'),
+            ],
+            null,
+            false, // requireCoverageMetadata
+        );
+        $configPath = '/config/path';
+
+        $this->assertSame(
+            [
+                '--configuration',
+                $configPath,
+            ],
+            $builder->buildForInitialTestsRun($configPath, '', '10.0'),
         );
     }
 
