@@ -56,8 +56,6 @@ use function str_starts_with;
  */
 final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsAndOptionsBuilder
 {
-    /** @var Deferred<bool> */
-    private Deferred $requireCoverageMetadata;
 
     /**
      * @param SplFileInfo[] $filteredSourceFilesToMutate
@@ -66,9 +64,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         private bool $executeOnlyCoveringTestCases,
         private array $filteredSourceFilesToMutate,
         private ?string $mapSourceClassToTestStrategy,
-        string $testFrameworkConfigContent,
     ) {
-        $this->requireCoverageMetadata = lazy(self::parseRequireCoverageMetadata($testFrameworkConfigContent));
     }
 
     /**
@@ -120,20 +116,6 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
         }
 
         return $options;
-    }
-
-    /**
-     * @return iterable<bool>
-     */
-    private static function parseRequireCoverageMetadata(string $xmlContent): iterable
-    {
-        try {
-            $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
-
-            yield $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
-        } catch (InvalidArgumentException) {
-            yield false;
-        }
     }
 
     private function mapSourceClassToTestClass(SplFileInfo $sourceFile): string
