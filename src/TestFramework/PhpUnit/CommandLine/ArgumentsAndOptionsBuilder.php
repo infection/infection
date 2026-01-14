@@ -44,13 +44,13 @@ use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
 use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use Infection\TestFramework\SafeDOMXPath;
+use InvalidArgumentException;
 use Later\Interfaces\Deferred;
 use function Later\lazy;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
 use function str_starts_with;
-use Throwable;
 
 /**
  * @internal
@@ -145,7 +145,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
             $xPath = SafeDOMXPath::fromString($xmlContent, preserveWhiteSpace: false);
 
             yield $xPath->queryAttribute('/phpunit/@requireCoverageMetadata')?->nodeValue === 'true';
-        } catch (Throwable) {
+        } catch (InvalidArgumentException) {
             yield false;
         }
     }
