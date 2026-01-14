@@ -164,17 +164,17 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
 
     public function getInitialTestsFailRecommendations(string $commandLine): string
     {
+        /** @var array<string> $recommendations */
         $recommendations = [parent::getInitialTestsFailRecommendations($commandLine)];
 
         if (version_compare($this->getVersion(), '7.2', '>=')) {
-            $recommendations = [...$this->getRandomOrderRecommendations(), $recommendations];
+            $recommendations = [...$this->getRandomOrderRecommendations(), ...$recommendations];
         }
 
         if (version_compare($this->getVersion(), '12.0', '>=')) {
-            $recommendations = [...$this->getPHPUnit12CoversRecommendations(), $recommendations];
+            $recommendations = [...$this->getPHPUnit12CoversRecommendations(), ...$recommendations];
         }
 
-        /** @var array<string> $recommendations */
         return implode("\n\n", $recommendations);
     }
 
