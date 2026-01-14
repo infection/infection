@@ -43,10 +43,10 @@ use function implode;
 use function in_array;
 use Infection\AbstractTestFramework\Coverage\TestLocation;
 use Infection\TestFramework\CommandLineArgumentsAndOptionsBuilder;
+use Infection\TestFramework\PhpUnit\Adapter\PhpUnitAdapter;
 use function ltrim;
 use SplFileInfo;
 use function sprintf;
-use function version_compare;
 
 /**
  * @internal
@@ -71,12 +71,15 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
+        if ($this->filteredSourceFilesToMutate === []) {
+            return $options;
+        }
+
         // Auto-add --covers for PHPUnit 10+ when requireCoverageMetadata is true
         // This filters tests to only those with matching #[CoversClass] attributes,
         // avoiding PHPUnit 12's "not a valid target for code coverage" warning
         if ($this->requireCoverageMetadata
-            && $this->filteredSourceFilesToMutate !== []
-            && version_compare($testFrameworkVersion, '10.0', '>=')
+            && PhpUnitAdapter::supportsCoversSelector($testFrameworkVersion)
             && !in_array('--covers', $options, true)
         ) {
             foreach ($this->filteredSourceFilesToMutate as $sourceFile) {
@@ -85,8 +88,7 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
             }
         }
 
-        if ($this->filteredSourceFilesToMutate !== []
-            && $this->mapSourceClassToTestStrategy !== null
+        if ($this->mapSourceClassToTestStrategy !== null
             && !in_array('--filter', $options, true)
         ) {
             $options[] = '--filter';

@@ -196,6 +196,14 @@ class PhpUnitAdapter extends AbstractTestFrameworkAdapter implements MemoryUsage
     }
 
     /**
+     * PHPUnit 10+ supports the `--covers` selector to choose only tests covering specific classes.
+     */
+    public static function supportsCoversSelector(string $version): bool
+    {
+        return version_compare($version, '10.0', '>=');
+    }
+
+    /**
      * @return string[]
      */
     public function getInitialRunOnlyOptions(): array
