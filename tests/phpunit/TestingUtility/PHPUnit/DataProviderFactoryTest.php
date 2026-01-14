@@ -58,4 +58,21 @@ final class DataProviderFactoryTest extends TestCase
 
         $this->assertSame($expected, $actual);
     }
+
+    public function test_it_can_add_a_prefix_to_the_title_of_the_scenarios_of_a_provider(): void
+    {
+        $input = [
+            0 => ['value0'],
+            'key1' => ['value1'],
+        ];
+
+        $expected = [
+            'prefix:0' => ['value0'],
+            'prefix:key1' => ['value1'],
+        ];
+
+        $actual = take(DataProviderFactory::prefix('prefix:', $input))->toAssoc();
+
+        $this->assertSame($expected, $actual);
+    }
 }
