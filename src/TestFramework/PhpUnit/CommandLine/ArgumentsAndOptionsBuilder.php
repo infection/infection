@@ -75,25 +75,12 @@ final readonly class ArgumentsAndOptionsBuilder implements CommandLineArgumentsA
     /**
      * @return list<string>
      */
-    public function buildForInitialTestsRun(string $configPath, string $extraOptions, string $testFrameworkVersion): array
+    public function buildForInitialTestsRun(string $configPath, string $extraOptions): array
     {
         $options = $this->prepareArgumentsAndOptions($configPath, $extraOptions);
 
         if ($this->filteredSourceFilesToMutate === []) {
             return $options;
-        }
-
-        // Auto-add --covers for PHPUnit 10+ when requireCoverageMetadata is true
-        // This filters tests to only those with matching #[CoversClass] attributes,
-        // avoiding PHPUnit 12's "not a valid target for code coverage" warning
-        if (!self::hasOption($options, '--covers')
-            && PhpUnitAdapter::supportsCoversSelector($testFrameworkVersion)
-            && $this->requireCoverageMetadata->get()
-        ) {
-            foreach ($this->filteredSourceFilesToMutate as $sourceFile) {
-                $options[] = '--covers';
-                $options[] = $sourceFile->getBasename('.' . $sourceFile->getExtension());
-            }
         }
 
         if ($this->mapSourceClassToTestStrategy !== null

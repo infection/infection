@@ -36,7 +36,6 @@ declare(strict_types=1);
 namespace Infection\TestFramework\PhpUnit\Adapter;
 
 use function escapeshellarg;
-use function implode;
 use Infection\AbstractTestFramework\MemoryUsageAware;
 use Infection\AbstractTestFramework\SyntaxErrorAware;
 use Infection\Config\ValueProvider\PCOVDirectoryProvider;
