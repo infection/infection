@@ -70,8 +70,8 @@ final class ModulusTest extends BaseMutatorTestCase
         yield 'It does not mutate mod equals' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
-                        $a = 1;
-                        $a %= 2;
+                    $a = 1;
+                    $a %= 2;
                     PHP,
             ),
         ];

@@ -77,15 +77,18 @@ final class ShiftRightTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
-    }
 
-    public function test_replaces_post_decrement(): void
-    {
-        $code = self::wrapCodeInMethod('$a = 1; $a >> 2;');
-        $mutations = $this->mutate($code);
-
-        $expectedMutatedCode = self::wrapCodeInMethod('$a = 1; $a << 2;');
-
-        $this->assertSame($expectedMutatedCode, $mutations[0]);
+        yield 'It replaces post decrement' => [
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1; $a >> 2;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 1; $a << 2;
+                    PHP,
+            ),
+        ];
     }
 }

@@ -70,7 +70,7 @@ final class LessThanOrEqualToTest extends BaseMutatorTestCase
         yield 'It does not mutate an arrow' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
-                        [1 => 2];
+                    [1 => 2];
                     PHP,
             ),
         ];
@@ -78,7 +78,7 @@ final class LessThanOrEqualToTest extends BaseMutatorTestCase
         yield 'It does not mutate a spaceship' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
-                        1 <=> 2;
+                    1 <=> 2;
                     PHP,
             ),
         ];

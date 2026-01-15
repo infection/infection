@@ -201,30 +201,24 @@ final class ProtectedVisibilityTest extends BaseMutatorTestCase
         yield 'it mutates an anonymous class' => [
             self::wrapCodeInMethod(
                 <<<'PHP'
-                    function something()
+                    return new class
                     {
-                        return new class
+                        protected function anything()
                         {
-                            protected function anything()
-                            {
-                                return null;
-                            }
-                        };
-                    }
+                            return null;
+                        }
+                    };
                     PHP,
             ),
             self::wrapCodeInMethod(
                 <<<'PHP'
-                    function something()
+                    return new class
                     {
-                        return new class
+                        private function anything()
                         {
-                            private function anything()
-                            {
-                                return null;
-                            }
-                        };
-                    }
+                            return null;
+                        }
+                    };
                     PHP,
             ),
         ];

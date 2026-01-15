@@ -242,28 +242,56 @@ final class IncrementIntegerTest extends BaseMutatorTestCase
         $maxInt = PHP_INT_MAX;
 
         yield 'It does not increment max int' => [
-            self::wrapCodeInMethod("random_int(10000000, {$maxInt});"),
-            self::wrapCodeInMethod("random_int(10000001, {$maxInt});"),
+            self::wrapCodeInMethod(
+                <<<PHP
+                    random_int(10000000, {$maxInt});
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<PHP
+                    random_int(10000001, {$maxInt});
+                    PHP,
+            ),
         ];
 
         $minIntPlus1 = PHP_INT_MIN + 1;
         $minIntPlus2 = $minIntPlus1 + 1;
 
         yield 'It increments min int plus one, up to value of -PHP_INT_MAX' => [
-            self::wrapCodeInMethod("if (\$foo === {$minIntPlus1}) { echo 'bar'; }"),
-            self::wrapCodeInMethod("if (\$foo === {$minIntPlus2}) { echo 'bar'; }"),
+            self::wrapCodeInMethod(
+                <<<PHP
+                    if (\$foo === {$minIntPlus1}) { echo 'bar'; }
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<PHP
+                    if (\$foo === {$minIntPlus2}) { echo 'bar'; }
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment preg_match() return value above 1 on identical comparison' => [
-            self::wrapCodeInMethod('if (preg_match() === 1) {}'),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_match() === 1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment preg_match() return value above 1 on equal comparison' => [
-            self::wrapCodeInMethod('if (preg_match() == 1) {}'),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_match() == 1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It does not increment preg_match() return value above 1 on not-equal comparison' => [
-            self::wrapCodeInMethod('if (preg_mAtch() != 1) {}'),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    if (preg_mAtch() != 1) {}
+                    PHP,
+            ),
         ];
 
         yield 'It increments return value above 1 on not-equal comparison for userland function' => [
