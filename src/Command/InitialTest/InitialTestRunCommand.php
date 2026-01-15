@@ -45,7 +45,6 @@ use Infection\Command\Option\TestFrameworkOption;
 use Infection\Command\Option\TestFrameworkOptionsOption;
 use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
-use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -77,7 +76,6 @@ final class InitialTestRunCommand extends BaseCommand
     protected function executeCommand(IO $io): bool
     {
         $logger = new ConsoleLogger($io);
-        $consoleOutput = new ConsoleOutput($logger);
 
         $inputBase = BaseOption::get($io);
         $inputFilter = FilterOption::get($io);
@@ -93,7 +91,6 @@ final class InitialTestRunCommand extends BaseCommand
             debug: true,
         );
 
-        // LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
         $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
 
         $configuration = $container->getConfiguration();
