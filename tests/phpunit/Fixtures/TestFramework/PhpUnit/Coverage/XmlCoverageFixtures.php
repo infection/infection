@@ -39,9 +39,6 @@ final class XmlCoverageFixtures
 {
     public const FIXTURES_SRC_DIR = __DIR__ . '/../../../Files/phpunit/coverage/src';
     public const FIXTURES_COVERAGE_DIR = __DIR__ . '/../../../Files/phpunit/coverage/coverage-xml';
-    public const FIXTURES_INCORRECT_COVERAGE_DIR = __DIR__ . '/../../../Files/phpunit/coverage-incomplete';
-    public const FIXTURES_OLD_COVERAGE_DIR = __DIR__ . '/../../../Files/phpunit/old-coverage/coverage-xml';
-    public const FIXTURES_OLD_SRC_DIR = __DIR__ . '/../../../Files/phpunit/old-coverage/src';
 
     /**
      * @return iterable<XmlCoverageFixture>
@@ -49,7 +46,6 @@ final class XmlCoverageFixtures
     public static function provideAllFixtures(): iterable
     {
         yield from self::provideFixtures();
-        yield from self::providePhpUnit6Fixtures();
     }
 
     /**
@@ -189,57 +185,6 @@ final class XmlCoverageFixtures
             [
                 'byLine' => [],
                 'byMethod' => [],
-            ]
-        );
-    }
-
-    /**
-     * @return iterable<XmlCoverageFixture>
-     */
-    public static function providePhpUnit6Fixtures(): iterable
-    {
-        yield new XmlCoverageFixture(
-            self::FIXTURES_OLD_COVERAGE_DIR,
-            'Middleware/ReleaseRecordedEventsMiddleware.php.xml',
-            self::FIXTURES_OLD_SRC_DIR,
-            '/Middleware/ReleaseRecordedEventsMiddleware.php',
-            [
-                'byLine' => [
-                    29 => [
-                        [
-                            'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
-                            'testFilePath' => null,
-                            'testExecutionTime' => null,
-                        ],
-                        [
-                            'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
-                            'testFilePath' => null,
-                            'testExecutionTime' => null,
-                        ],
-                    ],
-                    30 => [
-                        [
-                            'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_dispatches_recorded_events',
-                            'testFilePath' => null,
-                            'testExecutionTime' => null,
-                        ],
-                        [
-                            'testMethod' => 'BornFree\TacticianDomainEvent\Tests\Middleware\ReleaseRecordedEventsMiddlewareTest::it_erases_events_when_exception_is_raised',
-                            'testFilePath' => null,
-                            'testExecutionTime' => null,
-                        ],
-                    ],
-                ],
-                'byMethod' => [
-                    '__construct' => [
-                        'startLine' => 27,
-                        'endLine' => 31,
-                    ],
-                    'execute' => [
-                        'startLine' => 43,
-                        'endLine' => 60,
-                    ],
-                ],
             ]
         );
     }

@@ -38,12 +38,10 @@ namespace Infection\Tests\TestFramework\Coverage\XmlReport\IndexXmlCoverageParse
 use function dirname;
 use Exception;
 use Infection\FileSystem\FakeFileSystem;
-use Infection\FileSystem\FileSystem;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\XmlReport\IndexXmlCoverageParser;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
 use Infection\TestFramework\Coverage\XmlReport\SourceFileInfoProvider;
-use Infection\Tests\Fixtures\TestFramework\PhpUnit\Coverage\XmlCoverageFixtures;
 use Infection\Tests\TestingUtility\FS;
 use Infection\Tests\TestingUtility\PHPUnit\ExpectsThrowables;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -51,9 +49,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use function Pipeline\take;
-use function Safe\file_get_contents;
 use function Safe\file_put_contents;
-use function Safe\preg_replace;
 use function Safe\unlink;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
@@ -63,8 +59,6 @@ use Symfony\Component\Filesystem\Path;
 final class IndexXmlCoverageParserTest extends TestCase
 {
     use ExpectsThrowables;
-
-    private static ?string $fixturesOldXmlFileName = null;
 
     private string $generatedIndexXmlPath;
 
@@ -169,56 +163,6 @@ final class IndexXmlCoverageParserTest extends TestCase
                 $createNominalSourceFileInfo('noPercentage.php.xml'),
             ],
         ];
-
-        $phpunit6OrLessIndexPath = Path::canonicalize(__DIR__ . '/index-for_phpunit6_and_less.xml');
-
-        $createPhp6OrLessSourceFileInfo = static fn (
-            string $relativeCoverageFilePath,
-        ) => new SourceFileInfoProvider(
-            coverageIndexPath: $phpunit6OrLessIndexPath,
-            coverageDir: dirname($phpunit6OrLessIndexPath),
-            relativeCoverageFilePath: $relativeCoverageFilePath,
-            projectSource: '/path/to/src',
-            fileSystem: new FakeFileSystem(),
-        );
-
-        yield 'PHPUnit <6' => [
-            $phpunit6OrLessIndexPath,
-            dirname($phpunit6OrLessIndexPath),
-            [
-                $createPhp6OrLessSourceFileInfo('FirstLevel/firstLevel.php.xml'),
-                $createPhp6OrLessSourceFileInfo('FirstLevel/SecondLevel/secondLevel.php.xml'),
-                $createPhp6OrLessSourceFileInfo('FirstLevel/SecondLevel/secondLevelTrait.php.xml'),
-                $createPhp6OrLessSourceFileInfo('zeroLevel.php.xml'),
-                $createPhp6OrLessSourceFileInfo('noPercentage.php.xml'),
-            ],
-        ];
-
-        $oldFixturesIndexPath = Path::canonicalize(self::getOldFixturesXmlFileName());
-
-        $createOldFixturesSourceFileInfo = static fn (
-            string $relativeCoverageFilePath,
-        ) => new SourceFileInfoProvider(
-            coverageIndexPath: $oldFixturesIndexPath,
-            coverageDir: XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
-            relativeCoverageFilePath: $relativeCoverageFilePath,
-            projectSource: Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-            fileSystem: new FakeFileSystem(),
-        );
-
-        yield 'old coverage' => [
-            self::getOldFixturesXmlFileName(),
-            XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR,
-            [
-                $createOldFixturesSourceFileInfo('Middleware/ReleaseRecordedEventsMiddleware.php.xml'),
-            ],
-        ];
-
-        yield 'parses the XML when directory has absolute path for old PHPUnit versions' => [
-            __DIR__ . '/phpunit6_index_with_absolute_path.xml',
-            __DIR__,
-            [],
-        ];
     }
 
     public static function noCoveredLineReportProviders(): iterable
@@ -318,32 +262,5 @@ final class IndexXmlCoverageParserTest extends TestCase
         foreach ($sources as $source) {
             return;
         }
-    }
-
-    private static function getOldFixturesXmlFileName(): string
-    {
-        if (self::$fixturesOldXmlFileName !== null) {
-            return self::$fixturesOldXmlFileName;
-        }
-
-        $sourceXml = Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/index.xml');
-
-        $xml = file_get_contents($sourceXml);
-
-        // Replaces dummy source path with the real path
-        $correctedXml = preg_replace(
-            '/(name=\").*?(\")/',
-            sprintf(
-                '$1%s$2',
-                Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_SRC_DIR),
-            ),
-            $xml,
-        );
-
-        self::$fixturesOldXmlFileName = Path::canonicalize(XmlCoverageFixtures::FIXTURES_OLD_COVERAGE_DIR . '/generated_index.xml');
-
-        (new FileSystem())->dumpFile(self::$fixturesOldXmlFileName, $correctedXml);
-
-        return self::$fixturesOldXmlFileName;
     }
 }
