@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command\InitialTest;
 
+use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
@@ -47,7 +48,6 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
-use function explode;
 
 /**
  * @internal

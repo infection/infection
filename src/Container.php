@@ -881,6 +881,11 @@ final class Container extends DIContainer
         return $this->get(InitialStaticAnalysisProcessFactory::class);
     }
 
+    public function getInitialTestsRunProcessFactory(): InitialTestsRunProcessFactory
+    {
+        return $this->get(InitialTestsRunProcessFactory::class);
+    }
+
     public function getInitialTestsRunner(): InitialTestsRunner
     {
         return $this->get(InitialTestsRunner::class);

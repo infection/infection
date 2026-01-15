@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Command\Option;
 
+use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
 use Infection\TestFramework\MapSourceClassToTestStrategy;
 use InvalidArgumentException;
+use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use function in_array;
-use function sprintf;
 
 /**
  * @internal

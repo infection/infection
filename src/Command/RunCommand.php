@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function extension_loaded;
+use function implode;
 use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\MapSourceClassToTestOption;
@@ -61,15 +63,13 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
+use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
+use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use function extension_loaded;
-use function implode;
-use function sprintf;
 use function trim;
-use const PHP_SAPI;
 
 /**
  * @internal

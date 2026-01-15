@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command\InitialTest;
 
+use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
@@ -42,12 +43,12 @@ use Infection\Command\InitialTest\Option\InitialTestsPhpOptionsOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\TestFrameworkOption;
 use Infection\Command\Option\TestFrameworkOptionsOption;
+use Infection\Configuration\Configuration;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\ConsoleOutput;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
-use function explode;
 
 /**
  * @internal
@@ -96,12 +97,28 @@ final class InitialTestRunCommand extends BaseCommand
         $container->getSubscriberRegisterer()->registerSubscribers($io->getOutput());
 
         $configuration = $container->getConfiguration();
+        $initialTestsPhpOptions = self::getInitialtestsPhpOptions($configuration);
 
-        $initialTestSuiteProcess = $container->getInitialTestsRunner()->run(
-            $configuration->testFrameworkExtraOptions,
-            explode(' ', (string) $configuration->initialTestsPhpOptions),
-            $configuration->skipCoverage,
-        );
+        $initialTestSuiteInnerProcess = $container
+            ->getInitialTestsRunProcessFactory()
+            ->createProcess(
+                $configuration->testFrameworkExtraOptions,
+                $initialTestsPhpOptions,
+                $configuration->skipCoverage,
+            );
+
+        $io->writeln([
+            'Command executed:',
+            $initialTestSuiteInnerProcess->getCommandLine(),
+        ]);
+
+        $initialTestSuiteProcess = $container
+            ->getInitialTestsRunner()
+            ->run(
+                $configuration->testFrameworkExtraOptions,
+                $initialTestsPhpOptions,
+                $configuration->skipCoverage,
+            );
 
         if (!$initialTestSuiteProcess->isSuccessful()) {
             throw InitialTestsFailed::fromProcessAndAdapter(
@@ -114,5 +131,13 @@ final class InitialTestRunCommand extends BaseCommand
         $io->success('Initial test run successfully executed.');
 
         return true;
+    }
+
+    /**
+     * @return string[]
+     */
+    private static function getInitialtestsPhpOptions(Configuration $configuration): array
+    {
+        return explode(' ', (string) $configuration->initialTestsPhpOptions);
     }
 }
