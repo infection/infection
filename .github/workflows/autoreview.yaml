@@ -35,6 +35,8 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=100M
         env:
           # This is necessary when installing a tool with a specific version
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

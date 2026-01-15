@@ -38,7 +38,7 @@ namespace Infection\Command\Option;
 use function implode;
 use Infection\CannotBeInstantiated;
 use Infection\Console\IO;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\TestFramework\TestFrameworkTypes;
 use function sprintf;
 use Symfony\Component\Console\Command\Command;
@@ -48,7 +48,7 @@ use function trim;
 /**
  * @internal
  */
-final class TestFrameworkOption
+final class TestFrameworkOption implements CommandOption
 {
     use CannotBeInstantiated;
 

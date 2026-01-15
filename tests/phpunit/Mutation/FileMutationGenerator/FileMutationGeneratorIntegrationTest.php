@@ -36,20 +36,17 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation\FileMutationGenerator;
 
 use function current;
-use function file_exists;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Arithmetic\Plus;
 use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\TestFramework\Tracing\DummyTracer;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use function iterator_to_array;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function Safe\file_get_contents;
-use Symfony\Component\Finder\SplFileInfo;
 
 #[Group('integration')]
 #[CoversClass(FileMutationGenerator::class)]
@@ -59,7 +56,7 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
 
     public function test_it_generates_mutations_for_a_given_file(): void
     {
-        $fileInfoMock = $this->createSplFileInfoMock(self::FIXTURES_DIR . '/TwoAdditions.php');
+        $fileInfoMock = new MockSplFileInfo(realPath: self::FIXTURES_DIR . '/TwoAdditions.php');
 
         $mutators = [new Plus()];
 
@@ -69,6 +66,7 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
             SingletonContainer::getContainer()->getLineRangeCalculator(),
             SingletonContainer::getContainer()->getSourceLineMatcher(),
             new DummyTracer(),
+            SingletonContainer::getContainer()->getFileStore(),
         );
 
         $mutations = $mutationGenerator->generate(
@@ -92,16 +90,5 @@ final class FileMutationGeneratorIntegrationTest extends TestCase
             MutatorName::getName(Plus::class),
             $mutation->getMutatorName(),
         );
-    }
-
-    private function createSplFileInfoMock(string $file): SplFileInfo&MockObject
-    {
-        $splFileInfoMock = $this->createMock(SplFileInfo::class);
-        $splFileInfoMock->method('getRealPath')->willReturn($file);
-        $splFileInfoMock->method('getContents')->willReturn(
-            file_exists($file) ? file_get_contents($file) : 'content',
-        );
-
-        return $splFileInfoMock;
     }
 }

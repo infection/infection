@@ -17,17 +17,21 @@ on:
     branches:
       - main
       - master
+  pull_request:
+    paths:
+      - '.github/workflows/mt.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 env:
+  PHP_VERSION: '8.2'
   MIN_MSI: 77.0
   MIN_COVERED_MSI: 86.00
 
 jobs:
-  tests:
+  mutation-testing:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -37,11 +41,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-      - name: Setup PHP
+      - name: Setup PHP for coverage
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           # Any supported PHP version is fine
-          php-version: '8.2'
+          php-version: ${{ env.PHP_VERSION }}
           coverage: pcov
           tools: composer
         env:
@@ -56,9 +60,9 @@ jobs:
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('composer.*') }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
           restore-keys: |
-            composer-${{ runner.os }}-${{ matrix.php-version }}-
+            composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
             composer-${{ runner.os }}-
             composer-
 
@@ -70,8 +74,20 @@ jobs:
       - name: Collect coverage report
         run: |
           php vendor/phpunit/phpunit/phpunit --stop-on-failure \
-            --coverage-xml=var/logs/coverage-xml \
-            --log-junit=var/logs/junit.xml
+            --coverage-xml=var/coverage/coverage-xml \
+            --log-junit=var/coverage/junit.xml
+
+      - name: Setup PHP for mutation testing
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create opcache directory
+        run: mkdir -p /tmp/opcache
 
       - name: Run Infection on the full codebase
         env:
@@ -81,7 +97,7 @@ jobs:
             --skip-initial-tests \
             --min-msi=$MIN_MSI \
             --min-covered-msi=$MIN_COVERED_MSI \
-            --coverage=var/logs \
+            --coverage=var/coverage \
             --log-verbosity=none \
             --no-interaction \
             --no-progress
@@ -92,7 +108,7 @@ jobs:
       name: Mutation Testing Status
       runs-on: ubuntu-latest
       timeout-minutes: 30
-      needs: tests
+      needs: mutation-testing
       if: always()
       steps:
           - name: Successful run

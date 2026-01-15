@@ -47,7 +47,7 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * @internal
  */
-final class MapSourceClassToTestOption
+final class MapSourceClassToTestOption implements CommandOption
 {
     use CannotBeInstantiated;
 
@@ -68,7 +68,7 @@ final class MapSourceClassToTestOption
     }
 
     /**
-     * @return non-empty-string|null
+     * @return MapSourceClassToTestStrategy::*|null
      */
     public static function get(IO $io): ?string
     {
@@ -85,17 +85,27 @@ final class MapSourceClassToTestOption
             return MapSourceClassToTestStrategy::SIMPLE;
         }
 
-        if (!in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
-                    $inputValue,
-                    self::NAME,
-                    MapSourceClassToTestStrategy::SIMPLE,
-                ),
-            );
-        }
+        self::assertIsValid($inputValue);
 
         return $inputValue;
+    }
+
+    /**
+     * @phpstan-assert MapSourceClassToTestStrategy::* $inputValue
+     */
+    private static function assertIsValid(string $inputValue): void
+    {
+        if (in_array($inputValue, MapSourceClassToTestStrategy::getAll(), true)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf(
+                'Cannot pass "%s" to "--%s": only "%s" or no argument is supported',
+                $inputValue,
+                self::NAME,
+                MapSourceClassToTestStrategy::SIMPLE,
+            ),
+        );
     }
 }

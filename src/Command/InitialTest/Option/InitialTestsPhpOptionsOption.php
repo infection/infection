@@ -36,8 +36,9 @@ declare(strict_types=1);
 namespace Infection\Command\InitialTest\Option;
 
 use Infection\CannotBeInstantiated;
+use Infection\Command\Option\CommandOption;
 use Infection\Console\IO;
-use Infection\Container;
+use Infection\Container\Container;
 use function sprintf;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,7 +47,7 @@ use function trim;
 /**
  * @internal
  */
-final class InitialTestsPhpOptionsOption
+final class InitialTestsPhpOptionsOption implements CommandOption
 {
     use CannotBeInstantiated;
 

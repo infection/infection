@@ -1,0 +1,189 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:braces
+
+name: Performance Metrics
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '.github/workflows/perf-metrics.yaml'
+      - 'src/**'
+      - 'bin/**'
+      - 'composer.*'
+  pull_request:
+    paths:
+      - '.github/workflows/perf-metrics.yaml'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (tag, commit, or branch) to test'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.2'
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    name: Collect and commit metrics
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          # When ref input is provided, checkout from upstream (where tags exist)
+          repository: ${{ github.event.inputs.ref && 'infection/infection' || github.repository }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Setup PHP for coverage
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # master
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: pcov
+          tools: composer
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
+          restore-keys: |
+            composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+            composer-${{ runner.os }}-
+            composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Collect coverage report
+        run: |
+          php vendor/phpunit/phpunit/phpunit --stop-on-failure \
+            --coverage-xml=var/coverage/coverage-xml \
+            --log-junit=var/coverage/junit.xml
+
+      - name: Re-configure PHP for mutation testing without pcov and with opcache
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # master
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          ini-values: opcache.enable_cli=1, opcache.file_cache=/tmp/opcache, opcache.file_cache_only=1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create opcache directory
+        run: mkdir -p /tmp/opcache
+
+      - name: Collect runner specs
+        id: runner-specs
+        run: |
+          echo "cpu_model=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs)" >> $GITHUB_OUTPUT
+          echo "cpu_cores=$(nproc)" >> $GITHUB_OUTPUT
+          echo "cpu_arch=$(uname -m)" >> $GITHUB_OUTPUT
+          echo "total_memory_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Check for summary logger support
+        id: feature-check
+        run: |
+          if git grep -q 'logger-summary-json' -- src/; then
+            echo "has_summary_logger=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_summary_logger=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Infection with timing
+        run: |
+          SUMMARY_OPT=""
+          if [[ "${{ steps.feature-check.outputs.has_summary_logger }}" == "true" ]]; then
+            SUMMARY_OPT="--logger-summary-json=infection-summary.json"
+          fi
+
+          /usr/bin/time -f '{"user_time_sec":%U,"system_time_sec":%S,"wall_clock_sec":%e,"max_rss_kb":%M,"cpu_percent":"%P","voluntary_ctx_switches":%w,"involuntary_ctx_switches":%c,"exit_status":%x}' \
+            -o timing.json \
+            php bin/infection \
+              --skip-initial-tests \
+              --coverage=var/coverage \
+              --no-progress \
+              --threads=max \
+              --no-interaction \
+              $SUMMARY_OPT \
+            || true
+          cat timing.json
+
+      - name: Checkout metrics repository
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          repository: infection/infection-metrics
+          ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
+          path: metrics-repo
+
+      - name: Prepare and commit metrics
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          CPU_CORES: ${{ steps.runner-specs.outputs.cpu_cores }}
+          GIT_REF: ${{ github.event.inputs.ref || github.ref }}
+          TRIGGER: ${{ github.event_name }}
+          CPU_MODEL: ${{ steps.runner-specs.outputs.cpu_model }}
+          CPU_ARCH: ${{ steps.runner-specs.outputs.cpu_arch }}
+          TOTAL_MEM: ${{ steps.runner-specs.outputs.total_memory_kb }}
+        run: |
+          export COMMIT_DATE=$(git log -1 --format='%cI')
+          export GIT_SHA=$(git rev-parse HEAD)
+          export IMAGE_VERSION="${ImageVersion:-unknown}"
+
+          php metrics-repo/scripts/prepare-metrics.php timing.json entry.json
+
+          echo "Final metrics entry:"
+          cat entry.json
+
+          cd metrics-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Pull latest to minimize conflicts with concurrent runs
+          git pull --rebase
+
+          # Append new entry as single line
+          jq -c . ../entry.json >> metrics.jsonl
+
+          echo "Updated metrics.jsonl:"
+          tail -5 metrics.jsonl
+
+          git add metrics.jsonl
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+
+          # Build commit message with tag (if provided) and short SHA
+          SHORT_SHA="${{ github.sha }}"
+          SHORT_SHA="${SHORT_SHA:0:7}"
+          REF_INPUT="${{ github.event.inputs.ref }}"
+          if [[ -n "$REF_INPUT" ]]; then
+            COMMIT_MSG="perf: Add metrics for $REF_INPUT ($SHORT_SHA)"
+          else
+            COMMIT_MSG="perf: Add metrics for $SHORT_SHA"
+          fi
+
+          git commit -m "$COMMIT_MSG"
+
+          # Retry with rebase if concurrent run committed first
+          for i in 1 2 3; do
+            git push && break
+            echo "Push failed, rebasing and retrying ($i/3)..."
+            git pull --rebase
+          done

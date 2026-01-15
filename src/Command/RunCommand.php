@@ -50,13 +50,14 @@ use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
 use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Engine;
 use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
 use Infection\Source\Exception\NoSourceFound;
@@ -67,9 +68,7 @@ use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use function trim;
 
 /**
  * @internal
@@ -93,6 +92,14 @@ final class RunCommand extends BaseCommand
      * without value"
      */
     public const OPTION_VALUE_NOT_PROVIDED = false;
+
+    public const OPTION_LOGGER_SUMMARY_JSON = 'logger-summary-json';
+
+    /** @var string */
+    public const OPTION_WITH_TIMEOUTS = 'with-timeouts';
+
+    /** @var string */
+    public const OPTION_MAX_TIMEOUTS = 'max-timeouts';
 
     private const OPTION_STATIC_ANALYSIS_TOOL = 'static-analysis-tool';
 
@@ -277,6 +284,12 @@ final class RunCommand extends BaseCommand
                 'Path to text report file.',
             )
             ->addOption(
+                self::OPTION_LOGGER_SUMMARY_JSON,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to summary JSON report file (statistics only, no mutation details).',
+            )
+            ->addOption(
                 self::OPTION_USE_NOOP_MUTATORS,
                 null,
                 InputOption::VALUE_NONE,
@@ -301,6 +314,19 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Minimum Covered Code Mutation Score Indicator (MSI) percentage value',
                 Container::DEFAULT_MIN_COVERED_MSI,
+            )
+            ->addOption(
+                self::OPTION_WITH_TIMEOUTS,
+                null,
+                InputOption::VALUE_NONE,
+                'Treat timed out mutants as escaped (affects MSI calculation)',
+            )
+            ->addOption(
+                self::OPTION_MAX_TIMEOUTS,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Maximum allowed timeouts. Build fails if exceeded',
+                Container::DEFAULT_MAX_TIMEOUTS,
             )
             ->addOption(
                 self::OPTION_LOG_VERBOSITY,
@@ -367,6 +393,7 @@ final class RunCommand extends BaseCommand
                 $container->getMutationGenerator(),
                 $container->getMutationTestingRunner(),
                 $container->getMinMsiChecker(),
+                $container->getMaxTimeoutsChecker(),
                 $consoleOutput,
                 $container->getMetricsCalculator(),
                 $container->getTestFrameworkExtraOptionsFilter(),
@@ -386,7 +413,7 @@ final class RunCommand extends BaseCommand
             }
 
             throw $noSourceFoundException;
-        } catch (InitialTestsFailed|MinMsiCheckFailed $exception) {
+        } catch (InitialTestsFailed|MinMsiCheckFailed|MaxTimeoutCountReached $exception) {
             // TODO: we can move that in a dedicated logger later and handle those cases in the
             // Engine instead
             $io->error($exception->getMessage());
@@ -404,14 +431,7 @@ final class RunCommand extends BaseCommand
         LoggerInterface $logger,
     ): Container {
         $input = $io->getInput();
-
-        $coverage = trim((string) $input->getOption(self::OPTION_COVERAGE));
-        $staticAnalysisTool = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL));
-        $staticAnalysisToolOptions = trim((string) $input->getOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS));
-        $gitlabFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_GITLAB));
-        $htmlFileLogPath = trim((string) $input->getOption(self::OPTION_LOGGER_HTML));
-        $textLogFilePath = trim((string) $input->getOption(self::OPTION_LOGGER_TEXT));
-        $loggerProjectRootDirectory = $input->getOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY);
+        $commandHelper = new RunCommandHelper($input);
 
         /** @var string|null $minMsi */
         $minMsi = $input->getOption(self::OPTION_MIN_MSI);
@@ -432,26 +452,22 @@ final class RunCommand extends BaseCommand
             );
         }
 
-        $commandHelper = new RunCommandHelper($input);
-
         return $this->getApplication()->getContainer()->withValues(
             logger: $logger,
             output: $io->getOutput(),
             configFile: $configFile,
-            mutatorsInput: trim((string) $input->getOption(self::OPTION_MUTATORS)),
+            mutatorsInput: $commandHelper->getStringOption(self::OPTION_MUTATORS, Container::DEFAULT_MUTATORS_INPUT),
             numberOfShownMutations: $commandHelper->getNumberOfShownMutations(),
-            logVerbosity: trim((string) $input->getOption(self::OPTION_LOG_VERBOSITY)),
+            logVerbosity: $commandHelper->getStringOption(self::OPTION_LOG_VERBOSITY, Container::DEFAULT_LOG_VERBOSITY),
             // To keep in sync with Container::DEFAULT_DEBUG
             debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            formatterName: self::getFormatterName($input),
+            formatterName: self::getFormatterName($commandHelper),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             noProgress: $noProgress,
             forceProgress: $forceProgress,
-            existingCoveragePath: $coverage === ''
-                ? Container::DEFAULT_EXISTING_COVERAGE_PATH
-                : $coverage,
+            existingCoveragePath: $commandHelper->getStringOption(self::OPTION_COVERAGE, Container::DEFAULT_EXISTING_COVERAGE_PATH),
             initialTestsPhpOptions: InitialTestsPhpOptionsOption::get($io),
             // To keep in sync with Container::DEFAULT_SKIP_INITIAL_TESTS
             skipInitialTests: (bool) $input->getOption(self::OPTION_SKIP_INITIAL_TESTS),
@@ -459,25 +475,26 @@ final class RunCommand extends BaseCommand
             ignoreMsiWithNoMutations: $commandHelper->getIgnoreMsiWithNoMutations(),
             minMsi: MsiParser::parse($minMsi, $msiPrecision, self::OPTION_MIN_MSI),
             minCoveredMsi: MsiParser::parse($minCoveredMsi, $msiPrecision, self::OPTION_MIN_COVERED_MSI),
+            timeoutsAsEscaped: $commandHelper->getTimeoutsAsEscaped(),
+            maxTimeouts: $commandHelper->getMaxTimeouts(),
             msiPrecision: $msiPrecision,
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
-            staticAnalysisToolOptions: $staticAnalysisToolOptions === ''
-                ? Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS
-                : $staticAnalysisToolOptions,
+            staticAnalysisToolOptions: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL_OPTIONS, Container::DEFAULT_STATIC_ANALYSIS_TOOL_OPTIONS),
             sourceFilter: SourceFilterOptions::get($io),
             threadCount: $commandHelper->getThreadCount(),
             // To keep in sync with Container::DEFAULT_DRY_RUN
             dryRun: (bool) $input->getOption(self::OPTION_DRY_RUN),
             useGitHubLogger: $commandHelper->getUseGitHubLogger(),
-            gitlabLogFilePath: $gitlabFileLogPath === '' ? Container::DEFAULT_GITLAB_LOGGER_PATH : $gitlabFileLogPath,
-            htmlLogFilePath: $htmlFileLogPath === '' ? Container::DEFAULT_HTML_LOGGER_PATH : $htmlFileLogPath,
-            textLogFilePath: $textLogFilePath === '' ? Container::DEFAULT_TEXT_LOGGER_PATH : $textLogFilePath,
+            gitlabLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_GITLAB, Container::DEFAULT_GITLAB_LOGGER_PATH),
+            htmlLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_HTML, Container::DEFAULT_HTML_LOGGER_PATH),
+            textLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_TEXT, Container::DEFAULT_TEXT_LOGGER_PATH),
+            summaryJsonLogFilePath: $commandHelper->getStringOption(self::OPTION_LOGGER_SUMMARY_JSON, Container::DEFAULT_SUMMARY_JSON_LOGGER_PATH),
             useNoopMutators: (bool) $input->getOption(self::OPTION_USE_NOOP_MUTATORS),
             executeOnlyCoveringTestCases: (bool) $input->getOption(self::OPTION_EXECUTE_ONLY_COVERING_TEST_CASES),
             mapSourceClassToTestStrategy: MapSourceClassToTestOption::get($io),
-            loggerProjectRootDirectory: $loggerProjectRootDirectory,
-            staticAnalysisTool: $staticAnalysisTool === '' ? Container::DEFAULT_STATIC_ANALYSIS_TOOL : $staticAnalysisTool,
+            loggerProjectRootDirectory: $commandHelper->getStringOption(self::OPTION_LOGGER_PROJECT_ROOT_DIRECTORY),
+            staticAnalysisTool: $commandHelper->getStringOption(self::OPTION_STATIC_ANALYSIS_TOOL, Container::DEFAULT_STATIC_ANALYSIS_TOOL),
             mutantId: $input->getOption(self::OPTION_MUTANT_ID),
         );
     }
@@ -486,7 +503,10 @@ final class RunCommand extends BaseCommand
     {
         $installationDecider = $container->getAdapterInstallationDecider();
 
-        $adapterName = TestFrameworkOption::get($io);
+        $configuration = $container->getConfiguration();
+        $configTestFramework = $configuration->testFramework;
+
+        $adapterName = TestFrameworkOption::get($io) ?? $configTestFramework;
 
         if (!$installationDecider->shouldBeInstalled($adapterName, $io)) {
             return;
@@ -585,10 +605,10 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(InputInterface $input): FormatterName
+    private static function getFormatterName(RunCommandHelper $commandHelper): FormatterName
     {
-        $value = trim((string) $input->getOption(self::OPTION_FORMATTER));
-
-        return FormatterName::from($value);
+        return FormatterName::from(
+            $commandHelper->getStringOption(self::OPTION_FORMATTER, Container::DEFAULT_FORMATTER_NAME->value),
+        );
     }
 }

@@ -119,12 +119,6 @@ parameters:
             count: 1
             path: ../src/TestFramework/SafeDOMXPath.php
 
-        -
-            message: "#FS::tmpFile#"
-            identifier: shipmonk.deadMethod
-            count: 1
-            path: ../tests/phpunit/TestingUtility/FS.php
-
         # We are explicitly testing the guards here
         -
             identifier: argument.type
@@ -186,7 +180,18 @@ parameters:
         -
             message: '#^Method .+\\Container::getConfiguration\(\) has .+\\(FileOrDirectoryNotFound|NoSourceFound) in PHPDoc \@throws tag but it.+s not thrown\.$#'
             identifier: throws.unusedType
-            path: ../src/Container.php
+            path: ../src/Container/Container.php
+
+        # This is legit; To review if that remains to be true once we dealt with
+        # https://github.com/infection/infection/issues/2760.
+        -
+            message: '#getDefaultLocation#'
+            identifier: shipmonk.deadMethod
+            path: ../src/TestFramework/Coverage/Locator/ReportLocator.php
+        -
+            message: '#getDefaultLocation#'
+            identifier: shipmonk.deadMethod
+            path: ../src/TestFramework/Coverage/Locator/FakeLocator.php
 
         # PHPStan cannot really properly infer the types here
         -
@@ -204,6 +209,13 @@ parameters:
             identifier: argument.type
             path: ../src/Mutator/NodeMutationGenerator.php
 
+        # This class is copy/pasted from PhpParser so we don't want to change it too much
+        -
+            identifier: if.condNotBoolean
+            path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
+        -
+            identifier: booleanAnd.rightNotBoolean
+            path: ../tests/phpunit/TestingUtility/PhpParser/NodeDumper/NodeDumper.php
     level: 8
     paths:
         - ../src
@@ -217,6 +229,7 @@ parameters:
         - %currentWorkingDirectory%/tests/e2e/*
         - %currentWorkingDirectory%/tests/phpunit/Fixtures/*
         - ../tests/phpunit/Mutation/FileMutationGenerator/Fixtures/TwoAdditions.php
+        - ../tests/phpunit/PhpParser/Visitor/VisitorCollectorIntegration/Fixtures/TwoAdditions.php
         # Current PHPStan version doesn't support `array<int, callable<mixed>>` syntax (callable)
         - %currentWorkingDirectory%/tests/phpunit/WithConsecutive.php
         - ../tests/benchmark/MutationGenerator/sources (?)

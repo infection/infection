@@ -144,11 +144,11 @@ final class RoundingFamilyTest extends BaseMutatorTestCase
         ];
 
         yield 'It mutates round() to floor() and ceil() and leaves only 1 argument' => [
-            <<<'PHP_WRAP'
+            <<<'PHP'
                 <?php
 
                 $var = round(1.23, 2, PHP_ROUND_HALF_UP);
-                PHP_WRAP,
+                PHP,
             [
                 <<<'PHP'
                     <?php

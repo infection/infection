@@ -36,13 +36,14 @@ declare(strict_types=1);
 namespace Infection\Command;
 
 use function getenv;
-use Infection\Container;
+use Infection\Container\Container;
 use Infection\Resource\Processor\CpuCoresCountProvider;
 use InvalidArgumentException;
 use function is_numeric;
 use function max;
 use function sprintf;
 use Symfony\Component\Console\Input\InputInterface;
+use function trim;
 use Webmozart\Assert\Assert;
 
 /**
@@ -53,6 +54,20 @@ final readonly class RunCommandHelper
     public function __construct(
         private InputInterface $input,
     ) {
+    }
+
+    /**
+     * @template T of string|null
+     * @param T $default
+     * @return (T is null ? string|null : string)
+     */
+    public function getStringOption(string $name, ?string $default = null): ?string
+    {
+        $optionValue = trim((string) $this->input->getOption($name));
+
+        return $optionValue === ''
+            ? $default
+            : $optionValue;
     }
 
     public function getUseGitHubLogger(): ?bool
@@ -141,5 +156,18 @@ final readonly class RunCommandHelper
             RunCommand::OPTION_VALUE_NOT_PROVIDED => null,
             default => true,
         };
+    }
+
+    public function getTimeoutsAsEscaped(): bool
+    {
+        return (bool) $this->input->getOption(RunCommand::OPTION_WITH_TIMEOUTS);
+    }
+
+    public function getMaxTimeouts(): ?int
+    {
+        /** @var string|null $maxTimeoutsInput */
+        $maxTimeoutsInput = $this->input->getOption(RunCommand::OPTION_MAX_TIMEOUTS);
+
+        return $maxTimeoutsInput !== null ? (int) $maxTimeoutsInput : null;
     }
 }

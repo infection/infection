@@ -39,7 +39,7 @@ use DomainException;
 use Infection\TestFramework\Tracing\Trace\NodeLineRangeData;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\TestFramework\Tracing\Trace\Trace;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 /**
  * Represents a Trace state with any dynamic behaviour or laziness of any kind.
@@ -65,11 +65,6 @@ final readonly class SyntheticTrace implements Trace
     public function getRealPath(): string
     {
         return $this->realPath;
-    }
-
-    public function getRelativePathname(): string
-    {
-        return $this->relativePathname;
     }
 
     public function hasTests(): bool

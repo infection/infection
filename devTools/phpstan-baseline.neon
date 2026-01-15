@@ -13,12 +13,6 @@ parameters:
 			path: ../src/Command/MakeCustomMutatorCommand.php
 
 		-
-			message: '#^Parameter \#2 \$value of method DIContainer\\Container\:\:set\(\) expects \(callable\(DIContainer\\Container\)\: object\)\|class\-string\<DIContainer\\Builder\<object\>\>, callable\(Infection\\Container\)\: object given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../src/Container.php
-
-		-
 			message: '#^Variable \$end might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -761,12 +755,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
-
-		-
-			message: '#^Parameter \#1 \$nodes of method PhpParser\\NodeTraverser\:\:traverse\(\) expects array\<PhpParser\\Node\>, array\<PhpParser\\Node\\Stmt\>\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/PhpParser/Visitor/IgnoreNode/BaseNodeIgnorerTestCase.php
 
 		-
 			message: '#^Call to an undefined method Infection\\Event\\MutationTestingWasFinished\|Infection\\Event\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'
