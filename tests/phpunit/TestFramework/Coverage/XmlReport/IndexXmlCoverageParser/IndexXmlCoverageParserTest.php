@@ -60,8 +60,6 @@ final class IndexXmlCoverageParserTest extends TestCase
 {
     use ExpectsThrowables;
 
-    private static ?string $fixturesOldXmlFileName = null;
-
     private string $generatedIndexXmlPath;
 
     protected function setUp(): void
