@@ -46,7 +46,6 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use Infection\Tests\Fixtures\Mutator\FakeMutator;
-use Infection\Tests\Fixtures\PhpParser\FakeIgnorer;
 use Infection\Tests\Fixtures\PhpParser\FakeNode;
 use Infection\Tests\PhpParser\FakeToken;
 use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
@@ -107,8 +106,6 @@ final class FileMutationGeneratorTest extends TestCase
             new FakeMutator(),
             new FakeMutator(),
         ];
-
-        $nodeIgnorers = [new FakeIgnorer()];
 
         $initialStatements = [
             new FakeNode(),
@@ -184,7 +181,6 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfoMock,
             false,
             $mutators,
-            $nodeIgnorers,
         );
 
         // We cannot really check more than that here as controlling the mutations yielded
@@ -211,8 +207,6 @@ final class FileMutationGeneratorTest extends TestCase
             new FakeMutator(),
             new FakeMutator(),
         ];
-
-        $nodeIgnorers = [new FakeIgnorer()];
 
         $initialStatements = [
             new FakeNode(),
@@ -271,7 +265,6 @@ final class FileMutationGeneratorTest extends TestCase
             $fileInfoMock,
             $scenario->onlyCovered,
             $mutators,
-            $nodeIgnorers,
         );
 
         // See the test description: we do not check the result itself only the mocks

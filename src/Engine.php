@@ -48,7 +48,6 @@ use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Mutation\MutationGenerator;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Process\Runner\InitialStaticAnalysisRunFailed;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -63,7 +62,6 @@ use Infection\TestFramework\Coverage\Locator\Throwable\NoReportFound;
 use Infection\TestFramework\Coverage\Locator\Throwable\ReportLocationThrowable;
 use Infection\TestFramework\Coverage\Locator\Throwable\TooManyReportsFound;
 use Infection\TestFramework\Coverage\XmlReport\InvalidCoverage;
-use Infection\TestFramework\IgnoresAdditionalNodes;
 use Infection\TestFramework\ProvidesInitialRunOnlyOptions;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
 use Webmozart\Assert\Assert;
@@ -221,25 +219,12 @@ final readonly class Engine
     {
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
-            $this->getNodeIgnorers(),
         );
 
         $this->mutationTestingRunner->run(
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
         );
-    }
-
-    /**
-     * @return NodeIgnorer[]
-     */
-    private function getNodeIgnorers(): array
-    {
-        if ($this->adapter instanceof IgnoresAdditionalNodes) {
-            return $this->adapter->getNodeIgnorers();
-        }
-
-        return [];
     }
 
     private function getFilteredExtraOptionsForMutant(): string
