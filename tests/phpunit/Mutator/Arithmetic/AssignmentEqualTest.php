@@ -88,12 +88,12 @@ final class AssignmentEqualTest extends BaseMutatorTestCase
         ];
 
         yield 'It does not try to assign a variable to a built in constant' => [
-            <<<'PHP_WRAP'
+            <<<'PHP'
                 <?php
 
                 if (PHP_EOL == $a) {
                 }
-                PHP_WRAP,
+                PHP,
         ];
 
         yield 'It does not try to assign a scalar to a result of a function call' => [

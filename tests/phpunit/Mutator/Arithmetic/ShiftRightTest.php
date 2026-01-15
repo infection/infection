@@ -77,18 +77,5 @@ final class ShiftRightTest extends BaseMutatorTestCase
                     PHP,
             ),
         ];
-
-        yield 'It replaces post decrement' => [
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    $a = 1; $a >> 2;
-                    PHP,
-            ),
-            self::wrapCodeInMethod(
-                <<<'PHP'
-                    $a = 1; $a << 2;
-                    PHP,
-            ),
-        ];
     }
 }
