@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           # When ref input is provided, checkout from upstream (where tags exist)
           repository: ${{ github.event.inputs.ref && 'infection/infection' || github.repository }}
@@ -60,7 +60,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ hashFiles('composer.*') }}
@@ -128,7 +128,7 @@ jobs:
 
       - name: Checkout metrics repository
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           repository: infection/infection-metrics
           ssh-key: ${{ secrets.INFECTION_METRICS_SSHKEY }}
