@@ -89,6 +89,7 @@ final class InitialTestRunCommand extends BaseCommand
             testFramework: TestFrameworkOption::get($io),
             testFrameworkExtraOptions: TestFrameworkOptionsOption::get($io),
             sourceFilter: new IncompleteGitDiffFilter($inputFilter, $inputBase),
+            debug: true,
         );
 
         // LogVerbosity::convertVerbosityLevel($io->getInput(), $consoleOutput);
