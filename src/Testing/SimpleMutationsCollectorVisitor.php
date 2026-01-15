@@ -84,7 +84,7 @@ final class SimpleMutationsCollectorVisitor extends NodeVisitorAbstract
         if (!$this->isOnFunctionSignature()
             && !$this->isInsideFunction()
         ) {
-            return;
+            return null;
         }
 
         if (!$this->mutator->canMutate($node)) {
