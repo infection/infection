@@ -51,6 +51,7 @@ use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector;
 use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
 use Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector;
+use Rector\Php73\Rector\String_\SensitiveHereNowDocRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AddInstanceofAssertForNullableInstanceRector;
@@ -169,6 +170,7 @@ return RectorConfig::configure()
             __DIR__ . '/src/StaticAnalysis/StaticAnalysisToolTypes.php',
             __DIR__ . '/tests/phpunit/Fixtures/',
         ],
+        SensitiveHereNowDocRector::class,
         SimplifyDeMorganBinaryRector::class,
         SimplifyIfElseToTernaryRector::class,
         SimplifyIfReturnBoolRector::class => [
