@@ -46,6 +46,11 @@ final class MockSplFileInfo extends SplFileInfo
         parent::__construct($pathname);
     }
 
+    public static function create(string $pathname): self
+    {
+        return new self($pathname, $pathname);
+    }
+
     public function getRealPath(): false|string
     {
         return $this->realPath;
