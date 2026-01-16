@@ -106,7 +106,6 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SimpleMutation;
 use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
-use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
 use function iterator_to_array;
@@ -173,7 +172,6 @@ final class ProjectCodeProvider
         SingletonContainer::class,
         Source::class,
         StopInfectionOnSigintSignalSubscriber::class,
-        StringNormalizer::class,
         StrykerCurlClient::class,
         TooManyReportsFound::class,
         XdebugHandler::class,

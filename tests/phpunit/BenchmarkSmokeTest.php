@@ -37,7 +37,7 @@ namespace Infection\Tests;
 
 use function file_exists;
 use Infection\Framework\OperatingSystem;
-use Infection\Testing\StringNormalizer;
+use Infection\Framework\Str;
 use Infection\Tests\TestingUtility\Process\TestPhpExecutableFinder;
 use const PHP_SAPI;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -87,7 +87,7 @@ final class BenchmarkSmokeTest extends TestCase
         ]);
         $benchmarkProcess->mustRun();
 
-        $actualOutput = StringNormalizer::normalizeString($benchmarkProcess->getOutput());
+        $actualOutput = Str::rTrimLines($benchmarkProcess->getOutput());
 
         $this->assertStringContainsString($expectedOutput, $actualOutput);
     }

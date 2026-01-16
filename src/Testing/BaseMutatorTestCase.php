@@ -43,6 +43,7 @@ use function count;
 use function explode;
 use function implode;
 use Infection\Framework\ClassName;
+use Infection\Framework\Str;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
@@ -99,7 +100,7 @@ abstract class BaseMutatorTestCase extends TestCase
     ): void {
         $expectedCodeSamples = (array) $expectedCode;
 
-        $inputCode = StringNormalizer::normalizeString($inputCode);
+        $inputCode = Str::rTrimLines($inputCode);
 
         if ($inputCode === $expectedCode) {
             $this->fail('Input code cant be the same as mutated code');
@@ -114,7 +115,7 @@ abstract class BaseMutatorTestCase extends TestCase
                 'Failed asserting that the number of code samples (%d) equals the number of mutants (%d) created by the mutator. Make sure mutator is enabled and mutates the source code. Mutants are: %s',
                 count($expectedCodeSamples),
                 count($mutants),
-                StringNormalizer::normalizeString(implode(PHP_EOL, $mutants)),
+                Str::rTrimLines(implode(PHP_EOL, $mutants)),
             ),
         );
 
@@ -129,8 +130,8 @@ abstract class BaseMutatorTestCase extends TestCase
             Assert::string($expectedCodeSample);
 
             $this->assertSame(
-                StringNormalizer::normalizeString($expectedCodeSample),
-                StringNormalizer::normalizeString($realMutatedCode),
+                Str::rTrimLines($expectedCodeSample),
+                Str::rTrimLines($realMutatedCode),
             );
 
             if (!$allowInvalidCode) {
