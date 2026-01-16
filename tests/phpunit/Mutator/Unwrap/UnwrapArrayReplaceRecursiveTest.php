@@ -55,218 +55,218 @@ final class UnwrapArrayReplaceRecursiveTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'It mutates correctly when provided with an array' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_replace_recursive(['A', 1, 'C'], ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_replace_recursive(['A', 1, 'C'], ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a constant' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_replace_recursive(\Class_With_Const::Const, ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_replace_recursive(\Class_With_Const::Const, ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = \Class_With_Const::Const;
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = \Class_With_Const::Const;
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when a backslash is in front of array_replace_recursive' => [
-            <<<'PHP'
-                <?php
-
-                $a = \array_replace_recursive(['A', 1, 'C'], ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = \array_replace_recursive(['A', 1, 'C'], ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly within if statements' => [
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                if (array_replace_recursive($a, ['D']) === $a) {
-                    return true;
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    if (array_replace_recursive($a, ['D']) === $a) {
+                        return true;
+                    }
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    if ($a === $a) {
-                        return true;
-                    }
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    if (['D'] === $a) {
-                        return true;
-                    }
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        if ($a === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        if (['D'] === $a) {
+                            return true;
+                        }
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_replace_recursive is wrongly capitalized' => [
-            <<<'PHP'
-                <?php
-
-                $a = aRrAy_RePlAcE_rEcUrSiVe(['A', 1, 'C'], ['D']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = aRrAy_RePlAcE_rEcUrSiVe(['A', 1, 'C'], ['D']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when array_replace_recursive uses functions as input' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_replace_recursive($foo->bar(), $foo->baz());
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_replace_recursive($foo->bar(), $foo->baz());
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->bar();
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = $foo->baz();
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->bar();
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = $foo->baz();
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when provided with a more complex situation' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', array_replace_recursive(['A', 1, 'C'], ['D']));
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', array_replace_recursive(['A', 1, 'C'], ['D']));
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['A', 1, 'C']);
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = array_map('strtolower', ['D']);
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['A', 1, 'C']);
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = array_map('strtolower', ['D']);
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It mutates correctly when only one parameter is present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_replace_recursive(['A', 1, 'C']);
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a = ['A', 1, 'C'];
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_replace_recursive(['A', 1, 'C']);
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = ['A', 1, 'C'];
+                    PHP,
+            ),
         ];
 
         yield 'It mutates correctly when more than two parameters are present' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_replace_recursive(['A', 1, 'C'], ['D'], ['E', 'F']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_replace_recursive(['A', 1, 'C'], ['D'], ['E', 'F']);
+                    PHP,
+            ),
             [
-                <<<'PHP'
-                    <?php
-
-                    $a = ['A', 1, 'C'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['D'];
-                    PHP,
-                <<<'PHP'
-                    <?php
-
-                    $a = ['E', 'F'];
-                    PHP,
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['A', 1, 'C'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['D'];
+                        PHP,
+                ),
+                self::wrapCodeInMethod(
+                    <<<'PHP'
+                        $a = ['E', 'F'];
+                        PHP,
+                ),
             ],
         ];
 
         yield 'It does not mutate other array_ calls' => [
-            <<<'PHP'
-                <?php
-
-                $a = array_map('strtolower', ['A', 'B', 'C']);
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = array_map('strtolower', ['A', 'B', 'C']);
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate functions named array_replace_recursive' => [
-            <<<'PHP'
-                <?php
-
-                function array_replace_recursive($array, $array1, $array2)
-                {
-                }
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    function array_replace_recursive($array, $array1, $array2)
+                    {
+                    }
+                    PHP,
+            ),
         ];
 
         yield 'It does not mutate when a variable function name is used' => [
-            <<<'PHP'
-                <?php
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a = 'array_replace_recursive';
 
-                $a = 'array_replace_recursive';
-
-                $b = $a(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
-                PHP,
+                    $b = $a(['A', 'B', 'C'], ['foo', 'bar', 'baz']);
+                    PHP,
+            ),
         ];
     }
 }
