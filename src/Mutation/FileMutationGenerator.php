@@ -41,7 +41,6 @@ use Infection\Mutator\NodeMutationGenerator;
 use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
@@ -72,7 +71,6 @@ class FileMutationGenerator
 
     /**
      * @param Mutator<Node>[] $mutators
-     * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws NoSourceFound
      * @throws UnparsableFile
@@ -83,10 +81,8 @@ class FileMutationGenerator
         SplFileInfo $sourceFile,
         bool $onlyCovered,
         array $mutators,
-        array $nodeIgnorers,
     ): iterable {
         Assert::allIsInstanceOf($mutators, Mutator::class);
-        Assert::allIsInstanceOf($nodeIgnorers, NodeIgnorer::class);
 
         $trace = $this->trace($sourceFile);
 
@@ -114,7 +110,7 @@ class FileMutationGenerator
             ),
         );
 
-        $traverser = $this->traverserFactory->create($mutationCollectorVisitor, $nodeIgnorers);
+        $traverser = $this->traverserFactory->create($mutationCollectorVisitor);
         $traverser->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();

@@ -66,7 +66,6 @@ final class VisitorCollectorIntegrationTest extends VisitorTestCase
         $traversedNodes = $traverserFactory
             ->create(
                 new MarkTraversedNodesAsVisitedVisitor(),
-                [],
             )
         ->traverse($nodes);
 
