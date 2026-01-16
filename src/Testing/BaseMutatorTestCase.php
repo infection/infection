@@ -43,14 +43,22 @@ use function count;
 use function explode;
 use function implode;
 use Infection\Framework\ClassName;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
+use Infection\Mutator\NodeMutationGenerator;
 use Infection\Mutator\ProfileList;
 use Infection\PhpParser\NodeTraverserFactory;
+use Infection\PhpParser\Visitor\MutationCollectorVisitor;
 use Infection\PhpParser\Visitor\MutatorVisitor;
+use Infection\Source\Matcher\NullSourceLineMatcher;
+use Infection\TestFramework\Tracing\Trace\EmptyTrace;
+use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
+use Infection\Tests\TestingUtility\FileSystem\MockSplFileInfo;
 use const PHP_EOL;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PHPUnit\Framework\TestCase;
+use function Pipeline\take;
 use function sprintf;
 use Throwable;
 use function token_get_all;
@@ -215,7 +223,7 @@ abstract class BaseMutatorTestCase extends TestCase
     }
 
     /**
-     * @return SimpleMutation[]
+     * @return Mutation[]
      */
     private function getMutationsFromCode(string $code, array $settings): array
     {
@@ -225,11 +233,23 @@ abstract class BaseMutatorTestCase extends TestCase
 
         $this->assertNotNull($nodes);
 
-        $mutationsCollectorVisitor = new SimpleMutationsCollectorVisitor(
-            $this->createMutator($settings),
-            $nodes,
-            $originalFileTokens,
-            $code,
+        // Note that in theory we could just use the FileMutationGenerator. However,
+        // we may add more visitors/traverses in the near future, which would become
+        // impossible with FileMutationGenerator, hence we leave it as is for now.
+        $mutationsCollectorVisitor = new MutationCollectorVisitor(
+            new NodeMutationGenerator(
+                mutators: [$this->createMutator($settings)],
+                filePath: '/path/to/test-file.php',
+                fileNodes: $nodes,
+                trace: new EmptyTrace(
+                    new MockSplFileInfo('/path/to/test-file.php'),
+                ),
+                onlyCovered: false,
+                lineRangeCalculator: new LineRangeCalculator(),
+                sourceLineMatcher: new NullSourceLineMatcher(),
+                originalFileTokens: $originalFileTokens,
+                originalFileContent: $code,
+            ),
         );
 
         $factory = new NodeTraverserFactory();
@@ -241,7 +261,7 @@ abstract class BaseMutatorTestCase extends TestCase
             ->create($mutationsCollectorVisitor)
             ->traverse($nodes);
 
-        return $mutationsCollectorVisitor->getMutations();
+        return take($mutationsCollectorVisitor->getMutations())->toList();
     }
 
     private function assertSyntaxIsValid(string $realMutatedCode): void

@@ -103,8 +103,6 @@ use Infection\TestFramework\Tracing\Trace\SourceMethodLineRange;
 use Infection\TestFramework\Tracing\Trace\TestLocations;
 use Infection\Testing\BaseMutatorTestCase;
 use Infection\Testing\MutatorName;
-use Infection\Testing\SimpleMutation;
-use Infection\Testing\SimpleMutationsCollectorVisitor;
 use Infection\Testing\SingletonContainer;
 use Infection\Testing\StringNormalizer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
@@ -168,8 +166,6 @@ final class ProjectCodeProvider
         OperatingSystem::class,
         ProgressFormatter::class,
         SchemaConfiguration::class,
-        SimpleMutation::class,
-        SimpleMutationsCollectorVisitor::class,
         SingletonContainer::class,
         Source::class,
         StopInfectionOnSigintSignalSubscriber::class,
