@@ -229,7 +229,7 @@ final class EngineTest extends TestCase
         $mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false, [])
+            ->with(false)
         ;
 
         $mutationTestingRunner = $this->createMock(MutationTestingRunner::class);
@@ -368,7 +368,7 @@ final class EngineTest extends TestCase
         $mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false, [])
+            ->with(false)
             ->willReturnCallback(static function () use (&$callOrder) {
                 $callOrder[] = 'generate';
 
@@ -468,7 +468,7 @@ final class EngineTest extends TestCase
         $mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false, [])
+            ->with(false)
             ->willReturn([])
         ;
 
@@ -562,7 +562,7 @@ final class EngineTest extends TestCase
         $mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false, [])
+            ->with(false)
             ->willReturn([])
         ;
 
@@ -666,7 +666,7 @@ final class EngineTest extends TestCase
         $mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false, [])
+            ->with(false)
             ->willReturn([])
         ;
 
@@ -755,7 +755,7 @@ final class EngineTest extends TestCase
         $mutationGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with(false, [])
+            ->with(false)
             ->willReturn([])
         ;
 
