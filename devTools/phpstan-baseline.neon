@@ -175,30 +175,6 @@ parameters:
 			path: ../src/Testing/BaseMutatorTestCase.php
 
 		-
-			message: '#^Class Infection\\Testing\\SimpleMutation extends @final class Infection\\Mutation\\Mutation\.$#'
-			identifier: class.extendsFinalByPhpDoc
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Infection\\Testing\\SimpleMutation\:\:__construct\(\) does not call parent constructor from Infection\\Mutation\\Mutation\.$#'
-			identifier: constructor.missingParentCall
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Method Infection\\Testing\\SimpleMutation\:\:__construct\(\) has parameter \$mutator with generic interface Infection\\Mutator\\Mutator but does not specify its types\: TNode$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
-			message: '#^Method Infection\\Testing\\SimpleMutation\:\:getMutator\(\) return type with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
-			identifier: missingType.generics
-			count: 1
-			path: ../src/Testing/SimpleMutation.php
-
-		-
 			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
 			identifier: argument.type
 			count: 1
