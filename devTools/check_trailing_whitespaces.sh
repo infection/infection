@@ -31,7 +31,6 @@ files_with_trailing_spaces=$(
         ':!tests/autoloaded/*' \
         ':!tests/e2e/*' \
         ':!tests/phpunit/Framework/StrTest.php' \
-        ':!tests/phpunit/StringNormalizerTest.php' \
         ':!tests/phpunit/TestFramework/PhpUnit/Config/Builder/Fixtures/format-whitespace/original-phpunit.xml' \
         ':!tests/benchmark/Tracing/benchmark-source' \
         ':!tests/benchmark/MutationGenerator/sources.tar.gz' \
