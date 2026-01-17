@@ -43,6 +43,7 @@ use function count;
 use function explode;
 use function implode;
 use Infection\Framework\ClassName;
+use Infection\Framework\Str;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
