@@ -33,18 +33,16 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace newSrc;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use SplFileInfo;
+
+interface Configuration
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
-    {
-    }
+    public function shouldSkipInitialTests(string $frameworkName): bool;
+
+    /**
+     * @return iterable<SplFileInfo>
+     */
+    public function getSourceFiles(): iterable;
 }

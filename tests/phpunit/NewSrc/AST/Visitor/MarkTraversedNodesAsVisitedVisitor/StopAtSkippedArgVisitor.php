@@ -33,18 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\NewSrc\AST\Visitor\MarkTraversedNodesAsVisitedVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+final class StopAtSkippedArgVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    public const SKIP_ATTRIBUTE = 'skip';
+
+    public static function markNodeAsSkipped(Node $node): Node
     {
+        $node->setAttribute(self::SKIP_ATTRIBUTE, true);
+
+        return $node;
+    }
+
+    public static function isNodeMarkedAsSkipped(Node $node): bool
+    {
+        return $node->hasAttribute(self::SKIP_ATTRIBUTE);
+    }
+
+    public function enterNode(Node $node)
+    {
+        if (self::isNodeMarkedAsSkipped($node)) {
+            return self::DONT_TRAVERSE_CURRENT_AND_CHILDREN;
+        }
     }
 }

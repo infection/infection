@@ -33,18 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection;
+namespace Infection\Tests\NewSrc\AST\Visitor\RecordTraverseVisitor;
 
-/**
- * Very simple trait which only purpose it make it a bit more explicit why the constructor is
- * private.
- *
- * @internal
- */
-trait CannotBeInstantiated
+use function func_get_args;
+use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
+
+final class RecordTraverseVisitor extends NodeVisitorAbstract
 {
-    // TODO: should be leverage in the new code
-    private function __construct()
+    /**
+     * @var list<array{string, list<mixed>}>
+     */
+    private array $records = [];
+
+    public function fetch(): array
     {
+        $records = $this->records;
+        $this->records = [];
+
+        return $records;
+    }
+
+    public function beforeTraverse(array $nodes): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function enterNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function leaveNode(Node $node): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
+    }
+
+    public function afterTraverse(array $nodes): void
+    {
+        $this->records[] = [__FUNCTION__, func_get_args()];
     }
 }
