@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection;
 
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisFinished;
+use Infection\Event\Events\MutationAnalysis\MutationAnalysisStarted;
 use function explode;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\Configuration\Configuration;
@@ -217,6 +219,8 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
+        $this->eventDispatcher->dispatch(new MutationAnalysisStarted());
+
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
         );
@@ -225,6 +229,8 @@ final readonly class Engine
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
         );
+
+        $this->eventDispatcher->dispatch(new MutationAnalysisFinished());
     }
 
     private function getFilteredExtraOptionsForMutant(): string

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
-use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -133,6 +132,8 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
+use Infection\Telemetry\Subscriber\TelemetrySubscriber;
+use Infection\Telemetry\Subscriber\TelemetrySubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -149,12 +150,12 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
+use Infection\TestFramework\Tracing\EventEmitterTracer;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -166,6 +167,8 @@ use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function php_ini_loaded_file;
 
 /**
  * @internal
@@ -250,8 +253,11 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
-                $container->getTraceProvider(),
+            Tracer::class => static fn (self $container) => new EventEmitterTracer(
+                new TraceProviderAdapterTracer(
+                    $container->getTraceProvider(),
+                ),
+                $container->getEventDispatcher(),
             ),
             TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
@@ -379,6 +385,7 @@ final class Container extends DIContainer
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->getStopInfectionOnSigintSignalSubscriberFactory(),
                     $container->getDispatchPcntlSignalSubscriberFactory(),
+                    $container->get(TelemetrySubscriberFactory::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {
@@ -454,6 +461,7 @@ final class Container extends DIContainer
                 $container->getSourceLineMatcher(),
                 $container->getTracer(),
                 $container->getFileStore(),
+                $container->getEventDispatcher(),
             ),
             FileLoggerFactory::class => static function (self $container): FileLoggerFactory {
                 $config = $container->getConfiguration();
@@ -583,6 +591,7 @@ final class Container extends DIContainer
             },
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
+                $container->getEventDispatcher(),
             ),
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {

@@ -35,6 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\Events\AstCollection\SourceAstCollectionFinished;
+use Infection\Event\Events\AstCollection\SourceAstCollectionStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\SourceMutationGenerationFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\SourceMutationGenerationStarted;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -66,6 +71,7 @@ class FileMutationGenerator
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -90,11 +96,17 @@ class FileMutationGenerator
             return;
         }
 
+        $this->eventDispatcher->dispatch(new SourceAstCollectionStarted());
+
         [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
 
         // Pre-traverse the nodes to connect them
         $preTraverser = $this->traverserFactory->createPreTraverser();
         $preTraverser->traverse($initialStatements);
+
+        $this->eventDispatcher->dispatch(new SourceAstCollectionFinished());
+
+        $this->eventDispatcher->dispatch(new SourceMutationGenerationStarted());
 
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
@@ -114,6 +126,8 @@ class FileMutationGenerator
         $traverser->traverse($initialStatements);
 
         yield from $mutationCollectorVisitor->getMutations();
+
+        $this->eventDispatcher->dispatch(new SourceMutationGenerationFinished());
     }
 
     private function trace(SplFileInfo $sourceFile): Trace

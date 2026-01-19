@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
 use function get_debug_type;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
@@ -52,6 +53,7 @@ final readonly class SourceCollectorFactory
 {
     public function __construct(
         private Git $git,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -59,6 +61,24 @@ final readonly class SourceCollectorFactory
      * @param non-empty-string $configurationPathname
      */
     public function create(
+        string $configurationPathname,
+        Source $source,
+        ?SourceFilter $sourceFilter,
+    ): SourceCollector {
+        return new EventEmitterSourceCollector(
+            $this->createCollector(
+                $configurationPathname,
+                $source,
+                $sourceFilter,
+            ),
+            $this->eventDispatcher,
+        );
+    }
+
+    /**
+     * @param non-empty-string $configurationPathname
+     */
+    private function createCollector(
         string $configurationPathname,
         Source $source,
         ?SourceFilter $sourceFilter,

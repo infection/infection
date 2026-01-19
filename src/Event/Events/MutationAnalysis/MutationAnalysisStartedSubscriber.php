@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Infection\Event\Events\MutationAnalysis;
+
+use Infection\Event\Events\SourceCollection\SourceCollectionFinished;
+use Infection\Event\Subscriber\EventSubscriber;
+
+/**
+ * @internal
+ */
+interface MutationAnalysisStartedSubscriber extends EventSubscriber
+{
+    public function onMutationAnalysisStarted(MutationAnalysisStarted $event): void;
+}
