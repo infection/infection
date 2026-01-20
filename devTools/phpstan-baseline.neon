@@ -697,12 +697,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
 
 		-
-			message: '#^Parameter \#1 \$resolvedMutators of method Infection\\Mutator\\MutatorFactory\:\:create\(\) expects array\<class\-string\<Infection\\Mutator\\ConfigurableMutator\<PhpParser\\Node\>\>, array\<mixed\>\>, non\-empty\-array\<''Infection\\\\Mutator…'', array\{\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
-
-		-
 			message: '#^Property Infection\\Tests\\Mutator\\NoopMutatorTest\:\:\$mutatorMock with generic interface Infection\\Mutator\\Mutator does not specify its types\: TNode$#'
 			identifier: missingType.generics
 			count: 1
@@ -871,12 +865,6 @@ parameters:
 			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
 
 		-
-			message: '#\$callback of function array_map expects#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/TestFramework/PhpUnit/Config/Builder/MutationConfigBuilderTest.php
-
-		-
 			message: '#MutationConfigBuilderTest::queryXpath.* return type with generic class DOMNodeList does not specify its types: TNode#'
 			identifier: missingType.generics
 			count: 1
@@ -957,3 +945,15 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: ../tests/phpunit/Source/Collector/BasicSourceCollector/BasicSourceCollectorTest.php
+
+		-
+			message: '#Access to an undefined property DOMNameSpaceNode\|DOMNode::\$attributes#'
+			identifier: property.notFound
+			count: 2
+			path: ../tests/phpunit/TestFramework/SafeDOMXPath/SafeDOMXPathTest.php
+
+		-
+			message: '#^Parameter \#1 \$resolvedMutators of method .*\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../tests/phpunit/Mutator/MutatorRobustnessTest.php
