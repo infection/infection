@@ -35,8 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use function extension_loaded;
-use function implode;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -44,7 +42,6 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
 use Infection\Container\Container;
 use Infection\Engine;
@@ -53,6 +50,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -60,12 +58,14 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
-use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
-use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
+use function extension_loaded;
+use function implode;
+use function sprintf;
 use function trim;
+use const PHP_SAPI;
 
 /**
  * @internal
@@ -165,6 +165,8 @@ final class RunCommand extends BaseCommand
 
     private const OPTION_MUTANT_ID = 'id';
 
+    private const OPTION_TEAMCITY = 'teamcity';
+
     protected function configure(): void
     {
         $this
@@ -260,7 +262,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the formatter to use (%s)',
-                    FormatterName::quotedCommaSeparatedList(),
+                    MutationAnalysisLoggerName::quotedCommaSeparatedList(),
                 ),
                 Container::DEFAULT_FORMATTER_NAME->value,
             )
@@ -396,6 +398,12 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Runs mutation testing and does not run killer processes.',
             )
+            ->addOption(
+                self::OPTION_TEAMCITY,
+                null,
+                InputOption::VALUE_NONE,
+                'Changes the progress output to Teamcity.',
+            )
         ;
     }
 
@@ -497,7 +505,10 @@ final class RunCommand extends BaseCommand
             debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            formatterName: self::getFormatterName($commandHelper),
+            formatterName: self::getFormatterName(
+                $commandHelper,
+                (bool) $input->getOption(self::OPTION_TEAMCITY),
+            ),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             noProgress: $noProgress,
             forceProgress: $forceProgress,
@@ -638,10 +649,19 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(RunCommandHelper $commandHelper): FormatterName
+    // TODO: there is more renaming to do here...
+    private static function getFormatterName(
+        RunCommandHelper $commandHelper,
+        bool $teamcity,
+    ): MutationAnalysisLoggerName
     {
-        return FormatterName::from(
-            $commandHelper->getStringOption(self::OPTION_FORMATTER, Container::DEFAULT_FORMATTER_NAME->value),
+        return MutationAnalysisLoggerName::from(
+            $teamcity
+                ? MutationAnalysisLoggerName::TEAMCITY
+                : $commandHelper->getStringOption(
+                    self::OPTION_FORMATTER,
+                    Container::DEFAULT_FORMATTER_NAME->value,
+                ),
         );
     }
 }

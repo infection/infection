@@ -35,20 +35,20 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console\OutputFormatter;
 
-use function implode;
-use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Framework\Enum\EnumBucket;
 use Infection\Framework\Str;
+use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
+use function implode;
+use function strip_tags;
 
-#[CoversClass(DotFormatter::class)]
+#[CoversClass(ConsoleDotLogger::class)]
 final class DotFormatterTest extends TestCase
 {
     private const ANY_PRIME_NUMBER = 127;
@@ -56,7 +56,7 @@ final class DotFormatterTest extends TestCase
     public function test_begins_by_displaying_a_legend(): void
     {
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
+        $formatter = new ConsoleDotLogger($output);
 
         $expected = Str::toSystemLineEndings(
             implode(
@@ -88,7 +88,7 @@ final class DotFormatterTest extends TestCase
             ),
         );
 
-        $formatter->start(10);
+        $formatter->startAnalysis(10);
 
         $actual = $output->fetch();
 
@@ -101,14 +101,14 @@ final class DotFormatterTest extends TestCase
         string $expected,
     ): void {
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
+        $formatter = new ConsoleDotLogger($output);
 
         // Clear the initial output: it is already tested and it would bloat the
         // test to include it.
-        $formatter->start(10);
+        $formatter->startAnalysis(10);
         $output->fetch();
 
-        $formatter->advance(
+        $formatter->finishEvaluation(
             $this->createMutantExecutionResultOfType($detectionStatus),
             10,
         );
@@ -175,11 +175,11 @@ final class DotFormatterTest extends TestCase
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
-        $formatter->start($totalMutations);
+        $formatter = new ConsoleDotLogger($output);
+        $formatter->startAnalysis($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $formatter->advance(
+            $formatter->finishEvaluation(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 $totalMutations,
             );
@@ -207,11 +207,11 @@ final class DotFormatterTest extends TestCase
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
-        $formatter->start($totalMutations);
+        $formatter = new ConsoleDotLogger($output);
+        $formatter->startAnalysis($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $formatter->advance(
+            $formatter->finishEvaluation(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 0,
             );

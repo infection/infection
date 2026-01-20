@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Framework\Iterable;
 
-use function count;
 use Infection\CannotBeInstantiated;
-use Infection\Console\OutputFormatter\AbstractOutputFormatter;
+use Infection\Logger\MutationAnalysis\AbstractMutationAnalysisLogger;
+use function count;
 use function is_array;
 use function iterator_to_array;
 
@@ -55,7 +55,7 @@ final class IterableCounter
     {
         if ($runConcurrently) {
             // This number is typically fed to ProgressFormatter/ProgressBar or variants.
-            return AbstractOutputFormatter::UNKNOWN_COUNT;
+            return AbstractMutationAnalysisLogger::UNKNOWN_COUNT;
         }
 
         if (is_array($subjects)) {

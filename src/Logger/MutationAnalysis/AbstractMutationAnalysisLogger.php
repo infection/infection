@@ -33,16 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 
 /**
  * @internal
  *
  * Abstract empty class to simplify particular implementations
  */
-abstract class AbstractOutputFormatter implements OutputFormatter
+abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
 {
     /**
      * In progress bar lingo 0 stands for an unknown number of steps.
@@ -51,17 +52,23 @@ abstract class AbstractOutputFormatter implements OutputFormatter
 
     protected int $callsCount = 0;
 
-    public function start(int $mutationCount): void
+    public function startAnalysis(int $mutationCount): void
     {
         $this->callsCount = 0;
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function startEvaluation(Mutation $mutation, int $mutationCount): void
+    {
+        // Do nothing.
+    }
+
+    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void
     {
         ++$this->callsCount;
     }
 
-    public function finish(): void
+    public function finishAnalysis(): void
     {
+        // Do nothing.
     }
 }

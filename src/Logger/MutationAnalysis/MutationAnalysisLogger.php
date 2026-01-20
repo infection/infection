@@ -33,24 +33,31 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 
-interface OutputFormatter
+/**
+ * Logger for the mutation evaluation process.
+ * TODO: decide: analysis or evaluation?
+ */
+interface MutationAnalysisLogger
 {
     /**
-     * Triggered when mutation testing is being started
+     * Records the start of the mutation evaluation process.
      */
-    public function start(int $mutationCount): void;
+    public function startAnalysis(int $mutationCount): void;
+
+    public function startEvaluation(Mutation $mutation, int $mutationCount): void;
 
     /**
-     * Triggered each time mutation process is finished for one Mutant
+     * Records the result of the evaluation of a mutation.
      */
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void;
+    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void;
 
     /**
-     * Triggered when mutation testing is finished
+     * Records the end of the mutation evaluation process.
      */
-    public function finish(): void;
+    public function finishAnalysis(): void;
 }

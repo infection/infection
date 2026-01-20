@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
@@ -44,6 +43,7 @@ use Infection\Event\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
@@ -51,18 +51,18 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Tests\Fixtures\Logger\DummyLineMutationTestingResultsLogger;
 use Infection\Tests\Fixtures\Logger\FakeLogger;
 use Infection\Tests\Logger\FakeMutationTestingResultsLogger;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Filesystem\Filesystem;
 use function Safe\fopen;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
 use function str_replace;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Filesystem\Filesystem;
+use const PHP_EOL;
 
 #[Group('integration')]
 #[CoversClass(MutationTestingConsoleLoggerSubscriber::class)]
@@ -70,7 +70,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 {
     private MockObject&OutputInterface $output;
 
-    private MockObject&OutputFormatter $outputFormatter;
+    private MockObject&MutationAnalysisLogger $outputFormatter;
 
     private MockObject&MetricsCalculator $metricsCalculator;
 
@@ -81,7 +81,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->output = $this->createMock(OutputInterface::class);
-        $this->outputFormatter = $this->createMock(OutputFormatter::class);
+        $this->outputFormatter = $this->createMock(MutationAnalysisLogger::class);
         $this->metricsCalculator = $this->createMock(MetricsCalculator::class);
         $this->resultsCollector = $this->createMock(ResultsCollector::class);
         $this->diffColorizer = $this->createMock(DiffColorizer::class);
@@ -91,7 +91,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->outputFormatter
             ->expects($this->once())
-            ->method('start');
+            ->method('startAnalysis');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -119,7 +119,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $this->outputFormatter
             ->expects($this->once())
-            ->method('advance');
+            ->method('finishEvaluation');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -145,7 +145,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->outputFormatter
             ->expects($this->once())
-            ->method('finish');
+            ->method('finishAnalysis');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -629,7 +629,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->outputFormatter
             ->expects($this->once())
-            ->method('finish');
+            ->method('finishAnalysis');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(

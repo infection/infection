@@ -90,7 +90,9 @@ class MutationTestingRunner
         $processContainers = take($mutations)
             ->stream()
             ->tap(
-                fn () => $this->eventDispatcher->dispatch(new SourceMutationEvaluationStarted()),
+                fn (Mutation $mutation) => $this->eventDispatcher->dispatch(
+                    new SourceMutationEvaluationStarted($mutation),
+                ),
             )
             ->filter(
                 $this->createFilter($this->ignoredByMutantId(...)),

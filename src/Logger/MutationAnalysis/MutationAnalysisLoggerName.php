@@ -33,17 +33,18 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Framework\Enum\ImplodableEnum;
 
 /**
  * @internal
  */
-enum FormatterName: string
+enum MutationAnalysisLoggerName: string
 {
     use ImplodableEnum;
 
     case DOT = 'dot';
     case PROGRESS = 'progress';
+    case TEAMCITY = 'teamcity';
 }

@@ -33,19 +33,19 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
 use function str_repeat;
 use function strlen;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final class DotFormatter extends AbstractOutputFormatter
+final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
 {
     private const DOTS_PER_ROW = 50;
 
@@ -54,9 +54,9 @@ final class DotFormatter extends AbstractOutputFormatter
     ) {
     }
 
-    public function start(int $mutationCount): void
+    public function startAnalysis(int $mutationCount): void
     {
-        parent::start($mutationCount);
+        parent::startAnalysis($mutationCount);
 
         $this->output->writeln([
             '',
@@ -73,9 +73,9 @@ final class DotFormatter extends AbstractOutputFormatter
         ]);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        parent::advance($executionResult, $mutationCount);
+        parent::finishEvaluation($executionResult, $mutationCount);
 
         $this->output->write(
             self::getCharacter($executionResult),

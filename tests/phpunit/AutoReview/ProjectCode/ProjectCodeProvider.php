@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
-use function array_filter;
-use const DIRECTORY_SEPARATOR;
-use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Git\LoggerFactory;
@@ -57,9 +54,6 @@ use Infection\Configuration\SourceFilter\FakeSourceFilter;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\OutputFormatter;
-use Infection\Console\OutputFormatter\ProgressFormatter;
 use Infection\Console\XdebugHandler;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
@@ -74,6 +68,9 @@ use Infection\FileSystem\Finder\TestFrameworkFinder;
 use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
+use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
@@ -106,16 +103,19 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
+use ReflectionClass;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use function array_filter;
+use function in_array;
 use function iterator_to_array;
 use function ltrim;
 use function Pipeline\take;
-use ReflectionClass;
 use function sort;
-use const SORT_STRING;
 use function sprintf;
 use function str_replace;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use const DIRECTORY_SEPARATOR;
+use const SORT_STRING;
 
 final class ProjectCodeProvider
 {
@@ -145,7 +145,7 @@ final class ProjectCodeProvider
         FilterOption::class,
         FixedSourceCollector::class,
         SourceFilterOptions::class,
-        FormatterName::class,
+        MutationAnalysisLoggerName::class,
         GitDiffFilter::class,
         GitDiffSourceCollector::class,
         IncompleteGitDiffFilter::class,
@@ -163,7 +163,7 @@ final class ProjectCodeProvider
         NullSourceLineMatcher::class,
         NullSubscriber::class,
         OperatingSystem::class,
-        ProgressFormatter::class,
+        ConsoleProgressBarLogger::class,
         SchemaConfiguration::class,
         SingletonContainer::class,
         Source::class,
@@ -205,7 +205,7 @@ final class ProjectCodeProvider
         Definition::class,
         Mutator::class,
         MutatorCategory::class,
-        OutputFormatter::class,
+        MutationAnalysisLogger::class,
         SchemaConfigurationFactory::class,
         SchemaConfigurationFileLoader::class,
         SchemaValidator::class,

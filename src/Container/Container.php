@@ -35,9 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Container;
 
-use Infection\Logger\Teamcity\TeamcitySubscriber;
-use Infection\Logger\Teamcity\TeamcitySubscriberFactory;
-use function array_filter;
 use DIContainer\Container as DIContainer;
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
 use Infection\CI\MemoizedCiDetector;
@@ -52,9 +49,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterFactory;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
@@ -91,8 +85,12 @@ use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
+use Infection\Logger\Teamcity\TeamcitySubscriberFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
 use Infection\Metrics\MetricsCalculator;
@@ -158,7 +156,6 @@ use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
 use Infection\TestFramework\Tracing\Tracer;
 use OndraM\CiDetector\CiDetector;
-use function php_ini_loaded_file;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -170,6 +167,8 @@ use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
+use function array_filter;
+use function php_ini_loaded_file;
 
 /**
  * @internal
@@ -188,7 +187,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_WITH_UNCOVERED = false;
 
-    public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_FORMATTER_NAME = MutationAnalysisLoggerName::DOT;
 
     public const DEFAULT_MUTANT_ID = null;
 
@@ -628,7 +627,7 @@ final class Container extends DIContainer
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
-        FormatterName $formatterName = self::DEFAULT_FORMATTER_NAME,
+        MutationAnalysisLoggerName $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
@@ -692,8 +691,8 @@ final class Container extends DIContainer
         );
 
         $clone->offsetSet(
-            OutputFormatter::class,
-            static fn (self $container): OutputFormatter => $container->getFormatterFactory()->create($formatterName),
+            MutationAnalysisLogger::class,
+            static fn (self $container): MutationAnalysisLogger => $container->getFormatterFactory()->create($formatterName),
         );
 
         $clone->offsetSet(
@@ -1007,14 +1006,14 @@ final class Container extends DIContainer
         return $this->get(OutputInterface::class);
     }
 
-    public function getFormatterFactory(): FormatterFactory
+    public function getFormatterFactory(): MutationAnalysisLoggerFactory
     {
-        return $this->get(FormatterFactory::class);
+        return $this->get(MutationAnalysisLoggerFactory::class);
     }
 
-    public function getOutputFormatter(): OutputFormatter
+    public function getOutputFormatter(): MutationAnalysisLogger
     {
-        return $this->get(OutputFormatter::class);
+        return $this->get(MutationAnalysisLogger::class);
     }
 
     public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher
