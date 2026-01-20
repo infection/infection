@@ -33,24 +33,25 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger;
+namespace Infection\Logger\Console;
 
 use DateTime;
 use DateTimeInterface;
-use function gettype;
 use Infection\Console\IO;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LogLevel;
+use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
+use function gettype;
 use function is_object;
 use function is_scalar;
 use function method_exists;
-use Psr\Log\AbstractLogger;
-use Psr\Log\LogLevel;
 use function sprintf;
 use function str_contains;
 use function strtr;
-use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
 
 /**
+ * TODO: unless we got custom code here, we can actually just configure the SymfonyConsoleLogger
  * @internal
  */
 final class ConsoleLogger extends AbstractLogger

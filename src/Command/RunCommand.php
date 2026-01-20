@@ -49,7 +49,7 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -655,13 +655,13 @@ final class RunCommand extends BaseCommand
         bool $teamcity,
     ): MutationAnalysisLoggerName
     {
-        return MutationAnalysisLoggerName::from(
-            $teamcity
-                ? MutationAnalysisLoggerName::TEAMCITY
-                : $commandHelper->getStringOption(
+        return $teamcity
+            ? MutationAnalysisLoggerName::TEAMCITY
+            : MutationAnalysisLoggerName::from(
+                $commandHelper->getStringOption(
                     self::OPTION_FORMATTER,
                     Container::DEFAULT_FORMATTER_NAME->value,
-                ),
-        );
+                )
+            );
     }
 }

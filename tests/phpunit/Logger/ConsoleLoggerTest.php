@@ -38,20 +38,20 @@ namespace Infection\Tests\Logger;
 use DateTimeImmutable as UnsafeDateTimeImmutable;
 use Infection\Console\IO;
 use Infection\Framework\Str;
-use Infection\Logger\ConsoleLogger;
+use Infection\Logger\Console\ConsoleLogger;
 use InvalidArgumentException;
-use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Safe\DateTime;
-use function Safe\fopen;
 use stdClass;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use function Safe\fopen;
+use const PHP_EOL;
 
 #[Group('integration')]
 #[CoversClass(ConsoleLogger::class)]

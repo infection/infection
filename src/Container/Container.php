@@ -386,7 +386,6 @@ final class Container extends DIContainer
                     $container->getStopInfectionOnSigintSignalSubscriberFactory(),
                     $container->getDispatchPcntlSignalSubscriberFactory(),
                     $container->get(TelemetrySubscriberFactory::class),
-                    $container->get(TeamcitySubscriberFactory::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {

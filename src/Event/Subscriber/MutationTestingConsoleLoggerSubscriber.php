@@ -95,7 +95,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->logger->startAnalysis($this->mutationCount);
     }
 
-    public function onMutantProcessWasFinished(SourceMutationEvaluationStarted $event): void
+    public function onSourceMutationEvaluationStarted(SourceMutationEvaluationStarted $event): void
     {
         $this->logger->startEvaluation(
             $event->mutation,
