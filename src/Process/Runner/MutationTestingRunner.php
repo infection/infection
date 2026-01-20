@@ -35,13 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Process\Runner;
 
+use function array_key_exists;
 use Closure;
+use function func_get_args;
+use Infection\Differ\DiffSourceCodeMatcher;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\SourceMutationEvaluationFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\SourceMutationEvaluationStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\SourceMutationGenerationFinished;
-use function array_key_exists;
-use Infection\Differ\DiffSourceCodeMatcher;
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
@@ -52,7 +53,6 @@ use Infection\Mutant\MutantFactory;
 use Infection\Mutation\Mutation;
 use Infection\Process\Factory\MutantProcessContainerFactory;
 use Infection\Process\MutantProcessContainer;
-use function func_get_args;
 use function Pipeline\take;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -90,7 +90,7 @@ class MutationTestingRunner
         $processContainers = take($mutations)
             ->stream()
             ->tap(
-                fn () => $this->eventDispatcher->dispatch(new SourceMutationEvaluationStarted())
+                fn () => $this->eventDispatcher->dispatch(new SourceMutationEvaluationStarted()),
             )
             ->filter(
                 $this->createFilter($this->ignoredByMutantId(...)),
@@ -129,8 +129,7 @@ class MutationTestingRunner
      */
     private function createFilter(
         Closure $filter,
-    ): Closure
-    {
+    ): Closure {
         return function () use ($filter) {
             $continue = $filter(...func_get_args());
 

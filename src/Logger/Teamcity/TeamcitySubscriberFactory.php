@@ -33,11 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+namespace Infection\Logger\Teamcity;
+
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class SourceMutationEvaluationFinished
+final readonly class TeamcitySubscriberFactory implements SubscriberFactory
 {
+    public function create(OutputInterface $output): EventSubscriber
+    {
+        return new TeamcitySubscriber(
+            $output,
+            new Teamcity(),
+        );
+    }
 }

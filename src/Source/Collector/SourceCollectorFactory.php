@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Source\Collector;
 
-use Infection\Event\EventDispatcher\EventDispatcher;
 use function get_debug_type;
 use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
+use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use function sprintf;
