@@ -45,6 +45,7 @@ use Rector\CodeQuality\Rector\Include_\AbsolutizeRequireAndIncludePathRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\ConstFetch\RemovePhpVersionIdCheckRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
@@ -162,6 +163,9 @@ return RectorConfig::configure()
         ],
         RemoveUnusedConstructorParamRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
+        ],
+        RemoveUnusedPrivateMethodRector::class => [
+            __DIR__ . '/src/Git/CommandLineGit.php',
         ],
         RemoveUnusedPrivateMethodParameterRector::class => [
             __DIR__ . '/tests/phpunit/Fixtures/',
