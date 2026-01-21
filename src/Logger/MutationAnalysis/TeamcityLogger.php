@@ -9,10 +9,12 @@ use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Path;
 use function array_reverse;
 use function array_slice;
 use function count;
 use function explode;
+use function Safe\getcwd;
 use function min;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
@@ -26,10 +28,14 @@ final class TeamcityLogger implements MutationAnalysisLogger
      */
     private array $openSuites = [];
 
+    private string $cwd;
+
     public function __construct(
         private readonly Teamcity $teamcity,
         private readonly LoggerInterface $logger,
+        private readonly string $configurationDirPathname,
     ) {
+        $this->cwd = getcwd();
     }
 
     public function startAnalysis(int $mutationCount): void
@@ -59,7 +65,19 @@ final class TeamcityLogger implements MutationAnalysisLogger
 
     private function processResult(MutantExecutionResult $result): void
     {
-        $filePath = $result->getOriginalFilePath();
+        // If the current path is:
+        // /path/to/project/src/Differ/DiffColorizer.php
+        // and the current working dir:
+        // /path/to/project/sub-dir
+        // Then the relative path would be:
+        // '../src/Differ/DiffColorizer.php'
+        // so '..' does appear at the top hierarchy... But I think it's ok.
+        // Either we take the current working dir as the base path or the config
+        // file.
+        $filePath = Path::makeRelative(
+            $result->getOriginalFilePath(),
+            $this->configurationDirPathname,
+        );
         $pathSegments = $this->getPathSegments($filePath);
 
         $this->adjustSuiteHierarchy($pathSegments);

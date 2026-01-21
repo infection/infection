@@ -40,6 +40,7 @@ use Infection\Logger\Teamcity\Teamcity;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use function dirname;
 
 /**
  * @internal
@@ -49,6 +50,7 @@ final readonly class MutationAnalysisLoggerFactory
     public function __construct(
         private OutputInterface $output,
         private Teamcity $teamcity,
+        private readonly string $configurationPathname,
     ) {
     }
 
@@ -62,6 +64,7 @@ final readonly class MutationAnalysisLoggerFactory
             MutationAnalysisLoggerName::TEAMCITY => new TeamcityLogger(
                 $this->teamcity,
                 new BasicConsoleLogger($this->output),
+                dirname($this->configurationPathname),
             ),
         };
     }

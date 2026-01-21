@@ -43,9 +43,11 @@ use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
 use Infection\Git\Git;
 use Infection\Source\Collector\BasicSourceCollector;
+use Infection\Source\Collector\EventEmitterSourceCollector;
 use Infection\Source\Collector\GitDiffSourceCollector;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Collector\SourceCollectorFactory;
+use Infection\Tests\Event\EventDispatcher\FakeEventDispatcher;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -65,6 +67,7 @@ final class SourceCollectorFactoryTest extends TestCase
     ): void {
         $factory = new SourceCollectorFactory(
             $this->createMock(Git::class),
+            new FakeEventDispatcher(),
         );
 
         if ($exceptionOrExpectedCollectorClassName instanceof Exception) {
@@ -78,7 +81,9 @@ final class SourceCollectorFactoryTest extends TestCase
         );
 
         if (!($exceptionOrExpectedCollectorClassName instanceof Exception)) {
-            $this->assertSame($actual::class, $exceptionOrExpectedCollectorClassName);
+            $this->assertInstanceOf(EventEmitterSourceCollector::class, $actual);
+
+            $this->assertSame($actual->decoratedCollector::class, $exceptionOrExpectedCollectorClassName);
         }
     }
 

@@ -90,6 +90,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
+use Infection\Logger\Teamcity\Teamcity;
 use Infection\Logger\Teamcity\TeamcitySubscriberFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
 use Infection\Metrics\MaxTimeoutsChecker;
@@ -605,6 +606,11 @@ final class Container extends DIContainer
                         ),
                     );
                 },
+            ),
+            MutationAnalysisLoggerFactory::class => static fn (self $container): MutationAnalysisLoggerFactory => new MutationAnalysisLoggerFactory(
+                $container->getOutput(),
+                $container->get(Teamcity::class),
+                $container->getConfiguration()->configurationPathname,
             ),
         ]);
 

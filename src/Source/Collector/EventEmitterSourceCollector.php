@@ -51,7 +51,7 @@ final readonly class EventEmitterSourceCollector implements SourceCollector
      * @param SourceCollector|Closure():SourceCollector $decoratedCollector
      */
     public function __construct(
-        private SourceCollector $decoratedCollector,
+        public SourceCollector $decoratedCollector,
         private EventDispatcher $eventDispatcher,
     ) {
     }

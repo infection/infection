@@ -40,6 +40,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutant\MutantExecutionResultFactory;
 use function microtime;
 use Symfony\Component\Process\Process;
+use function var_dump;
 
 /**
  * @internal
