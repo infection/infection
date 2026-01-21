@@ -145,7 +145,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // enqueueFrom should be called before any isEmpty checks
         $queueMock->expects($this->atLeastOnce())
             ->method('enqueueFrom')
-            ->willReturnCallback(static function () use (&$callSequence) {
+            ->willReturnCallback(static function () use (&$callSequence): int {
                 $callSequence[] = 'enqueueFrom';
 
                 return 0;
@@ -153,7 +153,7 @@ final class ParallelProcessRunnerTest extends TestCase
 
         $queueMock->expects($this->atLeastOnce())
             ->method('isEmpty')
-            ->willReturnCallback(static function () use (&$callSequence) {
+            ->willReturnCallback(static function () use (&$callSequence): bool {
                 $callSequence[] = 'isEmpty';
 
                 return true; // Exit loop immediately
@@ -426,7 +426,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // hasProcessesThatCouldBeFreed should be called and return true at least once
         $runner->expects($this->atLeastOnce())
             ->method('hasProcessesThatCouldBeFreed')
-            ->willReturnCallback(static function () use (&$callCount) {
+            ->willReturnCallback(static function () use (&$callCount): bool {
                 ++$callCount;
 
                 return $callCount <= 2; // Return true twice, then false
@@ -482,7 +482,7 @@ final class ParallelProcessRunnerTest extends TestCase
         // hasProcessesThatCouldBeFreed should return true once to enter the loop
         $runner->expects($this->atLeastOnce())
             ->method('hasProcessesThatCouldBeFreed')
-            ->willReturnCallback(static function () use (&$callCount) {
+            ->willReturnCallback(static function () use (&$callCount): bool {
                 ++$callCount;
 
                 return $callCount <= 1; // Return true once, then false
