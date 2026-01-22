@@ -35,23 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Teamcity;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Symfony\Component\Console\Output\StreamOutput;
 use function array_reverse;
 use function array_slice;
 use function count;
-use function file_put_contents;
-use function fopen;
 use const DIRECTORY_SEPARATOR;
 use function explode;
+use function file_put_contents;
+use function fopen;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Telemetry\Subscriber\GodSubscriber;
+use function min;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * @internal
@@ -60,9 +60,10 @@ final class TeamcitySubscriber extends GodSubscriber
 {
     private const MILLISECONDS_PER_SECOND = 1000;
 
-    private const DEBUG_LOG = __DIR__.'/../../../var/teamcity.log';
+    private const DEBUG_LOG = __DIR__ . '/../../../var/teamcity.log';
 
     private readonly OutputInterface $output;
+
     private readonly OutputInterface $debugOutput;
 
     /**
@@ -72,7 +73,7 @@ final class TeamcitySubscriber extends GodSubscriber
 
     public function __construct(
         OutputInterface $output,
-        private readonly Teamcity $teamcity,
+        private readonly TeamCity $teamcity,
     ) {
         file_put_contents(self::DEBUG_LOG, '');
 

@@ -48,7 +48,7 @@ final readonly class TeamcitySubscriberFactory implements SubscriberFactory
     {
         return new TeamcitySubscriber(
             $output,
-            new Teamcity(),
+            new TeamCity(),
         );
     }
 }

@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use function count;
+use function floor;
 use Generator;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\SourceMutationEvaluationStarted;
@@ -49,15 +51,13 @@ use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
 use LogicException;
-use Symfony\Component\Console\Output\OutputInterface;
-use function count;
-use function floor;
 use function sprintf;
 use function str_pad;
+use const STR_PAD_LEFT;
 use function str_repeat;
 use function str_starts_with;
 use function strlen;
-use const STR_PAD_LEFT;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal

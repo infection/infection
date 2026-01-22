@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Console\OutputFormatter;
 
+use function implode;
 use Infection\Framework\Enum\EnumBucket;
 use Infection\Framework\Str;
 use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
@@ -44,9 +45,8 @@ use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
-use function implode;
 use function strip_tags;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 #[CoversClass(ConsoleDotLogger::class)]
 final class DotFormatterTest extends TestCase

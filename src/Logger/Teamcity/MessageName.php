@@ -33,38 +33,15 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
-
-use function dirname;
-use Infection\Logger\Console\BasicConsoleLogger;
-use Infection\Logger\Teamcity\TeamCity;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Logger\Teamcity;
 
 /**
- * @internal
+ * Only contains a subset of the allowed messages.
+ *
+ * @see https://www.jetbrains.com/help/teamcity/service-messages.html
  */
-final readonly class MutationAnalysisLoggerFactory
+enum MessageName: string
 {
-    public function __construct(
-        private OutputInterface $output,
-        private TeamCity $teamcity,
-        private readonly string $configurationPathname,
-    ) {
-    }
-
-    public function create(MutationAnalysisLoggerName $name): MutationAnalysisLogger
-    {
-        return match ($name) {
-            MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
-                new ProgressBar($this->output),
-            ),
-            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),
-            MutationAnalysisLoggerName::TEAMCITY => new TeamcityLogger(
-                $this->teamcity,
-                new BasicConsoleLogger($this->output),
-                dirname($this->configurationPathname),
-            ),
-        };
-    }
+    case FLOW_STARTED = 'flowStarted';
+    case FLOW_FINISHED = 'flowFinished';
 }

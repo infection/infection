@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Psr\Log\LoggerInterface;
 use function implode;
 use const PHP_EOL;
+use Psr\Log\LoggerInterface;
 use function sprintf;
 
 /**

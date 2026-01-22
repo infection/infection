@@ -52,11 +52,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use function Safe\fopen;
 use function Safe\rewind;
 use function Safe\stream_get_contents;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 #[CoversClass(MutationTestingConsoleLoggerSubscriberFactory::class)]
 #[Group('integration')]

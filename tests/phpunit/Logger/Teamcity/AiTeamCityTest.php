@@ -36,26 +36,26 @@ declare(strict_types=1);
 namespace Infection\Tests\Logger\Teamcity;
 
 use function getmypid;
-use Infection\Logger\Teamcity\Teamcity;
+use Infection\Logger\Teamcity\TeamCity;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function sprintf;
 
-#[CoversClass(Teamcity::class)]
-final class TeamcityTest extends TestCase
+#[CoversClass(TeamCity::class)]
+final class AiTeamCityTest extends TestCase
 {
-    private Teamcity $teamcity;
+    private TeamCity $teamcity;
 
     protected function setUp(): void
     {
-        $this->teamcity = new Teamcity();
+        $this->teamcity = new TeamCity();
     }
 
     public function test_it_formats_test_suite_started(): void
     {
         $message = $this->teamcity->testSuiteStarted('My Suite');
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testSuiteStarted name='My Suite' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -65,7 +65,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testSuiteFinished('My Suite');
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testSuiteFinished name='My Suite' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -75,7 +75,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testCount(42);
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testCount count='42' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -85,7 +85,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testStarted('my_test');
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testStarted name='my_test' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -95,7 +95,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testFinished('my_test');
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testFinished name='my_test' duration='0' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -105,7 +105,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testFinished('my_test', 1234);
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testFinished name='my_test' duration='1234' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -115,7 +115,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testFailed('my_test', 'Something went wrong', 'Stack trace here');
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testFailed name='my_test' message='Something went wrong' details='Stack trace here' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -125,7 +125,7 @@ final class TeamcityTest extends TestCase
     {
         $message = $this->teamcity->testIgnored('my_test', 'Skipped because of reason');
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testIgnored name='my_test' message='Skipped because of reason' flowId='%d']\n", getmypid()),
             $message,
         );
@@ -136,10 +136,10 @@ final class TeamcityTest extends TestCase
         $message = $this->teamcity->testFailed(
             "test'name",
             "message|with[special]chars\nand\rnewlines",
-            "details",
+            'details',
         );
 
-        self::assertSame(
+        $this->assertSame(
             sprintf("##teamcity[testFailed name='test|'name' message='message||with|[special|]chars|nand|rnewlines' details='details' flowId='%d']\n", getmypid()),
             $message,
         );

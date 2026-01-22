@@ -35,16 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function array_map;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Console\IO;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\Source\Collector\SourceCollector;
-use SplFileInfo;
-use Symfony\Component\Filesystem\Path;
-use function array_map;
 use function Safe\getcwd;
 use function sort;
+use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @internal

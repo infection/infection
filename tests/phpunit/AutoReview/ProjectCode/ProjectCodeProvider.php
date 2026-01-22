@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\AutoReview\ProjectCode;
 
+use function array_filter;
+use const DIRECTORY_SEPARATOR;
+use function in_array;
 use Infection\CannotBeInstantiated;
 use Infection\Command\ConfigureCommand;
 use Infection\Command\Git\LoggerFactory;
@@ -69,8 +72,8 @@ use Infection\Framework\OperatingSystem;
 use Infection\Logger\Http\StrykerCurlClient;
 use Infection\Logger\Http\StrykerDashboardClient;
 use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Definition;
@@ -103,19 +106,16 @@ use Infection\Testing\MutatorName;
 use Infection\Testing\SingletonContainer;
 use Infection\Tests\AutoReview\ConcreteClassReflector;
 use Infection\Tests\TestingUtility\PHPUnit\DataProviderFactory;
-use ReflectionClass;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
-use function array_filter;
-use function in_array;
 use function iterator_to_array;
 use function ltrim;
 use function Pipeline\take;
+use ReflectionClass;
 use function sort;
+use const SORT_STRING;
 use function sprintf;
 use function str_replace;
-use const DIRECTORY_SEPARATOR;
-use const SORT_STRING;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class ProjectCodeProvider
 {

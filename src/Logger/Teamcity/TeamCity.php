@@ -35,9 +35,15 @@ declare(strict_types=1);
 
 namespace Infection\Logger\Teamcity;
 
+use function array_keys;
+use function array_map;
+use function implode;
+use function is_int;
+use function preg_replace;
 use function Safe\getmypid;
 use function Safe\ini_get;
 use function sprintf;
+use function str_contains;
 use function str_replace;
 use function stripos;
 use Throwable;
@@ -47,8 +53,15 @@ use Throwable;
  *
  * @internal
  */
-final class Teamcity
+final class TeamCity
 {
+    // `|` must be escaped FIRST to avoid double-escaping.
+    private const CHARACTERS_TO_ESCAPE = ['|', "'", "\n", "\r", '[', ']'];
+
+    private const ESCAPED_CHARACTERS = ['||', "|'", '|n', '|r', '|[', '|]'];
+
+    private const UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
+
     private ?int $flowId = null;
 
     public function __construct()
@@ -122,6 +135,27 @@ final class Teamcity
         );
     }
 
+    /**
+     * @see https://www.jetbrains.com/help/teamcity/2025.07/service-messages.html#Service+Messages+Formats
+     *
+     * @param string|array<non-empty-string|int, string|int|float> $valueOrAttributes
+     */
+    public function write(
+        MessageName $messageName,
+        string|array $valueOrAttributes,
+    ): string {
+        return sprintf(
+            '##teamcity[%s]',
+            implode(
+                ' ',
+                [
+                    $messageName->value,
+                    ...self::escape((array) $valueOrAttributes),
+                ],
+            ),
+        );
+    }
+
     private function setFlowId(): void
     {
         try {
@@ -150,19 +184,67 @@ final class Teamcity
             $message .= sprintf(
                 " %s='%s'",
                 $key,
-                $this->escape((string) $value),
+                $this->legacyEscape((string) $value),
             );
         }
 
         return $message . "]\n";
     }
 
-    private function escape(string $string): string
+    private function legacyEscape(string $string): string
     {
         return str_replace(
             ['|', "'", "\n", "\r", ']', '['],
             ['||', "|'", '|n', '|r', '|]', '|['],
             $string,
         );
+    }
+
+    /**
+     * @param array<non-empty-string|int, string|int|float> $values
+     *
+     * @return non-empty-string[]
+     */
+    private static function escape(array $values): array
+    {
+        return array_map(
+            static function (string|int $key) use ($values): string {
+                $value = $values[$key];
+
+                return is_int($key)
+                    ? self::escapeValue($value)
+                    : sprintf(
+                        '%s=%s',
+                        $key,
+                        self::escapeValue($value),
+                    );
+            },
+            array_keys($values),
+        );
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private static function escapeValue(string|int|float $value): string
+    {
+        $escapedValue = sprintf(
+            '\'%s\'',
+            str_replace(
+                self::CHARACTERS_TO_ESCAPE,
+                self::ESCAPED_CHARACTERS,
+                (string) $value,
+            ),
+        );
+
+        if (str_contains($value, '\u')) {
+            $escapedValue = preg_replace(
+                self::UNICODE_CHARACTER_REGEX,
+                '|0x$1',
+                $escapedValue,
+            );
+        }
+
+        return $escapedValue;
     }
 }

@@ -37,10 +37,10 @@ namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
-use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
 use function str_repeat;
 use function strlen;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal

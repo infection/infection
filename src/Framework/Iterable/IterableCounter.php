@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Framework\Iterable;
 
+use function count;
 use Infection\CannotBeInstantiated;
 use Infection\Logger\MutationAnalysis\AbstractMutationAnalysisLogger;
-use function count;
 use function is_array;
 use function iterator_to_array;
 

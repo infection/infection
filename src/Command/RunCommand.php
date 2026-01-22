@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use function extension_loaded;
+use function implode;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Command\Option\SourceFilterOptions;
 use Infection\Configuration\Schema\SchemaConfigurationLoader;
@@ -58,14 +60,12 @@ use Infection\Source\Exception\NoSourceFound;
 use Infection\StaticAnalysis\StaticAnalysisToolTypes;
 use Infection\TestFramework\TestFrameworkTypes;
 use InvalidArgumentException;
+use const PHP_SAPI;
 use Psr\Log\LoggerInterface;
+use function sprintf;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
-use function extension_loaded;
-use function implode;
-use function sprintf;
 use function trim;
-use const PHP_SAPI;
 
 /**
  * @internal
@@ -653,15 +653,14 @@ final class RunCommand extends BaseCommand
     private static function getFormatterName(
         RunCommandHelper $commandHelper,
         bool $teamcity,
-    ): MutationAnalysisLoggerName
-    {
+    ): MutationAnalysisLoggerName {
         return $teamcity
             ? MutationAnalysisLoggerName::TEAMCITY
             : MutationAnalysisLoggerName::from(
                 $commandHelper->getStringOption(
                     self::OPTION_FORMATTER,
                     Container::DEFAULT_FORMATTER_NAME->value,
-                )
+                ),
             );
     }
 }

@@ -41,12 +41,12 @@ use Infection\Framework\Str;
 use Infection\Logger\Console\ConsoleLogger;
 use Infection\Metrics\MinMsiChecker;
 use Infection\Metrics\MinMsiCheckFailed;
+use const PHP_EOL;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Terminal;
-use const PHP_EOL;
 
 #[CoversClass(MinMsiChecker::class)]
 final class MinMsiCheckerTest extends TestCase

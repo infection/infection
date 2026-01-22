@@ -38,7 +38,7 @@ namespace Infection\Tests\Logger\Teamcity;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
-use Infection\Logger\Teamcity\Teamcity;
+use Infection\Logger\Teamcity\TeamCity;
 use Infection\Logger\Teamcity\TeamcitySubscriber;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
@@ -49,12 +49,14 @@ use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function substr_count;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 #[CoversClass(TeamcitySubscriber::class)]
 final class TeamcitySubscriberTest extends TestCase
 {
     private BufferedOutput $output;
+
     private TeamcitySubscriber $subscriber;
 
     protected function setUp(): void
@@ -62,7 +64,7 @@ final class TeamcitySubscriberTest extends TestCase
         $this->output = new BufferedOutput();
         $this->subscriber = new TeamcitySubscriber(
             $this->output,
-            new Teamcity(),
+            new TeamCity(),
         );
     }
 
@@ -75,7 +77,7 @@ final class TeamcitySubscriberTest extends TestCase
 
         $output = $this->output->fetch();
 
-        self::assertStringContainsString("##teamcity[testCount count='42'", $output);
+        $this->assertStringContainsString("##teamcity[testCount count='42'", $output);
     }
 
     public function test_it_outputs_test_suite_hierarchy_for_file_path(): void
@@ -91,9 +93,9 @@ final class TeamcitySubscriberTest extends TestCase
 
         $output = $this->output->fetch();
 
-        self::assertStringContainsString("##teamcity[testSuiteStarted name='src'", $output);
-        self::assertStringContainsString("##teamcity[testSuiteStarted name='Foo'", $output);
-        self::assertStringContainsString("##teamcity[testSuiteStarted name='Bar.php'", $output);
+        $this->assertStringContainsString("##teamcity[testSuiteStarted name='src'", $output);
+        $this->assertStringContainsString("##teamcity[testSuiteStarted name='Foo'", $output);
+        $this->assertStringContainsString("##teamcity[testSuiteStarted name='Bar.php'", $output);
     }
 
     public function test_it_closes_all_suites_on_mutation_testing_finished(): void
@@ -115,9 +117,9 @@ final class TeamcitySubscriberTest extends TestCase
 
         $output = $this->output->fetch();
 
-        self::assertStringContainsString("##teamcity[testSuiteFinished name='Bar.php'", $output);
-        self::assertStringContainsString("##teamcity[testSuiteFinished name='Foo'", $output);
-        self::assertStringContainsString("##teamcity[testSuiteFinished name='src'", $output);
+        $this->assertStringContainsString("##teamcity[testSuiteFinished name='Bar.php'", $output);
+        $this->assertStringContainsString("##teamcity[testSuiteFinished name='Foo'", $output);
+        $this->assertStringContainsString("##teamcity[testSuiteFinished name='src'", $output);
     }
 
     public function test_it_reuses_common_path_prefix(): void
@@ -141,15 +143,15 @@ final class TeamcitySubscriberTest extends TestCase
         $output = $this->output->fetch();
 
         // src and Foo should only be started once
-        self::assertSame(1, substr_count($output, "name='src'"));
-        self::assertSame(1, substr_count($output, "name='Foo'"));
+        $this->assertSame(1, substr_count($output, "name='src'"));
+        $this->assertSame(1, substr_count($output, "name='Foo'"));
 
         // Bar.php and Baz.php should both be started
-        self::assertStringContainsString("testSuiteStarted name='Bar.php'", $output);
-        self::assertStringContainsString("testSuiteStarted name='Baz.php'", $output);
+        $this->assertStringContainsString("testSuiteStarted name='Bar.php'", $output);
+        $this->assertStringContainsString("testSuiteStarted name='Baz.php'", $output);
 
         // Bar.php should be finished before Baz.php starts
-        self::assertStringContainsString("testSuiteFinished name='Bar.php'", $output);
+        $this->assertStringContainsString("testSuiteFinished name='Bar.php'", $output);
     }
 
     #[DataProvider('mutantStatusProvider')]
@@ -168,56 +170,56 @@ final class TeamcitySubscriberTest extends TestCase
 
         $output = $this->output->fetch();
 
-        self::assertStringContainsString("##teamcity[testStarted", $output);
-        self::assertStringContainsString($expectedContains, $output);
-        self::assertStringContainsString("##teamcity[testFinished", $output);
+        $this->assertStringContainsString('##teamcity[testStarted', $output);
+        $this->assertStringContainsString($expectedContains, $output);
+        $this->assertStringContainsString('##teamcity[testFinished', $output);
     }
 
     public static function mutantStatusProvider(): iterable
     {
         yield 'killed by tests' => [
             DetectionStatus::KILLED_BY_TESTS,
-            "##teamcity[testFinished",
+            '##teamcity[testFinished',
         ];
 
         yield 'killed by static analysis' => [
             DetectionStatus::KILLED_BY_STATIC_ANALYSIS,
-            "##teamcity[testFinished",
+            '##teamcity[testFinished',
         ];
 
         yield 'escaped' => [
             DetectionStatus::ESCAPED,
-            "##teamcity[testFailed",
+            '##teamcity[testFailed',
         ];
 
         yield 'timed out' => [
             DetectionStatus::TIMED_OUT,
-            "##teamcity[testFailed",
+            '##teamcity[testFailed',
         ];
 
         yield 'error' => [
             DetectionStatus::ERROR,
-            "##teamcity[testFailed",
+            '##teamcity[testFailed',
         ];
 
         yield 'syntax error' => [
             DetectionStatus::SYNTAX_ERROR,
-            "##teamcity[testFailed",
+            '##teamcity[testFailed',
         ];
 
         yield 'skipped' => [
             DetectionStatus::SKIPPED,
-            "##teamcity[testIgnored",
+            '##teamcity[testIgnored',
         ];
 
         yield 'not covered' => [
             DetectionStatus::NOT_COVERED,
-            "##teamcity[testIgnored",
+            '##teamcity[testIgnored',
         ];
 
         yield 'ignored' => [
             DetectionStatus::IGNORED,
-            "##teamcity[testIgnored",
+            '##teamcity[testIgnored',
         ];
     }
 
@@ -234,8 +236,8 @@ final class TeamcitySubscriberTest extends TestCase
 
         $output = $this->output->fetch();
 
-        self::assertStringContainsString("message='Mutant escaped'", $output);
-        self::assertStringContainsString("details='", $output);
+        $this->assertStringContainsString("message='Mutant escaped'", $output);
+        $this->assertStringContainsString("details='", $output);
     }
 
     public function test_test_name_includes_mutator_line_and_hash(): void
@@ -252,7 +254,7 @@ final class TeamcitySubscriberTest extends TestCase
         $output = $this->output->fetch();
 
         // Test name should include mutator name, line number, and hash
-        self::assertStringContainsString("For_ (L10) abc123", $output);
+        $this->assertStringContainsString('For_ (L10) abc123', $output);
     }
 
     private function createMutantResult(
