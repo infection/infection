@@ -56,7 +56,7 @@ final class ConsoleDotLoggerTest extends TestCase
     public function test_begins_by_displaying_a_legend(): void
     {
         $output = new BufferedOutput();
-        $formatter = new ConsoleDotLogger($output);
+        $logger = new ConsoleDotLogger($output);
 
         $expected = Str::toSystemLineEndings(
             implode(
@@ -88,7 +88,7 @@ final class ConsoleDotLoggerTest extends TestCase
             ),
         );
 
-        $formatter->start(10);
+        $logger->start(10);
 
         $actual = $output->fetch();
 
@@ -101,14 +101,14 @@ final class ConsoleDotLoggerTest extends TestCase
         string $expected,
     ): void {
         $output = new BufferedOutput();
-        $formatter = new ConsoleDotLogger($output);
+        $logger = new ConsoleDotLogger($output);
 
         // Clear the initial output: it is already tested and it would bloat the
         // test to include it.
-        $formatter->start(10);
+        $logger->start(10);
         $output->fetch();
 
-        $formatter->advance(
+        $logger->advance(
             $this->createMutantExecutionResultOfType($detectionStatus),
             10,
         );
@@ -175,11 +175,11 @@ final class ConsoleDotLoggerTest extends TestCase
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
-        $formatter = new ConsoleDotLogger($output);
-        $formatter->start($totalMutations);
+        $logger = new ConsoleDotLogger($output);
+        $logger->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $formatter->advance(
+            $logger->advance(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 $totalMutations,
             );
@@ -207,11 +207,11 @@ final class ConsoleDotLoggerTest extends TestCase
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
-        $formatter = new ConsoleDotLogger($output);
-        $formatter->start($totalMutations);
+        $logger = new ConsoleDotLogger($output);
+        $logger->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $formatter->advance(
+            $logger->advance(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 0,
             );
