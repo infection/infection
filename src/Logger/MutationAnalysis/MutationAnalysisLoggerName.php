@@ -33,24 +33,17 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Framework\Enum\ImplodableEnum;
 
-interface OutputFormatter
+/**
+ * @internal
+ */
+enum MutationAnalysisLoggerName: string
 {
-    /**
-     * Triggered when mutation testing is being started
-     */
-    public function start(int $mutationCount): void;
+    use ImplodableEnum;
 
-    /**
-     * Triggered each time mutation process is finished for one Mutant
-     */
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void;
-
-    /**
-     * Triggered when mutation testing is finished
-     */
-    public function finish(): void;
+    case DOT = 'dot';
+    case PROGRESS = 'progress';
 }

@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\MutationTestingWasFinished;
@@ -43,10 +42,11 @@ use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Framework\Str;
 use Infection\Logger\FederatedLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Tests\Fixtures\Console\FakeOutputFormatter;
+use Infection\Tests\Logger\MutationAnalysis\FakeMutationAnalysisLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -98,7 +98,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
             $this->diffColorizerMock,
             new FederatedLogger(),
             $numberOfShownMutations,
-            new FakeOutputFormatter(),
+            new FakeMutationAnalysisLogger(),
             withUncovered: true,
             withTimeouts: false,
         );
@@ -128,7 +128,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $metricsCalculator = $this->createMock(MetricsCalculator::class);
         $resultsCollector = $this->createMock(ResultsCollector::class);
         $diffColorizer = $this->createMock(DiffColorizer::class);
-        $outputFormatter = $this->createMock(OutputFormatter::class);
+        $outputFormatter = $this->createMock(MutationAnalysisLogger::class);
 
         $resultsCollector->expects($this->once())
             ->method('getEscapedExecutionResults')
@@ -168,7 +168,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $metricsCalculator = $this->createMock(MetricsCalculator::class);
         $resultsCollector = $this->createMock(ResultsCollector::class);
         $diffColorizer = $this->createMock(DiffColorizer::class);
-        $outputFormatter = $this->createMock(OutputFormatter::class);
+        $outputFormatter = $this->createMock(MutationAnalysisLogger::class);
 
         $timedOutExecutionResult = $this->createMock(MutantExecutionResult::class);
         $timedOutExecutionResult->expects($this->once())

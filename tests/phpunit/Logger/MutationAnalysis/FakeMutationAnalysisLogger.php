@@ -33,51 +33,26 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Console\OutputFormatter;
+namespace Infection\Tests\Logger\MutationAnalysis;
 
-use Infection\Console\OutputFormatter\DotFormatter;
-use Infection\Console\OutputFormatter\FormatterFactory;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\ProgressFormatter;
-use Infection\Framework\Enum\EnumBucket;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Tests\UnsupportedMethod;
 
-#[CoversClass(FormatterFactory::class)]
-final class FormatterFactoryTest extends TestCase
+final class FakeMutationAnalysisLogger implements MutationAnalysisLogger
 {
-    #[DataProvider('formatterProvider')]
-    public function test_it_can_create_all_known_factories(
-        FormatterName $formatterName,
-        string $expectedFormatterClassName,
-    ): void {
-        $outputMock = $this->createMock(OutputInterface::class);
-        $outputMock
-            ->method('isDecorated')
-            ->willReturn(false)
-        ;
-
-        $formatter = (new FormatterFactory($outputMock))->create($formatterName);
-
-        $this->assertInstanceOf($expectedFormatterClassName, $formatter);
+    public function start(int $mutationCount): void
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public static function formatterProvider(): iterable
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        $bucket = EnumBucket::create(FormatterName::class);
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
 
-        yield [
-            $bucket->take(FormatterName::DOT),
-            DotFormatter::class,
-        ];
-
-        yield [
-            $bucket->take(FormatterName::PROGRESS),
-            ProgressFormatter::class,
-        ];
-
-        $bucket->assertIsEmpty();
+    public function finish(): void
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 }

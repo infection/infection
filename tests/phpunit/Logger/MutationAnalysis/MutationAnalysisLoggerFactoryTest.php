@@ -33,35 +33,51 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Tests\Logger\MutationAnalysis;
 
-use Infection\Mutant\MutantExecutionResult;
+use Infection\Framework\Enum\EnumBucket;
+use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
+use Infection\Logger\MutationAnalysis\ConsoleProgressBarLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @internal
- *
- * Abstract empty class to simplify particular implementations
- */
-abstract class AbstractOutputFormatter implements OutputFormatter
+#[CoversClass(MutationAnalysisLoggerFactory::class)]
+final class MutationAnalysisLoggerFactoryTest extends TestCase
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    final public const UNKNOWN_COUNT = 0;
+    #[DataProvider('formatterProvider')]
+    public function test_it_can_create_all_known_factories(
+        MutationAnalysisLoggerName $formatterName,
+        string $expectedFormatterClassName,
+    ): void {
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock
+            ->method('isDecorated')
+            ->willReturn(false)
+        ;
 
-    protected int $callsCount = 0;
+        $formatter = (new MutationAnalysisLoggerFactory($outputMock))->create($formatterName);
 
-    public function start(int $mutationCount): void
-    {
-        $this->callsCount = 0;
+        $this->assertInstanceOf($expectedFormatterClassName, $formatter);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public static function formatterProvider(): iterable
     {
-        ++$this->callsCount;
-    }
+        $bucket = EnumBucket::create(MutationAnalysisLoggerName::class);
 
-    public function finish(): void
-    {
+        yield [
+            $bucket->take(MutationAnalysisLoggerName::DOT),
+            ConsoleDotLogger::class,
+        ];
+
+        yield [
+            $bucket->take(MutationAnalysisLoggerName::PROGRESS),
+            ConsoleProgressBarLogger::class,
+        ];
+
+        $bucket->assertIsEmpty();
     }
 }

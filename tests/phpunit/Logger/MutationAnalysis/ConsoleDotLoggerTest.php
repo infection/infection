@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Console\OutputFormatter;
+namespace Infection\Tests\Logger\MutationAnalysis;
 
 use function implode;
-use Infection\Console\OutputFormatter\DotFormatter;
 use Infection\Framework\Enum\EnumBucket;
 use Infection\Framework\Str;
+use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -48,15 +48,15 @@ use PHPUnit\Framework\TestCase;
 use function strip_tags;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-#[CoversClass(DotFormatter::class)]
-final class DotFormatterTest extends TestCase
+#[CoversClass(ConsoleDotLogger::class)]
+final class ConsoleDotLoggerTest extends TestCase
 {
     private const ANY_PRIME_NUMBER = 127;
 
     public function test_begins_by_displaying_a_legend(): void
     {
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
+        $formatter = new ConsoleDotLogger($output);
 
         $expected = Str::toSystemLineEndings(
             implode(
@@ -101,7 +101,7 @@ final class DotFormatterTest extends TestCase
         string $expected,
     ): void {
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
+        $formatter = new ConsoleDotLogger($output);
 
         // Clear the initial output: it is already tested and it would bloat the
         // test to include it.
@@ -175,7 +175,7 @@ final class DotFormatterTest extends TestCase
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
+        $formatter = new ConsoleDotLogger($output);
         $formatter->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
@@ -207,7 +207,7 @@ final class DotFormatterTest extends TestCase
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
-        $formatter = new DotFormatter($output);
+        $formatter = new ConsoleDotLogger($output);
         $formatter->start($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {

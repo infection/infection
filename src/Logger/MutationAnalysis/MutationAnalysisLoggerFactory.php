@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,18 +41,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class FormatterFactory
+final readonly class MutationAnalysisLoggerFactory
 {
     public function __construct(
         private OutputInterface $output,
     ) {
     }
 
-    public function create(FormatterName $formatterName): OutputFormatter
+    public function create(MutationAnalysisLoggerName $formatterName): MutationAnalysisLogger
     {
         return match ($formatterName) {
-            FormatterName::PROGRESS => new ProgressFormatter(new ProgressBar($this->output)),
-            FormatterName::DOT => new DotFormatter($this->output),
+            MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
+                new ProgressBar($this->output),
+            ),
+            MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),
         };
     }
 }

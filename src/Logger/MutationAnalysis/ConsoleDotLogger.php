@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
@@ -45,7 +45,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class DotFormatter extends AbstractOutputFormatter
+final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
 {
     private const DOTS_PER_ROW = 50;
 

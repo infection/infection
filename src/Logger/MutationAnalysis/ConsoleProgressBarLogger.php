@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Console\OutputFormatter;
+namespace Infection\Logger\MutationAnalysis;
 
 use Infection\Mutant\MutantExecutionResult;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -41,7 +41,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 /**
  * @internal
  */
-final class ProgressFormatter extends AbstractOutputFormatter
+final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
 {
     public function __construct(
         private readonly ProgressBar $progressBar,

@@ -38,13 +38,13 @@ namespace Infection\Event\Subscriber;
 use function count;
 use function floor;
 use Generator;
-use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
@@ -75,7 +75,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     public function __construct(
         private readonly OutputInterface $output,
-        private readonly OutputFormatter $outputFormatter,
+        private readonly MutationAnalysisLogger $outputFormatter,
         private readonly MetricsCalculator $metricsCalculator,
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
