@@ -35,6 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Mutation;
 
+use Infection\Event\EventDispatcher\EventDispatcher;
+use Infection\Event\MutationGenerationForSourceFileWasFinished;
+use Infection\Event\MutationGenerationForSourceFileWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -42,7 +45,6 @@ use Infection\PhpParser\FileParser;
 use Infection\PhpParser\NodeTraverserFactory;
 use Infection\PhpParser\UnparsableFile;
 use Infection\PhpParser\Visitor\MutationCollectorVisitor;
-use Infection\Source\Exception\NoSourceFound;
 use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\TestFramework\Tracing\Throwable\NoTraceFound;
 use Infection\TestFramework\Tracing\Trace\EmptyTrace;
@@ -50,6 +52,8 @@ use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\Trace\Trace;
 use Infection\TestFramework\Tracing\Tracer;
 use PhpParser\Node;
+use PhpParser\Node\Stmt;
+use PhpParser\Token;
 use SplFileInfo;
 use Webmozart\Assert\Assert;
 
@@ -66,13 +70,13 @@ class FileMutationGenerator
         private readonly SourceLineMatcher $sourceLineMatcher,
         private readonly Tracer $tracer,
         private readonly FileStore $fileStore,
+        private readonly EventDispatcher $eventDispatcher,
     ) {
     }
 
     /**
      * @param Mutator<Node>[] $mutators
      *
-     * @throws NoSourceFound
      * @throws UnparsableFile
      *
      * @return iterable<Mutation>
@@ -90,12 +94,32 @@ class FileMutationGenerator
             return;
         }
 
-        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
+        [$initialStatements, $originalFileTokens] = $this->createAst($sourceFile);
 
-        // Pre-traverse the nodes to connect them
-        $preTraverser = $this->traverserFactory->createPreTraverser();
-        $preTraverser->traverse($initialStatements);
+        yield from $this->generateMutations(
+            $mutators,
+            $sourceFile,
+            $initialStatements,
+            $trace,
+            $onlyCovered,
+            $originalFileTokens,
+        );
+    }
 
+    /**
+     * @param Mutator<Node>[] $mutators
+     * @param Stmt[] $initialStatements
+     * @param Token[] $originalFileTokens
+     *
+     * @return iterable<Mutation>
+     */
+    public function generateMutations(array $mutators,
+        SplFileInfo $sourceFile,
+        mixed $initialStatements,
+        Trace $trace,
+        bool $onlyCovered,
+        mixed $originalFileTokens,
+    ): iterable {
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
@@ -110,10 +134,42 @@ class FileMutationGenerator
             ),
         );
 
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationForSourceFileWasStarted(),
+        );
+
         $traverser = $this->traverserFactory->create($mutationCollectorVisitor);
         $traverser->traverse($initialStatements);
 
-        yield from $mutationCollectorVisitor->getMutations();
+        $sourceFileMutationIds = [];
+
+        foreach ($mutationCollectorVisitor->getMutations() as $mutation) {
+            $sourceFileMutationIds[] = $mutation->getHash();
+
+            yield $mutation;
+        }
+
+        $this->eventDispatcher->dispatch(
+            new MutationGenerationForSourceFileWasFinished(
+                $sourceFileMutationIds,
+            ),
+        );
+    }
+
+    /**
+     * @throws UnparsableFile
+     *
+     * @return array{Stmt[], Token[]}
+     */
+    private function createAst(SplFileInfo $sourceFile): array
+    {
+        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
+
+        // Pre-traverse the nodes to connect them
+        $preTraverser = $this->traverserFactory->createPreTraverser();
+        $preTraverser->traverse($initialStatements);
+
+        return [$initialStatements, $originalFileTokens];
     }
 
     private function trace(SplFileInfo $sourceFile): Trace

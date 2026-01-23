@@ -39,7 +39,7 @@ use function count;
 use function floor;
 use Generator;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutationEvaluationWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Logger\FederatedLogger;
@@ -91,19 +91,19 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $this->mutationCount = $event->getMutationCount();
 
-        $this->logger->start($this->mutationCount);
+        $this->logger->startAnalysis($this->mutationCount);
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutantProcessWasFinished(MutationEvaluationWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
-        $this->logger->advance($executionResult, $this->mutationCount);
+        $this->logger->finishEvaluation($executionResult, $this->mutationCount);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->logger->finish();
+        $this->logger->finishAnalysis();
 
         if ($this->numberOfMutationsBudget !== 0) {
             $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');

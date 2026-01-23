@@ -88,7 +88,7 @@ final class ConsoleDotLoggerTest extends TestCase
             ),
         );
 
-        $logger->start(10);
+        $logger->startAnalysis(10);
 
         $actual = $output->fetch();
 
@@ -105,10 +105,10 @@ final class ConsoleDotLoggerTest extends TestCase
 
         // Clear the initial output: it is already tested and it would bloat the
         // test to include it.
-        $logger->start(10);
+        $logger->startAnalysis(10);
         $output->fetch();
 
-        $logger->advance(
+        $logger->finishEvaluation(
             $this->createMutantExecutionResultOfType($detectionStatus),
             10,
         );
@@ -176,10 +176,10 @@ final class ConsoleDotLoggerTest extends TestCase
 
         $output = new BufferedOutput();
         $logger = new ConsoleDotLogger($output);
-        $logger->start($totalMutations);
+        $logger->startAnalysis($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $logger->advance(
+            $logger->finishEvaluation(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 $totalMutations,
             );
@@ -208,10 +208,10 @@ final class ConsoleDotLoggerTest extends TestCase
 
         $output = new BufferedOutput();
         $logger = new ConsoleDotLogger($output);
-        $logger->start($totalMutations);
+        $logger->startAnalysis($totalMutations);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
-            $logger->advance(
+            $logger->finishEvaluation(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
                 0,
             );

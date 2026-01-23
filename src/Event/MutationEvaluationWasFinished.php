@@ -33,43 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutationEvaluationWasFinished;
-use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
-use Infection\Metrics\Collector;
-use Infection\Tests\Mutant\MutantExecutionResultBuilder;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Infection\Mutant\MutantExecutionResult;
 
-#[CoversClass(MutationTestingResultsCollectorSubscriber::class)]
-final class MutationTestingResultsCollectorSubscriberTest extends TestCase
+/**
+ * @internal
+ * @final
+ */
+class MutationEvaluationWasFinished
 {
-    public function test_it_reacts_on_mutation_process_finished(): void
+    public function __construct(
+        private readonly MutantExecutionResult $executionResult,
+    ) {
+    }
+
+    public function getExecutionResult(): MutantExecutionResult
     {
-        $collectorA = $this->createMock(Collector::class);
-        $collectorA
-            ->expects($this->once())
-            ->method('collect')
-        ;
-
-        $collectorB = $this->createMock(Collector::class);
-        $collectorB
-            ->expects($this->once())
-            ->method('collect')
-        ;
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriber(
-            $collectorA,
-            $collectorB,
-        ));
-
-        $dispatcher->dispatch(
-            new MutationEvaluationWasFinished(
-                MutantExecutionResultBuilder::withMinimalTestData()->build(),
-            ),
-        );
+        return $this->executionResult;
     }
 }

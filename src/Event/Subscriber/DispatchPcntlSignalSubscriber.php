@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function function_exists;
-use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutationEvaluationWasFinished;
 use function Safe\pcntl_signal_dispatch;
 
 /**
@@ -44,7 +44,7 @@ use function Safe\pcntl_signal_dispatch;
  */
 final class DispatchPcntlSignalSubscriber implements EventSubscriber
 {
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutantProcessWasFinished(MutationEvaluationWasFinished $event): void
     {
         if (!function_exists('pcntl_signal_dispatch')) {
             return;

@@ -48,23 +48,23 @@ final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
     ) {
     }
 
-    public function start(int $mutationCount): void
+    public function startAnalysis(int $mutationCount): void
     {
-        parent::start($mutationCount);
+        parent::startAnalysis($mutationCount);
 
         $this->progressBar->start($mutationCount);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        parent::advance($executionResult, $mutationCount);
+        parent::finishEvaluation($executionResult, $mutationCount);
 
         $this->progressBar->advance();
     }
 
-    public function finish(): void
+    public function finishAnalysis(): void
     {
-        parent::finish();
+        parent::finishAnalysis();
 
         $this->progressBar->finish();
     }

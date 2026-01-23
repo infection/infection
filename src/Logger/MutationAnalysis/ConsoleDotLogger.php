@@ -54,9 +54,9 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     ) {
     }
 
-    public function start(int $mutationCount): void
+    public function startAnalysis(int $mutationCount): void
     {
-        parent::start($mutationCount);
+        parent::startAnalysis($mutationCount);
 
         $this->output->writeln([
             '',
@@ -73,9 +73,9 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         ]);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        parent::advance($executionResult, $mutationCount);
+        parent::finishEvaluation($executionResult, $mutationCount);
 
         $this->output->write(
             self::getCharacter($executionResult),

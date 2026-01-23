@@ -35,21 +35,16 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
-use Infection\Mutant\MutantExecutionResult;
-
 /**
  * @internal
- * @final
  */
-class MutantProcessWasFinished
+final readonly class MutationGenerationForSourceFileWasFinished
 {
+    /**
+     * @param list<string> $sourceFileMutationIds
+     */
     public function __construct(
-        private readonly MutantExecutionResult $executionResult,
+        public array $sourceFileMutationIds,
     ) {
-    }
-
-    public function getExecutionResult(): MutantExecutionResult
-    {
-        return $this->executionResult;
     }
 }
