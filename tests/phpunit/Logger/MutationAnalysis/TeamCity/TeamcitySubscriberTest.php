@@ -33,24 +33,24 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\Teamcity;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
-use Infection\Logger\Teamcity\TeamCity;
-use Infection\Logger\Teamcity\TeamcitySubscriber;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamcitySubscriber;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Testing\MutatorName;
-use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function substr_count;
 use Symfony\Component\Console\Output\BufferedOutput;
+use function Later\now;
+use function substr_count;
 
 #[CoversClass(TeamcitySubscriber::class)]
 final class TeamcitySubscriberTest extends TestCase

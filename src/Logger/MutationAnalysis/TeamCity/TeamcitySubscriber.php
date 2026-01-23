@@ -33,81 +33,88 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\MutationAnalysis;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
+use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\MutationTestingWasStarted;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Telemetry\Subscriber\GodSubscriber;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use function array_reverse;
 use function array_slice;
 use function count;
-use const DIRECTORY_SEPARATOR;
 use function explode;
-use Infection\Logger\Teamcity\TeamCity;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
+use function file_put_contents;
+use function fopen;
 use function min;
-use Psr\Log\LoggerInterface;
-use function Safe\getcwd;
 use function sprintf;
-use Symfony\Component\Filesystem\Path;
+use const DIRECTORY_SEPARATOR;
 
-final class TeamcityLogger implements MutationAnalysisLogger
+/**
+ * @internal
+ */
+final class TeamcitySubscriber extends GodSubscriber
 {
     private const MILLISECONDS_PER_SECOND = 1000;
+
+    private const DEBUG_LOG = __DIR__ . '/../../../var/teamcity.log';
+
+    private readonly OutputInterface $output;
+
+    private readonly OutputInterface $debugOutput;
 
     /**
      * @var list<string> Currently open test suite names (forming a path hierarchy)
      */
     private array $openSuites = [];
 
-    private string $cwd;
-
     public function __construct(
+        OutputInterface $output,
         private readonly TeamCity $teamcity,
-        private readonly LoggerInterface $logger,
-        private readonly string $configurationDirPathname,
     ) {
-        $this->cwd = getcwd();
-    }
+        file_put_contents(self::DEBUG_LOG, '');
 
-    public function startAnalysis(int $mutationCount): void
-    {
-        $this->logger->warning(
-            $this->teamcity->testCount($mutationCount),
+        $this->output = new DuplicatedOutput(
+            $output,
+            new StreamOutput(fopen(self::DEBUG_LOG, 'w')),
         );
     }
 
-    public function startEvaluation(Mutation $mutation, int $mutationCount): void
+    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
-        // TODO
+        parent::onMutationTestingWasStarted($event);
+
+        $this->output->write(
+            $this->teamcity->testCount($event->getMutationCount()),
+        );
     }
 
-    public function finishEvaluation(
-        MutantExecutionResult $executionResult,
-        int $mutationCount,
-    ): void {
-        $this->processResult($executionResult);
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        parent::onMutantProcessWasFinished($event);
+
+        $result = $event->getExecutionResult();
+        $this->processResult($result);
     }
 
-    public function finishAnalysis(): void
+    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
+        parent::onMutationTestingWasFinished($event);
+
         $this->closeAllSuites();
+    }
+
+    protected function log(object $event): void
+    {
+        // No-op: we handle specific events directly
     }
 
     private function processResult(MutantExecutionResult $result): void
     {
-        // If the current path is:
-        // /path/to/project/src/Differ/DiffColorizer.php
-        // and the current working dir:
-        // /path/to/project/sub-dir
-        // Then the relative path would be:
-        // '../src/Differ/DiffColorizer.php'
-        // so '..' does appear at the top hierarchy... But I think it's ok.
-        // Either we take the current working dir as the base path or the config
-        // file.
-        $filePath = Path::makeRelative(
-            $result->getOriginalFilePath(),
-            $this->configurationDirPathname,
-        );
+        $filePath = $result->getOriginalFilePath();
         $pathSegments = $this->getPathSegments($filePath);
 
         $this->adjustSuiteHierarchy($pathSegments);
@@ -143,7 +150,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
         $suitesToClose = array_slice($this->openSuites, $commonPrefixLength);
 
         foreach (array_reverse($suitesToClose) as $suiteName) {
-            $this->logger->warning(
+            $this->output->write(
                 $this->teamcity->testSuiteFinished($suiteName),
             );
         }
@@ -152,7 +159,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
         $suitesToOpen = array_slice($newPathSegments, $commonPrefixLength);
 
         foreach ($suitesToOpen as $suiteName) {
-            $this->logger->warning(
+            $this->output->write(
                 $this->teamcity->testSuiteStarted($suiteName),
             );
         }
@@ -163,7 +170,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
     private function closeAllSuites(): void
     {
         foreach (array_reverse($this->openSuites) as $suiteName) {
-            $this->logger->warning(
+            $this->output->write(
                 $this->teamcity->testSuiteFinished($suiteName),
             );
         }
@@ -176,13 +183,13 @@ final class TeamcityLogger implements MutationAnalysisLogger
         $testName = $this->getMutantTestName($result);
         $durationMs = (int) ($result->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
 
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testStarted($testName),
         );
 
         match ($result->getDetectionStatus()) {
             DetectionStatus::KILLED_BY_TESTS,
-            DetectionStatus::KILLED_BY_STATIC_ANALYSIS => $this->logger->warning(
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS => $this->output->write(
                 $this->teamcity->testFinished($testName, $durationMs),
             ),
             DetectionStatus::ESCAPED => $this->emitEscapedMutant($testName, $result, $durationMs),
@@ -210,7 +217,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFailed(
                 $testName,
                 'Mutant escaped',
@@ -218,7 +225,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
             ),
         );
 
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }
@@ -228,7 +235,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFailed(
                 $testName,
                 'Mutant timed out',
@@ -236,7 +243,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
             ),
         );
 
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }
@@ -246,7 +253,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFailed(
                 $testName,
                 sprintf('Mutant caused %s', $result->getDetectionStatus()->value),
@@ -254,7 +261,7 @@ final class TeamcityLogger implements MutationAnalysisLogger
             ),
         );
 
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }
@@ -264,14 +271,14 @@ final class TeamcityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testIgnored(
                 $testName,
                 sprintf('Mutant %s', $result->getDetectionStatus()->value),
             ),
         );
 
-        $this->logger->warning(
+        $this->output->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }

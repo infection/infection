@@ -35,11 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis;
 
-use function dirname;
 use Infection\Logger\Console\BasicConsoleLogger;
-use Infection\Logger\Teamcity\TeamCity;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use function dirname;
 
 /**
  * @internal
@@ -60,7 +61,7 @@ final readonly class MutationAnalysisLoggerFactory
                 new ProgressBar($this->output),
             ),
             MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),
-            MutationAnalysisLoggerName::TEAMCITY => new TeamcityLogger(
+            MutationAnalysisLoggerName::TEAMCITY => new TeamCityLogger(
                 $this->teamcity,
                 new BasicConsoleLogger($this->output),
                 dirname($this->configurationPathname),

@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\Teamcity;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -33,19 +33,22 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\Teamcity;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
+use Infection\CannotBeInstantiated;
 use function explode;
 use function implode;
-use Infection\CannotBeInstantiated;
 use function max;
 use function Safe\preg_match;
 use function str_ends_with;
 use function str_repeat;
 
 /**
- * This service is a utility purely for testing purposes to make the TeamCity
- * logs more readable by indenting them based on the opening/closing blocks.
+ * This service is a utility to make the TeamCity logs more readable by indenting
+ * them based on the opening/closing blocks.
+ *
+ * Note that this is purely for testing purposes for better readability: teamcity
+ * logs do not need to be indented.
  */
 final class TeamCityLogIndenter
 {
@@ -67,7 +70,7 @@ final class TeamCityLogIndenter
     /**
      * @param string[] $lines
      */
-    public static function indentLines(
+    private static function indentLines(
         array $lines,
     ): string {
         $indentedLines = [];

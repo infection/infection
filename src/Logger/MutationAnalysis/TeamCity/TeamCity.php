@@ -33,8 +33,9 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\Teamcity;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
+use Throwable;
 use function array_keys;
 use function array_map;
 use function implode;
@@ -46,9 +47,10 @@ use function sprintf;
 use function str_contains;
 use function str_replace;
 use function stripos;
-use Throwable;
 
 /**
+ * This service provides the primitives to write a TeamCity log record.
+ *
  * @see https://www.jetbrains.com/help/teamcity/2025.07/service-messages.html
  *
  * @internal
@@ -62,11 +64,9 @@ final class TeamCity
 
     private const UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
 
-    private ?int $flowId = null;
-
-    public function __construct()
-    {
-        $this->setFlowId();
+    public function __construct(
+        //private string $rootFlowId = 'root',
+    ) {
     }
 
     public function testSuiteStarted(string $name): string
@@ -145,7 +145,7 @@ final class TeamCity
         string|array $valueOrAttributes,
     ): string {
         return sprintf(
-            '##teamcity[%s]',
+            '##teamcity[%s]'."\n",
             implode(
                 ' ',
                 [
@@ -154,19 +154,6 @@ final class TeamCity
                 ],
             ),
         );
-    }
-
-    private function setFlowId(): void
-    {
-        try {
-            $disabledFunctions = ini_get('disable_functions');
-
-            if (stripos($disabledFunctions, 'getmypid') === false) {
-                $this->flowId = getmypid();
-            }
-        } catch (Throwable) {
-            // Ignore: flowId is optional
-        }
     }
 
     /**

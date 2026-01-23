@@ -33,10 +33,10 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\Teamcity;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Logger\Teamcity\MessageName;
-use Infection\Logger\Teamcity\TeamCity;
+use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -62,7 +62,9 @@ final class TeamCityTest extends TestCase
             $value,
         );
 
-        $this->assertSame($expected, $actual);
+        $indentedActual = TeamCityLogIndenter::indent($actual);
+
+        $this->assertSame($expected, $indentedActual);
     }
 
     public static function messageProvider(): iterable

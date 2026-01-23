@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\Teamcity;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

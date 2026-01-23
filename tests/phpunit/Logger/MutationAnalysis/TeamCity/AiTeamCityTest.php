@@ -33,12 +33,12 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Logger\Teamcity;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use function getmypid;
-use Infection\Logger\Teamcity\TeamCity;
+use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use function getmypid;
 use function sprintf;
 
 #[CoversClass(TeamCity::class)]

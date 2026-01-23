@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Logger\Teamcity;
+namespace Infection\Logger\MutationAnalysis\TeamCity;
 
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Event\Subscriber\SubscriberFactory;
