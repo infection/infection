@@ -75,7 +75,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     public function __construct(
         private readonly OutputInterface $output,
-        private readonly MutationAnalysisLogger $outputFormatter,
+        private readonly MutationAnalysisLogger $logger,
         private readonly MetricsCalculator $metricsCalculator,
         private readonly ResultsCollector $resultsCollector,
         private readonly DiffColorizer $diffColorizer,
@@ -91,19 +91,19 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $this->mutationCount = $event->getMutationCount();
 
-        $this->outputFormatter->start($this->mutationCount);
+        $this->logger->start($this->mutationCount);
     }
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
-        $this->outputFormatter->advance($executionResult, $this->mutationCount);
+        $this->logger->advance($executionResult, $this->mutationCount);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->outputFormatter->finish();
+        $this->logger->finish();
 
         if ($this->numberOfMutationsBudget !== 0) {
             $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');

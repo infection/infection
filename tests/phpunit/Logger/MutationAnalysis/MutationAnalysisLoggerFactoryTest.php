@@ -48,9 +48,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[CoversClass(MutationAnalysisLoggerFactory::class)]
 final class MutationAnalysisLoggerFactoryTest extends TestCase
 {
-    #[DataProvider('formatterProvider')]
+    #[DataProvider('loggerProvider')]
     public function test_it_can_create_all_known_factories(
-        MutationAnalysisLoggerName $formatterName,
+        MutationAnalysisLoggerName $name,
         string $expectedFormatterClassName,
     ): void {
         $outputMock = $this->createMock(OutputInterface::class);
@@ -59,12 +59,12 @@ final class MutationAnalysisLoggerFactoryTest extends TestCase
             ->willReturn(false)
         ;
 
-        $formatter = (new MutationAnalysisLoggerFactory($outputMock))->create($formatterName);
+        $logger = (new MutationAnalysisLoggerFactory($outputMock))->create($name);
 
-        $this->assertInstanceOf($expectedFormatterClassName, $formatter);
+        $this->assertInstanceOf($expectedFormatterClassName, $logger);
     }
 
-    public static function formatterProvider(): iterable
+    public static function loggerProvider(): iterable
     {
         $bucket = EnumBucket::create(MutationAnalysisLoggerName::class);
 

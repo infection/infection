@@ -48,9 +48,9 @@ final readonly class MutationAnalysisLoggerFactory
     ) {
     }
 
-    public function create(MutationAnalysisLoggerName $formatterName): MutationAnalysisLogger
+    public function create(MutationAnalysisLoggerName $name): MutationAnalysisLogger
     {
-        return match ($formatterName) {
+        return match ($name) {
             MutationAnalysisLoggerName::PROGRESS => new ConsoleProgressBarLogger(
                 new ProgressBar($this->output),
             ),
