@@ -98,7 +98,7 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $executionResult = $event->getExecutionResult();
 
-        $this->logger->advance($executionResult, $this->mutationCount);
+        $this->logger->advance($executionResult);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void

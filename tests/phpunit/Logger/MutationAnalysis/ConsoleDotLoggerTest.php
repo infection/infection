@@ -38,6 +38,7 @@ namespace Infection\Tests\Logger\MutationAnalysis;
 use function implode;
 use Infection\Framework\Enum\EnumBucket;
 use Infection\Framework\Str;
+use Infection\Logger\MutationAnalysis\AbstractMutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
@@ -110,7 +111,6 @@ final class ConsoleDotLoggerTest extends TestCase
 
         $logger->advance(
             $this->createMutantExecutionResultOfType($detectionStatus),
-            10,
         );
 
         $actual = $output->fetch();
@@ -181,7 +181,6 @@ final class ConsoleDotLoggerTest extends TestCase
         for ($i = 0; $i < $totalMutations; ++$i) {
             $logger->advance(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
-                $totalMutations,
             );
         }
 
@@ -202,18 +201,17 @@ final class ConsoleDotLoggerTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function test_it_prints_current_number_of_pending_mutations(): void
+    public function test_it_prints_current_number_of_processed_mutations_when_the_total_number_is_not_known(): void
     {
         $totalMutations = self::ANY_PRIME_NUMBER;
 
         $output = new BufferedOutput();
         $logger = new ConsoleDotLogger($output);
-        $logger->start($totalMutations);
+        $logger->start(AbstractMutationAnalysisLogger::UNKNOWN_COUNT);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
             $logger->advance(
                 $this->createMutantExecutionResultOfType(DetectionStatus::KILLED_BY_TESTS),
-                0,
             );
         }
 
