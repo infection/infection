@@ -497,7 +497,7 @@ final class RunCommand extends BaseCommand
             debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            formatterName: self::getFormatterName($commandHelper),
+            loggerName: self::getMutationAnalysisLoggerName($commandHelper),
             // To keep in sync with Container::DEFAULT_NO_PROGRESS
             noProgress: $noProgress,
             forceProgress: $forceProgress,
@@ -638,7 +638,7 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(RunCommandHelper $commandHelper): MutationAnalysisLoggerName
+    private static function getMutationAnalysisLoggerName(RunCommandHelper $commandHelper): MutationAnalysisLoggerName
     {
         return MutationAnalysisLoggerName::from(
             $commandHelper->getStringOption(self::OPTION_FORMATTER, Container::DEFAULT_FORMATTER_NAME->value),

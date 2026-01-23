@@ -617,7 +617,7 @@ final class Container extends DIContainer
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
-        MutationAnalysisLoggerName $formatterName = self::DEFAULT_FORMATTER_NAME,
+        MutationAnalysisLoggerName $loggerName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
@@ -682,7 +682,7 @@ final class Container extends DIContainer
 
         $clone->offsetSet(
             MutationAnalysisLogger::class,
-            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($formatterName),
+            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($loggerName),
         );
 
         $clone->offsetSet(
