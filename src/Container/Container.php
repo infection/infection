@@ -50,9 +50,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterFactory;
-use Infection\Console\OutputFormatter\FormatterName;
-use Infection\Console\OutputFormatter\OutputFormatter;
 use Infection\Container\Builder\IndexXmlCoverageParserBuilder;
 use Infection\Differ\DiffColorizer;
 use Infection\Differ\Differ;
@@ -89,6 +86,9 @@ use Infection\Git\Git;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLoggerFactory;
 use Infection\Logger\Html\StrykerHtmlReportBuilder;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerFactory;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Logger\StrykerLoggerFactory;
 use Infection\Metrics\FilteringResultsCollectorFactory;
@@ -184,7 +184,7 @@ final class Container extends DIContainer
 
     public const DEFAULT_WITH_UNCOVERED = false;
 
-    public const DEFAULT_FORMATTER_NAME = FormatterName::DOT;
+    public const DEFAULT_FORMATTER_NAME = MutationAnalysisLoggerName::DOT;
 
     public const DEFAULT_MUTANT_ID = null;
 
@@ -436,7 +436,7 @@ final class Container extends DIContainer
                     $container->getDiffColorizer(),
                     $federatedMutationTestingResultsLogger,
                     $config->numberOfShownMutations,
-                    $container->getOutputFormatter(),
+                    $container->getMutationAnalysisLogger(),
                     !$config->mutateOnlyCoveredCode(),
                     $config->timeoutsAsEscaped,
                 );
@@ -617,7 +617,7 @@ final class Container extends DIContainer
         string $logVerbosity = self::DEFAULT_LOG_VERBOSITY,
         bool $debug = self::DEFAULT_DEBUG,
         bool $withUncovered = self::DEFAULT_WITH_UNCOVERED,
-        FormatterName $formatterName = self::DEFAULT_FORMATTER_NAME,
+        MutationAnalysisLoggerName $formatterName = self::DEFAULT_FORMATTER_NAME,
         bool $noProgress = self::DEFAULT_NO_PROGRESS,
         bool $forceProgress = self::DEFAULT_FORCE_PROGRESS,
         ?string $existingCoveragePath = self::DEFAULT_EXISTING_COVERAGE_PATH,
@@ -681,8 +681,8 @@ final class Container extends DIContainer
         );
 
         $clone->offsetSet(
-            OutputFormatter::class,
-            static fn (self $container): OutputFormatter => $container->getFormatterFactory()->create($formatterName),
+            MutationAnalysisLogger::class,
+            static fn (self $container): MutationAnalysisLogger => $container->getMutationAnalysisLoggerFactory()->create($formatterName),
         );
 
         $clone->offsetSet(
@@ -996,14 +996,14 @@ final class Container extends DIContainer
         return $this->get(OutputInterface::class);
     }
 
-    public function getFormatterFactory(): FormatterFactory
+    public function getMutationAnalysisLoggerFactory(): MutationAnalysisLoggerFactory
     {
-        return $this->get(FormatterFactory::class);
+        return $this->get(MutationAnalysisLoggerFactory::class);
     }
 
-    public function getOutputFormatter(): OutputFormatter
+    public function getMutationAnalysisLogger(): MutationAnalysisLogger
     {
-        return $this->get(OutputFormatter::class);
+        return $this->get(MutationAnalysisLogger::class);
     }
 
     public function getDiffSourceCodeMatcher(): DiffSourceCodeMatcher

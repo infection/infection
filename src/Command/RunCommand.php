@@ -44,7 +44,6 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
 use Infection\Container\Container;
 use Infection\Engine;
@@ -53,6 +52,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -260,7 +260,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the formatter to use (%s)',
-                    FormatterName::quotedCommaSeparatedList(),
+                    MutationAnalysisLoggerName::quotedCommaSeparatedList(),
                 ),
                 Container::DEFAULT_FORMATTER_NAME->value,
             )
@@ -638,9 +638,9 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(RunCommandHelper $commandHelper): FormatterName
+    private static function getFormatterName(RunCommandHelper $commandHelper): MutationAnalysisLoggerName
     {
-        return FormatterName::from(
+        return MutationAnalysisLoggerName::from(
             $commandHelper->getStringOption(self::OPTION_FORMATTER, Container::DEFAULT_FORMATTER_NAME->value),
         );
     }

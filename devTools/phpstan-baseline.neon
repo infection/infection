@@ -340,7 +340,7 @@ parameters:
 			message: '#^Parameter \#1 \$expected of method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) expects class\-string\<object\>, string given\.$#'
 			identifier: argument.type
 			count: 1
-			path: ../tests/phpunit/Console/OutputFormatter/FormatterFactoryTest.php
+			path: ../tests/phpunit/Logger/MutationAnalysis/MutationAnalysisLoggerFactoryTest.php
 
 		-
 			message: '#^Parameter \#1 \$environment of method Infection\\Environment\\StrykerApiKeyResolver\:\:resolve\(\) expects array\<string, string\>, array\<string, int\|stdClass\|string\> given\.$#'

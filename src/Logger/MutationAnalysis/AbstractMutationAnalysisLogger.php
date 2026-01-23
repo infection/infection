@@ -33,44 +33,35 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Logger\MutationAnalysis;
 
-use Infection\Differ\DiffColorizer;
-use Infection\Logger\FederatedLogger;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Metrics\MetricsCalculator;
-use Infection\Metrics\ResultsCollector;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
+ *
+ * Abstract empty class to simplify particular implementations
  */
-final readonly class MutationTestingConsoleLoggerSubscriberFactory implements SubscriberFactory
+abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
 {
-    public function __construct(
-        private MetricsCalculator $metricsCalculator,
-        private ResultsCollector $resultsCollector,
-        private DiffColorizer $diffColorizer,
-        private FederatedLogger $mutationTestingResultsLogger,
-        private ?int $numberOfShownMutations,
-        private MutationAnalysisLogger $formatter,
-        private bool $withUncovered,
-        private bool $withTimeouts,
-    ) {
+    /**
+     * In progress bar lingo 0 stands for an unknown number of steps.
+     */
+    final public const UNKNOWN_COUNT = 0;
+
+    protected int $callsCount = 0;
+
+    public function start(int $mutationCount): void
+    {
+        $this->callsCount = 0;
     }
 
-    public function create(OutputInterface $output): EventSubscriber
+    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
     {
-        return new MutationTestingConsoleLoggerSubscriber(
-            $output,
-            $this->formatter,
-            $this->metricsCalculator,
-            $this->resultsCollector,
-            $this->diffColorizer,
-            $this->mutationTestingResultsLogger,
-            $this->numberOfShownMutations,
-            $this->withUncovered,
-            $this->withTimeouts,
-        );
+        ++$this->callsCount;
+    }
+
+    public function finish(): void
+    {
     }
 }
