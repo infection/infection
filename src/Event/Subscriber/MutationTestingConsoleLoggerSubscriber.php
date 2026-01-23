@@ -42,6 +42,7 @@ use Infection\Differ\DiffColorizer;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -69,6 +70,9 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
 
     private const MEDIUM_QUALITY_THRESHOLD = 90;
 
+    /**
+     * @var positive-int|IterableCounter::UNKNOWN_COUNT
+     */
     private int $mutationCount = 0;
 
     private ?int $numberOfMutationsBudget;

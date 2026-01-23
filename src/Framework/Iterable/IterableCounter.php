@@ -37,7 +37,6 @@ namespace Infection\Framework\Iterable;
 
 use function count;
 use Infection\CannotBeInstantiated;
-use Infection\Logger\MutationAnalysis\AbstractMutationAnalysisLogger;
 use function is_array;
 use function iterator_to_array;
 
@@ -48,14 +47,21 @@ final class IterableCounter
 {
     use CannotBeInstantiated;
 
+    // To facilitate the usage with the console which is the primary consumer,
+    // we use the same value as for the Symfony ProgressBar where 0 stands for
+    // an unknown number of steps.
+    public const UNKNOWN_COUNT = 0;
+
     /**
      * @param iterable<mixed> $subjects
+     *
+     * @return positive-int|self::UNKNOWN_COUNT
      */
     public static function bufferAndCountIfNeeded(iterable &$subjects, bool $runConcurrently): int
     {
         if ($runConcurrently) {
             // This number is typically fed to ProgressFormatter/ProgressBar or variants.
-            return AbstractMutationAnalysisLogger::UNKNOWN_COUNT;
+            return self::UNKNOWN_COUNT;
         }
 
         if (is_array($subjects)) {
