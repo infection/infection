@@ -50,7 +50,7 @@ interface MutationAnalysisLogger
     /**
      * Triggered each time mutation process is finished for one Mutant
      */
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void;
+    public function advance(MutantExecutionResult $executionResult): void;
 
     /**
      * Triggered when mutation testing is finished
