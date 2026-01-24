@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event;
 
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Process\Runner\ProcessRunner;
 
 /**
@@ -42,12 +43,18 @@ use Infection\Process\Runner\ProcessRunner;
  */
 final readonly class MutationTestingWasStarted
 {
+    /**
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
+     */
     public function __construct(
         private int $mutationCount,
         private ProcessRunner $processRunner,
     ) {
     }
 
+    /**
+     * @return positive-int|IterableCounter::UNKNOWN_COUNT
+     */
     public function getMutationCount(): int
     {
         return $this->mutationCount;

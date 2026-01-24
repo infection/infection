@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis;
 
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\MutantExecutionResult;
 
 /**
@@ -43,12 +44,16 @@ use Infection\Mutant\MutantExecutionResult;
 interface MutationAnalysisLogger
 {
     /**
-     * Triggered when mutation testing is being started
+     * Records the start of the process.
+     *
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
     public function start(int $mutationCount): void;
 
     /**
      * Triggered each time mutation process is finished for one Mutant
+     *
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
     public function advance(MutantExecutionResult $executionResult, int $mutationCount): void;
 
