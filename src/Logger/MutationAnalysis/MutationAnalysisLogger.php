@@ -52,8 +52,6 @@ interface MutationAnalysisLogger
 
     /**
      * Triggered each time mutation process is finished for one Mutant
-     *
-     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
     public function advance(MutantExecutionResult $executionResult): void;
 
