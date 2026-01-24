@@ -176,6 +176,8 @@ An artefact produced by a [tracer][tracer], associating a piece of source code w
 
 ## References
 
+_Note: These references indicate where a term is used or defined, not necessarily the original source that coined it._
+
 1. Goran Petrović, Marko Ivanković, Gordon Fraser, and René Just, "Practical Mutation Testing at Scale: A view from Google," _IEEE Trans. Softw. Eng._, vol. 48, no. 10, pp. 3900–3912, Oct. 2022, doi: [10.1109/TSE.2021.3107634](https://doi.org/10.1109/TSE.2021.3107634).
 2. Yue Jia and Mark Harman, "An Analysis and Survey of the Development of Mutation Testing," _IEEE Trans. Softw. Eng._, vol. 37, no. 5, pp. 649–678, Sep. 2011, doi: [10.1109/TSE.2010.62](https://doi.org/10.1109/TSE.2010.62).
 3. Richard A. DeMillo, Richard J. Lipton, and Frederick G. Sayward, "Hints on Test Data Selection: Help for the Practicing Programmer," _Computer_, vol. 11, no. 4, pp. 34–41, Apr. 1978, doi: [10.1109/C-M.1978.218136](https://doi.org/10.1109/C-M.1978.218136).
