@@ -51,7 +51,7 @@ abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
         $this->callsCount = 0;
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult): void
     {
         ++$this->callsCount;
     }

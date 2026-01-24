@@ -42,6 +42,7 @@ use function sprintf;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -49,6 +50,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
 {
     private const DOTS_PER_ROW = 50;
+
+    private ?int $mutationCount = null;
 
     public function __construct(
         private readonly OutputInterface $output,
@@ -58,6 +61,8 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     public function start(int $mutationCount): void
     {
         parent::start($mutationCount);
+
+        $this->mutationCount = $mutationCount;
 
         $this->output->writeln([
             '',
@@ -74,9 +79,12 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         ]);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult): void
     {
-        parent::advance($executionResult, $mutationCount);
+        parent::advance($executionResult);
+
+        $mutationCount = $this->mutationCount;
+        Assert::notNull($mutationCount);
 
         $this->output->write(
             self::getCharacter($executionResult),

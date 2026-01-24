@@ -55,9 +55,9 @@ final class ConsoleProgressBarLogger extends AbstractMutationAnalysisLogger
         $this->progressBar->start($mutationCount);
     }
 
-    public function advance(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function advance(MutantExecutionResult $executionResult): void
     {
-        parent::advance($executionResult, $mutationCount);
+        parent::advance($executionResult);
 
         $this->progressBar->advance();
     }
