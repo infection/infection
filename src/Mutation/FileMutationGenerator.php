@@ -111,7 +111,7 @@ class FileMutationGenerator
      *
      * @return iterable<Mutation>
      */
-    public function generateMutations(array $mutators,
+    private function generateMutations(array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
         Trace $trace,
