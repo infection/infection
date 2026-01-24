@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis;
 
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use function sprintf;
@@ -98,7 +99,7 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         }
 
         if ($lastDot || $endOfRow) {
-            if ($mutationCount === self::UNKNOWN_COUNT) {
+            if ($mutationCount === IterableCounter::UNKNOWN_COUNT) {
                 $this->output->write(sprintf('   (%5d)', $this->callsCount)); // 5 because folks with over 10k mutations have more important problems
             } else {
                 $length = strlen((string) $mutationCount);

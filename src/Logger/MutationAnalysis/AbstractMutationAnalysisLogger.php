@@ -44,11 +44,6 @@ use Infection\Mutant\MutantExecutionResult;
  */
 abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
 {
-    /**
-     * In progress bar lingo 0 stands for an unknown number of steps.
-     */
-    final public const UNKNOWN_COUNT = 0;
-
     protected int $callsCount = 0;
 
     public function start(int $mutationCount): void
