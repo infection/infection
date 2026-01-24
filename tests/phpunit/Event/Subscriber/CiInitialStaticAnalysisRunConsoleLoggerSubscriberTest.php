@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStarted;
 use Infection\Event\Subscriber\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
@@ -85,7 +85,7 @@ final class CiInitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCa
             $this->output,
         ));
 
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $dispatcher->dispatch(new InitialStaticAnalysisRunStarted());
     }
 
     public function test_fallbacks_to_unknown_version_in_case_of_error(): void
@@ -113,6 +113,6 @@ final class CiInitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCa
             $this->output,
         ));
 
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $dispatcher->dispatch(new InitialStaticAnalysisRunStarted());
     }
 }

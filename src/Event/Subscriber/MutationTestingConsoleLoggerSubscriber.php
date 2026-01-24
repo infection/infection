@@ -39,9 +39,12 @@ use function count;
 use function floor;
 use Generator;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
@@ -62,7 +65,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
+final class MutationTestingConsoleLoggerSubscriber implements MutantProcessFinishedSubscriber, MutationTestingFinishedSubscriber, MutationTestingStartedSubscriber
 {
     private const PAD_LENGTH = 8;
 
@@ -91,21 +94,21 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
         $this->numberOfMutationsBudget = $this->numberOfShownMutations;
     }
 
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
+    public function onMutationTestingStarted(MutationTestingStarted $event): void
     {
         $this->mutationCount = $event->getMutationCount();
 
         $this->logger->start($this->mutationCount);
     }
 
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    public function onMutantProcessFinished(MutantProcessFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
         $this->logger->advance($executionResult);
     }
 
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
+    public function onMutationTestingFinished(MutationTestingFinished $event): void
     {
         $this->logger->finish();
 

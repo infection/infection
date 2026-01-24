@@ -35,16 +35,19 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationStartedSubscriber;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
+final readonly class MutationGeneratingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationGenerationFinishedSubscriber, MutationGenerationStartedSubscriber
 {
     private ProgressBar $progressBar;
 
@@ -55,7 +58,7 @@ final readonly class MutationGeneratingConsoleLoggerSubscriber implements EventS
         $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    public function onMutationGenerationStarted(MutationGenerationStarted $event): void
     {
         $this->output->writeln(['', '', 'Generate mutants...', '']);
         $this->progressBar->start($event->getMutableFilesCount());
@@ -66,7 +69,7 @@ final readonly class MutationGeneratingConsoleLoggerSubscriber implements EventS
         $this->progressBar->advance();
     }
 
-    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
+    public function onMutationGenerationFinished(MutationGenerationFinished $event): void
     {
         $this->progressBar->finish();
     }

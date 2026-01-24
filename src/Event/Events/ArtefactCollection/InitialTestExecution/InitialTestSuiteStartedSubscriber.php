@@ -33,11 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final class InitialStaticAnalysisRunWasStarted
+interface InitialTestSuiteStartedSubscriber extends EventSubscriber
 {
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void;
 }

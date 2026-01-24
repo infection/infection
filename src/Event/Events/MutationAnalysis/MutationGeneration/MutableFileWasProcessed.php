@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
 /**
  * @internal
  */
-final class MutationGenerationWasFinished
+final class MutableFileWasProcessed
 {
 }

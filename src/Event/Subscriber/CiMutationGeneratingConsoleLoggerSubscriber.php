@@ -35,20 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationStartedSubscriber;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements EventSubscriber
+final readonly class CiMutationGeneratingConsoleLoggerSubscriber implements MutationGenerationStartedSubscriber
 {
     public function __construct(
         private OutputInterface $output,
     ) {
     }
 
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    public function onMutationGenerationStarted(MutationGenerationStarted $event): void
     {
         $this->output->writeln([
             '',

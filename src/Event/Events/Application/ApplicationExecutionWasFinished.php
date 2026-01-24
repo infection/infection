@@ -33,11 +33,11 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\Application;
 
 /**
  * @internal
  */
-final class MutationTestingWasFinished
+final class ApplicationExecutionWasFinished
 {
 }

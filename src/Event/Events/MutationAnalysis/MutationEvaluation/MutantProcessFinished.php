@@ -33,11 +33,23 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+
+use Infection\Mutant\MutantExecutionResult;
 
 /**
  * @internal
+ * @final
  */
-final class MutableFileWasProcessed
+class MutantProcessFinished
 {
+    public function __construct(
+        private readonly MutantExecutionResult $executionResult,
+    ) {
+    }
+
+    public function getExecutionResult(): MutantExecutionResult
+    {
+        return $this->executionResult;
+    }
 }

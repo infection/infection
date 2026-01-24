@@ -38,9 +38,9 @@ namespace Infection\Tests\Process\Runner;
 use function array_map;
 use function array_unique;
 use function array_values;
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Infection\Process\Runner\InitialStaticAnalysisRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -92,9 +92,9 @@ final class InitialStaticAnalysisRunnerTest extends TestCase
 
         $this->assertSame(
             [
-                InitialStaticAnalysisRunWasStarted::class,
-                InitialStaticAnalysisSubStepWasCompleted::class,
-                InitialStaticAnalysisRunWasFinished::class,
+                InitialStaticAnalysisRunStarted::class,
+                InitialStaticAnalysisSubStepCompleted::class,
+                InitialStaticAnalysisRunFinished::class,
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );

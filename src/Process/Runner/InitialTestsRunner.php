@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Symfony\Component\Process\Process;
 
@@ -68,7 +68,7 @@ class InitialTestsRunner
             $skipCoverage,
         );
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasStarted());
+        $this->eventDispatcher->dispatch(new InitialTestSuiteStarted());
 
         $process->run(function (string $type) use ($process): void {
             if ($type === Process::ERR) {
@@ -76,10 +76,10 @@ class InitialTestsRunner
                 $process->stop();
             }
 
-            $this->eventDispatcher->dispatch(new InitialTestCaseWasCompleted());
+            $this->eventDispatcher->dispatch(new InitialTestCaseCompleted());
         });
 
-        $this->eventDispatcher->dispatch(new InitialTestSuiteWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialTestSuiteFinished($process->getOutput()));
 
         return $process;
     }

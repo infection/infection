@@ -35,9 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStartedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepCompletedSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;
@@ -48,7 +51,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements EventSubscriber
+final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements InitialStaticAnalysisRunFinishedSubscriber, InitialStaticAnalysisRunStartedSubscriber, InitialStaticAnalysisSubStepCompletedSubscriber
 {
     private ProgressBar $progressBar;
 
@@ -61,7 +64,7 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
         $this->progressBar->setFormat('verbose');
     }
 
-    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
+    public function onInitialStaticAnalysisRunStarted(InitialStaticAnalysisRunStarted $event): void
     {
         try {
             $version = $this->staticAnalysisToolAdapter->getVersion();
@@ -84,17 +87,17 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
         $this->progressBar->start();
     }
 
-    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
+    public function onInitialStaticAnalysisSubStepCompleted(InitialStaticAnalysisSubStepCompleted $event): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function onInitialStaticAnalysisRunFinished(InitialStaticAnalysisRunFinished $event): void
     {
         $this->progressBar->finish();
 
         if ($this->debug) {
             $this->output->writeln(PHP_EOL . $event->getOutputText());
         }
-    }
-
-    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
-    {
-        $this->progressBar->advance();
     }
 }

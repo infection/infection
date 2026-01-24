@@ -33,11 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final class InitialTestCaseWasCompleted
+interface MutationTestingFinishedSubscriber extends EventSubscriber
 {
+    public function onMutationTestingFinished(MutationTestingFinished $event);
 }

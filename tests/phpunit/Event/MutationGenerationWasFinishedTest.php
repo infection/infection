@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationGenerationWasFinished::class)]
+#[CoversClass(MutationGenerationFinished::class)]
 final class MutationGenerationWasFinishedTest extends TestCase
 {
     /**
@@ -47,8 +47,8 @@ final class MutationGenerationWasFinishedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new MutationGenerationWasFinished();
+        $class = new MutationGenerationFinished();
 
-        $this->assertInstanceOf(MutationGenerationWasFinished::class, $class);
+        $this->assertInstanceOf(MutationGenerationFinished::class, $class);
     }
 }

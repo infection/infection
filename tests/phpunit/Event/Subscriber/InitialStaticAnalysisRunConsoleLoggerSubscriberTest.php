@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStarted;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
@@ -62,7 +62,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
 
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $dispatcher->dispatch(new InitialStaticAnalysisRunStarted());
     }
 
     public function test_it_sets_static_analysis_tool_version_as_unknown_in_case_of_exception(): void
@@ -91,7 +91,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
 
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $dispatcher->dispatch(new InitialStaticAnalysisRunStarted());
     }
 
     public function test_it_outputs_the_initial_process_text_if_in_debug_mode(): void
@@ -110,6 +110,6 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, true));
 
-        $dispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($processText));
+        $dispatcher->dispatch(new InitialStaticAnalysisRunFinished($processText));
     }
 }

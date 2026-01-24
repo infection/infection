@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingFinished;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Framework\Str;
@@ -154,7 +154,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $displayOutput = $this->getDisplay($output);
 
@@ -208,7 +208,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $displayOutput = $this->getDisplay($output);
 

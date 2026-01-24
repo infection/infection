@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStarted;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(InitialTestSuiteWasStarted::class)]
+#[CoversClass(InitialTestSuiteStarted::class)]
 final class InitialTestSuiteWasStartedTest extends TestCase
 {
     /**
@@ -47,8 +47,8 @@ final class InitialTestSuiteWasStartedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new InitialTestSuiteWasStarted();
+        $class = new InitialTestSuiteStarted();
 
-        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $class);
+        $this->assertInstanceOf(InitialTestSuiteStarted::class, $class);
     }
 }

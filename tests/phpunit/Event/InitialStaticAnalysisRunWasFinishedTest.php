@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(InitialStaticAnalysisRunWasFinished::class)]
+#[CoversClass(InitialStaticAnalysisRunFinished::class)]
 final class InitialStaticAnalysisRunWasFinishedTest extends TestCase
 {
     public function test_it_exposes_its_output(): void
     {
         $text = 'foo-bar-baz';
 
-        $class = new InitialStaticAnalysisRunWasFinished($text);
+        $class = new InitialStaticAnalysisRunFinished($text);
 
         $this->assertSame($text, $class->getOutputText());
     }

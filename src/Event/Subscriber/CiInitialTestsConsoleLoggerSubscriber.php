@@ -36,7 +36,8 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStartedSubscriber;
 use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,7 +45,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class CiInitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final readonly class CiInitialTestsConsoleLoggerSubscriber implements InitialTestSuiteStartedSubscriber
 {
     public function __construct(
         private OutputInterface $output,
@@ -52,7 +53,7 @@ final readonly class CiInitialTestsConsoleLoggerSubscriber implements EventSubsc
     ) {
     }
 
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();

@@ -33,20 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationGenerationWasStarted
+interface InitialStaticAnalysisSubStepCompletedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private int $mutableFilesCount,
-    ) {
-    }
-
-    public function getMutableFilesCount(): int
-    {
-        return $this->mutableFilesCount;
-    }
+    public function onInitialStaticAnalysisSubStepCompleted(InitialStaticAnalysisSubStepCompleted $event): void;
 }

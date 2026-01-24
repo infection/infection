@@ -33,11 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final class InitialStaticAnalysisSubStepWasCompleted
+interface InitialStaticAnalysisRunFinishedSubscriber extends EventSubscriber
 {
+    public function onInitialStaticAnalysisRunFinished(InitialStaticAnalysisRunFinished $event): void;
 }

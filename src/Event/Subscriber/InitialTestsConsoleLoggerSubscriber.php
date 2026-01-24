@@ -36,9 +36,12 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseCompletedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteFinishedSubscriber;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStartedSubscriber;
 use InvalidArgumentException;
 use const PHP_EOL;
 use function sprintf;
@@ -48,7 +51,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final readonly class InitialTestsConsoleLoggerSubscriber implements InitialTestCaseCompletedSubscriber, InitialTestSuiteFinishedSubscriber, InitialTestSuiteStartedSubscriber
 {
     private ProgressBar $progressBar;
 
@@ -61,7 +64,7 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscri
         $this->progressBar->setFormat('verbose');
     }
 
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    public function onInitialTestSuiteStarted(InitialTestSuiteStarted $event): void
     {
         try {
             $version = $this->testFrameworkAdapter->getVersion();
@@ -83,7 +86,7 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscri
         $this->progressBar->start();
     }
 
-    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
+    public function onInitialTestSuiteFinished(InitialTestSuiteFinished $event): void
     {
         $this->progressBar->finish();
 
@@ -92,7 +95,7 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscri
         }
     }
 
-    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
+    public function onInitialTestCaseCompleted(InitialTestCaseCompleted $event): void
     {
         $this->progressBar->advance();
     }

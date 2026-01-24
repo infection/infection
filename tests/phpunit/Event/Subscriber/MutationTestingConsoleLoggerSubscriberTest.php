@@ -37,9 +37,9 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
@@ -108,7 +108,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $processRunner = $this->createMock(ProcessRunner::class);
 
-        $dispatcher->dispatch(new MutationTestingWasStarted(1, $processRunner));
+        $dispatcher->dispatch(new MutationTestingStarted(1, $processRunner));
     }
 
     public function test_it_reacts_on_mutation_process_finished(): void
@@ -135,7 +135,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
         ));
 
         $dispatcher->dispatch(
-            new MutantProcessWasFinished(
+            new MutantProcessFinished(
                 $this->createMock(MutantExecutionResult::class),
             ),
         );
@@ -160,7 +160,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
     }
 
     public function test_it_outputs_escaped_and_uncovered_mutants_when_mutation_testing_is_finished(): void
@@ -207,7 +207,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $resultOutput = $this->getDisplay($output);
 
@@ -282,7 +282,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $this->assertStringContainsString(
             "\n\nMetrics:\n",
@@ -386,7 +386,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $this->assertStringContainsString(
             "\n\nMetrics:\n",
@@ -470,7 +470,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $output = $this->getDisplay($output);
         $this->assertStringContainsString(
@@ -504,7 +504,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $this->assertStringContainsString(
             "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations=20" or configure file loggers.',
@@ -529,7 +529,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $this->assertStringNotContainsString(
             "\n\n" . 'Note: to see escaped mutants run Infection with "--show-mutations" or configure file loggers.',
@@ -571,7 +571,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $this->assertStringContainsString(
             "\n\n\n" . '... and 1 more mutants were omitted. Use "--show-mutations=max" to see all of them.',
@@ -617,7 +617,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $this->assertStringNotContainsString(
             'mutants were omitted.',
@@ -644,7 +644,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
     }
 
     public function test_it_shows_mutation_score_indicator_when_flag_is_true(): void
@@ -680,7 +680,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $displayOutput = $this->getDisplay($output);
 
@@ -722,7 +722,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $displayOutput = $this->getDisplay($output);
 
@@ -758,7 +758,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: false,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $displayOutput = $this->getDisplay($output);
 
@@ -810,7 +810,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
             withTimeouts: true,
         ));
 
-        $dispatcher->dispatch(new MutationTestingWasFinished());
+        $dispatcher->dispatch(new MutationTestingFinished());
 
         $displayOutput = $this->getDisplay($output);
 

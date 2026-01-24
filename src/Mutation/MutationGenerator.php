@@ -37,9 +37,9 @@ namespace Infection\Mutation;
 
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Source\Collector\SourceCollector;
@@ -92,7 +92,7 @@ class MutationGenerator
         $sources = $this->sourceCollector->collect();
         $numberOfFiles = count($sources);
 
-        $this->eventDispatcher->dispatch(new MutationGenerationWasStarted($numberOfFiles));
+        $this->eventDispatcher->dispatch(new MutationGenerationStarted($numberOfFiles));
 
         foreach ($sources as $source) {
             yield from $this->fileMutationGenerator->generate(
@@ -104,6 +104,6 @@ class MutationGenerator
             $this->eventDispatcher->dispatch(new MutableFileWasProcessed());
         }
 
-        $this->eventDispatcher->dispatch(new MutationGenerationWasFinished());
+        $this->eventDispatcher->dispatch(new MutationGenerationFinished());
     }
 }

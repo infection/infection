@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationStarted;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
@@ -120,10 +120,10 @@ final class MutationGeneratorTest extends TestCase
             ->expects($this->exactly(4))
             ->method('dispatch')
             ->with(...WithConsecutive::create(
-                [new MutationGenerationWasStarted(2)],
+                [new MutationGenerationStarted(2)],
                 [new MutableFileWasProcessed()],
                 [new MutableFileWasProcessed()],
-                [new MutationGenerationWasFinished()],
+                [new MutationGenerationFinished()],
             ))
         ;
 

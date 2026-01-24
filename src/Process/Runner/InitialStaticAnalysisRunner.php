@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepCompleted;
 use Infection\Process\Factory\InitialStaticAnalysisProcessFactory;
 use Symfony\Component\Process\Process;
 
@@ -58,11 +58,11 @@ readonly class InitialStaticAnalysisRunner
     {
         $process = $this->initialStaticAnalysisProcessFactory->createProcess();
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunStarted());
 
-        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepWasCompleted()));
+        $process->run(fn () => $this->eventDispatcher->dispatch(new InitialStaticAnalysisSubStepCompleted()));
 
-        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($process->getOutput()));
+        $this->eventDispatcher->dispatch(new InitialStaticAnalysisRunFinished($process->getOutput()));
 
         return $process;
     }

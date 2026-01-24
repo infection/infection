@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepCompleted;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(InitialStaticAnalysisSubStepWasCompleted::class)]
+#[CoversClass(InitialStaticAnalysisSubStepCompleted::class)]
 final class InitialStaticAnalysisSubStepWasCompletedTest extends TestCase
 {
     /**
@@ -47,8 +47,8 @@ final class InitialStaticAnalysisSubStepWasCompletedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new InitialStaticAnalysisSubStepWasCompleted();
+        $class = new InitialStaticAnalysisSubStepCompleted();
 
-        $this->assertInstanceOf(InitialStaticAnalysisSubStepWasCompleted::class, $class);
+        $this->assertInstanceOf(InitialStaticAnalysisSubStepCompleted::class, $class);
     }
 }

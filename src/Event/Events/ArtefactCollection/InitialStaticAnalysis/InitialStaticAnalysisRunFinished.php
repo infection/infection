@@ -33,49 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Resource\Listener;
-
-use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
-use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Resource\Memory\MemoryFormatter;
-use Infection\Resource\Time\Stopwatch;
-use Infection\Resource\Time\TimeFormatter;
-use function memory_get_peak_usage;
-use function sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
 
 /**
  * @internal
  */
-final readonly class PerformanceLoggerSubscriber implements EventSubscriber
+final readonly class InitialStaticAnalysisRunFinished
 {
     public function __construct(
-        private Stopwatch $stopwatch,
-        private TimeFormatter $timeFormatter,
-        private MemoryFormatter $memoryFormatter,
-        private int $threadCount,
-        private OutputInterface $output,
+        private string $outputText,
     ) {
     }
 
-    public function onApplicationExecutionWasStarted(ApplicationExecutionWasStarted $event): void
+    public function getOutputText(): string
     {
-        $this->stopwatch->start();
-    }
-
-    public function onApplicationExecutionWasFinished(ApplicationExecutionWasFinished $event): void
-    {
-        $time = $this->stopwatch->stop();
-
-        $this->output->writeln([
-            '',
-            sprintf(
-                'Time: %s. Memory: %s. Threads: %s',
-                $this->timeFormatter->toHumanReadableString($time),
-                $this->memoryFormatter->toHumanReadableString(memory_get_peak_usage(true)),
-                $this->threadCount,
-            ),
-        ]);
+        return $this->outputText;
     }
 }

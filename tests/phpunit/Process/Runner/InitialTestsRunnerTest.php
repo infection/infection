@@ -42,9 +42,9 @@ use function array_values;
 use function count;
 use function end;
 use function extension_loaded;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteStarted;
 use Infection\Process\Factory\InitialTestsRunProcessFactory;
 use Infection\Process\Runner\InitialTestsRunner;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
@@ -104,9 +104,9 @@ final class InitialTestsRunnerTest extends TestCase
 
         $this->assertSame(
             [
-                InitialTestSuiteWasStarted::class,
-                InitialTestCaseWasCompleted::class,
-                InitialTestSuiteWasFinished::class,
+                InitialTestSuiteStarted::class,
+                InitialTestCaseCompleted::class,
+                InitialTestSuiteFinished::class,
             ],
             array_values(array_unique(array_map(get_class(...), $this->eventDispatcher->getEvents()))),
         );
@@ -149,15 +149,15 @@ final class InitialTestsRunnerTest extends TestCase
         $events = $this->eventDispatcher->getEvents();
 
         // First event must be suite start, last must be suite finish
-        $this->assertInstanceOf(InitialTestSuiteWasStarted::class, $events[0]);
-        $this->assertInstanceOf(InitialTestSuiteWasFinished::class, end($events));
+        $this->assertInstanceOf(InitialTestSuiteStarted::class, $events[0]);
+        $this->assertInstanceOf(InitialTestSuiteFinished::class, end($events));
 
         // Count completed events - OS buffering makes exact count non-deterministic
         // Minimum 1: at least one output chunk was processed
         // Maximum 4: the test script has 4 writes total
         $completedCount = count(array_filter(
             $events,
-            static fn ($e) => $e instanceof InitialTestCaseWasCompleted,
+            static fn ($e) => $e instanceof InitialTestCaseCompleted,
         ));
         $this->assertGreaterThanOrEqual(1, $completedCount, 'Should process at least one output');
         $this->assertLessThanOrEqual(4, $completedCount, 'Should stop after error, max 4 outputs');

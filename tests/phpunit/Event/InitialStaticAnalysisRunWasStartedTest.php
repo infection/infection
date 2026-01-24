@@ -35,11 +35,11 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunStarted;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(InitialStaticAnalysisRunWasStarted::class)]
+#[CoversClass(InitialStaticAnalysisRunStarted::class)]
 final class InitialStaticAnalysisRunWasStartedTest extends TestCase
 {
     /**
@@ -47,8 +47,8 @@ final class InitialStaticAnalysisRunWasStartedTest extends TestCase
      */
     public function test_it_can_be_instantiated(): void
     {
-        $class = new InitialStaticAnalysisRunWasStarted();
+        $class = new InitialStaticAnalysisRunStarted();
 
-        $this->assertInstanceOf(InitialStaticAnalysisRunWasStarted::class, $class);
+        $this->assertInstanceOf(InitialStaticAnalysisRunStarted::class, $class);
     }
 }

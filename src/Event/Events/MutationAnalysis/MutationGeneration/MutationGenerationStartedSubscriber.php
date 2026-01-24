@@ -33,20 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisRunWasFinished
+interface MutationGenerationStartedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private string $outputText,
-    ) {
-    }
-
-    public function getOutputText(): string
-    {
-        return $this->outputText;
-    }
+    public function onMutationGenerationStarted(MutationGenerationStarted $event);
 }

@@ -33,11 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
 
 /**
  * @internal
  */
-final class ApplicationExecutionWasStarted
+final readonly class InitialTestSuiteFinished
 {
+    public function __construct(
+        private string $outputText,
+    ) {
+    }
+
+    public function getOutputText(): string
+    {
+        return $this->outputText;
+    }
 }

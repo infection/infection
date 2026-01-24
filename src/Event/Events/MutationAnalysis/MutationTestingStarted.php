@@ -33,7 +33,7 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis;
 
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Process\Runner\ProcessRunner;
@@ -41,7 +41,7 @@ use Infection\Process\Runner\ProcessRunner;
 /**
  * @internal
  */
-final readonly class MutationTestingWasStarted
+final readonly class MutationTestingStarted
 {
     /**
      * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount

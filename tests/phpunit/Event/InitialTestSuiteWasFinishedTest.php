@@ -35,18 +35,18 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event;
 
-use Infection\Event\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteFinished;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(InitialTestSuiteWasFinished::class)]
+#[CoversClass(InitialTestSuiteFinished::class)]
 final class InitialTestSuiteWasFinishedTest extends TestCase
 {
     public function test_it_exposes_its_output(): void
     {
         $text = 'foo-bar-baz';
 
-        $class = new InitialTestSuiteWasFinished($text);
+        $class = new InitialTestSuiteFinished($text);
 
         $this->assertSame($text, $class->getOutputText());
     }

@@ -33,23 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
-
-use Infection\Mutant\MutantExecutionResult;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
 /**
  * @internal
- * @final
  */
-class MutantProcessWasFinished
+final readonly class MutationGenerationStarted
 {
     public function __construct(
-        private readonly MutantExecutionResult $executionResult,
+        private int $mutableFilesCount,
     ) {
     }
 
-    public function getExecutionResult(): MutantExecutionResult
+    public function getMutableFilesCount(): int
     {
-        return $this->executionResult;
+        return $this->mutableFilesCount;
     }
 }

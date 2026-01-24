@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingFinished;
 use Infection\Event\Subscriber\CleanUpAfterMutationTestingFinishedSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -55,6 +55,6 @@ final class CleanUpAfterMutationTestingFinishedSubscriberTest extends TestCase
 
         $subscriber = new CleanUpAfterMutationTestingFinishedSubscriber($filesystem, sys_get_temp_dir());
 
-        $subscriber->onMutationTestingWasFinished(new MutationTestingWasFinished());
+        $subscriber->onMutationTestingFinished(new MutationTestingFinished());
     }
 }
