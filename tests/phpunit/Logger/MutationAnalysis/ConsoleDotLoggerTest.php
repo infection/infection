@@ -37,8 +37,8 @@ namespace Infection\Tests\Logger\MutationAnalysis;
 
 use function implode;
 use Infection\Framework\Enum\EnumBucket;
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Framework\Str;
-use Infection\Logger\MutationAnalysis\AbstractMutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\ConsoleDotLogger;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
@@ -207,7 +207,7 @@ final class ConsoleDotLoggerTest extends TestCase
 
         $output = new BufferedOutput();
         $logger = new ConsoleDotLogger($output);
-        $logger->start(AbstractMutationAnalysisLogger::UNKNOWN_COUNT);
+        $logger->start(IterableCounter::UNKNOWN_COUNT);
 
         for ($i = 0; $i < $totalMutations; ++$i) {
             $logger->advance(
