@@ -47,9 +47,7 @@ final class IterableCounter
 {
     use CannotBeInstantiated;
 
-    // To facilitate the usage with the console which is the primary consumer,
-    // we use the same value as for the Symfony ProgressBar where 0 stands for
-    // an unknown number of steps.
+    // Follows the Symfony ProgressBar convention: 0 indicates an unknown number of steps.
     public const UNKNOWN_COUNT = 0;
 
     /**
