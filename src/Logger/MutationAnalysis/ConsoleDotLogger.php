@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis;
 
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use function sprintf;
 use function str_repeat;
 use function strlen;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -48,6 +50,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
 {
     private const DOTS_PER_ROW = 50;
+
+    private ?int $mutationCount = null;
 
     public function __construct(
         private readonly OutputInterface $output,
@@ -57,6 +61,8 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
     public function startAnalysis(int $mutationCount): void
     {
         parent::startAnalysis($mutationCount);
+
+        $this->mutationCount = $mutationCount;
 
         $this->output->writeln([
             '',
@@ -73,9 +79,12 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         ]);
     }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
-        parent::finishEvaluation($executionResult, $mutationCount);
+        parent::finishEvaluation($executionResult);
+
+        $mutationCount = $this->mutationCount;
+        Assert::notNull($mutationCount);
 
         $this->output->write(
             self::getCharacter($executionResult),
@@ -90,7 +99,7 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
         }
 
         if ($lastDot || $endOfRow) {
-            if ($mutationCount === self::UNKNOWN_COUNT) {
+            if ($mutationCount === IterableCounter::UNKNOWN_COUNT) {
                 $this->output->write(sprintf('   (%5d)', $this->callsCount)); // 5 because folks with over 10k mutations have more important problems
             } else {
                 $length = strlen((string) $mutationCount);

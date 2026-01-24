@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis;
 
+use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 
@@ -44,7 +45,9 @@ use Infection\Mutation\Mutation;
 interface MutationAnalysisLogger
 {
     /**
-     * Records the start of the mutation evaluation process.
+     * Records the start of the process.
+     *
+     * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
     public function startAnalysis(int $mutationCount): void;
 
@@ -53,7 +56,7 @@ interface MutationAnalysisLogger
     /**
      * Records the result of the evaluation of a mutation.
      */
-    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void;
+    public function finishEvaluation(MutantExecutionResult $executionResult): void;
 
     /**
      * Records the end of the mutation evaluation process.

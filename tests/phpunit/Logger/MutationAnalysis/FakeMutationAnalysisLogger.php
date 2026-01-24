@@ -46,7 +46,7 @@ final class FakeMutationAnalysisLogger implements MutationAnalysisLogger
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
 
-    public function finishEvaluation(MutantExecutionResult $executionResult, int $mutationCount): void
+    public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }
