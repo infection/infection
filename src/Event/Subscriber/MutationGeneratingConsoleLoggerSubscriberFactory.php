@@ -50,8 +50,8 @@ final readonly class MutationGeneratingConsoleLoggerSubscriberFactory implements
     public function create(OutputInterface $output): EventSubscriber
     {
         return $this->skipProgressBar
-            ? new CiMutationGeneratingConsoleLoggerSubscriberWas($output)
-            : new MutationGeneratingConsoleLoggerSubscriberWasWas($output)
+            ? new CiMutationGeneratingConsoleLoggerSubscriber($output)
+            : new MutationGeneratingConsoleLoggerSubscriber($output)
         ;
     }
 }

@@ -44,6 +44,6 @@ final class StopInfectionOnSigintSignalSubscriberFactory implements SubscriberFa
 {
     public function create(OutputInterface $output): EventSubscriber
     {
-        return new StopInfectionOnSigintSignalSubscriberWas();
+        return new StopInfectionOnSigintSignalSubscriber();
     }
 }

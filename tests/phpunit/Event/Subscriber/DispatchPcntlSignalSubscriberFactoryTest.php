@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
 use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberFactory;
-use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberWas;
 use Infection\Event\Subscriber\EventSubscriber;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +51,7 @@ final class DispatchPcntlSignalSubscriberFactoryTest extends TestCase
 
         $subscriber = (new DispatchPcntlSignalSubscriberFactory())->create($outputMock);
 
-        $this->assertInstanceOf(DispatchPcntlSignalSubscriberWas::class, $subscriber);
+        $this->assertInstanceOf(DispatchPcntlSignalSubscriber::class, $subscriber);
         $this->assertInstanceOf(EventSubscriber::class, $subscriber);
     }
 }

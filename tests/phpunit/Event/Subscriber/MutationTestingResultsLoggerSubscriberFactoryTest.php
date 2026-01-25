@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
+use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsLoggerSubscriberFactory;
-use Infection\Event\Subscriber\MutationTestingWasResultsLoggerSubscriber;
 use Infection\Logger\MutationTestingResultsLogger;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -55,6 +55,6 @@ final class MutationTestingResultsLoggerSubscriberFactoryTest extends TestCase
 
         $subscriber = $factory->create(new FakeOutput());
 
-        $this->assertInstanceOf(MutationTestingWasResultsLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(MutationTestingResultsLoggerSubscriber::class, $subscriber);
     }
 }

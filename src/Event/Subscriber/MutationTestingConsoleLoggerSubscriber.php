@@ -65,7 +65,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingWasWasConsoleLoggerSubscriberWas implements MutantProcessWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class MutationTestingConsoleLoggerSubscriber implements MutantProcessWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     private const PAD_LENGTH = 8;
 

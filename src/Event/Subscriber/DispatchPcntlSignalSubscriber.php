@@ -43,7 +43,7 @@ use function Safe\pcntl_signal_dispatch;
 /**
  * @internal
  */
-final class DispatchPcntlSignalSubscriberWas implements MutantProcessWasFinishedSubscriber
+final class DispatchPcntlSignalSubscriber implements MutantProcessWasFinishedSubscriber
 {
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {

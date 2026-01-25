@@ -38,8 +38,8 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\MutationTestingWasWasConsoleLoggerSubscriberWas;
 use Infection\Framework\Str;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -111,7 +111,7 @@ final class MutationTestingConsoleLoggerSubscriberFactoryTest extends TestCase
 
         $subscriber = $factory->create($outputMock);
 
-        $this->assertInstanceOf(MutationTestingWasWasConsoleLoggerSubscriberWas::class, $subscriber);
+        $this->assertInstanceOf(MutationTestingConsoleLoggerSubscriber::class, $subscriber);
     }
 
     public static function showMutationsProvider(): iterable

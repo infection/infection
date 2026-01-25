@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Subscriber\CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,7 +45,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber::class)]
+#[CoversClass(CiInitialStaticAnalysisRunConsoleLoggerSubscriber::class)]
 final class CiInitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
 {
     private OutputInterface&MockObject $output;
@@ -80,7 +80,7 @@ final class CiInitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCa
             ->willReturn('PHPStan');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber(
+        $dispatcher->addSubscriber(new CiInitialStaticAnalysisRunConsoleLoggerSubscriber(
             $this->staticAnalysisToolAdapter,
             $this->output,
         ));
@@ -108,7 +108,7 @@ final class CiInitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCa
             ->willReturn('PHPStan');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber(
+        $dispatcher->addSubscriber(new CiInitialStaticAnalysisRunConsoleLoggerSubscriber(
             $this->staticAnalysisToolAdapter,
             $this->output,
         ));

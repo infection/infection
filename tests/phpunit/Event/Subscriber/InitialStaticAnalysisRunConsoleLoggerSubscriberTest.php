@@ -38,7 +38,7 @@ namespace Infection\Tests\Event\Subscriber;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
 use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Subscriber\InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas;
+use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;
@@ -46,7 +46,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas::class)]
+#[CoversClass(InitialStaticAnalysisRunConsoleLoggerSubscriber::class)]
 final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_initial_run(): void
@@ -60,7 +60,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
             ->method('getVersion');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas($staticAnalysisToolAdapter, $output, false));
+        $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
 
         $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
     }
@@ -89,7 +89,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
             ->willThrowException(new InvalidArgumentException());
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas($staticAnalysisToolAdapter, $output, false));
+        $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, false));
 
         $dispatcher->dispatch(new InitialStaticAnalysisRunWasStarted());
     }
@@ -108,7 +108,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberTest extends TestCase
         $staticAnalysisToolAdapter = $this->createMock(StaticAnalysisToolAdapter::class);
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas($staticAnalysisToolAdapter, $output, true));
+        $dispatcher->addSubscriber(new InitialStaticAnalysisRunConsoleLoggerSubscriber($staticAnalysisToolAdapter, $output, true));
 
         $dispatcher->dispatch(new InitialStaticAnalysisRunWasFinished($processText));
     }

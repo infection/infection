@@ -35,42 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Metrics\Collector;
 
 /**
  * @internal
  */
-final readonly class MutationGeneratingConsoleLoggerSubscriberWasWas implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
+final readonly class MutationTestingResultsCollectorSubscriber implements MutantProcessWasFinishedSubscriber
 {
-    private ProgressBar $progressBar;
+    /** @var Collector[] */
+    private array $collectors;
 
-    public function __construct(
-        private OutputInterface $output,
-    ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
+    public function __construct(Collector ...$collectors)
+    {
+        $this->collectors = $collectors;
     }
 
-    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $this->output->writeln(['', '', 'Generate mutants...', '']);
-        $this->progressBar->start($event->getMutableFilesCount());
-    }
+        $executionResult = $event->getExecutionResult();
 
-    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
-    {
-        $this->progressBar->advance();
-    }
-
-    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
-    {
-        $this->progressBar->finish();
+        foreach ($this->collectors as $collector) {
+            $collector->collect($executionResult);
+        }
     }
 }

@@ -35,27 +35,42 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class CiMutationGeneratingConsoleLoggerSubscriberWas implements MutationGenerationWasStartedSubscriber
+final readonly class MutationGeneratingConsoleLoggerSubscriber implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
 {
+    private ProgressBar $progressBar;
+
     public function __construct(
         private OutputInterface $output,
     ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
     public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->output->writeln([
-            '',
-            'Generate mutants...',
-            '',
-            'Processing source code files...',
-        ]);
+        $this->output->writeln(['', '', 'Generate mutants...', '']);
+        $this->progressBar->start($event->getMutableFilesCount());
+    }
+
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    {
+        $this->progressBar->advance();
+    }
+
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
+    {
+        $this->progressBar->finish();
     }
 }

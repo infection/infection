@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriberWas;
+use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberWasWas;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +52,7 @@ final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCas
 
         $subscriber = $factory->create(new FakeOutput());
 
-        $this->assertInstanceOf(CiMutationGeneratingConsoleLoggerSubscriberWas::class, $subscriber);
+        $this->assertInstanceOf(CiMutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }
 
     public function test_it_creates_a_regular_subscriber_if_does_not_skip_the_progress_bar(): void
@@ -67,6 +67,6 @@ final class MutationGeneratingConsoleLoggerSubscriberFactoryTest extends TestCas
 
         $subscriber = $factory->create($outputMock);
 
-        $this->assertInstanceOf(MutationGeneratingConsoleLoggerSubscriberWasWas::class, $subscriber);
+        $this->assertInstanceOf(MutationGeneratingConsoleLoggerSubscriber::class, $subscriber);
     }
 }

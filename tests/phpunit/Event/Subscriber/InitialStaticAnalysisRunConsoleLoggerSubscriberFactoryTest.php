@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Subscriber\CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiInitialStaticAnalysisRunConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\InitialStaticAnalysisRunConsoleLoggerSubscriberFactory;
-use Infection\Event\Subscriber\InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -71,7 +71,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
 
         $subscriber = $factory->create(new FakeOutput());
 
-        $this->assertInstanceOf(CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(CiInitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
     }
 
     #[DataProvider('debugProvider')]
@@ -91,7 +91,7 @@ final class InitialStaticAnalysisRunConsoleLoggerSubscriberFactoryTest extends T
 
         $subscriber = $factory->create($outputMock);
 
-        $this->assertInstanceOf(InitialStaticAnalysisRunWasWasConsoleLoggerSubscriberWas::class, $subscriber);
+        $this->assertInstanceOf(InitialStaticAnalysisRunConsoleLoggerSubscriber::class, $subscriber);
     }
 
     public static function debugProvider(): iterable

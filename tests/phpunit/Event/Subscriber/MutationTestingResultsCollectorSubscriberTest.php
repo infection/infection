@@ -37,13 +37,13 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberWas;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Metrics\Collector;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(MutationTestingResultsCollectorSubscriberWas::class)]
+#[CoversClass(MutationTestingResultsCollectorSubscriber::class)]
 final class MutationTestingResultsCollectorSubscriberTest extends TestCase
 {
     public function test_it_reacts_on_mutation_process_finished(): void
@@ -61,7 +61,7 @@ final class MutationTestingResultsCollectorSubscriberTest extends TestCase
         ;
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriberWas(
+        $dispatcher->addSubscriber(new MutationTestingResultsCollectorSubscriber(
             $collectorA,
             $collectorB,
         ));
