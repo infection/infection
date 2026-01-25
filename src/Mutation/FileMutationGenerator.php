@@ -172,22 +172,6 @@ class FileMutationGenerator
         return [$initialStatements, $originalFileTokens];
     }
 
-    /**
-     * @throws UnparsableFile
-     *
-     * @return array{Stmt[], Token[]}
-     */
-    private function createAst(SplFileInfo $sourceFile): array
-    {
-        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
-
-        // Pre-traverse the nodes to connect them
-        $preTraverser = $this->traverserFactory->createPreTraverser();
-        $preTraverser->traverse($initialStatements);
-
-        return [$initialStatements, $originalFileTokens];
-    }
-
     private function trace(SplFileInfo $sourceFile): Trace
     {
         try {

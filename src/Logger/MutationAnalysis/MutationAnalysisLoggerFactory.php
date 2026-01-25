@@ -33,26 +33,14 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Telemetry/Subscriber/TelemetrySubscriberFactory.php
-namespace Infection\Telemetry\Subscriber;
-========
 namespace Infection\Logger\MutationAnalysis;
->>>>>>>> feat/events:src/Logger/MutationAnalysis/MutationAnalysisLoggerFactory.php
 
-use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\SubscriberFactory;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-<<<<<<<< HEAD:src/Telemetry/Subscriber/TelemetrySubscriberFactory.php
-final readonly class TelemetrySubscriberFactory implements SubscriberFactory
-{
-    public function create(OutputInterface $output): EventSubscriber
-    {
-        return new TelemetrySubscriber();
-========
 final readonly class MutationAnalysisLoggerFactory
 {
     public function __construct(
@@ -68,6 +56,5 @@ final readonly class MutationAnalysisLoggerFactory
             ),
             MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),
         };
->>>>>>>> feat/events:src/Logger/MutationAnalysis/MutationAnalysisLoggerFactory.php
     }
 }

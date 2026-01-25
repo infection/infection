@@ -88,7 +88,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
         );
     }
 
-    public function startEvaluation(Mutation $mutation, int $mutationCount): void
+    public function startEvaluation(Mutation $mutation): void
     {
         $relativeSourceFilePath = Path::makeRelative(
             $mutation->getOriginalFilePath(),
@@ -150,10 +150,8 @@ final class TeamCityLogger implements MutationAnalysisLogger
         );
     }
 
-    public function finishEvaluation(
-        MutantExecutionResult $executionResult,
-        int $mutationCount,
-    ): void {
+    public function finishEvaluation(MutantExecutionResult $executionResult): void
+    {
         $mutationFlowId = $this->openTestsFlowIds[$executionResult->getMutantHash()];
         unset($this->openTestsFlowIds[$executionResult->getMutantHash()]);
 

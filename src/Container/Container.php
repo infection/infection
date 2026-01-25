@@ -134,7 +134,6 @@ use Infection\Source\Matcher\SourceLineMatcher;
 use Infection\StaticAnalysis\Config\StaticAnalysisConfigLocator;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use Infection\StaticAnalysis\StaticAnalysisToolFactory;
-use Infection\Telemetry\Subscriber\TelemetrySubscriberFactory;
 use Infection\TestFramework\AdapterInstallationDecider;
 use Infection\TestFramework\AdapterInstaller;
 use Infection\TestFramework\Config\TestFrameworkConfigLocator;
@@ -151,7 +150,6 @@ use Infection\TestFramework\Coverage\XmlReport\PhpUnitXmlCoverageTraceProvider;
 use Infection\TestFramework\Coverage\XmlReport\XmlCoverageParser;
 use Infection\TestFramework\Factory;
 use Infection\TestFramework\TestFrameworkExtraOptionsFilter;
-use Infection\TestFramework\Tracing\EventEmitterTracer;
 use Infection\TestFramework\Tracing\Trace\LineRangeCalculator;
 use Infection\TestFramework\Tracing\TraceProvider;
 use Infection\TestFramework\Tracing\TraceProviderAdapterTracer;
@@ -253,11 +251,8 @@ final class Container extends DIContainer
     {
         $container = new self([
             IndexXmlCoverageParser::class => IndexXmlCoverageParserBuilder::class,
-            Tracer::class => static fn (self $container) => new EventEmitterTracer(
-                new TraceProviderAdapterTracer(
-                    $container->getTraceProvider(),
-                ),
-                $container->getEventDispatcher(),
+            Tracer::class => static fn (self $container) => new TraceProviderAdapterTracer(
+                $container->getTraceProvider(),
             ),
             TraceProvider::class => static fn (self $container): TraceProvider => new CoveredTraceProvider(
                 $container->getPhpUnitXmlCoverageTraceProvider(),
@@ -385,7 +380,6 @@ final class Container extends DIContainer
                     $container->getCleanUpAfterMutationTestingFinishedSubscriberFactory(),
                     $container->getStopInfectionOnSigintSignalSubscriberFactory(),
                     $container->getDispatchPcntlSignalSubscriberFactory(),
-                    $container->get(TelemetrySubscriberFactory::class),
                 ];
 
                 if ($container->getConfiguration()->isStaticAnalysisEnabled()) {

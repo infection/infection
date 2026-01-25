@@ -44,15 +44,13 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
-use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
 use Infection\Container\Container;
 use Infection\Engine;
-use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Logger\ConsoleLogger;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
@@ -263,7 +261,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the formatter to use (%s)',
-                    FormatterName::quotedCommaSeparatedList(),
+                    MutationAnalysisLoggerName::quotedCommaSeparatedList(),
                 ),
                 Container::DEFAULT_FORMATTER_NAME->value,
             )
@@ -506,7 +504,7 @@ final class RunCommand extends BaseCommand
             debug: (bool) $input->getOption(self::OPTION_DEBUG),
             // To keep in sync with Container::DEFAULT_WITH_UNCOVERED
             withUncovered: (bool) $input->getOption(self::OPTION_WITH_UNCOVERED),
-            formatterName: self::getFormatterName(
+            loggerName: self::getMutationAnalysisLoggerName(
                 $commandHelper,
                 (bool) $input->getOption(self::OPTION_TEAMCITY),
             ),
@@ -650,7 +648,7 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    private static function getFormatterName(
+    private static function getMutationAnalysisLoggerName(
         RunCommandHelper $commandHelper,
         bool $teamcity,
     ): MutationAnalysisLoggerName {
