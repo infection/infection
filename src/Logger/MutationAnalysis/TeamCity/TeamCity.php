@@ -35,18 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use Throwable;
 use function array_keys;
 use function array_map;
 use function implode;
 use function is_int;
 use function preg_replace;
-use function Safe\getmypid;
-use function Safe\ini_get;
 use function sprintf;
 use function str_contains;
 use function str_replace;
-use function stripos;
 
 /**
  * This service provides the primitives to write a TeamCity log record.
@@ -65,7 +61,7 @@ final class TeamCity
     private const UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
 
     public function __construct(
-        //private string $rootFlowId = 'root',
+        // private string $rootFlowId = 'root',
     ) {
     }
 
@@ -145,7 +141,7 @@ final class TeamCity
         string|array $valueOrAttributes,
     ): string {
         return sprintf(
-            '##teamcity[%s]'."\n",
+            '##teamcity[%s]' . "\n",
             implode(
                 ' ',
                 [

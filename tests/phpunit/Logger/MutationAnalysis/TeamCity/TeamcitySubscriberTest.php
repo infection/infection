@@ -45,12 +45,12 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Loop\For_;
 use Infection\Process\Runner\ProcessRunner;
 use Infection\Testing\MutatorName;
+use function Later\now;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
-use function Later\now;
 use function substr_count;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 #[CoversClass(TeamcitySubscriber::class)]
 final class TeamcitySubscriberTest extends TestCase

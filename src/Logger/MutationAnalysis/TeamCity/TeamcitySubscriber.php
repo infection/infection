@@ -35,23 +35,23 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
+use function array_reverse;
+use function array_slice;
+use function count;
+use const DIRECTORY_SEPARATOR;
+use function explode;
+use function file_put_contents;
+use function fopen;
 use Infection\Event\MutantProcessWasFinished;
 use Infection\Event\MutationTestingWasFinished;
 use Infection\Event\MutationTestingWasStarted;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Telemetry\Subscriber\GodSubscriber;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
-use function array_reverse;
-use function array_slice;
-use function count;
-use function explode;
-use function file_put_contents;
-use function fopen;
 use function min;
 use function sprintf;
-use const DIRECTORY_SEPARATOR;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * @internal

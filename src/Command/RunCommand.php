@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
-use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use function extension_loaded;
 use function implode;
 use Infection\Command\Option\ConfigurationOption;
@@ -54,6 +53,7 @@ use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
 use Infection\Logger\ConsoleLogger;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -653,8 +653,7 @@ final class RunCommand extends BaseCommand
     private static function getFormatterName(
         RunCommandHelper $commandHelper,
         bool $teamcity,
-    ): MutationAnalysisLoggerName
-    {
+    ): MutationAnalysisLoggerName {
         return $teamcity
             ? MutationAnalysisLoggerName::TEAMCITY
             : MutationAnalysisLoggerName::from(

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\CannotBeInstantiated;
 use function explode;
 use function implode;
+use Infection\CannotBeInstantiated;
 use function max;
 use function Safe\preg_match;
 use function str_ends_with;
@@ -99,7 +99,7 @@ final class TeamCityLogIndenter
             ? ''
             : str_repeat(self::INDENT, $indent);
 
-        return $indent.$line;
+        return $indent . $line;
     }
 
     private static function getMessageName(string $line): ?string

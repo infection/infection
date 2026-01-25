@@ -44,10 +44,8 @@ enum MessageName: string
 {
     case FLOW_STARTED = 'flowStarted';
     case FLOW_FINISHED = 'flowFinished';
-
     case TEST_SUITE_STARTED = 'testSuiteStarted';
     case TEST_SUITE_FINISHED = 'testSuiteFinished';
-
     case TEST_STARTED = 'testStarted';
     case TEST_FINISHED = 'testFinished';
 }

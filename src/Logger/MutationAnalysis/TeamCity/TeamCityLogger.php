@@ -35,22 +35,21 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Mutant\DetectionStatus;
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Path;
 use function array_key_exists;
 use function array_reverse;
 use function array_slice;
 use function count;
+use const DIRECTORY_SEPARATOR;
 use function explode;
 use function hash;
+use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
+use Infection\Mutant\DetectionStatus;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use function min;
-use function Safe\getcwd;
+use Psr\Log\LoggerInterface;
 use function sprintf;
-use const DIRECTORY_SEPARATOR;
+use Symfony\Component\Filesystem\Path;
 
 // TODO: explain somewhere the concept of TestSuite and Test for TeamCity
 final class TeamCityLogger implements MutationAnalysisLogger

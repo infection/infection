@@ -35,12 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
+use function array_filter;
+use function array_map;
 use Closure;
+use function explode;
+use function implode;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Logger\MutationAnalysis\TeamCity\MessageName;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
-use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutator\Boolean\LogicalAnd as LogicalAndMutator;
 use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -50,16 +52,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
-use function array_filter;
-use function array_map;
-use function explode;
-use function implode;
-use function trim;
 
 #[CoversClass(TeamCityLogger::class)]
 final class TeamCityLoggerTest extends TestCase
 {
     private TestLogger $testLogger;
+
     private MutationAnalysisLogger $teamCityLogger;
 
     protected function setUp(): void
@@ -74,7 +72,7 @@ final class TeamCityLoggerTest extends TestCase
     }
 
     /**
-     * @param Closure(MutationAnalysisLogger):void      $execute
+     * @param Closure(MutationAnalysisLogger):void $execute
      */
     #[DataProvider('executionProvider')]
     public function test_it_can_log_an_execution(
@@ -88,27 +86,6 @@ final class TeamCityLoggerTest extends TestCase
         $actual = $this->getTeamCityLog();
 
         $this->assertSame($cleanedUpExpected, $actual);
-    }
-
-    private static function removeBlankLines(string $lines): string
-    {
-        return implode(
-            "\n",
-            array_filter(
-                explode("\n", $lines),
-            ),
-        );
-    }
-
-    private function getTeamCityLog(): string
-    {
-        return implode(
-            '',
-            array_map(
-                static fn (array $record): string => $record['message'],
-                $this->testLogger->recordsByLevel[LogLevel::WARNING],
-            ),
-        );
     }
 
     public static function executionProvider(): iterable
@@ -133,17 +110,17 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-            ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
-            ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-            ##teamcity[flowFinished flowId='dafea228a2b182fe']
+                ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
+                ##teamcity[flowFinished flowId='dafea228a2b182fe']
             
-            ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-            ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
-            TEAM_CITY,
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
+                TEAM_CITY,
         ];
 
         yield 'two mutations executed for a source file, launched synchronously' => [
@@ -178,22 +155,22 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-            ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
-            ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-            ##teamcity[flowFinished flowId='dafea228a2b182fe']
+                ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
+                ##teamcity[flowFinished flowId='dafea228a2b182fe']
             
-            ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
-            ##teamcity[flowFinished flowId='dafea228a2b182fe']
+                ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
+                ##teamcity[flowFinished flowId='dafea228a2b182fe']
             
-            ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-            ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
-            TEAM_CITY,
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
+                TEAM_CITY,
         ];
 
         yield 'two mutations executed for a source file, launched in parallel' => [
@@ -232,24 +209,24 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-            ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
-            ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
             
-            ##teamcity[flowStarted flowId='a20ac7aa8518e530' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
+                ##teamcity[flowStarted flowId='a20ac7aa8518e530' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
             
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
-            ##teamcity[flowFinished flowId='a20ac7aa8518e530']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
+                ##teamcity[flowFinished flowId='a20ac7aa8518e530']
             
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-            ##teamcity[flowFinished flowId='18830ccd5b35e676']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[flowFinished flowId='18830ccd5b35e676']
             
-            ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-            ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
-            TEAM_CITY,
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
+                TEAM_CITY,
         ];
 
         yield 'one mutation executed for two source file, launched synchronously' => [
@@ -289,28 +266,28 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-            ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
-            ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-            ##teamcity[flowFinished flowId='18830ccd5b35e676']
+                ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[flowFinished flowId='18830ccd5b35e676']
             
-            ##teamcity[flowStarted flowId='12f6def551a5aae7']
-            ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+                ##teamcity[flowStarted flowId='12f6def551a5aae7']
+                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
             
-            ##teamcity[flowStarted flowId='ea74aba5c3e84a26' parent='12f6def551a5aae7']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-            ##teamcity[flowFinished flowId='ea74aba5c3e84a26']
+                ##teamcity[flowStarted flowId='ea74aba5c3e84a26' parent='12f6def551a5aae7']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[flowFinished flowId='ea74aba5c3e84a26']
             
-            ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-            ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
-            ##teamcity[flowFinished flowId='12f6def551a5aae7']
-            TEAM_CITY,
+                ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+                ##teamcity[flowFinished flowId='12f6def551a5aae7']
+                TEAM_CITY,
         ];
 
         yield 'one mutation executed for two source file, launched in parallel' => [
@@ -350,30 +327,51 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-            ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
-            ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
             
-            ##teamcity[flowStarted flowId='12f6def551a5aae7']
-            ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+                ##teamcity[flowStarted flowId='12f6def551a5aae7']
+                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
             
-            ##teamcity[flowStarted flowId='ea74aba5c3e84a26' parent='12f6def551a5aae7']
-            ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[flowStarted flowId='ea74aba5c3e84a26' parent='12f6def551a5aae7']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
             
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-            ##teamcity[flowFinished flowId='ea74aba5c3e84a26']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[flowFinished flowId='ea74aba5c3e84a26']
             
-            ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-            ##teamcity[flowFinished flowId='18830ccd5b35e676']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[flowFinished flowId='18830ccd5b35e676']
             
-            ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-            ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
             
-            ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
-            ##teamcity[flowFinished flowId='12f6def551a5aae7']
-            TEAM_CITY,
+                ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+                ##teamcity[flowFinished flowId='12f6def551a5aae7']
+                TEAM_CITY,
         ];
+    }
+
+    private static function removeBlankLines(string $lines): string
+    {
+        return implode(
+            "\n",
+            array_filter(
+                explode("\n", $lines),
+            ),
+        );
+    }
+
+    private function getTeamCityLog(): string
+    {
+        return implode(
+            '',
+            array_map(
+                static fn (array $record): string => $record['message'],
+                $this->testLogger->recordsByLevel[LogLevel::WARNING],
+            ),
+        );
     }
 }
