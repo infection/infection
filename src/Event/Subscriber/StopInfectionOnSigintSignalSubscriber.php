@@ -36,14 +36,15 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function function_exists;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use function Safe\pcntl_signal;
 use const SIGINT;
 
 /**
  * @internal
  */
-final class StopInfectionOnSigintSignalSubscriber implements EventSubscriber
+final class StopInfectionOnSigintSignalSubscriber implements MutationTestingWasStartedSubscriber
 {
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {

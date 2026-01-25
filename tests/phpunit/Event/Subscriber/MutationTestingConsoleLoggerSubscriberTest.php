@@ -37,9 +37,9 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutationEvaluationWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
@@ -91,7 +91,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->outputFormatter
             ->expects($this->once())
-            ->method('startAnalysis');
+            ->method('start');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -119,7 +119,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
 
         $this->outputFormatter
             ->expects($this->once())
-            ->method('finishEvaluation');
+            ->method('advance');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -145,7 +145,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->outputFormatter
             ->expects($this->once())
-            ->method('finishAnalysis');
+            ->method('finish');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(
@@ -629,7 +629,7 @@ final class MutationTestingConsoleLoggerSubscriberTest extends TestCase
     {
         $this->outputFormatter
             ->expects($this->once())
-            ->method('finishAnalysis');
+            ->method('finish');
 
         $dispatcher = new SyncEventDispatcher();
         $dispatcher->addSubscriber(new MutationTestingConsoleLoggerSubscriber(

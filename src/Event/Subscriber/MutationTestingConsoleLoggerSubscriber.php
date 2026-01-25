@@ -39,9 +39,12 @@ use function count;
 use function floor;
 use Generator;
 use Infection\Differ\DiffColorizer;
-use Infection\Event\MutationEvaluationWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;
@@ -62,7 +65,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
+final class MutationTestingConsoleLoggerSubscriber implements MutationEvaluationWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     private const PAD_LENGTH = 8;
 
@@ -95,19 +98,19 @@ final class MutationTestingConsoleLoggerSubscriber implements EventSubscriber
     {
         $this->mutationCount = $event->getMutationCount();
 
-        $this->logger->startAnalysis($this->mutationCount);
+        $this->logger->start($this->mutationCount);
     }
 
-    public function onMutantProcessWasFinished(MutationEvaluationWasFinished $event): void
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
-        $this->logger->finishEvaluation($executionResult);
+        $this->logger->advance($executionResult);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->logger->finishAnalysis();
+        $this->logger->finish();
 
         if ($this->numberOfMutationsBudget !== 0) {
             $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');

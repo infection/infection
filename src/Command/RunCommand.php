@@ -47,7 +47,7 @@ use Infection\Console\LogVerbosity;
 use Infection\Console\XdebugHandler;
 use Infection\Container\Container;
 use Infection\Engine;
-use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;

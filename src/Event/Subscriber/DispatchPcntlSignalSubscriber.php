@@ -36,15 +36,16 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function function_exists;
-use Infection\Event\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
 use function Safe\pcntl_signal_dispatch;
 
 /**
  * @internal
  */
-final class DispatchPcntlSignalSubscriber implements EventSubscriber
+final class DispatchPcntlSignalSubscriber implements MutationEvaluationWasFinishedSubscriber
 {
-    public function onMutantProcessWasFinished(MutationEvaluationWasFinished $event): void
+    public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
         if (!function_exists('pcntl_signal_dispatch')) {
             return;

@@ -113,7 +113,7 @@ class FileMutationGenerator
      *
      * @return iterable<Mutation>
      */
-    public function generateMutations(array $mutators,
+    private function generateMutations(array $mutators,
         SplFileInfo $sourceFile,
         mixed $initialStatements,
         Trace $trace,
@@ -154,6 +154,22 @@ class FileMutationGenerator
                 $sourceFileMutationIds,
             ),
         );
+    }
+
+    /**
+     * @throws UnparsableFile
+     *
+     * @return array{Stmt[], Token[]}
+     */
+    private function createAst(SplFileInfo $sourceFile): array
+    {
+        [$initialStatements, $originalFileTokens] = $this->parser->parse($sourceFile);
+
+        // Pre-traverse the nodes to connect them
+        $preTraverser = $this->traverserFactory->createPreTraverser();
+        $preTraverser->traverse($initialStatements);
+
+        return [$initialStatements, $originalFileTokens];
     }
 
     /**

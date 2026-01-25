@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutation\FileMutationGenerator;
 use Infection\Mutation\Mutation;
 use Infection\Mutation\MutationGenerator;
