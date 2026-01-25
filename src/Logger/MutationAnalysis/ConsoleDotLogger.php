@@ -38,6 +38,7 @@ namespace Infection\Logger\MutationAnalysis;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use function sprintf;
 use function str_repeat;
 use function strlen;
@@ -77,6 +78,11 @@ final class ConsoleDotLogger extends AbstractMutationAnalysisLogger
             . '<ignored>I</ignored>: ignored',
             '',
         ]);
+    }
+
+    public function startEvaluation(Mutation $mutation): void
+    {
+        // Do nothing.
     }
 
     public function finishEvaluation(MutantExecutionResult $executionResult): void
