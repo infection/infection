@@ -33,30 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use Infection\Metrics\Collector;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsCollectorSubscriber implements EventSubscriber
+interface MutableFileWasProcessedSubscriber extends EventSubscriber
 {
-    /** @var Collector[] */
-    private array $collectors;
-
-    public function __construct(Collector ...$collectors)
-    {
-        $this->collectors = $collectors;
-    }
-
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
-    {
-        $executionResult = $event->getExecutionResult();
-
-        foreach ($this->collectors as $collector) {
-            $collector->collect($executionResult);
-        }
-    }
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void;
 }

@@ -58,10 +58,10 @@ use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\Application;
 use Infection\Console\XdebugHandler;
-use Infection\Event\Subscriber\DispatchPcntlSignalSubscriber;
-use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\DispatchPcntlSignalSubscriberWas;
+use Infection\Event\Subscriber\MutationGeneratingConsoleLoggerSubscriberWasWas;
 use Infection\Event\Subscriber\NullSubscriber;
-use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberWas;
 use Infection\FileSystem\DummyFileSystem;
 use Infection\FileSystem\FakeFileSystem;
 use Infection\FileSystem\FileSystem;
@@ -135,7 +135,7 @@ final class ProjectCodeProvider
         ConfigurationOption::class,
         ConsoleProgressBarLogger::class,
         CpuCoresCountProvider::class,
-        DispatchPcntlSignalSubscriber::class,
+        DispatchPcntlSignalSubscriberWas::class,
         DummyFileSystem::class,
         EmptyTrace::class,
         FakeFileSystem::class,
@@ -155,7 +155,7 @@ final class ProjectCodeProvider
         MapSourceClassToTestStrategy::class, // no need to test 1 const for now
         MutationAnalysisLoggerName::class,
         MutantExecutionResult::class,
-        MutationGeneratingConsoleLoggerSubscriber::class,
+        MutationGeneratingConsoleLoggerSubscriberWasWas::class,
         MutatorName::class,
         NameResolverFactory::class,
         NodeMutationGenerator::class,
@@ -167,7 +167,7 @@ final class ProjectCodeProvider
         SchemaConfiguration::class,
         SingletonContainer::class,
         Source::class,
-        StopInfectionOnSigintSignalSubscriber::class,
+        StopInfectionOnSigintSignalSubscriberWas::class,
         StrykerCurlClient::class,
         TooManyReportsFound::class,
         XdebugHandler::class,

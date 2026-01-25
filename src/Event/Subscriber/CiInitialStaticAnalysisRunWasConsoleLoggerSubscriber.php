@@ -33,42 +33,43 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriberWas;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
+use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use InvalidArgumentException;
+use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriberWas::class)]
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class CiInitialStaticAnalysisRunWasConsoleLoggerSubscriber implements InitialStaticAnalysisRunWasStartedSubscriber
 {
-    private MockObject&OutputInterface $output;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
+    public function __construct(
+        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
+        private OutputInterface $output,
+    ) {
     }
 
-    public function test_it_reacts_on_mutation_generating_started_event(): void
+    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Generate mutants...',
-                '',
-                'Processing source code files...',
-            ]);
+        try {
+            $version = $this->staticAnalysisToolAdapter->getVersion();
+        } catch (InvalidArgumentException) {
+            $version = 'unknown';
+        }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriberWas($this->output));
-
-        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
+        $this->output->writeln([
+            '',
+            'Running initial Static Analysis...',
+            '',
+            sprintf(
+                '%s version: %s',
+                $this->staticAnalysisToolAdapter->getName(),
+                $version,
+            ),
+        ]);
     }
 }

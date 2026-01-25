@@ -33,42 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriberWas;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Subscriber\EventSubscriber;
 
-#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriberWas::class)]
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+interface InitialTestSuiteWasFinishedSubscriber extends EventSubscriber
 {
-    private MockObject&OutputInterface $output;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
-    }
-
-    public function test_it_reacts_on_mutation_generating_started_event(): void
-    {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Generate mutants...',
-                '',
-                'Processing source code files...',
-            ]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriberWas($this->output));
-
-        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
-    }
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void;
 }

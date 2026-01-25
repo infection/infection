@@ -33,42 +33,27 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriberWas;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\OutputInterface;
+use function function_exists;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStartedSubscriber;
+use function Safe\pcntl_signal;
+use const SIGINT;
 
-#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriberWas::class)]
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final class StopInfectionOnSigintSignalSubscriberWas implements MutationTestingWasStartedSubscriber
 {
-    private MockObject&OutputInterface $output;
-
-    protected function setUp(): void
+    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
-        parent::setUp();
+        if (!function_exists('pcntl_signal')) {
+            return;
+        }
 
-        $this->output = $this->createMock(OutputInterface::class);
-    }
-
-    public function test_it_reacts_on_mutation_generating_started_event(): void
-    {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Generate mutants...',
-                '',
-                'Processing source code files...',
-            ]);
-
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriberWas($this->output));
-
-        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
+        pcntl_signal(SIGINT, static function () use ($event): void {
+            $event->getProcessRunner()->stop();
+        });
     }
 }

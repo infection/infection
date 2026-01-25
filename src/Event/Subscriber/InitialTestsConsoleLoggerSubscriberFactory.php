@@ -53,8 +53,8 @@ final readonly class InitialTestsConsoleLoggerSubscriberFactory implements Subsc
     public function create(OutputInterface $output): EventSubscriber
     {
         return $this->skipProgressBar
-            ? new CiInitialTestsConsoleLoggerSubscriber($output, $this->testFrameworkAdapter)
-            : new InitialTestsConsoleLoggerSubscriber(
+            ? new CiInitialTestsConsoleLoggerSubscriberWas($output, $this->testFrameworkAdapter)
+            : new InitialTestsConsoleLoggerSubscriberWasWasWas(
                 $output,
                 $this->testFrameworkAdapter,
                 $this->debug,

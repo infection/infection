@@ -44,6 +44,6 @@ final class DispatchPcntlSignalSubscriberFactory implements SubscriberFactory
 {
     public function create(OutputInterface $output): EventSubscriber
     {
-        return new DispatchPcntlSignalSubscriber();
+        return new DispatchPcntlSignalSubscriberWas();
     }
 }

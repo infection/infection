@@ -37,14 +37,14 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
 use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriberWas;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiInitialTestsConsoleLoggerSubscriber::class)]
+#[CoversClass(CiInitialTestsConsoleLoggerSubscriberWas::class)]
 final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
 {
     private MockObject&OutputInterface $output;
@@ -79,7 +79,7 @@ final class CiInitialTestsConsoleLoggerSubscriberTest extends TestCase
             ->willReturn('PHPUnit');
 
         $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriber($this->output, $this->testFramework));
+        $dispatcher->addSubscriber(new CiInitialTestsConsoleLoggerSubscriberWas($this->output, $this->testFramework));
 
         $dispatcher->dispatch(new InitialTestSuiteWasStarted());
     }

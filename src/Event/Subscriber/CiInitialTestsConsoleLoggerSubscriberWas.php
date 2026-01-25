@@ -35,66 +35,41 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
+use Infection\AbstractTestFramework\TestFrameworkAdapter;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStartedSubscriber;
 use InvalidArgumentException;
-use const PHP_EOL;
 use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements EventSubscriber
+final readonly class CiInitialTestsConsoleLoggerSubscriberWas implements InitialTestSuiteWasStartedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
         private OutputInterface $output,
-        private bool $debug,
+        private TestFrameworkAdapter $testFrameworkAdapter,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
-    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
+    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
     {
         try {
-            $version = $this->staticAnalysisToolAdapter->getVersion();
+            $version = $this->testFrameworkAdapter->getVersion();
         } catch (InvalidArgumentException) {
             $version = 'unknown';
         }
 
         $this->output->writeln([
             '',
-            '',
-            'Running initial Static Analysis...',
+            'Running initial test suite...',
             '',
             sprintf(
                 '%s version: %s',
-                $this->staticAnalysisToolAdapter->getName(),
+                $this->testFrameworkAdapter->getName(),
                 $version,
             ),
-            '',
         ]);
-        $this->progressBar->start();
-    }
-
-    public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
-    {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->getOutputText());
-        }
-    }
-
-    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
-    {
-        $this->progressBar->advance();
     }
 }

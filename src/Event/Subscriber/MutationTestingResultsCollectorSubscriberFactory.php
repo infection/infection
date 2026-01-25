@@ -53,7 +53,7 @@ final readonly class MutationTestingResultsCollectorSubscriberFactory implements
 
     public function create(OutputInterface $output): EventSubscriber
     {
-        return new MutationTestingResultsCollectorSubscriber(
+        return new MutationTestingResultsCollectorSubscriberWas(
             ...$this->collectors,
         );
     }

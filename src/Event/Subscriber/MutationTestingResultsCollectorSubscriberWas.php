@@ -35,24 +35,29 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use function function_exists;
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
-use function Safe\pcntl_signal;
-use const SIGINT;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
+use Infection\Metrics\Collector;
 
 /**
  * @internal
  */
-final class StopInfectionOnSigintSignalSubscriber implements EventSubscriber
+final readonly class MutationTestingResultsCollectorSubscriberWas implements MutantProcessWasFinishedSubscriber
 {
-    public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
-    {
-        if (!function_exists('pcntl_signal')) {
-            return;
-        }
+    /** @var Collector[] */
+    private array $collectors;
 
-        pcntl_signal(SIGINT, static function () use ($event): void {
-            $event->getProcessRunner()->stop();
-        });
+    public function __construct(Collector ...$collectors)
+    {
+        $this->collectors = $collectors;
+    }
+
+    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
+    {
+        $executionResult = $event->getExecutionResult();
+
+        foreach ($this->collectors as $collector) {
+            $collector->collect($executionResult);
+        }
     }
 }

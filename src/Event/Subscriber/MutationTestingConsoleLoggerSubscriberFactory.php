@@ -61,7 +61,7 @@ final readonly class MutationTestingConsoleLoggerSubscriberFactory implements Su
 
     public function create(OutputInterface $output): EventSubscriber
     {
-        return new MutationTestingConsoleLoggerSubscriber(
+        return new MutationTestingWasWasConsoleLoggerSubscriberWas(
             $output,
             $this->logger,
             $this->metricsCalculator,

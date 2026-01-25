@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Event\Subscriber;
 
-use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriber;
 use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberFactory;
+use Infection\Event\Subscriber\MutationTestingResultsCollectorSubscriberWas;
 use Infection\Metrics\Collector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -60,6 +60,6 @@ final class MutationTestingResultsCollectorSubscriberFactoryTest extends TestCas
 
         $subscriber = $factory->create($outputMock);
 
-        $this->assertInstanceOf(MutationTestingResultsCollectorSubscriber::class, $subscriber);
+        $this->assertInstanceOf(MutationTestingResultsCollectorSubscriberWas::class, $subscriber);
     }
 }

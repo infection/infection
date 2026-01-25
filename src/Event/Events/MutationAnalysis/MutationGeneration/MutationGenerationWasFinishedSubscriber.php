@@ -33,23 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 
-use function function_exists;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
-use function Safe\pcntl_signal_dispatch;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final class DispatchPcntlSignalSubscriber implements EventSubscriber
+interface MutationGenerationWasFinishedSubscriber extends EventSubscriber
 {
-    public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
-    {
-        if (!function_exists('pcntl_signal_dispatch')) {
-            return;
-        }
-
-        pcntl_signal_dispatch();
-    }
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void;
 }

@@ -35,65 +35,27 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
-use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
-use InvalidArgumentException;
-use const PHP_EOL;
-use function sprintf;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @internal
  */
-final readonly class InitialTestsConsoleLoggerSubscriber implements EventSubscriber
+final readonly class CiMutationGeneratingConsoleLoggerSubscriberWas implements MutationGenerationWasStartedSubscriber
 {
-    private ProgressBar $progressBar;
-
     public function __construct(
         private OutputInterface $output,
-        private TestFrameworkAdapter $testFrameworkAdapter,
-        private bool $debug,
     ) {
-        $this->progressBar = new ProgressBar($this->output);
-        $this->progressBar->setFormat('verbose');
     }
 
-    public function onInitialTestSuiteWasStarted(InitialTestSuiteWasStarted $event): void
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        try {
-            $version = $this->testFrameworkAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
         $this->output->writeln([
             '',
-            'Running initial test suite...',
+            'Generate mutants...',
             '',
-            sprintf(
-                '%s version: %s',
-                $this->testFrameworkAdapter->getName(),
-                $version,
-            ),
-            '',
+            'Processing source code files...',
         ]);
-        $this->progressBar->start();
-    }
-
-    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void
-    {
-        $this->progressBar->finish();
-
-        if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->getOutputText());
-        }
-    }
-
-    public function onInitialTestCaseWasCompleted(InitialTestCaseWasCompleted $event): void
-    {
-        $this->progressBar->advance();
     }
 }

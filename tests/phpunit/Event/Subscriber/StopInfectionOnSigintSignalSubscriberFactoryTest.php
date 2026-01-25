@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\Subscriber\EventSubscriber;
-use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriber;
 use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberFactory;
+use Infection\Event\Subscriber\StopInfectionOnSigintSignalSubscriberWas;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,7 +51,7 @@ final class StopInfectionOnSigintSignalSubscriberFactoryTest extends TestCase
 
         $subscriber = (new StopInfectionOnSigintSignalSubscriberFactory())->create($outputMock);
 
-        $this->assertInstanceOf(StopInfectionOnSigintSignalSubscriber::class, $subscriber);
+        $this->assertInstanceOf(StopInfectionOnSigintSignalSubscriberWas::class, $subscriber);
         $this->assertInstanceOf(EventSubscriber::class, $subscriber);
     }
 }

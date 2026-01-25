@@ -33,42 +33,44 @@
 
 declare(strict_types=1);
 
-namespace Infection\Tests\Event\Subscriber;
+namespace Infection\Event\Subscriber;
 
-use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
-use Infection\Event\Subscriber\CiMutationGeneratingConsoleLoggerSubscriberWas;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStartedSubscriber;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[CoversClass(CiMutationGeneratingConsoleLoggerSubscriberWas::class)]
-final class CiMutationGeneratingConsoleLoggerSubscriberTest extends TestCase
+/**
+ * @internal
+ */
+final readonly class MutationGeneratingConsoleLoggerSubscriberWasWas implements MutableFileWasProcessedSubscriber, MutationGenerationWasFinishedSubscriber, MutationGenerationWasStartedSubscriber
 {
-    private MockObject&OutputInterface $output;
+    private ProgressBar $progressBar;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->output = $this->createMock(OutputInterface::class);
+    public function __construct(
+        private OutputInterface $output,
+    ) {
+        $this->progressBar = new ProgressBar($this->output);
+        $this->progressBar->setFormat('Processing source code files: %current%/%max%');
     }
 
-    public function test_it_reacts_on_mutation_generating_started_event(): void
+    public function onMutationGenerationWasStarted(MutationGenerationWasStarted $event): void
     {
-        $this->output->expects($this->once())
-            ->method('writeln')
-            ->with([
-                '',
-                'Generate mutants...',
-                '',
-                'Processing source code files...',
-            ]);
+        $this->output->writeln(['', '', 'Generate mutants...', '']);
+        $this->progressBar->start($event->getMutableFilesCount());
+    }
 
-        $dispatcher = new SyncEventDispatcher();
-        $dispatcher->addSubscriber(new CiMutationGeneratingConsoleLoggerSubscriberWas($this->output));
+    public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
+    {
+        $this->progressBar->advance();
+    }
 
-        $dispatcher->dispatch(new MutationGenerationWasStarted(0));
+    public function onMutationGenerationWasFinished(MutationGenerationWasFinished $event): void
+    {
+        $this->progressBar->finish();
     }
 }

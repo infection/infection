@@ -33,23 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
 
-use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
-use Infection\Logger\MutationTestingResultsLogger;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsLoggerSubscriber implements EventSubscriber
+interface InitialStaticAnalysisSubStepWasCompletedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private MutationTestingResultsLogger $logger,
-    ) {
-    }
-
-    public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
-    {
-        $this->logger->log();
-    }
+    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void;
 }

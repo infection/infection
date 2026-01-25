@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
-use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriber;
+use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriberWas;
 use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberFactory;
+use Infection\Event\Subscriber\InitialTestsConsoleLoggerSubscriberWasWasWas;
 use Infection\Tests\Fixtures\Console\FakeOutput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -71,7 +71,7 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
 
         $subscriber = $factory->create(new FakeOutput());
 
-        $this->assertInstanceOf(CiInitialTestsConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(CiInitialTestsConsoleLoggerSubscriberWas::class, $subscriber);
     }
 
     #[DataProvider('debugProvider')]
@@ -91,7 +91,7 @@ final class InitialTestsConsoleLoggerSubscriberFactoryTest extends TestCase
 
         $subscriber = $factory->create($outputMock);
 
-        $this->assertInstanceOf(InitialTestsConsoleLoggerSubscriber::class, $subscriber);
+        $this->assertInstanceOf(InitialTestsConsoleLoggerSubscriberWasWasWas::class, $subscriber);
     }
 
     public static function debugProvider(): iterable
