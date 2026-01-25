@@ -48,6 +48,6 @@ final class InitialTestSuiteWasFinishedTest extends TestCase
 
         $class = new InitialTestSuiteWasFinished($text);
 
-        $this->assertSame($text, $class->getOutputText());
+        $this->assertSame($text, $class->outputText);
     }
 }

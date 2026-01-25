@@ -38,6 +38,6 @@ namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
 /**
  * @internal
  */
-final class InitialTestSuiteWasStarted
+final readonly class InitialTestSuiteWasStarted
 {
 }

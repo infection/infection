@@ -53,7 +53,7 @@ final readonly class MutationTestingResultsCollectorSubscriber implements EventS
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $executionResult = $event->getExecutionResult();
+        $executionResult = $event->executionResult;
 
         foreach ($this->collectors as $collector) {
             $collector->collect($executionResult);

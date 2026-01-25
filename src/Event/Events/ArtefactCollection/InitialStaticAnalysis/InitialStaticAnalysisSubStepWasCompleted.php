@@ -38,6 +38,6 @@ namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
 /**
  * @internal
  */
-final class InitialStaticAnalysisSubStepWasCompleted
+final readonly class InitialStaticAnalysisSubStepWasCompleted
 {
 }

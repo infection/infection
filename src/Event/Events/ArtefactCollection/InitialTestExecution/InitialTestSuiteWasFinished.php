@@ -41,12 +41,7 @@ namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
 final readonly class InitialTestSuiteWasFinished
 {
     public function __construct(
-        private string $outputText,
+        public string $outputText,
     ) {
-    }
-
-    public function getOutputText(): string
-    {
-        return $this->outputText;
     }
 }

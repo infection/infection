@@ -38,6 +38,6 @@ namespace Infection\Event\Events\Application;
 /**
  * @internal
  */
-final class ApplicationExecutionWasFinished
+final readonly class ApplicationExecutionWasFinished
 {
 }
