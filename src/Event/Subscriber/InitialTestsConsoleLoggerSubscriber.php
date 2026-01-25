@@ -91,7 +91,7 @@ final readonly class InitialTestsConsoleLoggerSubscriber implements InitialTestC
         $this->progressBar->finish();
 
         if ($this->debug) {
-            $this->output->writeln(PHP_EOL . $event->getOutputText());
+            $this->output->writeln(PHP_EOL . $event->outputText);
         }
     }
 

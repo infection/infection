@@ -38,6 +38,6 @@ namespace Infection\Event\Events\MutationAnalysis;
 /**
  * @internal
  */
-final class MutationTestingWasFinished
+final readonly class MutationTestingWasFinished
 {
 }

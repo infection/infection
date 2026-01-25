@@ -96,14 +96,14 @@ final class MutationTestingConsoleLoggerSubscriber implements MutantProcessWasFi
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
-        $this->mutationCount = $event->getMutationCount();
+        $this->mutationCount = $event->mutationCount;
 
         $this->logger->start($this->mutationCount);
     }
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $executionResult = $event->getExecutionResult();
+        $executionResult = $event->executionResult;
 
         $this->logger->advance($executionResult);
     }

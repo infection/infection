@@ -54,7 +54,7 @@ final readonly class MutationTestingResultsCollectorSubscriber implements Mutant
 
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {
-        $executionResult = $event->getExecutionResult();
+        $executionResult = $event->executionResult;
 
         foreach ($this->collectors as $collector) {
             $collector->collect($executionResult);

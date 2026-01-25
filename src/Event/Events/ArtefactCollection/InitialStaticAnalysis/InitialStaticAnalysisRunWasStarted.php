@@ -38,6 +38,6 @@ namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
 /**
  * @internal
  */
-final class InitialStaticAnalysisRunWasStarted
+final readonly class InitialStaticAnalysisRunWasStarted
 {
 }

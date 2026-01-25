@@ -47,21 +47,8 @@ final readonly class MutationTestingWasStarted
      * @param positive-int|IterableCounter::UNKNOWN_COUNT $mutationCount
      */
     public function __construct(
-        private int $mutationCount,
-        private ProcessRunner $processRunner,
+        public int $mutationCount,
+        public ProcessRunner $processRunner,
     ) {
-    }
-
-    /**
-     * @return positive-int|IterableCounter::UNKNOWN_COUNT
-     */
-    public function getMutationCount(): int
-    {
-        return $this->mutationCount;
-    }
-
-    public function getProcessRunner(): ProcessRunner
-    {
-        return $this->processRunner;
     }
 }
