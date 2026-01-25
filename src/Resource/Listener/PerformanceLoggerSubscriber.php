@@ -36,8 +36,9 @@ declare(strict_types=1);
 namespace Infection\Resource\Listener;
 
 use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinishedSubscriber;
 use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
-use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Events\Application\ApplicationExecutionWasStartedSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Resource\Time\TimeFormatter;
@@ -48,7 +49,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final readonly class PerformanceLoggerSubscriber implements EventSubscriber
+final readonly class PerformanceLoggerSubscriber implements ApplicationExecutionWasFinishedSubscriber, ApplicationExecutionWasStartedSubscriber
 {
     public function __construct(
         private Stopwatch $stopwatch,

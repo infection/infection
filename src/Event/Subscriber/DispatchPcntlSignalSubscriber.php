@@ -37,12 +37,13 @@ namespace Infection\Event\Subscriber;
 
 use function function_exists;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use function Safe\pcntl_signal_dispatch;
 
 /**
  * @internal
  */
-final class DispatchPcntlSignalSubscriber implements EventSubscriber
+final class DispatchPcntlSignalSubscriber implements MutantProcessWasFinishedSubscriber
 {
     public function onMutantProcessWasFinished(MutantProcessWasFinished $event): void
     {

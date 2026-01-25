@@ -33,43 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Subscriber;
+namespace Infection\Event\Events\ArtefactCollection\InitialTestExecution;
 
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStartedSubscriber;
-use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
-use InvalidArgumentException;
-use function sprintf;
-use Symfony\Component\Console\Output\OutputInterface;
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class CiInitialStaticAnalysisRunConsoleLoggerSubscriber implements InitialStaticAnalysisRunWasStartedSubscriber
+interface InitialTestSuiteWasFinishedSubscriber extends EventSubscriber
 {
-    public function __construct(
-        private StaticAnalysisToolAdapter $staticAnalysisToolAdapter,
-        private OutputInterface $output,
-    ) {
-    }
-
-    public function onInitialStaticAnalysisRunWasStarted(InitialStaticAnalysisRunWasStarted $event): void
-    {
-        try {
-            $version = $this->staticAnalysisToolAdapter->getVersion();
-        } catch (InvalidArgumentException) {
-            $version = 'unknown';
-        }
-
-        $this->output->writeln([
-            '',
-            'Running initial Static Analysis...',
-            '',
-            sprintf(
-                '%s version: %s',
-                $this->staticAnalysisToolAdapter->getName(),
-                $version,
-            ),
-        ]);
-    }
+    public function onInitialTestSuiteWasFinished(InitialTestSuiteWasFinished $event): void;
 }
