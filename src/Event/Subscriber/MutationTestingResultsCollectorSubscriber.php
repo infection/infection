@@ -36,12 +36,13 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinishedSubscriber;
 use Infection\Metrics\Collector;
 
 /**
  * @internal
  */
-final readonly class MutationTestingResultsCollectorSubscriber implements EventSubscriber
+final readonly class MutationTestingResultsCollectorSubscriber implements MutantProcessWasFinishedSubscriber
 {
     /** @var Collector[] */
     private array $collectors;
