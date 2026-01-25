@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use function sprintf;

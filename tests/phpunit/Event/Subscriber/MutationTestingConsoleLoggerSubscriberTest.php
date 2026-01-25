@@ -37,9 +37,9 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Logger\FederatedLogger;
 use Infection\Logger\FileLogger;

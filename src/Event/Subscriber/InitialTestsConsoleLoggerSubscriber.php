@@ -36,9 +36,9 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestCaseWasCompleted;
-use Infection\Event\InitialTestSuiteWasFinished;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestCaseWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
 use const PHP_EOL;
 use function sprintf;

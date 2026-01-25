@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use Infection\Event\Subscriber\CiInitialTestsConsoleLoggerSubscriber;
 use Infection\TestFramework\AbstractTestFrameworkAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;

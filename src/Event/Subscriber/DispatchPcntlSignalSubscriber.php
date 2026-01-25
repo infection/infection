@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use function function_exists;
-use Infection\Event\MutantProcessWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutantProcessWasFinished;
 use function Safe\pcntl_signal_dispatch;
 
 /**

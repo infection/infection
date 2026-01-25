@@ -36,7 +36,7 @@ declare(strict_types=1);
 namespace Infection\Event\Subscriber;
 
 use Infection\AbstractTestFramework\TestFrameworkAdapter;
-use Infection\Event\InitialTestSuiteWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialTestExecution\InitialTestSuiteWasStarted;
 use InvalidArgumentException;
 use function sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
