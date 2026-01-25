@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command;
 
+use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
 use function extension_loaded;
 use function implode;
 use Infection\Command\Option\ConfigurationOption;
@@ -44,6 +45,7 @@ use Infection\Console\ConsoleOutput;
 use Infection\Console\Input\MsiParser;
 use Infection\Console\IO;
 use Infection\Console\LogVerbosity;
+use Infection\Console\OutputFormatter\FormatterName;
 use Infection\Console\XdebugHandler;
 use Infection\Container\Container;
 use Infection\Engine;
@@ -51,8 +53,7 @@ use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\FileSystem\Locator\FileNotFound;
 use Infection\FileSystem\Locator\FileOrDirectoryNotFound;
 use Infection\FileSystem\Locator\Locator;
-use Infection\Logger\Console\ConsoleLogger;
-use Infection\Logger\MutationAnalysis\MutationAnalysisLoggerName;
+use Infection\Logger\ConsoleLogger;
 use Infection\Metrics\MaxTimeoutCountReached;
 use Infection\Metrics\MinMsiCheckFailed;
 use Infection\Process\Runner\InitialTestsFailed;
@@ -262,7 +263,7 @@ final class RunCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 sprintf(
                     'Name of the formatter to use (%s)',
-                    MutationAnalysisLoggerName::quotedCommaSeparatedList(),
+                    FormatterName::quotedCommaSeparatedList(),
                 ),
                 Container::DEFAULT_FORMATTER_NAME->value,
             )
@@ -649,11 +650,11 @@ final class RunCommand extends BaseCommand
         }
     }
 
-    // TODO: there is more renaming to do here...
     private static function getFormatterName(
         RunCommandHelper $commandHelper,
         bool $teamcity,
-    ): MutationAnalysisLoggerName {
+    ): MutationAnalysisLoggerName
+    {
         return $teamcity
             ? MutationAnalysisLoggerName::TEAMCITY
             : MutationAnalysisLoggerName::from(

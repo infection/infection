@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter;
@@ -62,7 +62,7 @@ final class PerformanceLoggerSubscriberTest extends TestCase
     {
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with($this->callback(static function ($parameter): bool {
+            ->with($this->callback(static function (string|iterable $parameter): bool {
                 $expectedOutput = 'Time: 5s. Memory: 2.00KB. Threads: 1';
 
                 return is_array($parameter) && $parameter[0] === '' && $parameter[1] === $expectedOutput;

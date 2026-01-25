@@ -36,16 +36,11 @@ declare(strict_types=1);
 namespace Infection\Process\Runner;
 
 use function array_key_exists;
-use Closure;
-use function func_get_args;
 use Infection\Differ\DiffSourceCodeMatcher;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\SourceMutationEvaluationFinished;
-use Infection\Event\Events\MutationAnalysis\MutationEvaluation\SourceMutationEvaluationStarted;
-use Infection\Event\Events\MutationAnalysis\MutationGeneration\SourceMutationGenerationFinished;
-use Infection\Event\MutantProcessWasFinished;
-use Infection\Event\MutationTestingWasFinished;
-use Infection\Event\MutationTestingWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
 use Infection\Framework\Iterable\IterableCounter;
 use Infection\Mutant\Mutant;
 use Infection\Mutant\MutantExecutionResult;
@@ -89,29 +84,20 @@ class MutationTestingRunner
 
         $processContainers = take($mutations)
             ->stream()
-            ->tap(
-                fn (Mutation $mutation) => $this->eventDispatcher->dispatch(
-                    new SourceMutationEvaluationStarted($mutation),
-                ),
-            )
-            ->filter(
-                $this->createFilter($this->ignoredByMutantId(...)),
-            )
+            ->filter($this->ignoredByMutantId(...))
+            // Emitting the start of the event must be done _after_ checking the mutant ID
+            // as the latter does not dispatch any finished event.
+            ->tap($this->emitEvaluationStarted(...))
             ->cast($this->mutationToMutant(...))
-            ->filter(
-                $this->createFilter($this->ignoredByRegex(...)),
-            )
-            ->filter(
-                $this->createFilter($this->uncoveredByTest(...)),
-            )
-            ->filter(
-                $this->createFilter($this->takingTooLong(...)),
-            )
+            ->filter($this->ignoredByRegex(...))
+            ->filter($this->uncoveredByTest(...))
+            ->filter($this->takingTooLong(...))
             ->cast(fn (Mutant $mutant) => $this->mutantToContainer($mutant, $testFrameworkExtraOptions))
         ;
 
         take($this->processRunner->run($processContainers))
-            ->each($this->dispatchMutantEvaluationFinished(...))
+            ->cast(self::containerToFinishedEvent(...))
+            ->each($this->eventDispatcher->dispatch(...))
         ;
 
         $this->eventDispatcher->dispatch(new MutationTestingWasFinished());
@@ -122,38 +108,20 @@ class MutationTestingRunner
         return $this->mutantFactory->create($mutation);
     }
 
-    /**
-     * @template T
-     *
-     * @param Closure(T):bool $filter
-     *
-     * @return Closure(T):bool
-     */
-    private function createFilter(
-        Closure $filter,
-    ): Closure {
-        return function () use ($filter) {
-            $continue = $filter(...func_get_args());
-
-            if (!$continue) {
-                $this->eventDispatcher->dispatch(new SourceMutationGenerationFinished());
-            }
-
-            return $continue;
-        };
+    private function emitEvaluationStarted(Mutation $mutation): void
+    {
+        $this->eventDispatcher->dispatch(
+            new MutationEvaluationWasStarted($mutation),
+        );
     }
 
     private function ignoredByMutantId(Mutation $mutation): bool
     {
-        $result = $this->mutantId === null
-            ? true
-            : $mutation->getHash() === $this->mutantId;
-
-        if (!$result) {
-            $this->eventDispatcher->dispatch(new SourceMutationGenerationFinished());
+        if ($this->mutantId === null) {
+            return true;
         }
 
-        return $result;
+        return $mutation->getHash() === $this->mutantId;
     }
 
     private function ignoredByRegex(Mutant $mutant): bool
@@ -169,7 +137,7 @@ class MutationTestingRunner
                 continue;
             }
 
-            $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+            $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished(
                 MutantExecutionResult::createFromIgnoredMutant($mutant),
             ));
 
@@ -186,7 +154,7 @@ class MutationTestingRunner
             return true;
         }
 
-        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+        $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished(
             MutantExecutionResult::createFromNonCoveredMutant($mutant),
         ));
 
@@ -200,7 +168,7 @@ class MutationTestingRunner
             return true;
         }
 
-        $this->eventDispatcher->dispatch(new MutantProcessWasFinished(
+        $this->eventDispatcher->dispatch(new MutationEvaluationWasFinished(
             MutantExecutionResult::createFromTimeSkippedMutant($mutant),
         ));
 
@@ -214,13 +182,8 @@ class MutationTestingRunner
         return $this->processFactory->create($mutant, $testFrameworkExtraOptions);
     }
 
-    private function dispatchMutantEvaluationFinished(MutantProcessContainer $container): void
+    private static function containerToFinishedEvent(MutantProcessContainer $container): MutationEvaluationWasFinished
     {
-        $this->eventDispatcher->dispatch(
-            new MutantProcessWasFinished($container->getCurrent()->getMutantExecutionResult()),
-        );
-        $this->eventDispatcher->dispatch(
-            new SourceMutationEvaluationFinished(),
-        );
+        return new MutationEvaluationWasFinished($container->getCurrent()->getMutantExecutionResult());
     }
 }

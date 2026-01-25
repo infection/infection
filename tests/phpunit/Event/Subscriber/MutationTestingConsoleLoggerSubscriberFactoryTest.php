@@ -37,7 +37,7 @@ namespace Infection\Tests\Event\Subscriber;
 
 use Infection\Differ\DiffColorizer;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriber;
 use Infection\Event\Subscriber\MutationTestingConsoleLoggerSubscriberFactory;
 use Infection\Framework\Str;
@@ -46,7 +46,7 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Metrics\MetricsCalculator;
 use Infection\Metrics\ResultsCollector;
 use Infection\Mutant\MutantExecutionResult;
-use Infection\Tests\Fixtures\Console\FakeMutationAnalysisLogger;
+use Infection\Tests\Logger\MutationAnalysis\FakeMutationAnalysisLogger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;

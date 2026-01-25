@@ -33,24 +33,30 @@
 
 declare(strict_types=1);
 
+<<<<<<<< HEAD:src/Telemetry/Subscriber/TelemetrySubscriberFactory.php
+namespace Infection\Telemetry\Subscriber;
+========
 namespace Infection\Logger\MutationAnalysis;
+>>>>>>>> feat/events:src/Logger/MutationAnalysis/MutationAnalysisLoggerFactory.php
 
-use Infection\Logger\Console\BasicConsoleLogger;
-use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
-use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Infection\Event\Subscriber\EventSubscriber;
+use Infection\Event\Subscriber\SubscriberFactory;
 use Symfony\Component\Console\Output\OutputInterface;
-use function dirname;
 
 /**
  * @internal
  */
+<<<<<<<< HEAD:src/Telemetry/Subscriber/TelemetrySubscriberFactory.php
+final readonly class TelemetrySubscriberFactory implements SubscriberFactory
+{
+    public function create(OutputInterface $output): EventSubscriber
+    {
+        return new TelemetrySubscriber();
+========
 final readonly class MutationAnalysisLoggerFactory
 {
     public function __construct(
         private OutputInterface $output,
-        private TeamCity $teamcity,
-        private readonly string $configurationPathname,
     ) {
     }
 
@@ -61,11 +67,7 @@ final readonly class MutationAnalysisLoggerFactory
                 new ProgressBar($this->output),
             ),
             MutationAnalysisLoggerName::DOT => new ConsoleDotLogger($this->output),
-            MutationAnalysisLoggerName::TEAMCITY => new TeamCityLogger(
-                $this->teamcity,
-                new BasicConsoleLogger($this->output),
-                dirname($this->configurationPathname),
-            ),
         };
+>>>>>>>> feat/events:src/Logger/MutationAnalysis/MutationAnalysisLoggerFactory.php
     }
 }
