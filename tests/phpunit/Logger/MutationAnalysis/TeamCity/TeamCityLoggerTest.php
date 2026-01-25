@@ -104,22 +104,18 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutantHash($mutation->getHash())
                     ->build();
 
-                $logger->startEvaluation($mutation, $mutationCount);
-                $logger->finishEvaluation($executionResult, $mutationCount);
+                $logger->startEvaluation($mutation);
+                $logger->finishEvaluation($executionResult);
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-                ##teamcity[flowFinished flowId='dafea228a2b182fe']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
                 TEAM_CITY,
         ];
 
@@ -146,30 +142,24 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutantHash($mutation2->getHash())
                     ->build();
 
-                $logger->startEvaluation($mutation1, $mutationCount);
-                $logger->finishEvaluation($executionResult1, $mutationCount);
+                $logger->startEvaluation($mutation1);
+                $logger->finishEvaluation($executionResult1);
 
-                $logger->startEvaluation($mutation2, $mutationCount);
-                $logger->finishEvaluation($executionResult2, $mutationCount);
+                $logger->startEvaluation($mutation2);
+                $logger->finishEvaluation($executionResult2);
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-                ##teamcity[flowFinished flowId='dafea228a2b182fe']
 
-                ##teamcity[flowStarted flowId='dafea228a2b182fe' parent='5568c7d4af5ccc7f']
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
-                ##teamcity[flowFinished flowId='dafea228a2b182fe']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
                 TEAM_CITY,
         ];
 
@@ -200,32 +190,24 @@ final class TeamCityLoggerTest extends TestCase
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
 
-                $logger->startEvaluation($mutation1, $mutationCount);
-                $logger->startEvaluation($mutation2, $mutationCount);
+                $logger->startEvaluation($mutation1);
+                $logger->startEvaluation($mutation2);
 
-                $logger->finishEvaluation($executionResult2, $mutationCount);
-                $logger->finishEvaluation($executionResult1, $mutationCount);
+                $logger->finishEvaluation($executionResult2);
+                $logger->finishEvaluation($executionResult1);
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-
-                ##teamcity[flowStarted flowId='a20ac7aa8518e530' parent='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
-
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
-                ##teamcity[flowFinished flowId='a20ac7aa8518e530']
 
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-                ##teamcity[flowFinished flowId='18830ccd5b35e676']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
                 TEAM_CITY,
         ];
 
@@ -257,36 +239,28 @@ final class TeamCityLoggerTest extends TestCase
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
 
-                $logger->startEvaluation($mutation1, $mutationCount);
-                $logger->finishEvaluation($executionResult1, $mutationCount);
+                $logger->startEvaluation($mutation1);
+                $logger->finishEvaluation($executionResult1);
 
-                $logger->startEvaluation($mutation2, $mutationCount);
-                $logger->finishEvaluation($executionResult2, $mutationCount);
+                $logger->startEvaluation($mutation2);
+                $logger->finishEvaluation($executionResult2);
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-                ##teamcity[flowFinished flowId='18830ccd5b35e676']
-
-                ##teamcity[flowStarted flowId='12f6def551a5aae7']
-                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
-
-                ##teamcity[flowStarted flowId='ea74aba5c3e84a26' parent='12f6def551a5aae7']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-                ##teamcity[flowFinished flowId='ea74aba5c3e84a26']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
 
                 ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
-                ##teamcity[flowFinished flowId='12f6def551a5aae7']
                 TEAM_CITY,
         ];
 
@@ -318,38 +292,27 @@ final class TeamCityLoggerTest extends TestCase
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
 
-                $logger->startEvaluation($mutation1, $mutationCount);
-                $logger->startEvaluation($mutation2, $mutationCount);
+                $logger->startEvaluation($mutation1);
+                $logger->startEvaluation($mutation2);
 
-                $logger->finishEvaluation($executionResult2, $mutationCount);
-                $logger->finishEvaluation($executionResult1, $mutationCount);
+                $logger->finishEvaluation($executionResult2);
+                $logger->finishEvaluation($executionResult1);
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
-                ##teamcity[flowStarted flowId='5568c7d4af5ccc7f']
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[flowStarted flowId='18830ccd5b35e676' parent='5568c7d4af5ccc7f']
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-
-                ##teamcity[flowStarted flowId='12f6def551a5aae7']
-                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
-
-                ##teamcity[flowStarted flowId='ea74aba5c3e84a26' parent='12f6def551a5aae7']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-                ##teamcity[flowFinished flowId='ea74aba5c3e84a26']
-
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-                ##teamcity[flowFinished flowId='18830ccd5b35e676']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
-                ##teamcity[flowFinished flowId='5568c7d4af5ccc7f']
 
+                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
                 ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
-                ##teamcity[flowFinished flowId='12f6def551a5aae7']
                 TEAM_CITY,
         ];
     }

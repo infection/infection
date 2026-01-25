@@ -94,9 +94,8 @@ final class TeamCityLogger implements MutationAnalysisLogger
             $mutation->getOriginalFilePath(),
             $this->configurationDirPathname,
         );
-        $testSuiteFlowId = hash('xxh3', $relativeSourceFilePath);
-        // TODO: the mutation hash would be better but is too big!
-        $mutationFlowId = hash('xxh3', $mutation->getHash());
+        $testSuiteFlowId = self::createFlowId($relativeSourceFilePath);
+        $mutationFlowId = self::createMutationFlowId($mutation);
 
         // Open the test suite if not already opened
         // TODO: add test to showcase that this is needed: a test suite name must be unique
@@ -202,6 +201,18 @@ final class TeamCityLogger implements MutationAnalysisLogger
                 ['flowId' => 'root'],
             ),
         );
+    }
+
+    private static function createFlowId(string $value): string
+    {
+        // Any hash which avoids collision, is fast and deterministic will do.
+        return hash('xxh3', $value);
+    }
+
+    private static function createMutationFlowId(Mutation $mutation): string
+    {
+        // TODO: the mutation hash would be better but is too big!
+        return self::createFlowId($mutation->getHash());
     }
 
     private function processResult(MutantExecutionResult $result): void
