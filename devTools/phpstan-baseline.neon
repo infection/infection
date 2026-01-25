@@ -751,18 +751,6 @@ parameters:
 			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
 
 		-
-			message: '#^Parameter \#1 \$expectedEvents of method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:assertAreSameEvents\(\) expects array\<.+\\MutationTestingWasFinished\|.+\\MutationTestingWasStarted\>, array\<int, \(.+\\MutantProcessWasFinished&PHPUnit\\Framework\\MockObject\\MockObject\)\|.+\\MutationTestingWasFinished\|.+\\MutationTestingWasStarted\> given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
-			message: '#^Parameter \#1 \$expectedEvents of method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:assertAreSameEvents\(\) expects array\<.+\\MutationTestingWasFinished\|.+\\MutationTestingWasStarted\>, array\<int, .+\\MutantProcessWasFinished\|.+\\MutationTestingWasFinished\|.+\\MutationTestingWasStarted\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			message: '#^Parameter \#1 \$className of static method Infection\\Reflection\\AnonymousClassReflection\:\:fromClassName\(\) expects class\-string, string given\.$#'
 			identifier: argument.type
 			count: 1
