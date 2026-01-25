@@ -87,11 +87,6 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
         $this->progressBar->start();
     }
 
-    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
-    {
-        $this->progressBar->advance();
-    }
-
     public function onInitialStaticAnalysisRunWasFinished(InitialStaticAnalysisRunWasFinished $event): void
     {
         $this->progressBar->finish();
@@ -99,5 +94,10 @@ final readonly class InitialStaticAnalysisRunConsoleLoggerSubscriber implements 
         if ($this->debug) {
             $this->output->writeln(PHP_EOL . $event->getOutputText());
         }
+    }
+
+    public function onInitialStaticAnalysisSubStepWasCompleted(InitialStaticAnalysisSubStepWasCompleted $event): void
+    {
+        $this->progressBar->advance();
     }
 }
