@@ -585,7 +585,6 @@ final class Container extends DIContainer
             },
             SourceCollectorFactory::class => static fn (self $container): SourceCollectorFactory => new SourceCollectorFactory(
                 $container->getGit(),
-                $container->getEventDispatcher(),
             ),
             SourceCollector::class => static fn (self $container): SourceCollector => new LazySourceCollector(
                 static function () use ($container): SourceCollector {

@@ -33,34 +33,10 @@
 
 declare(strict_types=1);
 
-<<<<<<<< HEAD:src/Telemetry/Subscriber/TelemetrySubscriber.php
-namespace Infection\Telemetry\Subscriber;
-========
 namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
->>>>>>>> feat/events:src/Event/Events/MutationAnalysis/MutationEvaluation/MutationEvaluationWasFinished.php
 
-use const FILE_APPEND;
-use function file_put_contents;
-use const PHP_EOL;
+use Infection\Mutant\MutantExecutionResult;
 
-<<<<<<<< HEAD:src/Telemetry/Subscriber/TelemetrySubscriber.php
-final class TelemetrySubscriber extends GodSubscriber
-{
-    private const LOG_FILE = __DIR__ . '/../../../var/telemetry.log';
-
-    public function __construct()
-    {
-        file_put_contents(self::LOG_FILE, '');
-    }
-
-    protected function log(object $event): void
-    {
-        file_put_contents(
-            self::LOG_FILE,
-            $event::class . PHP_EOL,
-            FILE_APPEND,
-        );
-========
 /**
  * @internal
  * @final
@@ -75,6 +51,5 @@ class MutationEvaluationWasFinished
     public function getExecutionResult(): MutantExecutionResult
     {
         return $this->executionResult;
->>>>>>>> feat/events:src/Event/Events/MutationAnalysis/MutationEvaluation/MutationEvaluationWasFinished.php
     }
 }
