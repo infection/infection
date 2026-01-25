@@ -662,8 +662,8 @@ final class MutationTestingRunnerTest extends TestCase
     }
 
     /**
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished> $expectedEvents
-     * @param array<MutationTestingWasStarted|MutationTestingWasFinished> $actualEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantProcessWasFinished> $expectedEvents
+     * @param array<MutationTestingWasStarted|MutationTestingWasFinished|MutantProcessWasFinished> $actualEvents
      */
     private function assertAreSameEvents(array $expectedEvents, array $actualEvents): void
     {
