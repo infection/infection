@@ -35,10 +35,10 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
+use function array_fill_keys;
 use function array_key_exists;
+use function array_merge;
 use function array_reverse;
-use function array_slice;
-use function count;
 use const DIRECTORY_SEPARATOR;
 use function explode;
 use function hash;
@@ -46,10 +46,10 @@ use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
-use function min;
 use Psr\Log\LoggerInterface;
 use function sprintf;
 use Symfony\Component\Filesystem\Path;
+use Webmozart\Assert\Assert;
 
 // TODO: explain somewhere the concept of TestSuite and Test for TeamCity
 final class TeamCityLogger implements MutationAnalysisLogger
@@ -57,19 +57,14 @@ final class TeamCityLogger implements MutationAnalysisLogger
     private const MILLISECONDS_PER_SECOND = 1000;
 
     /**
-     * @var list<string> Currently open test suite names (forming a path hierarchy)
+     * @var array<string, array<string, true>>
      */
-    private array $openSuites = [];
+    private array $evaluatedMutationIdsBySourceFilePath = [];
 
     /**
-     * @var array<string, string> The index is the relative source path of the source file.
+     * @var array<string, array{'name': string, 'flowId': string}> The index is the unchanged (absolute) source path of the source file.
      */
-    private array $openTestSuitesFlowIds = [];
-
-    /**
-     * @var array<string, string> The index is the mutation hash.
-     */
-    private array $openTestsFlowIds = [];
+    private array $openTestSuites = [];
 
     public function __construct(
         private readonly TeamCity $teamcity,
@@ -80,127 +75,120 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
     public function startAnalysis(int $mutationCount): void
     {
-        $this->logger->warning(
-            $this->teamcity->write(
-                MessageName::FLOW_STARTED,
-                ['flowId' => 'root'],
-            ),
-        );
     }
 
     public function startEvaluation(Mutation $mutation): void
     {
-        $relativeSourceFilePath = Path::makeRelative(
-            $mutation->getOriginalFilePath(),
-            $this->configurationDirPathname,
-        );
-        $testSuiteFlowId = self::createFlowId($relativeSourceFilePath);
-        $mutationFlowId = self::createMutationFlowId($mutation);
-
         // Open the test suite if not already opened
-        // TODO: add test to showcase that this is needed: a test suite name must be unique
-        if (!array_key_exists($relativeSourceFilePath, $this->openTestSuitesFlowIds)) {
-            $this->openTestSuitesFlowIds[$relativeSourceFilePath] = $testSuiteFlowId;
-
-            $this->logger->warning(
-                $this->teamcity->write(
-                    MessageName::FLOW_STARTED,
-                    [
-                        'flowId' => $testSuiteFlowId,
-                        'parent' => 'root',
-                    ],
-                ),
-            );
-            $this->logger->warning(
-                $this->teamcity->write(
-                    MessageName::TEST_SUITE_STARTED,
-                    [
-                        'name' => $relativeSourceFilePath,
-                        'flowId' => $testSuiteFlowId,
-                    ],
-                ),
-            );
-        }
-
-        $this->openTestsFlowIds[$mutation->getHash()] = $mutationFlowId;
-
-        $this->logger->warning(
-            $this->teamcity->write(
-                MessageName::FLOW_STARTED,
-                [
-                    'flowId' => $mutationFlowId,
-                    'parent' => $testSuiteFlowId,
-                ],
-            ),
+        $flowId = $this->startTestSuiteIfNecessary(
+            $mutation->getOriginalFilePath(),
         );
-        $this->logger->warning(
-            $this->teamcity->write(
-                MessageName::TEST_STARTED,
-                [
-                    // TODO: add a test to make it obvious: a test name must be unique
-                    'name' => sprintf(
-                        '%s (%s)',
-                        $mutation->getMutatorClass(),
-                        $mutation->getHash(),
-                    ),
-                    'flowId' => $mutationFlowId,
-                ],
-            ),
+
+        $this->write(
+            $this->teamcity->testStarted($mutation, $flowId),
         );
     }
 
     public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
-        $mutationFlowId = $this->openTestsFlowIds[$executionResult->getMutantHash()];
-        unset($this->openTestsFlowIds[$executionResult->getMutantHash()]);
+        $sourceFilePath = $executionResult->getOriginalFilePath();
+        $flowId = $this->openTestSuites[$sourceFilePath]['flowId'];
 
-        $this->logger->warning(
-            $this->teamcity->write(
-                MessageName::TEST_FINISHED,
-                [
-                    'name' => sprintf(
-                        '%s (%s)',
-                        $executionResult->getMutatorClass(),
-                        $executionResult->getMutantHash(),
-                    ),
-                    'flowId' => $mutationFlowId,
-                ],
+        $this->write(
+            $this->teamcity->testFinished(
+                $executionResult,
+                $flowId,
             ),
         );
-        $this->logger->warning(
-            $this->teamcity->write(
-                MessageName::FLOW_FINISHED,
-                ['flowId' => $mutationFlowId],
+
+        $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath][$executionResult->getMutantHash()] = true;
+
+        // $this->closeTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
+    }
+
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void {
+        $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] = array_merge(
+            array_fill_keys(
+                $mutationIds,
+                false,
             ),
+            $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] ?? [],
         );
+
+        $this->closeTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
     }
 
     public function finishAnalysis(): void
     {
-        foreach ($this->openTestSuitesFlowIds as $name => $flowId) {
-            $this->logger->warning(
-                $this->teamcity->write(
-                    MessageName::TEST_SUITE_FINISHED,
-                    [
-                        'name' => $name,
-                        'flowId' => $flowId,
-                    ],
-                ),
-            );
-            $this->logger->warning(
-                $this->teamcity->write(
-                    MessageName::FLOW_FINISHED,
-                    ['flowId' => $flowId],
-                ),
-            );
+        Assert::count($this->openTestSuites, 0);
+    }
+
+    private function startTestSuiteIfNecessary(string $sourceFilePath): string
+    {
+        if (array_key_exists($sourceFilePath, $this->openTestSuites)) {
+            return $this->openTestSuites[$sourceFilePath]['flowId'];
         }
 
-        $this->logger->warning(
-            $this->teamcity->write(
-                MessageName::FLOW_FINISHED,
-                ['flowId' => 'root'],
+        $relativeSourceFilePath = Path::makeRelative(
+            $sourceFilePath,
+            $this->configurationDirPathname,
+        );
+        $flowId = self::createFlowId($relativeSourceFilePath);
+
+        $this->openTestSuites[$sourceFilePath] = [
+            'name' => $relativeSourceFilePath,
+            'flowId' => $flowId,
+        ];
+
+        $this->write(
+            $this->teamcity->testSuiteStarted(
+                // TODO: add test to showcase that this is needed: a test suite name must be unique
+                name: $relativeSourceFilePath,
+                flowId: $flowId,
             ),
         );
+
+        return $flowId;
+    }
+
+    private function closeTestSuiteIfAllMutationsWereExecuted(string $sourceFilePath): void
+    {
+        if (!$this->areAllMutationsOfSourceFileExecuted($sourceFilePath)) {
+            return;
+        }
+
+        unset($this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath]);
+
+        $testSuite = $this->openTestSuites[$sourceFilePath];
+        unset($this->openTestSuites[$sourceFilePath]);
+
+        $this->write(
+            $this->teamcity->testSuiteFinished(
+                name: $testSuite['name'],
+                flowId: $testSuite['flowId'],
+            ),
+        );
+    }
+
+    private function areAllMutationsOfSourceFileExecuted(string $sourceFilePath): bool
+    {
+        $evaluatedMutations = $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] ?? [];
+
+        foreach ($evaluatedMutations as $evaluated) {
+            if (!$evaluated) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function write(string $messsage): void
+    {
+        $this->logger->warning($messsage);
     }
 
     private static function createFlowId(string $value): string
@@ -244,48 +232,10 @@ final class TeamCityLogger implements MutationAnalysisLogger
         return explode(DIRECTORY_SEPARATOR, $filePath);
     }
 
-    /**
-     * @param list<string> $newPathSegments
-     */
-    private function adjustSuiteHierarchy(array $newPathSegments): void
-    {
-        // Find the common prefix length between current open suites and new path
-        $commonPrefixLength = 0;
-        $minLength = min(count($this->openSuites), count($newPathSegments));
-
-        for ($i = 0; $i < $minLength; ++$i) {
-            if ($this->openSuites[$i] === $newPathSegments[$i]) {
-                ++$commonPrefixLength;
-            } else {
-                break;
-            }
-        }
-
-        // Close suites that are no longer in the path (in reverse order)
-        $suitesToClose = array_slice($this->openSuites, $commonPrefixLength);
-
-        foreach (array_reverse($suitesToClose) as $suiteName) {
-            $this->logger->warning(
-                $this->teamcity->testSuiteFinished($suiteName),
-            );
-        }
-
-        // Open new suites that need to be opened
-        $suitesToOpen = array_slice($newPathSegments, $commonPrefixLength);
-
-        foreach ($suitesToOpen as $suiteName) {
-            $this->logger->warning(
-                $this->teamcity->testSuiteStarted($suiteName),
-            );
-        }
-
-        $this->openSuites = $newPathSegments;
-    }
-
     private function closeAllSuites(): void
     {
         foreach (array_reverse($this->openSuites) as $suiteName) {
-            $this->logger->warning(
+            $this->write(
                 $this->teamcity->testSuiteFinished($suiteName),
             );
         }
@@ -298,13 +248,13 @@ final class TeamCityLogger implements MutationAnalysisLogger
         $testName = $this->getMutantTestName($result);
         $durationMs = (int) ($result->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
 
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testStarted($testName),
         );
 
         match ($result->getDetectionStatus()) {
             DetectionStatus::KILLED_BY_TESTS,
-            DetectionStatus::KILLED_BY_STATIC_ANALYSIS => $this->logger->warning(
+            DetectionStatus::KILLED_BY_STATIC_ANALYSIS => $this->write(
                 $this->teamcity->testFinished($testName, $durationMs),
             ),
             DetectionStatus::ESCAPED => $this->emitEscapedMutant($testName, $result, $durationMs),
@@ -332,7 +282,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFailed(
                 $testName,
                 'Mutant escaped',
@@ -340,7 +290,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
             ),
         );
 
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }
@@ -350,7 +300,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFailed(
                 $testName,
                 'Mutant timed out',
@@ -358,7 +308,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
             ),
         );
 
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }
@@ -368,7 +318,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFailed(
                 $testName,
                 sprintf('Mutant caused %s', $result->getDetectionStatus()->value),
@@ -376,7 +326,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
             ),
         );
 
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }
@@ -386,14 +336,14 @@ final class TeamCityLogger implements MutationAnalysisLogger
         MutantExecutionResult $result,
         int $durationMs,
     ): void {
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testIgnored(
                 $testName,
                 sprintf('Mutant %s', $result->getDetectionStatus()->value),
             ),
         );
 
-        $this->logger->warning(
+        $this->write(
             $this->teamcity->testFinished($testName, $durationMs),
         );
     }

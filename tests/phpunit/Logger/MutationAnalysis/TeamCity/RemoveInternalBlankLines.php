@@ -33,11 +33,60 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event\Events\MutationAnalysis;
+namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
+
+use function count;
+use function explode;
+use function implode;
+use Infection\CannotBeInstantiated;
+use function trim;
 
 /**
- * @internal
+ * This service is a utility to make the TeamCity logs more readable by indenting
+ * them based on the opening/closing blocks.
+ *
+ * Note that this is purely for testing purposes for better readability: teamcity
+ * logs do not need to be indented.
  */
-final readonly class MutationAnalysisStarted
+final class RemoveInternalBlankLines
 {
+    use CannotBeInstantiated;
+
+    public static function remove(string $lines): string
+    {
+        $lineArray = explode("\n", $lines);
+        $lineCount = count($lineArray);
+
+        $firstNonBlank = null;
+        $lastNonBlank = null;
+
+        foreach ($lineArray as $i => $line) {
+            if (trim($line) !== '') {
+                $firstNonBlank ??= $i;
+                $lastNonBlank = $i;
+            }
+        }
+
+        if ($firstNonBlank === null) {
+            return $lines;
+        }
+
+        $result = [];
+
+        for ($i = 0; $i < $firstNonBlank; ++$i) {
+            $result[] = $lineArray[$i];
+        }
+
+        for ($i = $firstNonBlank; $i <= $lastNonBlank; ++$i) {
+            if (trim($lineArray[$i]) !== '') {
+                $result[] = $lineArray[$i];
+            }
+        }
+
+        for ($i = $lastNonBlank + 1; $i < $lineCount; ++$i) {
+            $result[] = $lineArray[$i];
+        }
+
+        return implode("\n", $result);
+    }
 }

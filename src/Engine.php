@@ -217,8 +217,6 @@ final readonly class Engine
      */
     private function runMutationAnalysis(): void
     {
-        $this->eventDispatcher->dispatch(new MutationAnalysisStarted());
-
         $mutations = $this->mutationGenerator->generate(
             $this->config->mutateOnlyCoveredCode(),
         );
@@ -227,8 +225,6 @@ final readonly class Engine
             $mutations,
             $this->getFilteredExtraOptionsForMutant(),
         );
-
-        $this->eventDispatcher->dispatch(new MutationAnalysisFinished());
     }
 
     private function getFilteredExtraOptionsForMutant(): string

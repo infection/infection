@@ -33,18 +33,20 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationEvaluation;
+
+use Infection\Mutation\Mutation;
 
 /**
+ * TODO: I had the idea "source" to indicate that it applies an an item rather
+ *   than the general process but not sure about that.
+ *
  * @internal
  */
-final readonly class MutationGenerationForSourceFileWasFinished
+final readonly class MutationEvaluationWasStarted
 {
-    /**
-     * @param list<string> $sourceFileMutationIds
-     */
     public function __construct(
-        public array $sourceFileMutationIds,
+        public Mutation $mutation,
     ) {
     }
 }

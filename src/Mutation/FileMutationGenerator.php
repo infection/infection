@@ -36,8 +36,8 @@ declare(strict_types=1);
 namespace Infection\Mutation;
 
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutationGenerationForSourceFileWasFinished;
-use Infection\Event\MutationGenerationForSourceFileWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasStarted;
 use Infection\FileSystem\FileStore;
 use Infection\Mutator\Mutator;
 use Infection\Mutator\NodeMutationGenerator;
@@ -120,10 +120,12 @@ class FileMutationGenerator
         bool $onlyCovered,
         mixed $originalFileTokens,
     ): iterable {
+        $sourceFilePath = $sourceFile->getRealPath();
+
         $mutationCollectorVisitor = new MutationCollectorVisitor(
             new NodeMutationGenerator(
                 mutators: $mutators,
-                filePath: $sourceFile->getRealPath(),
+                filePath: $sourceFilePath,
                 fileNodes: $initialStatements,
                 trace: $trace,
                 onlyCovered: $onlyCovered,
@@ -151,6 +153,7 @@ class FileMutationGenerator
 
         $this->eventDispatcher->dispatch(
             new MutationGenerationForSourceFileWasFinished(
+                $sourceFilePath,
                 $sourceFileMutationIds,
             ),
         );

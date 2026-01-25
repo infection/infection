@@ -40,7 +40,6 @@ use Infection\Configuration\Entry\Source;
 use Infection\Configuration\SourceFilter\GitDiffFilter;
 use Infection\Configuration\SourceFilter\PlainFilter;
 use Infection\Configuration\SourceFilter\SourceFilter;
-use Infection\Event\EventDispatcher\EventDispatcher;
 use Infection\Git\Git;
 use InvalidArgumentException;
 use function sprintf;
@@ -53,7 +52,6 @@ final readonly class SourceCollectorFactory
 {
     public function __construct(
         private Git $git,
-        private EventDispatcher $eventDispatcher,
     ) {
     }
 

@@ -41,6 +41,10 @@ use Generator;
 use Infection\Differ\DiffColorizer;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasFinishedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationEvaluation\MutationEvaluationWasStartedSubscriber;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationForSourceFileWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinishedSubscriber;
 use Infection\Event\Events\MutationAnalysis\MutationTestingWasStarted;
@@ -65,7 +69,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-final class MutationTestingConsoleLoggerSubscriber implements MutationEvaluationWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
+final class MutationTestingConsoleLoggerSubscriberWas implements MutationEvaluationWasFinishedSubscriber, MutationEvaluationWasStartedSubscriber, MutationGenerationForSourceFileWasFinishedSubscriber, MutationTestingWasFinishedSubscriber, MutationTestingWasStartedSubscriber
 {
     private const PAD_LENGTH = 8;
 
@@ -98,19 +102,32 @@ final class MutationTestingConsoleLoggerSubscriber implements MutationEvaluation
     {
         $this->mutationCount = $event->getMutationCount();
 
-        $this->logger->start($this->mutationCount);
+        $this->logger->startAnalysis($this->mutationCount);
+    }
+
+    public function onMutationGenerationForSourceFileWasFinished(MutationGenerationForSourceFileWasFinished $event): void
+    {
+        $this->logger->finishMutationGenerationForFile(
+            $event->sourceFilePath,
+            $event->mutationIds,
+        );
+    }
+
+    public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void
+    {
+        $this->logger->startEvaluation($event->mutation);
     }
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
         $executionResult = $event->getExecutionResult();
 
-        $this->logger->advance($executionResult);
+        $this->logger->finishEvaluation($executionResult);
     }
 
     public function onMutationTestingWasFinished(MutationTestingWasFinished $event): void
     {
-        $this->logger->finish();
+        $this->logger->finishAnalysis();
 
         if ($this->numberOfMutationsBudget !== 0) {
             $this->showMutations($this->resultsCollector->getEscapedExecutionResults(), 'Escaped');

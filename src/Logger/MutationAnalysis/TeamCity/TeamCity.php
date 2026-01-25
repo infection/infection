@@ -38,6 +38,8 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
 use function array_keys;
 use function array_map;
 use function implode;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use function is_int;
 use function preg_replace;
 use function sprintf;
@@ -45,7 +47,10 @@ use function str_contains;
 use function str_replace;
 
 /**
- * This service provides the primitives to write a TeamCity log record.
+ * This service provides the primitives to write a TeamCity log record. It is
+ * adapted to Infection in the context of mutation testing, but it does not
+ * make any assumption about the order of the calls made or the support the logs
+ * are written to.
  *
  * @see https://www.jetbrains.com/help/teamcity/2025.07/service-messages.html
  *
@@ -60,27 +65,31 @@ final class TeamCity
 
     private const UNICODE_CHARACTER_REGEX = '/\\\\u(?<hexadecimalDigits>[0-9A-Fa-f]{4})/';
 
-    public function __construct(
-        // private string $rootFlowId = 'root',
-    ) {
-    }
-
-    public function testSuiteStarted(string $name): string
-    {
-        return $this->writeMessage(
-            'testSuiteStarted',
-            ['name' => $name],
+    public function testSuiteStarted(
+        string $name,
+        string $flowId,
+    ): string {
+        return $this->write(
+            MessageName::TEST_SUITE_STARTED,
+            [
+                'name' => $name,
+                'flowId' => $flowId,
+            ],
         );
     }
 
-    public function testSuiteFinished(string $name): string
+    public function testSuiteFinished(string $name, string $flowId): string
     {
-        return $this->writeMessage(
-            'testSuiteFinished',
-            ['name' => $name],
+        return $this->write(
+            MessageName::TEST_SUITE_FINISHED,
+            [
+                'name' => $name,
+                'flowId' => $flowId,
+            ],
         );
     }
 
+    // TODO
     public function testCount(int $count): string
     {
         return $this->writeMessage(
@@ -89,45 +98,43 @@ final class TeamCity
         );
     }
 
-    public function testStarted(string $name): string
+    /**
+     * @param string $flowId Flow ID of the test suite the test belongs to.
+     */
+    public function testStarted(Mutation $mutation, string $flowId): string
     {
-        return $this->writeMessage(
-            'testStarted',
-            ['name' => $name],
-        );
-    }
-
-    public function testFinished(string $name, int $durationMs = 0): string
-    {
-        return $this->writeMessage(
-            'testFinished',
+        return $this->write(
+            MessageName::TEST_STARTED,
             [
-                'name' => $name,
-                'duration' => $durationMs,
+                'name' => self::createTestId($mutation),
+                'flowId' => $flowId,
             ],
         );
     }
 
-    public function testFailed(string $name, string $message, string $details = ''): string
-    {
-        return $this->writeMessage(
-            'testFailed',
+    public function testFinished(
+        MutantExecutionResult $executionResult,
+        string $flowId,
+    ): string {
+        return $this->write(
+            MessageName::TEST_FINISHED,
             [
-                'name' => $name,
-                'message' => $message,
-                'details' => $details,
+                'name' => self::createTestId($executionResult),
+                'flowId' => $flowId,
+                // 'duration' => $durationMs,
             ],
         );
     }
 
-    public function testIgnored(string $name, string $message): string
+    private function createTestId(Mutation|MutantExecutionResult $subject): string
     {
-        return $this->writeMessage(
-            'testIgnored',
-            [
-                'name' => $name,
-                'message' => $message,
-            ],
+        // TODO: add a test to make it obvious: a test name must be unique
+        return sprintf(
+            '%s (%s)',
+            $subject->getMutatorClass(),
+            $subject instanceof Mutation
+                ? $subject->getHash()
+                : $subject->getMutantHash(),
         );
     }
 
@@ -136,7 +143,7 @@ final class TeamCity
      *
      * @param string|array<non-empty-string|int, string|int|float> $valueOrAttributes
      */
-    public function write(
+    private function write(
         MessageName $messageName,
         string|array $valueOrAttributes,
     ): string {
@@ -149,37 +156,6 @@ final class TeamCity
                     ...self::escape((array) $valueOrAttributes),
                 ],
             ),
-        );
-    }
-
-    /**
-     * @param array<string, int|string> $parameters
-     */
-    private function writeMessage(string $eventName, array $parameters = []): string
-    {
-        $message = sprintf('##teamcity[%s', $eventName);
-
-        if ($this->flowId !== null) {
-            $parameters['flowId'] = $this->flowId;
-        }
-
-        foreach ($parameters as $key => $value) {
-            $message .= sprintf(
-                " %s='%s'",
-                $key,
-                $this->legacyEscape((string) $value),
-            );
-        }
-
-        return $message . "]\n";
-    }
-
-    private function legacyEscape(string $string): string
-    {
-        return str_replace(
-            ['|', "'", "\n", "\r", ']', '['],
-            ['||', "|'", '|n', '|r', '|]', '|['],
-            $string,
         );
     }
 

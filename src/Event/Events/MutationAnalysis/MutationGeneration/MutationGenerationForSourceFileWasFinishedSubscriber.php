@@ -33,11 +33,14 @@
 
 declare(strict_types=1);
 
-namespace Infection\Event;
+namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
+
+use Infection\Event\Subscriber\EventSubscriber;
 
 /**
  * @internal
  */
-final readonly class MutationGenerationForSourceFileWasStarted
+interface MutationGenerationForSourceFileWasFinishedSubscriber extends EventSubscriber
 {
+    public function onMutationGenerationForSourceFileWasFinished(MutationGenerationForSourceFileWasFinished $event): void;
 }

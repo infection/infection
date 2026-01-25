@@ -51,6 +51,14 @@ interface MutationAnalysisLogger
      */
     public function startAnalysis(int $mutationCount): void;
 
+    /**
+     * @param list<string> $mutationIds
+     */
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void;
+
     public function startEvaluation(Mutation $mutation): void;
 
     /**

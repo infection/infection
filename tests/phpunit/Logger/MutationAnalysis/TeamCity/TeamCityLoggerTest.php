@@ -35,10 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use function array_filter;
 use function array_map;
 use Closure;
-use function explode;
 use function implode;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
@@ -53,6 +51,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
 
+#[CoversClass(TeamCity::class)]
 #[CoversClass(TeamCityLogger::class)]
 final class TeamCityLoggerTest extends TestCase
 {
@@ -80,7 +79,7 @@ final class TeamCityLoggerTest extends TestCase
         string $expected,
     ): void {
         // We allow blank lines in expected for readability.
-        $cleanedUpExpected = self::removeBlankLines($expected);
+        $cleanedUpExpected = RemoveInternalBlankLines::remove($expected);
         $execute($this->teamCityLogger);
 
         $actual = $this->getTeamCityLog();
@@ -92,52 +91,62 @@ final class TeamCityLoggerTest extends TestCase
     {
         yield 'one mutation executed for a source file' => [
             static function (MutationAnalysisLogger $logger): void {
-                $mutationCount = 1;
-                $logger->startAnalysis($mutationCount);
+                $sourceFilePath = '/path/to/project/src/Service/UserService.php';
+
+                $logger->startAnalysis(1);
 
                 $mutation = MutationBuilder::withMinimalTestData()
-                    ->withOriginalFilePath('/path/to/project/src/Service/UserService.php')
+                    ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->build();
                 $executionResult = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation->getOriginalFilePath())
                     ->withMutatorClass($mutation->getMutatorClass())
                     ->withMutantHash($mutation->getHash())
                     ->build();
 
                 $logger->startEvaluation($mutation);
                 $logger->finishEvaluation($executionResult);
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath,
+                    [$mutation->getHash()],
+                );
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+
                 TEAM_CITY,
         ];
 
         yield 'two mutations executed for a source file, launched synchronously' => [
             static function (MutationAnalysisLogger $logger): void {
-                $mutationCount = 2;
-                $logger->startAnalysis($mutationCount);
+                $sourceFilePath = '/path/to/project/src/Service/UserService.php';
+
+                $logger->startAnalysis(2);
 
                 $mutation1 = MutationBuilder::withMinimalTestData()
-                    ->withOriginalFilePath('/path/to/project/src/Service/UserService.php')
+                    ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->build();
                 $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation1->getOriginalFilePath())
                     ->withMutatorClass($mutation1->getMutatorClass())
                     ->withMutantHash($mutation1->getHash())
                     ->build();
 
                 $mutation2 = MutationBuilder::withMinimalTestData()
-                    ->withOriginalFilePath('/path/to/project/src/Service/UserService.php')
+                    ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->build();
                 $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
                     ->withMutatorClass($mutation2->getMutatorClass())
                     ->withMutantHash($mutation2->getHash())
                     ->build();
@@ -148,18 +157,27 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->startEvaluation($mutation2);
                 $logger->finishEvaluation($executionResult2);
 
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath,
+                    [
+                        $mutation1->getHash(),
+                        $mutation2->getHash(),
+                    ],
+                );
+
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='dafea228a2b182fe']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='dafea228a2b182fe']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+
                 TEAM_CITY,
         ];
 
@@ -183,6 +201,7 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorName('LogicalAnd')
                     ->build();
                 $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
                     ->withMutatorClass($mutation2->getMutatorClass())
                     ->withMutantHash($mutation2->getHash())
                     ->build();
@@ -201,11 +220,11 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='18830ccd5b35e676']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
 
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='a20ac7aa8518e530']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='18830ccd5b35e676']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
                 TEAM_CITY,
@@ -213,25 +232,29 @@ final class TeamCityLoggerTest extends TestCase
 
         yield 'one mutation executed for two source file, launched synchronously' => [
             static function (MutationAnalysisLogger $logger): void {
-                $mutationCount = 2;
-                $logger->startAnalysis($mutationCount);
+                $logger->startAnalysis(2);
+
+                $sourceFilePath1 = '/path/to/project/src/Service/UserService.php';
+                $sourceFilePath2 = '/path/to/project/src/Service/ContactService.php';
 
                 $mutation1 = MutationBuilder::withMinimalTestData()
-                    ->withOriginalFilePath('/path/to/project/src/Service/UserService.php')
+                    ->withOriginalFilePath($sourceFilePath1)
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->withMutatorName('LogicalOr')
                     ->build();
                 $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation1->getOriginalFilePath())
                     ->withMutatorClass($mutation1->getMutatorClass())
                     ->withMutantHash($mutation1->getHash())
                     ->build();
 
                 $mutation2 = MutationBuilder::withMinimalTestData()
-                    ->withOriginalFilePath('/path/to/project/src/Service/ContactService.php')
+                    ->withOriginalFilePath($sourceFilePath2)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->withMutatorName('LogicalAnd')
                     ->build();
                 $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
                     ->withMutatorClass($mutation2->getMutatorClass())
                     ->withMutantHash($mutation2->getHash())
                     ->build();
@@ -241,26 +264,35 @@ final class TeamCityLoggerTest extends TestCase
 
                 $logger->startEvaluation($mutation1);
                 $logger->finishEvaluation($executionResult1);
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath1,
+                    [$mutation1->getHash()],
+                );
 
                 $logger->startEvaluation($mutation2);
                 $logger->finishEvaluation($executionResult2);
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath2,
+                    [$mutation2->getHash()],
+                );
 
                 $logger->finishAnalysis();
             },
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' flowId='12f6def551a5aae7']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (0a451675763250c03e95b626f7bcfb7d)' flowId='12f6def551a5aae7']
 
                 ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+
                 TEAM_CITY,
         ];
 
@@ -275,6 +307,7 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorName('LogicalOr')
                     ->build();
                 $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation1->getOriginalFilePath())
                     ->withMutatorClass($mutation1->getMutatorClass())
                     ->withMutantHash($mutation1->getHash())
                     ->build();
@@ -285,6 +318,7 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorName('LogicalAnd')
                     ->build();
                 $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
                     ->withMutatorClass($mutation2->getMutatorClass())
                     ->withMutantHash($mutation2->getHash())
                     ->build();
@@ -303,8 +337,8 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr' flowId='18830ccd5b35e676']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='18830ccd5b35e676']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='18830ccd5b35e676']
 
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd' flowId='ea74aba5c3e84a26']
@@ -315,16 +349,6 @@ final class TeamCityLoggerTest extends TestCase
                 ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
                 TEAM_CITY,
         ];
-    }
-
-    private static function removeBlankLines(string $lines): string
-    {
-        return implode(
-            "\n",
-            array_filter(
-                explode("\n", $lines),
-            ),
-        );
     }
 
     private function getTeamCityLog(): string

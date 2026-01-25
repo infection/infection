@@ -52,6 +52,13 @@ abstract class AbstractMutationAnalysisLogger implements MutationAnalysisLogger
         $this->callsCount = 0;
     }
 
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void {
+        // Do nothing.
+    }
+
     public function startEvaluation(Mutation $mutation): void
     {
         // Do nothing.
