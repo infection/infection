@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**

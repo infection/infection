@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
 use Infection\Event\EventDispatcher\SyncEventDispatcher;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Resource\Listener\PerformanceLoggerSubscriber;
 use Infection\Resource\Time\Stopwatch;
 use Infection\Tests\Fixtures\Resource\Memory\FakeMemoryFormatter;

@@ -37,9 +37,9 @@ namespace Infection\Mutation;
 
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
 use Infection\Source\Collector\SourceCollector;

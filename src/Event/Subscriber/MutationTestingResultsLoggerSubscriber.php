@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Infection\Logger\MutationTestingResultsLogger;
 
 /**

@@ -35,9 +35,9 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\InitialStaticAnalysisRunWasFinished;
-use Infection\Event\InitialStaticAnalysisRunWasStarted;
-use Infection\Event\InitialStaticAnalysisSubStepWasCompleted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasFinished;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisRunWasStarted;
+use Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis\InitialStaticAnalysisSubStepWasCompleted;
 use Infection\StaticAnalysis\StaticAnalysisToolAdapter;
 use InvalidArgumentException;
 use const PHP_EOL;

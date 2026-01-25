@@ -35,8 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Resource\Listener;
 
-use Infection\Event\ApplicationExecutionWasFinished;
-use Infection\Event\ApplicationExecutionWasStarted;
+use Infection\Event\Events\Application\ApplicationExecutionWasFinished;
+use Infection\Event\Events\Application\ApplicationExecutionWasStarted;
 use Infection\Event\Subscriber\EventSubscriber;
 use Infection\Resource\Memory\MemoryFormatter;
 use Infection\Resource\Time\Stopwatch;

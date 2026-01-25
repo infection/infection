@@ -35,7 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Event\Subscriber;
 
-use Infection\Event\MutationTestingWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationTestingWasFinished;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
