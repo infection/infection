@@ -113,10 +113,10 @@ final class MutationTestingConsoleLoggerSubscriber implements MutableFileWasProc
 
     public function onMutableFileWasProcessed(MutableFileWasProcessed $event): void
     {
-        if (count($event->mutationIds) > 0) {
+        if (count($event->mutationHashes) > 0) {
             $this->logger->finishMutationGenerationForFile(
                 $event->sourceFilePath,
-                $event->mutationIds,
+                $event->mutationHashes,
             );
         }
     }

@@ -41,11 +41,11 @@ namespace Infection\Event\Events\MutationAnalysis\MutationGeneration;
 final readonly class MutableFileWasProcessed
 {
     /**
-     * @param list<string> $mutationIds
+     * @param list<string> $mutationHashes
      */
     public function __construct(
         public string $sourceFilePath,
-        public array $mutationIds,
+        public array $mutationHashes,
     ) {
     }
 }
