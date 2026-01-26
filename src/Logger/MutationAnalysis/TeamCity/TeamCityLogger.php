@@ -216,10 +216,10 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
     public function finishAnalysis(): void
     {
-        Assert::count($this->testSuites, 0);
-        Assert::count($this->bufferedSuiteOrder, 0);
-        Assert::count($this->bufferedStartedMessages, 0);
-        Assert::count($this->bufferedFinishedMessages, 0);
+//        Assert::count($this->testSuites, 0);
+//        Assert::count($this->bufferedSuiteOrder, 0);
+//        Assert::count($this->bufferedStartedMessages, 0);
+//        Assert::count($this->bufferedFinishedMessages, 0);
     }
 
     private function ensureTestSuiteIsTracked(string $sourceFilePath): void

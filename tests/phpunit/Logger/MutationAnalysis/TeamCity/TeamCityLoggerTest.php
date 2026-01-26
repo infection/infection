@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
+use Infection\Mutator\Operator\Continue_;
 use function array_map;
 use Closure;
 use function implode;
@@ -205,7 +206,7 @@ final class TeamCityLoggerTest extends TestCase
                 TEAM_CITY,
         ];
 
-        yield 'two mutations executed for a source file, launched in parallel' => [
+        yield 'three mutations executed for a source file, launched in parallel' => [
             static function (MutationAnalysisLogger $logger): void {
                 $logger->startAnalysis(2);
 
@@ -224,13 +225,21 @@ final class TeamCityLoggerTest extends TestCase
                     ->build();
                 $executionResult2 = self::createExecutionResult($mutation2);
 
+                $mutation3 = MutationBuilder::from($mutation1)
+                    ->withMutatorClass(Continue_::class)
+                    ->withMutatorName('Continue_')
+                    ->build();
+                $executionResult3 = self::createExecutionResult($mutation3);
+
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
 
                 $logger->startEvaluation($mutation1);
                 $logger->startEvaluation($mutation2);
+                $logger->startEvaluation($mutation3);
 
                 $logger->finishEvaluation($executionResult2);
+                $logger->finishEvaluation($executionResult3);
                 $logger->finishEvaluation($executionResult1);
 
                 $logger->finishMutationGenerationForFile(
@@ -238,6 +247,7 @@ final class TeamCityLoggerTest extends TestCase
                     [
                         $mutation1->getHash(),
                         $mutation2->getHash(),
+                        $mutation3->getHash(),
                     ],
                 );
 
@@ -251,6 +261,9 @@ final class TeamCityLoggerTest extends TestCase
 
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
@@ -457,15 +470,6 @@ final class TeamCityLoggerTest extends TestCase
 
                 // Sanity check
                 self::assertNotSame($mutation1A->getHash(), $mutation1B->getHash());
-
-                // ::startEvaluation() of M1 (LogicalNot) of DiffColorizer.php
-                // ::startEvaluation() of M2 (Continue_) of DiffColorizer.php
-                // ::finishMutationGeneration() of DiffColorizer.php
-                // ::startEvaluation() of M3 (BooleanNot) of DiffSourceCodeMatcher.php
-                // ::finishEvaluation() of M1 (LogicalNot) of DiffColorizer.php
-                // ::finishEvaluation() of M2 (Continue_) of DiffColorizer.php
-                // ::finishMutationGeneration() of DiffSourceCodeMatcher.php
-                // ::finishEvaluation() of M3 (BooleanNot) of DiffSourceCodeMatcher.php
 
                 $logger->startEvaluation($mutation1A);
                 $logger->startEvaluation($mutation1B);
