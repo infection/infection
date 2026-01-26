@@ -124,6 +124,43 @@ final class TeamCityLoggerTest extends TestCase
 
                 TEAM_CITY,
         ];
+        yield 'one mutation executed for a source file for which the mutations were all generate before all mutants were' => [
+            static function (MutationAnalysisLogger $logger): void {
+                $sourceFilePath = '/path/to/project/src/Service/UserService.php';
+
+                $logger->startAnalysis(1);
+
+                $mutation = MutationBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($sourceFilePath)
+                    ->withMutatorClass(LogicalOrMutator::class)
+                    ->build();
+                $executionResult = MutantExecutionResultBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($mutation->getOriginalFilePath())
+                    ->withMutatorClass($mutation->getMutatorClass())
+                    ->withMutantHash($mutation->getHash())
+                    ->build();
+
+                $logger->startEvaluation($mutation);
+
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath,
+                    [$mutation->getHash()],
+                );
+
+                $logger->finishEvaluation($executionResult);
+
+                $logger->finishAnalysis();
+            },
+            <<<'TEAM_CITY'
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+
+                TEAM_CITY,
+        ];
 
         yield 'two mutations executed for a source file, launched synchronously' => [
             static function (MutationAnalysisLogger $logger): void {

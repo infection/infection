@@ -62,6 +62,14 @@ final class TeamCityLogger implements MutationAnalysisLogger
     private array $evaluatedMutationIdsBySourceFilePath = [];
 
     /**
+     * Populated when all the mutations were generated. This may happen while
+     * some mutants are still being evaluated.
+     *
+     * @var array<string, list<string>>
+     */
+    private array $generatedMutationIdsBySourceFilePath = [];
+
+    /**
      * @var array<string, array{'name': string, 'flowId': string}> The index is the unchanged (absolute) source path of the source file.
      */
     private array $openTestSuites = [];
@@ -103,13 +111,14 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
         $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath][$executionResult->getMutantHash()] = true;
 
-        // $this->closeTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
+         $this->closeTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
     }
 
     public function finishMutationGenerationForFile(
         string $sourceFilePath,
         array $mutationIds,
     ): void {
+        $this->generatedMutationIdsBySourceFilePath[$sourceFilePath] = $mutationIds;
         $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] = array_merge(
             array_fill_keys(
                 $mutationIds,
@@ -175,9 +184,17 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
     private function areAllMutationsOfSourceFileExecuted(string $sourceFilePath): bool
     {
-        $evaluatedMutations = $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] ?? [];
+        // We cannot confirm that all mutations
+        if (!array_key_exists($sourceFilePath, $this->generatedMutationIdsBySourceFilePath)) {
+            return false;
+        }
 
-        foreach ($evaluatedMutations as $evaluated) {
+        $mutationIds = $this->generatedMutationIdsBySourceFilePath[$sourceFilePath];
+        $evaluatedMutationsByMutationId = $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath] ?? [];
+
+        foreach ($mutationIds as $mutationId) {
+            $evaluated = $evaluatedMutationsByMutationId[$mutationId] ?? false;
+
             if (!$evaluated) {
                 return false;
             }
