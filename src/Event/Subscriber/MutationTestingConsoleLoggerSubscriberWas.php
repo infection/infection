@@ -107,10 +107,12 @@ final class MutationTestingConsoleLoggerSubscriberWas implements MutationEvaluat
 
     public function onMutationGenerationForSourceFileWasFinished(MutationGenerationForSourceFileWasFinished $event): void
     {
-        $this->logger->finishMutationGenerationForFile(
-            $event->sourceFilePath,
-            $event->mutationIds,
-        );
+        if (count($event->mutationIds) > 0) {
+            $this->logger->finishMutationGenerationForFile(
+                $event->sourceFilePath,
+                $event->mutationIds,
+            );
+        }
     }
 
     public function onMutationEvaluationWasStarted(MutationEvaluationWasStarted $event): void

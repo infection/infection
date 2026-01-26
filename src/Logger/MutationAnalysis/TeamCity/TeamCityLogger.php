@@ -38,24 +38,18 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
 use function array_fill_keys;
 use function array_key_exists;
 use function array_merge;
-use function array_reverse;
-use const DIRECTORY_SEPARATOR;
-use function explode;
+use function count;
 use function hash;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
-use Infection\Mutant\DetectionStatus;
 use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Psr\Log\LoggerInterface;
-use function sprintf;
 use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 // TODO: explain somewhere the concept of TestSuite and Test for TeamCity
 final class TeamCityLogger implements MutationAnalysisLogger
 {
-    private const MILLISECONDS_PER_SECOND = 1000;
-
     /**
      * @var array<string, array<string, true>>
      */
@@ -72,7 +66,56 @@ final class TeamCityLogger implements MutationAnalysisLogger
     /**
      * @var array<string, array{'name': string, 'flowId': string}> The index is the unchanged (absolute) source path of the source file.
      */
-    private array $openTestSuites = [];
+    private array $testSuites = [];
+
+    /**
+     * Maps mutation hash to source file path.
+     * This is needed because MutantExecutionResult may not have the correct source file path.
+     *
+     * @var array<string, string>
+     */
+    private array $mutationHashToSourceFilePath = [];
+
+    /**
+     * Maps mutation hash to the flowId used for its testStarted message.
+     * This ensures testFinished uses the same flowId for consistency.
+     *
+     * @var array<string, string>
+     */
+    private array $mutationHashToFlowId = [];
+
+    /**
+     * The source file path of the currently active test suite.
+     * Only one test suite can output at a time.
+     */
+    private ?string $activeTestSuiteSourceFilePath = null;
+
+    /**
+     * The mutation hash of the currently active mutation within the active test suite.
+     * Only the first mutation in a suite is "active" - subsequent mutations are buffered.
+     */
+    private ?string $activeMutationHash = null;
+
+    /**
+     * Buffered testStarted messages for test suites that need to wait for the active mutation to finish.
+     *
+     * @var array<string, list<string>>
+     */
+    private array $bufferedStartedMessages = [];
+
+    /**
+     * Buffered testFinished messages for test suites that need to wait for the active mutation to finish.
+     *
+     * @var array<string, list<string>>
+     */
+    private array $bufferedFinishedMessages = [];
+
+    /**
+     * Order in which buffered suites were started (for FIFO output).
+     *
+     * @var list<string>
+     */
+    private array $bufferedSuiteOrder = [];
 
     public function __construct(
         private readonly TeamCity $teamcity,
@@ -87,31 +130,89 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
     public function startEvaluation(Mutation $mutation): void
     {
-        // Open the test suite if not already opened
-        $flowId = $this->startTestSuiteIfNecessary(
-            $mutation->getOriginalFilePath(),
-        );
+        $sourceFilePath = $mutation->getOriginalFilePath();
+        $mutationHash = $mutation->getHash();
 
-        $this->write(
-            $this->teamcity->testStarted($mutation, $flowId),
-        );
+        // Track the mapping from mutation hash to source file path
+        $this->mutationHashToSourceFilePath[$mutationHash] = $sourceFilePath;
+
+        $this->ensureTestSuiteIsTracked($sourceFilePath);
+
+        if ($this->activeTestSuiteSourceFilePath === null) {
+            $this->activeTestSuiteSourceFilePath = $sourceFilePath;
+            $this->activeMutationHash = $mutationHash;
+
+            $flowId = $this->outputTestSuiteStarted($sourceFilePath);
+
+            $this->mutationHashToFlowId[$mutationHash] = $flowId;
+            $this->write(
+                $this->teamcity->testStarted(
+                    $mutation,
+                    $flowId,
+                ),
+            );
+        } elseif ($this->activeTestSuiteSourceFilePath === $sourceFilePath) {
+            // Same suite as active - buffer if there's an active mutation, otherwise output
+            if ($this->activeMutationHash !== null) {
+                // Buffer for later output - use suite flowId for buffered tests
+                $flowId = $this->testSuites[$sourceFilePath]['flowId'];
+                $this->mutationHashToFlowId[$mutationHash] = $flowId;
+                $this->bufferStartedMessage(
+                    $sourceFilePath,
+                    $this->teamcity->testStarted($mutation, $flowId),
+                );
+            } else {
+                $this->activeMutationHash = $mutationHash;
+                $flowId = $this->testSuites[$sourceFilePath]['flowId'];
+                $this->mutationHashToFlowId[$mutationHash] = $flowId;
+                $this->write($this->teamcity->testStarted($mutation, $flowId));
+            }
+        } else {
+            // Different suite - buffer the message
+            $this->ensureSuiteIsBuffered($sourceFilePath);
+            $flowId = $this->testSuites[$sourceFilePath]['flowId'];
+            $this->mutationHashToFlowId[$mutationHash] = $flowId;
+            $this->bufferStartedMessage(
+                $sourceFilePath,
+                $this->teamcity->testStarted($mutation, $flowId),
+            );
+        }
     }
 
     public function finishEvaluation(MutantExecutionResult $executionResult): void
     {
-        $sourceFilePath = $executionResult->getOriginalFilePath();
-        $flowId = $this->openTestSuites[$sourceFilePath]['flowId'];
+        // Use the mutation hash to look up the correct source file path
+        $mutantHash = $executionResult->getMutantHash();
+        $sourceFilePath = $this->mutationHashToSourceFilePath[$mutantHash];
+        // Use the same flowId that was used for testStarted
+        $flowId = $this->mutationHashToFlowId[$mutantHash];
 
-        $this->write(
-            $this->teamcity->testFinished(
-                $executionResult,
-                $flowId,
-            ),
-        );
+        $isActiveMutation = $sourceFilePath === $this->activeTestSuiteSourceFilePath
+            && $mutantHash === $this->activeMutationHash;
 
-        $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath][$executionResult->getMutantHash()] = true;
+        if ($isActiveMutation) {
+            // Active mutation - output directly
+            $this->write($this->teamcity->testFinished($executionResult, $flowId));
+            $this->activeMutationHash = null;
+            // Flush buffered messages for the current suite
+            $this->flushSuiteBuffer($sourceFilePath);
+        } elseif ($sourceFilePath === $this->activeTestSuiteSourceFilePath) {
+            // Same suite but not active mutation - buffer
+            $this->bufferFinishedMessage(
+                $sourceFilePath,
+                $this->teamcity->testFinished($executionResult, $flowId),
+            );
+        } else {
+            // Buffered suite - buffer the message
+            $this->bufferFinishedMessage(
+                $sourceFilePath,
+                $this->teamcity->testFinished($executionResult, $flowId),
+            );
+        }
 
-         $this->closeTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
+        $this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath][$mutantHash] = true;
+
+        $this->closeTestSuiteIfAllMutationsWereExecuted($sourceFilePath);
     }
 
     public function finishMutationGenerationForFile(
@@ -132,13 +233,13 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
     public function finishAnalysis(): void
     {
-        Assert::count($this->openTestSuites, 0);
+        Assert::count($this->testSuites, 0);
     }
 
-    private function startTestSuiteIfNecessary(string $sourceFilePath): string
+    private function ensureTestSuiteIsTracked(string $sourceFilePath): void
     {
-        if (array_key_exists($sourceFilePath, $this->openTestSuites)) {
-            return $this->openTestSuites[$sourceFilePath]['flowId'];
+        if (array_key_exists($sourceFilePath, $this->testSuites)) {
+            return;
         }
 
         $relativeSourceFilePath = Path::makeRelative(
@@ -147,20 +248,62 @@ final class TeamCityLogger implements MutationAnalysisLogger
         );
         $flowId = self::createFlowId($relativeSourceFilePath);
 
-        $this->openTestSuites[$sourceFilePath] = [
+        $this->testSuites[$sourceFilePath] = [
             'name' => $relativeSourceFilePath,
             'flowId' => $flowId,
         ];
+    }
+
+    private function outputTestSuiteStarted(string $sourceFilePath): string
+    {
+        $testSuite = $this->testSuites[$sourceFilePath];
 
         $this->write(
             $this->teamcity->testSuiteStarted(
-                // TODO: add test to showcase that this is needed: a test suite name must be unique
-                name: $relativeSourceFilePath,
-                flowId: $flowId,
+                name: $testSuite['name'],
+                flowId: $testSuite['flowId'],
             ),
         );
 
-        return $flowId;
+        return $testSuite['flowId'];
+    }
+
+    private function ensureSuiteIsBuffered(string $sourceFilePath): void
+    {
+        if (!array_key_exists($sourceFilePath, $this->bufferedStartedMessages)) {
+            $this->bufferedStartedMessages[$sourceFilePath] = [];
+            $this->bufferedFinishedMessages[$sourceFilePath] = [];
+            $this->bufferedSuiteOrder[] = $sourceFilePath;
+        }
+    }
+
+    private function bufferStartedMessage(string $sourceFilePath, string $message): void
+    {
+        $this->bufferedStartedMessages[$sourceFilePath][] = $message;
+    }
+
+    private function bufferFinishedMessage(string $sourceFilePath, string $message): void
+    {
+        $this->bufferedFinishedMessages[$sourceFilePath][] = $message;
+    }
+
+    private function flushSuiteBuffer(string $sourceFilePath): void
+    {
+        // Output started messages first, then finished messages
+        // to maintain the correct testStarted -> testFinished order
+        $startedMessages = $this->bufferedStartedMessages[$sourceFilePath] ?? [];
+        $finishedMessages = $this->bufferedFinishedMessages[$sourceFilePath] ?? [];
+
+        foreach ($startedMessages as $message) {
+            $this->write($message);
+        }
+
+        foreach ($finishedMessages as $message) {
+            $this->write($message);
+        }
+
+        $this->bufferedStartedMessages[$sourceFilePath] = [];
+        $this->bufferedFinishedMessages[$sourceFilePath] = [];
     }
 
     private function closeTestSuiteIfAllMutationsWereExecuted(string $sourceFilePath): void
@@ -171,20 +314,72 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
         unset($this->evaluatedMutationIdsBySourceFilePath[$sourceFilePath]);
 
-        $testSuite = $this->openTestSuites[$sourceFilePath];
-        unset($this->openTestSuites[$sourceFilePath]);
+        $testSuite = $this->testSuites[$sourceFilePath];
+        unset($this->testSuites[$sourceFilePath]);
 
-        $this->write(
-            $this->teamcity->testSuiteFinished(
+        if ($sourceFilePath === $this->activeTestSuiteSourceFilePath) {
+            // Close the active suite
+            $this->write(
+                $this->teamcity->testSuiteFinished(
+                    name: $testSuite['name'],
+                    flowId: $testSuite['flowId'],
+                ),
+            );
+            $this->activeTestSuiteSourceFilePath = null;
+            $this->activeMutationHash = null;
+
+            // Flush the next buffered suite if any
+            $this->flushNextBufferedSuite();
+        } else {
+            // This is a buffered suite - buffer the finish message
+            // For suites, we use the started buffer since it should come last
+            $this->bufferedStartedMessages[$sourceFilePath][] = $this->teamcity->testSuiteFinished(
                 name: $testSuite['name'],
                 flowId: $testSuite['flowId'],
-            ),
-        );
+            );
+        }
+    }
+
+    private function flushNextBufferedSuite(): void
+    {
+        if (count($this->bufferedSuiteOrder) === 0) {
+            return;
+        }
+
+        $nextSourceFilePath = array_shift($this->bufferedSuiteOrder);
+        $startedMessages = $this->bufferedStartedMessages[$nextSourceFilePath] ?? [];
+        $finishedMessages = $this->bufferedFinishedMessages[$nextSourceFilePath] ?? [];
+        unset($this->bufferedStartedMessages[$nextSourceFilePath]);
+        unset($this->bufferedFinishedMessages[$nextSourceFilePath]);
+
+        // Check if this suite is still tracked (it might have been completed while buffered)
+        if (array_key_exists($nextSourceFilePath, $this->testSuites)) {
+            $this->activeTestSuiteSourceFilePath = $nextSourceFilePath;
+            $this->outputTestSuiteStarted($nextSourceFilePath);
+        }
+
+        // Output started messages first, then finished messages
+        // to maintain the correct testStarted -> testFinished order
+        foreach ($startedMessages as $message) {
+            $this->write($message);
+        }
+
+        foreach ($finishedMessages as $message) {
+            $this->write($message);
+        }
+
+        // If the suite was already completed (finish message was buffered),
+        // it won't be in testSuites anymore, and activeTestSuiteSourceFilePath should be cleared
+        if (!array_key_exists($nextSourceFilePath, $this->testSuites)) {
+            $this->activeTestSuiteSourceFilePath = null;
+            $this->activeMutationHash = null;
+            // Recursively flush the next buffered suite
+            $this->flushNextBufferedSuite();
+        }
     }
 
     private function areAllMutationsOfSourceFileExecuted(string $sourceFilePath): bool
     {
-        // We cannot confirm that all mutations
         if (!array_key_exists($sourceFilePath, $this->generatedMutationIdsBySourceFilePath)) {
             return false;
         }
@@ -212,156 +407,5 @@ final class TeamCityLogger implements MutationAnalysisLogger
     {
         // Any hash which avoids collision, is fast and deterministic will do.
         return hash('xxh3', $value);
-    }
-
-    private static function createMutationFlowId(Mutation $mutation): string
-    {
-        // TODO: the mutation hash would be better but is too big!
-        return self::createFlowId($mutation->getHash());
-    }
-
-    private function processResult(MutantExecutionResult $result): void
-    {
-        // If the current path is:
-        // /path/to/project/src/Differ/DiffColorizer.php
-        // and the current working dir:
-        // /path/to/project/sub-dir
-        // Then the relative path would be:
-        // '../src/Differ/DiffColorizer.php'
-        // so '..' does appear at the top hierarchy... But I think it's ok.
-        // Either we take the current working dir as the base path or the config
-        // file.
-        $filePath = Path::makeRelative(
-            $result->getOriginalFilePath(),
-            $this->configurationDirPathname,
-        );
-        $pathSegments = $this->getPathSegments($filePath);
-
-        $this->adjustSuiteHierarchy($pathSegments);
-        $this->emitTestResult($result);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function getPathSegments(string $filePath): array
-    {
-        return explode(DIRECTORY_SEPARATOR, $filePath);
-    }
-
-    private function closeAllSuites(): void
-    {
-        foreach (array_reverse($this->openSuites) as $suiteName) {
-            $this->write(
-                $this->teamcity->testSuiteFinished($suiteName),
-            );
-        }
-
-        $this->openSuites = [];
-    }
-
-    private function emitTestResult(MutantExecutionResult $result): void
-    {
-        $testName = $this->getMutantTestName($result);
-        $durationMs = (int) ($result->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
-
-        $this->write(
-            $this->teamcity->testStarted($testName),
-        );
-
-        match ($result->getDetectionStatus()) {
-            DetectionStatus::KILLED_BY_TESTS,
-            DetectionStatus::KILLED_BY_STATIC_ANALYSIS => $this->write(
-                $this->teamcity->testFinished($testName, $durationMs),
-            ),
-            DetectionStatus::ESCAPED => $this->emitEscapedMutant($testName, $result, $durationMs),
-            DetectionStatus::TIMED_OUT => $this->emitTimedOutMutant($testName, $result, $durationMs),
-            DetectionStatus::ERROR,
-            DetectionStatus::SYNTAX_ERROR => $this->emitErrorMutant($testName, $result, $durationMs),
-            DetectionStatus::SKIPPED,
-            DetectionStatus::NOT_COVERED,
-            DetectionStatus::IGNORED => $this->emitIgnoredMutant($testName, $result, $durationMs),
-        };
-    }
-
-    private function getMutantTestName(MutantExecutionResult $result): string
-    {
-        return sprintf(
-            '%s (L%d) %s',
-            $result->getMutatorName(),
-            $result->getOriginalStartingLine(),
-            $result->getMutantHash(),
-        );
-    }
-
-    private function emitEscapedMutant(
-        string $testName,
-        MutantExecutionResult $result,
-        int $durationMs,
-    ): void {
-        $this->write(
-            $this->teamcity->testFailed(
-                $testName,
-                'Mutant escaped',
-                $result->getMutantDiff(),
-            ),
-        );
-
-        $this->write(
-            $this->teamcity->testFinished($testName, $durationMs),
-        );
-    }
-
-    private function emitTimedOutMutant(
-        string $testName,
-        MutantExecutionResult $result,
-        int $durationMs,
-    ): void {
-        $this->write(
-            $this->teamcity->testFailed(
-                $testName,
-                'Mutant timed out',
-                $result->getMutantDiff(),
-            ),
-        );
-
-        $this->write(
-            $this->teamcity->testFinished($testName, $durationMs),
-        );
-    }
-
-    private function emitErrorMutant(
-        string $testName,
-        MutantExecutionResult $result,
-        int $durationMs,
-    ): void {
-        $this->write(
-            $this->teamcity->testFailed(
-                $testName,
-                sprintf('Mutant caused %s', $result->getDetectionStatus()->value),
-                $result->getProcessOutput(),
-            ),
-        );
-
-        $this->write(
-            $this->teamcity->testFinished($testName, $durationMs),
-        );
-    }
-
-    private function emitIgnoredMutant(
-        string $testName,
-        MutantExecutionResult $result,
-        int $durationMs,
-    ): void {
-        $this->write(
-            $this->teamcity->testIgnored(
-                $testName,
-                sprintf('Mutant %s', $result->getDetectionStatus()->value),
-            ),
-        );
-
-        $this->write(
-            $this->teamcity->testFinished($testName, $durationMs),
-        );
     }
 }

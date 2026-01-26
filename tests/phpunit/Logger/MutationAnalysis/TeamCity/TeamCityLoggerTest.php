@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use function array_map;
 use Closure;
 use function implode;
@@ -99,11 +101,7 @@ final class TeamCityLoggerTest extends TestCase
                     ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->build();
-                $executionResult = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation->getOriginalFilePath())
-                    ->withMutatorClass($mutation->getMutatorClass())
-                    ->withMutantHash($mutation->getHash())
-                    ->build();
+                $executionResult = self::createExecutionResult($mutation);
 
                 $logger->startEvaluation($mutation);
                 $logger->finishEvaluation($executionResult);
@@ -134,11 +132,7 @@ final class TeamCityLoggerTest extends TestCase
                     ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->build();
-                $executionResult = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation->getOriginalFilePath())
-                    ->withMutatorClass($mutation->getMutatorClass())
-                    ->withMutantHash($mutation->getHash())
-                    ->build();
+                $executionResult = self::createExecutionResult($mutation);
 
                 $logger->startEvaluation($mutation);
 
@@ -172,21 +166,13 @@ final class TeamCityLoggerTest extends TestCase
                     ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->build();
-                $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation1->getOriginalFilePath())
-                    ->withMutatorClass($mutation1->getMutatorClass())
-                    ->withMutantHash($mutation1->getHash())
-                    ->build();
+                $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = MutationBuilder::withMinimalTestData()
                     ->withOriginalFilePath($sourceFilePath)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->build();
-                $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
-                    ->withMutatorClass($mutation2->getMutatorClass())
-                    ->withMutantHash($mutation2->getHash())
-                    ->build();
+                $executionResult2 = self::createExecutionResult($mutation2);
 
                 $logger->startEvaluation($mutation1);
                 $logger->finishEvaluation($executionResult1);
@@ -229,20 +215,13 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->withMutatorName('LogicalOr')
                     ->build();
-                $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withMutatorClass($mutation1->getMutatorClass())
-                    ->withMutantHash($mutation1->getHash())
-                    ->build();
+                $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = MutationBuilder::from($mutation1)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->withMutatorName('LogicalAnd')
                     ->build();
-                $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
-                    ->withMutatorClass($mutation2->getMutatorClass())
-                    ->withMutantHash($mutation2->getHash())
-                    ->build();
+                $executionResult2 = self::createExecutionResult($mutation2);
 
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
@@ -266,11 +245,11 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
-                
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
@@ -288,20 +267,13 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->withMutatorName('LogicalOr')
                     ->build();
-                $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withMutatorClass($mutation1->getMutatorClass())
-                    ->withMutantHash($mutation1->getHash())
-                    ->build();
+                $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = MutationBuilder::from($mutation1)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->withMutatorName('LogicalAnd')
                     ->build();
-                $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
-                    ->withMutatorClass($mutation2->getMutatorClass())
-                    ->withMutantHash($mutation2->getHash())
-                    ->build();
+                $executionResult2 = self::createExecutionResult($mutation2);
 
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
@@ -326,11 +298,11 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
-                
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (000fd378546ef75375056bea70335d8f)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
@@ -349,22 +321,14 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->withMutatorName('LogicalOr')
                     ->build();
-                $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation1->getOriginalFilePath())
-                    ->withMutatorClass($mutation1->getMutatorClass())
-                    ->withMutantHash($mutation1->getHash())
-                    ->build();
+                $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = MutationBuilder::withMinimalTestData()
                     ->withOriginalFilePath($sourceFilePath2)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->withMutatorName('LogicalAnd')
                     ->build();
-                $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
-                    ->withMutatorClass($mutation2->getMutatorClass())
-                    ->withMutantHash($mutation2->getHash())
-                    ->build();
+                $executionResult2 = self::createExecutionResult($mutation2);
 
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
@@ -415,22 +379,14 @@ final class TeamCityLoggerTest extends TestCase
                     ->withMutatorClass(LogicalOrMutator::class)
                     ->withMutatorName('LogicalOr')
                     ->build();
-                $executionResult1 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation1->getOriginalFilePath())
-                    ->withMutatorClass($mutation1->getMutatorClass())
-                    ->withMutantHash($mutation1->getHash())
-                    ->build();
+                $executionResult1 = self::createExecutionResult($mutation1);
 
                 $mutation2 = MutationBuilder::withMinimalTestData()
                     ->withOriginalFilePath($sourceFilePath2)
                     ->withMutatorClass(LogicalAndMutator::class)
                     ->withMutatorName('LogicalAnd')
                     ->build();
-                $executionResult2 = MutantExecutionResultBuilder::withMinimalTestData()
-                    ->withOriginalFilePath($mutation2->getOriginalFilePath())
-                    ->withMutatorClass($mutation2->getMutatorClass())
-                    ->withMutantHash($mutation2->getHash())
-                    ->build();
+                $executionResult2 = self::createExecutionResult($mutation2);
 
                 // Sanity check
                 self::assertNotSame($mutation1->getHash(), $mutation2->getHash());
@@ -441,7 +397,7 @@ final class TeamCityLoggerTest extends TestCase
                 $logger->finishEvaluation($executionResult2);
                 $logger->finishMutationGenerationForFile(
                     $sourceFilePath1,
-                    [$mutation2->getHash()],
+                    [$mutation1->getHash()],
                 );
 
                 $logger->finishEvaluation($executionResult1);
@@ -455,8 +411,8 @@ final class TeamCityLoggerTest extends TestCase
             <<<'TEAM_CITY'
                 ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='18830ccd5b35e676']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (000fd378546ef75375056bea70335d8f)' flowId='18830ccd5b35e676']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
@@ -469,6 +425,98 @@ final class TeamCityLoggerTest extends TestCase
 
                 TEAM_CITY,
         ];
+
+        yield 'mutations executed for multiple source file, launched in parallel (taken from a real execution)' => [
+            static function (MutationAnalysisLogger $logger): void {
+                $logger->startAnalysis(2);
+
+                $sourceFilePath1 = '/path/to/project/src/Service/UserService.php';
+                $sourceFilePath2 = '/path/to/project/src/Service/ContactService.php';
+
+                $mutation1A = MutationBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($sourceFilePath1)
+                    ->withMutatorClass(LogicalOrMutator::class)
+                    ->withMutatorName('LogicalOr')
+                    ->build();
+                $executionResult1A = self::createExecutionResult($mutation1A);
+
+                $mutation1B = MutationBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($sourceFilePath1)
+                    ->withMutatorClass(LogicalAndMutator::class)
+                    ->withMutatorName('LogicalAnd')
+                    ->build();
+                $executionResult1B = self::createExecutionResult($mutation1B);
+
+                $mutation2 = MutationBuilder::withMinimalTestData()
+                    ->withOriginalFilePath($sourceFilePath2)
+                    ->withMutatorClass(LogicalAndMutator::class)
+                    ->withMutatorName('BooleanNot')
+                    ->build();
+                $executionResult2 = self::createExecutionResult($mutation2);
+
+                // Sanity check
+                self::assertNotSame($mutation1A->getHash(), $mutation1B->getHash());
+
+                // ::startEvaluation() of M1 (LogicalNot) of DiffColorizer.php
+                // ::startEvaluation() of M2 (Continue_) of DiffColorizer.php
+                // ::finishMutationGeneration() of DiffColorizer.php
+                // ::startEvaluation() of M3 (BooleanNot) of DiffSourceCodeMatcher.php
+                // ::finishEvaluation() of M1 (LogicalNot) of DiffColorizer.php
+                // ::finishEvaluation() of M2 (Continue_) of DiffColorizer.php
+                // ::finishMutationGeneration() of DiffSourceCodeMatcher.php
+                // ::finishEvaluation() of M3 (BooleanNot) of DiffSourceCodeMatcher.php
+
+                $logger->startEvaluation($mutation1A);
+                $logger->startEvaluation($mutation1B);
+
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath1,
+                    [$mutation1A->getHash(), $mutation1A->getHash()],
+                );
+
+                $logger->startEvaluation($mutation2);
+
+                $logger->finishEvaluation($executionResult1A);
+                $logger->finishEvaluation($executionResult1B);
+
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath2,
+                    [$mutation2->getHash()],
+                );
+
+                $logger->finishEvaluation($executionResult2);
+
+                $logger->finishAnalysis();
+            },
+            <<<'TEAM_CITY'
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
+
+                ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\BooleanNot (<tbd>)' flowId='12f6def551a5aae7']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\BooleanNot (<tbd>)' flowId='12f6def551a5aae7']
+
+                ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
+
+                TEAM_CITY,
+        ];
+    }
+
+    private static function createExecutionResult(Mutation $mutation): MutantExecutionResult
+    {
+        return MutantExecutionResultBuilder::withMinimalTestData()
+            ->withOriginalFilePath($mutation->getOriginalFilePath())
+            ->withMutatorClass($mutation->getMutatorClass())
+            ->withMutantHash($mutation->getHash())
+            ->build();
     }
 
     private function getTeamCityLog(): string
