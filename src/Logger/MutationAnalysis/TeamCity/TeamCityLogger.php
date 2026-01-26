@@ -51,6 +51,10 @@ use Symfony\Component\Filesystem\Path;
 use Webmozart\Assert\Assert;
 
 // TODO: explain somewhere the concept of TestSuite and Test for TeamCity
+
+/**
+ * @phpstan-type MutationRecord = array{hash: string, message: string}
+ */
 final class TeamCityLogger implements MutationAnalysisLogger
 {
     /**
@@ -87,7 +91,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
      * Buffered testStarted messages for test suites that need to wait for the active mutation to finish.
      * Each entry contains the mutation hash and the formatted message.
      *
-     * @var array<string, list<array{hash: string, message: string}>>
+     * @var array<string, list<MutationRecord>>
      */
     private array $bufferedStartedMessages = [];
 
@@ -95,7 +99,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
      * Buffered testFinished messages for test suites that need to wait for the active mutation to finish.
      * Each entry contains the mutation hash and the formatted message.
      *
-     * @var array<string, list<array{hash: string, message: string}>>
+     * @var array<string, list<MutationRecord>>
      */
     private array $bufferedFinishedMessages = [];
 
@@ -278,11 +282,9 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
         // Safeguard: we don't want to unset entries that were not flushed by
         // accident.
-        Assert::count($this->bufferedSuiteOrder[$sourceFilePath] ?? [], 0);
         Assert::count($this->bufferedStartedMessages[$sourceFilePath] ?? [], 0);
         Assert::count($this->bufferedFinishedMessages[$sourceFilePath] ?? [], 0);
 
-        unset($this->bufferedSuiteOrder[$sourceFilePath]);
         unset($this->bufferedStartedMessages[$sourceFilePath]);
         unset($this->bufferedFinishedMessages[$sourceFilePath]);
 
@@ -369,7 +371,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
         }
 
         // Pop the first buffered mutation and make it active
-        /** @var array{hash: string, message: string} $nextMutation */
+        /** @var MutationRecord $nextMutation */
         $nextMutation = array_shift($this->bufferedStartedMessages[$sourceFilePath]);
 
         $mutationHash = $nextMutation['hash'];
@@ -505,7 +507,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
     }
 
     /**
-     * @param array{hash: string, message: string} $records
+     * @param list<array{hash: string, message: string}> $records
      *
      * @return array<string, string>
      */

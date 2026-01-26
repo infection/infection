@@ -96,6 +96,7 @@ return static function (int $maxCount): Closure {
         true,
     );
 
+    // TODO: use withService here too!
     $fileMutationGenerator = new FileMutationGenerator(
         $container->getFileParser(),
         $container->getNodeTraverserFactory(),
@@ -103,6 +104,7 @@ return static function (int $maxCount): Closure {
         $container->getSourceLineMatcher(),
         new EmptyTraceTracer(),
         $container->getFileStore(),
+        $container->getEventDispatcher(),
     );
 
     return static function () use ($sources, $fileMutationGenerator, $mutators, $maxCount): int {
