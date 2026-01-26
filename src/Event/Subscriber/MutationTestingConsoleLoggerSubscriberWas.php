@@ -100,7 +100,7 @@ final class MutationTestingConsoleLoggerSubscriberWas implements MutationEvaluat
 
     public function onMutationTestingWasStarted(MutationTestingWasStarted $event): void
     {
-        $this->mutationCount = $event->getMutationCount();
+        $this->mutationCount = $event->mutationCount;
 
         $this->logger->startAnalysis($this->mutationCount);
     }
@@ -122,7 +122,7 @@ final class MutationTestingConsoleLoggerSubscriberWas implements MutationEvaluat
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $executionResult = $event->getExecutionResult();
+        $executionResult = $event->executionResult;
 
         $this->logger->finishEvaluation($executionResult);
     }

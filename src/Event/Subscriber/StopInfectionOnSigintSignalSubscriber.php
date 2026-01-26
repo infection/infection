@@ -53,7 +53,7 @@ final class StopInfectionOnSigintSignalSubscriber implements MutationTestingWasS
         }
 
         pcntl_signal(SIGINT, static function () use ($event): void {
-            $event->getProcessRunner()->stop();
+            $event->processRunner->stop();
         });
     }
 }

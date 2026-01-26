@@ -54,7 +54,7 @@ final readonly class MutationTestingResultsCollectorSubscriber implements Mutati
 
     public function onMutationEvaluationWasFinished(MutationEvaluationWasFinished $event): void
     {
-        $executionResult = $event->getExecutionResult();
+        $executionResult = $event->executionResult;
 
         foreach ($this->collectors as $collector) {
             $collector->collect($executionResult);

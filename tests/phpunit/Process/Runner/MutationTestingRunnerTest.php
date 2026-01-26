@@ -59,6 +59,7 @@ use Infection\Process\Runner\ProcessRunner;
 use Infection\Testing\MutatorName;
 use Infection\Tests\Fixtures\Event\EventDispatcherCollector;
 use Infection\Tests\Mutant\MutantBuilder;
+use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\WithConsecutive;
 use PhpParser\Node\Stmt\Nop;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -209,7 +210,9 @@ final class MutationTestingRunnerTest extends TestCase
                 ...array_fill(
                     0,
                     $ignoredMutantCount,
-                    $this->createMock(MutationEvaluationWasFinished::class),
+                    new MutationEvaluationWasFinished(
+                        MutantExecutionResultBuilder::withMinimalTestData()->build(),
+                    ),
                 ),
                 new MutationTestingWasFinished(),
             ],
@@ -221,7 +224,7 @@ final class MutationTestingRunnerTest extends TestCase
 
         $this->assertSame(
             DetectionStatus::NOT_COVERED,
-            $secondSkippedEvent->getExecutionResult()->getDetectionStatus(),
+            $secondSkippedEvent->executionResult->getDetectionStatus(),
             'Mutations should be processed in the order they are given',
         );
     }
@@ -293,7 +296,9 @@ final class MutationTestingRunnerTest extends TestCase
         $this->assertAreSameEvents(
             [
                 new MutationTestingWasStarted(4, $this->processRunnerMock),
-                $this->createMock(MutationEvaluationWasFinished::class),
+                new MutationEvaluationWasFinished(
+                    MutantExecutionResultBuilder::withMinimalTestData()->build(),
+                ),
                 new MutationTestingWasFinished(),
             ],
             $this->eventDispatcher->getEvents(),
@@ -701,7 +706,12 @@ final class MutationTestingRunnerTest extends TestCase
 
             if ($expectedEvent instanceof MutationTestingWasStarted) {
                 /* @var MutationTestingWasStarted $event */
-                $this->assertSame($expectedEvent->getMutationCount(), $event->getMutationCount(), 'Mutation count is not matching');
+                $this->assertSame(
+                    $expectedEvent->mutationCount,
+                    // @phpstan-ignore property.notFound
+                    $event->mutationCount,
+                    'Mutation count is not matching',
+                );
             }
         }
 

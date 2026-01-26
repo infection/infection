@@ -41,12 +41,7 @@ namespace Infection\Event\Events\ArtefactCollection\InitialStaticAnalysis;
 final readonly class InitialStaticAnalysisRunWasFinished
 {
     public function __construct(
-        private string $outputText,
+        public string $outputText,
     ) {
-    }
-
-    public function getOutputText(): string
-    {
-        return $this->outputText;
     }
 }

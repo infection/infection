@@ -50,7 +50,7 @@ final class MutationTestingWasStartedTest extends TestCase
 
         $event = new MutationTestingWasStarted($count, $processRunner);
 
-        $this->assertSame($count, $event->getMutationCount());
-        $this->assertSame($processRunner, $event->getProcessRunner());
+        $this->assertSame($count, $event->mutationCount);
+        $this->assertSame($processRunner, $event->processRunner);
     }
 }

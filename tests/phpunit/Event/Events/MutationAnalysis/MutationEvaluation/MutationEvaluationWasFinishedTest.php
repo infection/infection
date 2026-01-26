@@ -49,6 +49,6 @@ final class MutationEvaluationWasFinishedTest extends TestCase
 
         $event = new MutationEvaluationWasFinished($executionResultMock);
 
-        $this->assertSame($executionResultMock, $event->getExecutionResult());
+        $this->assertSame($executionResultMock, $event->executionResult);
     }
 }

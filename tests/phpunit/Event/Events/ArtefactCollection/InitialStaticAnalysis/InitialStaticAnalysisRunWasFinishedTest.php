@@ -48,6 +48,6 @@ final class InitialStaticAnalysisRunWasFinishedTest extends TestCase
 
         $class = new InitialStaticAnalysisRunWasFinished($text);
 
-        $this->assertSame($text, $class->getOutputText());
+        $this->assertSame($text, $class->outputText);
     }
 }

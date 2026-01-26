@@ -727,12 +727,6 @@ parameters:
 			path: ../tests/phpunit/Mutator/Util/AbstractValueToNullReturnValueTest.php
 
 		-
-			message: '#^Call to an undefined method .+\\MutationTestingWasFinished\|.+\\MutationTestingWasStarted\:\:getMutationCount\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../tests/phpunit/Process/Runner/MutationTestingRunnerTest.php
-
-		-
 			message: '#^Method Infection\\Tests\\Process\\Runner\\MutationTestingRunnerTest\:\:emptyIterable\(\) return type with generic class PHPUnit\\Framework\\Constraint\\Callback does not specify its types\: CallbackInput$#'
 			identifier: missingType.generics
 			count: 1

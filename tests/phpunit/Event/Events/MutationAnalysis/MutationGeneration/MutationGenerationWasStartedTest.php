@@ -47,6 +47,6 @@ final class MutationGenerationWasStartedTest extends TestCase
         $count = 5;
         $event = new MutationGenerationWasStarted($count);
 
-        $this->assertSame($count, $event->getMutableFilesCount());
+        $this->assertSame($count, $event->mutableFilesCount);
     }
 }
