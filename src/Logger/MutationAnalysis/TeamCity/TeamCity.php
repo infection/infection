@@ -126,24 +126,12 @@ final class TeamCity
         );
     }
 
-    private function createTestId(Mutation|MutantExecutionResult $subject): string
-    {
-        // TODO: add a test to make it obvious: a test name must be unique
-        return sprintf(
-            '%s (%s)',
-            $subject->getMutatorClass(),
-            $subject instanceof Mutation
-                ? $subject->getHash()
-                : $subject->getMutantHash(),
-        );
-    }
-
     /**
      * @see https://www.jetbrains.com/help/teamcity/2025.07/service-messages.html#Service+Messages+Formats
      *
      * @param string|array<non-empty-string|int, string|int|float> $valueOrAttributes
      */
-    private function write(
+    public function write(
         MessageName $messageName,
         string|array $valueOrAttributes,
     ): string {
@@ -156,6 +144,18 @@ final class TeamCity
                     ...self::escape((array) $valueOrAttributes),
                 ],
             ),
+        );
+    }
+
+    private function createTestId(Mutation|MutantExecutionResult $subject): string
+    {
+        // TODO: add a test to make it obvious: a test name must be unique
+        return sprintf(
+            '%s (%s)',
+            $subject->getMutatorClass(),
+            $subject instanceof Mutation
+                ? $subject->getHash()
+                : $subject->getMutantHash(),
         );
     }
 

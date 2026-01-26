@@ -37,11 +37,24 @@ namespace Infection\Tests\Logger\MutationAnalysis;
 
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use Infection\Tests\UnsupportedMethod;
 
 final class FakeMutationAnalysisLogger implements MutationAnalysisLogger
 {
     public function startAnalysis(int $mutationCount): void
+    {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function finishMutationGenerationForFile(
+        string $sourceFilePath,
+        array $mutationIds,
+    ): void {
+        throw UnsupportedMethod::method(self::class, __FUNCTION__);
+    }
+
+    public function startEvaluation(Mutation $mutation): void
     {
         throw UnsupportedMethod::method(self::class, __FUNCTION__);
     }

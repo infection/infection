@@ -40,6 +40,7 @@ use function explode;
 use function implode;
 use Infection\CannotBeInstantiated;
 use function trim;
+use Webmozart\Assert\Assert;
 
 /**
  * This service is a utility to make the TeamCity logs more readable by indenting
@@ -71,6 +72,7 @@ final class RemoveInternalBlankLines
             return $lines;
         }
 
+        Assert::integer($lastNonBlank);
         $result = [];
 
         for ($i = 0; $i < $firstNonBlank; ++$i) {

@@ -51,15 +51,18 @@ final class TeamCityTest extends TestCase
         $this->teamcity = new TeamCity();
     }
 
+    /**
+     * @param string|array<non-empty-string|int, string|int|float> $valueOrAttributes
+     */
     #[DataProvider('messageProvider')]
     public function test_it_can_write_a_message(
         MessageName $messageName,
-        string|array $value,
+        string|array $valueOrAttributes,
         string $expected,
     ): void {
         $actual = $this->teamcity->write(
             $messageName,
-            $value,
+            $valueOrAttributes,
         );
 
         $indentedActual = TeamCityLogIndenter::indent($actual);
@@ -72,55 +75,55 @@ final class TeamCityTest extends TestCase
         yield 'single-attribute message' => [
             MessageName::FLOW_STARTED,
             'value',
-            "##teamcity[flowStarted 'value']",
+            "##teamcity[flowStarted 'value']\n",
         ];
 
         yield 'multiple-attribute message' => [
             MessageName::FLOW_STARTED,
             ['name1' => 'value1', 'name2' => 'value2'],
-            "##teamcity[flowStarted name1='value1' name2='value2']",
+            "##teamcity[flowStarted name1='value1' name2='value2']\n",
         ];
 
         yield '[escape] apostrophe' => [
             MessageName::FLOW_STARTED,
             "'",
-            "##teamcity[flowStarted '|'']",
+            "##teamcity[flowStarted '|'']\n",
         ];
 
         yield '[escape] line feed' => [
             MessageName::FLOW_STARTED,
             "\n",
-            "##teamcity[flowStarted '|n']",
+            "##teamcity[flowStarted '|n']\n",
         ];
 
         yield '[escape] carriage return' => [
             MessageName::FLOW_STARTED,
             "\r",
-            "##teamcity[flowStarted '|r']",
+            "##teamcity[flowStarted '|r']\n",
         ];
 
         yield '[escape] vertical bar' => [
             MessageName::FLOW_STARTED,
             '|',
-            "##teamcity[flowStarted '||']",
+            "##teamcity[flowStarted '||']\n",
         ];
 
         yield '[escape] opening bracket' => [
             MessageName::FLOW_STARTED,
             '[',
-            "##teamcity[flowStarted '|[']",
+            "##teamcity[flowStarted '|[']\n",
         ];
 
         yield '[escape] closing bracket' => [
             MessageName::FLOW_STARTED,
             ']',
-            "##teamcity[flowStarted '|]']",
+            "##teamcity[flowStarted '|]']\n",
         ];
 
         yield '[escape] message with escaped characters' => [
             MessageName::FLOW_STARTED,
             '\'\u99AA[||]\u00FF',
-            "##teamcity[flowStarted '|'|0x99AA|[|||||]|0x00FF']",
+            "##teamcity[flowStarted '|'|0x99AA|[|||||]|0x00FF']\n",
         ];
     }
 }

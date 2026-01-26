@@ -98,7 +98,7 @@ final class BasicConsoleLogger extends AbstractLogger implements LoggerInterface
 
         if ($output->getVerbosity() >= self::VERBOSITY_LEVEL_MAP[$level]) {
             $output->write(
-                $message,
+                (string) $message,
                 options: self::VERBOSITY_LEVEL_MAP[$level],
             );
         }

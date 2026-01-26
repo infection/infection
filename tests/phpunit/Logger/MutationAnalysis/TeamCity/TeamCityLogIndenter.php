@@ -104,7 +104,8 @@ final class TeamCityLogIndenter
 
     private static function getMessageName(string $line): ?string
     {
-        if (preg_match(self::MESSAGE_NAME_REGEX, $line, $matches)) {
+        if (preg_match(self::MESSAGE_NAME_REGEX, $line, $matches) === 1) {
+            // @phpstan-ignore offsetAccess.notFound
             return $matches['messageName'];
         }
 

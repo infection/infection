@@ -35,7 +35,6 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Mutator\Operator\Continue_;
 use function array_map;
 use Closure;
 use function implode;
@@ -46,6 +45,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use Infection\Mutator\Boolean\LogicalAnd as LogicalAndMutator;
 use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
+use Infection\Mutator\Operator\Continue_;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
 use Infection\Tests\Mutation\MutationBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -262,8 +262,8 @@ final class TeamCityLoggerTest extends TestCase
                 ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
                 ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (aa35bf87f287aa4e383112a632fde848)' flowId='5568c7d4af5ccc7f']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' flowId='5568c7d4af5ccc7f']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testStarted name='Infection\Mutator\Operator\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' flowId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Operator\Continue_ (9272ac9a2aff44767733cf23a4acb7c6)' flowId='5568c7d4af5ccc7f']
 
                 ##teamcity[testSuiteFinished name='src/Service/UserService.php' flowId='5568c7d4af5ccc7f']
 
@@ -529,7 +529,7 @@ final class TeamCityLoggerTest extends TestCase
         return implode(
             '',
             array_map(
-                static fn (array $record): string => $record['message'],
+                static fn (array $record): string => (string) $record['message'],
                 $this->testLogger->recordsByLevel[LogLevel::WARNING],
             ),
         );
