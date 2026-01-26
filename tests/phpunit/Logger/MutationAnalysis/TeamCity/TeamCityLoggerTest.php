@@ -35,14 +35,14 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
-use Infection\Mutant\MutantExecutionResult;
-use Infection\Mutation\Mutation;
 use function array_map;
 use Closure;
 use function implode;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCity;
 use Infection\Logger\MutationAnalysis\TeamCity\TeamCityLogger;
+use Infection\Mutant\MutantExecutionResult;
+use Infection\Mutation\Mutation;
 use Infection\Mutator\Boolean\LogicalAnd as LogicalAndMutator;
 use Infection\Mutator\Boolean\LogicalOr as LogicalOrMutator;
 use Infection\Tests\Mutant\MutantExecutionResultBuilder;
@@ -122,6 +122,7 @@ final class TeamCityLoggerTest extends TestCase
 
                 TEAM_CITY,
         ];
+
         yield 'one mutation executed for a source file for which the mutations were all generated before all mutants were' => [
             static function (MutationAnalysisLogger $logger): void {
                 $sourceFilePath = '/path/to/project/src/Service/UserService.php';
@@ -471,7 +472,7 @@ final class TeamCityLoggerTest extends TestCase
 
                 $logger->finishMutationGenerationForFile(
                     $sourceFilePath1,
-                    [$mutation1A->getHash(), $mutation1A->getHash()],
+                    [$mutation1A->getHash(), $mutation1B->getHash()],
                 );
 
                 $logger->startEvaluation($mutation2);
@@ -501,8 +502,8 @@ final class TeamCityLoggerTest extends TestCase
 
                 ##teamcity[testSuiteStarted name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
 
-                ##teamcity[testStarted name='Infection\Mutator\Boolean\BooleanNot (<tbd>)' flowId='12f6def551a5aae7']
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\BooleanNot (<tbd>)' flowId='12f6def551a5aae7']
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalAnd (a382bb75e854bae469f9da5ff3ac6a7b)' flowId='12f6def551a5aae7']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (a382bb75e854bae469f9da5ff3ac6a7b)' flowId='12f6def551a5aae7']
 
                 ##teamcity[testSuiteFinished name='src/Service/ContactService.php' flowId='12f6def551a5aae7']
 

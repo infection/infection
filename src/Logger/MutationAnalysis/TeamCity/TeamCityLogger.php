@@ -38,6 +38,7 @@ namespace Infection\Logger\MutationAnalysis\TeamCity;
 use function array_fill_keys;
 use function array_key_exists;
 use function array_merge;
+use function array_shift;
 use function count;
 use function hash;
 use Infection\Logger\MutationAnalysis\MutationAnalysisLogger;
@@ -51,7 +52,7 @@ use Webmozart\Assert\Assert;
 final class TeamCityLogger implements MutationAnalysisLogger
 {
     /**
-     * @var array<string, array<string, true>>
+     * @var array<string, array<string, bool>>
      */
     private array $evaluatedMutationIdsBySourceFilePath = [];
 
@@ -197,11 +198,17 @@ final class TeamCityLogger implements MutationAnalysisLogger
             // Flush buffered messages for the current suite
             $this->flushSuiteBuffer($sourceFilePath);
         } elseif ($sourceFilePath === $this->activeTestSuiteSourceFilePath) {
-            // Same suite but not active mutation - buffer
-            $this->bufferFinishedMessage(
-                $sourceFilePath,
-                $this->teamcity->testFinished($executionResult, $flowId),
-            );
+            // Same suite but not active mutation
+            // If there's no active mutation (buffer was flushed), output directly
+            if ($this->activeMutationHash === null) {
+                $this->write($this->teamcity->testFinished($executionResult, $flowId));
+            } else {
+                // Buffer for later output
+                $this->bufferFinishedMessage(
+                    $sourceFilePath,
+                    $this->teamcity->testFinished($executionResult, $flowId),
+                );
+            }
         } else {
             // Buffered suite - buffer the message
             $this->bufferFinishedMessage(
