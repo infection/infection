@@ -89,12 +89,14 @@ final class TeamCity
         );
     }
 
-    // TODO
+    /**
+     * @param positive-int $count
+     */
     public function testCount(int $count): string
     {
-        return $this->writeMessage(
-            'testCount',
-            ['count' => $count],
+        return $this->write(
+            MessageName::TEST_COUNT,
+            ['count' => (string) $count],
         );
     }
 

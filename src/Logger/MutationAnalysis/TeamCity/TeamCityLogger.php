@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Logger\MutationAnalysis\TeamCity;
 
+use EmptyIterator;
+use Infection\Framework\Iterable\IterableCounter;
 use function array_key_exists;
 use function array_map;
 use function count;
@@ -90,6 +92,11 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
     public function startAnalysis(int $mutationCount): void
     {
+        if ($mutationCount !== IterableCounter::UNKNOWN_COUNT) {
+            $this->write(
+                $this->teamcity->testCount($mutationCount),
+            );
+        }
     }
 
     public function startEvaluation(Mutation $mutation): void

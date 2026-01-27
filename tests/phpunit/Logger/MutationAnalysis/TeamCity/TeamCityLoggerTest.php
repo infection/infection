@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Tests\Logger\MutationAnalysis\TeamCity;
 
+use Infection\Framework\Iterable\IterableCounter;
 use function array_map;
 use function array_unique;
 use Closure;
@@ -100,7 +101,7 @@ final class TeamCityLoggerTest extends TestCase
             static function (MutationAnalysisLogger $logger): void {
                 $sourceFilePath = '/path/to/project/src/Service/UserService.php';
 
-                $logger->startAnalysis(1);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $mutation = self::createMutation(
                     $sourceFilePath,
@@ -128,11 +129,44 @@ final class TeamCityLoggerTest extends TestCase
                 TEAM_CITY,
         ];
 
-        yield 'one mutation executed for a source file for which the mutations were all generated before all mutants were' => [
+        yield 'one mutation executed for a source file with a known mutation count' => [
             static function (MutationAnalysisLogger $logger): void {
                 $sourceFilePath = '/path/to/project/src/Service/UserService.php';
 
                 $logger->startAnalysis(1);
+
+                $mutation = self::createMutation(
+                    $sourceFilePath,
+                    LogicalOrMutator::class,
+                );
+                $executionResult = self::createExecutionResult($mutation);
+
+                $logger->startEvaluation($mutation);
+                $logger->finishEvaluation($executionResult);
+                $logger->finishMutationGenerationForFile(
+                    $sourceFilePath,
+                    [$mutation->getHash()],
+                );
+
+                $logger->finishAnalysis();
+            },
+            <<<'TEAM_CITY'
+                ##teamcity[testCount count='1']
+                ##teamcity[testSuiteStarted name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
+
+                ##teamcity[testStarted name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalOr (49a5dfcd2f4a0b33d4a02e662812af55)' nodeId='18830ccd5b35e676' parentNodeId='5568c7d4af5ccc7f']
+
+                ##teamcity[testSuiteFinished name='src/Service/UserService.php' nodeId='5568c7d4af5ccc7f']
+
+                TEAM_CITY,
+        ];
+
+        yield 'one mutation executed for a source file for which the mutations were all generated before all mutants were' => [
+            static function (MutationAnalysisLogger $logger): void {
+                $sourceFilePath = '/path/to/project/src/Service/UserService.php';
+
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $mutation = self::createMutation(
                     $sourceFilePath,
@@ -166,7 +200,7 @@ final class TeamCityLoggerTest extends TestCase
             static function (MutationAnalysisLogger $logger): void {
                 $sourceFilePath = '/path/to/project/src/Service/UserService.php';
 
-                $logger->startAnalysis(2);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $mutation1 = self::createMutation(
                     $sourceFilePath,
@@ -218,7 +252,7 @@ final class TeamCityLoggerTest extends TestCase
 
         yield 'three mutations executed for a source file, launched in parallel' => [
             static function (MutationAnalysisLogger $logger): void {
-                $logger->startAnalysis(2);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $sourceFilePath = '/path/to/project/src/Service/UserService.php';
 
@@ -284,7 +318,7 @@ final class TeamCityLoggerTest extends TestCase
 
         yield 'two mutations executed for a source file, launched in parallel with the mutation generation finishing before all mutants are evaluated' => [
             static function (MutationAnalysisLogger $logger): void {
-                $logger->startAnalysis(2);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $sourceFilePath = '/path/to/project/src/Service/UserService.php';
 
@@ -336,7 +370,7 @@ final class TeamCityLoggerTest extends TestCase
 
         yield 'one mutation executed for two source file, launched synchronously' => [
             static function (MutationAnalysisLogger $logger): void {
-                $logger->startAnalysis(2);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $sourceFilePath1 = '/path/to/project/src/Service/UserService.php';
                 $sourceFilePath2 = '/path/to/project/src/Service/ContactService.php';
@@ -392,7 +426,7 @@ final class TeamCityLoggerTest extends TestCase
 
         yield 'one mutation executed for two source file, launched in parallel' => [
             static function (MutationAnalysisLogger $logger): void {
-                $logger->startAnalysis(2);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $sourceFilePath1 = '/path/to/project/src/Service/UserService.php';
                 $sourceFilePath2 = '/path/to/project/src/Service/ContactService.php';
@@ -448,7 +482,7 @@ final class TeamCityLoggerTest extends TestCase
 
         yield 'mutations executed for multiple source file, launched in parallel (taken from a real execution)' => [
             static function (MutationAnalysisLogger $logger): void {
-                $logger->startAnalysis(2);
+                $logger->startAnalysis(IterableCounter::UNKNOWN_COUNT);
 
                 $sourceFilePath1 = '/path/to/project/src/Service/UserService.php';
                 $sourceFilePath2 = '/path/to/project/src/Service/ContactService.php';
