@@ -170,6 +170,8 @@ final class TeamCityTest extends TestCase
             ->withMutantDiff($mutationDiff)
             ->withProcessRuntime(3.);
 
+        $expectedMessage = 'Mutator: LogicalAnd|nMutation ID: mutantHash|nMutation result: killed by tests';
+
         yield 'nominal' => [
             false,
             $nominalExecutionResultBuilder
@@ -177,7 +179,7 @@ final class TeamCityTest extends TestCase
             '1A',
             'A',
             <<<TEAM_CITY
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}' duration='3000']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='{$expectedMessage}' details='{$escapedMutationDiff}' duration='3000']
 
                 TEAM_CITY,
         ];
@@ -190,7 +192,7 @@ final class TeamCityTest extends TestCase
             '1A',
             'A',
             <<<TEAM_CITY
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='timed out' details='{$escapedMutationDiff}' duration='3000']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='Mutator: LogicalAnd|nMutation ID: mutantHash|nMutation result: timed out' details='{$escapedMutationDiff}' duration='3000']
 
                 TEAM_CITY,
         ];
@@ -203,7 +205,7 @@ final class TeamCityTest extends TestCase
             '1A',
             'A',
             <<<TEAM_CITY
-                ##teamcity[testFailed name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='timed out' details='{$escapedMutationDiff}' duration='3000']
+                ##teamcity[testFailed name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='Mutator: LogicalAnd|nMutation ID: mutantHash|nMutation result: timed out' details='{$escapedMutationDiff}' duration='3000']
 
                 TEAM_CITY,
         ];
@@ -216,7 +218,7 @@ final class TeamCityTest extends TestCase
             '1A',
             'A',
             <<<TEAM_CITY
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}' duration='5773']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='{$expectedMessage}' details='{$escapedMutationDiff}' duration='5773']
 
                 TEAM_CITY,
         ];
@@ -229,7 +231,7 @@ final class TeamCityTest extends TestCase
             '1A',
             'A',
             <<<TEAM_CITY
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}' duration='0']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='{$expectedMessage}' details='{$escapedMutationDiff}' duration='0']
 
                 TEAM_CITY,
         ];
