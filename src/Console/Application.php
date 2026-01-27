@@ -35,6 +35,8 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
+use Infection\Command\Debug\DebugTeamCityCommand;
+use Infection\Command\Debug\MockTeamCityCommand;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
@@ -105,17 +107,19 @@ final class Application extends BaseApplication
 
     protected function getDefaultCommands(): array
     {
-        Container::create()->getGit();
+        $fileSystem = Container::create()->getFileSystem();
 
         return array_merge(
             parent::getDefaultCommands(),
             [
                 new ConfigureCommand(),
+                new DebugTeamCityCommand(),
+                new MockTeamCityCommand($fileSystem),
                 new GitBaseReferenceCommand(),
                 new GitChangedFilesCommand(),
                 new GitChangedLinesCommand(),
                 new GitDefaultBaseCommand(),
-                new RunCommand(),
+                //new RunCommand(),
                 new DescribeCommand(),
                 new ListSourcesCommand(),
                 new MakeCustomMutatorCommand(),

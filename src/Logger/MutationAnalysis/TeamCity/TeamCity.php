@@ -43,6 +43,7 @@ use Infection\Mutant\MutantExecutionResult;
 use Infection\Mutation\Mutation;
 use function is_int;
 use function preg_replace;
+use function round;
 use function sprintf;
 use function str_contains;
 use function str_replace;
@@ -59,6 +60,8 @@ use function str_replace;
  */
 final readonly class TeamCity
 {
+    private const MILLISECONDS_PER_SECOND = 1000;
+
     // `|` must be escaped FIRST to avoid double-escaping.
     private const CHARACTERS_TO_ESCAPE = ['|', "'", "\n", "\r", '[', ']'];
 
@@ -121,6 +124,7 @@ final readonly class TeamCity
                 'name' => self::createTestName($mutation),
                 'nodeId' => $flowId,
                 'parentNodeId' => $parentFlowId,
+                'mutationId' => $mutation->getHash(),
             ],
         );
     }
@@ -137,9 +141,12 @@ final readonly class TeamCity
                 'nodeId' => $flowId,
                 'parentNodeId' => $parentFlowId,
                 // TODO: looks like this information is not used when the test is marked as successful or ignored :/
-                'message' => $executionResult->getDetectionStatus()->value,
+                'message' => sprintf(
+                    'Mutation result: %s',
+                    $executionResult->getDetectionStatus()->value,
+                ),
                 'details' => $executionResult->getMutantDiff(),
-                // 'duration' => $durationMs,
+                'duration' => self::getExecutionDurationInMs($executionResult),
             ],
         );
     }
@@ -248,5 +255,15 @@ final readonly class TeamCity
         }
 
         return $escapedValue;
+    }
+
+    private static function getExecutionDurationInMs(MutantExecutionResult $executionResult): string
+    {
+        // TODO: this is actually incorrect! Or is it?
+        //  this could be either the (singular) process, but what about:
+        //  - the other processes executed prior?
+        //  - the time taken by the heuristics?
+        //  - the waiting time in-between being generated and processes?
+        return (string) round($executionResult->getProcessRuntime() * self::MILLISECONDS_PER_SECOND);
     }
 }

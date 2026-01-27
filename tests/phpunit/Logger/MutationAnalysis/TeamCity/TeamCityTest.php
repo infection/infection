@@ -162,19 +162,74 @@ final class TeamCityTest extends TestCase
             PHP_DIFF;
         $escapedMutationDiff = '--- Original|n+++ Mutated|n@@ @@|n-$a = 10;|n+$a = 20;';
 
-        yield [
+        $nominalExecutionResultBuilder = MutantExecutionResultBuilder::withMinimalTestData()
+            ->withMutatorClass(LogicalAndMutator::class)
+            ->withMutatorName(MutatorName::getName(LogicalAndMutator::class))
+            ->withMutantHash('mutantHash')
+            ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
+            ->withMutantDiff($mutationDiff)
+            ->withProcessRuntime(3.);
+
+        yield 'nominal' => [
             false,
-            MutantExecutionResultBuilder::withMinimalTestData()
-                ->withMutatorClass(LogicalAndMutator::class)
-                ->withMutatorName(MutatorName::getName(LogicalAndMutator::class))
-                ->withMutantHash('mutantHash')
-                ->withDetectionStatus(DetectionStatus::KILLED_BY_TESTS)
-                ->withMutantDiff($mutationDiff)
+            $nominalExecutionResultBuilder
                 ->build(),
             '1A',
             'A',
             <<<TEAM_CITY
-                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}']
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}' duration='3000']
+
+                TEAM_CITY,
+        ];
+
+        yield 'timed-out with timeouts NOT counting as escaped' => [
+            false,
+            $nominalExecutionResultBuilder
+                ->withDetectionStatus(DetectionStatus::TIMED_OUT)
+                ->build(),
+            '1A',
+            'A',
+            <<<TEAM_CITY
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='timed out' details='{$escapedMutationDiff}' duration='3000']
+
+                TEAM_CITY,
+        ];
+
+        yield 'timed-out with timeouts counting as escaped' => [
+            true,
+            $nominalExecutionResultBuilder
+                ->withDetectionStatus(DetectionStatus::TIMED_OUT)
+                ->build(),
+            '1A',
+            'A',
+            <<<TEAM_CITY
+                ##teamcity[testFailed name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='timed out' details='{$escapedMutationDiff}' duration='3000']
+
+                TEAM_CITY,
+        ];
+
+        yield 'with an evaluation process that took some time' => [
+            false,
+            $nominalExecutionResultBuilder
+                ->withProcessRuntime(5.772644996643066)
+                ->build(),
+            '1A',
+            'A',
+            <<<TEAM_CITY
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}' duration='5773']
+
+                TEAM_CITY,
+        ];
+
+        yield 'with an evaluation process that did not take any time (e.g. killed by an heuristic)' => [
+            false,
+            $nominalExecutionResultBuilder
+                ->withProcessRuntime(0.)
+                ->build(),
+            '1A',
+            'A',
+            <<<TEAM_CITY
+                ##teamcity[testFinished name='Infection\Mutator\Boolean\LogicalAnd (mutantHash)' nodeId='1A' parentNodeId='A' message='killed by tests' details='{$escapedMutationDiff}' duration='0']
 
                 TEAM_CITY,
         ];
