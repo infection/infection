@@ -37,12 +37,11 @@ namespace Infection\Mutation;
 
 use function count;
 use Infection\Event\EventDispatcher\EventDispatcher;
-use Infection\Event\MutableFileWasProcessed;
-use Infection\Event\MutationGenerationWasFinished;
-use Infection\Event\MutationGenerationWasStarted;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutableFileWasProcessed;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasFinished;
+use Infection\Event\Events\MutationAnalysis\MutationGeneration\MutationGenerationWasStarted;
 use Infection\Mutator\Mutator;
 use Infection\PhpParser\UnparsableFile;
-use Infection\PhpParser\Visitor\IgnoreNode\NodeIgnorer;
 use Infection\Source\Collector\SourceCollector;
 use Infection\Source\Exception\NoSourceFound;
 use Infection\TestFramework\Coverage\JUnit\TestFileNameNotFoundException;
@@ -77,7 +76,6 @@ class MutationGenerator
 
     /**
      * @param bool $onlyCovered Mutates only covered by tests lines of code
-     * @param NodeIgnorer[] $nodeIgnorers
      *
      * @throws UnparsableFile
      * @throws InvalidCoverage
@@ -89,7 +87,7 @@ class MutationGenerator
      *
      * @return iterable<Mutation>
      */
-    public function generate(bool $onlyCovered, array $nodeIgnorers): iterable
+    public function generate(bool $onlyCovered): iterable
     {
         $sources = $this->sourceCollector->collect();
         $numberOfFiles = count($sources);
@@ -101,7 +99,6 @@ class MutationGenerator
                 $source,
                 $onlyCovered,
                 $this->mutators,
-                $nodeIgnorers,
             );
 
             $this->eventDispatcher->dispatch(new MutableFileWasProcessed());

@@ -55,50 +55,50 @@ final class AssignCoalesceTest extends BaseMutatorTestCase
     public static function mutationsProvider(): iterable
     {
         yield 'Mutate coalesce when right part is a scalar value' => [
-            <<<'PHP'
-                <?php
-
-                $a['value'] ??= 'otherValue';
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a['value'] = 'otherValue';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] ??= 'otherValue';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = 'otherValue';
+                    PHP,
+            ),
         ];
 
         yield 'Mutate coalesce when right part is an expression' => [
-            <<<'PHP'
-                <?php
-
-                $a['value'] ??= 'other' . ' Value';
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a['value'] = 'other' . ' Value';
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] ??= 'other' . ' Value';
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = 'other' . ' Value';
+                    PHP,
+            ),
         ];
 
         yield 'Mutate coalesce when right part is a variable' => [
-            <<<'PHP'
-                <?php
-
-                $a['value'] ??= $var;
-                PHP,
-            <<<'PHP'
-                <?php
-
-                $a['value'] = $var;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] ??= $var;
+                    PHP,
+            ),
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = $var;
+                    PHP,
+            ),
         ];
 
         yield 'Does not mutate coalesce binary operator' => [
-            <<<'PHP'
-                <?php
-
-                $a['value'] = $foo ?? $bar;
-                PHP,
+            self::wrapCodeInMethod(
+                <<<'PHP'
+                    $a['value'] = $foo ?? $bar;
+                    PHP,
+            ),
         ];
     }
 }
