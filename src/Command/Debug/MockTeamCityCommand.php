@@ -36,29 +36,23 @@ declare(strict_types=1);
 namespace Infection\Command\Debug;
 
 use Closure;
+use function explode;
 use Infection\Command\BaseCommand;
-use Infection\Command\Git\Option\BaseOption;
-use Infection\Command\Git\Option\FilterOption;
 use Infection\Command\Option\ConfigurationOption;
 use Infection\Configuration\Configuration;
-use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
-use Infection\Process\Runner\InitialTestsFailed;
+use const PHP_EOL;
+use function sprintf;
+use const STDIN;
+use function stream_get_contents;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-use Webmozart\Assert\Assert;
-use function explode;
-use function sprintf;
-use function stream_get_contents;
-use function stream_select;
 use function usleep;
-use function var_dump;
-use const PHP_EOL;
-use const STDIN;
+use Webmozart\Assert\Assert;
 
 /**
  * @internal
@@ -66,6 +60,7 @@ use const STDIN;
 final class MockTeamCityCommand extends BaseCommand
 {
     private const LOG_FILE_PATH_ARGUMENT = 'log';
+
     private const TIME_IN_MICRO_SECONDS_OPTION = 'time';
 
     private const DEFAULT_TIME_IN_MICRO_SECONDS = 100;  // 1ms
@@ -82,7 +77,7 @@ final class MockTeamCityCommand extends BaseCommand
         // TODO: should be debug:mock-teamcity
         //  https://github.com/j-plugins/infection-plugin/issues/28
         parent::__construct('debug:mock-teamcity');
-        //parent::__construct('run');
+        // parent::__construct('run');
 
         $this->sleep = $sleep ?? usleep(...);
     }
@@ -96,21 +91,21 @@ final class MockTeamCityCommand extends BaseCommand
         );
         $this->setHelp(
             <<<HELP
-            This command will pick the provided log and output it as if it was the log it was emitting
-            
-            This is useful to debug or test how the Infection plugin behaves with a given log. For
-            making it a bit more realistic, some timings are applied in-between each log.
-            
-            Examples:
-            
-            ```shell
-            infection $name teamcity.log
-            # or
-            cat teamcity.log | infection $name
-            # or
-            infection $name < teamcity.log
-            ```
-            HELP,
+                This command will pick the provided log and output it as if it was the log it was emitting
+
+                This is useful to debug or test how the Infection plugin behaves with a given log. For
+                making it a bit more realistic, some timings are applied in-between each log.
+
+                Examples:
+
+                ```shell
+                infection $name teamcity.log
+                # or
+                cat teamcity.log | infection $name
+                # or
+                infection $name < teamcity.log
+                ```
+                HELP,
         );
 
         $this->addArgument(
@@ -151,7 +146,7 @@ final class MockTeamCityCommand extends BaseCommand
     {
         $path = $this->getLogFile($io);
 
-        yield from null === $path
+        yield from $path === null
             ? $this->getLinesFromStdin($io->getInput())
             : explode(
                 PHP_EOL,
@@ -168,7 +163,7 @@ final class MockTeamCityCommand extends BaseCommand
         $inputStream ??= STDIN;
 
         $contents = stream_get_contents($inputStream);
-        Assert::notFalse($contents,' Could not read the input stream.');
+        Assert::notFalse($contents, ' Could not read the input stream.');
 
         return explode(
             PHP_EOL,
@@ -183,7 +178,7 @@ final class MockTeamCityCommand extends BaseCommand
     {
         $path = $io->getInput()->getArgument(self::LOG_FILE_PATH_ARGUMENT);
 
-        if (null === $path) {
+        if ($path === null) {
             return null;
         }
 

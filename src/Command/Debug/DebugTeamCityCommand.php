@@ -35,6 +35,7 @@ declare(strict_types=1);
 
 namespace Infection\Command\Debug;
 
+use function explode;
 use Infection\Command\BaseCommand;
 use Infection\Command\Git\Option\BaseOption;
 use Infection\Command\Git\Option\FilterOption;
@@ -47,7 +48,6 @@ use Infection\Configuration\SourceFilter\IncompleteGitDiffFilter;
 use Infection\Console\IO;
 use Infection\Logger\ConsoleLogger;
 use Infection\Process\Runner\InitialTestsFailed;
-use function explode;
 
 /**
  * @internal
@@ -68,9 +68,9 @@ final class DebugTeamCityCommand extends BaseCommand
         ConfigurationOption::addOption($this);
         BaseOption::addOption($this);
         FilterOption::addOption($this);
-//        InitialTestsPhpOptionsOption::addOption($this);
-//        TestFrameworkOption::addOption($this);
-//        TestFrameworkOptionsOption::addOption($this);
+        //        InitialTestsPhpOptionsOption::addOption($this);
+        //        TestFrameworkOption::addOption($this);
+        //        TestFrameworkOptionsOption::addOption($this);
     }
 
     protected function executeCommand(IO $io): bool

@@ -170,6 +170,7 @@ final class TeamCityLogger implements MutationAnalysisLogger
 
         $this->write(
             $this->teamcity->testSuiteStarted(
+                location: $sourceFilePath,
                 name: $relativeSourceFilePath,
                 flowId: $flowId,
             ),

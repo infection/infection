@@ -86,6 +86,7 @@ final readonly class TeamCity
     }
 
     public function testSuiteStarted(
+        string $location,
         string $name,
         string $flowId,
     ): string {
@@ -95,6 +96,10 @@ final readonly class TeamCity
                 'name' => $name,
                 'nodeId' => $flowId,
                 'parentNodeId' => '0',
+                'locationHint' => sprintf(
+                    'file://%s',
+                    $location,
+                ),
             ],
         );
     }
@@ -144,10 +149,10 @@ final readonly class TeamCity
                 // TODO: looks like this information is not used when the test is marked as successful or ignored :/
                 'message' => sprintf(
                     <<<'MESSAGE'
-                    Mutator: %s
-                    Mutation ID: %s
-                    Mutation result: %s
-                    MESSAGE,
+                        Mutator: %s
+                        Mutation ID: %s
+                        Mutation result: %s
+                        MESSAGE,
                     $executionResult->getMutatorName(),
                     $executionResult->getMutantHash(),
                     $executionResult->getDetectionStatus()->value,

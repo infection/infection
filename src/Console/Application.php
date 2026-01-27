@@ -35,12 +35,12 @@ declare(strict_types=1);
 
 namespace Infection\Console;
 
-use Infection\Command\Debug\DebugTeamCityCommand;
-use Infection\Command\Debug\MockTeamCityCommand;
 use function array_merge;
 use function class_exists;
 use Composer\InstalledVersions;
 use Infection\Command\ConfigureCommand;
+use Infection\Command\Debug\DebugTeamCityCommand;
+use Infection\Command\Debug\MockTeamCityCommand;
 use Infection\Command\DescribeCommand;
 use Infection\Command\Git\GitBaseReferenceCommand;
 use Infection\Command\Git\GitChangedFilesCommand;
